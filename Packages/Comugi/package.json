@@ -1,0 +1,14 @@
+{
+  "name": "ga.fuquna.comugi",
+  "version": "0.0.0",
+  "displayName": "Comugi",
+  "description": "Codebased MUlti Gui Interface",
+  "unity": "2020.3",
+  "dependencies": {
+ },
+  "author": {
+    "name": "fuqunaga",
+    "email": "fukhid@gmail.com",
+    "url": "https://fuquna.ga"
+  }
+}

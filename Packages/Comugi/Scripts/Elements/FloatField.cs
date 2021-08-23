@@ -1,7 +1,7 @@
 ﻿namespace Comugi
 {
-    public class FloatField : ValueElement<float>
+    public class FloatField : FieldBase<float>
     {
-        public FloatField(BinderBase<float> binder) : base(binder) { }
+        public FloatField(Label label, BinderBase<float> binder) : base(label, binder) { }
     }
 }

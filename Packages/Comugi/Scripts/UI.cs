@@ -34,7 +34,11 @@ namespace Comugi
 
         public static Element Field(Label label, IBinder binder)
         {
-            var element = BinderToElement.CreateElement(binder);
+#if true
+
+            return BinderToElement.CreateElement(label, binder);
+#else
+            var element = BinderToElement.CreateElement(label, binder);
             if (element == null) return null;
 
             if (label != null)
@@ -47,12 +51,13 @@ namespace Comugi
             SetInteractableWithBinder(element, binder);
 
             return element;
+#endif
         }
 
-        #endregion
+#endregion
 
 
-        #region Slider
+#region Slider
 
         public static Element Slider(Expression<Func<int>> targetExpression, int min = 0, int max = 100, Action<int> onValueChanged = null) => Slider<int>(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, min, max, onValueChanged);
         public static Element Slider(Expression<Func<float>> targetExpression, float min = 0f, float max = 1f, Action<float> onValueChanged = null) => Slider<float>(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, min, max, onValueChanged);
@@ -73,7 +78,7 @@ namespace Comugi
 
         public static Element Slider(Label label, IBinder binder, IMinMaxGetter minMaxGetter)
         {
-            var contents = binder.CreateSliderElement(minMaxGetter);
+            var contents = BinderToElement.CreateSliderElement(label, binder, minMaxGetter);
             if (contents == null) return null;
 
             var element = label == null
@@ -85,18 +90,18 @@ namespace Comugi
             return element;
         }
 
-        #endregion
+#endregion
 
 
-        #region Button
+#region Button
 
         public static ButtonElement Button(string name, Action onClick) => new ButtonElement(ConstGetter.Create(name), onClick);
         public static ButtonElement Button(Func<string> readName, Action onClick) => new ButtonElement(Getter.Create(readName), onClick);
 
-        #endregion
+#endregion
 
 
-        #region List
+#region List
 
 
         public static Element List<TItem, TValue>(Label label, List<TItem> list, Func<TItem, TValue> readItemValue, Action<TItem, TValue> onItemValueChanged, Func<TItem, string> createItemLabel = null)
@@ -133,14 +138,14 @@ namespace Comugi
                 createItemElementIBinder = (ibinder, itemLabel) => createItemElement(ibinder as BinderBase<T>, itemLabel);
             }
 
-            var element = BinderToElement.CreateListElement(ConstGetter.Create(list), createItemElementIBinder);
+            var element = BinderToElement.CreateListElement(label, ConstGetter.Create(list), createItemElementIBinder);
             return Fold(label, element);
 
         }
 
-        #endregion
+#endregion
 
-        #region Dropdown
+#region Dropdown
 
 
 
@@ -148,12 +153,11 @@ namespace Comugi
 
         public static Element Dropdown(Label label, Expression<Func<int>> targetExpression, IEnumerable<string> options, Action<int> onValueChanged = null)
         {
-            var optionsGetter = ConstGetter.Create(options);
             var binder = ExpressionUtility.CreateBinder(targetExpression);
             if (binder == null) return null;
             binder.onValueChanged += onValueChanged;
 
-            Element element = new Dropdown(binder, optionsGetter);
+            Element element = new Dropdown(label, binder, options);
 
             if (label != null) element = Row(label, element);
 
@@ -162,32 +166,32 @@ namespace Comugi
             return element;
         }
 
-        #endregion
+#endregion
 
-        #region Row/Column
+#region Row/Column
 
         public static Row Row(params Element[] elements) => new Row(elements);
         public static Row Row(IEnumerable<Element> elements) => new Row(elements);
         public static Column Column(params Element[] elements) => new Column(elements);
         public static Column Column(IEnumerable<Element> elements) => new Column(elements);
 
-        #endregion
+#endregion
 
-        #region Fold
+#region Fold
 
         public static FoldElement Fold(Label label, params Element[] elements) => Fold(label, elements as IEnumerable<Element>);
         public static FoldElement Fold(Label label, IEnumerable<Element> elements) => new FoldElement(label, Column(elements));
 
-        #endregion
+#endregion
 
-        #region Window
+#region Window
 
         public static Window Window(params Element[] elements) => new Window(elements);
         public static Window Window(IEnumerable<Element> elements) => new Window(elements);
 
-        #endregion
+#endregion
 
-        #region FindObject
+#region FindObject
 
         public static DynamicElement FindObjectObserverElement<T>(bool rebuildIfDisabled = true)
             where T : Behaviour, IElementCreator
@@ -226,7 +230,7 @@ namespace Comugi
         }
 
 
-        #endregion
+#endregion
 
 
         static void SetInteractableWithBinder(Element element, IBinder binder) => element.interactableSelf = !binder.IsReadOnly;

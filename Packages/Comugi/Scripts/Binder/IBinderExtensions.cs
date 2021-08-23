@@ -99,47 +99,6 @@ namespace Comugi
             return ret;
         }
 
-        public static Element CreateSliderElement(this IBinder binder, IMinMaxGetter minMaxGetter)
-        {
-            switch (binder)
-            {
-                case BinderBase<int> ib: return new IntSlider(ib, minMaxGetter as IGetter<(int, int)>);
-                case BinderBase<float> ib: return new FloatSlider(ib, minMaxGetter as IGetter<(float, float)>);
-
-                default:
-                    return CreateMemberSliderElement(binder, minMaxGetter);
-            }
-        }
-
-
-        static Element CreateMemberSliderElement(IBinder binder, IMinMaxGetter minMaxGetter)
-        {
-#if false
-            var valueType = binder.ValueType;
-            var elements = TypeUtility.GetSerializableFieldNames(valueType)
-                .Select(memberName =>
-                {
-                    var memberBinder = PropertyOrFieldBinder.CreateWithBinder(binder, memberName);
-                    var memberMinMaxGetter = PropertyOrFieldMinMaxGetter.Create(minMaxGetter, memberName);
-                    var elementGroups = UI.Slider(memberName, memberBinder, memberMinMaxGetter);
-
-                    return elementGroups;
-                });
-
-            /*
-            var ret = oneliner
-                ? new Row(elements)
-                : new Column(elements) as Element;
-
-                return ret;
-            */
-
-            return new Column(elements);
-#else
-            return null;
-#endif
-        }
-
 
 #if false
 

@@ -36,7 +36,7 @@ namespace Comugi.Test
                     UI.Label("By CreteElement()!"),
                     UI.Slider(() => floatValue)
                     );
-            }      
+            }
         }
 
         [Serializable]
@@ -93,48 +93,49 @@ namespace Comugi.Test
 
             var window = UI.Window(
 #if false
-                 UI.Slider(() => vector3Value, min:Vector3.zero, max:Vector3.one)
+                 UI.Field(() => intValue)
+                 , UI.Field(() => vector3Value)
 #else
                 UI.Label("Label")
-                , UI.Fold("Field usage"
-                    , UI.Field(() => floatValue)
-                    , UI.Field("CustomLabel", () => floatValue)
-                    , UI.Field(() => floatValue, onValueChanged: (f) => print($"{nameof(floatValue)} changed."))
-                    , UI.Field(() => floatValue + 1)                                                 // non-interactable if the expression is read-only, 
-                    , UI.Field(() => floatValue + 1, onValueChanged: (f) => floatValue = f - 1)      // interactable If onValuedChanged callback is present
-                )
+
                 , UI.Fold("Field allows any type"
                     , UI.Field(() => intValue)
                     , UI.Field(() => floatValue)
                     , UI.Field(() => stringValue)
                     , UI.Field(() => boolValue)
                     , UI.Field(() => enumValue)
-                    , UI.Field(() => vector3Value.x)
                     , UI.Field(() => vector3Value)
                     , UI.Field(() => vector4Value)
                     , UI.Field(() => simpleClass)
                     , UI.Field(() => complexClass)
                     , UI.Field(() => intList)
-                ).Close()
-                
+                )
+                , UI.Fold("Field usage"
+                    , UI.Field("CustomLabel", () => floatValue)
+                    , UI.Field("onValueChanged", () => floatValue, onValueChanged: (f) => print($"{nameof(floatValue)} changed."))
+                    , UI.Field(() => vector3Value.x) // public member
+                    , UI.Field(() => floatValue + 1) // non-interactable if the expression is read-only, 
+                    , UI.Field("Expression with onValueChanged", () => floatValue + 1, onValueChanged: (f) => floatValue = f - 1)      // interactable If onValuedChanged callback is present
+                )
 
                 , UI.Fold("Slider"
                     , UI.Slider(() => intValue)
                     , UI.Slider(() => floatValue)
-                    /*
-                    , UI.Slider(() => vector3Value,
-                        min: Vector3.zero,
-                        max: Vector3.one
-                        )
-                    */
-
-                    , UI.Row(
-                        UI.Label("LogSlider[WIP]"),
-                        new LogSlider(
-                            Binder.Create(() => transform.localScale.x, (v) => transform.localScale = Vector3.one * v),
-                            ConstGetter.Create((0.1f, 100f))
-                        )
+                /*
+                , UI.Slider(() => vector3Value,
+                    min: Vector3.zero,
+                    max: Vector3.one
                     )
+                */
+                /*
+                , UI.Row(
+                    UI.Label("LogSlider[WIP]"),
+                    new LogSlider(
+                        Binder.Create(() => transform.localScale.x, (v) => transform.localScale = Vector3.one * v),
+                        ConstGetter.Create((0.1f, 100f))
+                    )
+                )
+                */
                 ).Close()
 
                 , UI.Dropdown("Dropdown",

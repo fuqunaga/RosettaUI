@@ -8,21 +8,27 @@ namespace Comugi
 
     public static class BinderToElement
     {
-        public static Element CreateElement(IBinder binder)
+        public static Element CreateElement(Label label, IBinder binder)
         {
-            switch (binder)
+            var element = binder switch
             {
-                case BinderBase<int> bb: return new IntField(bb);
-                case BinderBase<float> bb: return new FloatField(bb);
-                case BinderBase<string> bb: return new StringField(bb);
-                case BinderBase<bool> bb: return new BoolField(bb);
-                case IGetter<IList> ig: return CreateListElement(ig);
+                BinderBase<int> bb => new IntField(label, bb),
+                BinderBase<float> bb => new FloatField(label, bb),
+                BinderBase<string> bb => new StringField(label, bb),
+                BinderBase<bool> bb => new BoolField(label, bb),
+                IGetter<IList> ig => CreateListElement(label, ig),
+                _ => null
+            };
+
+            if (element != null)
+            {
+                return element;
             }
 
             var valueType = binder.ValueType;
             if (valueType.IsEnum)
             {
-                return CreateEnumElement(binder, valueType);
+                return CreateEnumElement(label, binder, valueType);
             }
 
 
@@ -38,9 +44,9 @@ namespace Comugi
             }
             else if (TypeUtility.HasSerializableField(valueType))
             {
-
-                createElementFunc = () => CreateMemberElement(binder, valueType);
+                createElementFunc = () => CreateMemberElement(label, binder, valueType);
             }
+
 
             if (createElementFunc != null)
             {
@@ -59,7 +65,7 @@ namespace Comugi
 
 
 
-        static readonly Element nullElement = BinderToElement.CreateElement(ConstBinder.Create("null")).SetInteractable(false);
+        static readonly Element nullElement = new StringField(null, ConstBinder.Create("null")).SetInteractable(false);
 
         static Element NullGuard(IGetter getter, Func<Element> createElement)
         {
@@ -84,16 +90,16 @@ namespace Comugi
             return ret;
         }
 
-        static Element CreateEnumElement(IBinder binder, Type valueType)
+        static Element CreateEnumElement(Label label, IBinder binder, Type valueType)
         {
             var binderType = typeof(EnumToIdxBinder<>).MakeGenericType(valueType);
             var enumToIdxBinder = Activator.CreateInstance(binderType, binder) as BinderBase<int>;
 
-            return new Dropdown(enumToIdxBinder, ConstGetter.Create(Enum.GetNames(valueType)));
+            return new Dropdown(label, enumToIdxBinder, Enum.GetNames(valueType));
         }
 
 
-        static Element CreateMemberElement(IBinder binder, Type valueType)
+        static Element CreateMemberElement(Label label, IBinder binder, Type valueType)
         {
             var elements = TypeUtility.GetSerializableFieldNames(valueType)
                 .Select(fieldName =>
@@ -104,16 +110,17 @@ namespace Comugi
                     return elementGroups;
                 });
 
-            var ret = binder.IsOneliner()
-                ? new Row(elements)
-                : new Column(elements) as Element;
+            if (!binder.IsOneliner())
+            {
+                elements = new[] { new Column(elements) };
+            }
 
-            return ret;
+            return new Row(new[] { label }.Concat(elements));
         }
 
-        public static Element CreateListElement(IGetter<IList> listBinder, Func<IBinder, string, Element> createItemElement = null)
+        public static Element CreateListElement(Label label, IGetter<IList> listBinder, Func<IBinder, string, Element> createItemElement = null)
         {
-            return NullGuard(
+            var nullGuard = NullGuard(
                 listBinder,
                 () => new DynamicElement(
                        build: () =>
@@ -131,6 +138,57 @@ namespace Comugi
                        $"ListEelements({nameof(DynamicElement)})"
                    )
                 );
+
+            return label != null
+                ? new Row(new[] { label, nullGuard })
+                : nullGuard;
+
         }
+
+
+        #region Slider
+        public static Element CreateSliderElement(Label label, IBinder binder, IMinMaxGetter minMaxGetter)
+        {
+            switch (binder)
+            {
+                case BinderBase<int> ib: return new IntSlider(label, ib, minMaxGetter as IGetter<(int, int)>);
+                case BinderBase<float> ib: return new FloatSlider(label, ib, minMaxGetter as IGetter<(float, float)>);
+
+                default:
+                    return CreateMemberSliderElement(binder, minMaxGetter);
+            }
+        }
+
+
+        static Element CreateMemberSliderElement(IBinder binder, IMinMaxGetter minMaxGetter)
+        {
+#if false
+            var valueType = binder.ValueType;
+            var elements = TypeUtility.GetSerializableFieldNames(valueType)
+                .Select(memberName =>
+                {
+                    var memberBinder = PropertyOrFieldBinder.CreateWithBinder(binder, memberName);
+                    var memberMinMaxGetter = PropertyOrFieldMinMaxGetter.Create(minMaxGetter, memberName);
+                    var elementGroups = UI.Slider(memberName, memberBinder, memberMinMaxGetter);
+
+                    return elementGroups;
+                });
+
+            /*
+            var ret = oneliner
+                ? new Row(elements)
+                : new Column(elements) as Element;
+
+                return ret;
+            */
+
+            return new Column(elements);
+#else
+            return null;
+#endif
+        }
+
+
+        #endregion
     }
 }

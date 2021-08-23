@@ -3,11 +3,15 @@
     /// <summary>
     /// 値を持ち外部と同期するElement
     /// </summary>
-    public class ValueElement<T> : ReadOnlyValueElement<T>
+    public abstract class FieldBase<T> : ReadOnlyField<T>
     {
        readonly BinderBase<T> binder;
 
-        public ValueElement(BinderBase<T> binder) : base(binder) => this.binder = binder;
+        public FieldBase(Label label, BinderBase<T> binder) : base(label, binder)
+        {
+            this.binder = binder;
+            interactableSelf = !binder.IsReadOnly;
+        }
 
 
         #region Internal

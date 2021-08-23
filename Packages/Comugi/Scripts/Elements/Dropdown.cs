@@ -2,15 +2,13 @@
 
 namespace Comugi
 {
-    public class Dropdown : ValueElement<int>
+    public class Dropdown : FieldBase<int>
     {
-        readonly IGetter<IEnumerable<string>> options;
+        public readonly IEnumerable<string> options;
 
-        public Dropdown(BinderBase<int> binder, IGetter<IEnumerable<string>> options) : base(binder)
+        public Dropdown(Label label, BinderBase<int> binder, IEnumerable<string> options) : base(label, binder)
         {
             this.options = options;
         }
-
-        public IEnumerable<string> Options => options.Get();
     }
 }

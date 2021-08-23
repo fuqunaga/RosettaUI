@@ -2,8 +2,8 @@
 
 namespace Comugi
 {
-    public class StringField : ValueElement<string>
+    public class StringField : FieldBase<string>
     {
-        public StringField(BinderBase<string> binder) : base(binder){ }
+        public StringField(Label label, BinderBase<string> binder) : base(label, binder) { }
     }
 }

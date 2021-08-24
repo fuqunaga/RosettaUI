@@ -59,6 +59,13 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.textcore": {
+      "version": "1.0.0-preview.3",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
     "com.unity.textmeshpro": {
       "version": "3.0.6",
       "depth": 0,
@@ -89,11 +96,57 @@
         "com.unity.modules.imgui": "1.0.0"
       }
     },
+    "com.unity.ui": {
+      "version": "1.0.0-preview.16",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "nuget.moq": "1.0.0",
+        "nuget.castle-core": "1.0.1",
+        "com.unity.modules.uielementsnative": "1.0.0",
+        "com.unity.textcore": "1.0.0-preview.3"
+      },
+      "url": "https://packages.unity.com"
+    },
     "ga.fuquna.comugi": {
       "version": "file:Comugi",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}
+    },
+    "ga.fuquna.comugi.ugui": {
+      "version": "file:Comugi.UGUI",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.ugui": "1.0.0",
+        "ga.fuquna.comugi": "0.0.0"
+      }
+    },
+    "ga.fuquna.comugi.uitoolkit": {
+      "version": "file:Comugi.UIToolkit",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.ui": "1.0.0-preview.16",
+        "ga.fuquna.comugi": "0.0.0"
+      }
+    },
+    "nuget.castle-core": {
+      "version": "1.0.1",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "nuget.moq": {
+      "version": "1.0.0",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "nuget.castle-core": "1.0.1"
+      },
+      "url": "https://packages.unity.com"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

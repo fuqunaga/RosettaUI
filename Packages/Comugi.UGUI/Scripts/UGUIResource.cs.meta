@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: dd0cb2687d11f584dba539471aa7401e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - panel: {fileID: 344627633388179737, guid: 2115a2a53c65916468fa4f7344d1a41e, type: 3}
+  - label: {fileID: 174860557759460178, guid: 122cf0d2f00d8084da4628eea28a3517, type: 3}
+  - button: {fileID: 5952798223695865969, guid: 6d5cca354add35541982a41dcce2ba12,
+      type: 3}
+  - inputField: {fileID: 906307849094652917, guid: e562256640bb4d94cbf9c609c4bd3192,
+      type: 3}
+  - dropdown: {fileID: 8878199243071489276, guid: ef4f33a4183965945a1bfdc356ea3609,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -4,7 +4,7 @@ namespace Comugi
 {
     public abstract class Slider<T> : FieldBase<T>
     {
-        public Slider(Label label, BinderBase<T> binder, IGetter<(T,T)> minMaxGetter) : base(label, binder)
+        public Slider(LabelElement label, BinderBase<T> binder, IGetter<(T,T)> minMaxGetter) : base(label, binder)
         {
             this.minMaxGetter = minMaxGetter;
         }

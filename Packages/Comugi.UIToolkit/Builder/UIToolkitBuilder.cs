@@ -4,18 +4,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+using UILabel = UnityEngine.UIElements.Label;
+
 namespace Comugi.UIToolkit
 {
     public static class UIToolkitBuilder
     {
         static readonly Dictionary<Type, Func<Element, VisualElement>> buildFuncs = new Dictionary<Type, Func<Element, VisualElement>>()
         {
-            [typeof(Comugi.Window)] = (e) => Build_ElementGroup(new Window(), e)
+            [typeof(WindowElement)] = Build_Window,
             /*
             [typeof(Panel)] = (e) => Build_ElementGroup(e, resource.panel),
             [typeof(Row)] = Build_Row,
             [typeof(Column)] = Build_Column,
-            [typeof(Label)] = (e) => Build_Label((Label)e),
+            */
+            [typeof(LabelElement)] = Build_Label,
+            /*
             [typeof(IntField)] = Build_IntField,
             [typeof(FloatField)] = Build_FloatField,
             [typeof(StringField)] = Build_StringField,
@@ -30,17 +34,50 @@ namespace Comugi.UIToolkit
             */
         };
 
-        public static VisualElement Build(Element element)
+        static UIToolkitBuilder()
         {
-            if (buildFuncs.TryGetValue(element.GetType(), out var func))
-            {
-                return func(element);
-            }
-
-            return null;
+            ViewBridge.Init(SetActive, null, null, null, null, null /*SetInteractive, SetFoldOpen, SetLayout, Rebuild, Destroy*/);
         }
 
 
+        static readonly Dictionary<Element, VisualElement> elementToVisualElement = new Dictionary<Element, VisualElement>();
+        static VisualElement ElementToVisualElement(Element element)
+        {
+            elementToVisualElement.TryGetValue(element, out var ve);
+            return ve;
+        }
+
+        private static void SetActive(Element element, bool active)
+        {
+            var ve = ElementToVisualElement(element);
+            ve.visible = active;
+        }
+
+        public static VisualElement Build(Element element)
+        {
+            VisualElement ret = null;
+
+            if (buildFuncs.TryGetValue(element.GetType(), out var func))
+            {
+                var ve = func(element);
+                elementToVisualElement[element] = ve;
+
+                ret = ve;
+            }
+
+            return ret;
+        }
+
+
+
+        static VisualElement Build_Window(Element element)
+        {
+            var windowElement = (WindowElement)element;
+            var window = new Window();
+            window.closeButton.clicked += () => windowElement.enable = !windowElement.enable;
+
+            return Build_ElementGroup(window, element);
+        }
 
         private static VisualElement Build_ElementGroup(VisualElement container, Element element)
         {
@@ -54,5 +91,11 @@ namespace Comugi.UIToolkit
             return container;
         }
 
+
+        static VisualElement Build_Label(Element element)
+        {
+            var label = (LabelElement)element;
+            return new UILabel(label.GetInitialValue());
+        }
     }
 }

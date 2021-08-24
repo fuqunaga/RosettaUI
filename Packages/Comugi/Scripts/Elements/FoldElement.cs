@@ -2,7 +2,7 @@
 {
     public class FoldElement : ElementGroup
     {
-        public readonly Label title;
+        public readonly LabelElement title;
         public readonly Element contents;
 
 
@@ -23,7 +23,7 @@
         }
 
 
-        public FoldElement(Label title, Element contents)
+        public FoldElement(LabelElement title, Element contents)
         {
             this.title = title;
             this.contents = contents;

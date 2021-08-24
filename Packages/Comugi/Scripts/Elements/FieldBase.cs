@@ -7,7 +7,7 @@
     {
        readonly BinderBase<T> binder;
 
-        public FieldBase(Label label, BinderBase<T> binder) : base(label, binder)
+        public FieldBase(LabelElement label, BinderBase<T> binder) : base(label, binder)
         {
             this.binder = binder;
             interactableSelf = !binder.IsReadOnly;

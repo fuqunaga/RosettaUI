@@ -8,9 +8,9 @@ namespace Comugi
     /// </summary>
     public abstract class ReadOnlyField<T> : ReadOnlyValueElement<T>
     {
-        public Label label { get; protected set; }
+        public LabelElement label { get; protected set; }
 
-        public ReadOnlyField(Label label, IGetter<T> getter) : base(getter)
+        public ReadOnlyField(LabelElement label, IGetter<T> getter) : base(getter)
         {
             this.label = label;
         }

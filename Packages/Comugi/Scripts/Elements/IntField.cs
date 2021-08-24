@@ -4,6 +4,6 @@ namespace Comugi
 {
     public class IntField : FieldBase<int>
     {
-        public IntField(Label label, BinderBase<int> binder) : base(label, binder) { }
+        public IntField(LabelElement label, BinderBase<int> binder) : base(label, binder) { }
     }
 }

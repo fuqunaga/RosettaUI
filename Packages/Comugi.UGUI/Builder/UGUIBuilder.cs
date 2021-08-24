@@ -15,11 +15,11 @@ namespace Comugi.UGUI.Builder
 
         static readonly Dictionary<Type, Func<Element, GameObject>> buildFuncs = new Dictionary<Type, Func<Element, GameObject>>()
         {
-            [typeof(Window)] = (e) => Build_ElementGroup(e, resource.window),
+            [typeof(WindowElement)] = (e) => Build_ElementGroup(e, resource.window),
             [typeof(Panel)] = (e) => Build_ElementGroup(e, resource.panel),
             [typeof(Row)] = Build_Row,
             [typeof(Column)] = Build_Column,
-            [typeof(Label)] = (e) => Build_Label((Label)e),
+            [typeof(LabelElement)] = (e) => Build_Label((LabelElement)e),
             [typeof(IntField)] = Build_IntField,
             [typeof(FloatField)] = Build_FloatField,
             [typeof(StringField)] = Build_StringField,

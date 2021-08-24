@@ -2,6 +2,6 @@
 {
     public class FloatField : FieldBase<float>
     {
-        public FloatField(Label label, BinderBase<float> binder) : base(label, binder) { }
+        public FloatField(LabelElement label, BinderBase<float> binder) : base(label, binder) { }
     }
 }

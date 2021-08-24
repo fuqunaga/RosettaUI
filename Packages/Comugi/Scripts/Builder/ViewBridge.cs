@@ -5,12 +5,12 @@ namespace Comugi
 {
     public static class ViewBridge
     {
-        static Action<Element, bool> setActiveImpl;
-        static Action<Element, bool> setInteractiveImpl;
-        static Action<FoldElement, bool> setFoldOpenImpl;
-        static Action<Element, Layout> setLayoutImpl;
-        static Action<Element> rebuildImpl;
-        static Action<Element> destroyImpl;
+        static event Action<Element, bool> setActiveImpl;
+        static event Action<Element, bool> setInteractiveImpl;
+        static event Action<FoldElement, bool> setFoldOpenImpl;
+        static event Action<Element, Layout> setLayoutImpl;
+        static event Action<Element> rebuildImpl;
+        static event Action<Element> destroyImpl;
 
         public static void Init(
             Action<Element, bool> setActive,
@@ -20,12 +20,12 @@ namespace Comugi
             Action<Element> rebuild, 
             Action<Element> destory)
         {
-            setActiveImpl = setActive;
-            setInteractiveImpl = setInteractive;
-            setFoldOpenImpl = setFoldOpen;
-            setLayoutImpl = setLayout;
-            rebuildImpl = rebuild;
-            destroyImpl = destory;
+            setActiveImpl += setActive;
+            setInteractiveImpl += setInteractive;
+            setFoldOpenImpl += setFoldOpen;
+            setLayoutImpl += setLayout;
+            rebuildImpl += rebuild;
+            destroyImpl += destory;
         }
 
   

@@ -8,7 +8,7 @@ namespace Comugi
 
     public static class BinderToElement
     {
-        public static Element CreateElement(Label label, IBinder binder)
+        public static Element CreateElement(LabelElement label, IBinder binder)
         {
             var element = binder switch
             {
@@ -90,7 +90,7 @@ namespace Comugi
             return ret;
         }
 
-        static Element CreateEnumElement(Label label, IBinder binder, Type valueType)
+        static Element CreateEnumElement(LabelElement label, IBinder binder, Type valueType)
         {
             var binderType = typeof(EnumToIdxBinder<>).MakeGenericType(valueType);
             var enumToIdxBinder = Activator.CreateInstance(binderType, binder) as BinderBase<int>;
@@ -99,7 +99,7 @@ namespace Comugi
         }
 
 
-        static Element CreateMemberElement(Label label, IBinder binder, Type valueType)
+        static Element CreateMemberElement(LabelElement label, IBinder binder, Type valueType)
         {
             var elements = TypeUtility.GetSerializableFieldNames(valueType)
                 .Select(fieldName =>
@@ -118,7 +118,7 @@ namespace Comugi
             return new Row(new[] { label }.Concat(elements));
         }
 
-        public static Element CreateListElement(Label label, IGetter<IList> listBinder, Func<IBinder, string, Element> createItemElement = null)
+        public static Element CreateListElement(LabelElement label, IGetter<IList> listBinder, Func<IBinder, string, Element> createItemElement = null)
         {
             var nullGuard = NullGuard(
                 listBinder,
@@ -147,7 +147,7 @@ namespace Comugi
 
 
         #region Slider
-        public static Element CreateSliderElement(Label label, IBinder binder, IMinMaxGetter minMaxGetter)
+        public static Element CreateSliderElement(LabelElement label, IBinder binder, IMinMaxGetter minMaxGetter)
         {
             switch (binder)
             {

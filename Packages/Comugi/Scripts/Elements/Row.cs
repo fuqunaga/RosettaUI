@@ -16,7 +16,7 @@ namespace Comugi
                 var elem = _elements?.FirstOrDefault();
                 return elem switch
                 {
-                    Label label => label,
+                    LabelElement label => label,
                     ElementGroup group => group.displayName,
                     _ => GetType().Name,
                 };

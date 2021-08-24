@@ -8,7 +8,7 @@ namespace Comugi.UGUI.Builder
     {
         static GameObject Build_Label(Element element, Element containerElement = null)
         {
-            var label = (Label)element;
+            var label = (LabelElement)element;
             var initialValue = label.GetInitialValue();
 
 

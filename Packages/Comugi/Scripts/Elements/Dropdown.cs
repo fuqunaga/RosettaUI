@@ -6,7 +6,7 @@ namespace Comugi
     {
         public readonly IEnumerable<string> options;
 
-        public Dropdown(Label label, BinderBase<int> binder, IEnumerable<string> options) : base(label, binder)
+        public Dropdown(LabelElement label, BinderBase<int> binder, IEnumerable<string> options) : base(label, binder)
         {
             this.options = options;
         }

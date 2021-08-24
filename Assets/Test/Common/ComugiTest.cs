@@ -58,6 +58,9 @@ namespace Comugi.Test
 
         #endregion
 
+
+        public KeyCode toggleRootElementKey = KeyCode.U;
+
         public int intValue;
         public float floatValue;
         public string stringValue;
@@ -71,6 +74,8 @@ namespace Comugi.Test
         public List<int> intList = new List<int>(new[] { 1, 2, 3 });
         public List<SimpleClass> classList = new List<SimpleClass>(new[] { new SimpleClass() { floatValue = 1f, stringValue = "First" } });
 
+
+        Element rootElement;
 
         private int privateValue;
         private int privateProperty { get; set; }
@@ -218,6 +223,16 @@ namespace Comugi.Test
 
 
             BuildElement(window);
+
+            rootElement = window;
+        }
+
+        void Update()
+        {
+            if ( Input.GetKeyDown(toggleRootElementKey))
+            {
+                rootElement.enable = !rootElement.enable;
+            }
         }
 
 

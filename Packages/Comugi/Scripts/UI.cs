@@ -13,8 +13,8 @@ namespace Comugi
     {
         #region Label
 
-        public static Label Label(Label label) => label; // use implicit operator of Label
-        public static Label Label(Func<string> readLabel) => readLabel;
+        public static LabelElement Label(LabelElement label) => label; // use implicit operator of Label
+        public static LabelElement Label(Func<string> readLabel) => readLabel;
 
         #endregion
 
@@ -23,7 +23,7 @@ namespace Comugi
 
         public static Element Field<T>(Expression<Func<T>> targetExpression, Action<T> onValueChanged = null) => Field(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, onValueChanged);
 
-        public static Element Field<T>(Label label, Expression<Func<T>> targetExpression, Action<T> onValueChanged = null)
+        public static Element Field<T>(LabelElement label, Expression<Func<T>> targetExpression, Action<T> onValueChanged = null)
         {
             var binder = ExpressionUtility.CreateBinder(targetExpression);
             if (binder == null) return null;
@@ -32,7 +32,7 @@ namespace Comugi
             return Field(label, binder);
         }
 
-        public static Element Field(Label label, IBinder binder)
+        public static Element Field(LabelElement label, IBinder binder)
         {
 #if true
 
@@ -65,10 +65,10 @@ namespace Comugi
         public static Element Slider<T>(Expression<Func<T>> targetExpression, T min, T max, Action<T> onValueChanged = null) => Slider<T>(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, min, max, onValueChanged);
 
 
-        public static Element Slider(Label label, Expression<Func<int>> targetExpression, int min = 0, int max = 100, Action<int> onValueChanged = null) => Slider<int>(label, targetExpression, min, max, onValueChanged);
-        public static Element Slider(Label label, Expression<Func<float>> targetExpression, float min = 0f, float max = 1f, Action<float> onValueChanged = null) => Slider<float>(label, targetExpression, min, max, onValueChanged);
+        public static Element Slider(LabelElement label, Expression<Func<int>> targetExpression, int min = 0, int max = 100, Action<int> onValueChanged = null) => Slider<int>(label, targetExpression, min, max, onValueChanged);
+        public static Element Slider(LabelElement label, Expression<Func<float>> targetExpression, float min = 0f, float max = 1f, Action<float> onValueChanged = null) => Slider<float>(label, targetExpression, min, max, onValueChanged);
 
-        public static Element Slider<T>(Label label, Expression<Func<T>> targetExpression, T min, T max, Action<T> onValueChanged = null)
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T min, T max, Action<T> onValueChanged = null)
         {
             var binder = ExpressionUtility.CreateBinder(targetExpression);
             if (binder == null) return null;
@@ -76,7 +76,7 @@ namespace Comugi
             return Slider(label, binder, ConstMinMaxGetter.Create((min, max)));
         }
 
-        public static Element Slider(Label label, IBinder binder, IMinMaxGetter minMaxGetter)
+        public static Element Slider(LabelElement label, IBinder binder, IMinMaxGetter minMaxGetter)
         {
             var contents = BinderToElement.CreateSliderElement(label, binder, minMaxGetter);
             if (contents == null) return null;
@@ -104,7 +104,7 @@ namespace Comugi
 #region List
 
 
-        public static Element List<TItem, TValue>(Label label, List<TItem> list, Func<TItem, TValue> readItemValue, Action<TItem, TValue> onItemValueChanged, Func<TItem, string> createItemLabel = null)
+        public static Element List<TItem, TValue>(LabelElement label, List<TItem> list, Func<TItem, TValue> readItemValue, Action<TItem, TValue> onItemValueChanged, Func<TItem, string> createItemLabel = null)
             where TItem : class
         {
             return List(label,
@@ -122,7 +122,7 @@ namespace Comugi
 
                     var itemLabel = ((createItemLabel != null) && !binder.IsNull)
                         ? Label(() => createItemLabel(binder.Get()))
-                        : (Label)defaultLabelString;
+                        : (LabelElement)defaultLabelString;
 
                     return Field(itemLabel, childBinder);
                 }
@@ -130,7 +130,7 @@ namespace Comugi
 
         }
 
-        public static Element List<T>(Label label, List<T> list, Func<BinderBase<T>, string, Element> createItemElement = null)
+        public static Element List<T>(LabelElement label, List<T> list, Func<BinderBase<T>, string, Element> createItemElement = null)
         {
             Func<IBinder, string, Element> createItemElementIBinder = null;
             if (createItemElement != null)
@@ -151,7 +151,7 @@ namespace Comugi
 
         public static Element Dropdown(Expression<Func<int>> targetExpression, IEnumerable<string> options, Action<int> onValueChanged = null) => Dropdown(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, options, onValueChanged);
 
-        public static Element Dropdown(Label label, Expression<Func<int>> targetExpression, IEnumerable<string> options, Action<int> onValueChanged = null)
+        public static Element Dropdown(LabelElement label, Expression<Func<int>> targetExpression, IEnumerable<string> options, Action<int> onValueChanged = null)
         {
             var binder = ExpressionUtility.CreateBinder(targetExpression);
             if (binder == null) return null;
@@ -179,15 +179,15 @@ namespace Comugi
 
 #region Fold
 
-        public static FoldElement Fold(Label label, params Element[] elements) => Fold(label, elements as IEnumerable<Element>);
-        public static FoldElement Fold(Label label, IEnumerable<Element> elements) => new FoldElement(label, Column(elements));
+        public static FoldElement Fold(LabelElement label, params Element[] elements) => Fold(label, elements as IEnumerable<Element>);
+        public static FoldElement Fold(LabelElement label, IEnumerable<Element> elements) => new FoldElement(label, Column(elements));
 
 #endregion
 
 #region Window
 
-        public static Window Window(params Element[] elements) => new Window(elements);
-        public static Window Window(IEnumerable<Element> elements) => new Window(elements);
+        public static WindowElement Window(params Element[] elements) => new WindowElement(elements);
+        public static WindowElement Window(IEnumerable<Element> elements) => new WindowElement(elements);
 
 #endregion
 

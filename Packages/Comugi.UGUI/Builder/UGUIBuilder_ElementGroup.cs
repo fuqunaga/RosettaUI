@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Comugi.Reactive;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,8 +11,6 @@ namespace Comugi.UGUI.Builder
         {
             return Build_ElementGroup(element, null, true, (go) => AddLayoutGroup<VerticalLayoutGroup>(go));
         }
-
-
 
 
         static GameObject Build_Row(Element element)
@@ -58,14 +57,16 @@ namespace Comugi.UGUI.Builder
             fold.SetTitleContents(titleGo.transform);
 
             // build contents
-            var contentsGo = Build(trans, contentsElement);
+            var contentsGo = impl.Build(contentsElement);
+            contentsGo.transform.SetParent(trans);
             fold.SetContents(contentsGo.transform);
 
             // set callback
             fold.onOpen.AddListener(() => foldElement.isOpen = true);
             fold.onClose.AddListener(() => foldElement.isOpen = false);
 
-            RegisterSetFoldOpen(foldElement, (isOpen) => fold.IsOpen = isOpen);
+            //RegisterSetFoldOpen(foldElement, (isOpen) => fold.IsOpen = isOpen);
+            foldElement.isOpenRx.Subscribe((isOpen) => fold.IsOpen = isOpen);
 
 
             return go;
@@ -81,10 +82,12 @@ namespace Comugi.UGUI.Builder
             var go = Instantiate(name, prefab);
             addComponentFunc?.Invoke(go);
 
+            var trans = go.transform;
             //elementGroup.BuildChildElements();
             foreach (var e in elementGroup.Elements)
             {
-                Build(go.transform, e);
+                var childGo = impl.Build(e);
+                childGo.transform.SetParent(trans);
             }
 
             return go;

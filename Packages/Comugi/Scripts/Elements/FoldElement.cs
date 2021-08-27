@@ -1,4 +1,6 @@
-﻿namespace Comugi
+﻿using Comugi.Reactive;
+
+namespace Comugi
 {
     public class FoldElement : ElementGroup
     {
@@ -6,20 +8,13 @@
         public readonly Element contents;
 
 
+        public readonly ReactiveProperty<bool> isOpenRx = new ReactiveProperty<bool>();
         protected bool _isOpen;
 
         public bool isOpen
         {
-            get => _isOpen;
-            set
-            {
-                if (_isOpen != value)
-                {
-                    _isOpen = value;
-                    contents.enable = _isOpen;
-                    ViewBridge.SetFoldOpen(this, _isOpen);
-                }
-            }
+            get => isOpenRx.Value;
+            set => isOpenRx.Value = value;
         }
 
 

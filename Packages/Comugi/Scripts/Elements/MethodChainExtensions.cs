@@ -10,7 +10,7 @@
 
         public static Element SetInteractable(this Element e, bool interactable)
         {
-            e.interactableSelf = interactable;
+            e.interactable = interactable;
             return e;
         }
 

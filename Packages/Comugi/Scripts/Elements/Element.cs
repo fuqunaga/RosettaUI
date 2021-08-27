@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Comugi.Reactive;
+using System;
 
 namespace Comugi
 {
@@ -10,56 +11,31 @@ namespace Comugi
     /// </summary>
     public abstract class Element
     {
-        public event Action<Element> onDestroy;
+        public readonly ReactiveProperty<bool> enableRx = new ReactiveProperty<bool>(true);
+        public readonly ReactiveProperty<bool> interactableRx = new ReactiveProperty<bool>(true);
+        public readonly ReactiveProperty<Layout> layoutRx = new ReactiveProperty<Layout>();
 
-        protected bool _enable = true;
+        public event Action<Element> onRebuild;
+        public event Action<Element> onDestroy;
 
         public bool enable
         {
-            get => _enable;
-            set
-            {
-                _enable = value;
-                ViewBridge.SetActive(this, _enable);
-            }
+            get => enableRx.Value;
+            set => enableRx.Value = value;
         }
 
-        protected bool _interactableSelf = true;
-
-        public bool IsInteractable => interactableSelf && (parentGroup?.IsInteractable ?? true);
-        public virtual bool interactableSelf
+        public bool interactable
         {
-            get => _interactableSelf;
-            set
-            {
-                if (_interactableSelf != value)
-                {
-                    _interactableSelf = value;
-                    NotifyInteractive();
-                }
-            }
+            get => interactableRx.Value;
+            set => interactableRx.Value = value;
         }
-
-        internal virtual void NotifyInteractive()
-        {
-            ViewBridge.SetInteractive(this, IsInteractable);
-        }
-
-
-        Layout _layout;
 
         public Layout layout
         {
-            get => _layout;
-            set
-            {
-                if (!_layout.Equals(value))
-                {
-                    _layout = value;
-                    ViewBridge.SetLayout(this, _layout);
-                }
-            }
+            get => layoutRx.Value;
+            set => layoutRx.Value = value;
         }
+
 
         public ElementGroup parentGroup { get; internal set; }
 
@@ -71,15 +47,7 @@ namespace Comugi
 
         protected virtual void UpdateInternal() { }
 
-        public void Rebuild()
-        {
-            ViewBridge.Rebuild(this);
-        }
-
-        public void Destroy()
-        {
-            onDestroy?.Invoke(this);
-            ViewBridge.Destroy(this);
-        }
+        public void Rebuild() => onRebuild?.Invoke(this);
+        public void Destroy() => onDestroy?.Invoke(this);
     }
 }

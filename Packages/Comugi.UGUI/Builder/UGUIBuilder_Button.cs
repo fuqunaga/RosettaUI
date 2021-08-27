@@ -23,7 +23,7 @@ namespace Comugi.UGUI.Builder
                 SetupTextUIWithStringReadOnlyValueElement(buttonElement, textUI);
             }
 
-            RegisterSetInteractable(buttonElement, button, textUI);
+            SubscribeInteractable(buttonElement, button, textUI);
 
             return go;
         }

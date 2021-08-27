@@ -83,7 +83,7 @@ namespace Comugi.UGUI
             UGUIBuilder.resource = resource;
             UGUIBuilder.settings = settings;
 
-            var go = UGUIBuilder.Build(transform, element);
+            var go = UGUIBuilder.Build(element, transform);
             rootElementRect = go.transform as RectTransform;
             rootElement = element;
 

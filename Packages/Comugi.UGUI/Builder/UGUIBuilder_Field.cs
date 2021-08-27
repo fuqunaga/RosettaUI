@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Comugi.Reactive;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -34,7 +35,7 @@ namespace Comugi.UGUI.Builder
 
             boolField.RegisterSetValueToView((v) => toggle.isOn = v);
 
-            RegisterSetInteractable(element, (interactable) =>
+            element.interactableRx.Subscribe( (interactable) =>
             {
                 toggle.interactable = interactable;
 
@@ -106,7 +107,7 @@ namespace Comugi.UGUI.Builder
                 }
             });
 
-            RegisterSetInteractable(field, capturedInputFieldUI, capturedInputFieldUI.textComponent);
+            SubscribeInteractable(field, capturedInputFieldUI, capturedInputFieldUI.textComponent);
 
 
             return BuildField_AddLabelIfHas(go, field);

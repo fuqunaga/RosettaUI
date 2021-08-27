@@ -33,17 +33,6 @@ namespace Comugi
             }
         }
 
-
-        internal override void NotifyInteractive()
-        {
-            base.NotifyInteractive();
-
-            foreach (var e in _elements)
-            {
-                e.NotifyInteractive();
-            }
-        }
-
         protected override void UpdateInternal()
         {
             base.UpdateInternal();

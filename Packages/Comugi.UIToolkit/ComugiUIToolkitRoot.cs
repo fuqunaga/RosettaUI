@@ -9,6 +9,7 @@ namespace Comugi.UIToolkit
         UIDocument uiDocument;
         Element rootElement;
 
+        UIToolkitBuilder builder;
 
         void Update()
         {
@@ -27,7 +28,8 @@ namespace Comugi.UIToolkit
 
 
             var root = uiDocument.rootVisualElement;
-            root.Add(UIToolkitBuilder.Build(element));
+            if (builder == null) builder = new UIToolkitBuilder();
+            root.Add(builder.Build(element));
         }
     }
 }

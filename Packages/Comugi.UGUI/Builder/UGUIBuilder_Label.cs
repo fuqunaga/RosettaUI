@@ -1,6 +1,7 @@
 ﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Comugi.Reactive;
 
 namespace Comugi.UGUI.Builder
 {
@@ -53,7 +54,7 @@ namespace Comugi.UGUI.Builder
                 stringElement.RegisterSetValueToView((s) => textUI.text = s);
             }
 
-            RegisterSetInteractable(stringElement, (interactable) =>
+            stringElement.interactableRx.Subscribe((interactable) =>
             {
                 var theme = settings.theme;
 

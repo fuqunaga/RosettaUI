@@ -32,7 +32,7 @@ namespace Comugi.UGUI.Builder
             dropdown.onValueChanged.AddListener(dropdownElement.OnViewValueChanged);
 
             dropdownElement.RegisterSetValueToView((v) => dropdown.value = v);
-            RegisterSetInteractable(element, dropdown, dropdown.captionText);
+            SubscribeInteractable(element, dropdown, dropdown.captionText);
 
             return BuildField_AddLabelIfHas(go, dropdownElement);
         }

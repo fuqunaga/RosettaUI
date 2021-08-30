@@ -4,19 +4,24 @@ using System;
 namespace Comugi
 {
     /// <summary>
-    /// Comugiの基本単位
-    /// - UIの実装に依存しない
-    /// - ElementをもとにBuilderが実装依存のUI実体を作る
-    /// - アプリケーションはElement経由でUIにアクセスし、実体には触れない
+    /// Comugi's basic unit.
+    /// - UI implementation-independent
+    /// - Builder creates implementation-dependent UI entities based on Element
+    /// - Application accesses UI via Element, does not touch entities
     /// </summary>
-    public abstract class Element
+    public abstract partial class Element
     {
+        #region For Builder
+
         public readonly ReactiveProperty<bool> enableRx = new ReactiveProperty<bool>(true);
         public readonly ReactiveProperty<bool> interactableRx = new ReactiveProperty<bool>(true);
         public readonly ReactiveProperty<Layout> layoutRx = new ReactiveProperty<Layout>();
 
         public event Action<Element> onRebuild;
         public event Action<Element> onDestroy;
+
+        #endregion
+
 
         public bool enable
         {

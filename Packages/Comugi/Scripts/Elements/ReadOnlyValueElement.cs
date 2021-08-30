@@ -7,7 +7,16 @@ namespace Comugi
     /// </summary>
     public abstract class ReadOnlyValueElement<T> : Element
     {
+        #region For Builder
+
+        public event Action<T> setValueToView;
+        public T GetInitialValue() => getter.Get();
+
+        #endregion
+
+
         readonly IGetter<T> getter;
+
         public bool IsConst => getter.IsConst;
 
         public ReadOnlyValueElement(IGetter<T> getter)
@@ -24,16 +33,5 @@ namespace Comugi
                 setValueToView?.Invoke(getter.Get());
             }
         }
-
-
-        #region Internal
-
-        Action<T> setValueToView;
-
-        public void RegisterSetValueToView(Action<T> action) => setValueToView = action;
-
-        public T GetInitialValue() => getter.Get();
-
-        #endregion
     }
 }

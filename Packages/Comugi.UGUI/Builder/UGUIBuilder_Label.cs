@@ -51,7 +51,7 @@ namespace Comugi.UGUI.Builder
             textUI.color = settings.theme.labelColor;
             if (!stringElement.IsConst)
             {
-                stringElement.RegisterSetValueToView((s) => textUI.text = s);
+                stringElement.setValueToView += ((s) => textUI.text = s);
             }
 
             stringElement.interactableRx.Subscribe((interactable) =>

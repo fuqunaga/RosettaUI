@@ -79,7 +79,14 @@ namespace Comugi.UIToolkit
         static VisualElement Build_Label(Element element)
         {
             var label = (LabelElement)element;
-            return new UILabel(label.GetInitialValue());
+            var uiLabel = new UILabel(label.GetInitialValue());
+
+            if ( !label.IsConst)
+            {
+                label.setValueToView += (text) => uiLabel.text = text;
+            }
+
+            return uiLabel;
         }
 
         VisualElement Build_Fold(Element element)

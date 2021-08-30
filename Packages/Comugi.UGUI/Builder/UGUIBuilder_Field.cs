@@ -33,7 +33,10 @@ namespace Comugi.UGUI.Builder
 
             toggle.onValueChanged.AddListener(boolField.OnViewValueChanged);
 
-            boolField.RegisterSetValueToView((v) => toggle.isOn = v);
+            if (!boolField.IsConst)
+            {
+                boolField.setValueToView += ((v) => toggle.isOn = v);
+            }
 
             element.interactableRx.Subscribe( (interactable) =>
             {
@@ -96,16 +99,19 @@ namespace Comugi.UGUI.Builder
 
             var capturedInputFieldUI = inputFieldUI; // capture UI for lambda
 
-            field.RegisterSetValueToView((v) =>
+            if (!field.IsConst)
             {
-                var (success, viewValue) = tryParse(capturedInputFieldUI.text);
-                var isDifferent = !success || !(v?.Equals(viewValue) ?? (viewValue == null));
-
-                if (isDifferent)
+                field.setValueToView += ((v) =>
                 {
-                    capturedInputFieldUI.text = v?.ToString() ?? "";
-                }
-            });
+                    var (success, viewValue) = tryParse(capturedInputFieldUI.text);
+                    var isDifferent = !success || !(v?.Equals(viewValue) ?? (viewValue == null));
+
+                    if (isDifferent)
+                    {
+                        capturedInputFieldUI.text = v?.ToString() ?? "";
+                    }
+                });
+            }
 
             SubscribeInteractable(field, capturedInputFieldUI, capturedInputFieldUI.textComponent);
 

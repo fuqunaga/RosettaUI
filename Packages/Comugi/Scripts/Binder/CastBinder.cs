@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace Comugi
+namespace RosettaUI
 {
     public class CastBinder<TFrom, TTo> : ChildBinder<TFrom, TTo>
     {

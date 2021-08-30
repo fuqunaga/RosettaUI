@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 
-namespace Comugi.UGUI.Builder
+namespace RosettaUI.UGUI.Builder
 {
     [CreateAssetMenu(menuName = "UIIMirage/Create UGUIResource", order =1000)]
     public class UGUIResource : ScriptableObject

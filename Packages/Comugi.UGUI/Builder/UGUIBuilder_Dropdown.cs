@@ -2,7 +2,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace Comugi.UGUI.Builder
+namespace RosettaUI.UGUI.Builder
 {
     public static partial class UGUIBuilder
     {

@@ -2,7 +2,7 @@
 using UnityEngine.EventSystems;
 
 
-namespace Comugi.UGUI.Builder
+namespace RosettaUI.UGUI.Builder
 {
     [RequireComponent(typeof(RectTransform))]
     public class DragObject : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler

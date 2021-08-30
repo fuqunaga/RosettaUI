@@ -1,9 +1,7 @@
 {
-    "name": "Comugi.Test",
+    "name": "RosettaUI",
     "rootNamespace": "",
-    "references": [
-        "GUID:2b1b0416520827b409049c7e4d90bcc1"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Comugi
+namespace RosettaUI
 {
     public static class ConstMinMaxGetter
     {

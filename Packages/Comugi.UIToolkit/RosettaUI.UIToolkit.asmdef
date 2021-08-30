@@ -1,10 +1,9 @@
 {
-    "name": "Comugi.UGUI.Test",
+    "name": "RosettaUI.UIToolkit",
     "rootNamespace": "",
     "references": [
-        "GUID:2b1b0416520827b409049c7e4d90bcc1",
-        "GUID:ca866e500c1d74b4880b19a5e32a161f",
-        "GUID:ca20691888d75d9418d1e2b6c343b967"
+        "GUID:023ac9b81facd43ebbb2a6f1c6252835",
+        "GUID:2b1b0416520827b409049c7e4d90bcc1"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -2,7 +2,7 @@
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-namespace Comugi.UGUI.Builder
+namespace RosettaUI.UGUI.Builder
 {
     public class Fold : UIBehaviour
     {

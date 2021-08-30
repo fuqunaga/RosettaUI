@@ -1,6 +1,6 @@
-﻿using Comugi.Reactive;
+﻿using RosettaUI.Reactive;
 
-namespace Comugi
+namespace RosettaUI
 {
     public class FoldElement : ElementGroup
     {

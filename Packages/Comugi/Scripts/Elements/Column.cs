@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Comugi
+namespace RosettaUI
 {
     public class Column : ElementGroup
     {

@@ -1,10 +1,10 @@
-﻿using Comugi.Reactive;
+﻿using RosettaUI.Reactive;
 using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Comugi.UGUI.Builder
+namespace RosettaUI.UGUI.Builder
 {
     public static partial class UGUIBuilder
     {

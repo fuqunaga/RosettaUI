@@ -2,7 +2,7 @@
 using System.Reflection;
 using UnityEngine.Assertions;
 
-namespace Comugi.IL2CPP
+namespace RosettaUI.IL2CPP
 {
     internal interface IBinderCreatable
     {

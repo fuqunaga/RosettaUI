@@ -1,5 +1,5 @@
-using Comugi.Builder;
-using Comugi.Reactive;
+using RosettaUI.Builder;
+using RosettaUI.Reactive;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 
 using UILabel = UnityEngine.UIElements.Label;
 
-namespace Comugi.UIToolkit
+namespace RosettaUI.UIToolkit
 {
     public class UIToolkitBuilder : BuildFramework<VisualElement>
     {

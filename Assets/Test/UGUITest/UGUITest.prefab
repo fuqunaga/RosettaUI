@@ -121,7 +121,7 @@ GameObject:
   - component: {fileID: 2920888531832151978}
   - component: {fileID: 2920888531832151979}
   m_Layer: 0
-  m_Name: ComugiUGUITest
+  m_Name: RosettaUI_UGUITest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -154,6 +154,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99136c10ae093f64a9d05c35314cb778, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  toggleRootElementKey: 117
   intValue: 0
   floatValue: 0
   stringValue: 
@@ -222,7 +223,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5813498489188551332, guid: d7cde2e038598cc428421e756fce590e, type: 3}
       propertyPath: m_Name
-      value: ComugiUGUICanvas
+      value: RosettaUI_UGUICanvas
       objectReference: {fileID: 0}
     - target: {fileID: 5813498489188551387, guid: d7cde2e038598cc428421e756fce590e, type: 3}
       propertyPath: m_Pivot.x

@@ -2,7 +2,7 @@
 using UnityEngine;
 using Cursor = UnityEngine.UIElements.Cursor;
 
-namespace Comugi.UIToolkit
+namespace RosettaUI.UIToolkit
 {
     public enum CursorType
     {

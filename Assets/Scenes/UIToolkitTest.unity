@@ -308,7 +308,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 241753498078178854, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
       propertyPath: m_Name
-      value: ComugiUIToolkit
+      value: RosettaUI_UIToolkit
       objectReference: {fileID: 0}
     - target: {fileID: 6061266502516881229, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
       propertyPath: m_RootOrder
@@ -373,6 +373,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64be97541960a314cb06a4791af6ee15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  toggleRootElementKey: 117
   intValue: 0
   floatValue: 0
   stringValue: 

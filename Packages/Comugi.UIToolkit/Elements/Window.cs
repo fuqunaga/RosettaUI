@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 
-namespace Comugi.UIToolkit
+namespace RosettaUI.UIToolkit
 {
     public class Window : VisualElement
     {
@@ -29,7 +29,7 @@ namespace Comugi.UIToolkit
 
         #endregion
 
-        public static readonly string ussClassName = "comugi-window";
+        public static readonly string ussClassName = "rosettaui-window";
         readonly VisualElement _titleBarContainer = new VisualElement();
         readonly VisualElement _titleBarContainerRight = new VisualElement();
         readonly VisualElement _titleBarContainerLeft = new VisualElement();

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace Comugi.Builder
+namespace RosettaUI.Builder
 {
     public abstract class BuildFramework<UIObj>
     {
@@ -25,7 +25,7 @@ namespace Comugi.Builder
                 }
                 else
                 {
-                    Debug.LogError($"Comugi.Builder Unknown Type[{element.GetType()}].");
+                    Debug.LogError($"{GetType()}: Unknown Type[{element.GetType()}].");
                 }
             }
 

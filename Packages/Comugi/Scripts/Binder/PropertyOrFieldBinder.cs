@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Comugi
+namespace RosettaUI
 {
     // 型とフィールドかプロパティ名から生成されるBinder
     public static class PropertyOrFieldBinder

@@ -108,28 +108,28 @@
       },
       "url": "https://packages.unity.com"
     },
-    "ga.fuquna.comugi": {
+    "ga.fuquna.rosettaui": {
       "version": "file:Comugi",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}
     },
-    "ga.fuquna.comugi.ugui": {
+    "ga.fuquna.rosettaui.ugui": {
       "version": "file:Comugi.UGUI",
       "depth": 0,
       "source": "embedded",
       "dependencies": {
         "com.unity.ugui": "1.0.0",
-        "ga.fuquna.comugi": "0.0.0"
+        "ga.fuquna.rosettaui": "0.0.0"
       }
     },
-    "ga.fuquna.comugi.uitoolkit": {
+    "ga.fuquna.rosettaui.uitoolkit": {
       "version": "file:Comugi.UIToolkit",
       "depth": 0,
       "source": "embedded",
       "dependencies": {
         "com.unity.ui": "1.0.0-preview.16",
-        "ga.fuquna.comugi": "0.0.0"
+        "ga.fuquna.rosettaui": "0.0.0"
       }
     },
     "nuget.castle-core": {

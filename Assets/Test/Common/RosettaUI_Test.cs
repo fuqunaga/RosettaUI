@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Comugi.Test
+namespace RosettaUI.Test
 {
-    public abstract class ComugiTest : MonoBehaviour
+    public abstract class RosettaUI_Test : MonoBehaviour
     {
         #region Type Define
 

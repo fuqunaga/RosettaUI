@@ -1,12 +1,12 @@
 {
-  "name": "ga.fuquna.comugi.ugui",
+  "name": "ga.fuquna.rosettaui.ugui",
   "version": "0.0.0",
-  "displayName": "Comugi.UGUI",
-  "description": "COdebased MUlti Gui Interface for UGUI",
+  "displayName": "RosettaUI.UGUI",
+  "description": "Code-based multi gui interface for UGUI",
   "unity": "2020.3",
   "dependencies": {
       "com.unity.ugui": "1.0.0",
-      "ga.fuquna.comugi": "0.0.0"
+      "ga.fuquna.rosettaui": "0.0.0"
   },
   "author": {
     "name": "fuqunaga",

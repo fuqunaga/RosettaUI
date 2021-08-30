@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 
 
-namespace Comugi.IL2CPP
+namespace RosettaUI.IL2CPP
 {
     public static class IL2CPPUtility
     {

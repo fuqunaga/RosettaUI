@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Comugi
+namespace RosettaUI
 {
     public static class UICustom
     {

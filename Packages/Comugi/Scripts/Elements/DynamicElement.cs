@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Comugi
+namespace RosettaUI
 {
     /// <summary>
     /// 動的に内容が変化するElement

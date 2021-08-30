@@ -1,9 +1,9 @@
 ﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Comugi.Reactive;
+using RosettaUI.Reactive;
 
-namespace Comugi.UGUI.Builder
+namespace RosettaUI.UGUI.Builder
 {
     public static partial class UGUIBuilder
     {

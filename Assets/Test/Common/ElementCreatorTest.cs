@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 
-namespace Comugi.Test
+namespace RosettaUI.Test
 {
     public class ElementCreatorTest : MonoBehaviour, IElementCreator
     {

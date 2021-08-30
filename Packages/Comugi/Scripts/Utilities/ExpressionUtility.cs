@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 
 
-namespace Comugi
+namespace RosettaUI
 {
 
     public static class ExpressionUtility

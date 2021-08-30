@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Comugi.IL2CPP
+namespace RosettaUI.IL2CPP
 {
     public static class PropertyOrFieldGetterSetter_IL2CPP<TParent, TValue>
     {

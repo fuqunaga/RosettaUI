@@ -1,5 +1,5 @@
-﻿using Comugi.Builder;
-using Comugi.Reactive;
+﻿using RosettaUI.Builder;
+using RosettaUI.Reactive;
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
-namespace Comugi.UGUI.Builder
+namespace RosettaUI.UGUI.Builder
 {
     public static partial class UGUIBuilder
     {

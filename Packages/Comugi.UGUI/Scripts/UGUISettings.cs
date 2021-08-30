@@ -2,7 +2,7 @@
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-namespace Comugi.UGUI.Builder
+namespace RosettaUI.UGUI.Builder
 {
     [CreateAssetMenu(menuName = "UIIMirage/Create UGUISettings", order = 1000)]
     public class UGUISettings : ScriptableObject

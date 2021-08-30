@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Comugi
+namespace RosettaUI
 {
     public static class PropertyOrFieldGetterSetter<TParent, TValue>
     {

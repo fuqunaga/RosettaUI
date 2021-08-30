@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Comugi.UIToolkit
+namespace RosettaUI.UIToolkit
 {
     [RequireComponent(typeof(UIDocument))]
-    public class ComugiUIToolkitRoot : MonoBehaviour
+    public class RosettaUI_UIToolkitRoot : MonoBehaviour
     {
         UIDocument uiDocument;
         Element rootElement;

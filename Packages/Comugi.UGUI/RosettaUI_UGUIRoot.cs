@@ -1,13 +1,13 @@
-﻿using Comugi.UGUI.Builder;
+﻿using RosettaUI.UGUI.Builder;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Comugi.UGUI
+namespace RosettaUI.UGUI
 {
     [RequireComponent(typeof(Canvas))]
-    public class ComugiUGUIRoot : MonoBehaviour
+    public class RosettaUI_UGUIRoot : MonoBehaviour
     {
         public UGUIResource resource;
         public UGUISettings settings;

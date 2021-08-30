@@ -1,10 +1,10 @@
-﻿using Comugi.Reactive;
+﻿using RosettaUI.Reactive;
 using System;
 
-namespace Comugi
+namespace RosettaUI
 {
     /// <summary>
-    /// Comugi's basic unit.
+    /// RosettaUI's basic unit.
     /// - UI implementation-independent
     /// - Builder creates implementation-dependent UI entities based on Element
     /// - Application accesses UI via Element, does not touch entities

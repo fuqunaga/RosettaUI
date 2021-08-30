@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-namespace Comugi.UIToolkit
+namespace RosettaUI.UIToolkit
 {
     public static class CursorManager
     {

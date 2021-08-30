@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Comugi
+namespace RosettaUI
 {
     /// <summary>
     /// 値を持ち外部と同期するFieldElement

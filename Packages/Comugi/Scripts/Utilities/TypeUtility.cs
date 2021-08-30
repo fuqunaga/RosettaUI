@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace Comugi
+namespace RosettaUI
 {
     // None Generic Interface
     public static class TypeUtility

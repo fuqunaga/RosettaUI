@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Comugi
+namespace RosettaUI
 {
     /// <summary>
     /// 子供として複数の Element を持てる Element

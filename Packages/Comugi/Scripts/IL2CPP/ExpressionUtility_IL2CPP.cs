@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using UnityEngine;
 
-namespace Comugi.IL2CPP
+namespace RosettaUI.IL2CPP
 {
     public static class ExpressionUtility_IL2CPP
     {

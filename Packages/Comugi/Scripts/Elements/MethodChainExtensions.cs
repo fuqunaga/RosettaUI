@@ -1,4 +1,4 @@
-﻿namespace Comugi
+﻿namespace RosettaUI
 {
     public static class MethodChainExtensions 
     {

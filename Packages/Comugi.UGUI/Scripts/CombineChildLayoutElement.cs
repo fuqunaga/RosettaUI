@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Vector2 = UnityEngine.Vector2;
 
-namespace Comugi.UGUI.Builder
+namespace RosettaUI.UGUI.Builder
 {
     /// <summary>
     /// Child のRectTransformとLayoutElementのから自身のLayoutElementを求める

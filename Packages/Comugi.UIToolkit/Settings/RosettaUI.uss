@@ -1,4 +1,4 @@
-.comugi-window {
+.rosettaui-window {
 	min-width: 200px;
 	min-height: 200px;
 	background-color: rgba(45,45,45,0.9);
@@ -7,18 +7,18 @@
 	border-width: 4px;
 }
 
-.comugi-window__titlebar-container 
+.rosettaui-window__titlebar-container 
 {
 	flex-direction: row;
 }
 
-.comugi-window__titlebar-container__right
+.rosettaui-window__titlebar-container__right
 {
 	align-content: flex-end;
 	margin-left: auto;
 }
 
-.comugi-closebutton {
+.rosettaui-closebutton {
 	background-color: transparent;
 	border-width: 0;
 	border-radius: 0;

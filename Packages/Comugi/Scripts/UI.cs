@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Comugi
+namespace RosettaUI
 {
     /// <summary>
     /// Top level interface

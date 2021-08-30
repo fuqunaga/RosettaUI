@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 782f629a2df6243629ea8fe2873666a4, type: 3}
-  m_Name: ComugiDefaultPanelSettings
+  m_Name: RosettaUI_DefaultPanelSettings
   m_EditorClassIdentifier: 
   themeUss: {fileID: -4733365628477956816, guid: 5a5a80c8bd2a3294ca117e9b2bd6e704, type: 3}
   m_TargetTexture: {fileID: 0}

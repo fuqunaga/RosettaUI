@@ -1,12 +1,12 @@
-﻿using Comugi.Test;
+﻿using RosettaUI.Test;
 using UnityEngine;
 
-namespace Comugi.UGUI.Test
+namespace RosettaUI.UGUI.Test
 {
-    public class ComugiUGUITest : ComugiTest
+    public class RosettaUI_UGUITest : RosettaUI_Test
     {
         [SerializeField]
-        public ComugiUGUIRoot root;
+        public RosettaUI_UGUIRoot root;
 
         protected override void BuildElement(Element rootElement)
         {

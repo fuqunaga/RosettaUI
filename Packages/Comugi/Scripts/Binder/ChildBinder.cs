@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Comugi
+namespace RosettaUI
 {
     /// <summary>
     /// Binder, which targets a portion of the parents 

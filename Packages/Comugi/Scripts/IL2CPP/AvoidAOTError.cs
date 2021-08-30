@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Comugi.IL2CPP
+namespace RosettaUI.IL2CPP
 {
     /// <summary>
     /// AOTのエラーを回避するために使用するコードを書いておく

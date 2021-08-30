@@ -306,6 +306,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2920888531655970331, guid: 3ec1f7d78adf6dd4d9bfb6c1a2fb0b08, type: 3}
+      propertyPath: resource
+      value: 
+      objectReference: {fileID: 11400000, guid: 08ef7067831cec1458376cc6659ffc67, type: 2}
+    - target: {fileID: 2920888531655970331, guid: 3ec1f7d78adf6dd4d9bfb6c1a2fb0b08, type: 3}
+      propertyPath: settings
+      value: 
+      objectReference: {fileID: 11400000, guid: 711999d207c8c0143b390c253ade14b5, type: 2}
     - target: {fileID: 2920888532064321394, guid: 3ec1f7d78adf6dd4d9bfb6c1a2fb0b08, type: 3}
       propertyPath: m_Name
       value: UGUITest

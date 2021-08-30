@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 using UnityEngine.Assertions;
 
-namespace Comugi.IL2CPP
+namespace RosettaUI.IL2CPP
 {
     static class UnaryExpressionToBinder
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Comugi
+namespace RosettaUI
 {
     public abstract class Slider<T> : FieldBase<T>
     {

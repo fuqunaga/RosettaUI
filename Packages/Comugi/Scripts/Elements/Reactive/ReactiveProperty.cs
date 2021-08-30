@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 
-namespace Comugi.Reactive
+namespace RosettaUI.Reactive
 {
     public class ReactiveProperty<T> : IObservable<T>
     {

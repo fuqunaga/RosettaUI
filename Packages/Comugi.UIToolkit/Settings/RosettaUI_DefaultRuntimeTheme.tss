@@ -1,6 +1,7 @@
 
 @import url("/Packages/com.unity.ui/PackageResources/StyleSheets/Generated/DefaultCommonDark.uss.asset");
-@import url("Comugi.uss");
+@import url("RosettaUI.uss");
+
 
 
 

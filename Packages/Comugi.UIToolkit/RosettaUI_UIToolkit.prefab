@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2296522864914365321}
   - component: {fileID: 6882944272950959718}
   m_Layer: 0
-  m_Name: ComugiUIToolkit
+  m_Name: RosettaUI_UIToolkit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

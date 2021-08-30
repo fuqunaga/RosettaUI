@@ -1,7 +1,7 @@
 using System;
 
 
-namespace Comugi.Reactive
+namespace RosettaUI.Reactive
 {
 
     public class Observer<T> : IObserver<T>

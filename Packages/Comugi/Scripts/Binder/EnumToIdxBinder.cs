@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.Assertions;
 
-namespace Comugi
+namespace RosettaUI
 {
     public class EnumToIdxBinder<TFrom> : ChildBinder<TFrom, int>
     {

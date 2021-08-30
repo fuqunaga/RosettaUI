@@ -1,12 +1,12 @@
 {
-  "name": "ga.fuquna.comugi.uitoolkit",
+  "name": "ga.fuquna.rosettaui.uitoolkit",
   "version": "0.0.0",
-  "displayName": "Comugi.UIToolkit",
-  "description": "COdebased MUlti Gui Interface for UI Toolkit",
+  "displayName": "RosettaUI.UIToolkit",
+  "description": "Code-based multi gui interface for UI Toolkit",
   "unity": "2020.3",
   "dependencies": {
     "com.unity.ui": "1.0.0-preview.16",
-    "ga.fuquna.comugi": "0.0.0"
+    "ga.fuquna.rosettaui": "0.0.0"
   },
   "author": {
     "name": "fuqunaga",

@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace Comugi.UGUI.Builder
+namespace RosettaUI.UGUI.Builder
 {
     public static class PaddingHint
     {

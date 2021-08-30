@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Comugi.UIToolkit
+namespace RosettaUI.UIToolkit
 {
     public class CursorData : ScriptableObject
     {

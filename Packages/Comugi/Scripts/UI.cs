@@ -185,7 +185,7 @@ namespace RosettaUI
         #region Fold
 
         public static FoldElement Fold(LabelElement label, params Element[] elements) => Fold(label, elements as IEnumerable<Element>);
-        public static FoldElement Fold(LabelElement label, IEnumerable<Element> elements) => new FoldElement(label, Column(elements));
+        public static FoldElement Fold(LabelElement label, IEnumerable<Element> elements) => new FoldElement(label, elements);
 
         #endregion
 

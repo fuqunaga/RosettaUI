@@ -1,11 +1,14 @@
 ﻿using RosettaUI.Reactive;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace RosettaUI
 {
     public class FoldElement : ElementGroup
     {
         public readonly LabelElement title;
-        public readonly Element contents;
+        protected readonly List<Element> contents;
+        public IReadOnlyCollection<Element> Contents => contents;
 
 
         public readonly ReactiveProperty<bool> isOpenRx = new ReactiveProperty<bool>();
@@ -18,11 +21,11 @@ namespace RosettaUI
         }
 
 
-        public FoldElement(LabelElement title, Element contents)
+        public FoldElement(LabelElement title, IEnumerable<Element> contents)
         {
             this.title = title;
-            this.contents = contents;
-            SetElements(new Element[] { this.title, this.contents });
+            this.contents = contents.Where(e => e != null).ToList();
+            SetElements(new Element[] { this.title }.Concat(Contents));
         }
     }
 }

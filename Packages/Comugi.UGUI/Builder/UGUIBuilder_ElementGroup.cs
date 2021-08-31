@@ -40,8 +40,7 @@ namespace RosettaUI.UGUI.Builder
 
         static GameObject Build_Fold(Element element)
         {
-            var foldElement = element as FoldElement;
-            var contentsElement = foldElement.contents;
+            var foldElement = (FoldElement)element;
 
             var go = Instantiate(foldElement.title.GetInitialValue(), resource.fold);
             var trans = go.transform;
@@ -57,9 +56,15 @@ namespace RosettaUI.UGUI.Builder
             fold.SetTitleContents(titleGo.transform);
 
             // build contents
-            var contentsGo = impl.Build(contentsElement);
-            contentsGo.transform.SetParent(trans);
-            fold.SetContents(contentsGo.transform);
+            var column = Instantiate(nameof(FoldElement.Contents));
+            AddLayoutGroup<VerticalLayoutGroup>(column);
+            fold.SetContents(column.transform);
+
+            foreach (var content in foldElement.Contents)
+            {
+                var contentsGo = impl.Build(content);
+                contentsGo.transform.SetParent(column.transform);
+            }
 
             // set callback
             fold.onOpen.AddListener(() => foldElement.isOpen = true);

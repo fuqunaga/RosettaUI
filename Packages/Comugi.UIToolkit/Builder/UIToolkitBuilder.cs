@@ -67,7 +67,7 @@ namespace RosettaUI.UIToolkit
         {
             var elementGroup = (ElementGroup)element;
 
-            foreach(var e in elementGroup.Elements)
+            foreach (var e in elementGroup.Elements)
             {
                 container.Add(Build(e));
             }
@@ -81,7 +81,7 @@ namespace RosettaUI.UIToolkit
             var label = (LabelElement)element;
             var uiLabel = new UILabel(label.GetInitialValue());
 
-            if ( !label.IsConst)
+            if (!label.IsConst)
             {
                 label.setValueToView += (text) => uiLabel.text = text;
             }
@@ -97,7 +97,11 @@ namespace RosettaUI.UIToolkit
             var title = foldElement.title;
             fold.text = title.GetInitialValue();
 
-            fold.Add(Build(foldElement.contents));
+            foreach (var content in foldElement.Contents)
+            {
+                fold.Add(Build(content));
+            }
+
 
             foldElement.isOpenRx.Subscribe((isOpen) => fold.value = isOpen);
 

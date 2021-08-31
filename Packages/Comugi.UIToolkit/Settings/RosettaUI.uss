@@ -24,3 +24,14 @@
 	border-radius: 0;
 	align-self: flex-end;
 }
+
+
+.unity-base-field__input
+{
+	cursor: arrow;
+}
+
+.unity-base-field__label--with-dragger
+{
+	cursor: arrow:
+}

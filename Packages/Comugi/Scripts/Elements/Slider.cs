@@ -2,7 +2,7 @@
 
 namespace RosettaUI
 {
-    public abstract class Slider<T> : FieldBase<T>
+    public abstract class Slider<T> : FieldBaseElement<T>
     {
         public Slider(LabelElement label, BinderBase<T> binder, IGetter<(T,T)> minMaxGetter) : base(label, binder)
         {

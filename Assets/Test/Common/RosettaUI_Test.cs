@@ -62,6 +62,7 @@ namespace RosettaUI.Test
         public KeyCode toggleRootElementKey = KeyCode.U;
 
         public int intValue;
+        public uint uintValue;
         public float floatValue;
         public string stringValue;
         public bool boolValue;
@@ -105,6 +106,7 @@ namespace RosettaUI.Test
 
                 , UI.Fold("Field allows any type"
                     , UI.Field(() => intValue)
+                    , UI.Field(() => uintValue)
                     , UI.Field(() => floatValue)
                     , UI.Field(() => stringValue)
                     , UI.Field(() => boolValue)

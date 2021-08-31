@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-using UILabel = UnityEngine.UIElements.Label;
-
 namespace RosettaUI.UIToolkit
 {
     public class UIToolkitBuilder : BuildFramework<VisualElement>
@@ -27,11 +25,11 @@ namespace RosettaUI.UIToolkit
                 [typeof(Column)] = Build_Column,
                 */
                 [typeof(LabelElement)] = Build_Label,
-                [typeof(IntField)] = Build_IntField,
+                [typeof(IntFieldElement)] = Build_Field<int, IntegerField>,
+                [typeof(FloatFieldElement)] = Build_Field<float, FloatField>,
+                [typeof(StringFieldElement)] = Build_Field<string, TextField>,
+                [typeof(BoolFieldElement)] = Build_Field<bool, Toggle>,
                 /*
-                [typeof(FloatField)] = Build_FloatField,
-                [typeof(StringField)] = Build_StringField,
-                [typeof(BoolField)] = Build_BoolField,
                 [typeof(ButtonElement)] = Build_Button,
                 [typeof(Dropdown)] = Build_Dropdown,
                 [typeof(IntSlider)] = Build_IntSlider,
@@ -78,15 +76,20 @@ namespace RosettaUI.UIToolkit
 
         static VisualElement Build_Label(Element element)
         {
-            var label = (LabelElement)element;
-            var uiLabel = new UILabel(label.GetInitialValue());
+            var labelElement = (LabelElement)element;
+            var label = new Label(labelElement.GetInitialValue());
+            SetupLabelCallback(label, labelElement);
 
-            if (!label.IsConst)
+            return label;
+        }
+
+        static void SetupLabelCallback(Label label, LabelElement labelElement)
+        {
+            if (!labelElement.IsConst)
             {
-                label.setValueToView += (text) => uiLabel.text = text;
+                labelElement.setValueToView += (text) => label.text = text;
             }
 
-            return uiLabel;
         }
 
         VisualElement Build_Fold(Element element)
@@ -108,59 +111,21 @@ namespace RosettaUI.UIToolkit
             return fold;
         }
 
-
-        private static VisualElement Build_IntField(Element element)
+        static VisualElement Build_Field<T, TField>(Element element)
+            where TField : BaseField<T>, new()
         {
-            var fieldElement = (IntField)element;
-            var field = new IntegerField();
+            var fieldElement = (FieldBaseElement<T>)element;
+            var field = new TField();
             field.label = fieldElement.label.GetInitialValue();
+            SetupLabelCallback(field.labelElement, fieldElement.label);
+            
+
+            fieldElement.setValueToView += (v) => field.value = v;
             field.RegisterValueChangedCallback(ev => fieldElement.OnViewValueChanged(ev.newValue));
             return field;
+
         }
 
 
-#if false
-        static VisualElement Build_InputField<T>(FieldBase<T> field, GameObject prefab, TMP_InputField.ContentType contentType, Func<string, (bool, T)> tryParse, out TMP_InputField inputFieldUI)
-        {
-            var go = Instantiate(field, prefab);
-
-            inputFieldUI = go.GetComponentInChildren<TMP_InputField>();
-            inputFieldUI.contentType = contentType;
-            inputFieldUI.text = field.GetInitialValue()?.ToString();
-            inputFieldUI.pointSize = settings.fontSize;
-
-            inputFieldUI.colors = settings.theme.fieldColors;
-            inputFieldUI.selectionColor = settings.theme.selectionColor;
-            inputFieldUI.textComponent.color = settings.theme.textColor;
-
-            inputFieldUI.onValueChanged.AddListener((str) =>
-            {
-                var (success, v) = tryParse(str);
-                if (success)
-                {
-                    field.OnViewValueChanged(v);
-                }
-            }
-            );
-
-            var capturedInputFieldUI = inputFieldUI; // capture UI for lambda
-
-            field.RegisterSetValueToView((v) =>
-            {
-                var (success, viewValue) = tryParse(capturedInputFieldUI.text);
-                var isDifferent = !success || !(v?.Equals(viewValue) ?? (viewValue == null));
-
-                if (isDifferent)
-                {
-                    capturedInputFieldUI.text = v?.ToString() ?? "";
-                }
-            });
-
-            RegisterSetInteractable(field, capturedInputFieldUI, capturedInputFieldUI.textComponent);
-
-
-            return BuildField_AddLabelIfHas(go, field);
-        }
-#endif
     }
 }

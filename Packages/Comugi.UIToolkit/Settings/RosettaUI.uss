@@ -1,5 +1,5 @@
 .rosettaui-window {
-	min-width: 200px;
+	min-width: 400px;
 	min-height: 200px;
 	background-color: rgba(45,45,45,0.9);
 	position: absolute;

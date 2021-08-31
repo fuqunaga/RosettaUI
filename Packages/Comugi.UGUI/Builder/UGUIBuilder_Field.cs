@@ -10,23 +10,23 @@ namespace RosettaUI.UGUI.Builder
     {
         static GameObject Build_IntField(Element element)
         {
-            return Build_InputField((IntField)element, resource.inputField, TMP_InputField.ContentType.IntegerNumber, TryParseInt);
+            return Build_InputField((IntFieldElement)element, resource.inputField, TMP_InputField.ContentType.IntegerNumber, TryParseInt);
         }
         static GameObject Build_FloatField(Element element)
         {
-            return Build_InputField((FloatField)element, resource.inputField, TMP_InputField.ContentType.DecimalNumber, TryParseFloat);
+            return Build_InputField((FloatFieldElement)element, resource.inputField, TMP_InputField.ContentType.DecimalNumber, TryParseFloat);
         }
 
         static GameObject Build_StringField(Element element)
         {
-            return Build_InputField((StringField)element, resource.inputField, TMP_InputField.ContentType.Standard, str => (true, str));
+            return Build_InputField((StringFieldElement)element, resource.inputField, TMP_InputField.ContentType.Standard, str => (true, str));
         }
 
         static GameObject Build_BoolField(Element element)
         {
             var go = Instantiate(element, resource.toggle);
 
-            var boolField = element as BoolField;
+            var boolField = element as BoolFieldElement;
 
             var toggle = go.GetComponentInChildren<Toggle>();
             toggle.colors = settings.theme.fieldColors;
@@ -68,13 +68,13 @@ namespace RosettaUI.UGUI.Builder
             return (success, ret);
         }
 
-        static GameObject Build_InputField<T>(FieldBase<T> field, GameObject prefab, TMP_InputField.ContentType contentType, Func<string, (bool, T)> tryParse)
+        static GameObject Build_InputField<T>(FieldBaseElement<T> field, GameObject prefab, TMP_InputField.ContentType contentType, Func<string, (bool, T)> tryParse)
         {
             return Build_InputField(field, prefab, contentType, tryParse, out var _);
         }
 
 
-        static GameObject Build_InputField<T>(FieldBase<T> field, GameObject prefab, TMP_InputField.ContentType contentType, Func<string, (bool, T)> tryParse, out TMP_InputField inputFieldUI)
+        static GameObject Build_InputField<T>(FieldBaseElement<T> field, GameObject prefab, TMP_InputField.ContentType contentType, Func<string, (bool, T)> tryParse, out TMP_InputField inputFieldUI)
         {
             var go = Instantiate(field, prefab);
 
@@ -120,7 +120,7 @@ namespace RosettaUI.UGUI.Builder
         }
 
 
-        static GameObject BuildField_AddLabelIfHas<T>(GameObject go, FieldBase<T> field)
+        static GameObject BuildField_AddLabelIfHas<T>(GameObject go, FieldBaseElement<T> field)
         {
             var label = field.label;
             if (label != null)

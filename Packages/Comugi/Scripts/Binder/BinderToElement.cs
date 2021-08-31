@@ -12,10 +12,10 @@ namespace RosettaUI
         {
             var element = binder switch
             {
-                BinderBase<int> bb => new IntField(label, bb),
-                BinderBase<float> bb => new FloatField(label, bb),
-                BinderBase<string> bb => new StringField(label, bb),
-                BinderBase<bool> bb => new BoolField(label, bb),
+                BinderBase<int> bb => new IntFieldElement(label, bb),
+                BinderBase<float> bb => new FloatFieldElement(label, bb),
+                BinderBase<string> bb => new StringFieldElement(label, bb),
+                BinderBase<bool> bb => new BoolFieldElement(label, bb),
                 IGetter<IList> ig => CreateListElement(label, ig),
                 _ => null
             };
@@ -65,7 +65,7 @@ namespace RosettaUI
 
 
 
-        static readonly Element nullElement = new StringField(null, ConstBinder.Create("null")).SetInteractable(false);
+        static readonly Element nullElement = new StringFieldElement(null, ConstBinder.Create("null")).SetInteractable(false);
 
         static Element NullGuard(IGetter getter, Func<Element> createElement)
         {

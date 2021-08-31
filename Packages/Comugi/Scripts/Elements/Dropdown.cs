@@ -2,7 +2,7 @@
 
 namespace RosettaUI
 {
-    public class Dropdown : FieldBase<int>
+    public class Dropdown : FieldBaseElement<int>
     {
         public readonly IEnumerable<string> options;
 

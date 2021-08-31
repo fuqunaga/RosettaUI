@@ -27,7 +27,7 @@ namespace RosettaUI.UIToolkit
                 [typeof(Column)] = Build_Column,
                 */
                 [typeof(LabelElement)] = Build_Label,
-                //[typeof(IntField)] = Build_IntField,
+                [typeof(IntField)] = Build_IntField,
                 /*
                 [typeof(FloatField)] = Build_FloatField,
                 [typeof(StringField)] = Build_StringField,
@@ -104,14 +104,18 @@ namespace RosettaUI.UIToolkit
             return fold;
         }
 
-#if false
-        private static VisualElement Build_IntField(Element arg)
+
+        private static VisualElement Build_IntField(Element element)
         {
-            var field = new IntField();
+            var fieldElement = (IntField)element;
+            var field = new IntegerField();
+            field.label = fieldElement.label.GetInitialValue();
+            field.RegisterValueChangedCallback(ev => fieldElement.OnViewValueChanged(ev.newValue));
+            return field;
         }
 
 
-
+#if false
         static VisualElement Build_InputField<T>(FieldBase<T> field, GameObject prefab, TMP_InputField.ContentType contentType, Func<string, (bool, T)> tryParse, out TMP_InputField inputFieldUI)
         {
             var go = Instantiate(field, prefab);

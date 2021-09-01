@@ -3,6 +3,7 @@ using RosettaUI.Reactive;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -31,7 +32,9 @@ namespace RosettaUI.UIToolkit
                 [typeof(BoolFieldElement)] = Build_Field<bool, Toggle>,
                 /*
                 [typeof(ButtonElement)] = Build_Button,
-                [typeof(Dropdown)] = Build_Dropdown,
+                */
+                [typeof(DropdownElement)] = Build_Dropdown,
+                /*
                 [typeof(IntSlider)] = Build_IntSlider,
                 [typeof(FloatSlider)] = Build_FloatSlider,
                 [typeof(LogSlider)] = Build_LogSlider,
@@ -126,6 +129,23 @@ namespace RosettaUI.UIToolkit
 
         }
 
+        static VisualElement Build_Dropdown(Element element)
+        {
+            var dropdownElement = (DropdownElement)element;
+            var options = dropdownElement.options.ToList();
 
+            var field = new PopupField<string>(
+                options,
+                dropdownElement.GetInitialValue()
+                );
+
+            field.label = dropdownElement.label.GetInitialValue();
+            SetupLabelCallback(field.labelElement, dropdownElement.label);
+
+            dropdownElement.setValueToView += (v) => field.index = v;
+            field.RegisterValueChangedCallback(ev => dropdownElement.OnViewValueChanged(field.index));
+
+            return field;
+        }
     }
 }

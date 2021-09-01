@@ -29,7 +29,7 @@ namespace RosettaUI.UGUI.Builder
                 [typeof(StringFieldElement)] = Build_StringField,
                 [typeof(BoolFieldElement)] = Build_BoolField,
                 [typeof(ButtonElement)] = Build_Button,
-                [typeof(Dropdown)] = Build_Dropdown,
+                [typeof(DropdownElement)] = Build_Dropdown,
                 [typeof(IntSlider)] = Build_IntSlider,
                 [typeof(FloatSlider)] = Build_FloatSlider,
                 [typeof(LogSlider)] = Build_LogSlider,

@@ -95,7 +95,7 @@ namespace RosettaUI
             var binderType = typeof(EnumToIdxBinder<>).MakeGenericType(valueType);
             var enumToIdxBinder = Activator.CreateInstance(binderType, binder) as BinderBase<int>;
 
-            return new Dropdown(label, enumToIdxBinder, Enum.GetNames(valueType));
+            return new DropdownElement(label, enumToIdxBinder, Enum.GetNames(valueType));
         }
 
 

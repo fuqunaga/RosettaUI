@@ -162,9 +162,7 @@ namespace RosettaUI
             if (binder == null) return null;
             binder.onValueChanged += onValueChanged;
 
-            Element element = new Dropdown(label, binder, options);
-
-            if (label != null) element = Row(label, element);
+            Element element = new DropdownElement(label, binder, options);
 
             SetInteractableWithBinder(element, binder);
 

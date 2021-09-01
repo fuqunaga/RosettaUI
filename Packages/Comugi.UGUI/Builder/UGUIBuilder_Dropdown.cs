@@ -10,7 +10,7 @@ namespace RosettaUI.UGUI.Builder
         {
             var go = Instantiate(element, resource.dropdown);
 
-            var dropdownElement = element as Dropdown;
+            var dropdownElement = element as DropdownElement;
 
             var dropdown = go.GetComponentInChildren<TMP_Dropdown>();
             dropdown.colors = settings.theme.dropdownColors;

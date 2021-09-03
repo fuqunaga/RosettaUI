@@ -13,6 +13,7 @@ namespace RosettaUI
             var element = binder switch
             {
                 BinderBase<int> bb => new IntFieldElement(label, bb),
+                BinderBase<uint> bb => new IntFieldElement(label, new CastBinder<uint, int>(bb), true),
                 BinderBase<float> bb => new FloatFieldElement(label, bb),
                 BinderBase<string> bb => new StringFieldElement(label, bb),
                 BinderBase<bool> bb => new BoolFieldElement(label, bb),
@@ -44,7 +45,7 @@ namespace RosettaUI
             }
             else if (TypeUtility.HasSerializableField(valueType))
             {
-                createElementFunc = () => CreateMemberElement(label, binder, valueType);
+                createElementFunc = () => CreateCompositeFieldElement(label, binder, valueType);
             }
 
 
@@ -99,7 +100,7 @@ namespace RosettaUI
         }
 
 
-        static Element CreateMemberElement(LabelElement label, IBinder binder, Type valueType)
+        static Element CreateCompositeFieldElement(LabelElement label, IBinder binder, Type valueType)
         {
             var elements = TypeUtility.GetSerializableFieldNames(valueType)
                 .Select(fieldName =>
@@ -110,12 +111,9 @@ namespace RosettaUI
                     return elementGroups;
                 });
 
-            if (!binder.IsOneliner())
-            {
-                elements = new[] { new Column(elements) };
-            }
+            var contentsGroup = binder.IsOneliner() ? (ElementGroup)new Row(elements) : new Column(elements);
 
-            return new Row(new[] { label }.Concat(elements));
+            return new CompositeFieldElement(label, contentsGroup);
         }
 
         public static Element CreateListElement(LabelElement label, IGetter<IList> listBinder, Func<IBinder, string, Element> createItemElement = null)

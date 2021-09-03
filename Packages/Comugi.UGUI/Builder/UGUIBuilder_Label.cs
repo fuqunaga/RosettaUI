@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using RosettaUI.Reactive;
+using RosettaUI.Builder;
 
 namespace RosettaUI.UGUI.Builder
 {
@@ -29,7 +30,7 @@ namespace RosettaUI.UGUI.Builder
             if ( !isFixedSize)
             {
                 var hierarchyElement = containerElement ?? label;
-                if (hierarchyElement.IsPrefix())
+                if (hierarchyElement.IsCompositeFieldLabel())
                 {
                     layoutElement.preferredWidth -= hierarchyElement.GetIndent() * settings.paddingIndent;
                     go.name = $"{label.GetIndent()}";

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace RosettaUI.UIToolkit
 {
-    public class MathUtils
+    internal class MathUtils
     {
         // We cannot round to more decimals than 15 according to docs for System.Math.Round.
         private const int kMaxDecimals = 15;

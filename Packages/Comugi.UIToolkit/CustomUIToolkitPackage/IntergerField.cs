@@ -10,6 +10,8 @@ namespace RosettaUI.UIToolkit
     /// </summary>
     public class IntegerField : TextValueField<int>
     {
+        public bool isUnsigned { get; set; }
+
         // This property to alleviate the fact we have to cast all the time
         IntegerInput integerInput => (IntegerInput)textInputBase;
 
@@ -101,13 +103,14 @@ namespace RosettaUI.UIToolkit
         class IntegerInput : TextValueInput
         {
             IntegerField parentIntegerField => (IntegerField)parent;
+            bool isUnsigned => parentIntegerField.isUnsigned;
 
             internal IntegerInput()
             {
                 formatString = "#######0";
             }
 
-            protected override string allowedCharacters => "0123456789-";
+            protected override string allowedCharacters => isUnsigned ? "0123456789" : "0123456789-";
 
             public override void ApplyInputDeviceDelta(Vector3 delta, DeltaSpeed speed, int startValue)
             {
@@ -115,13 +118,17 @@ namespace RosettaUI.UIToolkit
                 float acceleration = NumericFieldDraggerUtility.Acceleration(speed == DeltaSpeed.Fast, speed == DeltaSpeed.Slow);
                 long v = StringToValue(text);
                 v += (long)Math.Round(NumericFieldDraggerUtility.NiceDelta(delta, acceleration) * sensitivity);
+
+                var intValue = MathUtils.ClampToInt(v);
+                if (isUnsigned) intValue = Mathf.Max(0, intValue);
+
                 if (parentIntegerField.isDelayed)
                 {
-                    text = ValueToString(MathUtils.ClampToInt(v));
+                    text = ValueToString(intValue);
                 }
                 else
                 {
-                    parentIntegerField.value = MathUtils.ClampToInt(v);
+                    parentIntegerField.value = intValue;
                 }
             }
 

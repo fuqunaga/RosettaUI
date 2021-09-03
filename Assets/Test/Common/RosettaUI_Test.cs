@@ -67,6 +67,7 @@ namespace RosettaUI.Test
         public string stringValue;
         public bool boolValue;
         public MyEnum enumValue;
+        public Vector2 vector2Value;
         public Vector3 vector3Value;
         public Vector4 vector4Value;
         public int dropDownIndex;
@@ -111,6 +112,7 @@ namespace RosettaUI.Test
                     , UI.Field(() => stringValue)
                     , UI.Field(() => boolValue)
                     , UI.Field(() => enumValue)
+                    , UI.Field(() => vector2Value)
                     , UI.Field(() => vector3Value)
                     , UI.Field(() => vector4Value)
                     , UI.Field(() => simpleClass)

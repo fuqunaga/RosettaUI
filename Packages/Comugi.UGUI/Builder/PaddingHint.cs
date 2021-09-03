@@ -36,28 +36,5 @@ namespace RosettaUI.UGUI.Builder
 
             return indent;
         }
-
-        public static bool IsPrefix(this Element label)
-        {
-            Element current = label;
-            var parent = current.parentGroup;
-            if (parent is FoldElement) return false;
-
-            while (parent != null)
-            {
-                if (parent is Row row)
-                {
-                    if (row.Elements.FirstOrDefault() != current)
-                    {
-                        return false;
-                    }
-                }
-
-                current = parent;
-                parent = current.parentGroup;
-            }
-
-            return true;
-        }
     }
 }

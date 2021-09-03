@@ -111,9 +111,19 @@ namespace RosettaUI
                     return elementGroups;
                 });
 
-            var contentsGroup = binder.IsOneliner() ? (ElementGroup)new Row(elements) : new Column(elements);
 
-            return new CompositeFieldElement(label, contentsGroup);
+            Element ret = null;
+            if ( binder.IsOneliner())
+            {
+                ret = new CompositeFieldElement(label, new Row(elements));
+            }
+            else
+            {
+                ret = new FoldElement(label, elements);
+
+            }
+
+            return ret;
         }
 
         public static Element CreateListElement(LabelElement label, IGetter<IList> listBinder, Func<IBinder, string, Element> createItemElement = null)

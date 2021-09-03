@@ -3,7 +3,9 @@ using System.Linq;
 
 namespace RosettaUI
 {
-
+    /// <summary>
+    /// A single line Field that combines multiple Fields
+    /// </summary>
     public class CompositeFieldElement : ElementGroup
     {
         public readonly LabelElement label;

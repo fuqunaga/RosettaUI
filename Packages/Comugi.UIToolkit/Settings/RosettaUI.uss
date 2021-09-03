@@ -43,7 +43,7 @@
 	min-width: 15px;
 	margin-left: 3px;
 	margin-right: 0px;
-	flex: 0 0 15px;
+	flex: 0 0 auto;
 }
 
 .rosettaui-row__contents--first > .unity-base-field__label

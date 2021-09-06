@@ -87,7 +87,7 @@ namespace RosettaUI
                 }
                 else
                 {
-                    const int oneLinerMaxCount = 4;
+                    const int oneLinerMaxCount = 3;
 
                     var fieldTypes = TypeUtility.GetSerializableFieldTypes(valueType).ToList();
                     ret = fieldTypes.Count <= oneLinerMaxCount && fieldTypes.All(IsSimpleType);

@@ -44,7 +44,14 @@ namespace RosettaUI.Builder
             var parent = element.parent;
             while(parent != null)
             {
-                if (parent is Row row && row.Elements.FirstOrDefault() != element)
+                ElementGroup parentGroup = parent switch
+                {
+                    Row r => r,
+                    CompositeFieldElement c => c,
+                    _ => null
+                };
+
+                if (parentGroup?.Elements.FirstOrDefault() != element)
                 {
                     return false;
                 }

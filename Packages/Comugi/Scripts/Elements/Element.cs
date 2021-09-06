@@ -42,7 +42,7 @@ namespace RosettaUI
         }
 
 
-        public ElementGroup parentGroup { get; internal set; }
+        public Element parent { get; internal set; }
 
 
         public virtual void Update()

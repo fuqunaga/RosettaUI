@@ -12,7 +12,11 @@ namespace RosettaUI
 
         public ReadOnlyFieldElement(LabelElement label, IGetter<T> getter) : base(getter)
         {
-            this.label = label;
+            if (label != null)
+            {
+                this.label = label;
+                label.parent = this;
+            }
         }
 
         protected override void UpdateInternal()

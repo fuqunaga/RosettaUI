@@ -5,8 +5,7 @@ using System.Linq;
 namespace RosettaUI
 {
     /// <summary>
-    /// 子供として複数の Element を持てる Element
-    /// リストの要素が増減した場合など動的にリビルドするときはコンストラクタで build function を登録する
+    /// 子供として任意の Element を持てる Element
     /// コンテンツが静的な場合は IEnumerable<Elements> を直接渡す
     /// </summary>
     public abstract class ElementGroup : Element
@@ -29,7 +28,7 @@ namespace RosettaUI
             _elements = elements.Where(e => e != null).ToList();
             foreach (var e in _elements)
             {
-                e.parentGroup = this;
+                e.parent = this;
             }
         }
 

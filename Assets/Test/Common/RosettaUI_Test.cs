@@ -32,8 +32,8 @@ namespace RosettaUI.Test
 
             public Element CreateElement()
             {
-                return UI.Column(
-                    UI.Label("By CreteElement()!"),
+                return UI.Row(
+                    UI.Label("By CreteElement()"),
                     UI.Slider(() => floatValue)
                     );
             }
@@ -72,6 +72,7 @@ namespace RosettaUI.Test
         public Vector4 vector4Value;
         public int dropDownIndex;
         public SimpleClass simpleClass;
+        public ElementCreator elementCreator;
         public ComplexClass complexClass;
         public List<int> intList = new List<int>(new[] { 1, 2, 3 });
         public List<SimpleClass> classList = new List<SimpleClass>(new[] { new SimpleClass() { floatValue = 1f, stringValue = "First" } });
@@ -104,7 +105,7 @@ namespace RosettaUI.Test
                  , UI.Field(() => vector3Value)
 #else
                 UI.Label("Label")
-
+                , UI.Field(() => intValue)
                 , UI.Fold("Field allows any type"
                     , UI.Field(() => intValue)
                     , UI.Field(() => uintValue)
@@ -116,8 +117,14 @@ namespace RosettaUI.Test
                     , UI.Field(() => vector3Value)
                     , UI.Field(() => vector4Value)
                     , UI.Field(() => simpleClass)
+                    , UI.Field(() => elementCreator)
                     , UI.Field(() => complexClass)
                     , UI.Field(() => intList)
+                    , UI.Fold("fold1"
+                        , UI.Fold("fold2"
+                            , UI.Field(() => intValue)
+                            )
+                        )
                 )
                 , UI.Fold("Field usage"
                     , UI.Field("CustomLabel", () => floatValue)

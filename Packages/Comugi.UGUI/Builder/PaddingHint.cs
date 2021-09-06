@@ -8,7 +8,7 @@ namespace RosettaUI.UGUI.Builder
         public static bool IsTopLevelRow(this Element element)
         {
             var ret = true;
-            var parent = element.parentGroup;
+            var parent = element.parent;
             while (parent != null)
             {
                 if (parent is Row)
@@ -17,7 +17,7 @@ namespace RosettaUI.UGUI.Builder
                     break;
                 }
 
-                parent = parent.parentGroup;
+                parent = parent.parent;
             }
 
             return ret;
@@ -27,11 +27,11 @@ namespace RosettaUI.UGUI.Builder
         public static int GetIndent(this Element element)
         {
             var indent = 0;
-            var parent = element.parentGroup;
+            var parent = element.parent;
             while(parent != null)
             {
                 if (parent is FoldElement) indent++;
-                parent = parent.parentGroup;
+                parent = parent.parent;
             }
 
             return indent;

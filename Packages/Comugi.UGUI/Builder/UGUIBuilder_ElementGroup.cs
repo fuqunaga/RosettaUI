@@ -101,7 +101,7 @@ namespace RosettaUI.UGUI.Builder
         static int CalcSelfIndent(Element element)
         {
             var indent = element.GetIndent();
-            var parent = element.parentGroup;
+            var parent = element.parent;
             while (parent != null)
             {
                 if (parent is Row)
@@ -110,7 +110,7 @@ namespace RosettaUI.UGUI.Builder
                     break;
                 }
 
-                parent = parent.parentGroup;
+                parent = parent.parent;
             }
 
             return indent;

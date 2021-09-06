@@ -1,3 +1,7 @@
+/********************************************************************************
+* Window Element
+********************************************************************************/
+
 .rosettaui-window 
 {
 	min-width: 400px;
@@ -6,6 +10,7 @@
 	position: absolute;
 	border-radius: 1px;
 	border-width: 4px;
+	padding-left: 15px;
 }
 
 .rosettaui-window__titlebar-container 
@@ -27,15 +32,22 @@
 	align-self: flex-end;
 }
 
+.unity-foldout--depth-1 > .unity-base-field > .unity-base-field__label
+{
+	margin-right: 2px;
+	padding-right: 2px;
+}
+
+/*
 .rosettaui-row
 {
 	flex-direction: row;
-	flex: 1 0 0;
+	flex: 1 0 auto;
 }
 
 .rosettaui-row > .unity-base-field
 {
-	flex: 1 0 0;
+	flex: 1 0 auto;
 }
 
 .rosettaui-row__contents > .unity-base-field__label
@@ -52,9 +64,18 @@
 	margin-right: 0px;
 	padding-left: 1px;
 }
+*/
 
 
-/* cursor */
+/********************************************************************************
+* override unity css
+********************************************************************************/
+
+.unity-foldout__toggle
+{
+	margin-left: -15px;
+}
+
 
 .unity-base-field__input
 {

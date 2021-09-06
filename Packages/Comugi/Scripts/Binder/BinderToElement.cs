@@ -41,13 +41,12 @@ namespace RosettaUI
             }
             else if (typeof(IElementCreator).IsAssignableFrom(valueType))
             {
-                createElementFunc = () => ((IElementCreator)binder.GetObject()).CreateElement();
+                createElementFunc = () => new FoldElement(label, new[] { ((IElementCreator)binder.GetObject()).CreateElement() });
             }
             else if (TypeUtility.HasSerializableField(valueType))
             {
-                createElementFunc = () => CreateCompositeFieldElement(label, binder, valueType);
+                 createElementFunc = () => CreateCompositeFieldElement(label, binder, valueType);
             }
-
 
             if (createElementFunc != null)
             {
@@ -154,7 +153,7 @@ namespace RosettaUI
         }
 
 
-        #region Slider
+#region Slider
         public static Element CreateSliderElement(LabelElement label, IBinder binder, IMinMaxGetter minMaxGetter)
         {
             switch (binder)
@@ -197,6 +196,6 @@ namespace RosettaUI
         }
 
 
-        #endregion
+#endregion
     }
 }

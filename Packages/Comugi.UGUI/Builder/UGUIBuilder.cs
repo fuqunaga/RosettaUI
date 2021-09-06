@@ -106,7 +106,7 @@ namespace RosettaUI.UGUI.Builder
                     Object.Destroy(go);
                 }
 
-                var parentGo = elementToUIObj[element.parentGroup];
+                var parentGo = elementToUIObj[element.parent];
                 var newGo = impl.Build(element);
                 newGo.transform.SetParent(parentGo.transform);
             }

@@ -40,7 +40,7 @@ namespace RosettaUI.UIToolkit
                 [typeof(LogSlider)] = Build_LogSlider,
                 */
                 [typeof(FoldElement)] = Build_Fold,
-                [typeof(DynamicElement)] = (e) => Build_ElementGroup(new VisualElement(), e)
+                [typeof(DynamicElement)] = (e) => Build_ElementGroup(new VisualElement() { name = nameof(DynamicElement)}, e),
             };
         }
 
@@ -112,10 +112,6 @@ namespace RosettaUI.UIToolkit
             if (contentsElement != null)
             {
                 var contents = Build(contentsElement);
-                if ( contents == null)
-                {
-                    Debug.Log("hoge");
-                }
                 contents.AddToClassList(FieldClassName.BaseFieldInput);
                 ve.Add(contents);
 
@@ -130,10 +126,6 @@ namespace RosettaUI.UIToolkit
 
             foreach (var e in elementGroup.Elements)
             {
-                if ( e == null)
-                {
-                    Debug.Log("hoge");
-                }
                 var ve = Build(e);
                 if (ve != null)
                 {
@@ -158,6 +150,16 @@ namespace RosettaUI.UIToolkit
 
         static void SetupLabelCallback(Label label, LabelElement labelElement)
         {
+            if (labelElement.IsLeftMost())
+            {
+                label.style.minWidth = Mathf.Max(0f, 150f - labelElement.GetIndent() * 15f);
+
+                // Foldout直下のラベルはmarginRight、paddingRightがUnityDefaultCommon*.uss で書き換わるので上書きしておく
+                // セレクタ例： .unity - foldout--depth - 1 > .unity - base - field > .unity - base - field__label
+                label.style.marginRight = 2f;
+                label.style.paddingRight = 2f;
+            }
+
             if (!labelElement.IsConst)
             {
                 labelElement.setValueToView += (text) => label.text = text;

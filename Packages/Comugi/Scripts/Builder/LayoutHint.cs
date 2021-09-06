@@ -7,12 +7,10 @@ namespace RosettaUI.Builder
     {
         public static bool IsCompositeFieldLabel(this Element element) => GetAncestorCompositeField(element)?.label == element;
 
-        public static bool IsCompositeFieldContents(this Element element) => GetAncestorCompositeField(element) != null;
-
         static CompositeFieldElement GetAncestorCompositeField(Element element)
         {
             Element current = element;
-            var parent = current.parentGroup;
+            var parent = current.parent;
 
             while (parent != null)
             {
@@ -22,9 +20,41 @@ namespace RosettaUI.Builder
                 }
 
                 current = parent;
-                parent = current.parentGroup;
+                parent = current.parent;
             }
             return null;
+        }
+
+
+        public static int GetIndent(this Element element)
+        {
+            var indent = 0;
+            var parent = element.parent;
+            while (parent != null)
+            {
+                if (parent is FoldElement) indent++;
+                parent = parent.parent;
+            }
+
+            return indent;
+        }
+
+        public static bool IsLeftMost(this Element element)
+        {
+            var parent = element.parent;
+            while(parent != null)
+            {
+                if (parent is Row row && row.Elements.FirstOrDefault() != element)
+                {
+                    return false;
+                }
+
+
+                element = parent;
+                parent = element.parent;
+            }
+
+            return true;
         }
     }
 }

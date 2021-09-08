@@ -280,6 +280,17 @@ namespace RosettaUI.UIToolkit
                         hasChanged = true;
                     }
                 }
+                // TextFieldからコピー
+                // 横並びの[IntergerField IntergerField]のようなケースで左右キーでフォーカスが移動してしまうので
+                // Navigationイベントを潰しておく
+                // Prevent duplicated navigation events, since we're observing KeyDownEvents instead
+                else if (evt.eventTypeId == NavigationSubmitEvent.TypeId() ||
+                         evt.eventTypeId == NavigationCancelEvent.TypeId() ||
+                         evt.eventTypeId == NavigationMoveEvent.TypeId())
+                {
+                    evt.StopPropagation();
+                    evt.PreventDefault();
+                }
 
                 if (!textValueFieldParent.isDelayed && hasChanged)
                 {

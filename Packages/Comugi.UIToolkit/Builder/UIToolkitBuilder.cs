@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace RosettaUI.UIToolkit
+namespace RosettaUI.UIToolkit.Builder
 {
     public class UIToolkitBuilder : BuildFramework<VisualElement>
     {
@@ -117,7 +117,6 @@ namespace RosettaUI.UIToolkit
             var ve = new VisualElement();
             ve.AddToClassList(FieldClassName.BaseField);
 
-
             var labelElement = compositeFieldElement.label;
             if (labelElement != null)
             {
@@ -132,7 +131,6 @@ namespace RosettaUI.UIToolkit
                 var contents = Build(contentsElement);
                 contents.AddToClassList(FieldClassName.BaseFieldInput);
                 ve.Add(contents);
-
             }
 
             return ve;

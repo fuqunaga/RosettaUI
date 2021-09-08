@@ -354,7 +354,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2296522864914365321, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
 --- !u!1 &1959795644732248772 stripped
 GameObject:
@@ -387,6 +388,8 @@ MonoBehaviour:
   simpleClass:
     floatValue: 0
     stringValue: 
+  elementCreator:
+    floatValue: 0
   complexClass:
     myEnumValue: 0
     vector3Value: {x: 0, y: 0, z: 0}

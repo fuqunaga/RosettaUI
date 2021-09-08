@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6061266502516881229}
   - component: {fileID: 8645983799860440562}
-  - component: {fileID: 2296522864914365321}
   - component: {fileID: 6882944272950959718}
   m_Layer: 0
   m_Name: RosettaUI_UIToolkit
@@ -49,18 +48,6 @@ MonoBehaviour:
   m_ParentUI: {fileID: 0}
   sourceAsset: {fileID: 0}
   m_SortingOrder: 0
---- !u!114 &2296522864914365321
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 241753498078178854}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: afe6c4600f907e64ca01409d01326a60, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &6882944272950959718
 MonoBehaviour:
   m_ObjectHideFlags: 0

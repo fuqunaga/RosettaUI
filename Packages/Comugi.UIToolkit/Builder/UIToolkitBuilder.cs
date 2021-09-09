@@ -231,6 +231,18 @@ namespace RosettaUI.UIToolkit.Builder
 
             return field;
 
+        static VisualElement Build_Button(Element element)
+        {
+            var buttonElement = (ButtonElement)element;
+
+            var button = new Button(buttonElement.onClick)
+            {
+                text = buttonElement.GetInitialValue(),
+            };
+
+            buttonElement.setValueToView += (str) => button.text = str;
+
+            return button;
         }
 
         static VisualElement Build_Dropdown(Element element)

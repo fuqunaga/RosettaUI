@@ -51,7 +51,7 @@ namespace RosettaUI.Builder
                     _ => null
                 };
 
-                if (parentGroup?.Elements.FirstOrDefault() != element)
+                if ((parentGroup != null) && (parentGroup.Elements.FirstOrDefault() != element))
                 {
                     return false;
                 }

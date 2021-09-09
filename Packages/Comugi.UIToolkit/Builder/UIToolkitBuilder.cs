@@ -19,8 +19,6 @@ namespace RosettaUI.UIToolkit.Builder
             public static readonly string Row = "rosettaui-row";
             public static readonly string RowContents = Row + "__contents";
             public static readonly string RowContentsFirst = RowContents + "--first";
-
-            public static readonly string CompositeField = "unity-composite-field";
         }
 
 
@@ -54,15 +52,13 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(FloatFieldElement)] = Build_Field<float, FloatField>,
                 [typeof(StringFieldElement)] = Build_Field<string, TextField>,
                 [typeof(BoolFieldElement)] = Build_Field<bool, Toggle>,
-                /*
-                [typeof(ButtonElement)] = Build_Button,
-                */
                 [typeof(DropdownElement)] = Build_Dropdown,
+                //[typeof(IntSlider)] = Build_IntSlider,
+                [typeof(FloatSliderElement)] = Build_FloatSlider,
                 /*
-                [typeof(IntSlider)] = Build_IntSlider,
-                [typeof(FloatSlider)] = Build_FloatSlider,
                 [typeof(LogSlider)] = Build_LogSlider,
                 */
+                [typeof(ButtonElement)] = Build_Button,
                 [typeof(FoldElement)] = Build_Fold,
                 [typeof(DynamicElement)] = (e) => Build_ElementGroup(new VisualElement() { name = nameof(DynamicElement) }, e),
             };
@@ -88,8 +84,7 @@ namespace RosettaUI.UIToolkit.Builder
 
         VisualElement Build_Row(Element element)
         {
-            var row = new VisualElement();
-            row.AddToClassList(FieldClassName.Row);
+            var row = CreateRowVisualElement();
 
             return Build_ElementGroup(row, element, (ve, i) =>
             {
@@ -99,6 +94,13 @@ namespace RosettaUI.UIToolkit.Builder
                     ve.AddToClassList(FieldClassName.RowContentsFirst);
                 }
             });
+        }
+
+        static VisualElement CreateRowVisualElement()
+        {
+            var row = new VisualElement();
+            row.AddToClassList(FieldClassName.Row);
+            return row;
         }
 
         VisualElement Build_Column(Element element)
@@ -230,6 +232,31 @@ namespace RosettaUI.UIToolkit.Builder
             field.RegisterValueChangedCallback(ev => fieldElement.OnViewValueChanged(ev.newValue));
 
             return field;
+        }
+
+
+        
+        VisualElement Build_FloatSlider(Element element)
+        {
+            var sliderElement = (FloatSliderElement)element;
+
+            var slider = Build_Field<float, Slider>(element);
+            slider.AddToClassList(FieldClassName.RowContentsFirst);
+
+            var field = new FloatField();
+            field.AddToClassList(FieldClassName.RowContents);
+
+            slider.RegisterValueChangedCallback((ev) => field.SetValueWithoutNotify(ev.newValue));
+            field.RegisterValueChangedCallback((ev) => slider.value = ev.newValue);
+
+            var row = CreateRowVisualElement();
+            row.Add(slider);
+            row.Add(field);
+
+            return row;
+        }
+
+
 
         static VisualElement Build_Button(Element element)
         {

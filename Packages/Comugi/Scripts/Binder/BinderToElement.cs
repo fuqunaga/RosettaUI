@@ -159,7 +159,7 @@ namespace RosettaUI
             switch (binder)
             {
                 case BinderBase<int> ib: return new IntSlider(label, ib, minMaxGetter as IGetter<(int, int)>);
-                case BinderBase<float> ib: return new FloatSlider(label, ib, minMaxGetter as IGetter<(float, float)>);
+                case BinderBase<float> ib: return new FloatSliderElement(label, ib, minMaxGetter as IGetter<(float, float)>);
 
                 default:
                     return CreateMemberSliderElement(binder, minMaxGetter);

@@ -86,13 +86,9 @@ namespace RosettaUI
             var contents = BinderToElement.CreateSliderElement(label, binder, minMaxGetter);
             if (contents == null) return null;
 
-            var element = label == null
-                ? contents
-                : Row(label, contents);
+            SetInteractableWithBinder(contents, binder);
 
-            SetInteractableWithBinder(element, binder);
-
-            return element;
+            return contents;
         }
 
         #endregion
@@ -150,6 +146,7 @@ namespace RosettaUI
 
         #endregion
 
+
         #region Dropdown
 
 
@@ -171,6 +168,7 @@ namespace RosettaUI
 
         #endregion
 
+
         #region Row/Column
 
         public static Row Row(params Element[] elements) => new Row(elements);
@@ -180,6 +178,7 @@ namespace RosettaUI
 
         #endregion
 
+
         #region Fold
 
         public static FoldElement Fold(LabelElement label, params Element[] elements) => Fold(label, elements as IEnumerable<Element>);
@@ -187,12 +186,14 @@ namespace RosettaUI
 
         #endregion
 
+
         #region Window
 
         public static WindowElement Window(params Element[] elements) => new WindowElement(elements);
         public static WindowElement Window(IEnumerable<Element> elements) => new WindowElement(elements);
 
         #endregion
+
 
         #region FindObject
 

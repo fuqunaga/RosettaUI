@@ -1,10 +1,34 @@
 /********************************************************************************
+* override unity css
+********************************************************************************/
+
+.unity-foldout__toggle
+{
+	margin-left: -15px;
+}
+
+.unity-base-field
+{
+	flex: 1 0 auto;
+}
+
+.unity-base-field__input
+{
+	cursor: arrow;
+}
+
+.unity-base-field__label--with-dragger
+{
+	cursor: arrow:
+}
+
+/********************************************************************************
 * Window Element
 ********************************************************************************/
 
 .rosettaui-window 
 {
-	min-width: 400px;
+	min-width: 500px;
 	min-height: 200px;
 	background-color: rgba(45,45,45,0.9);
 	position: absolute;
@@ -32,6 +56,9 @@
 	align-self: flex-end;
 }
 
+/********************************************************************************
+* Row
+********************************************************************************/
 
 .rosettaui-row
 {
@@ -42,6 +69,7 @@
 .rosettaui-row__contents
 {
 	margin: 0px;
+	flex-grow: 0;
 }
 
 .rosettaui-row__contents > .unity-base-field__label
@@ -90,26 +118,3 @@
 */
 
 
-/********************************************************************************
-* override unity css
-********************************************************************************/
-
-.unity-foldout__toggle
-{
-	margin-left: -15px;
-}
-
-.unity-base-field
-{
-	flex: 1 0 auto;
-}
-
-.unity-base-field__input
-{
-	cursor: arrow;
-}
-
-.unity-base-field__label--with-dragger
-{
-	cursor: arrow:
-}

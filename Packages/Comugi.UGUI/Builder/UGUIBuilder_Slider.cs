@@ -43,7 +43,7 @@ namespace RosettaUI.UGUI.Builder
             }
         }
 
-        static GameObject Build_FloatSlider(Element element) => Build_FloatSliderBase((FloatSlider)element, (f) => f, (f) => f);
+        static GameObject Build_FloatSlider(Element element) => Build_FloatSliderBase((FloatSliderElement)element, (f) => f, (f) => f);
 
 
         static GameObject Build_LogSlider(Element element)

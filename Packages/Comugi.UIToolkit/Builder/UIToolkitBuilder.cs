@@ -53,8 +53,8 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(StringFieldElement)] = Build_Field<string, TextField>,
                 [typeof(BoolFieldElement)] = Build_Field<bool, Toggle>,
                 [typeof(DropdownElement)] = Build_Dropdown,
-                //[typeof(IntSlider)] = Build_IntSlider,
-                [typeof(FloatSliderElement)] = Build_FloatSlider,
+                [typeof(IntSlider)] = Build_Slider<int, SliderInt, IntegerField>,
+                [typeof(FloatSliderElement)] = Build_Slider<float, Slider, FloatField>,
                 /*
                 [typeof(LogSlider)] = Build_LogSlider,
                 */
@@ -234,16 +234,17 @@ namespace RosettaUI.UIToolkit.Builder
             return field;
         }
 
-
-        
-        VisualElement Build_FloatSlider(Element element)
+        static VisualElement Build_Slider<T, TSlider, TField>(Element element)
+            where T : IComparable<T>
+            where TSlider : BaseSlider<T>, new()
+            where TField : BaseField<T>, new()
         {
-            var sliderElement = (FloatSliderElement)element;
+            var sliderElement = (Slider<T>)element;
 
-            var slider = Build_Field<float, Slider>(element);
+            var slider = Build_Field<T, TSlider>(element);
             slider.AddToClassList(FieldClassName.RowContentsFirst);
 
-            var field = new FloatField();
+            var field = new TField();
             field.AddToClassList(FieldClassName.RowContents);
 
             slider.RegisterValueChangedCallback((ev) => field.SetValueWithoutNotify(ev.newValue));
@@ -255,7 +256,6 @@ namespace RosettaUI.UIToolkit.Builder
 
             return row;
         }
-
 
 
         static VisualElement Build_Button(Element element)

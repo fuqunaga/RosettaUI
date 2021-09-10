@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using TMPro;
 using UnityEngine;
+using RosettaUI.Reactive;
+
 
 namespace RosettaUI.UGUI.Builder
 {
@@ -33,7 +35,7 @@ namespace RosettaUI.UGUI.Builder
 
             if (!dropdownElement.IsConst)
             {
-                dropdownElement.setValueToView += ((v) => dropdown.value = v);
+                dropdownElement.valueRx.Subscribe((v) => dropdown.value = v);
             }
             SubscribeInteractable(element, dropdown, dropdown.captionText);
 

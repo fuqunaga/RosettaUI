@@ -35,7 +35,7 @@ namespace RosettaUI.UGUI.Builder
 
             if (!boolField.IsConst)
             {
-                boolField.setValueToView += ((v) => toggle.isOn = v);
+                boolField.valueRx.Subscribe((v) => toggle.isOn = v);
             }
 
             element.interactableRx.Subscribe( (interactable) =>
@@ -80,7 +80,7 @@ namespace RosettaUI.UGUI.Builder
 
             inputFieldUI = go.GetComponentInChildren<TMP_InputField>();
             inputFieldUI.contentType = contentType;
-            inputFieldUI.text = field.GetInitialValue()?.ToString();
+            inputFieldUI.text = field.value?.ToString();
             inputFieldUI.pointSize = settings.fontSize;
 
             inputFieldUI.colors = settings.theme.fieldColors;
@@ -101,7 +101,7 @@ namespace RosettaUI.UGUI.Builder
 
             if (!field.IsConst)
             {
-                field.setValueToView += ((v) =>
+                field.valueRx.Subscribe((v) =>
                 {
                     var (success, viewValue) = tryParse(capturedInputFieldUI.text);
                     var isDifferent = !success || !(v?.Equals(viewValue) ?? (viewValue == null));

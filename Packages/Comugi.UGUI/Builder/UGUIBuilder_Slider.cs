@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RosettaUI.Reactive;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,7 +16,7 @@ namespace RosettaUI.UGUI.Builder
             var slider = go.GetComponentInChildren<Slider>();
             SetSliderColor(slider);
 
-            var (min, max) = sliderElement.GetInitialMinMax();
+            var (min, max) = sliderElement.minMax;
             slider.minValue = min;
             slider.maxValue = max;
             slider.wholeNumbers = true;
@@ -29,7 +30,7 @@ namespace RosettaUI.UGUI.Builder
 
             if (!sliderElement.IsMinMaxConst)
             {
-                sliderElement.RegisterSetMinMaxToView((pair) => { slider.minValue = pair.Item1; slider.maxValue = pair.Item2; });
+                sliderElement.minMaxRx.Subscribe((pair) => { slider.minValue = pair.Item1; slider.maxValue = pair.Item2; });
             }
 
             inputFieldUI.onValueChanged.AddListener((s) => SetInputFieldTextToSlider(s, slider));
@@ -66,11 +67,11 @@ namespace RosettaUI.UGUI.Builder
             var slider = go.GetComponentInChildren<Slider>();
             SetSliderColor(slider);
 
-            var (min, max) = sliderElement.GetInitialMinMax();
+            var (min, max) = sliderElement.minMax;
             slider.minValue = fieldToSlider(min);
             slider.maxValue = fieldToSlider(max);
             slider.wholeNumbers = false;
-            slider.value = fieldToSlider(sliderElement.GetInitialValue());
+            slider.value = fieldToSlider(sliderElement.value);
 
             slider.onValueChanged.AddListener((sliderValue) =>
             {
@@ -81,7 +82,7 @@ namespace RosettaUI.UGUI.Builder
 
             if (!sliderElement.IsMinMaxConst)
             {
-                sliderElement.RegisterSetMinMaxToView((pair) =>
+                sliderElement.minMaxRx.Subscribe((pair) =>
                 {
                     slider.minValue = fieldToSlider(pair.Item1);
                     slider.maxValue = fieldToSlider(pair.Item2);

@@ -42,7 +42,7 @@ namespace RosettaUI.UGUI.Builder
         {
             var foldElement = (FoldElement)element;
 
-            var go = Instantiate(foldElement.title.GetInitialValue(), resource.fold);
+            var go = Instantiate(foldElement.title.value, resource.fold);
             var trans = go.transform;
 
             // build title row

@@ -10,6 +10,6 @@ namespace RosettaUI
         public static implicit operator LabelElement(string label) => new LabelElement(ConstGetter.Create(label));
         public static implicit operator LabelElement(Func<string> readLabel) => new LabelElement(Getter.Create(readLabel));
 
-        public static implicit operator string(LabelElement label) => label.GetInitialValue();
+        public static implicit operator string(LabelElement label) => label.value;
     }
 }

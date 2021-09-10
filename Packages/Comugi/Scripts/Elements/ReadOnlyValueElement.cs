@@ -1,4 +1,4 @@
-﻿using System;
+﻿using RosettaUI.Reactive;
 
 namespace RosettaUI
 {
@@ -9,19 +9,22 @@ namespace RosettaUI
     {
         #region For Builder
 
-        public event Action<T> setValueToView;
-        public T GetInitialValue() => getter.Get();
+        public readonly ReactiveProperty<T> valueRx;
 
         #endregion
 
-
         readonly IGetter<T> getter;
 
+
+        public T value => valueRx.Value;
+        
         public bool IsConst => getter.IsConst;
+
 
         public ReadOnlyValueElement(IGetter<T> getter)
         {
             this.getter = getter ?? new ConstGetter<T>(default);
+            valueRx = new ReactiveProperty<T>(getter.Get());
         }
 
         protected override void UpdateInternal()
@@ -30,7 +33,7 @@ namespace RosettaUI
 
             if (!IsConst)
             {
-                setValueToView?.Invoke(getter.Get());
+                valueRx.Value = getter.Get();
             }
         }
     }

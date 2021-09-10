@@ -161,7 +161,7 @@ namespace RosettaUI.UIToolkit.Builder
         static VisualElement Build_Label(Element element)
         {
             var labelElement = (LabelElement)element;
-            var label = new Label(labelElement.GetInitialValue());
+            var label = new Label(labelElement.value);
             SetupLabelCallback(label, labelElement);
 
             return label;
@@ -182,7 +182,7 @@ namespace RosettaUI.UIToolkit.Builder
 
             if (!labelElement.IsConst)
             {
-                labelElement.setValueToView += (text) => label.text = text;
+                labelElement.valueRx.Subscribe((text) => label.text = text);
             }
         }
 
@@ -192,7 +192,7 @@ namespace RosettaUI.UIToolkit.Builder
             var fold = new Foldout();
 
             var title = foldElement.title;
-            fold.text = title.GetInitialValue();
+            fold.text = title.value;
 
             foreach (var content in foldElement.Contents)
             {
@@ -224,11 +224,11 @@ namespace RosettaUI.UIToolkit.Builder
 
             if (labelElement != null)
             {
-                field.label = labelElement.GetInitialValue();
+                field.label = labelElement.value;
                 SetupLabelCallback(field.labelElement, labelElement);
             }
 
-            fieldElement.setValueToView += (v) => field.value = v;
+            fieldElement.valueRx.Subscribe((v) => field.value = v);
             field.RegisterValueChangedCallback(ev => fieldElement.OnViewValueChanged(ev.newValue));
 
             return field;
@@ -243,6 +243,16 @@ namespace RosettaUI.UIToolkit.Builder
 
             var slider = Build_Field<T, TSlider>(element);
             slider.AddToClassList(FieldClassName.RowContentsFirst);
+
+            if ( !sliderElement.IsMinMaxConst)
+            {
+                sliderElement.minMaxRx.Subscribe((pair) =>
+                {
+                    var (min,max) = pair;
+                    slider.lowValue = min;
+                    slider.highValue = max;
+                });
+            }
 
             var field = new TField();
             field.AddToClassList(FieldClassName.RowContents);
@@ -264,10 +274,10 @@ namespace RosettaUI.UIToolkit.Builder
 
             var button = new Button(buttonElement.onClick)
             {
-                text = buttonElement.GetInitialValue(),
+                text = buttonElement.value,
             };
 
-            buttonElement.setValueToView += (str) => button.text = str;
+            buttonElement.valueRx.Subscribe((str) => button.text = str);
 
             return button;
         }
@@ -279,13 +289,13 @@ namespace RosettaUI.UIToolkit.Builder
 
             var field = new PopupField<string>(
                 options,
-                dropdownElement.GetInitialValue()
+                dropdownElement.value
                 );
 
-            field.label = dropdownElement.label.GetInitialValue();
+            field.label = dropdownElement.label.value;
             SetupLabelCallback(field.labelElement, dropdownElement.label);
 
-            dropdownElement.setValueToView += (v) => field.index = v;
+            dropdownElement.valueRx.Subscribe((v) => field.index = v);
             field.RegisterValueChangedCallback(ev => dropdownElement.OnViewValueChanged(field.index));
 
             return field;

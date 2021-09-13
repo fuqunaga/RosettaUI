@@ -41,11 +41,9 @@ namespace RosettaUI.UIToolkit.Builder
             buildFuncs = new Dictionary<Type, Func<Element, VisualElement>>()
             {
                 [typeof(WindowElement)] = Build_Window,
-                /*
-                [typeof(Panel)] = (e) => Build_ElementGroup(e, resource.panel),
-                */
                 [typeof(Row)] = Build_Row,
                 [typeof(Column)] = Build_Column,
+                [typeof(BoxElement)] = Build_Box,
                 [typeof(CompositeFieldElement)] = Build_CompositeField,
                 [typeof(LabelElement)] = Build_Label,
                 [typeof(IntFieldElement)] = Build_IntField,
@@ -109,6 +107,12 @@ namespace RosettaUI.UIToolkit.Builder
             //column.AddToClassList(FieldClassName.Column);
 
             return Build_ElementGroup(column, element);
+        }
+
+        VisualElement Build_Box(Element element)
+        {
+            var box = new Box();
+            return Build_ElementGroup(box, element);
         }
 
 
@@ -198,7 +202,6 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 fold.Add(Build(content));
             }
-
 
             foldElement.isOpenRx.Subscribe((isOpen) => fold.value = isOpen);
 

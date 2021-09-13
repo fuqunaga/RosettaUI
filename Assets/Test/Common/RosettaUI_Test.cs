@@ -30,13 +30,7 @@ namespace RosettaUI.Test
         {
             public float floatValue;
 
-            public Element CreateElement()
-            {
-                return UI.Row(
-                    UI.Label("By CreteElement()"),
-                    UI.Slider(() => floatValue)
-                    );
-            }
+            public Element CreateElement() => UI.Slider("By CreteElement()", () => floatValue);
         }
 
         [Serializable]
@@ -118,15 +112,11 @@ namespace RosettaUI.Test
                     , UI.Field(() => vector2Value)
                     , UI.Field(() => vector3Value)
                     , UI.Field(() => vector4Value)
+                    , UI.Field(() => intList)
                     , UI.Field(() => simpleClass)
                     , UI.Field(() => elementCreator)
                     , UI.Field(() => complexClass)
-                    , UI.Field(() => intList)
-                    , UI.Fold("fold1"
-                        , UI.Fold("fold2"
-                            , UI.Field(() => intValue)
-                            )
-                        )
+                    
                 )
                 , UI.Fold("Field usage"
                     , UI.Field("CustomLabel", () => floatValue)
@@ -156,15 +146,37 @@ namespace RosettaUI.Test
                     )
                 )
                 */
-                ).Close()
+                )
 
+                , UI.Fold("ElementGroup"
+                    , UI.Row(
+                        UI.Label("Row0"),
+                        UI.Label("Row1"),
+                        UI.Label("Row2")
+                    )
+                    , UI.Column(
+                        UI.Label("Column0"),
+                        UI.Label("Column1"),
+                        UI.Label("Column2")
+                        )
+                    , UI.Box(
+                        UI.Label("Box0"),
+                        UI.Label("Box1"),
+                        UI.Label("Box2")
+                        )
+                    , UI.Fold("Fold", 
+                        UI.Fold("Fold2",
+                            UI.Fold("Fold3",
+                                UI.Field("contents", () => floatValue)
+                            )
+                        )
+                    )
+                )
                 , UI.Dropdown("Dropdown",
                     () => dropDownIndex,
                     options: new[] { "One", "Two", "Three" }
                     )
 
-                , UI.Fold("Fold", UI.Fold("Fold2", UI.Field("hoge", () => intValue))).Close()
-                , UI.Row(UI.Label("Row Fold Test"), UI.Fold("Fold", UI.Field("hoge", () => intValue)))
                 , UI.Row(
                     UI.Label("DynamicElement Test\nchange ui when < 0"),
                     DynamicElement.Create(

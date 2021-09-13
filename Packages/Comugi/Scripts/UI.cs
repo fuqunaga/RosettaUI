@@ -54,16 +54,10 @@ namespace RosettaUI
         public static Element Slider<T>(Expression<Func<T>> targetExpression, Action<T> onValueChanged = null) => Slider<T>(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, null, onValueChanged);
 
 
-        public static Element Slider(LabelElement label, Expression<Func<int>> targetExpression, int min = 0, int max = 100, Action<int> onValueChanged = null) => Slider<int>(label, targetExpression, ConstMinMaxGetter.Create(min, max), onValueChanged);
-        public static Element Slider(LabelElement label, Expression<Func<float>> targetExpression, float min = 0f, float max = 1f, Action<float> onValueChanged = null) => Slider<float>(label, targetExpression, ConstMinMaxGetter.Create(min, max), onValueChanged);
-
-        /*
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, Func<(T, T)> getMinMaxFunc = null, Action<T> onValueChanged = null)
-        {
-            var minMaxGetter = getMinMaxFunc != null ? new MinMaxGetter<T>(getMinMaxFunc) : null;
-            return Slider(label, targetExpression, minMaxGetter, onValueChanged);
-        }
-        */
+        public static Element Slider(LabelElement label, Expression<Func<int>> targetExpression, int max, Action<int> onValueChanged = null) => Slider<int>(label, targetExpression, 0, max, onValueChanged);
+        public static Element Slider(LabelElement label, Expression<Func<float>> targetExpression, float max, Action<float> onValueChanged = null) => Slider<float>(label, targetExpression, 0f, max, onValueChanged);
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T min, T max, Action<T> onValueChanged = null) => Slider<T>(label, targetExpression, ConstMinMaxGetter.Create(min, max), onValueChanged);
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, Action<T> onValueChanged = null) => Slider<T>(label, targetExpression, null, onValueChanged);
 
         public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, IMinMaxGetter minMaxGetter, Action<T> onValueChanged = null)
         {
@@ -161,12 +155,14 @@ namespace RosettaUI
         #endregion
 
 
-        #region Row/Column
+        #region Row/Column/Box
 
         public static Row Row(params Element[] elements) => new Row(elements);
         public static Row Row(IEnumerable<Element> elements) => new Row(elements);
         public static Column Column(params Element[] elements) => new Column(elements);
         public static Column Column(IEnumerable<Element> elements) => new Column(elements);
+        public static BoxElement Box(params Element[] elements) => new BoxElement(elements);
+        public static BoxElement Box(IEnumerable<Element> elements) => new BoxElement(elements);
 
         #endregion
 
@@ -185,6 +181,7 @@ namespace RosettaUI
         public static WindowElement Window(IEnumerable<Element> elements) => new WindowElement(elements);
 
         #endregion
+
 
 
         #region FindObject

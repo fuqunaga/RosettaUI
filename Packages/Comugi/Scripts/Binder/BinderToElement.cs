@@ -139,7 +139,7 @@ namespace RosettaUI
                        {
                            var i = 0;
                            var func = createItemElement ?? ((binder, label) => UI.Field(label, binder));
-                           return new Column(ListBinder.CreateItemBindersFrom(listBinder).Select(binder => func(binder, "Item" + (i++))));
+                           return new BoxElement(ListBinder.CreateItemBindersFrom(listBinder).Select(binder => func(binder, "Item" + (i++))));
 
                        },
                        rebuildIf: (e) =>
@@ -152,7 +152,7 @@ namespace RosettaUI
                 );
 
             return label != null
-                ? new Row(new[] { label, nullGuard })
+                ? new FoldElement(label, new[] { nullGuard })
                 : nullGuard;
 
         }

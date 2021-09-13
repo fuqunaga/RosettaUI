@@ -20,7 +20,7 @@ namespace RosettaUI.UGUI.Builder
             static readonly Dictionary<Type, Func<Element, GameObject>> buildFuncs = new Dictionary<Type, Func<Element, GameObject>>()
             {
                 [typeof(WindowElement)] = (e) => Build_ElementGroup(e, resource.window),
-                [typeof(Panel)] = (e) => Build_ElementGroup(e, resource.panel),
+                [typeof(BoxElement)] = (e) => Build_ElementGroup(e, resource.panel),
                 [typeof(Row)] = Build_Row,
                 [typeof(Column)] = Build_Column,
                 [typeof(LabelElement)] = (e) => Build_Label((LabelElement)e),

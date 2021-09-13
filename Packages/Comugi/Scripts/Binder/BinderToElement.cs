@@ -45,7 +45,7 @@ namespace RosettaUI
             }
             else if (TypeUtility.HasSerializableField(valueType))
             {
-                 createElementFunc = () => CreateCompositeFieldElement(label, binder, valueType);
+                createElementFunc = () => CreateCompositeFieldElement(label, binder, valueType);
             }
 
             if (createElementFunc != null)
@@ -104,15 +104,20 @@ namespace RosettaUI
             var elements = TypeUtility.GetSerializableFieldNames(valueType)
                 .Select(fieldName =>
                 {
-                    var fieldBinder = PropertyOrFieldBinder.CreateWithBinder(binder, fieldName);
-                    var elementGroups = UI.Field(fieldName, fieldBinder);
+                    var range = TypeUtility.GetRange(valueType, fieldName);
 
-                    return elementGroups;
+                    var fieldBinder = PropertyOrFieldBinder.CreateWithBinder(binder, fieldName);
+
+                    Element element = (range == null)
+                    ? UI.Field(fieldName, fieldBinder)
+                    : UI.Slider(fieldName, fieldBinder, ConstMinMaxGetter.Create(range.min, range.max));
+
+                    return element;
                 });
 
 
             Element ret = null;
-            if ( binder.IsOneliner())
+            if (binder.IsOneliner())
             {
                 ret = new CompositeFieldElement(label, new Row(elements));
             }
@@ -153,49 +158,48 @@ namespace RosettaUI
         }
 
 
-#region Slider
+        #region Slider
         public static Element CreateSliderElement(LabelElement label, IBinder binder, IMinMaxGetter minMaxGetter)
         {
-            switch (binder)
+            Element element = binder switch
             {
-                case BinderBase<int> ib: return new IntSlider(label, ib, minMaxGetter as IGetter<(int, int)>);
-                case BinderBase<float> ib: return new FloatSliderElement(label, ib, minMaxGetter as IGetter<(float, float)>);
+                BinderBase<int> bb => new IntSliderElement(label, bb, (IGetter<(int, int)>)minMaxGetter),
+                BinderBase<float> bb => new FloatSliderElement(label, bb, (IGetter<(float, float)>)minMaxGetter),
+                _ => null
+            };
 
-                default:
-                    return CreateMemberSliderElement(binder, minMaxGetter);
+            if (element != null)
+            {
+                return element;
             }
+
+            var valueType = binder.ValueType;
+            if (TypeUtility.HasSerializableField(valueType))
+            {
+                return CreateCompositeSliderElement(label, binder, minMaxGetter, binder.ValueType);
+            }
+
+
+            // Sliderに出来ないものはCreateElement()へ
+            return CreateElement(label, binder);
         }
 
 
-        static Element CreateMemberSliderElement(IBinder binder, IMinMaxGetter minMaxGetter)
+        static Element CreateCompositeSliderElement(LabelElement label, IBinder binder, IMinMaxGetter minMaxGetter, Type valueType)
         {
-#if false
-            var valueType = binder.ValueType;
             var elements = TypeUtility.GetSerializableFieldNames(valueType)
-                .Select(memberName =>
+                .Select(fieldName =>
                 {
-                    var memberBinder = PropertyOrFieldBinder.CreateWithBinder(binder, memberName);
-                    var memberMinMaxGetter = PropertyOrFieldMinMaxGetter.Create(minMaxGetter, memberName);
-                    var elementGroups = UI.Slider(memberName, memberBinder, memberMinMaxGetter);
-
-                    return elementGroups;
+                    var fieldBinder = PropertyOrFieldBinder.CreateWithBinder(binder, fieldName);
+                    var fieldMinMaxGetter = minMaxGetter != null ? PropertyOrFieldMinMaxGetter.Create(minMaxGetter, fieldName) : null;
+                    return UI.Slider(fieldName, fieldBinder, fieldMinMaxGetter);
                 });
 
-            /*
-            var ret = oneliner
-                ? new Row(elements)
-                : new Column(elements) as Element;
 
-                return ret;
-            */
-
-            return new Column(elements);
-#else
-            return null;
-#endif
+            return new FoldElement(label, elements);
         }
 
 
-#endregion
+        #endregion
     }
 }

@@ -53,7 +53,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(StringFieldElement)] = Build_Field<string, TextField>,
                 [typeof(BoolFieldElement)] = Build_Field<bool, Toggle>,
                 [typeof(DropdownElement)] = Build_Dropdown,
-                [typeof(IntSlider)] = Build_Slider<int, SliderInt, IntegerField>,
+                [typeof(IntSliderElement)] = Build_Slider<int, SliderInt, IntegerField>,
                 [typeof(FloatSliderElement)] = Build_Slider<float, Slider, FloatField>,
                 /*
                 [typeof(LogSlider)] = Build_LogSlider,
@@ -243,6 +243,10 @@ namespace RosettaUI.UIToolkit.Builder
 
             var slider = Build_Field<T, TSlider>(element);
             slider.AddToClassList(FieldClassName.RowContentsFirst);
+
+            var (min, max) = sliderElement.minMax;
+            slider.lowValue = min;
+            slider.highValue = max;
 
             if ( !sliderElement.IsMinMaxConst)
             {

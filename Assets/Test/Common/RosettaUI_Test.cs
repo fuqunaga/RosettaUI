@@ -49,7 +49,9 @@ namespace RosettaUI.Test
         [Serializable]
         public class ComplexClass
         {
-            public MyEnum myEnumValue;
+            [Range(0f, 10f)]
+            public float floatWithRangeValue; // Fields with a range attribute are automatically displayed with a slider
+
             public Vector3 vector3Value;
             public SimpleClass simpleClass;
             public ElementCreator elementCreatorClass;
@@ -137,6 +139,8 @@ namespace RosettaUI.Test
                 , UI.Fold("Slider"
                     , UI.Slider(() => intValue)
                     , UI.Slider(() => floatValue)
+                    , UI.Slider("custom min max", () => floatValue, min:-1f, max:2f)
+                    , UI.Slider(() => vector2Value)
                 /*
                 , UI.Slider(() => vector3Value,
                     min: Vector3.zero,

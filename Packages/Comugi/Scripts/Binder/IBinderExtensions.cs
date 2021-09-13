@@ -90,7 +90,11 @@ namespace RosettaUI
                     const int oneLinerMaxCount = 3;
 
                     var fieldTypes = TypeUtility.GetSerializableFieldTypes(valueType).ToList();
-                    ret = fieldTypes.Count <= oneLinerMaxCount && fieldTypes.All(IsSimpleType);
+                    var fieldNames = TypeUtility.GetSerializableFieldNames(valueType);
+
+                    ret = fieldTypes.Count <= oneLinerMaxCount
+                        && fieldTypes.All(IsSimpleType)
+                        && fieldNames.All((name) => TypeUtility.GetRange(valueType, name) == null);
                 }
 
                 oneLinderDic[type] = ret;

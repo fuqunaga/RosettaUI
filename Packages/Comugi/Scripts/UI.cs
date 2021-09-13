@@ -34,7 +34,6 @@ namespace RosettaUI
 
         public static Element Field(LabelElement label, IBinder binder)
         {
-#if true
             var element = BinderToElement.CreateElement(label, binder);
             if (element != null)
             {
@@ -42,21 +41,6 @@ namespace RosettaUI
             }
 
             return element;
-#else
-            var element = BinderToElement.CreateElement(label, binder);
-            if (element == null) return null;
-
-            if (label != null)
-            {
-                element = binder.IsOneliner()
-                    ? Row(label, element)
-                    : Fold(label, element) as Element;
-            }
-
-            SetInteractableWithBinder(element, binder);
-
-            return element;
-#endif
         }
 
         #endregion
@@ -64,19 +48,25 @@ namespace RosettaUI
 
         #region Slider
 
-        public static Element Slider(Expression<Func<int>> targetExpression, int min = 0, int max = 100, Action<int> onValueChanged = null) => Slider<int>(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, min, max, onValueChanged);
-        public static Element Slider(Expression<Func<float>> targetExpression, float min = 0f, float max = 1f, Action<float> onValueChanged = null) => Slider<float>(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, min, max, onValueChanged);
-        public static Element Slider<T>(Expression<Func<T>> targetExpression, T min, T max, Action<T> onValueChanged = null) => Slider<T>(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, min, max, onValueChanged);
-        public static Element Slider<T>(Expression<Func<T>> targetExpression, Func<(T,T)> getMinMaxFunc, Action<T> onValueChanged = null) => Slider<T>(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, getMinMaxFunc, onValueChanged);
+        public static Element Slider(Expression<Func<int>> targetExpression, int max, Action<int> onValueChanged = null) => Slider<int>(targetExpression, 0, max, onValueChanged);
+        public static Element Slider(Expression<Func<float>> targetExpression, float max, Action<float> onValueChanged = null) => Slider<float>(targetExpression, 0f, max, onValueChanged);
+        public static Element Slider<T>(Expression<Func<T>> targetExpression, T min, T max, Action<T> onValueChanged = null) => Slider<T>(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, ConstMinMaxGetter.Create(min, max), onValueChanged);
+        public static Element Slider<T>(Expression<Func<T>> targetExpression, Action<T> onValueChanged = null) => Slider<T>(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, null, onValueChanged);
 
 
-        public static Element Slider(LabelElement label, Expression<Func<int>> targetExpression, int min = 0, int max = 100, Action<int> onValueChanged = null) => Slider<int>(label, targetExpression, min, max, onValueChanged);
-        public static Element Slider(LabelElement label, Expression<Func<float>> targetExpression, float min = 0f, float max = 1f, Action<float> onValueChanged = null) => Slider<float>(label, targetExpression, min, max, onValueChanged);
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T min, T max, Action<T> onValueChanged = null) => Slider(label, targetExpression, ConstMinMaxGetter.Create((min, max)), onValueChanged);
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, Func<(T,T)> getMinMaxFunc, Action<T> onValueChanged = null) => Slider(label, targetExpression, new MinMaxGetter<T>(getMinMaxFunc), onValueChanged);
+        public static Element Slider(LabelElement label, Expression<Func<int>> targetExpression, int min = 0, int max = 100, Action<int> onValueChanged = null) => Slider<int>(label, targetExpression, ConstMinMaxGetter.Create(min, max), onValueChanged);
+        public static Element Slider(LabelElement label, Expression<Func<float>> targetExpression, float min = 0f, float max = 1f, Action<float> onValueChanged = null) => Slider<float>(label, targetExpression, ConstMinMaxGetter.Create(min, max), onValueChanged);
+
+        /*
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, Func<(T, T)> getMinMaxFunc = null, Action<T> onValueChanged = null)
+        {
+            var minMaxGetter = getMinMaxFunc != null ? new MinMaxGetter<T>(getMinMaxFunc) : null;
+            return Slider(label, targetExpression, minMaxGetter, onValueChanged);
+        }
+        */
 
         public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, IMinMaxGetter minMaxGetter, Action<T> onValueChanged = null)
-        { 
+        {
             var binder = ExpressionUtility.CreateBinder(targetExpression);
             if (binder == null) return null;
             binder.onValueChanged += onValueChanged;

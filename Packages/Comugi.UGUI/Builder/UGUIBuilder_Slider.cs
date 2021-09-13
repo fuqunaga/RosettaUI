@@ -10,7 +10,7 @@ namespace RosettaUI.UGUI.Builder
     {
         static GameObject Build_IntSlider(Element element)
         {
-            var sliderElement = (IntSlider)element;
+            var sliderElement = (IntSliderElement)element;
             var go = Build_InputField(sliderElement, resource.slider, TMP_InputField.ContentType.IntegerNumber, TryParseInt, out var inputFieldUI);
 
             var slider = go.GetComponentInChildren<Slider>();

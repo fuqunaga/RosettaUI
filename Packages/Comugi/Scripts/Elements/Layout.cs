@@ -2,9 +2,16 @@
 {
     public struct Layout
     {
-        public int? preferredWidth;
-        public int? preferredHeight;
+        public enum Justify
+        {
+            Start,
+            End
+        }
 
-        public bool HasValue => preferredWidth.HasValue ||  preferredHeight.HasValue;
+        public int? width;
+        public int? height;
+        public Justify? justify;
+
+        public bool HasValue => width.HasValue ||  height.HasValue || justify.HasValue;
     }
 }

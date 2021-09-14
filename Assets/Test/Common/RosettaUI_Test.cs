@@ -236,19 +236,19 @@ namespace RosettaUI.Test
                 , UI.Fold("Custom Width"
                     , UI.Row(
                         UI.Label("Buttons")
-                        , UI.Button("1", null).SetPreferredWidth(30)
-                        , UI.Button("2", null).SetPreferredWidth(30)
-                        , UI.Button("3", null).SetPreferredWidth(30)
-                        , UI.Button("4", null).SetPreferredWidth(30)
-                        , UI.Button("5", null).SetPreferredWidth(30)
+                        , UI.Button("1", null).SetWidth(30)
+                        , UI.Button("2", null).SetWidth(30)
+                        , UI.Button("3", null).SetWidth(30)
+                        , UI.Button("4", null).SetWidth(30)
+                        , UI.Button("5", null).SetWidth(30)
                         )
                     , UI.Row(
                         UI.Label(nameof(intValue))
-                        , UI.Field(() => intValue).SetPreferredWidth(30)
+                        , UI.Field(() => intValue).SetWidth(30)
                     )
                     , UI.Row(
                         UI.Label(nameof(simpleClass))
-                        , UI.Field(() => simpleClass).SetPreferredWidth(300)
+                        , UI.Field(() => simpleClass).SetWidth(300)
                     )
                 )
 #endif

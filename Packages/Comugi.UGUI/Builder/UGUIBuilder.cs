@@ -68,46 +68,14 @@ namespace RosettaUI.UGUI.Builder
                 }
             }
 
-            readonly Dictionary<Element, LayoutElement> elementToLayoutElement = new Dictionary<Element, LayoutElement>();
 
 
-            void SetLayout(Element element, Layout layout)
-            {
-                if (layout.HasValue)
-                {
-                    if (!elementToLayoutElement.TryGetValue(element, out var layoutElement))
-                    {
-                        var go = GetUIObj(element);
-                        if (go != null)
-                        {
-                            layoutElement = go.GetComponent<LayoutElement>() ?? go.AddComponent<LayoutElement>();
-                        }
-                    }
-
-                    if (layoutElement)
-                    {
-                        if (layout.preferredWidth.HasValue)
-                        {
-                            layoutElement.preferredWidth = layout.preferredWidth.Value;
-                            layoutElement.flexibleWidth = 0;
-                        }
-
-                        if (layout.preferredHeight.HasValue)
-                        {
-                            layoutElement.preferredHeight = layout.preferredHeight.Value;
-                            layoutElement.flexibleHeight = 0;
-                        }
-                    }
-                }
-            }
-
-
-            protected override void OnElemnetEnableChanged(Element _, GameObject uiObj, bool enable)
+            protected override void OnElementEnableChanged(Element _, GameObject uiObj, bool enable)
             {
                 uiObj.SetActive(enable);
             }
 
-            protected override void OnElemnetInteractableChanged(Element element, GameObject uiObj, bool interactable)
+            protected override void OnElementInteractableChanged(Element element, GameObject uiObj, bool interactable)
             {
                 /*
                 if (element is ElementGroup elementGroup)
@@ -116,6 +84,38 @@ namespace RosettaUI.UGUI.Builder
                 }
                 */
                 throw new NotImplementedException();
+            }
+
+
+            readonly Dictionary<Element, LayoutElement> elementToLayoutElement = new Dictionary<Element, LayoutElement>();
+
+            protected override void OnElementLayoutChanged(Element element, GameObject go, Layout layout)
+            {
+                if (!layout.HasValue) return;
+                {
+                    if (!elementToLayoutElement.TryGetValue(element, out var layoutElement))
+                    {
+                        if (go != null)
+                        {
+                            layoutElement = go.GetComponent<LayoutElement>() ?? go.AddComponent<LayoutElement>();
+                        }
+                    }
+
+                    if (layoutElement)
+                    {
+                        if (layout.width is { } width)
+                        {
+                            layoutElement.preferredWidth = width;
+                            layoutElement.flexibleWidth = 0;
+                        }
+
+                        if (layout.height is { } height)
+                        {
+                            layoutElement.preferredHeight = height;
+                            layoutElement.flexibleHeight = 0;
+                        }
+                    }
+                }
             }
 
             protected override void OnRebuildElementGroupChildren(ElementGroup elementGroup)

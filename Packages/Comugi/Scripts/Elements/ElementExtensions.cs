@@ -1,6 +1,6 @@
 ﻿namespace RosettaUI
 {
-    public static class MethodChainExtensions 
+    public static class ElementExtensions_MethodChain
     {
         public static Element SetEnable(this Element e, bool enable)
         {
@@ -27,21 +27,35 @@
         }
 
 
-        public static Element SetPreferredWidth(this Element element, int width)
+        public static Element SetWidth(this Element element, int width)
         {
             var layout = element.layout;
-            layout.preferredWidth = width;
+            layout.width = width;
             element.layout = layout;
 
             return element;
         }
 
-        public static Element SetPreferredHeight(this Element element, int height)
+        public static Element SetHeight(this Element element, int height)
         {
             var layout = element.layout;
-            layout.preferredHeight = height;
+            layout.height = height;
             element.layout = layout;
 
+            return element;
+        }
+
+        public static Element SetJustify(this Element element, Layout.Justify justify)
+        {
+            var layout = element.layout;
+            layout.justify = justify;
+            element.layout = layout;
+            return element;
+        }
+
+        public static Element SetLayout(this Element element, Layout layout)
+        {
+            element.layout = layout;
             return element;
         }
     }

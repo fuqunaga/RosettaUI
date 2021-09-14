@@ -22,7 +22,7 @@ namespace RosettaUI.UIToolkit.Builder
         }
 
 
-        static class Layout
+        static class LayoutSettings
         {
             public static readonly float LabelWidth = 150f;
             public static readonly float IndentSize = 15f;
@@ -63,14 +63,27 @@ namespace RosettaUI.UIToolkit.Builder
         }
 
 
-        protected override void OnElemnetEnableChanged(Element _, VisualElement ve, bool enable)
+        protected override void OnElementEnableChanged(Element _, VisualElement ve, bool enable)
         {
             ve.style.display = enable ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
-        protected override void OnElemnetInteractableChanged(Element _, VisualElement ve, bool interactable)
+        protected override void OnElementInteractableChanged(Element _, VisualElement ve, bool interactable)
         {
             ve.SetEnabled(interactable);
+        }
+
+
+        protected override void OnElementLayoutChanged(Element element, VisualElement ve, Layout layout)
+        {
+            if (!layout.HasValue) return;
+
+            if (layout.width is { } width) ve.style.width = width;
+            if (layout.height is { } height) ve.style.height = height;
+            if (layout.justify is { } justify)
+            {
+                ve.style.justifyContent = justify == Layout.Justify.Start ? Justify.FlexStart : Justify.FlexEnd;
+            }
         }
 
         protected override void OnRebuildElementGroupChildren(ElementGroup elementGroup)
@@ -187,12 +200,12 @@ namespace RosettaUI.UIToolkit.Builder
         {
             if (labelElement.IsLeftMost())
             {
-                label.style.minWidth = Mathf.Max(0f, Layout.LabelWidth - labelElement.GetIndent() * Layout.IndentSize);
+                label.style.minWidth = Mathf.Max(0f, LayoutSettings.LabelWidth - labelElement.GetIndent() * LayoutSettings.IndentSize);
 
                 // Foldout直下のラベルはmarginRight、paddingRightがUnityDefaultCommon*.uss で書き換わるので上書きしておく
                 // セレクタ例： .unity - foldout--depth - 1 > .unity - base - field > .unity - base - field__label
-                label.style.marginRight = Layout.LabelMarginRight;
-                label.style.paddingRight = Layout.LabelPaddingRight;
+                label.style.marginRight = LayoutSettings.LabelMarginRight;
+                label.style.paddingRight = LayoutSettings.LabelPaddingRight;
             }
 
             if (!labelElement.IsConst)

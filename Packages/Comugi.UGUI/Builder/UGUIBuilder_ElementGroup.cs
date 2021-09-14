@@ -9,13 +9,13 @@ namespace RosettaUI.UGUI.Builder
     {
         static GameObject Build_Column(Element element)
         {
-            return Build_ElementGroup(element, null, true, (go) => AddLayoutGroup<VerticalLayoutGroup>(go));
+            return impl.Build_ElementGroup(element, null, true, (go) => AddLayoutGroup<VerticalLayoutGroup>(go));
         }
 
 
         static GameObject Build_Row(Element element)
         {
-            return Build_ElementGroup(element, null, true, (go) => AddHorizontalLayoutGroup(element, go));
+            return impl.Build_ElementGroup(element, null, true, (go) => AddHorizontalLayoutGroup(element, go));
         }
 
         static void AddHorizontalLayoutGroup(Element element, GameObject go)
@@ -77,26 +77,6 @@ namespace RosettaUI.UGUI.Builder
             return go;
         }
 
-
-        static GameObject Build_ElementGroup(Element element, GameObject prefab, bool useDisplayName = false, Action<GameObject> addComponentFunc = null)
-        {
-            var elementGroup = (ElementGroup)element;
-
-            var name = useDisplayName ? elementGroup.displayName : element.GetType().Name;
-
-            var go = Instantiate(name, prefab);
-            addComponentFunc?.Invoke(go);
-
-            var trans = go.transform;
-            //elementGroup.BuildChildElements();
-            foreach (var e in elementGroup.Elements)
-            {
-                var childGo = impl.Build(e);
-                childGo.transform.SetParent(trans);
-            }
-
-            return go;
-        }
 
         static int CalcSelfIndent(Element element)
         {

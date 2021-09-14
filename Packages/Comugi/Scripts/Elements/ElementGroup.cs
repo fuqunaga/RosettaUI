@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -10,6 +11,15 @@ namespace RosettaUI
     /// </summary>
     public abstract class ElementGroup : Element
     {
+        #region For Builder
+
+        public event Action<ElementGroup> onRebuildChildern;
+
+        public void RebuildChildren() => onRebuildChildern?.Invoke(this);
+
+        #endregion
+
+
         protected List<Element> _elements;
         public ReadOnlyCollection<Element> Elements => _elements.AsReadOnly();
 

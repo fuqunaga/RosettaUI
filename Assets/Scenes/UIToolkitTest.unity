@@ -391,7 +391,7 @@ MonoBehaviour:
   elementCreator:
     floatValue: 0
   complexClass:
-    myEnumValue: 0
+    floatWithRangeValue: 0
     vector3Value: {x: 0, y: 0, z: 0}
     simpleClass:
       floatValue: 0

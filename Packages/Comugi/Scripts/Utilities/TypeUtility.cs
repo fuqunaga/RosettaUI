@@ -23,8 +23,18 @@ namespace RosettaUI
             public readonly Dictionary<string, MemberData> memberDatas;
             public readonly List<(string, Type)> serializableFieldsNameAndType;
 
-            public ReflectionCache(IEnumerable<FieldInfo> fis, IEnumerable<PropertyInfo> pis)
+            public readonly Type listItamType;
+
+            public bool IsIList() => listItamType != null;
+
+            public ReflectionCache(Type type, IEnumerable<FieldInfo> fis, IEnumerable<PropertyInfo> pis)
             {
+                listItamType = type.GetInterfaces()
+                    .Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IList<>))
+                    .Select(t => t.GetGenericArguments().First())
+                    .FirstOrDefault();
+
+
                 fieldInfos = fis.ToDictionary(fi => fi.Name);
                 propertyInfos = pis.ToDictionary(fi => fi.Name);
 
@@ -55,6 +65,7 @@ namespace RosettaUI
             if (!reflectionCache.TryGetValue(type, out var cache))
             {
                 cache = new ReflectionCache(
+                    type,
                     type.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance),
                     type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
                     );
@@ -83,5 +94,6 @@ namespace RosettaUI
         public static bool HasSerializableField(Type type) => GetReflectionCache(type).serializableFieldsNameAndType.Any();
         public static IEnumerable<string> GetSerializableFieldNames(Type type) => GetReflectionCache(type).serializableFieldsNameAndType.Select(pair => pair.Item1);
         public static IEnumerable<Type> GetSerializableFieldTypes(Type type) => GetReflectionCache(type).serializableFieldsNameAndType.Select(pair => pair.Item2);
+        public static Type GetListItemType(Type type) => GetReflectionCache(type).listItamType;
     }
 }

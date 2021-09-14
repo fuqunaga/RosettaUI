@@ -97,8 +97,14 @@ namespace RosettaUI.Test
 
             var window = UI.Window(
 #if false
-                 UI.Field(() => intValue)
-                 , UI.Field(() => vector3Value)
+                UI.Row(
+                    UI.Field("Test Null", () => nullTestValue),
+                    UI.Button("Totggle null", () =>
+                        {
+                            if (nullTestValue != null) nullTestValue = null;
+                            else nullTestValue = new SimpleClass();
+                        })
+                )
 #else
                 UI.Label("Label")
                 , UI.Field(() => intValue)
@@ -192,11 +198,12 @@ namespace RosettaUI.Test
                 , UI.Row(
                     UI.Field("Test Null", () => nullTestValue),
                     UI.Button("Totggle null", () =>
-                        {
-                            if (nullTestValue != null) nullTestValue = null;
-                            else nullTestValue = new SimpleClass();
-                        })
+                    {
+                        if (nullTestValue != null) nullTestValue = null;
+                        else nullTestValue = new SimpleClass();
+                    })
                 )
+
                 /*
                 , UI.Fold("Interabletable",
                     fields.Concat(new[] {
@@ -213,7 +220,6 @@ namespace RosettaUI.Test
                 {
                     fold.isOpen = !fold.isOpen;
                 })
-                , UI.List("List", intList)
                 /*
                 , UI.Fold("ObjectUI"
                     , objectUI.Field(nameof(privateValue)) // also use private member if you specify it explicitly.
@@ -256,7 +262,7 @@ namespace RosettaUI.Test
 
         void Update()
         {
-            if ( Input.GetKeyDown(toggleRootElementKey))
+            if (Input.GetKeyDown(toggleRootElementKey))
             {
                 rootElement.enable = !rootElement.enable;
             }

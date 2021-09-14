@@ -17,25 +17,30 @@ namespace RosettaUI.UGUI.Builder
 
         class UGUIBuilderImpl : BuildFramework<GameObject>
         {
-            static readonly Dictionary<Type, Func<Element, GameObject>> buildFuncs = new Dictionary<Type, Func<Element, GameObject>>()
+            readonly Dictionary<Type, Func<Element, GameObject>> buildFuncs;
+
+            public UGUIBuilderImpl()
             {
-                [typeof(WindowElement)] = (e) => Build_ElementGroup(e, resource.window),
-                [typeof(BoxElement)] = (e) => Build_ElementGroup(e, resource.panel),
-                [typeof(Row)] = Build_Row,
-                [typeof(Column)] = Build_Column,
-                [typeof(LabelElement)] = (e) => Build_Label((LabelElement)e),
-                [typeof(IntFieldElement)] = Build_IntField,
-                [typeof(FloatFieldElement)] = Build_FloatField,
-                [typeof(StringFieldElement)] = Build_StringField,
-                [typeof(BoolFieldElement)] = Build_BoolField,
-                [typeof(ButtonElement)] = Build_Button,
-                [typeof(DropdownElement)] = Build_Dropdown,
-                [typeof(IntSliderElement)] = Build_IntSlider,
-                [typeof(FloatSliderElement)] = Build_FloatSlider,
-                [typeof(LogSlider)] = Build_LogSlider,
-                [typeof(FoldElement)] = Build_Fold,
-                [typeof(DynamicElement)] = (e) => Build_ElementGroup(e, null, true, (go) => AddLayoutGroup<HorizontalLayoutGroup>(go))
-            };
+                buildFuncs = new Dictionary<Type, Func<Element, GameObject>>()
+                {
+                    [typeof(WindowElement)] = (e) => Build_ElementGroup(e, resource.window),
+                    [typeof(BoxElement)] = (e) => Build_ElementGroup(e, resource.panel),
+                    [typeof(Row)] = Build_Row,
+                    [typeof(Column)] = Build_Column,
+                    [typeof(LabelElement)] = (e) => Build_Label((LabelElement)e),
+                    [typeof(IntFieldElement)] = Build_IntField,
+                    [typeof(FloatFieldElement)] = Build_FloatField,
+                    [typeof(StringFieldElement)] = Build_StringField,
+                    [typeof(BoolFieldElement)] = Build_BoolField,
+                    [typeof(ButtonElement)] = Build_Button,
+                    [typeof(DropdownElement)] = Build_Dropdown,
+                    [typeof(IntSliderElement)] = Build_IntSlider,
+                    [typeof(FloatSliderElement)] = Build_FloatSlider,
+                    [typeof(LogSlider)] = Build_LogSlider,
+                    [typeof(FoldElement)] = Build_Fold,
+                    [typeof(DynamicElement)] = (e) => Build_ElementGroup(e, null, true, (go) => AddLayoutGroup<HorizontalLayoutGroup>(go))
+                };
+            }
 
             protected override IReadOnlyDictionary<Type, Func<Element, GameObject>> buildFuncTable => buildFuncs;
 
@@ -49,12 +54,9 @@ namespace RosettaUI.UGUI.Builder
 
             protected override void Initialize(GameObject uiObj, Element element)
             {
-                SetLayerRecursive(uiObj.transform, layer);
+                base.Initialize(uiObj, element);
 
-                element.enableRx.Subscribe((enable) => uiObj.SetActive(enable));
-                element.layoutRx.Subscribe((layout) => SetLayout(element, layout));
-                element.onRebuild += OnRebuild;
-                element.onDestroy += OnDestroy;
+                SetLayerRecursive(uiObj.transform, layer);
 
                 static void SetLayerRecursive(Transform t, int layer)
                 {
@@ -75,7 +77,8 @@ namespace RosettaUI.UGUI.Builder
                 {
                     if (!elementToLayoutElement.TryGetValue(element, out var layoutElement))
                     {
-                        if (elementToUIObj.TryGetValue(element, out var go))
+                        var go = GetUIObj(element);
+                        if (go != null)
                         {
                             layoutElement = go.GetComponent<LayoutElement>() ?? go.AddComponent<LayoutElement>();
                         }
@@ -99,26 +102,64 @@ namespace RosettaUI.UGUI.Builder
             }
 
 
-            void OnRebuild(Element element)
+            protected override void OnElemnetEnableChanged(Element _, GameObject uiObj, bool enable)
             {
-                if (elementToUIObj.TryGetValue(element, out var go))
+                uiObj.SetActive(enable);
+            }
+
+            protected override void OnElemnetInteractableChanged(Element element, GameObject uiObj, bool interactable)
+            {
+                /*
+                if (element is ElementGroup elementGroup)
                 {
-                    Object.Destroy(go);
+                    element.interactable = element.interactable && interactable;
+                }
+                */
+                throw new NotImplementedException();
+            }
+
+            protected override void OnRebuildElementGroupChildren(ElementGroup elementGroup)
+            {
+                var parentGo = GetUIObj(elementGroup);
+                var trans = parentGo.transform;
+
+                foreach(var e in elementGroup.Elements)
+                {
+                    var go = impl.Build(e);
+                    go.transform.SetParent(trans);
                 }
 
-                var parentGo = elementToUIObj[element.parent];
-                var newGo = impl.Build(element);
-                newGo.transform.SetParent(parentGo.transform);
             }
 
 
-            void OnDestroy(Element element)
+            protected override void OnDestroyElement(Element element)
             {
-                if (elementToUIObj.TryGetValue(element, out var go))
+                var go = GetUIObj(element);
+
+                Object.Destroy(go);
+
+                UnregisterUIObj(element);
+
+            }
+
+
+            public GameObject Build_ElementGroup(Element element, GameObject prefab, bool useDisplayName = false, Action<GameObject> addComponentFunc = null)
+            {
+                var elementGroup = (ElementGroup)element;
+
+                var name = useDisplayName ? elementGroup.displayName : element.GetType().Name;
+
+                var go = Instantiate(name, prefab);
+                addComponentFunc?.Invoke(go);
+
+                var trans = go.transform;
+
+                foreach (var childGo in Build_ElementGroupChildren(elementGroup))
                 {
-                    Object.Destroy(go);
-                    elementToUIObj.Remove(element);
+                    childGo.transform.SetParent(trans);
                 }
+
+                return go;
             }
         }
 
@@ -136,7 +177,7 @@ namespace RosettaUI.UGUI.Builder
         }
 
 
-#region Utility Function
+        #region Utility Function
 
         static void SubscribeInteractable(Element element, Selectable selectable, TMP_Text text)
         {
@@ -175,6 +216,6 @@ namespace RosettaUI.UGUI.Builder
             }
         }
 
-#endregion
+        #endregion
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
-
+using UnityEngine;
 
 namespace RosettaUI
 {
@@ -139,13 +139,21 @@ namespace RosettaUI
                        {
                            var i = 0;
                            var func = createItemElement ?? ((binder, label) => UI.Field(label, binder));
-                           return new BoxElement(ListBinder.CreateItemBindersFrom(listBinder).Select(binder => func(binder, "Item" + (i++))));
+                           var itemElements = ListBinder.CreateItemBindersFrom(listBinder).Select(binder => func(binder, "Item" + (i++)));
+
+                           var listType = listBinder.ValueType;
+                           var itemType = TypeUtility.GetListItemType(listBinder.ValueType);
+
+                           var addButton = UI.Button("+", () => IListUtility.AddItemAtLast(listBinder.Get(), listType, itemType));
+                           var removeButton = UI.Button("-", () => IListUtility.RemoveItemAtLast(listBinder.Get(), itemType));
+
+                           return UI.Box(itemElements.Concat(new[] { UI.Row(addButton, removeButton)}));
 
                        },
                        rebuildIf: (e) =>
                        {
                            var count = listBinder.Get()?.Count ?? 0;
-                           return count != (e.element as ElementGroup).Elements.Count;
+                           return count != (e.element as ElementGroup).Elements.Count - 1; // -1 for UI.Row(addButton, removeButton)
                        },
                        $"ListEelements({nameof(DynamicElement)})"
                    )
@@ -154,6 +162,7 @@ namespace RosettaUI
             return label != null
                 ? new FoldElement(label, new[] { nullGuard })
                 : nullGuard;
+
 
         }
 

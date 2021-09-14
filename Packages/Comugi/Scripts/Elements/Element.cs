@@ -17,7 +17,6 @@ namespace RosettaUI
         public readonly ReactiveProperty<bool> interactableRx = new ReactiveProperty<bool>(true);
         public readonly ReactiveProperty<Layout> layoutRx = new ReactiveProperty<Layout>();
 
-        public event Action<Element> onRebuild;
         public event Action<Element> onDestroy;
 
         #endregion
@@ -52,7 +51,6 @@ namespace RosettaUI
 
         protected virtual void UpdateInternal() { }
 
-        public void Rebuild() => onRebuild?.Invoke(this);
         public void Destroy() => onDestroy?.Invoke(this);
     }
 }

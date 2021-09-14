@@ -59,7 +59,7 @@ namespace RosettaUI
             {
                 element?.Destroy();
                 BuildElement();
-                element?.Rebuild();
+                RebuildChildren();
             }
             else
             {

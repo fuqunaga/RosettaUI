@@ -58,15 +58,33 @@ namespace RosettaUI.UIToolkit.Builder
                 */
                 [typeof(ButtonElement)] = Build_Button,
                 [typeof(FoldElement)] = Build_Fold,
-                [typeof(DynamicElement)] = (e) => Build_ElementGroup(new VisualElement() { name = nameof(DynamicElement) }, e),
+                [typeof(DynamicElement)] = (e) => Build_ElementGroupChildren(new VisualElement() { name = nameof(DynamicElement) }, e),
             };
         }
 
 
-        protected override void Initialize(VisualElement ve, Element element)
+        protected override void OnElemnetEnableChanged(Element _, VisualElement ve, bool enable)
         {
-            element.enableRx.Subscribe((enable) => ve.style.display = enable ? DisplayStyle.Flex : DisplayStyle.None);
-            element.interactableRx.Subscribe((interactable) => ve.SetEnabled(interactable));
+            ve.style.display = enable ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
+        protected override void OnElemnetInteractableChanged(Element _, VisualElement ve, bool interactable)
+        {
+            ve.SetEnabled(interactable);
+        }
+
+        protected override void OnRebuildElementGroupChildren(ElementGroup elementGroup)
+        {
+            var groupVe = GetUIObj(elementGroup);
+            Build_ElementGroupChildren(groupVe, elementGroup);
+   
+        }
+
+        protected override void OnDestroyElement(Element element)
+        {
+            var ve = GetUIObj(element);
+            ve?.RemoveFromHierarchy();
+            UnregisterUIObj(element);
         }
 
 
@@ -77,14 +95,14 @@ namespace RosettaUI.UIToolkit.Builder
             var window = new Window();
             window.closeButton.clicked += () => windowElement.enable = !windowElement.enable;
 
-            return Build_ElementGroup(window, element);
+            return Build_ElementGroupChildren(window, element);
         }
 
         VisualElement Build_Row(Element element)
         {
             var row = CreateRowVisualElement();
 
-            return Build_ElementGroup(row, element, (ve, i) =>
+            return Build_ElementGroupChildren(row, element, (ve, i) =>
             {
                 ve.AddToClassList(FieldClassName.RowContents);
                 if (i == 0)
@@ -106,13 +124,13 @@ namespace RosettaUI.UIToolkit.Builder
             var column = new VisualElement();
             //column.AddToClassList(FieldClassName.Column);
 
-            return Build_ElementGroup(column, element);
+            return Build_ElementGroupChildren(column, element);
         }
 
         VisualElement Build_Box(Element element)
         {
             var box = new Box();
-            return Build_ElementGroup(box, element);
+            return Build_ElementGroupChildren(box, element);
         }
 
 
@@ -142,22 +160,15 @@ namespace RosettaUI.UIToolkit.Builder
             return ve;
         }
 
-        VisualElement Build_ElementGroup(VisualElement container, Element element, Action<VisualElement, int> setupContentsVe = null)
+        VisualElement Build_ElementGroupChildren(VisualElement container, Element element, Action<VisualElement, int> setupContentsVe = null)
         {
-            var elementGroup = (ElementGroup)element;
-            var elements = elementGroup.Elements;
-
-            for (var i = 0; i < elements.Count; ++i)
+            var i = 0;
+            foreach(var ve in Build_ElementGroupChildren((ElementGroup)element))
             {
-                var e = elements[i];
-                var ve = Build(e);
-                if (ve != null)
-                {
-                    setupContentsVe?.Invoke(ve, i);
-                    container.Add(ve);
-                }
+                setupContentsVe?.Invoke(ve, i);
+                container.Add(ve);
+                i++;
             }
-
             return container;
         }
 
@@ -203,7 +214,7 @@ namespace RosettaUI.UIToolkit.Builder
                 fold.Add(Build(content));
             }
 
-            foldElement.isOpenRx.Subscribe((isOpen) => fold.value = isOpen);
+            foldElement.isOpenRx.SubscribeAndCallOnce((isOpen) => fold.value = isOpen);
 
             return fold;
         }
@@ -231,7 +242,7 @@ namespace RosettaUI.UIToolkit.Builder
                 SetupLabelCallback(field.labelElement, labelElement);
             }
 
-            fieldElement.valueRx.Subscribe((v) => field.value = v);
+            fieldElement.valueRx.SubscribeAndCallOnce((v) => field.value = v);
             field.RegisterValueChangedCallback(ev => fieldElement.OnViewValueChanged(ev.newValue));
 
             return field;
@@ -279,12 +290,9 @@ namespace RosettaUI.UIToolkit.Builder
         {
             var buttonElement = (ButtonElement)element;
 
-            var button = new Button(buttonElement.onClick)
-            {
-                text = buttonElement.value,
-            };
+            var button = new Button(buttonElement.onClick);
 
-            buttonElement.valueRx.Subscribe((str) => button.text = str);
+            buttonElement.valueRx.SubscribeAndCallOnce((str) => button.text = str);
 
             return button;
         }
@@ -302,7 +310,7 @@ namespace RosettaUI.UIToolkit.Builder
             field.label = dropdownElement.label.value;
             SetupLabelCallback(field.labelElement, dropdownElement.label);
 
-            dropdownElement.valueRx.Subscribe((v) => field.index = v);
+            dropdownElement.valueRx.SubscribeAndCallOnce((v) => field.index = v);
             field.RegisterValueChangedCallback(ev => dropdownElement.OnViewValueChanged(field.index));
 
             return field;

@@ -67,4 +67,14 @@ namespace RosettaUI.Reactive
             }
         }
     }
+
+
+    public static class ReactivePropertyExtensions
+    {
+        public static IDisposable SubscribeAndCallOnce<T>(this ReactiveProperty<T> source, Action<T> onNext)
+        {
+            onNext?.Invoke(source.Value);
+            return source.Subscribe(onNext);
+        }
+    }
 }

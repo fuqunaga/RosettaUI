@@ -71,6 +71,7 @@ namespace RosettaUI.Test
         public ElementCreator elementCreator;
         public ComplexClass complexClass;
         public List<int> intList = new List<int>(new[] { 1, 2, 3 });
+        public float[] floatArray = new[] { 1f, 2f, 3f };
         public List<SimpleClass> classList = new List<SimpleClass>(new[] { new SimpleClass() { floatValue = 1f, stringValue = "First" } });
 
 
@@ -90,22 +91,16 @@ namespace RosettaUI.Test
                     );
             });
 
-            SimpleClass nullTestValue = null;
+            string nullString = null;
+            SimpleClass nullOneLineClass = null;
+            ComplexClass nullMultiLineClass = null;
+            ElementCreator nullElementCreator = null;
             var fold = UI.Fold("Fold", UI.Fold("Fold2", UI.Field("hoge", () => intValue)));
 
             var list = Enumerable.Range(0, 3).Select(_ => new ComplexClass()).ToList();
 
             var window = UI.Window(
-#if false
-                UI.Row(
-                    UI.Field("Test Null", () => nullTestValue),
-                    UI.Button("Totggle null", () =>
-                        {
-                            if (nullTestValue != null) nullTestValue = null;
-                            else nullTestValue = new SimpleClass();
-                        })
-                )
-#else
+#if true
                 UI.Label("Label")
                 , UI.Field(() => intValue)
                 , UI.Fold("Field allows any type"
@@ -119,11 +114,14 @@ namespace RosettaUI.Test
                     , UI.Field(() => vector3Value)
                     , UI.Field(() => vector4Value)
                     , UI.Field(() => intList)
+                    , UI.Field(() => floatArray)
                     , UI.Field(() => simpleClass)
-                    , UI.Field(() => elementCreator)
-                    , UI.Field(() => complexClass)
-                    
                 )
+                ,UI.Fold("Field complex"
+                    , UI.Field(() => elementCreator)
+                    , UI.Field(() => classList)
+                    , UI.Field(() => complexClass)
+                 )
                 , UI.Fold("Field usage"
                     , UI.Field("CustomLabel", () => floatValue)
                     , UI.Field("onValueChanged", () => floatValue, onValueChanged: (f) => print($"{nameof(floatValue)} changed."))
@@ -178,6 +176,31 @@ namespace RosettaUI.Test
                         )
                     )
                 )
+                , UI.Fold("Null"
+                    , UI.Box(
+                        UI.Label("Field")
+                        , UI.Field(nameof(String), () => nullString)
+                        , UI.Field(nameof(List<float>), () => (List<float>)null)
+                        , UI.Row(
+                            UI.Field(nameof(nullOneLineClass), () => nullOneLineClass),
+                            UI.Button("Totggle null", () =>
+                            {
+                                if (nullOneLineClass != null) nullOneLineClass = null;
+                                else nullOneLineClass = new SimpleClass();
+                            })
+                        )
+                        , UI.Field(nameof(nullMultiLineClass), () => nullMultiLineClass)
+                        , UI.Field(nameof(nullElementCreator), () => nullElementCreator)
+                    )
+
+                    , UI.Box(
+                        UI.Label("Slider")
+                        , UI.Slider(nameof(List<float>), () => (List<float>)null)
+                        , UI.Slider(nameof(nullOneLineClass), () => nullOneLineClass)
+                        , UI.Slider(nameof(nullMultiLineClass), () => nullMultiLineClass)
+                        , UI.Slider(nameof(nullElementCreator), () => nullElementCreator)
+                    )
+                )
                 , UI.Dropdown("Dropdown",
                     () => dropDownIndex,
                     options: new[] { "One", "Two", "Three" }
@@ -195,15 +218,7 @@ namespace RosettaUI.Test
                          }
                          )
                     )
-                , UI.Row(
-                    UI.Field("Test Null", () => nullTestValue),
-                    UI.Button("Totggle null", () =>
-                    {
-                        if (nullTestValue != null) nullTestValue = null;
-                        else nullTestValue = new SimpleClass();
-                    })
-                )
-
+      
                 /*
                 , UI.Fold("Interabletable",
                     fields.Concat(new[] {
@@ -215,7 +230,6 @@ namespace RosettaUI.Test
                     )
                 ).Close()
                 */
-                , fold.Close()
                 , UI.Button("Totggle fold", () =>
                 {
                     fold.isOpen = !fold.isOpen;

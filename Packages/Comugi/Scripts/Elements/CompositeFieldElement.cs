@@ -9,9 +9,9 @@ namespace RosettaUI
     public class CompositeFieldElement : ElementGroup
     {
         public readonly LabelElement label;
-        public readonly ElementGroup contents;
+        public readonly Element contents;
 
-        public CompositeFieldElement(LabelElement label, ElementGroup contents) : base(new Element[] { label, contents })
+        public CompositeFieldElement(LabelElement label, Element contents) : base(new Element[] { label, contents })
         {
             this.label = label;
             this.contents = contents;        

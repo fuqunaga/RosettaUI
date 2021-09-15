@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -10,64 +11,37 @@ namespace RosettaUI
     {
         public static Element CreateElement(LabelElement label, IBinder binder)
         {
-            var element = binder switch
+            var valueType = binder.ValueType;
+
+            Func<Element> createElementFunc = binder switch
             {
-                BinderBase<int> bb => new IntFieldElement(label, bb),
-                BinderBase<uint> bb => new IntFieldElement(label, new CastBinder<uint, int>(bb), true),
-                BinderBase<float> bb => new FloatFieldElement(label, bb),
-                BinderBase<string> bb => new StringFieldElement(label, bb),
-                BinderBase<bool> bb => new BoolFieldElement(label, bb),
-                IGetter<IList> ig => CreateListElement(label, ig),
-                _ => null
+                _ when UICustom.TryGetElementCreationMethod(valueType, out var custom) => () => custom.func(binder.GetObject()),
+
+                BinderBase<int> bb => () => new IntFieldElement(label, bb),
+                BinderBase<uint> bb => () => new IntFieldElement(label, new CastBinder<uint, int>(bb), true),
+                BinderBase<float> bb => () => new FloatFieldElement(label, bb),
+                BinderBase<string> bb => () => new StringFieldElement(label, bb),
+                BinderBase<bool> bb => () => new BoolFieldElement(label, bb),
+                _ when binder.ValueType.IsEnum => () => CreateEnumElement(label, binder),
+
+                IGetter<IElementCreator> ig => () => ig.Get().CreateElement(),
+                IGetter<IList> ig => () => CreateListElement(label, ig),
+
+                _ => () => CreateMemberFieldElement(label, binder)
             };
 
-            if (element != null)
-            {
-                return element;
-            }
-
-            var valueType = binder.ValueType;
-            if (valueType.IsEnum)
-            {
-                return CreateEnumElement(label, binder, valueType);
-            }
 
 
-            Func<Element> createElementFunc = null;
-
-            if (UICustom.TryGetElementCreationMethod(valueType, out var custom))
-            {
-                createElementFunc = () => custom.func(binder.GetObject());
-            }
-            else if (typeof(IElementCreator).IsAssignableFrom(valueType))
-            {
-                createElementFunc = () => new FoldElement(label, new[] { ((IElementCreator)binder.GetObject()).CreateElement() });
-            }
-            else if (TypeUtility.HasSerializableField(valueType))
-            {
-                createElementFunc = () => CreateCompositeFieldElement(label, binder, valueType);
-            }
-
-            if (createElementFunc != null)
-            {
-                if (valueType.IsValueType)
-                {
-                    return createElementFunc();
-                }
-                else
-                {
-                    return NullGuard(binder, createElementFunc);
-                }
-            }
-
-            return null;
+            return valueType.IsValueType || valueType == typeof(string)
+                ? createElementFunc()
+                : NullGuard(label, binder, createElementFunc);
         }
 
 
 
-        static readonly Element nullElement = new StringFieldElement(null, ConstBinder.Create("null")).SetInteractable(false);
+        static readonly BinderBase<string> nullStrBinder = ConstBinder.Create("null");
 
-        static Element NullGuard(IGetter getter, Func<Element> createElement)
+        static Element NullGuard(LabelElement label, IGetter getter, Func<Element> createElement)
         {
             Element ret = null;
 
@@ -77,7 +51,9 @@ namespace RosettaUI
                     readStatus: () => getter.IsNull,
                     buildWithStatus: (isNull) =>
                     {
-                        return isNull ? nullElement : createElement();
+                        return isNull
+                        ? new StringFieldElement(label, nullStrBinder).SetInteractable(false)
+                        : createElement();
                     },
                     $"NullGuard({nameof(DynamicElement)})"
                 );
@@ -90,8 +66,9 @@ namespace RosettaUI
             return ret;
         }
 
-        static Element CreateEnumElement(LabelElement label, IBinder binder, Type valueType)
+        static Element CreateEnumElement(LabelElement label, IBinder binder)
         {
+            var valueType = binder.ValueType;
             var binderType = typeof(EnumToIdxBinder<>).MakeGenericType(valueType);
             var enumToIdxBinder = Activator.CreateInstance(binderType, binder) as BinderBase<int>;
 
@@ -99,8 +76,10 @@ namespace RosettaUI
         }
 
 
-        static Element CreateCompositeFieldElement(LabelElement label, IBinder binder, Type valueType)
+        static Element CreateMemberFieldElement(LabelElement label, IBinder binder)
         {
+            var valueType = binder.ValueType;
+
             var elements = TypeUtility.GetSerializableFieldNames(valueType)
                 .Select(fieldName =>
                 {
@@ -114,7 +93,6 @@ namespace RosettaUI
 
                     return element;
                 });
-
 
             Element ret = null;
             if (binder.IsOneliner())
@@ -132,9 +110,7 @@ namespace RosettaUI
 
         public static Element CreateListElement(LabelElement label, IGetter<IList> listBinder, Func<IBinder, string, Element> createItemElement = null)
         {
-            var nullGuard = NullGuard(
-                listBinder,
-                () => new DynamicElement(
+            Element element = new DynamicElement(
                        build: () =>
                        {
                            var i = 0;
@@ -150,7 +126,7 @@ namespace RosettaUI
                            var addButton = UI.Button("+", () => IListUtility.AddItemAtLast(listBinder.Get(), listType, itemType)).SetWidth(buttonWidth);
                            var removeButton = UI.Button("-", () => IListUtility.RemoveItemAtLast(listBinder.Get(), itemType)).SetWidth(buttonWidth);
 
-                           return UI.Box(itemElements.Concat(new[] { UI.Row(addButton, removeButton).SetJustify(Layout.Justify.End)}));
+                           return UI.Box(itemElements.Concat(new[] { UI.Row(addButton, removeButton).SetJustify(Layout.Justify.End) }));
 
                        },
                        rebuildIf: (e) =>
@@ -159,47 +135,35 @@ namespace RosettaUI
                            return count != (e.element as ElementGroup).Elements.Count - 1; // -1 for UI.Row(addButton, removeButton)
                        },
                        $"ListEelements({nameof(DynamicElement)})"
-                   )
-                );
+                   );
 
             return label != null
-                ? new FoldElement(label, new[] { nullGuard })
-                : nullGuard;
-
-
+                ? new FoldElement(label, new[] { element })
+                : element;
         }
 
 
         #region Slider
+
         public static Element CreateSliderElement(LabelElement label, IBinder binder, IMinMaxGetter minMaxGetter)
         {
-            Element element = binder switch
+            var valueType = binder.ValueType;
+
+            return binder switch
             {
                 BinderBase<int> bb => new IntSliderElement(label, bb, (IGetter<(int, int)>)minMaxGetter),
                 BinderBase<float> bb => new FloatSliderElement(label, bb, (IGetter<(float, float)>)minMaxGetter),
-                _ => null
+                _ when TypeUtility.HasSerializableField(valueType) => CreateCompositeSliderElement(label, binder, minMaxGetter),
+
+                 // Sliderに出来ないものはCreateElement()へ
+                 _ => CreateElement(label, binder)
             };
-
-            if (element != null)
-            {
-                return element;
-            }
-
-            var valueType = binder.ValueType;
-            if (TypeUtility.HasSerializableField(valueType))
-            {
-                return CreateCompositeSliderElement(label, binder, minMaxGetter, binder.ValueType);
-            }
-
-
-            // Sliderに出来ないものはCreateElement()へ
-            return CreateElement(label, binder);
         }
 
 
-        static Element CreateCompositeSliderElement(LabelElement label, IBinder binder, IMinMaxGetter minMaxGetter, Type valueType)
+        static Element CreateCompositeSliderElement(LabelElement label, IBinder binder, IMinMaxGetter minMaxGetter)
         {
-            var elements = TypeUtility.GetSerializableFieldNames(valueType)
+            var elements = TypeUtility.GetSerializableFieldNames(binder.ValueType)
                 .Select(fieldName =>
                 {
                     var fieldBinder = PropertyOrFieldBinder.CreateWithBinder(binder, fieldName);
@@ -208,9 +172,11 @@ namespace RosettaUI
                 });
 
 
-            return new FoldElement(label, elements);
+            Func<Element> createElementFunc = () => new FoldElement(label, elements);
+            return binder.IsNullable
+                ? NullGuard(label, binder, createElementFunc)
+                : createElementFunc();
         }
-
 
         #endregion
     }

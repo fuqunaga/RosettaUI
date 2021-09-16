@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -5,34 +6,32 @@ namespace RosettaUI.UIToolkit
 {
     public class ColorField : BaseField<Color>
     {
-        ColorInput colorInput => (ColorInput)visualInput;
+        #region Uxml
 
         /// <summary>
         /// Instantiates a <see cref="ColorField"/> using the data read from a UXML file.
         /// </summary>
         public new class UxmlFactory : UxmlFactory<ColorField, UxmlTraits> { }
+
         /// <summary>
         /// Defines <see cref="UxmlTraits"/> for the <see cref="ColorField"/>.
         /// </summary>
         public new class UxmlTraits : TextValueFieldTraits<float, UxmlFloatAttributeDescription> { }
-        
-        /// <summary>
-        /// USS class name of elements of this type.
-        /// </summary>
+
+        #endregion
+
         public new static readonly string ussClassName = "rosettaui-color-field";
-        /// <summary>
-        /// USS class name of labels in elements of this type.
-        /// </summary>
         public new static readonly string labelUssClassName = ussClassName + "__label";
-        /// <summary>
-        /// USS class name of input elements in elements of this type.
-        /// </summary>
         public new static readonly string inputUssClassName = ussClassName + "__input";
+
+        ColorInput colorInput => (ColorInput)visualInput;
+
+        public event Action<Vector2, ColorField> showColorPickerFunc;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public ColorField() : this((string)null) { }
+        public ColorField() : this(null) { }
 
         /// <summary>
         /// Constructor.
@@ -45,7 +44,7 @@ namespace RosettaUI.UIToolkit
             labelElement.AddToClassList(labelUssClassName);
             visualInput.AddToClassList(inputUssClassName);
 
-            //visualInput.RegisterCallback<ClickEvent>(OnClick);
+            visualInput.RegisterCallback<ClickEvent>(OnClick);
         }
 
         public override void SetValueWithoutNotify(Color color)
@@ -54,6 +53,10 @@ namespace RosettaUI.UIToolkit
             colorInput.SetColor(color);
         }
 
+        private void OnClick(ClickEvent evt)
+        {
+            showColorPickerFunc?.Invoke(evt.position, this);
+        }
 
         class ColorInput : VisualElement
         {

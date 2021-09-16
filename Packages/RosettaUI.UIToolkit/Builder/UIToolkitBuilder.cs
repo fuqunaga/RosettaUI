@@ -50,7 +50,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(FloatFieldElement)] = Build_Field<float, FloatField>,
                 [typeof(StringFieldElement)] = Build_Field<string, TextField>,
                 [typeof(BoolFieldElement)] = Build_Field<bool, Toggle>,
-                [typeof(ColorFieldElement)] = Build_Field<Color, ColorField>,
+                [typeof(ColorFieldElement)] = Build_ColorField,
 
                 [typeof(DropdownElement)] = Build_Dropdown,
                 [typeof(IntSliderElement)] = Build_Slider<int, SliderInt, IntegerField>,
@@ -241,6 +241,19 @@ namespace RosettaUI.UIToolkit.Builder
             intField.isUnsigned = ((IntFieldElement)element).isUnsigned;
 
             return intField;
+        }
+
+
+        static VisualElement Build_ColorField(Element element)
+        {
+            var colorField = Build_Field<Color, ColorField>(element);
+
+
+            var colorPicker = new ModalWindow();
+            colorPicker.Add(new Label("hogehoge"));
+            colorField.showColorPickerFunc += (pos,target) => colorPicker.Show(pos, target);
+
+            return colorField;
         }
 
         static TField Build_Field<T, TField>(Element element)

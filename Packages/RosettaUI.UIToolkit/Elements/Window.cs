@@ -29,10 +29,19 @@ namespace RosettaUI.UIToolkit
 
         #endregion
 
-        public static readonly string ussClassName = "rosettaui-window";
-        readonly VisualElement _titleBarContainer = new VisualElement();
-        readonly VisualElement _titleBarContainerRight = new VisualElement();
-        readonly VisualElement _titleBarContainerLeft = new VisualElement();
+
+        public readonly bool resizable;
+
+        static readonly string ussClassName = "rosettaui-window";
+        static readonly string ussClassNameTitleBarContainer = ussClassName + "__titlebar-container";
+        static readonly string ussClassNameTitleBarContainerLeft = ussClassNameTitleBarContainer + "__left";
+        static readonly string ussClassNameTitleBarContainerRight = ussClassNameTitleBarContainer + "__right";
+        
+
+        readonly VisualElement titleBarContainer = new VisualElement();
+        readonly VisualElement titleBarContainerLeft = new VisualElement();
+        readonly VisualElement titleBarContainerRight = new VisualElement();
+
         Button _closeButton;
 
         DragMode dragMode;
@@ -41,9 +50,6 @@ namespace RosettaUI.UIToolkit
 
         ResizeEdge resizeEdge;
 
-
-        public VisualElement titleBarContainerRight => _titleBarContainerRight;
-        public VisualElement titleBarContainerLeft => _titleBarContainerLeft;
 
         public Button closeButton
         {
@@ -54,7 +60,7 @@ namespace RosettaUI.UIToolkit
                 {
                     if (_closeButton != null)
                     {
-                        hierarchy.Remove(_closeButton);
+                        titleBarContainerRight.Remove(_closeButton);
                     }
 
                     _closeButton = value;
@@ -64,20 +70,23 @@ namespace RosettaUI.UIToolkit
         }
 
 
-        public Window()
+        public Window(bool resizable = true)
         {
+            this.resizable = resizable;
+
             AddToClassList(ussClassName);
 
-            _titleBarContainer.AddToClassList(ussClassName + "__titlebar-container");
-            _titleBarContainerRight.AddToClassList(ussClassName + "__titlebar-container__right");
-            _titleBarContainerLeft.AddToClassList(ussClassName + "__titlebar-container__left");
+            titleBarContainer.AddToClassList(ussClassNameTitleBarContainer);
+            titleBarContainerLeft.AddToClassList(ussClassNameTitleBarContainerLeft);
+            titleBarContainerRight.AddToClassList(ussClassNameTitleBarContainerRight);
+            
 
-            _titleBarContainer.Add(titleBarContainerLeft);
-            _titleBarContainer.Add(titleBarContainerRight);
-            hierarchy.Add(_titleBarContainer);
+            titleBarContainer.Add(titleBarContainerLeft);
+            titleBarContainer.Add(titleBarContainerRight);
+            Add(titleBarContainer);
 
             closeButton = new CloseButton();
-            closeButton.clicked += () => visible = !visible;
+            closeButton.clicked += RemoveFromHierarchy;
 
             RegisterCallback<PointerDownEvent>(OnPointerDown);
             RegisterCallback<MouseMoveEvent>(OnMouseMove);
@@ -87,7 +96,7 @@ namespace RosettaUI.UIToolkit
 
         #region Event
 
-        private void OnPointerDown(PointerDownEvent evt)
+        protected virtual void OnPointerDown(PointerDownEvent evt)
         {
             if (evt.button == 0)
             {
@@ -101,10 +110,11 @@ namespace RosettaUI.UIToolkit
                 }
 
                 RegisterPanelCallback();
+                evt.StopPropagation();
             }
         }
 
-        private void OnPointerMoveOnRoot(PointerMoveEvent evt)
+        protected virtual void OnPointerMoveOnRoot(PointerMoveEvent evt)
         {
             if (dragMode != DragMode.None)
             {
@@ -130,7 +140,7 @@ namespace RosettaUI.UIToolkit
         }
 
 
-        private void OnPointerUpOnRoot(PointerUpEvent evt)
+        protected virtual void OnPointerUpOnRoot(PointerUpEvent evt)
         {
             if (evt.button == 0)
             {
@@ -140,15 +150,15 @@ namespace RosettaUI.UIToolkit
         }
 
 
-        private void OnMouseMove(MouseMoveEvent evt)
+        protected virtual void OnMouseMove(MouseMoveEvent evt)
         {
-            if (dragMode == DragMode.None)
+            if (resizable && dragMode == DragMode.None)
             {
                 UpdateResizeEdgeAndCursor(evt.localMousePosition);
             }
         }
 
-        private void OnMouseOut(MouseOutEvent evt)
+        protected virtual void OnMouseOut(MouseOutEvent evt)
         {
             if (dragMode != DragMode.ResizeWindow)
             {
@@ -176,7 +186,6 @@ namespace RosettaUI.UIToolkit
             }
         }
 
-
         #region DragWindow
 
         void StartDragWindow(Vector2 localPosition)
@@ -203,16 +212,18 @@ namespace RosettaUI.UIToolkit
             root.RegisterCallback<PointerUpEvent>(OnPointerUpOnRoot);
         }
 
-        void UnregisterPanelCallback()
+        protected void UnregisterPanelCallback()
         {
-            var root = panel.visualTree;
-            root.UnregisterCallback<PointerMoveEvent>(OnPointerMoveOnRoot);
-            root.UnregisterCallback<PointerUpEvent>(OnPointerUpOnRoot);
+            var root = panel?.visualTree;
+            if (root != null)
+            {
+                root.UnregisterCallback<PointerMoveEvent>(OnPointerMoveOnRoot);
+                root.UnregisterCallback<PointerUpEvent>(OnPointerUpOnRoot);
+            }
         }
 
+
         #endregion
-
-
 
         #region Resize Window
 
@@ -325,7 +336,62 @@ namespace RosettaUI.UIToolkit
 
             CursorManager.SetCursor(cursorType);
         }
-    }
 
-    #endregion
+
+        #endregion
+
+
+        protected virtual VisualElement selfRoot => this;
+
+        public virtual void Show(Vector2 position, VisualElement target)
+        {
+            var root = target.panel.visualTree;
+
+            if (root == null)
+            {
+                Debug.LogError("Could not find rootVisualContainer...");
+                return;
+            }
+
+            root.Add(selfRoot);
+
+            var local = root.WorldToLocal(position);
+            style.left = local.x - root.layout.x;
+            style.top = local.y - root.layout.y;
+
+            schedule.Execute(EnsureVisibilityInParent);
+
+            /*
+            if (targetElement != null)
+                targetElement.pseudoStates |= PseudoStates.Active;
+            */
+        }
+
+        public void EnsureVisibilityInParent()
+        {
+            var root = panel?.visualTree;
+            if (root != null && !float.IsNaN(layout.width) && !float.IsNaN(layout.height))
+            {
+                //if (m_DesiredRect == Rect.zero)
+                {
+                    var posX = Mathf.Min(layout.x, root.layout.width - layout.width);
+                    var posY = Mathf.Min(layout.y, Mathf.Max(0, root.layout.height - layout.height));
+
+                    style.left = posX;
+                    style.top = posY;
+                }
+
+                style.height = Mathf.Min(
+                    root.layout.height - root.layout.y - layout.y,
+                    layout.height + resolvedStyle.borderBottomWidth + resolvedStyle.borderTopWidth);
+
+                /*
+                if (m_DesiredRect != Rect.zero)
+                {
+                    m_OuterContainer.style.width = m_DesiredRect.width;
+                }
+                */
+            }
+        }
+    }
 }

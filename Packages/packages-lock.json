@@ -109,13 +109,13 @@
       "url": "https://packages.unity.com"
     },
     "ga.fuquna.rosettaui": {
-      "version": "file:Comugi",
+      "version": "file:RosettaUI",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}
     },
     "ga.fuquna.rosettaui.ugui": {
-      "version": "file:Comugi.UGUI",
+      "version": "file:RosettaUI.UGUI",
       "depth": 0,
       "source": "embedded",
       "dependencies": {
@@ -124,7 +124,7 @@
       }
     },
     "ga.fuquna.rosettaui.uitoolkit": {
-      "version": "file:Comugi.UIToolkit",
+      "version": "file:RosettaUI.UIToolkit",
       "depth": 0,
       "source": "embedded",
       "dependencies": {

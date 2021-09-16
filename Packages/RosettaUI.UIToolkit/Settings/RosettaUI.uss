@@ -117,4 +117,55 @@
 }
 */
 
+/********************************************************************************
+* ColorFIeld
+********************************************************************************/
+/*
+.rosettaui-color-field {
+    align-items: center;
+}
 
+.color-field__label {
+}
+
+.color-field__reset-button {
+    height:28px;
+    margin: 0 0 0 5px;
+    padding: 0 8px;
+}
+*/
+.rosettaui-color-field__input {
+    /*height: 28px;*/
+    border-width: 1px;
+    border-radius: 3px;
+    border-color: var(--color-primary-drk);
+    background-color: var(--color-back-drk);
+}
+
+.rosettaui-color-field__input:hover,
+.rosettaui-color-field__input:focus,
+.rosettaui-color-field:focus > .color-field__input,
+.rosettaui-color-field:hover > .color-field__input {
+    border-color: var(--color-primary-mid);
+}
+
+.rosettaui-color-field__input-rgb {
+    flex-grow: 1;
+    width: 100%;
+    background-color: black;
+}
+
+.rosettaui-color-field__input-alpha-container {
+    height: 20%;
+    width: 100%;
+    background-color: black;
+}
+
+.rosettaui-color-field__input-alpha {
+    flex-grow: 0;
+    flex-shrink: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+}

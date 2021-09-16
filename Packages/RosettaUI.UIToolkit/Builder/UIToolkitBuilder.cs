@@ -50,6 +50,8 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(FloatFieldElement)] = Build_Field<float, FloatField>,
                 [typeof(StringFieldElement)] = Build_Field<string, TextField>,
                 [typeof(BoolFieldElement)] = Build_Field<bool, Toggle>,
+                [typeof(ColorFieldElement)] = Build_Field<Color, ColorField>,
+
                 [typeof(DropdownElement)] = Build_Dropdown,
                 [typeof(IntSliderElement)] = Build_Slider<int, SliderInt, IntegerField>,
                 [typeof(FloatSliderElement)] = Build_Slider<float, Slider, FloatField>,

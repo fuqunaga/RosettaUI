@@ -22,6 +22,7 @@ namespace RosettaUI
                 BinderBase<float> bb => () => new FloatFieldElement(label, bb),
                 BinderBase<string> bb => () => new StringFieldElement(label, bb),
                 BinderBase<bool> bb => () => new BoolFieldElement(label, bb),
+                BinderBase<Color> bb => () => new ColorFieldElement(label, bb),
                 _ when binder.ValueType.IsEnum => () => CreateEnumElement(label, binder),
 
                 IGetter<IElementCreator> ig => () => ig.Get().CreateElement(),

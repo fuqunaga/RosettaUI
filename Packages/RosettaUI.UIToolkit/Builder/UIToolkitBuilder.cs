@@ -250,7 +250,7 @@ namespace RosettaUI.UIToolkit.Builder
 
 
             var colorPicker = new ModalWindow();
-            colorPicker.Add(new Label("hogehoge"));
+            colorPicker.Add(new ColorPicker());
             colorField.showColorPickerFunc += (pos,target) => colorPicker.Show(pos, target);
 
             return colorField;

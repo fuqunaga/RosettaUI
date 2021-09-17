@@ -36,6 +36,7 @@ namespace RosettaUI.UIToolkit
             var modalWindow = new ModalWindow();
             var textField = new TextField("text");
             modalWindow.Add(textField);
+            modalWindow.Add(new ColorPicker());
 
             var button = new Button()
             {

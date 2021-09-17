@@ -1,6 +1,8 @@
 
 @import url("/Packages/com.unity.ui/PackageResources/StyleSheets/Generated/DefaultCommonDark.uss.asset");
 @import url("RosettaUI.uss");
+@import url("RosettaUI_ColorPicker.uss");
+
 
 
 

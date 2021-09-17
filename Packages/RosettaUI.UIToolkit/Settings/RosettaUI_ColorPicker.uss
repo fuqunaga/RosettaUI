@@ -1,0 +1,17 @@
+/********************************************************************************
+* ColorPicker
+********************************************************************************/
+
+.rosettaui-colorpicker__preview 
+{
+    width: 200px;
+    height: 18px;
+    margin: 3px;
+    flex-direction: row;
+    
+}
+
+.rosettaui-colorpicker__handler
+{
+    flex-direction: row;
+}

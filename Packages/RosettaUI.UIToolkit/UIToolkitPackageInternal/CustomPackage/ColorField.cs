@@ -20,9 +20,9 @@ namespace RosettaUI.UIToolkit
 
         #endregion
 
-        public new static readonly string ussClassName = "rosettaui-color-field";
-        public new static readonly string labelUssClassName = ussClassName + "__label";
-        public new static readonly string inputUssClassName = ussClassName + "__input";
+        private new static readonly string ussClassName = "rosettaui-color-field";
+        private new static readonly string labelUssClassName = ussClassName + "__label";
+        private new static readonly string inputUssClassName = ussClassName + "__input";
 
         ColorInput colorInput => (ColorInput)visualInput;
 
@@ -85,7 +85,7 @@ namespace RosettaUI.UIToolkit
             public void SetColor(Color color)
             {
                 rgbField.style.backgroundColor = new Color(color.r, color.g, color.b, 1f);
-                alphaField.style.width = alphaField.parent.resolvedStyle.width * color.a;
+                alphaField.style.width = Length.Percent(color.a * 100f);
             }
         }
     }

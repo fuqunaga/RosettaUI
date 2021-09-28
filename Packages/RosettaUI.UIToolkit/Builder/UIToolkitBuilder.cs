@@ -32,13 +32,13 @@ namespace RosettaUI.UIToolkit.Builder
         }
 
 
-        readonly Dictionary<Type, Func<Element, VisualElement>> buildFuncs;
-        protected override IReadOnlyDictionary<Type, Func<Element, VisualElement>> buildFuncTable => buildFuncs;
+        readonly Dictionary<Type, Func<Element, VisualElement>> _buildFuncs;
+        protected override IReadOnlyDictionary<Type, Func<Element, VisualElement>> buildFuncTable => _buildFuncs;
 
 
         public UIToolkitBuilder()
         {
-            buildFuncs = new Dictionary<Type, Func<Element, VisualElement>>()
+            _buildFuncs = new Dictionary<Type, Func<Element, VisualElement>>()
             {
                 [typeof(WindowElement)] = Build_Window,
                 [typeof(Row)] = Build_Row,
@@ -247,11 +247,11 @@ namespace RosettaUI.UIToolkit.Builder
         static VisualElement Build_ColorField(Element element)
         {
             var colorField = Build_Field<Color, ColorField>(element);
-
-
-            var colorPicker = new ModalWindow();
-            colorPicker.Add(new ColorPicker());
-            colorField.showColorPickerFunc += (pos,target) => colorPicker.Show(pos, target);
+            
+            colorField.showColorPickerFunc += (pos,target) =>
+            {
+                ColorPicker.Show(pos, target, colorField.value, (color) => colorField.value = color);
+            };
 
             return colorField;
         }

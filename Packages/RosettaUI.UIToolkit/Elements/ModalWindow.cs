@@ -64,8 +64,6 @@ namespace RosettaUI.UIToolkit
             if (evt.originPanel == null)
                 return;
 
-
-
             UnregisterCallback<AttachToPanelEvent>(OnAttachToPanel);
             UnregisterCallback<DetachFromPanelEvent>(OnDetachFromPanel);
 

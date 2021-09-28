@@ -8,8 +8,17 @@
     height: 18px;
     margin: 3px;
     flex-direction: row;
-    
 }
+
+.rosettaui-colorpicker__preview-prev
+{
+    flex-grow: 1;
+}
+.rosettaui-colorpicker__preview-curr
+{
+    flex-grow: 1;
+}
+
 
 .rosettaui-colorpicker__handler
 {

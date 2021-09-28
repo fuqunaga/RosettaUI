@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -5,57 +7,90 @@ namespace RosettaUI.UIToolkit
 {
     public class ColorPicker : VisualElement
     {
-        #region CheckerBoard
+        #region static
 
-        static Texture2D _checkerBoardTexture;
-        static Texture2D checkerBoardTexture => _checkerBoardTexture ??= CreateChekcerBoardTexture(new Vector2Int(200, 18), 4, Color.white, Color.HSVToRGB(0f, 0f, 0.8f));
-        
-        static Texture2D CreateChekcerBoardTexture(Vector2Int size, int gridSize, Color col0, Color col1)
+        private static ModalWindow _window;
+        private static ColorPicker _colorPicker;
+
+        public static void Show(Vector2 position, VisualElement target, Color initialColor, Action<Color> onClose)
         {
-            var tex = new Texture2D(size.x, size.y);
-            for (var y = 0; y < size.y; y++)
+            if (_window == null)
             {
-                var flagY = ((y / gridSize) % 2 == 0);
-                for (var x = 0; x < size.x; x++)
-                {
-                    var flagX = ((x / gridSize) % 2 == 0);
-                    tex.SetPixel(x, y, (flagX ^ flagY) ? col0 : col1);
-                }
+                _window = new ModalWindow();
+                _colorPicker = new ColorPicker();
+                _window.Add(_colorPicker);
             }
 
-            tex.wrapMode = TextureWrapMode.Repeat;
-            tex.Apply();
-            return tex;
+            _colorPicker.PrevColor = initialColor;
+            _colorPicker.RegisterCallback<DetachFromPanelEvent>(OnDetach);
+            
+            _window.Show(position, target);
+            
+            void OnDetach(DetachFromPanelEvent _)
+            {
+                onClose(_colorPicker.Color);
+                _colorPicker.UnregisterCallback<DetachFromPanelEvent>(OnDetach);
+            }
         }
 
         #endregion
-
-
+        
         static readonly string ussClassName = "rosettaui-colorpicker";
         static readonly string ussClassNamePreview  = ussClassName + "__preview";
         static readonly string ussClassNamePreviewPrev = ussClassName + "__preview-prev";
-        static readonly string ussClassNamePreviewCurrent = ussClassName + "__preview-current";
+        static readonly string ussClassNamePreviewCurrent = ussClassName + "__preview-curr";
         static readonly string ussClassNameHandler = ussClassName + "__handler";
         static readonly string ussClassNameHandlerSV = ussClassName + "__handler-sv";
         static readonly string ussClassNameHandlerH = ussClassName + "__handler-h";
+
+        private static readonly Texture2D _svTexture;
         
+        private readonly VisualElement _previewPrev;
+        private readonly VisualElement _previewCurr;
 
 
-        public ColorPicker()
+        public Color PrevColor
+        {
+            get => _previewPrev.style.backgroundColor.value;
+            set
+            {
+                if (PrevColor != value)
+                {
+                    _previewPrev.style.backgroundColor = value;
+                }
+
+                Color = value;
+            }
+        }
+
+
+        public Color Color
+        {
+            get => _previewCurr.style.backgroundColor.value;
+            set
+            {
+                if (Color == value) return;
+                
+                _previewCurr.style.backgroundColor = value;
+                UpdateColor(value);
+            }
+        }
+
+
+
+        private ColorPicker()
         {
             AddToClassList(ussClassName);
 
-
             var preview = CreateElement(ussClassNamePreview, this);
-            preview.style.backgroundImage = checkerBoardTexture;
-            CreateElement(ussClassNamePreviewPrev, preview);
-            CreateElement(ussClassNamePreviewCurrent, preview);
+            _previewPrev = CreateElement(ussClassNamePreviewPrev, preview);
+            _previewCurr = CreateElement(ussClassNamePreviewCurrent, preview);
 
+            preview.style.backgroundImage = ColorPickerHelper.CheckerBoardTexture;
+            
             var handler = CreateElement(ussClassNameHandler, this);
             CreateElement(ussClassNameHandlerSV, handler);
             CreateElement(ussClassNameHandlerH, handler);
-
-
 
             static VisualElement CreateElement(string className, VisualElement parent)
             {
@@ -65,6 +100,11 @@ namespace RosettaUI.UIToolkit
 
                 return element;
             }
+        }
+
+        void UpdateColor(Color color)
+        {
+            
         }
     }
 }

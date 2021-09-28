@@ -24,3 +24,18 @@
 {
     flex-direction: row;
 }
+
+.rosettaui-colorpicker__handler-sv
+{
+    width: 200px;
+    height: 200px;
+}
+
+.rosettaui-colorpicker__circle
+{
+    width: 10px;
+    height: 10px;
+    margin: -5px -5px;
+    position: relative;
+    background-image: resource("circle");
+}

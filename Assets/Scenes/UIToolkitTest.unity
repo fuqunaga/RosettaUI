@@ -381,7 +381,7 @@ MonoBehaviour:
   stringValue: 
   boolValue: 0
   enumValue: 0
-  colorValue: {r: 0.77099997, g: 0.755182, b: 0.68927395, a: 0.57254905}
+  colorValue: {r: 0.77254903, g: 0.5149591, b: 0.47202745, a: 1}
   vector2Value: {x: 0, y: 0}
   vector3Value: {x: 0, y: 0, z: 0}
   vector4Value: {x: 0, y: 0, z: 0, w: 0}

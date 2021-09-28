@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace RosettaUI
+namespace RosettaUI.Builder
 {
     public static class ColorPickerHelper
     {

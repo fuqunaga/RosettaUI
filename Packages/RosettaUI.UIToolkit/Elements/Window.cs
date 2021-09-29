@@ -124,7 +124,7 @@ namespace RosettaUI.UIToolkit
                     switch (dragMode)
                     {
                         case DragMode.DragWindow:
-                            UpdateDragWindw(evt.position);
+                            UpdateDragWindow(evt.position);
                             break;
 
                         case DragMode.ResizeWindow:
@@ -195,7 +195,7 @@ namespace RosettaUI.UIToolkit
         }
 
 
-        void UpdateDragWindw(Vector2 position)
+        void UpdateDragWindow(Vector2 position)
         {
             var pos = position - draggingLocalPosition;
 

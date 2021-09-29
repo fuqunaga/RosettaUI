@@ -2,7 +2,7 @@ using System.Globalization;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace RosettaUI.UIToolkit
+namespace RosettaUI.UIToolkit.PackageInternal
 {
     /// <summary>
     /// Makes a text field for entering a float.

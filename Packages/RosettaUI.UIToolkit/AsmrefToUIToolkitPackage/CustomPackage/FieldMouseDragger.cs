@@ -3,7 +3,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace RosettaUI.UIToolkit
+namespace RosettaUI.UIToolkit.PackageInternal
 {
     /// <summary>
     /// Provides the base class for field mouse draggers.

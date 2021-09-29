@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
-namespace RosettaUI.UIToolkit
+namespace RosettaUI.UIToolkit.PackageInternal
 {
     /// <summary>
     /// Generic popup selection field.

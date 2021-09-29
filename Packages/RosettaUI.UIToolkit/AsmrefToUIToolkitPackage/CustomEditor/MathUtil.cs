@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace RosettaUI.UIToolkit
+namespace RosettaUI.UIToolkit.PackageInternal
 {
     internal class MathUtils
     {

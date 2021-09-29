@@ -5,8 +5,8 @@ namespace RosettaUI.UIToolkit
 {
     public class ModalWindow : Window
     {
-        VisualElement eventBlockerElement;
-        KeyboardNavigationManipulator navigationManipulator;
+        readonly VisualElement _eventBlockerElement;
+        KeyboardNavigationManipulator _navigationManipulator;
 
         static readonly string ussClassNameEventBlocker = "rosettaui-modal-window-eventblocker";
         static readonly string ussClassName = "rosettaui-modal-window";
@@ -16,9 +16,9 @@ namespace RosettaUI.UIToolkit
             closeButton = new CloseButton();
             closeButton.clicked += Hide;
 
-            eventBlockerElement = new VisualElement();
-            eventBlockerElement.AddToClassList(ussClassNameEventBlocker);
-            eventBlockerElement.Add(this);
+            _eventBlockerElement = new VisualElement();
+            _eventBlockerElement.AddToClassList(ussClassNameEventBlocker);
+            _eventBlockerElement.Add(this);
 
             AddToClassList(ussClassName);
 
@@ -43,8 +43,8 @@ namespace RosettaUI.UIToolkit
             */
 
 
-            eventBlockerElement.RegisterCallback<AttachToPanelEvent>(OnAttachToPanel);
-            eventBlockerElement.RegisterCallback<DetachFromPanelEvent>(OnDetachFromPanel);
+            _eventBlockerElement.RegisterCallback<AttachToPanelEvent>(OnAttachToPanel);
+            _eventBlockerElement.RegisterCallback<DetachFromPanelEvent>(OnDetachFromPanel);
         }
 
         void OnAttachToPanel(AttachToPanelEvent evt)
@@ -52,8 +52,8 @@ namespace RosettaUI.UIToolkit
             if (evt.destinationPanel == null)
                 return;
 
-            contentContainer.AddManipulator(navigationManipulator = new KeyboardNavigationManipulator(Apply));
-            eventBlockerElement.RegisterCallback<PointerDownEvent>(OnPointerDownOnBlocker);
+            contentContainer.AddManipulator(_navigationManipulator = new KeyboardNavigationManipulator(Apply));
+            _eventBlockerElement.RegisterCallback<PointerDownEvent>(OnPointerDownOnBlocker);
             //evt.destinationPanel.visualTree.RegisterCallback<GeometryChangedEvent>(OnParentResized);
             //m_ScrollView.RegisterCallback<GeometryChangedEvent>(OnContainerGeometryChanged);
             //RegisterCallback<FocusOutEvent>(OnFocusOut);
@@ -67,9 +67,9 @@ namespace RosettaUI.UIToolkit
             UnregisterCallback<AttachToPanelEvent>(OnAttachToPanel);
             UnregisterCallback<DetachFromPanelEvent>(OnDetachFromPanel);
 
-            contentContainer.RemoveManipulator(navigationManipulator);
+            contentContainer.RemoveManipulator(_navigationManipulator);
 
-            eventBlockerElement.UnregisterCallback<PointerDownEvent>(OnPointerDownOnBlocker);
+            _eventBlockerElement.UnregisterCallback<PointerDownEvent>(OnPointerDownOnBlocker);
 
             //evt.originPanel.visualTree.UnregisterCallback<GeometryChangedEvent>(OnParentResized);
         }
@@ -78,7 +78,7 @@ namespace RosettaUI.UIToolkit
         {
             UnregisterPanelCallback();
 
-            eventBlockerElement.RemoveFromHierarchy();
+            _eventBlockerElement.RemoveFromHierarchy();
 
             /*
             if (m_TargetElement != null)
@@ -254,7 +254,7 @@ namespace RosettaUI.UIToolkit
 #endif
 
 
-        protected override VisualElement selfRoot => eventBlockerElement;
+        protected override VisualElement selfRoot => _eventBlockerElement;
 
         public override void Show(Vector2 position, VisualElement target)
         {
@@ -262,10 +262,10 @@ namespace RosettaUI.UIToolkit
 
             var root = target.panel.visualTree;
 
-            eventBlockerElement.style.left = root.layout.x;
-            eventBlockerElement.style.top = root.layout.y;
-            eventBlockerElement.style.width = root.layout.width;
-            eventBlockerElement.style.height = root.layout.height;
+            _eventBlockerElement.style.left = root.layout.x;
+            _eventBlockerElement.style.top = root.layout.y;
+            _eventBlockerElement.style.width = root.layout.width;
+            _eventBlockerElement.style.height = root.layout.height;
         }
     }
 }

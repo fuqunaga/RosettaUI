@@ -19,17 +19,18 @@
 
 .unity-base-field__label--with-dragger
 {
-	cursor: arrow:
+	cursor: arrow;
 }
 
 /********************************************************************************
-* Window Element
+* Window
 ********************************************************************************/
-
 .rosettaui-window 
 {
+	/*
 	min-width: 500px;
 	min-height: 200px;
+	*/
 	background-color: rgba(45,45,45,0.9);
 	position: absolute;
 	border-radius: 1px;
@@ -50,11 +51,22 @@
 
 .rosettaui-closebutton 
 {
-	background-color: transparent;
+	/*background-color: transparent;*/
 	border-width: 0;
 	border-radius: 0;
 	align-self: flex-end;
 }
+
+/********************************************************************************
+* Modal Window
+********************************************************************************/
+/*
+.rosettaui-modal-window 
+{
+	min-width: auto;
+	min-height: auto;
+}
+*/
 
 /********************************************************************************
 * Row

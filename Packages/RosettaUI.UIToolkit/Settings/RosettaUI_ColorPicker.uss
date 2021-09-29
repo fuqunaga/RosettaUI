@@ -4,9 +4,9 @@
 
 .rosettaui-colorpicker__preview 
 {
-    width: 200px;
-    height: 18px;
-    margin: 3px;
+    width: 312px;
+    height: 24px;
+    margin: 4px;
     flex-direction: row;
 }
 
@@ -27,15 +27,33 @@
 
 .rosettaui-colorpicker__handler-sv
 {
-    width: 200px;
-    height: 200px;
+    width: 280px;
+    height: 280px;
+    margin: 4px;
 }
 
-.rosettaui-colorpicker__circle
+.rosettaui-colorpicker__handler-h
+{
+    width: 24px;
+    height: 280px;
+    margin: 4px;
+}
+
+.rosettaui-colorpicker-circle
 {
     width: 10px;
     height: 10px;
     margin: -5px -5px;
     position: relative;
     background-image: resource("circle");
+}
+
+.rosettaui-colorpicker-slider
+{
+    flex-direction: row;
+}
+
+.rosettaui-colorpicker-slider .unity-base-slider__label
+{
+    min-width: auto;
 }

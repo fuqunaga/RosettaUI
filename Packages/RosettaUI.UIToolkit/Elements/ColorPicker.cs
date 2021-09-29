@@ -12,7 +12,8 @@ namespace RosettaUI.UIToolkit
         private static ModalWindow _window;
         private static ColorPicker _colorPicker;
 
-        public static void Show(Vector2 position, VisualElement target, Color initialColor, Action<Color> onClose)
+        public static void Show(Vector2 position, VisualElement target, Color initialColor,
+            Action<Color> onColorChanged)
         {
             if (_window == null)
             {
@@ -22,13 +23,14 @@ namespace RosettaUI.UIToolkit
             }
 
             _colorPicker.PrevColor = initialColor;
+            _colorPicker.onColorChanged += onColorChanged;
             _colorPicker.RegisterCallback<DetachFromPanelEvent>(OnDetach);
 
             _window.Show(position, target);
 
             void OnDetach(DetachFromPanelEvent _)
             {
-                onClose(_colorPicker.Color);
+                _colorPicker.onColorChanged -= onColorChanged;
                 _colorPicker.UnregisterCallback<DetachFromPanelEvent>(OnDetach);
             }
         }
@@ -37,40 +39,30 @@ namespace RosettaUI.UIToolkit
 
         #region static members
 
-        private static readonly string ussClassName = "rosettaui-colorpicker";
-        private static readonly string ussClassNamePreview = ussClassName + "__preview";
-        private static readonly string ussClassNamePreviewPrev = ussClassNamePreview + "-prev";
-        private static readonly string ussClassNamePreviewCurrent = ussClassNamePreview + "-curr";
-        private static readonly string ussClassNameHandler = ussClassName + "__handler";
-        private static readonly string ussClassNameHandlerSV = ussClassNameHandler + "-sv";
-        private static readonly string ussClassNameHandlerH = ussClassNameHandler + "-h";
-        private static readonly string ussClassNameCircle = ussClassName + "__circle";
-
+        private static VisualTreeAsset _visualTreeAsset;
         private static Texture2D _svTexture;
 
         #endregion
-        
 
-        private readonly VisualElement _previewPrev;
-        private readonly VisualElement _previewCurr;
-        private readonly VisualElement _svHandler;
-        private readonly VisualElement _svCircle;
-        
+        public event Action<Color> onColorChanged;
+
+        private VisualElement _previewPrev;
+        private VisualElement _previewCurr;
+        private VisualElement _svHandler;
+        private VisualElement _svCircle;
+        private VisualElement _hueHandler;
+        private VisualElement _hueCircle;
+
         private Vector3 _hsv;
         private float _alpha;
-        
+
         public Color PrevColor
         {
             get => _previewPrev.style.backgroundColor.value;
             private set
             {
                 _previewPrev.style.backgroundColor = value;
-                
-                Color.RGBToHSV(value, out var h, out var s, out var v);
-                _hsv = new Vector3(h, s, v);
-                _alpha = value.a;
-
-                OnUpdateColor();
+                Color = value;
             }
         }
 
@@ -82,6 +74,14 @@ namespace RosettaUI.UIToolkit
                 var rgb = Color.HSVToRGB(hsv.x, hsv.y, hsv.z);
                 return new Color(rgb.r, rgb.g, rgb.b, _alpha);
             }
+            private set
+            {
+                Color.RGBToHSV(value, out var h, out var s, out var v);
+                _hsv = new Vector3(h, s, v);
+                _alpha = value.a;
+
+                OnUpdateColor();
+            }
         }
 
 
@@ -91,7 +91,7 @@ namespace RosettaUI.UIToolkit
             set
             {
                 if (_hsv == value) return;
-                
+
                 _hsv = value;
                 OnUpdateColor();
             }
@@ -99,80 +99,119 @@ namespace RosettaUI.UIToolkit
 
         private ColorPicker()
         {
+            _visualTreeAsset ??=Resources.Load<VisualTreeAsset>("RosettaUI_ColorPicker"); 
+            _visualTreeAsset.CloneTree(this);
+            
+            InitPreview();
+            InitHsvHandlers();
+            InitSliders();
+        }
+
+
+        private void InitHsvHandlers()
+        {
             if (_svTexture == null)
             {
-                _svTexture = new Texture2D(400, 400);
+                var size = ColorPickerHelper.defaultSvTextureSize;
+                _svTexture = new Texture2D(size.x, size.y);
             }
 
-            AddToClassList(ussClassName);
-
-            var preview = CreateElement(ussClassNamePreview, this);
-            _previewPrev = CreateElement(ussClassNamePreviewPrev, preview);
-            _previewCurr = CreateElement(ussClassNamePreviewCurrent, preview);
-
-            preview.style.backgroundImage = ColorPickerHelper.CheckerBoardTexture;
-
-            var handler = CreateElement(ussClassNameHandler, this);
-            _svHandler = CreateElement(ussClassNameHandlerSV, handler);
-            _svCircle = CreateElement(ussClassNameCircle, _svHandler);
-            CreateElement(ussClassNameHandlerH, handler);
+            _svHandler = this.Q("handler-sv");
+            _svCircle = _svHandler.Q("circle");
+            _hueHandler = this.Q("handler-h");
+            _hueCircle = _hueHandler.Q("circle");
 
             _svHandler.style.backgroundImage = _svTexture;
-            _svHandler.RegisterCallback<PointerDownEvent>(OnPointDownOnSV);
+            _hueHandler.style.backgroundImage = ColorPickerHelper.HueTexture;
+            _hueCircle.style.left = Length.Percent(50f);
 
-            static VisualElement CreateElement(string className, VisualElement parent)
+            PointerDrag.RegisterCallback(_svHandler, OnPointerMoveOnPanel_SV);
+            PointerDrag.RegisterCallback(_hueHandler, OnPointerMoveOnPanel_Hue);
+        }
+
+        private void InitPreview()
+        {
+            var preview = this.Q("preview");
+            _previewPrev = this.Q("preview-prev");
+            _previewCurr = this.Q("preview-curr");
+            
+            preview.style.backgroundImage = ColorPickerHelper.CheckerBoardTexture;
+            _previewPrev.RegisterCallback<PointerDownEvent>((_) => Color = PrevColor);
+        }
+
+        private void InitSliders()
+        {
+            InitSlider("slider0", "H", 360, (v) =>
             {
-                var element = new VisualElement();
-                element.AddToClassList(className);
-                parent.Add(element);
+                var hsv = Hsv;
+                hsv.x = v / 360f;
+                Hsv = hsv;
+            });
 
-                return element;
-            }
+            InitSlider("slider1", "S", 100, (v) =>
+            {
+                var hsv = Hsv;
+                hsv.y = v / 100f;
+                Hsv = hsv;
+            });
         }
 
-        private void OnPointDownOnSV(PointerDownEvent evt)
+        void InitSlider(string name, string label, int max, Action<int> onSliderValueChanged)
         {
-            var root = panel.visualTree;
-            root.RegisterCallback<PointerMoveEvent>(OnPointerMoveOnPanel);
-            root.RegisterCallback<PointerUpEvent>(OnPointerUpOnPanel);
-
-            evt.StopPropagation();
+            var container = this.Q(name);
+            //container.Q<Label>("label").text = label;
+            var slider = container.Q<SliderInt>("slider");
+            slider.label = label;
+            slider.highValue = max;
+            slider.RegisterValueChangedCallback((evt) => onSliderValueChanged(evt.newValue));
         }
 
-        private void OnPointerUpOnPanel(PointerUpEvent evt)
-        {
-            var root = panel.visualTree;
-            root.UnregisterCallback<PointerMoveEvent>(OnPointerMoveOnPanel);
-            root.UnregisterCallback<PointerUpEvent>(OnPointerUpOnPanel);
-            evt.StopPropagation();
-        }
-
-        private void OnPointerMoveOnPanel(PointerMoveEvent evt)
+        private void OnPointerMoveOnPanel_SV(PointerMoveEvent evt)
         {
             var localPos = _svHandler.WorldToLocal(evt.position);
 
             var svLayout = _svHandler.layout;
             var size = new Vector2(svLayout.width, svLayout.height);
-            var sv = localPos / size;
+            var xyRate = localPos / size;
 
             var hsv = Hsv;
-            hsv.y = Mathf.Clamp01(sv.x);
-            hsv.z = 1f - Mathf.Clamp01(sv.y);
+            hsv.y = Mathf.Clamp01(xyRate.x);
+            hsv.z = 1f - Mathf.Clamp01(xyRate.y);
             Hsv = hsv;
 
             evt.StopPropagation();
         }
 
+        private void OnPointerMoveOnPanel_Hue(PointerMoveEvent evt)
+        {
+            var localPos = _hueHandler.WorldToLocal(evt.position);
+
+            var hueLayout = _hueHandler.layout;
+            var yRate = localPos.y / hueLayout.height;
+
+            var hsv = Hsv;
+            hsv.x = 1f - Mathf.Clamp01(yRate);
+            Hsv = hsv;
+
+            evt.StopPropagation();
+        }
+
+
         void OnUpdateColor()
         {
             _previewCurr.style.backgroundColor = Color;
-
+            
             var hsv = Hsv;
-            ColorPickerHelper.UpdateSVTexture(_svTexture, hsv.x);
+            ColorPickerHelper.UpdateSvTexture(_svTexture, hsv.x);
 
             var svCircleStyle = _svCircle.style;
             svCircleStyle.left = Length.Percent(hsv.y * 100f);
             svCircleStyle.top = Length.Percent((1f - hsv.z) * 100f);
+
+            var hueCircleStyle = _hueCircle.style;
+            hueCircleStyle.top = Length.Percent((1f - hsv.x) * 100f);
+
+            onColorChanged?.Invoke(Color);
         }
     }
 }

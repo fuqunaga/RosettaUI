@@ -57,3 +57,9 @@
 {
     min-width: auto;
 }
+
+.rosettaui-colorpicker-slider .unity-float-field
+{
+    flex-grow: 0;
+    width: 50px;
+}

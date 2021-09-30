@@ -2,6 +2,7 @@
 <engine:UXML
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:engine="UnityEngine.UIElements"
+        xmlns:rosettaui="RosettaUI.UIToolkit"
         xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
 >
     <engine:VisualElement name = "preview" class="rosettaui-colorpicker__preview">
@@ -18,9 +19,10 @@
         </engine:VisualElement>
     </engine:VisualElement>
 
-    <engine:Template src="./RosettaUI_ColorPicker_Slider.uxml" name="Slider" />
     <engine:VisualElement name="sliders">
-        <engine:Instance template="Slider" name="slider0"/>
-        <engine:Instance template="Slider" name="slider1"/>
+        <rosettaui:SliderWithField name="slider0"/>
+        <rosettaui:SliderWithField name="slider1"/>
+        <rosettaui:SliderWithField name="slider2"/>
+        <rosettaui:SliderWithField name="slider3"/>
     </engine:VisualElement>
 </engine:UXML>

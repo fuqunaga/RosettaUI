@@ -228,19 +228,18 @@ namespace RosettaUI.UIToolkit
             var hueCircleStyle = _hueCircle.style;
             hueCircleStyle.top = Length.Percent((1f - hsv.x) * 100f);
 
-            _slider0.Value = AlignDecimal(hsv.x);
-            _slider1.Value = AlignDecimal(hsv.y);
-            _slider2.Value = AlignDecimal(hsv.z);
-            _slider3.Value = AlignDecimal(Alpha);
+            _slider0.SetValueWithoutNotify(AlignDecimal(hsv.x));
+            _slider1.SetValueWithoutNotify(AlignDecimal(hsv.y));
+            _slider2.SetValueWithoutNotify(AlignDecimal(hsv.z));
+            _slider3.SetValueWithoutNotify(AlignDecimal(Alpha));
 
             onColorChanged?.Invoke(Color);
         }
 
-        float AlignDecimal(float f)
+        static float AlignDecimal(float f)
         {
             var scale = 1000f;
             return Mathf.Round(f * scale) / scale;
         }
-        
     }
 }

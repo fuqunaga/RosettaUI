@@ -32,7 +32,6 @@ namespace RosettaUI.UIToolkit
             if (builder == null) builder = new UIToolkitBuilder();
             var window = builder.Build(element);
 
-
             var modalWindow = new ModalWindow();
             var textField = new TextField("text");
             modalWindow.Add(textField);

@@ -217,13 +217,13 @@ namespace RosettaUI.UIToolkit
 
             #endregion
 
-            private ColorPicker _colorPicker;
+            private readonly ColorPicker _colorPicker;
 
-            private Button _sliderTypeButton;
-            private Slider _slider0;
-            private Slider _slider1;
-            private Slider _slider2;
-            private Slider _slider3;
+            private readonly Button _sliderTypeButton;
+            private readonly Slider _slider0;
+            private readonly Slider _slider1;
+            private readonly Slider _slider2;
+            private readonly Slider _slider3;
 
             private SliderType _sliderType;
 
@@ -299,7 +299,8 @@ namespace RosettaUI.UIToolkit
                 var vec3 = _sliderType switch
                 {
                     SliderType.Hsv => Hsv,
-                    SliderType.Rgb => (Vector3) (Vector4) Color
+                    SliderType.Rgb => (Vector3) (Vector4) Color,
+                    _ => throw new ArgumentException()
                 };
 
                 _slider0.SetValueWithoutNotify(vec3.x);

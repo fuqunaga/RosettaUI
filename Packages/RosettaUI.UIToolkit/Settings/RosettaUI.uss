@@ -1,15 +1,9 @@
 /********************************************************************************
 * override unity css
 ********************************************************************************/
-
 .unity-foldout__toggle
 {
 	margin-left: -15px;
-}
-
-.unity-base-field
-{
-	flex: 1 0 auto;
 }
 
 .unity-base-field__input
@@ -130,20 +124,6 @@
 /********************************************************************************
 * ColorField
 ********************************************************************************/
-/*
-.rosettaui-color-field {
-    align-items: center;
-}
-
-.color-field__label {
-}
-
-.color-field__reset-button {
-    height:28px;
-    margin: 0 0 0 5px;
-    padding: 0 8px;
-}
-*/
 .rosettaui-color-field__input {
     /*height: 28px;*/
     border-width: 1px;

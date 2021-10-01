@@ -7,16 +7,16 @@ namespace RosettaUI.UIToolkit.Test
     [RequireComponent(typeof(RosettaUI_UIToolkitRoot))]
     public class RosettaUI_UIToolkitTest : RosettaUI_Test
     {
-        RosettaUI_UIToolkitRoot root;
+        RosettaUI_UIToolkitRoot _root;
 
         protected override void BuildElement(Element rootElement)
         {
-            if (root == null)
+            if (_root == null)
             {
-                root = GetComponent<RosettaUI_UIToolkitRoot>();
+                _root = GetComponent<RosettaUI_UIToolkitRoot>();
             }
 
-            root.Build(rootElement);
+            _root.Build(rootElement);
         }
     }
 }

@@ -53,14 +53,15 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(ColorFieldElement)] = Build_ColorField,
 
                 [typeof(DropdownElement)] = Build_Dropdown,
-                [typeof(IntSliderElement)] = Build_Slider<int, SliderInt, IntegerField>,
-                [typeof(FloatSliderElement)] = Build_Slider<float, Slider, FloatField>,
+                [typeof(IntSliderElement)] = Build_Slider<int, SliderInt>,
+                [typeof(FloatSliderElement)] = Build_Slider<float, Slider>,
                 /*
                 [typeof(LogSlider)] = Build_LogSlider,
                 */
                 [typeof(ButtonElement)] = Build_Button,
                 [typeof(FoldElement)] = Build_Fold,
-                [typeof(DynamicElement)] = (e) => Build_ElementGroupChildren(new VisualElement() { name = nameof(DynamicElement) }, e),
+                [typeof(DynamicElement)] = (e) =>
+                    Build_ElementGroupChildren(new VisualElement() {name = nameof(DynamicElement)}, e),
             };
         }
 
@@ -92,7 +93,6 @@ namespace RosettaUI.UIToolkit.Builder
         {
             var groupVe = GetUIObj(elementGroup);
             Build_ElementGroupChildren(groupVe, elementGroup);
-   
         }
 
         protected override void OnDestroyElement(Element element)
@@ -103,10 +103,9 @@ namespace RosettaUI.UIToolkit.Builder
         }
 
 
-
         VisualElement Build_Window(Element element)
         {
-            var windowElement = (WindowElement)element;
+            var windowElement = (WindowElement) element;
             var window = new Window();
             window.closeButton.clicked += () => windowElement.enable = !windowElement.enable;
 
@@ -151,7 +150,7 @@ namespace RosettaUI.UIToolkit.Builder
 
         VisualElement Build_CompositeField(Element element)
         {
-            var compositeFieldElement = (CompositeFieldElement)element;
+            var compositeFieldElement = (CompositeFieldElement) element;
 
             var ve = new VisualElement();
             ve.AddToClassList(FieldClassName.BaseField);
@@ -175,22 +174,24 @@ namespace RosettaUI.UIToolkit.Builder
             return ve;
         }
 
-        VisualElement Build_ElementGroupChildren(VisualElement container, Element element, Action<VisualElement, int> setupContentsVe = null)
+        VisualElement Build_ElementGroupChildren(VisualElement container, Element element,
+            Action<VisualElement, int> setupContentsVe = null)
         {
             var i = 0;
-            foreach(var ve in Build_ElementGroupChildren((ElementGroup)element))
+            foreach (var ve in Build_ElementGroupChildren((ElementGroup) element))
             {
                 setupContentsVe?.Invoke(ve, i);
                 container.Add(ve);
                 i++;
             }
+
             return container;
         }
 
 
         static VisualElement Build_Label(Element element)
         {
-            var labelElement = (LabelElement)element;
+            var labelElement = (LabelElement) element;
             var label = new Label(labelElement.value);
             SetupLabelCallback(label, labelElement);
 
@@ -202,7 +203,8 @@ namespace RosettaUI.UIToolkit.Builder
         {
             if (labelElement.IsLeftMost())
             {
-                label.style.minWidth = Mathf.Max(0f, LayoutSettings.LabelWidth - labelElement.GetIndent() * LayoutSettings.IndentSize);
+                label.style.minWidth = Mathf.Max(0f,
+                    LayoutSettings.LabelWidth - labelElement.GetIndent() * LayoutSettings.IndentSize);
 
                 // Foldout直下のラベルはmarginRight、paddingRightがUnityDefaultCommon*.uss で書き換わるので上書きしておく
                 // セレクタ例： .unity - foldout--depth - 1 > .unity - base - field > .unity - base - field__label
@@ -218,7 +220,7 @@ namespace RosettaUI.UIToolkit.Builder
 
         VisualElement Build_Fold(Element element)
         {
-            var foldElement = (FoldElement)element;
+            var foldElement = (FoldElement) element;
             var fold = new Foldout();
 
             var title = foldElement.title;
@@ -238,7 +240,7 @@ namespace RosettaUI.UIToolkit.Builder
         static VisualElement Build_IntField(Element element)
         {
             var intField = Build_Field<int, IntegerField>(element);
-            intField.isUnsigned = ((IntFieldElement)element).isUnsigned;
+            intField.isUnsigned = ((IntFieldElement) element).isUnsigned;
 
             return intField;
         }
@@ -247,8 +249,8 @@ namespace RosettaUI.UIToolkit.Builder
         static VisualElement Build_ColorField(Element element)
         {
             var colorField = Build_Field<Color, ColorField>(element);
-            
-            colorField.showColorPickerFunc += (pos,target) =>
+
+            colorField.showColorPickerFunc += (pos, target) =>
             {
                 ColorPicker.Show(pos, target, colorField.value, (color) => colorField.value = color);
             };
@@ -259,7 +261,7 @@ namespace RosettaUI.UIToolkit.Builder
         static TField Build_Field<T, TField>(Element element)
             where TField : BaseField<T>, new()
         {
-            var fieldElement = (FieldBaseElement<T>)element;
+            var fieldElement = (FieldBaseElement<T>) element;
             var labelElement = fieldElement.label;
 
             var field = new TField();
@@ -276,12 +278,11 @@ namespace RosettaUI.UIToolkit.Builder
             return field;
         }
 
-        static VisualElement Build_Slider<T, TSlider, TField>(Element element)
+        static VisualElement Build_Slider<T, TSlider>(Element element)
             where T : IComparable<T>
             where TSlider : BaseSlider<T>, new()
-            where TField : BaseField<T>, new()
         {
-            var sliderElement = (Slider<T>)element;
+            var sliderElement = (Slider<T>) element;
 
             var slider = Build_Field<T, TSlider>(element);
             slider.AddToClassList(FieldClassName.RowContentsFirst);
@@ -290,33 +291,24 @@ namespace RosettaUI.UIToolkit.Builder
             slider.lowValue = min;
             slider.highValue = max;
 
-            if ( !sliderElement.IsMinMaxConst)
+            if (!sliderElement.IsMinMaxConst)
             {
                 sliderElement.minMaxRx.Subscribe((pair) =>
                 {
-                    var (min,max) = pair;
+                    var (min, max) = pair;
                     slider.lowValue = min;
                     slider.highValue = max;
                 });
             }
-
-            var field = new TField();
-            field.AddToClassList(FieldClassName.RowContents);
-
-            slider.RegisterValueChangedCallback((ev) => field.SetValueWithoutNotify(ev.newValue));
-            field.RegisterValueChangedCallback((ev) => slider.value = ev.newValue);
-
-            var row = CreateRowVisualElement();
-            row.Add(slider);
-            row.Add(field);
-
-            return row;
+            
+            slider.showInputField = true;
+            return slider;
         }
 
 
         static VisualElement Build_Button(Element element)
         {
-            var buttonElement = (ButtonElement)element;
+            var buttonElement = (ButtonElement) element;
 
             var button = new Button(buttonElement.onClick);
 
@@ -327,13 +319,13 @@ namespace RosettaUI.UIToolkit.Builder
 
         static VisualElement Build_Dropdown(Element element)
         {
-            var dropdownElement = (DropdownElement)element;
+            var dropdownElement = (DropdownElement) element;
             var options = dropdownElement.options.ToList();
 
             var field = new PopupField<string>(
                 options,
                 dropdownElement.value
-                );
+            );
 
             field.label = dropdownElement.label.value;
             SetupLabelCallback(field.labelElement, dropdownElement.label);

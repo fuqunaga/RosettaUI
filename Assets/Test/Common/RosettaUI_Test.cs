@@ -71,9 +71,11 @@ namespace RosettaUI.Test
         public SimpleClass simpleClass;
         public ElementCreator elementCreator;
         public ComplexClass complexClass;
-        public List<int> intList = new List<int>(new[] { 1, 2, 3 });
-        public float[] floatArray = new[] { 1f, 2f, 3f };
-        public List<SimpleClass> classList = new List<SimpleClass>(new[] { new SimpleClass() { floatValue = 1f, stringValue = "First" } });
+        public List<int> intList = new List<int>(new[] {1, 2, 3});
+        public float[] floatArray = new[] {1f, 2f, 3f};
+
+        public List<SimpleClass> classList =
+            new List<SimpleClass>(new[] {new SimpleClass() {floatValue = 1f, stringValue = "First"}});
 
 
         Element rootElement;
@@ -89,7 +91,7 @@ namespace RosettaUI.Test
                 return UI.Column(
                     UI.Label("UICustomized!"),
                     UI.Field(() => uiCustomClass.floatValue)
-                    );
+                );
             });
 
             string nullString = null;
@@ -119,41 +121,40 @@ namespace RosettaUI.Test
                     , UI.Field(() => floatArray)
                     , UI.Field(() => simpleClass)
                 )
-                ,UI.Fold("Field complex"
+                , UI.Fold("Field complex"
                     , UI.Field(() => elementCreator)
                     , UI.Field(() => classList)
                     , UI.Field(() => complexClass)
-                 )
+                )
                 , UI.Fold("Field usage"
                     , UI.Field("CustomLabel", () => floatValue)
-                    , UI.Field("onValueChanged", () => floatValue, onValueChanged: (f) => print($"{nameof(floatValue)} changed."))
+                    , UI.Field("onValueChanged", () => floatValue,
+                        onValueChanged: (f) => print($"{nameof(floatValue)} changed."))
                     , UI.Field(() => vector3Value.x) // public member
                     , UI.Field(() => floatValue + 1) // non-interactable if the expression is read-only, 
-                    , UI.Field("Expression with onValueChanged", () => floatValue + 1, onValueChanged: (f) => floatValue = f - 1)      // interactable If onValuedChanged callback is present
+                    , UI.Field("Expression with onValueChanged", () => floatValue + 1, onValueChanged: (f) => floatValue = f - 1) // interactable If onValuedChanged callback is present
                 )
-
                 , UI.Fold("Slider"
                     , UI.Slider(() => intValue)
                     , UI.Slider(() => floatValue)
-                    , UI.Slider("custom min max", () => floatValue, min:-1f, max:2f)
+                    , UI.Slider("custom min max", () => floatValue, min: -1f, max: 2f)
                     , UI.Slider(() => vector2Value)
-                /*
-                , UI.Slider(() => vector3Value,
-                    min: Vector3.zero,
-                    max: Vector3.one
+                    /*
+                    , UI.Slider(() => vector3Value,
+                        min: Vector3.zero,
+                        max: Vector3.one
+                        )
+                    */
+                    /*
+                    , UI.Row(
+                        UI.Label("LogSlider[WIP]"),
+                        new LogSlider(
+                            Binder.Create(() => transform.localScale.x, (v) => transform.localScale = Vector3.one * v),
+                            ConstGetter.Create((0.1f, 100f))
+                        )
                     )
-                */
-                /*
-                , UI.Row(
-                    UI.Label("LogSlider[WIP]"),
-                    new LogSlider(
-                        Binder.Create(() => transform.localScale.x, (v) => transform.localScale = Vector3.one * v),
-                        ConstGetter.Create((0.1f, 100f))
-                    )
+                    */
                 )
-                */
-                )
-
                 , UI.Fold("ElementGroup"
                     , UI.Row(
                         UI.Label("Row0"),
@@ -164,13 +165,13 @@ namespace RosettaUI.Test
                         UI.Label("Column0"),
                         UI.Label("Column1"),
                         UI.Label("Column2")
-                        )
+                    )
                     , UI.Box(
                         UI.Label("Box0"),
                         UI.Label("Box1"),
                         UI.Label("Box2")
-                        )
-                    , UI.Fold("Fold", 
+                    )
+                    , UI.Fold("Fold",
                         UI.Fold("Fold2",
                             UI.Fold("Fold3",
                                 UI.Field("contents", () => floatValue)
@@ -182,7 +183,7 @@ namespace RosettaUI.Test
                     , UI.Box(
                         UI.Label("Field")
                         , UI.Field(nameof(String), () => nullString)
-                        , UI.Field(nameof(List<float>), () => (List<float>)null)
+                        , UI.Field(nameof(List<float>), () => (List<float>) null)
                         , UI.Row(
                             UI.Field(nameof(nullOneLineClass), () => nullOneLineClass),
                             UI.Button("Totggle null", () =>
@@ -194,10 +195,9 @@ namespace RosettaUI.Test
                         , UI.Field(nameof(nullMultiLineClass), () => nullMultiLineClass)
                         , UI.Field(nameof(nullElementCreator), () => nullElementCreator)
                     )
-
                     , UI.Box(
                         UI.Label("Slider")
-                        , UI.Slider(nameof(List<float>), () => (List<float>)null)
+                        , UI.Slider(nameof(List<float>), () => (List<float>) null)
                         , UI.Slider(nameof(nullOneLineClass), () => nullOneLineClass)
                         , UI.Slider(nameof(nullMultiLineClass), () => nullMultiLineClass)
                         , UI.Slider(nameof(nullElementCreator), () => nullElementCreator)
@@ -205,22 +205,20 @@ namespace RosettaUI.Test
                 )
                 , UI.Dropdown("Dropdown",
                     () => dropDownIndex,
-                    options: new[] { "One", "Two", "Three" }
-                    )
-
+                    options: new[] {"One", "Two", "Three"}
+                )
                 , UI.Row(
                     UI.Label("DynamicElement Test\nchange ui when < 0"),
                     DynamicElement.Create(
                         readStatus: () => intValue > 0,
-                         buildWithStatus: (status) =>
-                         {
-                             return status
-                                 ? UI.Field(nameof(intValue), () => intValue, (v) => intValue = v)
-                                 : UI.Label("Under Zero");
-                         }
-                         )
+                        buildWithStatus: (status) =>
+                        {
+                            return status
+                                ? UI.Field(nameof(intValue), () => intValue, (v) => intValue = v)
+                                : UI.Label("Under Zero");
+                        }
                     )
-      
+                )
                 /*
                 , UI.Fold("Interabletable",
                     fields.Concat(new[] {
@@ -232,10 +230,7 @@ namespace RosettaUI.Test
                     )
                 ).Close()
                 */
-                , UI.Button("Totggle fold", () =>
-                {
-                    fold.isOpen = !fold.isOpen;
-                })
+                , UI.Button("Totggle fold", () => { fold.isOpen = !fold.isOpen; })
                 /*
                 , UI.Fold("ObjectUI"
                     , objectUI.Field(nameof(privateValue)) // also use private member if you specify it explicitly.
@@ -257,7 +252,7 @@ namespace RosettaUI.Test
                         , UI.Button("3", null).SetWidth(30)
                         , UI.Button("4", null).SetWidth(30)
                         , UI.Button("5", null).SetWidth(30)
-                        )
+                    )
                     , UI.Row(
                         UI.Label(nameof(intValue))
                         , UI.Field(() => intValue).SetWidth(30)
@@ -270,6 +265,7 @@ namespace RosettaUI.Test
 #endif
             );
 
+            window.SetWidth(400);
 
             BuildElement(window);
 

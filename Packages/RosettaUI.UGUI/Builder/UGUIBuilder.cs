@@ -103,15 +103,15 @@ namespace RosettaUI.UGUI.Builder
 
                     if (layoutElement)
                     {
-                        if (layout.width is { } width)
+                        if (layout.minWidth is { } minWidth)
                         {
-                            layoutElement.preferredWidth = width;
+                            layoutElement.minWidth = minWidth;
                             layoutElement.flexibleWidth = 0;
                         }
 
-                        if (layout.height is { } height)
+                        if (layout.minHeight is { } minHeight)
                         {
-                            layoutElement.preferredHeight = height;
+                            layoutElement.minHeight = minHeight;
                             layoutElement.flexibleHeight = 0;
                         }
                     }

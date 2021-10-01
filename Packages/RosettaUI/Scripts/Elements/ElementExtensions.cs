@@ -27,19 +27,19 @@
         }
 
 
-        public static Element SetWidth(this Element element, int width)
+        public static Element SetMinWidth(this Element element, int minWidth)
         {
             var layout = element.layout;
-            layout.width = width;
+            layout.minWidth = minWidth;
             element.layout = layout;
 
             return element;
         }
 
-        public static Element SetHeight(this Element element, int height)
+        public static Element SetMinHeight(this Element element, int minHeight)
         {
             var layout = element.layout;
-            layout.height = height;
+            layout.minHeight = minHeight;
             element.layout = layout;
 
             return element;

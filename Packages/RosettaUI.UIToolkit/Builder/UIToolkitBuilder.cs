@@ -81,8 +81,8 @@ namespace RosettaUI.UIToolkit.Builder
         {
             if (!layout.HasValue) return;
 
-            if (layout.width is { } width) ve.style.width = width;
-            if (layout.height is { } height) ve.style.height = height;
+            if (layout.minWidth is { } minWidth) ve.style.minWidth = minWidth;
+            if (layout.minHeight is { } minnHeight) ve.style.minHeight = minnHeight;
             if (layout.justify is { } justify)
             {
                 ve.style.justifyContent = justify == Layout.Justify.Start ? Justify.FlexStart : Justify.FlexEnd;

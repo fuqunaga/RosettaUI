@@ -124,8 +124,8 @@ namespace RosettaUI
 
                            var buttonWidth = 30;
 
-                           var addButton = UI.Button("+", () => IListUtility.AddItemAtLast(listBinder.Get(), listType, itemType)).SetWidth(buttonWidth);
-                           var removeButton = UI.Button("-", () => IListUtility.RemoveItemAtLast(listBinder.Get(), itemType)).SetWidth(buttonWidth);
+                           var addButton = UI.Button("+", () => IListUtility.AddItemAtLast(listBinder.Get(), listType, itemType)).SetMinWidth(buttonWidth);
+                           var removeButton = UI.Button("-", () => IListUtility.RemoveItemAtLast(listBinder.Get(), itemType)).SetMinWidth(buttonWidth);
 
                            return UI.Box(itemElements.Concat(new[] { UI.Row(addButton, removeButton).SetJustify(Layout.Justify.End) }));
 

@@ -247,25 +247,25 @@ namespace RosettaUI.Test
                 , UI.Fold("Custom Width"
                     , UI.Row(
                         UI.Label("Buttons")
-                        , UI.Button("1", null).SetWidth(30)
-                        , UI.Button("2", null).SetWidth(30)
-                        , UI.Button("3", null).SetWidth(30)
-                        , UI.Button("4", null).SetWidth(30)
-                        , UI.Button("5", null).SetWidth(30)
+                        , UI.Button("1", null).SetMinWidth(30)
+                        , UI.Button("2", null).SetMinWidth(30)
+                        , UI.Button("3", null).SetMinWidth(30)
+                        , UI.Button("4", null).SetMinWidth(30)
+                        , UI.Button("5", null).SetMinWidth(30)
                     )
                     , UI.Row(
                         UI.Label(nameof(intValue))
-                        , UI.Field(() => intValue).SetWidth(30)
+                        , UI.Field(() => intValue).SetMinWidth(30)
                     )
                     , UI.Row(
                         UI.Label(nameof(simpleClass))
-                        , UI.Field(() => simpleClass).SetWidth(300)
+                        , UI.Field(() => simpleClass).SetMinWidth(300)
                     )
                 )
 #endif
             );
 
-            window.SetWidth(400);
+            window.SetMinWidth(400);
 
             BuildElement(window);
 

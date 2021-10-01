@@ -8,10 +8,10 @@
             End
         }
 
-        public int? width;
-        public int? height;
+        public int? minWidth;
+        public int? minHeight;
         public Justify? justify;
 
-        public bool HasValue => width.HasValue ||  height.HasValue || justify.HasValue;
+        public bool HasValue => minWidth.HasValue ||  minHeight.HasValue || justify.HasValue;
     }
 }

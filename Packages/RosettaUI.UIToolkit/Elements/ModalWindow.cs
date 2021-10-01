@@ -3,6 +3,9 @@ using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
+    /// <summary>
+    /// Referring to UIElement's Popup.
+    /// </summary>
     public class ModalWindow : Window
     {
         readonly VisualElement _eventBlockerElement;
@@ -15,6 +18,7 @@ namespace RosettaUI.UIToolkit
         {
             closeButton = new CloseButton();
             closeButton.clicked += Hide;
+            closeButton.visible = false;
 
             _eventBlockerElement = new VisualElement();
             _eventBlockerElement.AddToClassList(ussClassNameEventBlocker);
@@ -74,7 +78,7 @@ namespace RosettaUI.UIToolkit
             //evt.originPanel.visualTree.UnregisterCallback<GeometryChangedEvent>(OnParentResized);
         }
 
-        void Hide()
+        public void Hide()
         {
             UnregisterPanelCallback();
 

@@ -30,7 +30,6 @@ namespace RosettaUI.UIToolkit
             _colorPicker.RegisterCallback<DetachFromPanelEvent>(OnDetach);
 
 
-
             void OnDetach(DetachFromPanelEvent _)
             {
                 _colorPicker.onColorChanged -= onColorChanged;
@@ -56,10 +55,8 @@ namespace RosettaUI.UIToolkit
         private VisualElement _hueHandler;
         private VisualElement _hueCircle;
 
-        private SliderWithField _slider0;
-        private SliderWithField _slider1;
-        private SliderWithField _slider2;
-        private SliderWithField _slider3;
+        private readonly SliderSet _sliderSet;
+
 
         private Vector3 _hsv;
         private float _alpha;
@@ -88,7 +85,7 @@ namespace RosettaUI.UIToolkit
                 _hsv = new Vector3(h, s, v);
                 _alpha = value.a;
 
-                OnUpdateColor();
+                OnColorChanged();
             }
         }
 
@@ -101,7 +98,7 @@ namespace RosettaUI.UIToolkit
                 if (_hsv == value) return;
 
                 _hsv = value;
-                OnUpdateColor();
+                OnColorChanged();
             }
         }
 
@@ -112,7 +109,7 @@ namespace RosettaUI.UIToolkit
             {
                 if (_alpha == value) return;
                 _alpha = value;
-                OnUpdateColor();
+                OnColorChanged();
             }
         }
 
@@ -123,7 +120,7 @@ namespace RosettaUI.UIToolkit
 
             InitPreview();
             InitHsvHandlers();
-            InitSliders();
+            _sliderSet = new SliderSet(this);
         }
 
 
@@ -158,31 +155,6 @@ namespace RosettaUI.UIToolkit
             _previewPrev.RegisterCallback<PointerDownEvent>((_) => Color = PrevColor);
         }
 
-        private void InitSliders()
-        {
-            _slider0 = InitSlider("slider0", "H", (v) => SetHsv(v, 0));
-            _slider1 = InitSlider("slider1", "S", (v) => SetHsv(v, 1));
-            _slider2 = InitSlider("slider2", "V", (v) => SetHsv(v, 2));
-            _slider3 = InitSlider("slider3", "A", (v) => Alpha = Mathf.Clamp01(v));
-            
-            
-            void SetHsv(float value, int idx)
-            {
-                var hsv = Hsv;
-                hsv[idx] = Mathf.Clamp01(value);
-                Hsv = hsv;
-            }
-        }
-
-        SliderWithField InitSlider(string name, string label, Action<float> onValueChanged)
-        {
-            var sliderWithField = this.Q<SliderWithField>(name);
-            sliderWithField.Label = label;
-            sliderWithField.Slider.RegisterValueChangedCallback((evt) => onValueChanged(evt.newValue));
-            
-            return sliderWithField;
-        }
-
         private void OnPointerMoveOnPanel_SV(PointerMoveEvent evt)
         {
             var localPos = _svHandler.WorldToLocal(evt.position);
@@ -214,7 +186,7 @@ namespace RosettaUI.UIToolkit
         }
 
 
-        void OnUpdateColor()
+        void OnColorChanged()
         {
             _previewCurr.style.backgroundColor = Color;
 
@@ -228,18 +200,149 @@ namespace RosettaUI.UIToolkit
             var hueCircleStyle = _hueCircle.style;
             hueCircleStyle.top = Length.Percent((1f - hsv.x) * 100f);
 
-            _slider0.SetValueWithoutNotify(AlignDecimal(hsv.x));
-            _slider1.SetValueWithoutNotify(AlignDecimal(hsv.y));
-            _slider2.SetValueWithoutNotify(AlignDecimal(hsv.z));
-            _slider3.SetValueWithoutNotify(AlignDecimal(Alpha));
+            _sliderSet.OnColorChanged();
 
             onColorChanged?.Invoke(Color);
         }
 
-        static float AlignDecimal(float f)
+        class SliderSet
         {
-            var scale = 1000f;
-            return Mathf.Round(f * scale) / scale;
+            #region Type Define
+
+            enum SliderType
+            {
+                Hsv,
+                Rgb
+            }
+
+            #endregion
+
+            private ColorPicker _colorPicker;
+
+            private Button _sliderTypeButton;
+            private Slider _slider0;
+            private Slider _slider1;
+            private Slider _slider2;
+            private Slider _slider3;
+
+            private SliderType _sliderType;
+
+
+            private Color Color
+            {
+                get => _colorPicker.Color;
+                set => _colorPicker.Color = value;
+            }
+
+            private float Alpha
+            {
+                get => _colorPicker.Alpha;
+                set => _colorPicker.Alpha = value;
+            }
+
+            private Vector3 Hsv
+            {
+                get => _colorPicker.Hsv;
+                set => _colorPicker.Hsv = value;
+            }
+
+            public SliderSet(ColorPicker colorPicker)
+            {
+                _colorPicker = colorPicker;
+
+                _sliderTypeButton = colorPicker.Q<Button>("slider-type-button");
+                _sliderTypeButton.clicked += ToggleSliderType;
+
+                _slider0 = InitSlider("slider0", 0);
+                _slider1 = InitSlider("slider1", 1);
+                _slider2 = InitSlider("slider2", 2);
+                _slider3 = InitSlider("slider3", 3);
+
+                SetSliderType(SliderType.Hsv);
+
+                Slider InitSlider(string name, int idx)
+                {
+                    var ret = _colorPicker.Q<Slider>(name);
+                    ret.highValue = 1f;
+                    ret.RegisterValueChangedCallback((evt) => OnSliderValueChanged(evt.newValue, idx));
+                    return ret;
+                    
+                    void OnSliderValueChanged(float value, int index)
+                    {
+                        if (index == 3)
+                        {
+                            Alpha = value;
+                        }
+                        else
+                        {
+                            switch (_sliderType)
+                            {
+                                case SliderType.Hsv:
+                                    var hsv = Hsv;
+                                    hsv[index] = Mathf.Clamp01(value);
+                                    Hsv = hsv;
+                                    break;
+
+                                case SliderType.Rgb:
+                                    var color = Color;
+                                    color[index] = Mathf.Clamp01(value);
+                                    Color = color;
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            public void OnColorChanged()
+            {
+                var vec3 = _sliderType switch
+                {
+                    SliderType.Hsv => Hsv,
+                    SliderType.Rgb => (Vector3) (Vector4) Color
+                };
+
+                _slider0.SetValueWithoutNotify(vec3.x);
+                _slider1.SetValueWithoutNotify(vec3.y);
+                _slider2.SetValueWithoutNotify(vec3.z);
+                _slider3.SetValueWithoutNotify(Alpha);
+            }
+
+
+            private void ToggleSliderType()
+            {
+                var newType = _sliderType == SliderType.Hsv ? SliderType.Rgb : SliderType.Hsv;
+                SetSliderType(newType);
+            }
+
+            void SetSliderType(SliderType sliderType)
+            {
+                _sliderType = sliderType;
+
+                var buttonText = "";
+                switch (sliderType)
+                {
+                    case SliderType.Hsv:
+                        buttonText = "HSV";
+                        SetSliderLabels("H", "S", "V", "A");
+                        break;
+
+                    case SliderType.Rgb:
+                        buttonText = "RGB";
+                        SetSliderLabels("R", "G", "B", "A");
+                        break;
+                }
+
+                _sliderTypeButton.text = buttonText;
+
+                void SetSliderLabels(string label0, string label1, string label2, string label3)
+                {
+                    _slider0.label = label0;
+                    _slider1.label = label1;
+                    _slider2.label = label2;
+                    _slider3.label = label3;
+                }
+            }
         }
     }
 }

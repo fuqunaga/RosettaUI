@@ -19,10 +19,12 @@
         </engine:VisualElement>
     </engine:VisualElement>
 
-    <engine:VisualElement name="sliders">
-        <rosettaui:SliderWithField name="slider0"/>
-        <rosettaui:SliderWithField name="slider1"/>
-        <rosettaui:SliderWithField name="slider2"/>
-        <rosettaui:SliderWithField name="slider3"/>
+    <engine:Button name="slider-type-button" class="rosettaui-colorpicker-slider-type-button"/>
+    
+    <engine:VisualElement name="slider-container" class="rosettaui-colorpicker-slider-container">
+        <engine:Slider name="slider0" show-input-field="true" />
+        <engine:Slider name="slider1" show-input-field="true" />
+        <engine:Slider name="slider2" show-input-field="true" />
+        <engine:Slider name="slider3" show-input-field="true" />
     </engine:VisualElement>
 </engine:UXML>

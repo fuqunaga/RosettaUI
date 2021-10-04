@@ -15,14 +15,15 @@ namespace RosettaUI.UIToolkit
 
     public static class CursorHolder
     {
-        static readonly Dictionary<CursorType, CursorData.Data> cursorTable;
+        static readonly Dictionary<CursorType, CursorData.Data> CursorTable;
+        static readonly string CursorDataPath = "RosettaUI_CursorData";
 
 
         static CursorHolder()
         {
-            var data = Resources.Load<CursorData>("cursorData");
+            var data = Resources.Load<CursorData>(CursorDataPath);
 
-            cursorTable = new Dictionary<CursorType, CursorData.Data>()
+            CursorTable = new Dictionary<CursorType, CursorData.Data>()
             {
                 { CursorType.ResizeHorizontal, data.resizeHorizontal},
                 { CursorType.ResizeVertical, data.resizeVertical},
@@ -33,7 +34,7 @@ namespace RosettaUI.UIToolkit
 
         public static Cursor GetCursor(CursorType cursorType)
         {
-            if (cursorTable.TryGetValue(cursorType, out var data))
+            if (CursorTable.TryGetValue(cursorType, out var data))
             {
                 return new Cursor()
                 {

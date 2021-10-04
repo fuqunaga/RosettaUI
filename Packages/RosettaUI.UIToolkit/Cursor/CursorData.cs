@@ -2,6 +2,7 @@
 
 namespace RosettaUI.UIToolkit
 {
+    [CreateAssetMenu(menuName = "RosettaUI/CursorData", order = 1000)]
     public class CursorData : ScriptableObject
     {
         [System.Serializable]

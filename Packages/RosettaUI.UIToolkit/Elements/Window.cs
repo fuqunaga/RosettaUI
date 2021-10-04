@@ -36,7 +36,7 @@ namespace RosettaUI.UIToolkit
         static readonly string ussClassNameTitleBarContainer = ussClassName + "__titlebar-container";
         static readonly string ussClassNameTitleBarContainerLeft = ussClassNameTitleBarContainer + "__left";
         static readonly string ussClassNameTitleBarContainerRight = ussClassNameTitleBarContainer + "__right";
-        
+
 
         readonly VisualElement titleBarContainer = new VisualElement();
         readonly VisualElement titleBarContainerLeft = new VisualElement();
@@ -49,6 +49,9 @@ namespace RosettaUI.UIToolkit
         Vector2 draggingLocalPosition;
 
         ResizeEdge resizeEdge;
+
+        public VisualElement TitleBarContainerLeft => titleBarContainerLeft;
+        public VisualElement TitleBarContainerRight => titleBarContainerRight;
 
 
         public Button closeButton
@@ -79,14 +82,14 @@ namespace RosettaUI.UIToolkit
             titleBarContainer.AddToClassList(ussClassNameTitleBarContainer);
             titleBarContainerLeft.AddToClassList(ussClassNameTitleBarContainerLeft);
             titleBarContainerRight.AddToClassList(ussClassNameTitleBarContainerRight);
-            
+
 
             titleBarContainer.Add(titleBarContainerLeft);
             titleBarContainer.Add(titleBarContainerRight);
             Add(titleBarContainer);
 
             closeButton = new CloseButton();
-            closeButton.clicked += RemoveFromHierarchy;
+            closeButton.clicked += Hide;
 
             RegisterCallback<PointerDownEvent>(OnPointerDown);
             RegisterCallback<MouseMoveEvent>(OnMouseMove);
@@ -166,7 +169,6 @@ namespace RosettaUI.UIToolkit
             }
         }
 
-
         #endregion
 
 
@@ -204,7 +206,6 @@ namespace RosettaUI.UIToolkit
         }
 
 
-
         void RegisterPanelCallback()
         {
             var root = panel.visualTree;
@@ -221,7 +222,6 @@ namespace RosettaUI.UIToolkit
                 root.UnregisterCallback<PointerUpEvent>(OnPointerUpOnRoot);
             }
         }
-
 
         #endregion
 
@@ -249,7 +249,6 @@ namespace RosettaUI.UIToolkit
             {
                 var top = resolvedStyle.top;
                 style.minHeight = position.y - top;
-
             }
 
             if (resizeEdge.HasFlag(ResizeEdge.Left))
@@ -337,11 +336,22 @@ namespace RosettaUI.UIToolkit
             CursorManager.SetCursor(cursorType);
         }
 
-
         #endregion
 
+        
+        public virtual void Show()
+        {
+            style.display = DisplayStyle.Flex;
+        }
+
+        public virtual void Hide()
+        {
+            style.display = DisplayStyle.None;
+        }
+        
 
         protected virtual VisualElement selfRoot => this;
+
 
         public virtual void Show(Vector2 position, VisualElement target)
         {
@@ -365,6 +375,7 @@ namespace RosettaUI.UIToolkit
             if (targetElement != null)
                 targetElement.pseudoStates |= PseudoStates.Active;
             */
+            Show();
         }
 
         public void EnsureVisibilityInParent()

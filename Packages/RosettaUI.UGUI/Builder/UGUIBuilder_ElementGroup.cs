@@ -42,7 +42,7 @@ namespace RosettaUI.UGUI.Builder
         {
             var foldElement = (FoldElement)element;
 
-            var go = Instantiate(foldElement.title.value, resource.fold);
+            var go = Instantiate(foldElement.title.Value, resource.fold);
             var trans = go.transform;
 
             // build title row
@@ -67,8 +67,8 @@ namespace RosettaUI.UGUI.Builder
             }
 
             // set callback
-            fold.onOpen.AddListener(() => foldElement.isOpen = true);
-            fold.onClose.AddListener(() => foldElement.isOpen = false);
+            fold.onOpen.AddListener(() => foldElement.IsOpen = true);
+            fold.onClose.AddListener(() => foldElement.IsOpen = false);
 
             //RegisterSetFoldOpen(foldElement, (isOpen) => fold.IsOpen = isOpen);
             foldElement.isOpenRx.Subscribe((isOpen) => fold.IsOpen = isOpen);

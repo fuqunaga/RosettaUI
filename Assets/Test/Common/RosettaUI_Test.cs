@@ -101,8 +101,13 @@ namespace RosettaUI.Test
             var fold = UI.Fold("Fold", UI.Fold("Fold2", UI.Field("hoge", () => intValue)));
 
             var list = Enumerable.Range(0, 3).Select(_ => new ComplexClass()).ToList();
+            var smallWindow = UI.Window("SmallWindow",
+                UI.Field(() => intValue)
+            );
 
             var window = UI.Window(
+                "hoge",
+                UI.WindowLauncher(smallWindow),
 #if true
                 UI.Label("Label")
                 , UI.Field(() => intValue)
@@ -230,7 +235,7 @@ namespace RosettaUI.Test
                     )
                 ).Close()
                 */
-                , UI.Button("Totggle fold", () => { fold.isOpen = !fold.isOpen; })
+                , UI.Button("Totggle fold", () => { fold.IsOpen = !fold.IsOpen; })
                 /*
                 , UI.Fold("ObjectUI"
                     , objectUI.Field(nameof(privateValue)) // also use private member if you specify it explicitly.

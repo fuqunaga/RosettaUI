@@ -9,15 +9,15 @@ namespace RosettaUI
         {
         }
 
-        public override string displayName
+        public override string DisplayName
         {
             get
             {
-                var elem = _elements?.FirstOrDefault();
+                var elem = elements?.FirstOrDefault();
                 return elem switch
                 {
                     LabelElement label => label,
-                    ElementGroup group => group.displayName,
+                    ElementGroup group => group.DisplayName,
                     _ => GetType().Name,
                 };
             }

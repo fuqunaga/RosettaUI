@@ -13,10 +13,10 @@ namespace RosettaUI
 
         #endregion
 
-        readonly IGetter<T> getter;
+        public readonly IGetter<T> getter;
 
 
-        public T value => valueRx.Value;
+        public T Value => valueRx.Value;
         
         public bool IsConst => getter.IsConst;
 

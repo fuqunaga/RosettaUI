@@ -133,7 +133,7 @@ namespace RosettaUI
                        rebuildIf: (e) =>
                        {
                            var count = listBinder.Get()?.Count ?? 0;
-                           return count != (e.element as ElementGroup).Elements.Count - 1; // -1 for UI.Row(addButton, removeButton)
+                           return count != (e.element as ElementGroup).Children.Count - 1; // -1 for UI.Row(addButton, removeButton)
                        },
                        $"ListEelements({nameof(DynamicElement)})"
                    );

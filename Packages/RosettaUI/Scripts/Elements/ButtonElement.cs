@@ -4,11 +4,11 @@ namespace RosettaUI
 {
     public class ButtonElement : ReadOnlyValueElement<string>
     {
-        public readonly Action onClick;
-
+        public  Action OnClick { get; protected set; }
+        
         public ButtonElement(IGetter<string> readName = null, Action onClick = null) : base(readName)
         {
-            this.onClick = onClick;
+            this.OnClick = onClick;
         }
     }
 }

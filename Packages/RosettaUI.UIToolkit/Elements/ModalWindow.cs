@@ -78,7 +78,7 @@ namespace RosettaUI.UIToolkit
             //evt.originPanel.visualTree.UnregisterCallback<GeometryChangedEvent>(OnParentResized);
         }
 
-        public void Hide()
+        public override void Hide()
         {
             UnregisterPanelCallback();
 

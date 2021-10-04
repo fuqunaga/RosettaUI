@@ -1,6 +1,7 @@
 using RosettaUI.Reactive;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
@@ -51,7 +52,7 @@ namespace RosettaUI.Builder
 
             if (element is ElementGroup elementGroup)
             {
-                elementGroup.onRebuildChildern += OnRebuildElementGroupChildren;
+                elementGroup.onRebuildChildren += OnRebuildElementGroupChildren;
             }
         }
 
@@ -64,17 +65,7 @@ namespace RosettaUI.Builder
 
         protected IEnumerable<UIObj> Build_ElementGroupChildren(ElementGroup elementGroup)
         {
-            var elements = elementGroup.Elements;
-
-            for (var i = 0; i < elements.Count; ++i)
-            {
-                var e = elements[i];
-                var ve = Build(e);
-                if (ve != null)
-                {
-                    yield return ve;
-                }
-            }
+            return elementGroup.Contents.Select(e => Build(e)).Where(ve => ve != null);
         }
     }
 }

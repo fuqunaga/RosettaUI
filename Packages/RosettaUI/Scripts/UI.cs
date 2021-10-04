@@ -82,8 +82,7 @@ namespace RosettaUI
 
         #region Button
 
-        public static ButtonElement Button(string name, Action onClick) => new ButtonElement(ConstGetter.Create(name), onClick);
-        public static ButtonElement Button(Func<string> readName, Action onClick) => new ButtonElement(Getter.Create(readName), onClick);
+        public static ButtonElement Button(LabelElement label, Action onClick) => new ButtonElement(label?.getter, onClick);
 
         #endregion
 
@@ -177,11 +176,22 @@ namespace RosettaUI
 
         #region Window
 
-        public static WindowElement Window(params Element[] elements) => new WindowElement(elements);
-        public static WindowElement Window(IEnumerable<Element> elements) => new WindowElement(elements);
+        public static WindowElement Window(LabelElement title = null, params Element[] elements) => new WindowElement(title, elements);
+        public static WindowElement Window(LabelElement title, IEnumerable<Element> elements) => new WindowElement(title, elements);
 
         #endregion
 
+        
+        #region Window Launcher
+
+        public static WindowLauncherElement WindowLauncher(WindowElement window) => WindowLauncher(null, window);
+        public static WindowLauncherElement WindowLauncher(LabelElement title, WindowElement window)
+        {
+            var label = title ?? window.title;
+            return new WindowLauncherElement(label?.getter, window);
+        }
+        
+        #endregion
 
 
         #region FindObject

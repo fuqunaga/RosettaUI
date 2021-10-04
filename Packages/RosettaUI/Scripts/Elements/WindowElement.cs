@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.VFX;
 
 namespace RosettaUI
 {
-    public class WindowElement : Column
+    public class WindowElement : OpenCloseBaseElement
     {
-        public WindowElement(IEnumerable<Element> children) : base(children) { }
+        public WindowElement(LabelElement title, IEnumerable<Element> contents) : base(title, contents)
+        {}
     }
 }

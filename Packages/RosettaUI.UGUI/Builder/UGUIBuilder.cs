@@ -123,7 +123,7 @@ namespace RosettaUI.UGUI.Builder
                 var parentGo = GetUIObj(elementGroup);
                 var trans = parentGo.transform;
 
-                foreach(var e in elementGroup.Elements)
+                foreach(var e in elementGroup.Children)
                 {
                     var go = impl.Build(e);
                     go.transform.SetParent(trans);
@@ -147,7 +147,7 @@ namespace RosettaUI.UGUI.Builder
             {
                 var elementGroup = (ElementGroup)element;
 
-                var name = useDisplayName ? elementGroup.displayName : element.GetType().Name;
+                var name = useDisplayName ? elementGroup.DisplayName : element.GetType().Name;
 
                 var go = Instantiate(name, prefab);
                 addComponentFunc?.Invoke(go);

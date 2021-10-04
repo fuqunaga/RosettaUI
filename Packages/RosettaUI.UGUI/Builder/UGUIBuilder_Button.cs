@@ -15,7 +15,7 @@ namespace RosettaUI.UGUI.Builder
             button.colors = settings.theme.buttonColors;
             button.GetComponentInChildren<TMP_Text>().color = settings.theme.textColor;
 
-            button.onClick.AddListener(() => buttonElement.onClick?.Invoke());
+            button.onClick.AddListener(() => buttonElement.OnClick?.Invoke());
 
             var textUI = go.GetComponentInChildren<TMP_Text>();
             if (textUI != null)

@@ -13,17 +13,22 @@ namespace RosettaUI
     {
         #region For Builder
 
-        public event Action<ElementGroup> onRebuildChildern;
+        public event Action<ElementGroup> onRebuildChildren;
 
-        public void RebuildChildren() => onRebuildChildern?.Invoke(this);
+        public void RebuildChildren() => onRebuildChildren?.Invoke(this);
 
         #endregion
 
 
-        protected List<Element> _elements;
-        public ReadOnlyCollection<Element> Elements => _elements.AsReadOnly();
+        protected List<Element> elements;
+        
+        // Children　Update()で更新される子要素すべて
+        // Contents　特殊な意味の子要素は含まれない
+        // WindowのタイトルバーなどはChildrenに含むがContentsには含まない
+        public ReadOnlyCollection<Element> Children => elements.AsReadOnly();
+        public virtual IEnumerable<Element> Contents => Children;
 
-        public virtual string displayName => GetType().Name;
+        public virtual string DisplayName => GetType().Name;
 
 
         protected ElementGroup() { }
@@ -35,8 +40,8 @@ namespace RosettaUI
 
         protected void SetElements(IEnumerable<Element> elements)
         {
-            _elements = elements.Where(e => e != null).ToList();
-            foreach (var e in _elements)
+            this.elements = elements.Where(e => e != null).ToList();
+            foreach (var e in this.elements)
             {
                 e.parent = this;
             }
@@ -46,9 +51,9 @@ namespace RosettaUI
         {
             base.UpdateInternal();
 
-            if (_elements != null)
+            if (elements != null)
             {
-                foreach (var elem in _elements)
+                foreach (var elem in elements)
                 {
                     elem.Update();
                 }

@@ -17,12 +17,12 @@
 
         public static FoldElement Open(this FoldElement fold)
         {
-            fold.isOpen = true;
+            fold.IsOpen = true;
             return fold;
         }
         public static FoldElement Close(this FoldElement fold)
         {
-            fold.isOpen = false;
+            fold.IsOpen = false;
             return fold;
         }
 

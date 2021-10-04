@@ -11,7 +11,7 @@ namespace RosettaUI.UGUI.Builder
         static GameObject Build_Label(Element element, Element containerElement = null)
         {
             var label = (LabelElement)element;
-            var initialValue = label.value;
+            var initialValue = label.Value;
 
 
             // ラベルが変化するものは固定サイズにしておく。
@@ -47,7 +47,7 @@ namespace RosettaUI.UGUI.Builder
 
         static void SetupTextUIWithStringReadOnlyValueElement(ReadOnlyValueElement<string> stringElement, TMP_Text textUI)
         {
-            textUI.text = stringElement.value;
+            textUI.text = stringElement.Value;
             textUI.fontSize = settings.fontSize;
             textUI.color = settings.theme.labelColor;
             if (!stringElement.IsConst)

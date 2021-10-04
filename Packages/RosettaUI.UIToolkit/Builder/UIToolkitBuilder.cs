@@ -41,6 +41,7 @@ namespace RosettaUI.UIToolkit.Builder
             _buildFuncs = new Dictionary<Type, Func<Element, VisualElement>>()
             {
                 [typeof(WindowElement)] = Build_Window,
+                [typeof(WindowLauncherElement)] = Build_WindowLauncher,
                 [typeof(Row)] = Build_Row,
                 [typeof(Column)] = Build_Column,
                 [typeof(BoxElement)] = Build_Box,
@@ -107,9 +108,50 @@ namespace RosettaUI.UIToolkit.Builder
         {
             var windowElement = (WindowElement) element;
             var window = new Window();
+            window.TitleBarContainerLeft.Add(Build(windowElement.title));
             window.closeButton.clicked += () => windowElement.enable = !windowElement.enable;
 
+            windowElement.isOpenRx.SubscribeAndCallOnce((isOpen) =>
+            {
+                if (isOpen) window.Show();
+                else window.Hide();
+            });
+            
             return Build_ElementGroupChildren(window, element);
+        }
+        
+        VisualElement Build_Fold(Element element)
+        {
+            var foldElement = (FoldElement) element;
+            var fold = new Foldout();
+
+            var title = foldElement.title;
+            fold.text = title.Value;
+            
+            foldElement.isOpenRx.SubscribeAndCallOnce((isOpen) => fold.value = isOpen);
+            
+            return Build_ElementGroupChildren(fold, foldElement);
+        }
+
+        VisualElement Build_WindowLauncher(Element element)
+        {
+            var launcherElement = (WindowLauncherElement) element;
+            var windowElement = launcherElement.Window;
+            var window = (Window)Build(windowElement);
+
+            var button = Build_Button(launcherElement);
+            button.clickable.clickedWithEventInfo += (evt) =>
+            {
+                windowElement.enable = !windowElement.enable;
+                // panel==null（初回）はクリックした場所に出る
+                // 移行は以前の位置に出る
+                if (windowElement.enable && window.panel == null)
+                {
+                    window.Show(evt.originalMousePosition, button);
+                }
+            };
+
+            return button;
         }
 
         VisualElement Build_Row(Element element)
@@ -192,7 +234,7 @@ namespace RosettaUI.UIToolkit.Builder
         static VisualElement Build_Label(Element element)
         {
             var labelElement = (LabelElement) element;
-            var label = new Label(labelElement.value);
+            var label = new Label(labelElement.Value);
             SetupLabelCallback(label, labelElement);
 
             return label;
@@ -216,24 +258,6 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 labelElement.valueRx.Subscribe((text) => label.text = text);
             }
-        }
-
-        VisualElement Build_Fold(Element element)
-        {
-            var foldElement = (FoldElement) element;
-            var fold = new Foldout();
-
-            var title = foldElement.title;
-            fold.text = title.value;
-
-            foreach (var content in foldElement.Contents)
-            {
-                fold.Add(Build(content));
-            }
-
-            foldElement.isOpenRx.SubscribeAndCallOnce((isOpen) => fold.value = isOpen);
-
-            return fold;
         }
 
 
@@ -268,7 +292,7 @@ namespace RosettaUI.UIToolkit.Builder
 
             if (labelElement != null)
             {
-                field.label = labelElement.value;
+                field.label = labelElement.Value;
                 SetupLabelCallback(field.labelElement, labelElement);
             }
 
@@ -300,17 +324,17 @@ namespace RosettaUI.UIToolkit.Builder
                     slider.highValue = max;
                 });
             }
-            
+
             slider.showInputField = true;
             return slider;
         }
 
 
-        static VisualElement Build_Button(Element element)
+        static Button Build_Button(Element element)
         {
             var buttonElement = (ButtonElement) element;
 
-            var button = new Button(buttonElement.onClick);
+            var button = new Button(buttonElement.OnClick);
 
             buttonElement.valueRx.SubscribeAndCallOnce((str) => button.text = str);
 
@@ -324,10 +348,10 @@ namespace RosettaUI.UIToolkit.Builder
 
             var field = new PopupField<string>(
                 options,
-                dropdownElement.value
+                dropdownElement.Value
             );
 
-            field.label = dropdownElement.label.value;
+            field.label = dropdownElement.label.Value;
             SetupLabelCallback(field.labelElement, dropdownElement.label);
 
             dropdownElement.valueRx.SubscribeAndCallOnce((v) => field.index = v);

@@ -34,9 +34,9 @@ namespace RosettaUI
         readonly Func<DynamicElement, bool> rebuildIf;
         readonly string _displayName;
 
-        public override string displayName => string.IsNullOrEmpty(_displayName) ? base.displayName : _displayName;
+        public override string DisplayName => string.IsNullOrEmpty(_displayName) ? base.DisplayName : _displayName;
 
-        public Element element => _elements?.FirstOrDefault();
+        public Element element => elements?.FirstOrDefault();
 
 
         public DynamicElement(Func<Element> build, Func<DynamicElement, bool> rebuildIf, string displayName = null)

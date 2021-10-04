@@ -80,7 +80,7 @@ namespace RosettaUI.UGUI.Builder
 
             inputFieldUI = go.GetComponentInChildren<TMP_InputField>();
             inputFieldUI.contentType = contentType;
-            inputFieldUI.text = field.value?.ToString();
+            inputFieldUI.text = field.Value?.ToString();
             inputFieldUI.pointSize = settings.fontSize;
 
             inputFieldUI.colors = settings.theme.fieldColors;

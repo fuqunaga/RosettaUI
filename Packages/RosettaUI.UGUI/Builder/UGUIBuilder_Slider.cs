@@ -71,7 +71,7 @@ namespace RosettaUI.UGUI.Builder
             slider.minValue = fieldToSlider(min);
             slider.maxValue = fieldToSlider(max);
             slider.wholeNumbers = false;
-            slider.value = fieldToSlider(sliderElement.value);
+            slider.value = fieldToSlider(sliderElement.Value);
 
             slider.onValueChanged.AddListener((sliderValue) =>
             {

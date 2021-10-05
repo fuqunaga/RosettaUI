@@ -1,62 +1,54 @@
 /********************************************************************************
 * override unity css
 ********************************************************************************/
-.unity-foldout__toggle
-{
-	margin-left: -15px;
+.unity-foldout__toggle {
+    margin-left: -15px;
 }
 
-.unity-base-field__input
-{
-	cursor: arrow;
+.unity-base-field__input {
+    cursor: arrow;
 }
 
-.unity-base-field__label--with-dragger
-{
-	cursor: arrow;
+.unity-base-field__label--with-dragger {
+    cursor: arrow;
 }
 
 /********************************************************************************
 * Window
 ********************************************************************************/
-.rosettaui-window 
-{
-	/*
-	min-width: 500px;
-	min-height: 200px;
-	*/
-	background-color: rgba(45,45,45,0.9);
-	position: absolute;
-	border-radius: 1px;
-	border-width: 4px;
-	padding-left: 15px;
+.rosettaui-window {
+    /*
+    min-width: 500px;
+    min-height: 200px;
+    */
+    background-color: rgba(45, 45, 45, 0.9);
+    position: absolute;
+    border-radius: 1px;
+    border-width: 4px;
+    padding-left: 15px;
 }
 
-.rosettaui-window__titlebar-container 
-{
-	flex-direction: row;
+.rosettaui-window__titlebar-container {
+    flex-direction: row;
 }
 
-.rosettaui-window__titlebar-container__right
-{
-	align-content: flex-end;
-	margin-left: auto;
+.rosettaui-window__titlebar-container__right {
+    align-content: flex-end;
+    margin-left: auto;
 }
 
-.rosettaui-closebutton 
-{
-	/*background-color: transparent;*/
-	border-width: 0;
-	border-radius: 0;
-	align-self: flex-end;
+.rosettaui-closebutton {
+    /*background-color: transparent;*/
+    border-width: 0;
+    border-radius: 0;
+    align-self: flex-end;
 }
 
 /********************************************************************************
 * Modal Window
 ********************************************************************************/
-.rosettaui-modal-window 
-{
-	padding-left: 4;
+.rosettaui-modal-window {
+    padding-left: 4px;
 }
 
 
@@ -64,37 +56,32 @@
 * Row
 ********************************************************************************/
 
-.rosettaui-row
-{
-	flex-direction: row;
-	flex: 0 0 auto;
+.rosettaui-row {
+    flex-direction: row;
+    flex: 0 0 auto;
 }
 
-.rosettaui-row__contents
-{
-	margin: 0px;
-	flex-grow: 0;
+.rosettaui-row__contents {
+    margin: 0px;
+    flex-grow: 0;
 }
 
-.rosettaui-row__contents > .unity-base-field__label
-{
-	min-width: 15px;
-	margin-left: 3px;
-	margin-right: 0px;
-	flex: 0 0 auto;
+.rosettaui-row__contents > .unity-base-field__label {
+    min-width: 15px;
+    margin-left: 3px;
+    margin-right: 0;
+    flex: 0 0 auto;
 }
 
-.rosettaui-row__contents > .unity-base-field__input
-{
-	min-width: 105px;
-	flex: 0 0 auto;
+.rosettaui-row__contents > .unity-base-field__input {
+    min-width: 105px;
+    flex: 0 0 auto;
 }
 
-.rosettaui-row__contents--first > .unity-base-field__label
-{
-	margin-left: 0px;
-	margin-right: 0px;
-	padding-left: 1px;
+.rosettaui-row__contents--first > .unity-base-field__label {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 1px;
 }
 
 /*
@@ -128,16 +115,20 @@
     /*height: 28px;*/
     border-width: 1px;
     border-radius: 3px;
+    /*
     border-color: var(--color-primary-drk);
     background-color: var(--color-back-drk);
+    */
 }
 
+/*
 .rosettaui-color-field__input:hover,
 .rosettaui-color-field__input:focus,
 .rosettaui-color-field:focus > .color-field__input,
 .rosettaui-color-field:hover > .color-field__input {
     border-color: var(--color-primary-mid);
 }
+*/
 
 .rosettaui-color-field__input-rgb {
     flex-grow: 1;
@@ -159,3 +150,35 @@
     height: 100%;
     background-color: white;
 }
+
+
+/********************************************************************************
+* Window Launcher
+********************************************************************************/
+.rosettaui-window-launcher 
+{
+    margin: 0 0 0 -15px;
+    padding: 2px 3px 2px 0;
+}
+
+.rosettaui-window-launcher:hover
+{
+    background-color: #404040;
+}
+
+.rosettaui-window-launcher:checked
+{
+    background-color: #484848;
+}
+
+.rosettaui-window-launcher .unity-toggle__checkmark,
+.rosettaui-window-launcher .unity-toggle__input:focus .unity-toggle__checkmark,
+.rosettaui-window-launcher .unity-toggle__input:hover .unity-toggle__checkmark,
+.rosettaui-window-launcher .unity-toggle__input:checked .unity-toggle__checkmark,
+.rosettaui-window-launcher .unity-toggle__input:hover:checked .unity-toggle__checkmark,
+.rosettaui-window-launcher .unity-toggle__input:focus:checked .unity-toggle__checkmark 
+{
+    -unity-background-image-tint-color: darkgray;
+    background-image: resource("RosettaUI_WindowIcon");
+}
+

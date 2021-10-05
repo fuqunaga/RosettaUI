@@ -188,7 +188,7 @@ namespace RosettaUI
         public static WindowLauncherElement WindowLauncher(LabelElement title, WindowElement window)
         {
             var label = title ?? window.title;
-            return new WindowLauncherElement(label?.getter, window);
+            return new WindowLauncherElement(label, window);
         }
         
         #endregion

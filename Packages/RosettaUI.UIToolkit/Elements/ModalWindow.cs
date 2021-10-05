@@ -258,7 +258,7 @@ namespace RosettaUI.UIToolkit
 #endif
 
 
-        protected override VisualElement selfRoot => _eventBlockerElement;
+        protected override VisualElement SelfRoot => _eventBlockerElement;
 
         public override void Show(Vector2 position, VisualElement target)
         {

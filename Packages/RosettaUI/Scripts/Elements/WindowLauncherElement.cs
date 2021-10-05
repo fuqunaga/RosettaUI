@@ -1,14 +1,14 @@
-﻿using System;
-
-namespace RosettaUI
+﻿namespace RosettaUI
 {
-    public class WindowLauncherElement : ButtonElement
+    public class WindowLauncherElement : BoolFieldElement
     {
-        public WindowElement Window { get; }
-
-        public WindowLauncherElement(IGetter<string> readName, WindowElement window) : base(readName)
+        public WindowLauncherElement(LabelElement label, WindowElement window) :
+            base(label, Binder.Create(() => window.enable, v => window.enable = v))
         {
             Window = window;
+            Window.enable = false;
         }
+
+        public WindowElement Window { get; }
     }
 }

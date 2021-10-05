@@ -350,7 +350,7 @@ namespace RosettaUI.UIToolkit
         }
         
 
-        protected virtual VisualElement selfRoot => this;
+        protected virtual VisualElement SelfRoot => this;
 
 
         public virtual void Show(Vector2 position, VisualElement target)
@@ -363,7 +363,7 @@ namespace RosettaUI.UIToolkit
                 return;
             }
 
-            root.Add(selfRoot);
+            root.Add(SelfRoot);
 
             var local = root.WorldToLocal(position);
             style.left = local.x - root.layout.x;

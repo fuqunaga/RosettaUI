@@ -248,7 +248,8 @@ namespace RosettaUI.Test
                     , objectUI.SliderNoLabel(nameof(intValue), max:100f)
                 )
                 */
-                , UI.FindObjectObserverElement<ElementCreatorTest>()
+                , UI.ElementCreatorWindowLauncher<ElementCreatorTest>()
+                , UI.ElementCreatorInline<ElementCreatorTest>()
                 , UI.Fold("Custom Width"
                     , UI.Row(
                         UI.Label("Buttons")

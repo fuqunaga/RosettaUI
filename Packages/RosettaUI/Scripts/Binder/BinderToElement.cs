@@ -81,7 +81,7 @@ namespace RosettaUI
         {
             var valueType = binder.ValueType;
 
-            var elements = TypeUtility.GetSerializableFieldNames(valueType)
+            var elements = TypeUtility.GetUITargetFieldNames(valueType)
                 .Select(fieldName =>
                 {
                     var range = TypeUtility.GetRange(valueType, fieldName);
@@ -164,7 +164,7 @@ namespace RosettaUI
 
         static Element CreateCompositeSliderElement(LabelElement label, IBinder binder, IMinMaxGetter minMaxGetter)
         {
-            var elements = TypeUtility.GetSerializableFieldNames(binder.ValueType)
+            var elements = TypeUtility.GetUITargetFieldNames(binder.ValueType)
                 .Select(fieldName =>
                 {
                     var fieldBinder = PropertyOrFieldBinder.CreateWithBinder(binder, fieldName);

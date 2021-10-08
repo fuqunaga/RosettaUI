@@ -75,9 +75,7 @@ namespace RosettaUI
 
             if (!oneLinderDic.TryGetValue(type, out var ret))
             {
-                if (typeof(IElementCreator).IsAssignableFrom(valueType)
-                    || typeof(IList).IsAssignableFrom(valueType)
-                    )
+                if (typeof(IElementCreator).IsAssignableFrom(valueType) || typeof(IList).IsAssignableFrom(valueType))
                 {
                     ret = false;
                 }
@@ -89,8 +87,8 @@ namespace RosettaUI
                 {
                     const int oneLinerMaxCount = 3;
 
-                    var fieldTypes = TypeUtility.GetSerializableFieldTypes(valueType).ToList();
-                    var fieldNames = TypeUtility.GetSerializableFieldNames(valueType);
+                    var fieldTypes = TypeUtility.GetUITargetFieldTypes(valueType).ToList();
+                    var fieldNames = TypeUtility.GetUITargetFieldNames(valueType);
 
                     ret = fieldTypes.Count <= oneLinerMaxCount
                         && fieldTypes.All(IsSimpleType)

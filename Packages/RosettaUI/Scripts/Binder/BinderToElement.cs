@@ -98,7 +98,7 @@ namespace RosettaUI
             Element ret = null;
             if (binder.IsOneliner())
             {
-                ret = new CompositeFieldElement(label, new Row(elements));
+                ret = new CompositeFieldElement(label, elements);
             }
             else
             {

@@ -15,7 +15,7 @@ namespace RosettaUI
             if (label != null)
             {
                 this.label = label;
-                label.parent = this;
+                label.Parent = this;
             }
         }
 

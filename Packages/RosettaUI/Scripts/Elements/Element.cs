@@ -22,31 +22,31 @@ namespace RosettaUI
         #endregion
 
 
-        public bool enable
+        public bool Enable
         {
             get => enableRx.Value;
             set => enableRx.Value = value;
         }
 
-        public bool interactable
+        public bool Interactable
         {
             get => interactableRx.Value;
             set => interactableRx.Value = value;
         }
 
-        public Layout layout
+        public Layout Layout
         {
             get => layoutRx.Value;
             set => layoutRx.Value = value;
         }
 
 
-        public Element parent { get; internal set; }
+        public Element Parent { get; internal set; }
 
 
         public virtual void Update()
         {
-            if (enable) UpdateInternal();
+            if (Enable) UpdateInternal();
         }
 
         protected virtual void UpdateInternal() { }

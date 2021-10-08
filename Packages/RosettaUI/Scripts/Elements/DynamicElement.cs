@@ -63,7 +63,7 @@ namespace RosettaUI
             }
             else
             {
-                if (enable) UpdateInternal();
+                if (Enable) UpdateInternal();
             }
         }
     }

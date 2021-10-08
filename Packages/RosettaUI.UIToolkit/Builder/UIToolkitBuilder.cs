@@ -38,11 +38,11 @@ namespace RosettaUI.UIToolkit.Builder
                 */
                 [typeof(ButtonElement)] = Build_Button,
                 [typeof(FoldElement)] = Build_Fold,
-                [typeof(DynamicElement)] = e =>
-                    Build_ElementGroupChildren(new VisualElement {name = nameof(DynamicElement)}, e)
+                [typeof(DynamicElement)] = Build_DynamicElement
             };
         }
 
+        
         protected override IReadOnlyDictionary<Type, Func<Element, VisualElement>> buildFuncTable => _buildFuncs;
 
 
@@ -70,7 +70,7 @@ namespace RosettaUI.UIToolkit.Builder
         protected override void OnRebuildElementGroupChildren(ElementGroup elementGroup)
         {
             var groupVe = GetUIObj(elementGroup);
-            Build_ElementGroupChildren(groupVe, elementGroup);
+            Build_ElementGroupContents(groupVe, elementGroup);
         }
 
         protected override void OnDestroyElement(Element element)
@@ -79,14 +79,20 @@ namespace RosettaUI.UIToolkit.Builder
             ve?.RemoveFromHierarchy();
             UnregisterUIObj(element);
         }
-
+        
+        private VisualElement Build_DynamicElement(Element element)
+        {
+            var ve = new VisualElement();
+            ve.AddToClassList(UssClassName.DynamicElement);
+            return Build_ElementGroupContents(ve, element);
+        }
 
         private VisualElement Build_Window(Element element)
         {
             var windowElement = (WindowElement) element;
             var window = new Window();
             window.TitleBarContainerLeft.Add(Build(windowElement.title));
-            window.closeButton.clicked += () => windowElement.enable = !windowElement.enable;
+            window.closeButton.clicked += () => windowElement.Enable = !windowElement.Enable;
 
             windowElement.isOpenRx.SubscribeAndCallOnce(isOpen =>
             {
@@ -94,7 +100,7 @@ namespace RosettaUI.UIToolkit.Builder
                 else window.Hide();
             });
 
-            return Build_ElementGroupChildren(window, element);
+            return Build_ElementGroupContents(window, element);
         }
 
         private VisualElement Build_Fold(Element element)
@@ -107,7 +113,7 @@ namespace RosettaUI.UIToolkit.Builder
 
             foldElement.isOpenRx.SubscribeAndCallOnce(isOpen => fold.value = isOpen);
 
-            return Build_ElementGroupChildren(fold, foldElement);
+            return Build_ElementGroupContents(fold, foldElement);
         }
 
         private VisualElement Build_WindowLauncher(Element element)
@@ -123,7 +129,7 @@ namespace RosettaUI.UIToolkit.Builder
                 // panel==null（初回）はクリックした場所に出る
                 // 以降は以前の位置に出る
                 // Toggleの値が変わるのはこのイベントの後
-                if (!windowElement.enable && window.panel == null) window.Show(evt.originalMousePosition, toggle);
+                if (!windowElement.Enable && window.panel == null) window.Show(evt.originalMousePosition, toggle);
             });
 
             launcherElement.label.valueRx.SubscribeAndCallOnce((v) => toggle.text = v);
@@ -135,9 +141,9 @@ namespace RosettaUI.UIToolkit.Builder
         {
             var row = CreateRowVisualElement();
 
-            return Build_ElementGroupChildren(row, element, (ve, i) =>
+            return Build_ElementGroupContents(row, element, (ve, i) =>
             {
-                ve.AddToClassList(UssClassName.RowContents);
+                //ve.AddToClassList(UssClassName.RowContents);
                 if (i == 0) ve.AddToClassList(UssClassName.RowContentsFirst);
             });
         }
@@ -154,13 +160,13 @@ namespace RosettaUI.UIToolkit.Builder
             var column = new VisualElement();
             //column.AddToClassList(FieldClassName.Column);
 
-            return Build_ElementGroupChildren(column, element);
+            return Build_ElementGroupContents(column, element);
         }
 
         private VisualElement Build_Box(Element element)
         {
             var box = new Box();
-            return Build_ElementGroupChildren(box, element);
+            return Build_ElementGroupContents(box, element);
         }
 
 
@@ -168,33 +174,37 @@ namespace RosettaUI.UIToolkit.Builder
         {
             var compositeFieldElement = (CompositeFieldElement) element;
 
-            var ve = new VisualElement();
-            ve.AddToClassList(UssClassName.UnityBaseField);
+            var field = new VisualElement();
+            field.AddToClassList(UssClassName.UnityBaseField);
+            field.AddToClassList(UssClassName.CompositeField);
 
-            var labelElement = compositeFieldElement.label;
+            var labelElement = compositeFieldElement.title;
             if (labelElement != null)
             {
                 var label = Build(labelElement);
                 label.AddToClassList(UssClassName.UnityBaseFieldLabel);
-                ve.Add(label);
+                field.Add(label);
             }
 
-            var contentsElement = compositeFieldElement.contents;
-            if (contentsElement != null)
+            var contentContainer = new VisualElement();
+            contentContainer.AddToClassList(UssClassName.CompositeFieldContents);
+            field.Add(contentContainer);
+            Build_ElementGroupContents(contentContainer, element, (ve, idx) =>
             {
-                var contents = Build(contentsElement);
-                contents.AddToClassList(UssClassName.UnityBaseFieldInput);
-                ve.Add(contents);
-            }
+                if (idx == 0)
+                {
+                    ve.AddToClassList(UssClassName.CompositeFieldFirstChild);
+                }
+            });
 
-            return ve;
+            return field;
         }
 
-        private VisualElement Build_ElementGroupChildren(VisualElement container, Element element,
+        private VisualElement Build_ElementGroupContents(VisualElement container, Element element,
             Action<VisualElement, int> setupContentsVe = null)
         {
             var i = 0;
-            foreach (var ve in Build_ElementGroupChildren((ElementGroup) element))
+            foreach (var ve in Build_ElementGroupContents((ElementGroup) element))
             {
                 setupContentsVe?.Invoke(ve, i);
                 container.Add(ve);
@@ -219,11 +229,10 @@ namespace RosettaUI.UIToolkit.Builder
         {
             if (labelElement.IsLeftMost())
             {
-                label.style.minWidth = Mathf.Max(0f,
-                    LayoutSettings.LabelWidth - labelElement.GetIndent() * LayoutSettings.IndentSize);
+                label.style.minWidth = Mathf.Max(0f, LayoutSettings.LabelWidth - labelElement.GetIndent() * LayoutSettings.IndentSize);
 
                 // Foldout直下のラベルはmarginRight、paddingRightがUnityDefaultCommon*.uss で書き換わるので上書きしておく
-                // セレクタ例： .unity - foldout--depth - 1 > .unity - base - field > .unity - base - field__label
+                // セレクタ例： .unity-foldout--depth-1 > .unity-base-field > .unity-base-field__label
                 label.style.marginRight = LayoutSettings.LabelMarginRight;
                 label.style.paddingRight = LayoutSettings.LabelPaddingRight;
             }
@@ -256,9 +265,9 @@ namespace RosettaUI.UIToolkit.Builder
         private static TField Build_Field<T, TField>(Element element)
             where TField : BaseField<T>, new()
         {
-            return Build_Field<T, TField>(element, true);  
-        } 
-        
+            return Build_Field<T, TField>(element, true);
+        }
+
         private static TField Build_Field<T, TField>(Element element, bool initLabel)
             where TField : BaseField<T>, new()
         {
@@ -277,7 +286,7 @@ namespace RosettaUI.UIToolkit.Builder
                     SetupLabelCallback(field.labelElement, labelElement);
                 }
             }
-            
+
             return field;
         }
 
@@ -328,9 +337,11 @@ namespace RosettaUI.UIToolkit.Builder
             var field = new PopupField<string>(
                 options,
                 dropdownElement.Value
-            );
+            )
+            {
+                label = dropdownElement.label.Value
+            };
 
-            field.label = dropdownElement.label.Value;
             SetupLabelCallback(field.labelElement, dropdownElement.label);
 
             dropdownElement.valueRx.SubscribeAndCallOnce(v => field.index = v);
@@ -345,11 +356,17 @@ namespace RosettaUI.UIToolkit.Builder
             public static readonly string UnityBaseFieldLabel = UnityBaseField + "__label";
             public static readonly string UnityBaseFieldInput = UnityBaseField + "__input";
 
+            public static readonly string CompositeField = "rosettaui-composite-field";
+            public static readonly string CompositeFieldContents = CompositeField + "__contents";
+            public static readonly string CompositeFieldFirstChild = CompositeField + "__first-child";
+            
             public static readonly string Row = "rosettaui-row";
             public static readonly string RowContents = Row + "__contents";
             public static readonly string RowContentsFirst = RowContents + "--first";
-            
+
             public static readonly string WindowLauncher = "rosettaui-window-launcher";
+
+            public static readonly string DynamicElement = "rosettaui-dynamic-element";
         }
 
 

@@ -7,28 +7,27 @@ namespace RosettaUI.UIToolkit
     [RequireComponent(typeof(UIDocument))]
     public class RosettaUI_UIToolkitRoot : MonoBehaviour
     {
-        UIDocument uiDocument;
-        Element rootElement;
-
-        UIToolkitBuilder builder;
+        UIDocument _uiDocument;
+        Element _rootElement;
+        UIToolkitBuilder _builder;
 
         void Update()
         {
-            rootElement.Update();
+            _rootElement.Update();
         }
 
         public void Build(Element element)
         {
-            rootElement = element;
+            _rootElement = element;
 
-            if (uiDocument == null)
+            if (_uiDocument == null)
             {
-                uiDocument = GetComponent<UIDocument>();
+                _uiDocument = GetComponent<UIDocument>();
             }
 
-            var root = uiDocument.rootVisualElement;
-            if (builder == null) builder = new UIToolkitBuilder();
-            var window = builder.Build(element);
+            var root = _uiDocument.rootVisualElement;
+            _builder ??= new UIToolkitBuilder();
+            var window = _builder.Build(element);
 
             root.Add(window);
         }

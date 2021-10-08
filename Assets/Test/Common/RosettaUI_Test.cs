@@ -282,7 +282,7 @@ namespace RosettaUI.Test
         {
             if (Input.GetKeyDown(toggleRootElementKey))
             {
-                rootElement.enable = !rootElement.enable;
+                rootElement.Enable = !rootElement.Enable;
             }
         }
 

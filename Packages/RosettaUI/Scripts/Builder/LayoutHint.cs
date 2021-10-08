@@ -5,35 +5,14 @@ namespace RosettaUI.Builder
 {
     public static class LayoutHint
     {
-        public static bool IsCompositeFieldLabel(this Element element) => GetAncestorCompositeField(element)?.label == element;
-
-        static CompositeFieldElement GetAncestorCompositeField(Element element)
-        {
-            Element current = element;
-            var parent = current.parent;
-
-            while (parent != null)
-            {
-                if (parent is CompositeFieldElement compositeField)
-                {
-                    return compositeField;
-                }
-
-                current = parent;
-                parent = current.parent;
-            }
-            return null;
-        }
-
-
         public static int GetIndent(this Element element)
         {
             var indent = 0;
-            var parent = element.parent;
+            var parent = element.Parent;
             while (parent != null)
             {
                 if (parent is FoldElement) indent++;
-                parent = parent.parent;
+                parent = parent.Parent;
             }
 
             return indent;
@@ -41,7 +20,7 @@ namespace RosettaUI.Builder
 
         public static bool IsLeftMost(this Element element)
         {
-            var parent = element.parent;
+            var parent = element.Parent;
             while(parent != null)
             {
                 ElementGroup parentGroup = parent switch
@@ -51,14 +30,14 @@ namespace RosettaUI.Builder
                     _ => null
                 };
 
-                if ((parentGroup != null) && (parentGroup.Contents.FirstOrDefault() != element))
+                if ((parentGroup != null) && (parentGroup.Children.FirstOrDefault() != element))
                 {
                     return false;
                 }
 
 
                 element = parent;
-                parent = element.parent;
+                parent = element.Parent;
             }
 
             return true;

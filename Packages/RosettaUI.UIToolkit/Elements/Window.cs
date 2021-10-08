@@ -369,7 +369,7 @@ namespace RosettaUI.UIToolkit
             style.left = local.x - root.layout.x;
             style.top = local.y - root.layout.y;
 
-            schedule.Execute(EnsureVisibilityInParent);
+            //schedule.Execute(EnsureVisibilityInParent);
 
             /*
             if (targetElement != null)

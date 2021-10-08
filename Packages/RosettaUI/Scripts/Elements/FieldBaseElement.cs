@@ -10,7 +10,7 @@
         public FieldBaseElement(LabelElement label, BinderBase<T> binder) : base(label, binder)
         {
             this.binder = binder;
-            interactable = !binder.IsReadOnly;
+            Interactable = !binder.IsReadOnly;
         }
 
 

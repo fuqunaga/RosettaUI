@@ -63,9 +63,9 @@ namespace RosettaUI.Builder
         protected abstract void OnDestroyElement(Element element);
 
 
-        protected IEnumerable<UIObj> Build_ElementGroupChildren(ElementGroup elementGroup)
+        protected IEnumerable<UIObj> Build_ElementGroupContents(ElementGroup elementGroup)
         {
-            return elementGroup.Contents.Select(e => Build(e)).Where(ve => ve != null);
+            return elementGroup.Contents.Select(Build).Where(ve => ve != null);
         }
     }
 }

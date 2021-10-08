@@ -1,26 +1,55 @@
+:root {
+    --fixed-field-width: 105px;
+}
+
 /********************************************************************************
 * override unity css
 ********************************************************************************/
-.unity-foldout__toggle {
-    margin-left: -15px;
+.unity-base-field {
+    flex-grow: 1;
 }
 
 .unity-base-field__input {
     cursor: arrow;
+    flex-grow: 1;
 }
 
 .unity-base-field__label--with-dragger {
     cursor: arrow;
 }
 
+.unity-foldout
+{
+    flex-grow: 1;
+}
+
+.unity-foldout__toggle {
+    margin-left: -15px;
+}
+
+.unity-foldout__toggle .unity-text-element
+{
+    margin-left: 1px
+}
+
+.unity-foldout__toggle .unity-text-element,
+.unity-toggle__label
+{
+    padding-top: 2px;
+    padding-bottom: 3px;
+}
+
+.unity-base-slider__text-field
+{
+    flex-grow: 0;
+    min-width: var(--fixed-field-width);
+}
+
+
 /********************************************************************************
 * Window
 ********************************************************************************/
 .rosettaui-window {
-    /*
-    min-width: 500px;
-    min-height: 200px;
-    */
     background-color: rgba(45, 45, 45, 0.9);
     position: absolute;
     border-radius: 1px;
@@ -38,7 +67,6 @@
 }
 
 .rosettaui-closebutton {
-    /*background-color: transparent;*/
     border-width: 0;
     border-radius: 0;
     align-self: flex-end;
@@ -55,15 +83,9 @@
 /********************************************************************************
 * Row
 ********************************************************************************/
-
 .rosettaui-row {
     flex-direction: row;
     flex: 0 0 auto;
-}
-
-.rosettaui-row__contents {
-    margin: 0px;
-    flex-grow: 0;
 }
 
 .rosettaui-row__contents > .unity-base-field__label {
@@ -73,62 +95,39 @@
     flex: 0 0 auto;
 }
 
-.rosettaui-row__contents > .unity-base-field__input {
-    min-width: 105px;
-    flex: 0 0 auto;
+
+/********************************************************************************
+* Composite Field
+********************************************************************************/
+.rosettaui-composite-field,
+.rosettaui-composite-field__contents
+{
+    flex-direction: row;
 }
 
-.rosettaui-row__contents--first > .unity-base-field__label {
+.rosettaui-composite-field__first-child
+{
     margin-left: 0;
-    margin-right: 0;
-    padding-left: 1px;
 }
 
-/*
+.rosettaui-composite-field__contents .unity-base-field__label {
+    min-width: 15px;
+}
 
-.rosettaui-row > .unity-base-field
-{
-	flex: 1 0 auto;
+.rosettaui-composite-field__contents  .unity-base-field__input {
+    min-width: var(--fixed-field-width);
 }
 
 
-.rosettaui-row__contents > .unity-base-field__label
-{
-	min-width: 15px;
-	margin-left: 3px;
-	margin-right: 0px;
-	flex: 0 0 auto;
-}
-
-.rosettaui-row__contents--first > .unity-base-field__label
-{
-	margin-left: 0px;
-	margin-right: 0px;
-	padding-left: 1px;
-}
-*/
 
 /********************************************************************************
 * ColorField
 ********************************************************************************/
 .rosettaui-color-field__input {
-    /*height: 28px;*/
     border-width: 1px;
     border-radius: 3px;
-    /*
-    border-color: var(--color-primary-drk);
-    background-color: var(--color-back-drk);
-    */
 }
 
-/*
-.rosettaui-color-field__input:hover,
-.rosettaui-color-field__input:focus,
-.rosettaui-color-field:focus > .color-field__input,
-.rosettaui-color-field:hover > .color-field__input {
-    border-color: var(--color-primary-mid);
-}
-*/
 
 .rosettaui-color-field__input-rgb {
     flex-grow: 1;
@@ -182,3 +181,10 @@
     background-image: resource("RosettaUI_WindowIcon");
 }
 
+/********************************************************************************
+* Dynamic Element
+********************************************************************************/
+.rosettaui-dynamic-element
+{
+    flex-grow: 1;
+}

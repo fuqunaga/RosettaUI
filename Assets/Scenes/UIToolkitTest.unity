@@ -216,6 +216,114 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &852668082
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 852668086}
+  - component: {fileID: 852668085}
+  - component: {fileID: 852668084}
+  - component: {fileID: 852668083}
+  m_Layer: 0
+  m_Name: RosettaUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &852668083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 852668082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64be97541960a314cb06a4791af6ee15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  toggleRootElementKey: 117
+  intValue: 0
+  uintValue: 0
+  floatValue: 0
+  stringValue: 
+  boolValue: 0
+  enumValue: 0
+  colorValue: {r: 0, g: 0, b: 0, a: 0}
+  vector2Value: {x: 0, y: 0}
+  vector3Value: {x: 0, y: 0, z: 0}
+  vector4Value: {x: 0, y: 0, z: 0, w: 0}
+  dropDownIndex: 0
+  simpleClass:
+    floatValue: 0
+    stringValue: 
+  elementCreator:
+    floatValue: 0
+  complexClass:
+    floatWithRangeValue: 0
+    vector3Value: {x: 0, y: 0, z: 0}
+    simpleClass:
+      floatValue: 0
+      stringValue: 
+    elementCreatorClass:
+      floatValue: 0
+    uiCustomClass:
+      floatValue: 0
+  intList: 010000000200000003000000
+  floatArray:
+  - 1
+  - 2
+  - 3
+  classList:
+  - floatValue: 1
+    stringValue: First
+--- !u!114 &852668084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 852668082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de292b76e20316349842181a7da14d32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &852668085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 852668082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f21c074d86024caca2a0034ce4f53f73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: 320b0b0110e90474da373047f1fe12c4, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 0}
+  m_SortingOrder: 0
+--- !u!4 &852668086
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 852668082}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -341,115 +449,5 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1959795644732248771
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 241753498078178854, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
-      propertyPath: m_Name
-      value: RosettaUI_UIToolkit
-      objectReference: {fileID: 0}
-    - target: {fileID: 6061266502516881229, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
-      propertyPath: m_RootOrder
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6061266502516881229, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6061266502516881229, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6061266502516881229, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6061266502516881229, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6061266502516881229, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6061266502516881229, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6061266502516881229, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6061266502516881229, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6061266502516881229, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6061266502516881229, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 2296522864914365321, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
-  m_SourcePrefab: {fileID: 100100000, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
---- !u!1 &1959795644732248772 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 241753498078178854, guid: 22e51075c8571fc4fa471cabffb2896a, type: 3}
-  m_PrefabInstance: {fileID: 1959795644732248771}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1959795644732248773
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1959795644732248772}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64be97541960a314cb06a4791af6ee15, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  toggleRootElementKey: 117
-  intValue: 0
-  uintValue: 12
-  floatValue: 0
-  stringValue: 
-  boolValue: 0
-  enumValue: 0
-  colorValue: {r: 0.06666667, g: 0.13333334, b: 0.264, a: 1}
-  vector2Value: {x: 0, y: 0}
-  vector3Value: {x: 0, y: 0, z: 0}
-  vector4Value: {x: 0, y: 0, z: 0, w: 0}
-  dropDownIndex: 0
-  simpleClass:
-    floatValue: 0
-    stringValue: 
-  elementCreator:
-    floatValue: 0
-  complexClass:
-    floatWithRangeValue: 0
-    vector3Value: {x: 0, y: 0, z: 0}
-    simpleClass:
-      floatValue: 0
-      stringValue: 
-    elementCreatorClass:
-      floatValue: 0
-    uiCustomClass:
-      floatValue: 0
-  intList: 010000000200000003000000
-  floatArray:
-  - 1
-  - 2
-  - 3
-  classList:
-  - floatValue: 1
-    stringValue: First

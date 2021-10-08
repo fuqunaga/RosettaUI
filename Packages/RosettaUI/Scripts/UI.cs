@@ -25,7 +25,7 @@ namespace RosettaUI
 
         private static void SetInteractableWithBinder(Element element, IBinder binder)
         {
-            element.interactable = !binder.IsReadOnly;
+            element.Interactable = !binder.IsReadOnly;
         }
 
         #region Label
@@ -99,32 +99,27 @@ namespace RosettaUI
         }
 
 
-        public static Element Slider(LabelElement label, Expression<Func<int>> targetExpression, int max,
-            Action<int> onValueChanged = null)
+        public static Element Slider(LabelElement label, Expression<Func<int>> targetExpression, int max, Action<int> onValueChanged = null)
         {
             return Slider(label, targetExpression, 0, max, onValueChanged);
         }
 
-        public static Element Slider(LabelElement label, Expression<Func<float>> targetExpression, float max,
-            Action<float> onValueChanged = null)
+        public static Element Slider(LabelElement label, Expression<Func<float>> targetExpression, float max, Action<float> onValueChanged = null)
         {
             return Slider(label, targetExpression, 0f, max, onValueChanged);
         }
 
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T min, T max,
-            Action<T> onValueChanged = null)
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T min, T max, Action<T> onValueChanged = null)
         {
             return Slider(label, targetExpression, ConstMinMaxGetter.Create(min, max), onValueChanged);
         }
 
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression,
-            Action<T> onValueChanged = null)
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, Action<T> onValueChanged = null)
         {
             return Slider(label, targetExpression, null, onValueChanged);
         }
 
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression,
-            IMinMaxGetter minMaxGetter, Action<T> onValueChanged = null)
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, IMinMaxGetter minMaxGetter, Action<T> onValueChanged = null)
         {
             var binder = ExpressionUtility.CreateBinder(targetExpression);
             if (binder == null) return null;
@@ -267,7 +262,8 @@ namespace RosettaUI
 
         #region Window
 
-        public static WindowElement Window(LabelElement title = null, params Element[] elements)
+        public static WindowElement Window(params Element[] elements) => Window(null, elements);
+        public static WindowElement Window(LabelElement title, params Element[] elements)
         {
             return new WindowElement(title, elements);
         }

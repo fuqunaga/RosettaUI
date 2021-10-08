@@ -1,16 +1,10 @@
-﻿using RosettaUI.Reactive;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
+using RosettaUI.Reactive;
 
 namespace RosettaUI
 {
-    public abstract class OpenCloseBaseElement : ElementGroup
-    {
-        public readonly LabelElement title;
-        protected readonly List<Element> contents;
-        public override IEnumerable<Element> Contents => contents;
-
-
+    public abstract class OpenCloseBaseElement : ElementGroupWithTitle
+    { 
         public readonly ReactiveProperty<bool> isOpenRx = new ReactiveProperty<bool>();
         protected bool isOpen;
 
@@ -18,14 +12,10 @@ namespace RosettaUI
         {
             get => isOpenRx.Value;
             set => isOpenRx.Value = value;
+            
         }
-
-
-        public OpenCloseBaseElement(LabelElement title, IEnumerable<Element> contents)
+        protected OpenCloseBaseElement(LabelElement title, IEnumerable<Element> contents) :base(title, contents)
         {
-            this.title = title;
-            this.contents = contents.Where(e => e != null).ToList();
-            SetElements(new Element[] { this.title }.Concat(Contents));
         }
     }
 }

@@ -43,7 +43,7 @@ namespace RosettaUI
             this.elements = elements.Where(e => e != null).ToList();
             foreach (var e in this.elements)
             {
-                e.parent = this;
+                e.Parent = this;
             }
         }
 

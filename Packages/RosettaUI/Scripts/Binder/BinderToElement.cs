@@ -182,8 +182,9 @@ namespace RosettaUI
             return binder switch
             {
                 BinderBase<(int, int)> bb => new IntMinMaxSliderElement(label, bb, (IGetter<(int, int)>) minMaxGetter),
-                //BinderBase<(float, float)> bb => new FloatMinMaxSliderElement(label, bb, (IGetter<(float, float)>) minMaxGetter),
-                _ => CreateCompositeSliderElement(label, binder, minMaxGetter)
+                BinderBase<(float, float)> bb => new FloatMinMaxSliderElement(label, bb, (IGetter<(float, float)>) minMaxGetter),
+                //_ => CreateCompositeSliderElement(label, binder, minMaxGetter)
+                _ => throw new NotImplementedException()
             };
         }
 

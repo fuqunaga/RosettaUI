@@ -74,7 +74,8 @@ namespace RosettaUI.Test
         public List<int> intList = new List<int>(new[] {1, 2, 3});
         public float[] floatArray = new[] {1f, 2f, 3f};
 
-        public (int, int) minMaxIntValue;
+        public Vector2Int minMaxIntValue;
+        public Vector2 minMaxFloatValue;
 
         public List<SimpleClass> classList =
             new List<SimpleClass>(new[] {new SimpleClass() {floatValue = 1f, stringValue = "First"}});
@@ -148,7 +149,10 @@ namespace RosettaUI.Test
                     , UI.Slider(() => vector2Value)
                 )
                 , UI.Fold("MinMaxSlider"
-                    , UI.MinMaxSlider(() => minMaxIntValue)
+                    , UI.MinMaxSlider(
+                        () => ValueTuple.Create(minMaxIntValue.x, minMaxIntValue.y),
+                        (minMax) => minMaxIntValue = new Vector2Int(minMax.Item1, minMax.Item2)
+                        )
                     )
                 /*
                 , UI.Row(

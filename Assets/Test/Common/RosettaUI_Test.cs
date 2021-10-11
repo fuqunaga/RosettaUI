@@ -74,6 +74,8 @@ namespace RosettaUI.Test
         public List<int> intList = new List<int>(new[] {1, 2, 3});
         public float[] floatArray = new[] {1f, 2f, 3f};
 
+        public (int, int) minMaxIntValue;
+
         public List<SimpleClass> classList =
             new List<SimpleClass>(new[] {new SimpleClass() {floatValue = 1f, stringValue = "First"}});
 
@@ -144,22 +146,19 @@ namespace RosettaUI.Test
                     , UI.Slider(() => floatValue)
                     , UI.Slider("custom min max", () => floatValue, min: -1f, max: 2f)
                     , UI.Slider(() => vector2Value)
-                    /*
-                    , UI.Slider(() => vector3Value,
-                        min: Vector3.zero,
-                        max: Vector3.one
-                        )
-                    */
-                    /*
-                    , UI.Row(
-                        UI.Label("LogSlider[WIP]"),
-                        new LogSlider(
-                            Binder.Create(() => transform.localScale.x, (v) => transform.localScale = Vector3.one * v),
-                            ConstGetter.Create((0.1f, 100f))
-                        )
-                    )
-                    */
                 )
+                , UI.Fold("MinMaxSlider"
+                    , UI.MinMaxSlider(() => minMaxIntValue)
+                    )
+                /*
+                , UI.Row(
+                    UI.Label("LogSlider[WIP]"),
+                    new LogSlider(
+                        Binder.Create(() => transform.localScale.x, (v) => transform.localScale = Vector3.one * v),
+                        ConstGetter.Create((0.1f, 100f))
+                    )
+                )
+                */
                 , UI.Fold("ElementGroup"
                     , UI.Row(
                         UI.Label("Row0"),

@@ -16,7 +16,7 @@ namespace RosettaUI.UGUI.Builder
             var slider = go.GetComponentInChildren<Slider>();
             SetSliderColor(slider);
 
-            var (min, max) = sliderElement.minMax;
+            var (min, max) = sliderElement.MinMax;
             slider.minValue = min;
             slider.maxValue = max;
             slider.wholeNumbers = true;
@@ -49,7 +49,7 @@ namespace RosettaUI.UGUI.Builder
 
         static GameObject Build_LogSlider(Element element)
         {
-            var slider = (LogSlider)element;
+            var slider = (LogSliderElement)element;
             var logBase = slider.logBase;
 
             return Build_FloatSliderBase(
@@ -60,14 +60,14 @@ namespace RosettaUI.UGUI.Builder
         }
 
 
-        static GameObject Build_FloatSliderBase(Slider<float> sliderElement, Func<float, float> sliderToField, Func<float, float> fieldToSlider)
+        static GameObject Build_FloatSliderBase(SliderElement<float> sliderElement, Func<float, float> sliderToField, Func<float, float> fieldToSlider)
         {
             var go = Build_InputField(sliderElement, resource.slider, TMP_InputField.ContentType.DecimalNumber, TryParseFloat, out var inputFieldUI);
 
             var slider = go.GetComponentInChildren<Slider>();
             SetSliderColor(slider);
 
-            var (min, max) = sliderElement.minMax;
+            var (min, max) = sliderElement.MinMax;
             slider.minValue = fieldToSlider(min);
             slider.maxValue = fieldToSlider(max);
             slider.wholeNumbers = false;

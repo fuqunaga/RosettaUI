@@ -1,5 +1,7 @@
 :root {
-    --fixed-field-width: 105px;
+    --fixed-field-width-m: 105px;
+    --fixed-field-width-s: 64px;
+    --slider-min-width: 248px;
 }
 
 /********************************************************************************
@@ -35,10 +37,22 @@
     padding-bottom: 3px;
 }
 
-.unity-base-slider__text-field
+.unity-base-slider__text-field,
+.rosettaui-min-max-slider__text-field
 {
     flex-grow: 0;
-    min-width: var(--fixed-field-width);
+    min-width: var(--fixed-field-width-s);
+}
+
+.unity-min-max-slider
+{
+    flex-grow: 1;
+}
+
+.unity-min-max-slider__input
+{
+    min-width: var(--slider-min-width);
+    margin-right: 3px;
 }
 
 
@@ -111,7 +125,7 @@
 }
 
 .rosettaui-composite-field__contents  .unity-base-field__input {
-    min-width: var(--fixed-field-width);
+    min-width: var(--fixed-field-width-m);
 }
 
 

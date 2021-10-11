@@ -33,6 +33,8 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(DropdownElement)] = Build_Dropdown,
                 [typeof(IntSliderElement)] = Build_Slider<int, SliderInt>,
                 [typeof(FloatSliderElement)] = Build_Slider<float, Slider>,
+
+                [typeof(IntMinMaxSliderElement)] = Build_MinMaxSlider,
                 /*
                 [typeof(LogSlider)] = Build_LogSlider,
                 */
@@ -42,7 +44,7 @@ namespace RosettaUI.UIToolkit.Builder
             };
         }
 
-        
+
         protected override IReadOnlyDictionary<Type, Func<Element, VisualElement>> buildFuncTable => _buildFuncs;
 
 
@@ -79,7 +81,7 @@ namespace RosettaUI.UIToolkit.Builder
             ve?.RemoveFromHierarchy();
             UnregisterUIObj(element);
         }
-        
+
         private VisualElement Build_DynamicElement(Element element)
         {
             var ve = new VisualElement();
@@ -122,7 +124,8 @@ namespace RosettaUI.UIToolkit.Builder
             var windowElement = launcherElement.Window;
             var window = (Window) Build(windowElement);
 
-            var toggle = Build_Field<bool, Toggle>(element, false);
+            //var toggle = Build_Field<bool, Toggle>(element, false);
+            var toggle = CreateField<bool, Toggle>(launcherElement);
             toggle.AddToClassList(UssClassName.WindowLauncher);
             toggle.RegisterCallback<PointerUpEvent>(evt =>
             {
@@ -229,7 +232,8 @@ namespace RosettaUI.UIToolkit.Builder
         {
             if (labelElement.IsLeftMost())
             {
-                label.style.minWidth = Mathf.Max(0f, LayoutSettings.LabelWidth - labelElement.GetIndent() * LayoutSettings.IndentSize);
+                label.style.minWidth = Mathf.Max(0f,
+                    LayoutSettings.LabelWidth - labelElement.GetIndent() * LayoutSettings.IndentSize);
 
                 // Foldout直下のラベルはmarginRight、paddingRightがUnityDefaultCommon*.uss で書き換わるので上書きしておく
                 // セレクタ例： .unity-foldout--depth-1 > .unity-base-field > .unity-base-field__label
@@ -265,58 +269,128 @@ namespace RosettaUI.UIToolkit.Builder
         private static TField Build_Field<T, TField>(Element element)
             where TField : BaseField<T>, new()
         {
-            return Build_Field<T, TField>(element, true);
+            return Build_Field<T, T, TField>(element, (v) => v, (v) => v);
         }
 
-        private static TField Build_Field<T, TField>(Element element, bool initLabel)
-            where TField : BaseField<T>, new()
+        private static TField Build_Field<TElementValue, TFieldValue, TField>(
+            Element element,
+            Func<TElementValue, TFieldValue> elementToFieldValue,
+            Func<TFieldValue, TElementValue> fieldToElement
+        )
+            where TField : BaseField<TFieldValue>, new()
         {
-            var fieldElement = (FieldBaseElement<T>) element;
-            var field = new TField();
+            var fieldElement = (FieldBaseElement<TElementValue>) element;
+            var field = CreateField<TElementValue, TFieldValue, TField>(fieldElement,elementToFieldValue, fieldToElement);
 
-            fieldElement.valueRx.SubscribeAndCallOnce(v => field.value = v);
-            field.RegisterValueChangedCallback(ev => fieldElement.OnViewValueChanged(ev.newValue));
-
-            if (initLabel)
+            var labelElement = fieldElement.label;
+            if (labelElement != null)
             {
-                var labelElement = fieldElement.label;
-                if (labelElement != null)
-                {
-                    field.label = labelElement.Value;
-                    SetupLabelCallback(field.labelElement, labelElement);
-                }
+                field.label = labelElement.Value;
+                SetupLabelCallback(field.labelElement, labelElement);
             }
 
             return field;
         }
 
+        static TField CreateField<T, TField>(FieldBaseElement<T> fieldBaseElement)
+            where TField : BaseField<T>, new()
+        {
+            return CreateField<T, T, TField>(fieldBaseElement, (v) => v, (v) => v);
+        }
+
+        private static TField CreateField<TElementValue, TFieldValue, TField>(
+            FieldBaseElement<TElementValue> fieldBaseElement,
+            Func<TElementValue, TFieldValue> elementToFieldValue,
+            Func<TFieldValue, TElementValue> fieldToElement
+        )
+            where TField : BaseField<TFieldValue>, new()
+        {
+            var field = new TField();
+            fieldBaseElement.valueRx.SubscribeAndCallOnce(v => field.value = elementToFieldValue(v));
+            field.RegisterValueChangedCallback(ev => fieldBaseElement.OnViewValueChanged(fieldToElement(ev.newValue)));
+
+            return field;
+        }
+
+        
         private static VisualElement Build_Slider<T, TSlider>(Element element)
             where T : IComparable<T>
             where TSlider : BaseSlider<T>, new()
         {
-            var sliderElement = (Slider<T>) element;
+            var sliderElement = (SliderElement<T>) element;
+            var slider = Build_Field<T, TSlider>(sliderElement);
 
-            var slider = Build_Field<T, TSlider>(element);
-            slider.AddToClassList(UssClassName.RowContentsFirst);
-
-            var (min, max) = sliderElement.minMax;
-            slider.lowValue = min;
-            slider.highValue = max;
-
-            if (!sliderElement.IsMinMaxConst)
+            InitRangeFieldElement(sliderElement, (minMax) =>
             {
-                sliderElement.minMaxRx.Subscribe(pair =>
-                {
-                    var (min, max) = pair;
-                    slider.lowValue = min;
-                    slider.highValue = max;
-                });
-            }
+                var (min, max) = minMax;
+                slider.lowValue = min;
+                slider.highValue = max;
+            });
 
             slider.showInputField = true;
             return slider;
         }
 
+        private static VisualElement Build_MinMaxSlider(Element element)
+        {
+            var sliderElement = (IntMinMaxSliderElement) element;
+            var slider = Build_Field<(int, int), Vector2, MinMaxSlider>(sliderElement, IntTupleToVector2, Vector2ToIntTuple);
+
+            InitRangeFieldElement(sliderElement, (minMax) =>
+            {
+                var (min, max) = minMax;
+                slider.lowLimit = min;
+                slider.highLimit = max;
+            });
+
+            var minField = new IntegerField();
+            var maxField = new IntegerField();
+            
+            
+            slider.RegisterValueChangedCallback((evt) =>
+            {
+                var (min, max) = (evt.newValue.x, evt.newValue.y);
+                minField.SetValueWithoutNotify((int)min);
+                maxField.SetValueWithoutNotify((int)max);
+            });
+            
+            minField.RegisterValueChangedCallback((evt) => slider.minValue = evt.newValue);
+            maxField.RegisterValueChangedCallback((evt) => slider.maxValue = evt.newValue);
+
+            
+            var row = CreateRowVisualElement();
+            
+            row.AddToClassList(UssClassName.MinMaxSlider);
+            minField.AddToClassList(UssClassName.MinMaxSliderTextField);
+            maxField.AddToClassList(UssClassName.MinMaxSliderTextField);
+
+            row.Add(slider);
+            row.Add(minField);
+            row.Add(maxField);
+            
+            return row;
+
+            static Vector2 IntTupleToVector2((int, int) tuple) => new Vector2(tuple.Item1, tuple.Item2);
+            static (int, int) Vector2ToIntTuple(Vector2 v2) => ((int)v2.x, (int)v2.y);
+        }
+
+
+        static void InitRangeFieldElement<T, TRange>(RangeFieldElement<T, TRange> rangeFieldElement,
+            Action<(TRange, TRange)> updateRange)
+        {
+            if (rangeFieldElement.IsMinMaxConst)
+            {
+                updateRange(rangeFieldElement.MinMax);
+
+            }
+            else
+            {
+                rangeFieldElement.minMaxRx.SubscribeAndCallOnce(pair =>
+                {
+                    updateRange(pair);
+                });
+            }
+        }
 
         private static Button Build_Button(Element element)
         {
@@ -359,7 +433,7 @@ namespace RosettaUI.UIToolkit.Builder
             public static readonly string CompositeField = "rosettaui-composite-field";
             public static readonly string CompositeFieldContents = CompositeField + "__contents";
             public static readonly string CompositeFieldFirstChild = CompositeField + "__first-child";
-            
+
             public static readonly string Row = "rosettaui-row";
             public static readonly string RowContents = Row + "__contents";
             public static readonly string RowContentsFirst = RowContents + "--first";
@@ -367,6 +441,9 @@ namespace RosettaUI.UIToolkit.Builder
             public static readonly string WindowLauncher = "rosettaui-window-launcher";
 
             public static readonly string DynamicElement = "rosettaui-dynamic-element";
+            
+            public static readonly string MinMaxSlider = "rosettaui-min-max-slider";
+            public static readonly string MinMaxSliderTextField = MinMaxSlider + "__text-field";
         }
 
 

@@ -30,7 +30,8 @@ namespace RosettaUI.UGUI.Builder
             if ( !isFixedSize)
             {
                 var hierarchyElement = containerElement ?? label;
-                if (hierarchyElement.IsCompositeFieldLabel())
+                //if (hierarchyElement.IsCompositeFieldLabel())
+                if ( hierarchyElement.IsLeftMost())
                 {
                     layoutElement.preferredWidth -= hierarchyElement.GetIndent() * settings.paddingIndent;
                     go.name = $"{label.GetIndent()}";

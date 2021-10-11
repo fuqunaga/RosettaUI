@@ -154,7 +154,7 @@ namespace RosettaUI.UGUI.Builder
 
                 var trans = go.transform;
 
-                foreach (var childGo in Build_ElementGroupChildren(elementGroup))
+                foreach (var childGo in Build_ElementGroupContents(elementGroup))
                 {
                     childGo.transform.SetParent(trans);
                 }

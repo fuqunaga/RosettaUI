@@ -9,7 +9,7 @@ namespace RosettaUI
 {
     public static class TypeUtility
     {
-        private static readonly Dictionary<Type, ReflectionCache> reflectionCache = new Dictionary<Type, ReflectionCache>();
+        private static readonly Dictionary<Type, ReflectionCache> ReflectionCacheTable = new Dictionary<Type, ReflectionCache>();
 
         static TypeUtility()
         {
@@ -18,7 +18,7 @@ namespace RosettaUI
 
         static void RegisterUnityBuiltinProperties()
         {
-            RegisterUITargetProperties(typeof(Vector2Int), "X", "y");
+            RegisterUITargetProperties(typeof(Vector2Int), "x", "y");
             RegisterUITargetProperties(typeof(Vector2Int), "x", "y");
             RegisterUITargetProperties(typeof(Vector3Int), "x", "y", "z");
             RegisterUITargetProperties(typeof(Rect),       "x", "y", "width", "height");
@@ -30,7 +30,7 @@ namespace RosettaUI
         
         private static ReflectionCache GetReflectionCache(Type type)
         {
-            if (!reflectionCache.TryGetValue(type, out var cache))
+            if (!ReflectionCacheTable.TryGetValue(type, out var cache))
             {
                 cache = new ReflectionCache(
                     type,
@@ -38,7 +38,7 @@ namespace RosettaUI
                     type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
                 );
 
-                reflectionCache[type] = cache;
+                ReflectionCacheTable[type] = cache;
             }
 
             return cache;

@@ -2,7 +2,8 @@
 {
     public abstract class SliderElement<T> : RangeFieldElement<T, T>
     {
-        public SliderElement(LabelElement label, BinderBase<T> binder, IGetter<(T,T)> minMaxGetter) : base(label, binder, minMaxGetter)
+        public SliderElement(LabelElement label, BinderBase<T> binder, IMinMaxGetter<T> minMaxGetter) 
+            : base(label, binder, minMaxGetter)
         {
         }
     }

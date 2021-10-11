@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using RosettaUI.Builder;
 using RosettaUI.Reactive;
 using UnityEngine;
@@ -34,7 +35,8 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(IntSliderElement)] = Build_Slider<int, SliderInt>,
                 [typeof(FloatSliderElement)] = Build_Slider<float, Slider>,
 
-                [typeof(IntMinMaxSliderElement)] = Build_MinMaxSlider,
+                [typeof(IntMinMaxSliderElement)] = Build_MinMaxSlider_Int,
+                [typeof(FloatMinMaxSliderElement)] = Build_MinMaxSlider_Float,
                 /*
                 [typeof(LogSlider)] = Build_LogSlider,
                 */
@@ -280,7 +282,8 @@ namespace RosettaUI.UIToolkit.Builder
             where TField : BaseField<TFieldValue>, new()
         {
             var fieldElement = (FieldBaseElement<TElementValue>) element;
-            var field = CreateField<TElementValue, TFieldValue, TField>(fieldElement,elementToFieldValue, fieldToElement);
+            var field = CreateField<TElementValue, TFieldValue, TField>(fieldElement, elementToFieldValue,
+                fieldToElement);
 
             var labelElement = fieldElement.label;
             if (labelElement != null)
@@ -312,7 +315,7 @@ namespace RosettaUI.UIToolkit.Builder
             return field;
         }
 
-        
+
         private static VisualElement Build_Slider<T, TSlider>(Element element)
             where T : IComparable<T>
             where TSlider : BaseSlider<T>, new()
@@ -331,35 +334,47 @@ namespace RosettaUI.UIToolkit.Builder
             return slider;
         }
 
-        private static VisualElement Build_MinMaxSlider(Element element)
+        static VisualElement Build_MinMaxSlider_Int(Element element) =>
+            Build_MinMaxSlider<int, IntegerField>(element, (i) => i, (f) => (int)f);
+
+        static VisualElement Build_MinMaxSlider_Float(Element element) =>
+            Build_MinMaxSlider<float, FloatField>(element, (f) => f, (f) => f);
+        
+        private static VisualElement Build_MinMaxSlider<T, TField>(Element element, Func<T, float> toFloat,
+            [NotNull] Func<float, T> ToValue)
+            where TField : TextInputBaseField<T>, new()
         {
-            var sliderElement = (IntMinMaxSliderElement) element;
-            var slider = Build_Field<(int, int), Vector2, MinMaxSlider>(sliderElement, IntTupleToVector2, Vector2ToIntTuple);
+            if (ToValue == null) throw new ArgumentNullException(nameof(ToValue));
+            var sliderElement = (MinMaxSliderElement<T>) element;
+            var slider = Build_Field<MinMax<T>, Vector2, MinMaxSlider>(
+                sliderElement,
+                (minMax) => new Vector2(toFloat(minMax.min), toFloat(minMax.max)),
+                (vec2) => MinMax.Create(ToValue(vec2.x), ToValue(vec2.y))
+            );
 
             InitRangeFieldElement(sliderElement, (minMax) =>
             {
                 var (min, max) = minMax;
-                slider.lowLimit = min;
-                slider.highLimit = max;
+                slider.lowLimit = toFloat(min);
+                slider.highLimit = toFloat(max);
             });
 
-            var minField = new IntegerField();
-            var maxField = new IntegerField();
-            
-            
+            var minField = new TField();
+            var maxField = new TField();
+
             slider.RegisterValueChangedCallback((evt) =>
             {
                 var (min, max) = (evt.newValue.x, evt.newValue.y);
-                minField.SetValueWithoutNotify((int)min);
-                maxField.SetValueWithoutNotify((int)max);
+                minField.SetValueWithoutNotify(ToValue(min));
+                maxField.SetValueWithoutNotify(ToValue(max));
             });
-            
-            minField.RegisterValueChangedCallback((evt) => slider.minValue = evt.newValue);
-            maxField.RegisterValueChangedCallback((evt) => slider.maxValue = evt.newValue);
 
-            
+            minField.RegisterValueChangedCallback((evt) => slider.minValue = toFloat(evt.newValue));
+            maxField.RegisterValueChangedCallback((evt) => slider.maxValue = toFloat(evt.newValue));
+
+
             var row = CreateRowVisualElement();
-            
+
             row.AddToClassList(UssClassName.MinMaxSlider);
             minField.AddToClassList(UssClassName.MinMaxSliderTextField);
             maxField.AddToClassList(UssClassName.MinMaxSliderTextField);
@@ -367,28 +382,21 @@ namespace RosettaUI.UIToolkit.Builder
             row.Add(slider);
             row.Add(minField);
             row.Add(maxField);
-            
-            return row;
 
-            static Vector2 IntTupleToVector2((int, int) tuple) => new Vector2(tuple.Item1, tuple.Item2);
-            static (int, int) Vector2ToIntTuple(Vector2 v2) => ((int)v2.x, (int)v2.y);
+            return row;
         }
 
 
         static void InitRangeFieldElement<T, TRange>(RangeFieldElement<T, TRange> rangeFieldElement,
-            Action<(TRange, TRange)> updateRange)
+            Action<MinMax<TRange>> updateRange)
         {
             if (rangeFieldElement.IsMinMaxConst)
             {
                 updateRange(rangeFieldElement.MinMax);
-
             }
             else
             {
-                rangeFieldElement.minMaxRx.SubscribeAndCallOnce(pair =>
-                {
-                    updateRange(pair);
-                });
+                rangeFieldElement.minMaxRx.SubscribeAndCallOnce(updateRange);
             }
         }
 
@@ -441,7 +449,7 @@ namespace RosettaUI.UIToolkit.Builder
             public static readonly string WindowLauncher = "rosettaui-window-launcher";
 
             public static readonly string DynamicElement = "rosettaui-dynamic-element";
-            
+
             public static readonly string MinMaxSlider = "rosettaui-min-max-slider";
             public static readonly string MinMaxSliderTextField = MinMaxSlider + "__text-field";
         }

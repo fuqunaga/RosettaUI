@@ -1,9 +1,11 @@
 ﻿namespace RosettaUI
 {
-    public abstract class MinMaxSliderElement<T> : RangeFieldElement<(T, T), T>
+    public abstract class MinMaxSliderElement<T> : RangeFieldElement<MinMax<T>, T>
     {
-        public MinMaxSliderElement(LabelElement label, BinderBase<(T, T)> binder, IGetter<(T, T)> minMaxGetter) : base(label, binder, minMaxGetter)
+        public MinMaxSliderElement(LabelElement label, BinderBase<MinMax<T>> binder, IMinMaxGetter<T> minMaxGetter)
+            : base(label, binder, minMaxGetter)
         {
+            
         }
     }
 }

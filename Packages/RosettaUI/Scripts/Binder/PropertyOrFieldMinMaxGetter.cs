@@ -17,9 +17,9 @@ namespace RosettaUI
 
     public class PropertyOrFieldMinMaxGetter<TParent, TValue> : MinMaxGetter<TValue>
     {
-        readonly IMinMaxGetter<TParent> parentGetter;
+        readonly IMinMaxGetter<TParent> _parentGetter;
 
-        static Func<(TValue,TValue)> CreateChildGetter(IMinMaxGetter<TParent> parentGetter, string propertyOrFieldName)
+        static Func<MinMax<TValue>> CreateChildGetter(IMinMaxGetter<TParent> parentGetter, string propertyOrFieldName)
         {
             var (childGetter, _) = PropertyOrFieldGetterSetter<TParent, TValue>.GetGetterSetter(propertyOrFieldName);
 
@@ -27,15 +27,16 @@ namespace RosettaUI
             return () =>
             {
                 var (min, max) = parentGetter.Get();
-                return (childGetter(min), childGetter(max));
+                return MinMax.Create(childGetter(min), childGetter(max));
             };
         }
 
-        public PropertyOrFieldMinMaxGetter(IMinMaxGetter<TParent> parentGetter, string propertyOrFieldName) : base(CreateChildGetter(parentGetter, propertyOrFieldName))
+        public PropertyOrFieldMinMaxGetter(IMinMaxGetter<TParent> parentGetter, string propertyOrFieldName)
+            : base(CreateChildGetter(parentGetter, propertyOrFieldName))
         {
-            this.parentGetter = parentGetter;
+            this._parentGetter = parentGetter;
         }
 
-        public override bool IsConst => parentGetter.IsConst;
+        public override bool IsConst => _parentGetter.IsConst;
     }
 }

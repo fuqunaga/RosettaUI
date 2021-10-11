@@ -30,7 +30,7 @@ namespace RosettaUI.UGUI.Builder
 
             if (!sliderElement.IsMinMaxConst)
             {
-                sliderElement.minMaxRx.Subscribe((pair) => { slider.minValue = pair.Item1; slider.maxValue = pair.Item2; });
+                sliderElement.minMaxRx.Subscribe((minMax) => { slider.minValue = minMax.min; slider.maxValue = minMax.max; });
             }
 
             inputFieldUI.onValueChanged.AddListener((s) => SetInputFieldTextToSlider(s, slider));
@@ -82,10 +82,10 @@ namespace RosettaUI.UGUI.Builder
 
             if (!sliderElement.IsMinMaxConst)
             {
-                sliderElement.minMaxRx.Subscribe((pair) =>
+                sliderElement.minMaxRx.Subscribe((minMax) =>
                 {
-                    slider.minValue = fieldToSlider(pair.Item1);
-                    slider.maxValue = fieldToSlider(pair.Item2);
+                    slider.minValue = fieldToSlider(minMax.min);
+                    slider.maxValue = fieldToSlider(minMax.max);
                 });
             }
 

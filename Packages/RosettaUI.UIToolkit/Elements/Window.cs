@@ -297,7 +297,7 @@ namespace RosettaUI.UIToolkit
             return edge;
         }
 
-        CursorType ToCursorType(ResizeEdge edge)
+        static CursorType ToCursorType(ResizeEdge edge)
         {
             var type = CursorType.Default;
 
@@ -333,7 +333,10 @@ namespace RosettaUI.UIToolkit
         {
             var cursorType = ToCursorType(resizeEdge);
 
-            CursorManager.SetCursor(cursorType);
+            if (cursorType != CursorType.Default)
+            {
+                CursorManager.SetCursor(cursorType);
+            }
         }
 
         #endregion

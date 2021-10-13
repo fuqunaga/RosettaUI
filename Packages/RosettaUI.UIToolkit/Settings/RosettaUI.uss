@@ -2,6 +2,7 @@
     --fixed-field-width-m: 105px;
     --fixed-field-width-s: 80px;
     --slider-min-width: 248px;
+    --cursor-resize-horizontal: resource("cursor_ew");
 }
 
 /********************************************************************************
@@ -10,10 +11,6 @@
 .unity-base-field__input {
     cursor: arrow;
     flex-grow: 1;
-}
-
-.unity-base-field__label--with-dragger {
-    cursor: arrow;
 }
 
 .unity-foldout
@@ -53,6 +50,13 @@
 {
     min-width: var(--slider-min-width);
     margin-right: 3px;
+}
+
+.unity-base-field__label--with-dragger,
+.unity-min-max-slider__min-thumb,
+.unity-min-max-slider__max-thumb
+{
+    cursor: var(--cursor-resize-horizontal) 29 4;
 }
 
 

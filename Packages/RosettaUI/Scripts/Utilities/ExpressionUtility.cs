@@ -12,7 +12,7 @@ namespace RosettaUI
 
     public static class ExpressionUtility
     {
-        public static BinderBase<T> CreateBinder<T>(Expression<Func<T>> lambda)
+        public static IBinder<T> CreateBinder<T>(Expression<Func<T>> lambda)
         {
 #if ENABLE_IL2CPP
             return IL2CPP.ExpressionUtility_IL2CPP.CreateBinder(lambda);
@@ -21,7 +21,7 @@ namespace RosettaUI
 #endif
         }
 
-        static BinderBase<T> _CreateBinder<T>(Expression<Func<T>> lambda)
+        static Binder<T> _CreateBinder<T>(Expression<Func<T>> lambda)
         {
             var getFunc = lambda.Compile();
 
@@ -38,6 +38,7 @@ namespace RosettaUI
             }
             catch (Exception)
             {
+                // ignored
             }
 
 
@@ -45,8 +46,8 @@ namespace RosettaUI
         }
 
 
-        const string methodCallDummyInstanceName = "MethodCallDummy...";
-        static readonly SimplifyVisitor readbleExpressionVisitor = new SimplifyVisitor();
+        const string MethodCallDummyInstanceName = "MethodCallDummy...";
+        static readonly SimplifyVisitor ReadableExpressionVisitor = new SimplifyVisitor();
 
         public static string CreateLabelString<T>(Expression<Func<T>> lambda)
         {
@@ -57,13 +58,13 @@ namespace RosettaUI
 #else
 
             //return lambda.Body.ToString();
-            var changedExpr = readbleExpressionVisitor.Visit(lambda.Body);
-            return changedExpr.ToString().Replace(methodCallDummyInstanceName + ".", "");
+            var changedExpr = ReadableExpressionVisitor.Visit(lambda.Body);
+            return changedExpr.ToString().Replace(MethodCallDummyInstanceName + ".", "");
 #endif
         }
 
 
-        public class SimplifyVisitor : ExpressionVisitor
+        private class SimplifyVisitor : ExpressionVisitor
         {
             protected override Expression VisitMember(MemberExpression node)
             {
@@ -104,7 +105,7 @@ namespace RosettaUI
 
                 if (obj is ConstantExpression)
                 {
-                    var param = Expression.Parameter(obj.Type, methodCallDummyInstanceName);
+                    var param = Expression.Parameter(obj.Type, MethodCallDummyInstanceName);
                     return Expression.Call(param, node.Method, node.Arguments);
                 }
 

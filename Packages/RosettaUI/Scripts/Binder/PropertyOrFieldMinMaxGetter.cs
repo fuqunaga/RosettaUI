@@ -4,25 +4,33 @@ namespace RosettaUI
 {
     public static class PropertyOrFieldMinMaxGetter
     {
-        public static IMinMaxGetter Create(IMinMaxGetter minMaxGetter, string propertyOrFieldName)
+        public static IGetter Create(IGetter minMaxGetter, string propertyOrFieldName)
         {
-            var valueType = minMaxGetter.MinMaxType;
+            var valueType = minMaxGetter.GetMinMaxValueType();
             var memberType = TypeUtility.GetPropertyOrFieldType(valueType, propertyOrFieldName);
             var getterType = typeof(PropertyOrFieldMinMaxGetter<,>).MakeGenericType(valueType, memberType);
 
-            return Activator.CreateInstance(getterType, minMaxGetter, propertyOrFieldName) as IMinMaxGetter;
+            return (IGetter) Activator.CreateInstance(getterType, minMaxGetter, propertyOrFieldName);
         }
     }
 
 
-    public class PropertyOrFieldMinMaxGetter<TParent, TValue> : MinMaxGetter<TValue>
+    public class PropertyOrFieldMinMaxGetter<TParent, TValue> : Getter<MinMax<TValue>>
     {
-        readonly IMinMaxGetter<TParent> _parentGetter;
+        private readonly IGetter<MinMax<TParent>> _parentGetter;
 
-        static Func<MinMax<TValue>> CreateChildGetter(IMinMaxGetter<TParent> parentGetter, string propertyOrFieldName)
+        public PropertyOrFieldMinMaxGetter(IGetter<MinMax<TParent>> parentGetter, string propertyOrFieldName)
+            : base(CreateChildGetter(parentGetter, propertyOrFieldName))
+        {
+            _parentGetter = parentGetter;
+        }
+
+        public override bool IsConst => _parentGetter.IsConst;
+
+        private static Func<MinMax<TValue>> CreateChildGetter(IGetter<MinMax<TParent>> parentGetter,
+            string propertyOrFieldName)
         {
             var (childGetter, _) = PropertyOrFieldGetterSetter<TParent, TValue>.GetGetterSetter(propertyOrFieldName);
-
 
             return () =>
             {
@@ -30,13 +38,5 @@ namespace RosettaUI
                 return MinMax.Create(childGetter(min), childGetter(max));
             };
         }
-
-        public PropertyOrFieldMinMaxGetter(IMinMaxGetter<TParent> parentGetter, string propertyOrFieldName)
-            : base(CreateChildGetter(parentGetter, propertyOrFieldName))
-        {
-            this._parentGetter = parentGetter;
-        }
-
-        public override bool IsConst => _parentGetter.IsConst;
     }
 }

@@ -18,12 +18,12 @@ namespace RosettaUI
                 _ when UICustom.TryGetElementCreationMethod(valueType, out var custom) => () =>
                     custom.func(binder.GetObject()),
 
-                BinderBase<int> bb => () => new IntFieldElement(label, bb),
-                BinderBase<uint> bb => () => new IntFieldElement(label, new CastBinder<uint, int>(bb), true),
-                BinderBase<float> bb => () => new FloatFieldElement(label, bb),
-                BinderBase<string> bb => () => new StringFieldElement(label, bb),
-                BinderBase<bool> bb => () => new BoolFieldElement(label, bb),
-                BinderBase<Color> bb => () => new ColorFieldElement(label, bb),
+                IBinder<int> bb => () => new IntFieldElement(label, bb),
+                IBinder<uint> bb => () => new IntFieldElement(label, new CastBinder<uint, int>(bb), true),
+                IBinder<float> bb => () => new FloatFieldElement(label, bb),
+                IBinder<string> bb => () => new StringFieldElement(label, bb),
+                IBinder<bool> bb => () => new BoolFieldElement(label, bb),
+                IBinder<Color> bb => () => new ColorFieldElement(label, bb),
                 _ when binder.ValueType.IsEnum => () => CreateEnumElement(label, binder),
 
                 IGetter<IElementCreator> ig => () => ig.Get().CreateElement(),
@@ -136,19 +136,18 @@ namespace RosettaUI
 
         #region Slider
 
-        public static Element CreateSliderElement(LabelElement label, IBinder binder, IMinMaxGetter minMaxGetter)
+        public static Element CreateSliderElement(LabelElement label, IBinder binder, IGetter minMaxGetter)
         {
             return binder switch
             {
-                BinderBase<int> bb => new IntSliderElement(label, bb, (IMinMaxGetter<int>) minMaxGetter),
-                BinderBase<float> bb => new FloatSliderElement(label, bb, (IMinMaxGetter<float>) minMaxGetter),
+                BinderBase<int> bb => new IntSliderElement(label, bb, (IGetter<MinMax<int>>) minMaxGetter),
+                BinderBase<float> bb => new FloatSliderElement(label, bb, (IGetter<MinMax<float>>) minMaxGetter),
                 _ => CreateCompositeSliderElement(label, binder, minMaxGetter)
             };
         }
 
 
-        private static Element CreateCompositeSliderElement(LabelElement label, IBinder binder,
-            IMinMaxGetter minMaxGetter)
+        private static Element CreateCompositeSliderElement(LabelElement label, IBinder binder, IGetter minMaxGetter)
         {
             var fieldNames = TypeUtility.GetUITargetFieldNames(binder.ValueType).ToList();
             if (!fieldNames.Any()) return null;
@@ -177,15 +176,38 @@ namespace RosettaUI
 
         #region MinMax Slider
 
-        public static Element CreateMinMaxSliderElement(LabelElement label, IBinder binder, IMinMaxGetter minMaxGetter)
+        public static Element CreateMinMaxSliderElement(LabelElement label, IBinder binder, IGetter minMaxGetter)
         {
             return binder switch
             {
-                BinderBase<MinMax<int>> bb => new IntMinMaxSliderElement(label, bb, (IMinMaxGetter<int>) minMaxGetter),
-                BinderBase<MinMax<float>> bb => new FloatMinMaxSliderElement(label, bb, (IMinMaxGetter<float>) minMaxGetter),
-                //_ => CreateCompositeSliderElement(label, binder, minMaxGetter)
-                _ => throw new NotImplementedException()
+                IBinder<MinMax<int>> bb => new IntMinMaxSliderElement(label, bb, (IGetter<MinMax<int>>) minMaxGetter),
+                IBinder<MinMax<float>> bb => new FloatMinMaxSliderElement(label, bb, (IGetter<MinMax<float>>) minMaxGetter),
+                _ => CreateCompositeMinMaxSliderElement(label, binder, minMaxGetter)
             };
+        }
+
+        private static Element CreateCompositeMinMaxSliderElement(LabelElement label, IBinder binder, IGetter minMaxGetter)
+        {
+            var fieldNames = TypeUtility.GetUITargetFieldNames(binder.GetMinMaxValueType()).ToList();
+            if (!fieldNames.Any()) return null;
+
+            var elements = fieldNames.Select(fieldName =>
+            {
+                var fieldBinder = PropertyOrFieldMinMaxBinder.Create(binder, fieldName);
+                var fieldMinMaxGetter = minMaxGetter != null
+                    ? PropertyOrFieldMinMaxGetter.Create(minMaxGetter, fieldName)
+                    : null;
+                return UI.MinMaxSlider(fieldName, fieldBinder, fieldMinMaxGetter);
+            }).ToList();
+
+            return binder.IsNullable
+                ? NullGuard(label, binder, CreateElementFunc)
+                : CreateElementFunc();
+
+            Element CreateElementFunc()
+            {
+                return new FoldElement(label, elements);
+            }
         }
 
         #endregion

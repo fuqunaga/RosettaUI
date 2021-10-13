@@ -2,7 +2,7 @@
 {
     public abstract class MinMaxSliderElement<T> : RangeFieldElement<MinMax<T>, T>
     {
-        public MinMaxSliderElement(LabelElement label, BinderBase<MinMax<T>> binder, IMinMaxGetter<T> minMaxGetter)
+        public MinMaxSliderElement(LabelElement label, IBinder<MinMax<T>> binder, IGetter<MinMax<T>> minMaxGetter)
             : base(label, binder, minMaxGetter)
         {
             

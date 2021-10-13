@@ -8,12 +8,12 @@ namespace RosettaUI
 {
     public static class PropertyOrFieldGetterSetter<TParent, TValue>
     {
-        static readonly Dictionary<string, (Func<TParent, TValue>, Func<TParent, TValue, TParent>)> table = new Dictionary<string, (Func<TParent, TValue>, Func<TParent, TValue, TParent>)>();
+        static readonly Dictionary<string, (Func<TParent, TValue>, Func<TParent, TValue, TParent>)> Table = new Dictionary<string, (Func<TParent, TValue>, Func<TParent, TValue, TParent>)>();
 
 
         public static (Func<TParent, TValue>, Func<TParent, TValue, TParent>) GetGetterSetter(string propertyOrFieldName)
         {
-            if (!table.TryGetValue(propertyOrFieldName, out var pair))
+            if (!Table.TryGetValue(propertyOrFieldName, out var pair))
             {
 #if ENABLE_IL2CPP
                 var getter = IL2CPP.PropertyOrFieldGetterSetter_IL2CPP<TParent, TValue>.CreateGetter(propertyOrFieldName);
@@ -23,7 +23,7 @@ namespace RosettaUI
                 var setter = CreateSetter(propertyOrFieldName);
 #endif
 
-                table[propertyOrFieldName] = pair = (getter, setter);
+                Table[propertyOrFieldName] = pair = (getter, setter);
             }
 
             return pair;

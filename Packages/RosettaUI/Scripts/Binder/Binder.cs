@@ -4,22 +4,27 @@ namespace RosettaUI
 {
     public static class Binder
     {
-        public static Binder<T> Create<T>(Func<T> getter, Action<T> setter) => new Binder<T>(Getter.Create(getter), setter);
-
+        public static Binder<T> Create<T>(Func<T> getter, Action<T> setter)
+        {
+            return new Binder<T>(Getter.Create(getter), setter);
+        }
     }
 
 
     public class Binder<T> : BinderBase<T>
     {
-        readonly Action<T> setter;
+        private readonly Action<T> _setter;
 
         public Binder(IGetter<T> getter, Action<T> setter) : base(getter)
         {
-            this.setter = setter;
+            _setter = setter;
         }
 
-        public override bool IsReadOnly => setter == null && base.IsReadOnly;
+        public override bool IsReadOnly => _setter == null && base.IsReadOnly;
 
-        protected override void SetInternal(T t) => setter?.Invoke(t);
+        protected override void SetInternal(T t)
+        {
+            _setter?.Invoke(t);
+        }
     }
 }

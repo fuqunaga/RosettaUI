@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace RosettaUI.Test
 {
@@ -74,8 +75,9 @@ namespace RosettaUI.Test
         public List<int> intList = new List<int>(new[] {1, 2, 3});
         public float[] floatArray = new[] {1f, 2f, 3f};
 
-        public MinMax<int> minMaxIntValue;
-        public MinMax<float> minMaxFloatValue;
+        public MinMax<int> intMinMax;
+        public MinMax<float> floatMinMax;
+        public MinMax<Vector2> vector2MinMax;
 
         public List<SimpleClass> classList =
             new List<SimpleClass>(new[] {new SimpleClass() {floatValue = 1f, stringValue = "First"}});
@@ -149,8 +151,9 @@ namespace RosettaUI.Test
                     , UI.Slider(() => vector2Value)
                 )
                 , UI.Fold("MinMaxSlider"
-                    , UI.MinMaxSlider(() => minMaxIntValue)
-                    , UI.MinMaxSlider(() => minMaxFloatValue)
+                    , UI.MinMaxSlider(() => intMinMax)
+                    , UI.MinMaxSlider(() => floatMinMax)
+                    , UI.MinMaxSlider(() => vector2MinMax)
                 )
                 /*
                 , UI.Row(

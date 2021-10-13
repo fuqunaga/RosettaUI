@@ -4,7 +4,7 @@
     {
         public readonly float logBase;
 
-        public LogSliderElement(LabelElement label, BinderBase<float> binder, IMinMaxGetter<float> minMaxGetter, float logBase=10f)
+        public LogSliderElement(LabelElement label, IBinder<float> binder, IGetter<MinMax<float>> minMaxGetter, float logBase=10f)
             : base(label, binder, minMaxGetter)
         {
             this.logBase = logBase;

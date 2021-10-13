@@ -279,6 +279,12 @@ MonoBehaviour:
   - 1
   - 2
   - 3
+  minMaxIntValue:
+    min: 0
+    max: 0
+  minMaxFloatValue:
+    min: 0
+    max: 0
   classList:
   - floatValue: 1
     stringValue: First

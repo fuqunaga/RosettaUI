@@ -6,7 +6,7 @@ namespace RosettaUI
     {
         public readonly IEnumerable<string> options;
 
-        public DropdownElement(LabelElement label, BinderBase<int> binder, IEnumerable<string> options) : base(label, binder)
+        public DropdownElement(LabelElement label, IBinder<int> binder, IEnumerable<string> options) : base(label, binder)
         {
             this.options = options;
         }

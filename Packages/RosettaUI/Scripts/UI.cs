@@ -108,8 +108,7 @@ namespace RosettaUI
             return Slider(label, targetExpression, null, onValueChanged);
         }
 
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression,
-            IMinMaxGetter minMaxGetter, Action<T> onValueChanged = null)
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, IGetter minMaxGetter, Action<T> onValueChanged = null)
         {
             var binder = ExpressionUtility.CreateBinder(targetExpression);
             if (binder == null) return null;
@@ -117,7 +116,7 @@ namespace RosettaUI
             return Slider(label, binder, minMaxGetter);
         }
 
-        public static Element Slider(LabelElement label, IBinder binder, IMinMaxGetter minMaxGetter)
+        public static Element Slider(LabelElement label, IBinder binder, IGetter minMaxGetter)
         {
             var contents = BinderToElement.CreateSliderElement(label, binder, minMaxGetter);
             if (contents == null) return null;
@@ -157,7 +156,7 @@ namespace RosettaUI
             return MinMaxSlider(label, targetExpression, null, onValueChanged);
         }
         
-        public static Element MinMaxSlider<T>(LabelElement label, Expression<Func<MinMax<T>>> targetExpression, IMinMaxGetter minMaxGetter, Action<MinMax<T>> onValueChanged = null)
+        public static Element MinMaxSlider<T>(LabelElement label, Expression<Func<MinMax<T>>> targetExpression, IGetter minMaxGetter, Action<MinMax<T>> onValueChanged = null)
         {
             var binder = ExpressionUtility.CreateBinder(targetExpression);
             if (binder == null) return null;
@@ -165,7 +164,7 @@ namespace RosettaUI
             return MinMaxSlider(label, binder, minMaxGetter);
         }
         
-        public static Element MinMaxSlider(LabelElement label, IBinder binder, IMinMaxGetter minMaxGetter)
+        public static Element MinMaxSlider(LabelElement label, IBinder binder, IGetter minMaxGetter)
         {
             var contents = BinderToElement.CreateMinMaxSliderElement(label, binder, minMaxGetter);
             if (contents == null) return null;

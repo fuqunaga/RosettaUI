@@ -9,14 +9,14 @@ namespace RosettaUI
 
     public class Getter<T> : IGetter<T>
     {
-        readonly Func<T> func;
+        readonly Func<T> _func;
 
         public virtual bool IsConst => false;
 
 
-        public Getter(Func<T> func) => this.func = func;
+        public Getter(Func<T> func) => _func = func;
 
-        public T Get() => (func != null) ? func() : default;
+        public T Get() => (_func != null) ? _func() : default;
 
         public Type ValueType => typeof(T);
 

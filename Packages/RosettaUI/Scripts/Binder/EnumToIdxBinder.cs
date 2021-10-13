@@ -9,8 +9,8 @@ namespace RosettaUI
     {
         #region static
 
-        readonly static Func<TFrom, int> toIdxFunc;
-        readonly static Func<TFrom, int, TFrom> toEnumFunc;
+        static readonly Func<TFrom, int> ToIdxFunc;
+        static readonly Func<TFrom, int, TFrom> ToEnumFunc;
 
         static EnumToIdxBinder()
         {
@@ -23,13 +23,13 @@ namespace RosettaUI
                 valueToIdx[v] = i;
             }
 
-            toIdxFunc = (e) =>
+            ToIdxFunc = (e) =>
             {
                 valueToIdx.TryGetValue(e, out var ret);
                 return ret;
             };
 
-            toEnumFunc = (e, idx) =>
+            ToEnumFunc = (e, idx) =>
             {
                 return (0 <= idx && idx < idxToValue.Count)
                     ? idxToValue[idx]
@@ -41,7 +41,7 @@ namespace RosettaUI
         #endregion
 
 
-        public EnumToIdxBinder(BinderBase<TFrom> parentBinder) : base(parentBinder, toIdxFunc, toEnumFunc)
+        public EnumToIdxBinder(IBinder<TFrom> parentBinder) : base(parentBinder, ToIdxFunc, ToEnumFunc)
         {
         }
 

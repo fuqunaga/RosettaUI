@@ -1,12 +1,14 @@
 ﻿using System;
 
-
 namespace RosettaUI
 {
     // 型とフィールドかプロパティ名から生成されるBinder
     public static class PropertyOrFieldBinder
     {
-        public static IBinder Create<T>(T obj, string propertyOrFieldName) => CreateWithBinder(ConstBinder.Create(obj), propertyOrFieldName);
+        public static IBinder Create<T>(T obj, string propertyOrFieldName)
+        {
+            return CreateWithBinder(ConstBinder.Create(obj), propertyOrFieldName);
+        }
 
         public static IBinder CreateWithBinder(IBinder binder, string propertyOrFieldName)
         {
@@ -20,7 +22,12 @@ namespace RosettaUI
 
     public class PropertyOrFieldBinder<TParent, TValue> : ChildBinder<TParent, TValue>
     {
-        public PropertyOrFieldBinder(BinderBase<TParent> parentBinder, string propertyOrFieldName) : base(parentBinder, PropertyOrFieldGetterSetter<TParent, TValue>.GetGetterSetter(propertyOrFieldName))
+        public PropertyOrFieldBinder(IBinder<TParent> parentBinder, string propertyOrFieldName)
+            : base(parentBinder,
+                PropertyOrFieldGetterSetter<TParent, TValue>.GetGetterSetter(propertyOrFieldName).Item1,
+                PropertyOrFieldGetterSetter<TParent, TValue>.GetGetterSetter(propertyOrFieldName).Item2
+            )
+
         {
         }
     }

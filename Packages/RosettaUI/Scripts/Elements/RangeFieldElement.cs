@@ -4,11 +4,11 @@ namespace RosettaUI
 {
     public abstract class RangeFieldElement<T, TRange> : FieldBaseElement<T>
     {
-        private readonly IMinMaxGetter<TRange> _minMaxGetter;
+        private readonly IGetter<MinMax<TRange>> _minMaxGetter;
         public readonly ReactiveProperty<MinMax<TRange>> minMaxRx;
 
 
-        public RangeFieldElement(LabelElement label, BinderBase<T> binder, IMinMaxGetter<TRange> minMaxGetter) :
+        public RangeFieldElement(LabelElement label, IBinder<T> binder, IGetter<MinMax<TRange>> minMaxGetter) :
             base(label, binder)
         {
             _minMaxGetter = minMaxGetter;

@@ -4,6 +4,6 @@ namespace RosettaUI
 {
     public class ColorFieldElement : FieldBaseElement<Color>
     {
-        public ColorFieldElement(LabelElement label, BinderBase<Color> binder) : base(label, binder) { }
+        public ColorFieldElement(LabelElement label, IBinder<Color> binder) : base(label, binder) { }
     }
 }

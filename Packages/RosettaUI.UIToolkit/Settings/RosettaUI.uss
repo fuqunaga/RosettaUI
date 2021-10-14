@@ -41,6 +41,16 @@
     min-width: var(--fixed-field-width-s);
 }
 
+.unity-base-slider--horizontal .unity-base-slider__text-field
+{
+    width: auto;
+}
+
+.unity-base-slider--horizontal .unity-base-slider__drag-container
+{
+    min-width: var(--slider-min-width);
+}
+
 .unity-min-max-slider
 {
     flex-grow: 1;

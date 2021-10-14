@@ -1,11 +1,10 @@
-using RosettaUI.Test;
+using RosettaUI.Example;
 using UnityEngine;
-
 
 namespace RosettaUI.UIToolkit.Test
 {
     [RequireComponent(typeof(RosettaUI_UIToolkitRoot))]
-    public class RosettaUI_UIToolkitTest : RosettaUI_Test
+    public class RosettaUI_UIToolkitTest : RosettaUIExample
     {
         RosettaUI_UIToolkitRoot _root;
 

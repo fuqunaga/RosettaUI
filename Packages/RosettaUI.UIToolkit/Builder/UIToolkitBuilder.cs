@@ -4,6 +4,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using RosettaUI.Builder;
 using RosettaUI.Reactive;
+using RosettaUI.UIToolkit.PackageInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -32,8 +33,8 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(ColorFieldElement)] = Build_ColorField,
 
                 [typeof(DropdownElement)] = Build_Dropdown,
-                [typeof(IntSliderElement)] = Build_Slider<int, SliderInt>,
-                [typeof(FloatSliderElement)] = Build_Slider<float, Slider>,
+                [typeof(IntSliderElement)] = Build_Slider<int, ClampFreeSliderInt>,
+                [typeof(FloatSliderElement)] = Build_Slider<float, ClampFreeSlider>,
 
                 [typeof(IntMinMaxSliderElement)] = Build_MinMaxSlider_Int,
                 [typeof(FloatMinMaxSliderElement)] = Build_MinMaxSlider_Float,

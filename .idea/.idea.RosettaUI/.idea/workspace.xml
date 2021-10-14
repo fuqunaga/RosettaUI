@@ -5,51 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0fe36ce1-5363-4af9-be79-bc64757004ac" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/Example.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/Common.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/Common/ElementCreatorTest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/Common/ElementCreatorTest.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/Common/FieldExample.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/Common/FieldExample.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/Common/RosettaUI.Test.asmdef" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/Common/RosettaUI.Test.asmdef.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/Common/SliderExample.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/Common/SliderExample.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/UGUITest.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/UGUITest/RosettaUI.UGUI.Test.asmdef" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/UGUITest/RosettaUI.UGUI.Test.asmdef.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/UGUITest/RosettaUI_UGUITest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/UGUITest/RosettaUI_UGUITest.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/UGUITest/UGUITest.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/UGUITest/UGUITest.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/UIToolkitTest.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/UIToolkitTest/RosettaUI.UIToolkit.Test.asmdef" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/UIToolkitTest/RosettaUI.UIToolkit.Test.asmdef.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/UIToolkitTest/RosettaUI_UIToolkitTest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Example/UIToolkitTest/RosettaUI_UIToolkitTest.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.RosettaUI/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/UIToolkitTest.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/UIToolkitTest.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/Common.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/Common/ElementCreatorTest.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/Common/ElementCreatorTest.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/Common/RosettaUI.Test.asmdef" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/Common/RosettaUI.Test.asmdef.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/Common/RosettaUI_Test.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Example/Common/RosettaUIExample.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/Common/RosettaUI_Test.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Example/Common/RosettaUIExample.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/UGUITest.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/UGUITest/RosettaUI.UGUI.Test.asmdef" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/UGUITest/RosettaUI.UGUI.Test.asmdef.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/UGUITest/RosettaUI_UGUITest.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/UGUITest/RosettaUI_UGUITest.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/UGUITest/UGUITest.prefab" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/UGUITest/UGUITest.prefab.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/UIToolkitTest.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/UIToolkitTest/RosettaUI.UIToolkit.Test.asmdef" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/UIToolkitTest/RosettaUI.UIToolkit.Test.asmdef.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/UIToolkitTest/RosettaUI_UIToolkitTest.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Test/UIToolkitTest/RosettaUI_UIToolkitTest.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/RosettaUI.UIToolkit/Settings/RosettaUI.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/RosettaUI.UIToolkit/Settings/RosettaUI.uss" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Packages/RosettaUI.UIToolkit/AsmrefToUIToolkitPackage/CustomPackage/UnclampledSlider.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Packages/RosettaUI.UIToolkit/AsmrefToUIToolkitPackage/CustomPackage/UnclampledSlider.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Packages/RosettaUI.UIToolkit/AsmrefToUIToolkitPackage/CustomPackage/UnclampledSliderInt.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Packages/RosettaUI.UIToolkit/AsmrefToUIToolkitPackage/CustomPackage/UnclampledSliderInt.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.RosettaUI/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.RosettaUI/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/RosettaUI.UIToolkit/Builder/UIToolkitBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/RosettaUI.UIToolkit/Builder/UIToolkitBuilder.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,6 +28,10 @@
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Packages/RosettaUI.UIToolkit/AsmrefToUIToolkitPackage/CustomPackage/UnclampledSliderInt.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Packages/RosettaUI.UIToolkit/AsmrefToUIToolkitPackage/CustomPackage/UnclampledSlider.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="ProjectId" id="1zU0kNyyhAFNR1lenX283k1HieN" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -74,6 +39,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="Discover.Launch.Via.Unity" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
@@ -119,7 +85,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1634187504838</updated>
-      <workItem from="1634187516232" duration="1749000" />
+      <workItem from="1634187516232" duration="5224000" />
     </task>
     <servers />
   </component>

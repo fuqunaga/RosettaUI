@@ -4,51 +4,54 @@ namespace RosettaUI.Example
 {
     public class MinMaxSliderExample : MonoBehaviour, IElementCreator
     {
-        public MinMax<int> intValue;
-        public MinMax<uint> uintValue;
-        public MinMax<float> floatValue;
-        public MinMax<Vector2> vector2Value;
-        public MinMax<Vector3> vector3Value;
-        public MinMax<Vector4> vector4Value;
-        public MinMax<Vector2Int> vector2IntValue;
-        public MinMax<Vector3Int> vector3IntValue;
-        public MinMax<Rect> rectValue;
-        public MinMax<RectInt> rectIntValue;
-        public MinMax<RectOffset> rectOffsetValue;
-        public MinMax<Bounds> boundsValue;
-        public MinMax<BoundsInt> boundsIntValue;
-        
+        public MinMax<int> intMinMax;
+        public MinMax<uint> uintMinMax;
+        public MinMax<float> floatMinMax;
+        public MinMax<Vector2> vector2MinMax;
+        public MinMax<Vector3> vector3MinMax;
+        public MinMax<Vector4> vector4MinMax;
+        public MinMax<Vector2Int> vector2IntMinMax;
+        public MinMax<Vector3Int> vector3IntMinMax;
+        public MinMax<Rect> rectMinMax;
+        public MinMax<RectInt> rectIntMinMax;
+        public MinMax<RectOffset> rectOffsetMinMax;
+        public MinMax<Bounds> boundsMinMax;
+        public MinMax<BoundsInt> boundsIntMinMax;
 
         public Element CreateElement()
         {
             return UI.Column(
                 UI.Fold("MinMaxSlider"
-                    , UI.MinMaxSlider(() => intValue)
-                    , UI.MinMaxSlider(() => uintValue)
-                    , UI.MinMaxSlider(() => floatValue)
-                    , UI.MinMaxSlider(() => vector2Value)
-                    , UI.MinMaxSlider(() => vector3Value)
-                    , UI.MinMaxSlider(() => vector4Value)
-                    , UI.MinMaxSlider(() => vector2IntValue)
-                    , UI.MinMaxSlider(() => vector3IntValue)
-                    , UI.MinMaxSlider(() => rectValue)
-                    , UI.MinMaxSlider(() => rectIntValue)
-                    , UI.MinMaxSlider(() => rectOffsetValue)
-                    , UI.MinMaxSlider(() => boundsValue)
-                    , UI.MinMaxSlider(() => boundsIntValue)
+                    , UI.MinMaxSlider(() => intMinMax)
+                    , UI.MinMaxSlider(() => uintMinMax)
+                    , UI.MinMaxSlider(() => floatMinMax)
+                    , UI.MinMaxSlider(() => vector2MinMax)
+                    , UI.MinMaxSlider(() => vector3MinMax)
+                    , UI.MinMaxSlider(() => vector4MinMax)
+                    , UI.MinMaxSlider(() => vector2IntMinMax)
+                    , UI.MinMaxSlider(() => vector3IntMinMax)
+                    , UI.MinMaxSlider(() => rectMinMax)
+                    , UI.MinMaxSlider(() => rectIntMinMax)
+                    , UI.MinMaxSlider(() => rectOffsetMinMax)
+                    , UI.MinMaxSlider(() => boundsMinMax)
+                    , UI.MinMaxSlider(() => boundsIntMinMax)
                 )
-                /*
                 , UI.Fold("Usage"
-                    , UI.Slider("CustomLabel", () => floatValue)
-                    , UI.Slider("custom min max", () => floatValue, -1f, 2f)
-                    , UI.Slider("onValueChanged", () => floatValue, f => print($"{nameof(floatValue)} changed."))
-                    , UI.Slider(() => vector2Value.x) // public member
-                    , UI.Slider(() => floatValue + 0.1f) // non-interactable if the expression is read-only, 
-                    , UI.Slider("Expression with onValueChanged",
-                        () => floatValue + 0.1f,
-                        f => floatValue = f - 0.1f) // interactable If onValuedChanged callback is present
-                )
-                */
+                    , UI.MinMaxSlider("CustomLabel", () => floatMinMax)
+                    , UI.MinMaxSlider("Custom min max", () => floatMinMax, -1f, 2f)
+                    , UI.MinMaxSlider("Custom min max", () => vector2MinMax, Vector2.zero, new Vector2(360f, 100f)) 
+                    , UI.MinMaxSlider("onValueChanged",
+                        targetExpression: () => floatMinMax,
+                        onValueChanged: f => print($"{nameof(floatMinMax)} changed."))
+
+                    // non-interactable if the expression is read-only,
+                    , UI.MinMaxSlider(() => MinMax.Create(floatMinMax.min + 0.1f, floatMinMax.max + 0.1f))
+
+                    // interactable If onValuedChanged callback is present
+                    , UI.MinMaxSlider(
+                        targetExpression: () => MinMax.Create(floatMinMax.min + 0.1f, floatMinMax.max + 0.1f),
+                        onValueChanged: f => floatMinMax = MinMax.Create(f.min - 0.1f, f.max - 0.1f))
+                    )
             );
         }
     }

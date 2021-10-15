@@ -19,9 +19,8 @@ namespace RosettaUI.Example
         public BoundsInt boundsIntValue;
         public SimpleClass simpleClass;
 
-        [Range(-100f, 100f)] public int rangeIntValue;
-        [Range(-100f, 100f)] public float rangeValue;
         public string stringValue;
+        [Range(-100f, 100f)] public float rangeValue;
 
         public Element CreateElement()
         {
@@ -70,7 +69,7 @@ namespace RosettaUI.Example
                     , UI.Slider("Unsupported type (string)", () => stringValue)
 
                     // Min and max will be set automatically if there is a range attribute, 
-                    , UI.Slider(() => rangeIntValue)
+                    , UI.Slider(() => rangeValue)
                 )
             );
         }

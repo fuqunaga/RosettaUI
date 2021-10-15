@@ -9,7 +9,6 @@ using UnityEngine.Assertions;
 
 namespace RosettaUI
 {
-
     public static class ExpressionUtility
     {
         public static IBinder<T> CreateBinder<T>(Expression<Func<T>> lambda)
@@ -24,7 +23,6 @@ namespace RosettaUI
         static Binder<T> _CreateBinder<T>(Expression<Func<T>> lambda)
         {
             var getFunc = lambda.Compile();
-
 
             Action<T> setFunc = null;
             var p = Expression.Parameter(typeof(T));
@@ -46,6 +44,8 @@ namespace RosettaUI
         }
 
 
+        #region CreateLabelString
+
         const string MethodCallDummyInstanceName = "MethodCallDummy...";
         static readonly SimplifyVisitor ReadableExpressionVisitor = new SimplifyVisitor();
 
@@ -59,7 +59,7 @@ namespace RosettaUI
 
             //return lambda.Body.ToString();
             var changedExpr = ReadableExpressionVisitor.Visit(lambda.Body);
-            return changedExpr.ToString().Replace(MethodCallDummyInstanceName + ".", "");
+            return changedExpr?.ToString().Replace(MethodCallDummyInstanceName + ".", "");
 #endif
         }
 
@@ -76,8 +76,12 @@ namespace RosettaUI
                     Type type;
                     switch (member)
                     {
-                        case FieldInfo fi: type = fi.FieldType; break;
-                        case PropertyInfo pi: type = pi.PropertyType; break;
+                        case FieldInfo fi:
+                            type = fi.FieldType;
+                            break;
+                        case PropertyInfo pi:
+                            type = pi.PropertyType;
+                            break;
 
                         default:
                             return node;
@@ -110,8 +114,25 @@ namespace RosettaUI
                 }
 
                 return base.VisitMethodCall(node);
-
             }
         }
+
+        #endregion
+
+
+        #region GetAttribute
+
+        public static TAttribute GetAttribute<T, TAttribute>(Expression<Func<T>> lambda)
+            where TAttribute : Attribute
+        {
+            if (lambda.Body is MemberExpression memberExpression)
+            {
+                return memberExpression.Member.GetCustomAttribute<TAttribute>();
+            }
+
+            return null;
+        }
+
+        #endregion
     }
 }

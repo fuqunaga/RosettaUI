@@ -28,16 +28,21 @@ namespace RosettaUI.Example
         public SimpleClass simpleClass;
 
         public ElementCreator elementCreator;
+
         public List<SimpleClass> classList = new[]
         {
             new SimpleClass {floatValue = 1f, stringValue = "First"}
         }.ToList();
         
-        public ComplexClass complexClass;
+        [Range(-100f, 100f)]
+        public float rangeValue;
+
+        //public ComplexClass complexClass;
 
 
         public Element CreateElement()
         {
+            SimpleClass nullClass = null;
             return UI.Column(
                 UI.Fold("Allows any type"
                     , UI.Field(() => intValue)
@@ -60,22 +65,41 @@ namespace RosettaUI.Example
                     , UI.Field(() => intList)
                     , UI.Field(() => floatArray)
                     , UI.Field(() => simpleClass)
+                    , UI.Field(() => classList)
                 )
                 , UI.Fold("Usage"
                     , UI.Field("CustomLabel", () => floatValue)
-                    , UI.Field("onValueChanged", () => floatValue,
-                        f => print($"{nameof(floatValue)} changed."))
-                    , UI.Field(() => vector2Value.x) // public member
-                    , UI.Field(() => floatValue + 1f) // non-interactable if the expression is read-only, 
-                    , UI.Field("Expression with onValueChanged",
-                        () => floatValue + 1f,
-                        f => floatValue = f - 1f) // interactable If onValuedChanged callback is present
-                )
-                , UI.Fold("Complex types"
+                    , UI.Field("onValueChanged",
+                        targetExpression: () => floatValue,
+                        onValueChanged: f => print($"{nameof(floatValue)} changed.")
+                    )
+
+                    // non-interactable if the expression is read-only,
+                    , UI.Field(() => floatValue + 1f)
+
+                    // interactable If onValuedChanged callback is present
+                    , UI.Field(
+                        targetExpression: () => floatValue + 1f,
+                        onValueChanged: f => floatValue = f - 1f
+                    )
+
+                    // Supports public member
+                    , UI.Field(() => vector2Value.x)
+                    
+                    // Null safe
+                    , UI.Field(() => nullClass)
+                    
+                    // Field with range attribute will become Slider
+                    , UI.Field(() => rangeValue)
+
+                    // IElementCreator will use CreateElement() method
                     , UI.Field(() => elementCreator)
-                    , UI.Field(() => classList)
+                )
+                /*
+                , UI.Fold("Complex types"
                     , UI.Field(() => complexClass)
                 )
+                */
             );
         }
     }

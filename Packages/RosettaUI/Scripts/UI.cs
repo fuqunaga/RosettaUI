@@ -23,7 +23,6 @@ namespace RosettaUI
         #endregion
 
 
-
         #region Label
 
         public static LabelElement Label(LabelElement label) => label;
@@ -42,16 +41,13 @@ namespace RosettaUI
         public static Element Field<T>(LabelElement label, Expression<Func<T>> targetExpression,
             Action<T> onValueChanged = null)
         {
-            var binder = ExpressionUtility.CreateBinder(targetExpression);
-            if (binder == null) return null;
-            binder.onValueChanged += onValueChanged;
-
+            var binder = CreateBinder(targetExpression, onValueChanged);
             return Field(label, binder);
         }
 
         public static Element Field(LabelElement label, IBinder binder)
         {
-            var element = BinderToElement.CreateElement(label, binder);
+            var element = BinderToElement.CreateFieldElement(label, binder);
             if (element != null) SetInteractableWithBinder(element, binder);
 
             return element;
@@ -80,8 +76,7 @@ namespace RosettaUI
 
         public static Element Slider<T>(Expression<Func<T>> targetExpression, Action<T> onValueChanged = null)
         {
-            return Slider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, null,
-                onValueChanged);
+            return Slider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, null, onValueChanged);
         }
 
 
@@ -97,7 +92,8 @@ namespace RosettaUI
             return Slider(label, targetExpression, 0f, max, onValueChanged);
         }
 
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T min, T max, Action<T> onValueChanged = null)
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T min, T max,
+            Action<T> onValueChanged = null)
         {
             return Slider(label, targetExpression, ConstMinMaxGetter.Create(min, max), onValueChanged);
         }
@@ -108,11 +104,12 @@ namespace RosettaUI
             return Slider(label, targetExpression, null, onValueChanged);
         }
 
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, IGetter minMaxGetter, Action<T> onValueChanged = null)
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, IGetter minMaxGetter,
+            Action<T> onValueChanged = null)
         {
-            var binder = ExpressionUtility.CreateBinder(targetExpression);
-            if (binder == null) return null;
-            binder.onValueChanged += onValueChanged;
+            var binder = CreateBinder(targetExpression, onValueChanged);
+            minMaxGetter ??= CreateMinMaxGetterFromRangeAttribute(targetExpression);
+
             return Slider(label, binder, minMaxGetter);
         }
 
@@ -127,43 +124,50 @@ namespace RosettaUI
         }
 
         #endregion
-        
-        
+
+
         #region MinMax Slider
-        
-        public static Element MinMaxSlider(Expression<Func<MinMax<int>>> targetExpression, int max, Action<MinMax<int>> onValueChanged = null)
+
+        public static Element MinMaxSlider(Expression<Func<MinMax<int>>> targetExpression, int max,
+            Action<MinMax<int>> onValueChanged = null)
         {
             return MinMaxSlider(targetExpression, 0, max, onValueChanged);
         }
-        
-        public static Element MinMaxSlider<T>(Expression<Func<MinMax<T>>> targetExpression, T min, T max, Action<MinMax<T>> onValueChanged = null)
+
+        public static Element MinMaxSlider<T>(Expression<Func<MinMax<T>>> targetExpression, T min, T max,
+            Action<MinMax<T>> onValueChanged = null)
         {
-            return MinMaxSlider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, ConstMinMaxGetter.Create(min, max), onValueChanged);
+            return MinMaxSlider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression,
+                ConstMinMaxGetter.Create(min, max), onValueChanged);
         }
 
-        public static Element MinMaxSlider<T>(Expression<Func<MinMax<T>>> targetExpression, Action<MinMax<T>> onValueChanged = null)
+        public static Element MinMaxSlider<T>(Expression<Func<MinMax<T>>> targetExpression,
+            Action<MinMax<T>> onValueChanged = null)
         {
-            return MinMaxSlider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, null, onValueChanged);
+            return MinMaxSlider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, null,
+                onValueChanged);
         }
 
-        public static Element MinMaxSlider<T>(LabelElement label, Expression<Func<MinMax<T>>> targetExpression, T min, T max, Action<MinMax<T>> onValueChanged = null)
+        public static Element MinMaxSlider<T>(LabelElement label, Expression<Func<MinMax<T>>> targetExpression, T min,
+            T max, Action<MinMax<T>> onValueChanged = null)
         {
             return MinMaxSlider(label, targetExpression, ConstMinMaxGetter.Create(min, max), onValueChanged);
         }
 
-        public static Element MinMaxSlider<T>(LabelElement label, Expression<Func<MinMax<T>>> targetExpression, Action<MinMax<T>> onValueChanged = null)
+        public static Element MinMaxSlider<T>(LabelElement label, Expression<Func<MinMax<T>>> targetExpression,
+            Action<MinMax<T>> onValueChanged = null)
         {
             return MinMaxSlider(label, targetExpression, null, onValueChanged);
         }
-        
-        public static Element MinMaxSlider<T>(LabelElement label, Expression<Func<MinMax<T>>> targetExpression, IGetter minMaxGetter, Action<MinMax<T>> onValueChanged = null)
+
+        public static Element MinMaxSlider<T>(LabelElement label, Expression<Func<MinMax<T>>> targetExpression,
+            IGetter minMaxGetter, Action<MinMax<T>> onValueChanged = null)
         {
-            var binder = ExpressionUtility.CreateBinder(targetExpression);
-            if (binder == null) return null;
-            binder.onValueChanged += onValueChanged;
+            var binder = CreateBinder(targetExpression, onValueChanged);
+
             return MinMaxSlider(label, binder, minMaxGetter);
         }
-        
+
         public static Element MinMaxSlider(LabelElement label, IBinder binder, IGetter minMaxGetter)
         {
             var contents = BinderToElement.CreateMinMaxSliderElement(label, binder, minMaxGetter);
@@ -173,7 +177,7 @@ namespace RosettaUI
 
             return contents;
         }
-        
+
         #endregion
 
 
@@ -233,9 +237,7 @@ namespace RosettaUI
         public static Element Dropdown(LabelElement label, Expression<Func<int>> targetExpression,
             IEnumerable<string> options, Action<int> onValueChanged = null)
         {
-            var binder = ExpressionUtility.CreateBinder(targetExpression);
-            if (binder == null) return null;
-            binder.onValueChanged += onValueChanged;
+            var binder = CreateBinder(targetExpression, onValueChanged);
 
             Element element = new DropdownElement(label, binder, options);
 
@@ -390,12 +392,40 @@ namespace RosettaUI
         }
 
         #endregion
-        
-        
+
+
+        static IBinder<T> CreateBinder<T>(Expression<Func<T>> targetExpression, Action<T> onValueChanged)
+        {
+            var binder = ExpressionUtility.CreateBinder(targetExpression);
+            if (binder != null)
+            {
+                binder.onValueChanged += onValueChanged;
+            }
+
+            return binder;
+        }
+
+
+        static IGetter<MinMax<T>> CreateMinMaxGetterFromRangeAttribute<T>(Expression<Func<T>> targetExpression)
+        {
+            if (typeof(IConvertible).IsAssignableFrom(typeof(T)))
+            {
+                var rangeAttribute = ExpressionUtility.GetAttribute<T, RangeAttribute>(targetExpression);
+                if (rangeAttribute != null)
+                {
+                    var min = (T) Convert.ChangeType(rangeAttribute.min, typeof(T));
+                    var max = (T) Convert.ChangeType(rangeAttribute.max, typeof(T));
+                    return ConstMinMaxGetter.Create(min, max);
+                }
+            }
+
+            return null;
+        }
+
+
         private static void SetInteractableWithBinder(Element element, IBinder binder)
         {
             element.Interactable = !binder.IsReadOnly;
         }
-
     }
 }

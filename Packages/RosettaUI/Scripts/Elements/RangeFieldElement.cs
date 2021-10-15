@@ -1,28 +1,45 @@
 ﻿using RosettaUI.Reactive;
+using UnityEngine.UIElements;
 
 namespace RosettaUI
 {
     public abstract class RangeFieldElement<T, TRange> : FieldBaseElement<T>
     {
-        private readonly IGetter<MinMax<TRange>> _minMaxGetter;
-        public readonly ReactiveProperty<MinMax<TRange>> minMaxRx;
+        private readonly IGetter<TRange> _minGetter;
+        private readonly IGetter<TRange> _maxGetter;
 
+        public readonly ReactiveProperty<TRange> minRx;
+        public readonly ReactiveProperty<TRange> maxRx;
 
-        public RangeFieldElement(LabelElement label, IBinder<T> binder, IGetter<MinMax<TRange>> minMaxGetter) :
-            base(label, binder)
+        public RangeFieldElement(LabelElement label, IBinder<T> binder, IGetter<MinMax<TRange>> minMaxGetter)
+            : this(label, binder, 
+                Getter.Create(() => minMaxGetter.Get().min),
+                Getter.Create(() => minMaxGetter.Get().max))
         {
-            _minMaxGetter = minMaxGetter;
-            minMaxRx = new ReactiveProperty<MinMax<TRange>>(minMaxGetter.Get());
         }
 
-        public MinMax<TRange> MinMax => minMaxRx.Value;
+        public RangeFieldElement(LabelElement label, IBinder<T> binder, IGetter<TRange> minGetter,
+            IGetter<TRange> maxGetter)
+            : base(label, binder)
+        {
+            _minGetter = minGetter;
+            _maxGetter = maxGetter;
 
-        public bool IsMinMaxConst => _minMaxGetter.IsConst;
+            minRx = new ReactiveProperty<TRange>(_minGetter.Get());
+            maxRx = new ReactiveProperty<TRange>(_maxGetter.Get());
+        }
+
+        public TRange Min => minRx.Value;
+        public TRange Max => maxRx.Value;
+
+        public bool IsMinConst => _minGetter.IsConst;
+        public bool IsMaxConst => _maxGetter.IsConst;
 
         public override void Update()
         {
             base.Update();
-            if (!IsMinMaxConst) minMaxRx.Value = _minMaxGetter.Get();
+            if (!IsMinConst) minRx.Value = _minGetter.Get();
+            if (!IsMaxConst) maxRx.Value = _maxGetter.Get();
         }
     }
 }

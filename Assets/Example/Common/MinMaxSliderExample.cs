@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace RosettaUI.Example
 {
-    public class SliderExample : MonoBehaviour, IElementCreator
+    public class MinMaxSliderExample : MonoBehaviour, IElementCreator
     {
         public int intValue;
         public uint uintValue;
@@ -18,14 +18,11 @@ namespace RosettaUI.Example
         public Bounds boundsValue;
         public BoundsInt boundsIntValue;
         public SimpleClass simpleClass;
+        public ComplexClass complexClass;
 
-        [Range(-100f, 100f)] public int rangeIntValue;
-        [Range(-100f, 100f)] public float rangeValue;
-        public string stringValue;
 
         public Element CreateElement()
         {
-            SimpleClass nullClass = null;
             return UI.Column(
                 UI.Fold("Slider"
                     , UI.Slider(() => intValue)
@@ -42,34 +39,17 @@ namespace RosettaUI.Example
                     , UI.Slider(() => boundsValue)
                     , UI.Slider(() => boundsIntValue)
                     , UI.Slider(() => simpleClass)
+                    , UI.Slider(() => complexClass)
                 )
                 , UI.Fold("Usage"
                     , UI.Slider("CustomLabel", () => floatValue)
-                    , UI.Slider("Custom min max", () => floatValue, -1f, 2f)
-                    , UI.Slider("onValueChanged",
-                        targetExpression: () => floatValue,
-                        onValueChanged: f => print($"{nameof(floatValue)} changed."))
-
-                    // non-interactable if the expression is read-only,
-                    , UI.Slider(() => floatValue + 0.1f)
-
-                    // interactable If onValuedChanged callback is present
-                    , UI.Slider(
-                        targetExpression: () => floatValue + 0.1f,
-                        onValueChanged: f => floatValue = f - 0.1f
-                    )
-
-                    // Supports public member
-                    , UI.Slider(() => vector2Value.x)
-
-                    // Null safe
-                    , UI.Slider(() => nullClass)
-
-                    // unsupported type will fallback to UI.Field()
-                    , UI.Slider("Unsupported type (string)", () => stringValue)
-
-                    // Min and max will be set automatically if there is a range attribute, 
-                    , UI.Slider(() => rangeIntValue)
+                    , UI.Slider("custom min max", () => floatValue, -1f, 2f)
+                    , UI.Slider("onValueChanged", () => floatValue, f => print($"{nameof(floatValue)} changed."))
+                    , UI.Slider(() => vector2Value.x) // public member
+                    , UI.Slider(() => floatValue + 0.1f) // non-interactable if the expression is read-only, 
+                    , UI.Slider("Expression with onValueChanged",
+                        () => floatValue + 0.1f,
+                        f => floatValue = f - 0.1f) // interactable If onValuedChanged callback is present
                 )
             );
         }

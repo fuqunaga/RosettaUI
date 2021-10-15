@@ -213,16 +213,7 @@ MonoBehaviour:
   classList:
   - floatValue: 1
     stringValue: First
-  complexClass:
-    floatWithRangeValue: 0
-    vector3Value: {x: 0, y: 0, z: 0}
-    simpleClass:
-      floatValue: 0
-      stringValue: 
-    elementCreatorClass:
-      floatValue: 0
-    uiCustomClass:
-      floatValue: 0
+  rangeValue: 0
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -635,3 +626,6 @@ MonoBehaviour:
   simpleClass:
     floatValue: 0
     stringValue: 
+  rangeIntValue: 0
+  rangeValue: 0
+  stringValue: 

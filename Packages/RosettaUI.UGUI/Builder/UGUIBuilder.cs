@@ -36,7 +36,7 @@ namespace RosettaUI.UGUI.Builder
                     [typeof(DropdownElement)] = Build_Dropdown,
                     [typeof(IntSliderElement)] = Build_IntSlider,
                     [typeof(FloatSliderElement)] = Build_FloatSlider,
-                    [typeof(LogSliderElement)] = Build_LogSlider,
+                    //[typeof(LogSliderElement)] = Build_LogSlider,
                     [typeof(FoldElement)] = Build_Fold,
                     [typeof(DynamicElement)] = (e) => Build_ElementGroup(e, null, true, (go) => AddLayoutGroup<HorizontalLayoutGroup>(go))
                 };

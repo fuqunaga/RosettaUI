@@ -324,25 +324,23 @@ namespace RosettaUI.UIToolkit.Builder
             var sliderElement = (SliderElement<T>) element;
             var slider = Build_Field<T, TSlider>(sliderElement);
 
-            InitRangeFieldElement(sliderElement, (minMax) =>
-            {
-                var (min, max) = minMax;
-                slider.lowValue = min;
-                slider.highValue = max;
-            });
+            InitRangeFieldElement(sliderElement,
+                (min) => slider.lowValue = min,
+                (max) => slider.highValue = max
+            );
 
             slider.showInputField = true;
             return slider;
         }
 
         static VisualElement Build_MinMaxSlider_Int(Element element) =>
-            Build_MinMaxSlider<int, IntegerField>(element, (i) => i, (f) => (int)f);
+            Build_MinMaxSlider<int, IntegerField>(element, (i) => i, (f) => (int) f);
 
         static VisualElement Build_MinMaxSlider_Float(Element element) =>
             Build_MinMaxSlider<float, FloatField>(element, (f) => f, (f) => f);
-        
+
         private static VisualElement Build_MinMaxSlider<T, TField>(Element element, Func<T, float> toFloat,
-            [NotNull] Func<float, T> ToValue)
+            Func<float, T> ToValue)
             where TField : TextInputBaseField<T>, new()
         {
             if (ToValue == null) throw new ArgumentNullException(nameof(ToValue));
@@ -353,12 +351,10 @@ namespace RosettaUI.UIToolkit.Builder
                 (vec2) => MinMax.Create(ToValue(vec2.x), ToValue(vec2.y))
             );
 
-            InitRangeFieldElement(sliderElement, (minMax) =>
-            {
-                var (min, max) = minMax;
-                slider.lowLimit = toFloat(min);
-                slider.highLimit = toFloat(max);
-            });
+            InitRangeFieldElement(sliderElement,
+                (min) => slider.lowLimit = toFloat(min),
+                (max) => slider.highLimit = toFloat(max)
+            );
 
             var minField = new TField();
             var maxField = new TField();
@@ -388,17 +384,21 @@ namespace RosettaUI.UIToolkit.Builder
         }
 
 
-        static void InitRangeFieldElement<T, TRange>(RangeFieldElement<T, TRange> rangeFieldElement,
-            Action<MinMax<TRange>> updateRange)
+        static void InitRangeFieldElement<T, TRange>(
+            RangeFieldElement<T, TRange> rangeFieldElement,
+            Action<TRange> updateMin,
+            Action<TRange> updateMax
+        )
         {
-            if (rangeFieldElement.IsMinMaxConst)
-            {
-                updateRange(rangeFieldElement.MinMax);
-            }
+            if (rangeFieldElement.IsMinConst)
+                updateMin(rangeFieldElement.Min);
             else
-            {
-                rangeFieldElement.minMaxRx.SubscribeAndCallOnce(updateRange);
-            }
+                rangeFieldElement.minRx.SubscribeAndCallOnce(updateMin);
+            
+            if (rangeFieldElement.IsMaxConst)
+                updateMax(rangeFieldElement.Max);
+            else
+                rangeFieldElement.maxRx.SubscribeAndCallOnce(updateMax);
         }
 
         private static Button Build_Button(Element element)

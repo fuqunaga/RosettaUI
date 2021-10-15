@@ -9,7 +9,7 @@ namespace RosettaUI
     {
         private static readonly BinderBase<string> NullStrBinder = ConstBinder.Create("null");
 
-        public static Element CreateElement(LabelElement label, IBinder binder)
+        public static Element CreateFieldElement(LabelElement label, IBinder binder)
         {
             var valueType = binder.ValueType;
 
@@ -73,24 +73,24 @@ namespace RosettaUI
             var elements = TypeUtility.GetUITargetFieldNames(valueType)
                 .Select(fieldName =>
                 {
-                    var range = TypeUtility.GetRange(valueType, fieldName);
-
                     var fieldBinder = PropertyOrFieldBinder.CreateWithBinder(binder, fieldName);
 
-                    var element = range == null
-                        ? UI.Field(fieldName, fieldBinder)
-                        : UI.Slider(fieldName, fieldBinder, ConstMinMaxGetter.Create(range.min, range.max));
-
-                    return element;
+                    var range = TypeUtility.GetRange(valueType, fieldName);
+                    if (range == null)
+                    {
+                        return UI.Field(fieldName, fieldBinder);
+                    }
+                    else
+                    {
+                        var (minGetter, maxGetter) = RangeUtility.CreateGetterMinMax(range, fieldBinder.ValueType);
+                        return UI.Slider(fieldName, fieldBinder, minGetter, maxGetter);
+                    }
                 });
 
-            Element ret = null;
-            if (binder.IsOneliner())
-                ret = new CompositeFieldElement(label, elements);
-            else
-                ret = new FoldElement(label, elements);
 
-            return ret;
+            return binder.IsOneliner()
+                ? (Element)new CompositeFieldElement(label, elements)
+                : new FoldElement(label, elements);
         }
 
         public static Element CreateListElement(LabelElement label, IGetter<IList> listBinder,
@@ -136,18 +136,30 @@ namespace RosettaUI
 
         #region Slider
 
-        public static Element CreateSliderElement(LabelElement label, IBinder binder, IGetter minMaxGetter)
+        public static Element CreateSliderElement(LabelElement label, IBinder binder, IGetter minGetter,
+            IGetter maxGetter)
         {
             return binder switch
             {
-                BinderBase<int> bb => new IntSliderElement(label, bb, (IGetter<MinMax<int>>) minMaxGetter),
-                BinderBase<float> bb => new FloatSliderElement(label, bb, (IGetter<MinMax<float>>) minMaxGetter),
-                _ => CreateCompositeSliderElement(label, binder, minMaxGetter)
+                IBinder<int> bb => new IntSliderElement(label, bb, (IGetter<int>) minGetter, (IGetter<int>) maxGetter),
+                IBinder<uint> bb => new IntSliderElement(label,
+                    new CastBinder<uint, int>(bb),
+                    CastGetter.Create<uint, int>((IGetter<uint>) minGetter),
+                    CastGetter.Create<uint, int>((IGetter<uint>) maxGetter)
+                ),
+                IBinder<float> bb => new FloatSliderElement(label,
+                    bb,
+                    (IGetter<float>) minGetter,
+                    (IGetter<float>) maxGetter
+                ),
+                _ => CreateCompositeSliderElement(label, binder, minGetter, maxGetter) ??
+                     CreateFieldElement(label, binder)
             };
         }
 
 
-        private static Element CreateCompositeSliderElement(LabelElement label, IBinder binder, IGetter minMaxGetter)
+        private static Element CreateCompositeSliderElement(LabelElement label, IBinder binder, IGetter minGetter,
+            IGetter maxGetter)
         {
             var fieldNames = TypeUtility.GetUITargetFieldNames(binder.ValueType).ToList();
             if (!fieldNames.Any()) return null;
@@ -155,16 +167,21 @@ namespace RosettaUI
             var elements = fieldNames.Select(fieldName =>
             {
                 var fieldBinder = PropertyOrFieldBinder.CreateWithBinder(binder, fieldName);
-                var fieldMinMaxGetter = minMaxGetter != null
-                    ? PropertyOrFieldMinMaxGetter.Create(minMaxGetter, fieldName)
+                var fieldMinGetter = minGetter != null
+                    ? PropertyOrFieldMinMaxGetter.Create(minGetter, fieldName)
                     : null;
-                return UI.Slider(fieldName, fieldBinder, fieldMinMaxGetter);
+                var fieldMaxGetter = maxGetter != null
+                    ? PropertyOrFieldMinMaxGetter.Create(maxGetter, fieldName)
+                    : null;
+                return UI.Slider(fieldName, fieldBinder, fieldMinGetter, fieldMaxGetter);
             });
 
             return binder.IsNullable
                 ? NullGuard(label, binder, CreateElementFunc)
                 : CreateElementFunc();
 
+            // NullGuard前にelements.ToList()などで評価していまうとbinder.Get()のオブジェクトがnullであるケースがある
+            // 評価を遅延させる
             Element CreateElementFunc()
             {
                 return new FoldElement(label, elements);
@@ -181,12 +198,14 @@ namespace RosettaUI
             return binder switch
             {
                 IBinder<MinMax<int>> bb => new IntMinMaxSliderElement(label, bb, (IGetter<MinMax<int>>) minMaxGetter),
-                IBinder<MinMax<float>> bb => new FloatMinMaxSliderElement(label, bb, (IGetter<MinMax<float>>) minMaxGetter),
+                IBinder<MinMax<float>> bb => new FloatMinMaxSliderElement(label, bb,
+                    (IGetter<MinMax<float>>) minMaxGetter),
                 _ => CreateCompositeMinMaxSliderElement(label, binder, minMaxGetter)
             };
         }
 
-        private static Element CreateCompositeMinMaxSliderElement(LabelElement label, IBinder binder, IGetter minMaxGetter)
+        private static Element CreateCompositeMinMaxSliderElement(LabelElement label, IBinder binder,
+            IGetter minMaxGetter)
         {
             var fieldNames = TypeUtility.GetUITargetFieldNames(binder.GetMinMaxValueType()).ToList();
             if (!fieldNames.Any()) return null;

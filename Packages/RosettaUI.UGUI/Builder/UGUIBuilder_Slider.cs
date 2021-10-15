@@ -15,10 +15,9 @@ namespace RosettaUI.UGUI.Builder
 
             var slider = go.GetComponentInChildren<Slider>();
             SetSliderColor(slider);
-
-            var (min, max) = sliderElement.MinMax;
-            slider.minValue = min;
-            slider.maxValue = max;
+            
+            slider.minValue = sliderElement.Min;
+            slider.maxValue = sliderElement.Max;
             slider.wholeNumbers = true;
             SetInputFieldTextToSlider(inputFieldUI.text, slider);
 
@@ -28,9 +27,14 @@ namespace RosettaUI.UGUI.Builder
                 sliderElement.OnViewValueChanged(Mathf.RoundToInt(f));
             });
 
-            if (!sliderElement.IsMinMaxConst)
+            if (!sliderElement.IsMinConst)
             {
-                sliderElement.minMaxRx.Subscribe((minMax) => { slider.minValue = minMax.min; slider.maxValue = minMax.max; });
+                sliderElement.minRx.Subscribe((min) => slider.minValue = min);
+            }
+            
+            if (!sliderElement.IsMaxConst)
+            {
+                sliderElement.maxRx.Subscribe((max) => slider.maxValue = max);
             }
 
             inputFieldUI.onValueChanged.AddListener((s) => SetInputFieldTextToSlider(s, slider));
@@ -47,6 +51,7 @@ namespace RosettaUI.UGUI.Builder
         static GameObject Build_FloatSlider(Element element) => Build_FloatSliderBase((FloatSliderElement)element, (f) => f, (f) => f);
 
 
+        /*
         static GameObject Build_LogSlider(Element element)
         {
             var slider = (LogSliderElement)element;
@@ -58,6 +63,7 @@ namespace RosettaUI.UGUI.Builder
                 (f) => Mathf.Log(f, logBase)
                 );
         }
+        */
 
 
         static GameObject Build_FloatSliderBase(SliderElement<float> sliderElement, Func<float, float> sliderToField, Func<float, float> fieldToSlider)
@@ -67,9 +73,8 @@ namespace RosettaUI.UGUI.Builder
             var slider = go.GetComponentInChildren<Slider>();
             SetSliderColor(slider);
 
-            var (min, max) = sliderElement.MinMax;
-            slider.minValue = fieldToSlider(min);
-            slider.maxValue = fieldToSlider(max);
+            slider.minValue = fieldToSlider(sliderElement.Min);
+            slider.maxValue = fieldToSlider(sliderElement.Max);
             slider.wholeNumbers = false;
             slider.value = fieldToSlider(sliderElement.Value);
 
@@ -80,14 +85,16 @@ namespace RosettaUI.UGUI.Builder
                 sliderElement.OnViewValueChanged(f);
             });
 
-            if (!sliderElement.IsMinMaxConst)
+            if (!sliderElement.IsMinConst)
             {
-                sliderElement.minMaxRx.Subscribe((minMax) =>
-                {
-                    slider.minValue = fieldToSlider(minMax.min);
-                    slider.maxValue = fieldToSlider(minMax.max);
-                });
+                sliderElement.minRx.Subscribe((min) => slider.minValue = fieldToSlider(min));
             }
+            
+            if (!sliderElement.IsMaxConst)
+            {
+                sliderElement.maxRx.Subscribe((max) => slider.maxValue = fieldToSlider(max));
+            }
+
 
             inputFieldUI.onValueChanged.AddListener((s) =>
             {

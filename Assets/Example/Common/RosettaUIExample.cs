@@ -110,6 +110,7 @@ namespace RosettaUI.Example
 #if true
                 UI.ElementCreatorWindowLauncher<FieldExample>()
                 , UI.ElementCreatorWindowLauncher<SliderExample>()
+                , UI.ElementCreatorWindowLauncher<MinMaxSliderExample>()
                 /*
                 , UI.Row(
                     UI.Label("LogSlider[WIP]"),

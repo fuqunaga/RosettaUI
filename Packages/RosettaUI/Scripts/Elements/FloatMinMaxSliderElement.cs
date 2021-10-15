@@ -2,8 +2,11 @@
 {
     public class FloatMinMaxSliderElement : MinMaxSliderElement<float>
     {
-        public FloatMinMaxSliderElement(LabelElement label, IBinder<MinMax<float>> binder, IGetter<MinMax<float>> minMaxGetter)
-            : base(label, binder, minMaxGetter ?? ConstMinMaxGetter.DefaultFloat)
+        public FloatMinMaxSliderElement(LabelElement label, IBinder<MinMax<float>> binder, IGetter<float> minGetter, IGetter<float> maxGetter)
+            : base(label, binder, 
+                minGetter ?? FloatSliderElement.MinGetterDefault, 
+                maxGetter ?? FloatSliderElement.MaxGetterDefault
+                )
         {
         }
     }

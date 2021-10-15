@@ -1,5 +1,4 @@
 ﻿using RosettaUI.Reactive;
-using UnityEngine.UIElements;
 
 namespace RosettaUI
 {
@@ -10,16 +9,8 @@ namespace RosettaUI
 
         public readonly ReactiveProperty<TRange> minRx;
         public readonly ReactiveProperty<TRange> maxRx;
-
-        public RangeFieldElement(LabelElement label, IBinder<T> binder, IGetter<MinMax<TRange>> minMaxGetter)
-            : this(label, binder, 
-                Getter.Create(() => minMaxGetter.Get().min),
-                Getter.Create(() => minMaxGetter.Get().max))
-        {
-        }
-
-        public RangeFieldElement(LabelElement label, IBinder<T> binder, IGetter<TRange> minGetter,
-            IGetter<TRange> maxGetter)
+        
+        public RangeFieldElement(LabelElement label, IBinder<T> binder, IGetter<TRange> minGetter, IGetter<TRange> maxGetter)
             : base(label, binder)
         {
             _minGetter = minGetter;

@@ -420,6 +420,7 @@ Transform:
   m_Children:
   - {fileID: 590657663}
   - {fileID: 1740173063}
+  - {fileID: 1922449324}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -629,3 +630,89 @@ MonoBehaviour:
   rangeIntValue: 0
   rangeValue: 0
   stringValue: 
+--- !u!1 &1922449323
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1922449324}
+  - component: {fileID: 1922449325}
+  m_Layer: 0
+  m_Name: MinMaxSliderExample
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1922449324
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1922449323}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 852668086}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1922449325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1922449323}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f4d532e574549a4aa50ea0898ecd519, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  intValue: 0
+  uintValue: 0
+  floatValue: 0
+  vector2Value: {x: 0, y: 0}
+  vector3Value: {x: 0, y: 0, z: 0}
+  vector4Value: {x: 0, y: 0, z: 0, w: 0}
+  vector2IntValue: {x: 0, y: 0}
+  vector3IntValue: {x: 0, y: 0, z: 0}
+  rectValue:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
+  rectIntValue:
+    x: 0
+    y: 0
+    width: 0
+    height: 0
+  rectOffsetValue:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  boundsValue:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  boundsIntValue:
+    m_Position: {x: 0, y: 0, z: 0}
+    m_Size: {x: 0, y: 0, z: 0}
+  simpleClass:
+    floatValue: 0
+    stringValue: 
+  complexClass:
+    floatWithRangeValue: 0
+    vector3Value: {x: 0, y: 0, z: 0}
+    simpleClass:
+      floatValue: 0
+      stringValue: 
+    elementCreatorClass:
+      floatValue: 0
+    uiCustomClass:
+      floatValue: 0

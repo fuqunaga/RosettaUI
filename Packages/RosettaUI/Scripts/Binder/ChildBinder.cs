@@ -37,7 +37,8 @@ namespace RosettaUI
         private readonly Func<TParent, TValue> _getter;
         private readonly Func<TParent, TValue, TParent> _setter;
 
-        public ChildBinder(IBinder<TParent> parentBinder, Func<TParent, TValue> getter, Func<TParent, TValue, TParent> setter) 
+        public ChildBinder(IBinder<TParent> parentBinder, Func<TParent, TValue> getter,
+            Func<TParent, TValue, TParent> setter)
             : base(parentBinder)
         {
             _getter = getter;

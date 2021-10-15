@@ -46,6 +46,7 @@ namespace RosettaUI.Example
                 , UI.Fold("Usage"
                     , UI.Slider("CustomLabel", () => floatValue)
                     , UI.Slider("Custom min max", () => floatValue, -1f, 2f)
+                    , UI.Slider("Custom min max", () => vector2Value, Vector2.zero, new Vector2(360f, 100f)) 
                     , UI.Slider("onValueChanged",
                         targetExpression: () => floatValue,
                         onValueChanged: f => print($"{nameof(floatValue)} changed."))

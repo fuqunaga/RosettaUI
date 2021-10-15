@@ -6,19 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="0fe36ce1-5363-4af9-be79-bc64757004ac" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.RosettaUI/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.RosettaUI/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Example/Common/MinMaxSliderExample.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Example/Common/MinMaxSliderExample.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Example/Common/RosettaUIExample.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Example/Common/RosettaUIExample.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Example/Common/SliderExample.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Example/Common/SliderExample.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/UIToolkitTest.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/UIToolkitTest.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/BinderToElement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/BinderToElement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/CastGetter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/CastGetter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/ChildBinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/ChildBinder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Elements/FloatMinMaxSliderElement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Elements/FloatMinMaxSliderElement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Elements/FloatSliderElement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Elements/FloatSliderElement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Elements/IntMinMaxSliderElement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Elements/IntMinMaxSliderElement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Elements/IntSliderElement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Elements/IntSliderElement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/CastBinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/CastBinder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/PropertyOrFieldBinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/PropertyOrFieldBinder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/PropertyOrFieldMinMaxBinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/PropertyOrFieldMinMaxBinder.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Elements/MinMaxSlider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Elements/MinMaxSlider.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Elements/RangeFieldElement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/Elements/RangeFieldElement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/UI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/RosettaUI/Scripts/UI.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -38,17 +30,20 @@
     </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/cafb29d5233847fbb4edcf8d7c32b1e3299c90/88/b991cc0f/CustomAttributeExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/51c9fc2d1be048cfa2dd679deaa7d4f717a300/bc/fc127b98/Expression.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/CastGetter.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/351e49e2a5bf4fd6beabb458ce2255f3ff600/ca/7363510e/Enumerable.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Packages/RosettaUI/Scripts/Utilities/RangeUtility.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3c9e850c90c548a0af7e388089bbdae93ea98/57/6be932f8/LambdaExpression.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/ChildGetter.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/cafb29d5233847fbb4edcf8d7c32b1e3299c90/f1/150a419b/Converter`2.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a0ef933b1aa54b668801ea864e4204fe13b600/a1/bb8d01bf/RangeAttribute.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/PropertyOrFieldGetter.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Example/Common/MinMaxSliderExample.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/CastMinMaxBinder.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/cafb29d5233847fbb4edcf8d7c32b1e3299c90/88/b991cc0f/CustomAttributeExtensions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/CastGetter.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/351e49e2a5bf4fd6beabb458ce2255f3ff600/ca/7363510e/Enumerable.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/ChildGetter.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/MinMaxBinder.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/BinderSet.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Packages/RosettaUI/Scripts/Binder/PropertyOrFieldGetter.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="1zU0kNyyhAFNR1lenX283k1HieN" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -107,7 +102,7 @@
       <option name="presentableId" value="Default" />
       <updated>1634187504838</updated>
       <workItem from="1634187516232" duration="16770000" />
-      <workItem from="1634268023651" duration="10565000" />
+      <workItem from="1634268023651" duration="21895000" />
     </task>
     <servers />
   </component>

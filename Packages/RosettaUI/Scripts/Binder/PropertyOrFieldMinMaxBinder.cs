@@ -26,8 +26,6 @@ namespace RosettaUI
                 PropertyOrFieldGetterSetter<TParent, TValue>.GetGetterSetter(propertyOrFieldName);
         }
 
-        public Type MinMaxType => typeof(TValue);
-
         protected override MinMax<TValue> GetFromChild(MinMax<TParent> parent)
         {
             var (min, max) = parent;

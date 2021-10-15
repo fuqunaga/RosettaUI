@@ -180,8 +180,8 @@ namespace RosettaUI
 
         public static Element MinMaxSlider<T>(LabelElement label,
             Expression<Func<MinMax<T>>> targetExpression,
-            IGetter minGetter,
-            IGetter maxGetter,
+            IGetter<T> minGetter,
+            IGetter<T> maxGetter,
             Action<MinMax<T>> onValueChanged = null)
         {
             var binder = CreateBinder(targetExpression, onValueChanged);

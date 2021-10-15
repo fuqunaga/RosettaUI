@@ -14,8 +14,8 @@ namespace RosettaUI
 
         #region static
 
-        private static readonly Func<TFrom, TTo> CastFunc;
-        private static readonly Func<TFrom, TTo, TFrom> CastToParentFunc;
+        public static readonly Func<TFrom, TTo> CastFunc;
+        public static readonly Func<TFrom, TTo, TFrom> CastToParentFunc;
 
         static CastBinder()
         {

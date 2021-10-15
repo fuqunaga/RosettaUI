@@ -5,12 +5,14 @@ namespace RosettaUI
     // 型とフィールドかプロパティ名から生成されるBinder
     public static class PropertyOrFieldBinder
     {
+        /*
         public static IBinder Create<T>(T obj, string propertyOrFieldName)
         {
             return CreateWithBinder(ConstBinder.Create(obj), propertyOrFieldName);
         }
+        */
 
-        public static IBinder CreateWithBinder(IBinder binder, string propertyOrFieldName)
+        public static IBinder Create(IBinder binder, string propertyOrFieldName)
         {
             var parent = binder.ValueType;
             var memberType = TypeUtility.GetPropertyOrFieldType(parent, propertyOrFieldName);

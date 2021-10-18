@@ -272,18 +272,20 @@ namespace RosettaUI.UIToolkit.Builder
         private static TField Build_Field<T, TField>(Element element)
             where TField : BaseField<T>, new()
         {
-            return Build_Field<T, T, TField>(element, (v) => v, (v) => v);
+            return Build_Field<T, T, TField>(element,
+                (field, v) => field.SetValueWithoutNotify(v), 
+                (v) => v);
         }
 
         private static TField Build_Field<TElementValue, TFieldValue, TField>(
             Element element,
-            Func<TElementValue, TFieldValue> elementToFieldValue,
+            Action<TField, TElementValue> onElementValueChanged,
             Func<TFieldValue, TElementValue> fieldToElement
         )
             where TField : BaseField<TFieldValue>, new()
         {
             var fieldElement = (FieldBaseElement<TElementValue>) element;
-            var field = CreateField<TElementValue, TFieldValue, TField>(fieldElement, elementToFieldValue,
+            var field = CreateField<TElementValue, TFieldValue, TField>(fieldElement, onElementValueChanged,
                 fieldToElement);
 
             var labelElement = fieldElement.label;
@@ -299,18 +301,19 @@ namespace RosettaUI.UIToolkit.Builder
         static TField CreateField<T, TField>(FieldBaseElement<T> fieldBaseElement)
             where TField : BaseField<T>, new()
         {
-            return CreateField<T, T, TField>(fieldBaseElement, (v) => v, (v) => v);
+            return CreateField<T, T, TField>(fieldBaseElement, (field, v) => field.SetValueWithoutNotify(v), (v) => v);
         }
 
         private static TField CreateField<TElementValue, TFieldValue, TField>(
             FieldBaseElement<TElementValue> fieldBaseElement,
-            Func<TElementValue, TFieldValue> elementToFieldValue,
+            //Func<TElementValue, TFieldValue> elementToFieldValue,
+            Action<TField, TElementValue> onElementValueChanged,
             Func<TFieldValue, TElementValue> fieldToElement
         )
             where TField : BaseField<TFieldValue>, new()
         {
             var field = new TField();
-            fieldBaseElement.valueRx.SubscribeAndCallOnce(v => field.value = elementToFieldValue(v));
+            fieldBaseElement.valueRx.SubscribeAndCallOnce(v => onElementValueChanged(field, v));
             field.RegisterValueChangedCallback(ev => fieldBaseElement.OnViewValueChanged(fieldToElement(ev.newValue)));
 
             return field;
@@ -339,46 +342,46 @@ namespace RosettaUI.UIToolkit.Builder
         static VisualElement Build_MinMaxSlider_Float(Element element) =>
             Build_MinMaxSlider<float, FloatField>(element, (f) => f, (f) => f);
 
-        private static VisualElement Build_MinMaxSlider<T, TField>(Element element, Func<T, float> toFloat,
-            Func<float, T> ToValue)
-            where TField : TextInputBaseField<T>, new()
+        private static VisualElement Build_MinMaxSlider<T, TTextField>(Element element, Func<T, float> toFloat, Func<float, T> toValue)
+            where TTextField : TextInputBaseField<T>, new()
         {
-            if (ToValue == null) throw new ArgumentNullException(nameof(ToValue));
+            if (toValue == null) throw new ArgumentNullException(nameof(toValue));
+            
+            var minTextField = new TTextField();
+            var maxTextField = new TTextField();
+
             var sliderElement = (MinMaxSliderElement<T>) element;
             var slider = Build_Field<MinMax<T>, Vector2, MinMaxSlider>(
                 sliderElement,
-                (minMax) => new Vector2(toFloat(minMax.min), toFloat(minMax.max)),
-                (vec2) => MinMax.Create(ToValue(vec2.x), ToValue(vec2.y))
+                onElementValueChanged: (field, minMax) =>
+                {
+                    var vec2 = new Vector2(toFloat(minMax.min), toFloat(minMax.max));
+                    
+                    field.SetValueWithoutNotify(vec2);
+                    minTextField.SetValueWithoutNotify(minMax.min);
+                    maxTextField.SetValueWithoutNotify(minMax.max);
+                },
+                (vec2) => MinMax.Create(toValue(vec2.x), toValue(vec2.y))
             );
 
             InitRangeFieldElement(sliderElement,
                 (min) => slider.lowLimit = toFloat(min),
                 (max) => slider.highLimit = toFloat(max)
             );
-
-            var minField = new TField();
-            var maxField = new TField();
-
-            slider.RegisterValueChangedCallback((evt) =>
-            {
-                var (min, max) = (evt.newValue.x, evt.newValue.y);
-                minField.SetValueWithoutNotify(ToValue(min));
-                maxField.SetValueWithoutNotify(ToValue(max));
-            });
-
-            minField.RegisterValueChangedCallback((evt) => slider.minValue = toFloat(evt.newValue));
-            maxField.RegisterValueChangedCallback((evt) => slider.maxValue = toFloat(evt.newValue));
+            
+            minTextField.RegisterValueChangedCallback((evt) => slider.minValue = toFloat(evt.newValue));
+            maxTextField.RegisterValueChangedCallback((evt) => slider.maxValue = toFloat(evt.newValue));
 
 
             var row = CreateRowVisualElement();
 
             row.AddToClassList(UssClassName.MinMaxSlider);
-            minField.AddToClassList(UssClassName.MinMaxSliderTextField);
-            maxField.AddToClassList(UssClassName.MinMaxSliderTextField);
+            minTextField.AddToClassList(UssClassName.MinMaxSliderTextField);
+            maxTextField.AddToClassList(UssClassName.MinMaxSliderTextField);
 
             row.Add(slider);
-            row.Add(minField);
-            row.Add(maxField);
+            row.Add(minTextField);
+            row.Add(maxTextField);
 
             return row;
         }

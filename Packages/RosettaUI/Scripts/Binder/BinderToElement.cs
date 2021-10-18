@@ -189,13 +189,16 @@ namespace RosettaUI
                 IBinder<MinMax<int>> b => new IntMinMaxSliderElement(label, b,
                     (IGetter<int>) minGetter,
                     (IGetter<int>) maxGetter),
+                
                 IBinder<MinMax<uint>> b => new IntMinMaxSliderElement(label, 
                     new CastMinMaxBinder<uint,int>(b),
                     (IGetter<int>) minGetter,
                     (IGetter<int>) maxGetter),
+                
                 IBinder<MinMax<float>> b => new FloatMinMaxSliderElement(label, b,
                     (IGetter<float>) minGetter,
                     (IGetter<float>) maxGetter),
+                
                 _ => CreateCompositeMinMaxSliderElement(label, binder, minGetter, maxGetter)
             };
         }

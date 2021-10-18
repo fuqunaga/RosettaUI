@@ -38,8 +38,8 @@ namespace RosettaUI.Example
                 )
                 , UI.Fold("Usage"
                     , UI.MinMaxSlider("CustomLabel", () => floatMinMax)
-                    , UI.MinMaxSlider("Custom min max", () => floatMinMax, -1f, 2f)
-                    , UI.MinMaxSlider("Custom min max", () => vector2MinMax, Vector2.zero, new Vector2(360f, 100f)) 
+                    , UI.MinMaxSlider("Custom min max", () => floatMinMax, min: -1f, max: 2f)
+                    , UI.MinMaxSlider("Custom min max", () => vector2MinMax, min: Vector2.zero, max: new Vector2(360f, 100f)) 
                     , UI.MinMaxSlider("onValueChanged",
                         targetExpression: () => floatMinMax,
                         onValueChanged: f => print($"{nameof(floatMinMax)} changed."))

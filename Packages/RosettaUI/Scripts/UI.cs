@@ -321,6 +321,22 @@ namespace RosettaUI
 
         #region Window
 
+        public static DynamicElement DynamicElementOnStatusChanged<T>(Func<T> readStatus, Func<T, Element> build)
+            where T : IEquatable<T>
+        {
+            return DynamicElement.Create(readStatus, build);
+        }
+        
+        public static DynamicElement DynamicElementOnTrigger(Func<Element> build, Func<DynamicElement, bool> rebuildIf)
+        {
+            return new DynamicElement(build, rebuildIf);
+        }
+        
+
+        #endregion
+        
+        #region Window
+
         public static WindowElement Window(params Element[] elements)
         {
             return Window(null, elements);
@@ -373,19 +389,17 @@ namespace RosettaUI
         public static DynamicElement ElementCreatorInline<T>(bool rebuildIfDisabled = true)
             where T : Behaviour, IElementCreator
         {
-            return FindObjectObserverElement<T>(t => t.CreateElement(), typeof(T).Name, rebuildIfDisabled);
+            return FindObjectObserverElement<T>(t => t.CreateElement(), rebuildIfDisabled);
         }
 
-        public static DynamicElement FindObjectObserverElement<T>(Func<T, Element> build, string displayName = null,
-            bool rebuildIfDisabled = true)
+        public static DynamicElement FindObjectObserverElement<T>(Func<T, Element> build, bool rebuildIfDisabled = true)
             where T : Behaviour
         {
             T target = null;
             var lastCheckTime = Time.realtimeSinceStartup;
-            var interval =
-                Random.Range(1f, 1.5f); // 起動時に多くのFindObjectObserverElementが呼ばれるとFindObject()を呼ぶタイミングがかぶって重いのでランダムで散らす
+            var interval = Random.Range(1f, 1.5f); // 起動時に多くのFindObjectObserverElementが呼ばれるとFindObject()を呼ぶタイミングがかぶって重いのでランダムで散らす
 
-            return new DynamicElement(
+            return DynamicElementOnTrigger(
                 () => target != null ? build?.Invoke(target) : null,
                 e =>
                 {
@@ -401,8 +415,7 @@ namespace RosettaUI
                     }
 
                     return false;
-                },
-                displayName
+                }
             );
 
             bool CheckTargetEnable()

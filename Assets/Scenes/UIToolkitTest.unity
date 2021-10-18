@@ -123,6 +123,97 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &256655864
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 256655865}
+  - component: {fileID: 256655866}
+  m_Layer: 0
+  m_Name: ElementCreatorSimple
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &256655865
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 256655864}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 544456411}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &256655866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 256655864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 745a2b324a58a0645809582f1930d841, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  intValue: 0
+--- !u!1 &544456410
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 544456411}
+  - component: {fileID: 544456412}
+  m_Layer: 0
+  m_Name: MiscExample
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &544456411
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 544456410}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 256655865}
+  m_Father: {fileID: 852668086}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &544456412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 544456410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 364c33e898cee9e48a376d6ff0640a6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dropDownIndex: 0
+  floatValue: 0
+  intValue: 0
 --- !u!1 &590657662
 GameObject:
   m_ObjectHideFlags: 0
@@ -421,6 +512,7 @@ Transform:
   - {fileID: 590657663}
   - {fileID: 1740173063}
   - {fileID: 1922449324}
+  - {fileID: 544456411}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -627,9 +719,8 @@ MonoBehaviour:
   simpleClass:
     floatValue: 0
     stringValue: 
-  rangeIntValue: 0
-  rangeValue: 0
   stringValue: 
+  rangeValue: 0
 --- !u!1 &1922449323
 GameObject:
   m_ObjectHideFlags: 0
@@ -673,46 +764,76 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f4d532e574549a4aa50ea0898ecd519, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  intValue: 0
-  uintValue: 0
-  floatValue: 0
-  vector2Value: {x: 0, y: 0}
-  vector3Value: {x: 0, y: 0, z: 0}
-  vector4Value: {x: 0, y: 0, z: 0, w: 0}
-  vector2IntValue: {x: 0, y: 0}
-  vector3IntValue: {x: 0, y: 0, z: 0}
-  rectValue:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 0
-    height: 0
-  rectIntValue:
-    x: 0
-    y: 0
-    width: 0
-    height: 0
-  rectOffsetValue:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  boundsValue:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
-  boundsIntValue:
-    m_Position: {x: 0, y: 0, z: 0}
-    m_Size: {x: 0, y: 0, z: 0}
-  simpleClass:
-    floatValue: 0
-    stringValue: 
-  complexClass:
-    floatWithRangeValue: 0
-    vector3Value: {x: 0, y: 0, z: 0}
-    simpleClass:
-      floatValue: 0
-      stringValue: 
-    elementCreatorClass:
-      floatValue: 0
-    uiCustomClass:
-      floatValue: 0
+  intMinMax:
+    min: 0
+    max: 0
+  uintMinMax:
+    min: 0
+    max: 0
+  floatMinMax:
+    min: 0
+    max: 0
+  vector2MinMax:
+    min: {x: 0, y: 0}
+    max: {x: 0, y: 0}
+  vector3MinMax:
+    min: {x: 0, y: 0, z: 0}
+    max: {x: 0, y: 0, z: 0}
+  vector4MinMax:
+    min: {x: 0, y: 0, z: 0, w: 0}
+    max: {x: 0, y: 0, z: 0, w: 0}
+  vector2IntMinMax:
+    min: {x: 0, y: 0}
+    max: {x: 0, y: 0}
+  vector3IntMinMax:
+    min: {x: 0, y: 0, z: 0}
+    max: {x: 0, y: 0, z: 0}
+  rectMinMax:
+    min:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    max:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  rectIntMinMax:
+    min:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    max:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  rectOffsetMinMax:
+    min:
+      m_Left: 0
+      m_Right: 0
+      m_Top: 0
+      m_Bottom: 0
+    max:
+      m_Left: 0
+      m_Right: 0
+      m_Top: 0
+      m_Bottom: 0
+  boundsMinMax:
+    min:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    max:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+  boundsIntMinMax:
+    min:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    max:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}

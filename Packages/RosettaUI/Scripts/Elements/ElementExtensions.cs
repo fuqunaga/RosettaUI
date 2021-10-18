@@ -1,6 +1,6 @@
 ﻿namespace RosettaUI
 {
-    public static class ElementExtensions_MethodChain
+    public static class ElementExtensionsMethodChain
     {
         public static Element SetEnable(this Element e, bool enable)
         {
@@ -13,19 +13,6 @@
             e.Interactable = interactable;
             return e;
         }
-
-
-        public static FoldElement Open(this FoldElement fold)
-        {
-            fold.IsOpen = true;
-            return fold;
-        }
-        public static FoldElement Close(this FoldElement fold)
-        {
-            fold.IsOpen = false;
-            return fold;
-        }
-
 
         public static Element SetMinWidth(this Element element, int minWidth)
         {
@@ -58,5 +45,20 @@
             element.Layout = layout;
             return element;
         }
+        
+        
+
+        public static FoldElement Open(this FoldElement fold)
+        {
+            fold.IsOpen = true;
+            return fold;
+        }
+        public static FoldElement Close(this FoldElement fold)
+        {
+            fold.IsOpen = false;
+            return fold;
+        }
+
+
     }
 }

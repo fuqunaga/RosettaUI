@@ -117,7 +117,7 @@ namespace RosettaUI
                         .SetMinWidth(buttonWidth);
 
                     return UI.Box(itemElements.Concat(new[]
-                        {UI.Row(addButton, removeButton).SetJustify(Layout.Justify.End)}));
+                        {UI.Row(addButton, removeButton).SetJustify(Style.Justify.End)}));
                 },
                 e =>
                 {

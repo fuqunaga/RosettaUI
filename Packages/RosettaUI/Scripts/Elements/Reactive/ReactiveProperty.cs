@@ -51,8 +51,8 @@ namespace RosettaUI.Reactive
 
         private class Unsubscriber : IDisposable
         {
-            private List<IObserver<T>> _observers;
-            private IObserver<T> _observer;
+            private readonly List<IObserver<T>> _observers;
+            private readonly IObserver<T> _observer;
 
             public Unsubscriber(List<IObserver<T>> observers, IObserver<T> observer)
             {

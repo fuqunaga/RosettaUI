@@ -62,14 +62,17 @@ namespace RosettaUI.UIToolkit.Builder
         }
 
 
-        protected override void OnElementLayoutChanged(Element element, VisualElement ve, Layout layout)
+        protected override void OnElementStyleChanged(Element element, VisualElement ve, Style style)
         {
-            if (!layout.HasValue) return;
+            if (!style.HasValue) return;
 
-            if (layout.minWidth is { } minWidth) ve.style.minWidth = minWidth;
-            if (layout.minHeight is { } minnHeight) ve.style.minHeight = minnHeight;
-            if (layout.justify is { } justify)
-                ve.style.justifyContent = justify == Layout.Justify.Start ? Justify.FlexStart : Justify.FlexEnd;
+            if (style.color is { } color) ve.style.color = color;
+            if (style.minWidth is { } minWidth) ve.style.minWidth = minWidth;
+            if (style.minHeight is { } minnHeight) ve.style.minHeight = minnHeight;
+            if (style.justify is { } justify)
+            {
+                ve.style.justifyContent = justify == Style.Justify.Start ? Justify.FlexStart : Justify.FlexEnd;
+            }
         }
 
         protected override void OnRebuildElementGroupChildren(ElementGroup elementGroup)
@@ -273,7 +276,7 @@ namespace RosettaUI.UIToolkit.Builder
             where TField : BaseField<T>, new()
         {
             return Build_Field<T, T, TField>(element,
-                (field, v) => field.SetValueWithoutNotify(v), 
+                (field, v) => field.SetValueWithoutNotify(v),
                 (v) => v);
         }
 
@@ -342,11 +345,12 @@ namespace RosettaUI.UIToolkit.Builder
         static VisualElement Build_MinMaxSlider_Float(Element element) =>
             Build_MinMaxSlider<float, FloatField>(element, (f) => f, (f) => f);
 
-        private static VisualElement Build_MinMaxSlider<T, TTextField>(Element element, Func<T, float> toFloat, Func<float, T> toValue)
+        private static VisualElement Build_MinMaxSlider<T, TTextField>(Element element, Func<T, float> toFloat,
+            Func<float, T> toValue)
             where TTextField : TextInputBaseField<T>, new()
         {
             if (toValue == null) throw new ArgumentNullException(nameof(toValue));
-            
+
             var minTextField = new TTextField();
             var maxTextField = new TTextField();
 
@@ -356,7 +360,7 @@ namespace RosettaUI.UIToolkit.Builder
                 onElementValueChanged: (field, minMax) =>
                 {
                     var vec2 = new Vector2(toFloat(minMax.min), toFloat(minMax.max));
-                    
+
                     field.SetValueWithoutNotify(vec2);
                     minTextField.SetValueWithoutNotify(minMax.min);
                     maxTextField.SetValueWithoutNotify(minMax.max);
@@ -368,7 +372,7 @@ namespace RosettaUI.UIToolkit.Builder
                 (min) => slider.lowLimit = toFloat(min),
                 (max) => slider.highLimit = toFloat(max)
             );
-            
+
             minTextField.RegisterValueChangedCallback((evt) => slider.minValue = toFloat(evt.newValue));
             maxTextField.RegisterValueChangedCallback((evt) => slider.maxValue = toFloat(evt.newValue));
 
@@ -397,7 +401,7 @@ namespace RosettaUI.UIToolkit.Builder
                 updateMin(rangeFieldElement.Min);
             else
                 rangeFieldElement.minRx.SubscribeAndCallOnce(updateMin);
-            
+
             if (rangeFieldElement.IsMaxConst)
                 updateMax(rangeFieldElement.Max);
             else

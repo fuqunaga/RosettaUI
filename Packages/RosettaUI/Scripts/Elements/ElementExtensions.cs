@@ -1,4 +1,6 @@
-﻿namespace RosettaUI
+﻿using UnityEngine;
+
+namespace RosettaUI
 {
     public static class ElementExtensionsMethodChain
     {
@@ -14,35 +16,45 @@
             return e;
         }
 
+
+        public static Element SetColor(this Element element, Color color)
+        {
+            var style = element.Style;
+            style.color = color;
+            element.Style = style;
+
+            return element;
+        }
+        
         public static Element SetMinWidth(this Element element, int minWidth)
         {
-            var layout = element.Layout;
-            layout.minWidth = minWidth;
-            element.Layout = layout;
+            var style = element.Style;
+            style.minWidth = minWidth;
+            element.Style = style;
 
             return element;
         }
 
         public static Element SetMinHeight(this Element element, int minHeight)
         {
-            var layout = element.Layout;
-            layout.minHeight = minHeight;
-            element.Layout = layout;
+            var style = element.Style;
+            style.minHeight = minHeight;
+            element.Style = style;
 
             return element;
         }
 
-        public static Element SetJustify(this Element element, Layout.Justify justify)
+        public static Element SetJustify(this Element element, Style.Justify justify)
         {
-            var layout = element.Layout;
-            layout.justify = justify;
-            element.Layout = layout;
+            var style = element.Style;
+            style.justify = justify;
+            element.Style = style;
             return element;
         }
 
-        public static Element SetLayout(this Element element, Layout layout)
+        public static Element SetStyle(this Element element, Style style)
         {
-            element.Layout = layout;
+            element.Style = style;
             return element;
         }
         

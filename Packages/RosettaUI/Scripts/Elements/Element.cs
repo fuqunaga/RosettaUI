@@ -4,18 +4,18 @@ using System;
 namespace RosettaUI
 {
     /// <summary>
-    /// RosettaUI's basic unit.
+    /// RosettaUI basic unit.
     /// - UI implementation-independent
     /// - Builder creates implementation-dependent UI entities based on Element
     /// - Application accesses UI via Element, does not touch entities
     /// </summary>
-    public abstract partial class Element
+    public abstract class Element
     {
         #region For Builder
 
         public readonly ReactiveProperty<bool> enableRx = new ReactiveProperty<bool>(true);
         public readonly ReactiveProperty<bool> interactableRx = new ReactiveProperty<bool>(true);
-        public readonly ReactiveProperty<Layout> layoutRx = new ReactiveProperty<Layout>();
+        public readonly ReactiveProperty<Style> styleRx = new ReactiveProperty<Style>();
 
         public event Action<Element> onDestroy;
 
@@ -34,10 +34,10 @@ namespace RosettaUI
             set => interactableRx.Value = value;
         }
 
-        public Layout Layout
+        public Style Style
         {
-            get => layoutRx.Value;
-            set => layoutRx.Value = value;
+            get => styleRx.Value;
+            set => styleRx.Value = value;
         }
 
 

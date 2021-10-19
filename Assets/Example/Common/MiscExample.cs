@@ -91,8 +91,8 @@ namespace RosettaUI.Example
                 )
                 , UI.Fold("Methods"
                     , UI.Label(nameof(ElementExtensionsMethodChain.SetEnable)).SetEnable(false) // disappear
-                    , UI.Field(nameof(ElementExtensionsMethodChain.SetInteractable), () => floatValue)
-                        .SetInteractable(false)
+                    , UI.Field(nameof(ElementExtensionsMethodChain.SetInteractable), () => floatValue).SetInteractable(false)
+                    , UI.Label(nameof(ElementExtensionsMethodChain.SetColor)).SetColor(Color.red)
                     , UI.Row(
                         UI.Field(nameof(ElementExtensionsMethodChain.SetMinWidth), () => floatValue).SetMinWidth(0)
                     )
@@ -102,7 +102,7 @@ namespace RosettaUI.Example
                     )
                     , UI.Row(
                         UI.Label(nameof(ElementExtensionsMethodChain.SetJustify)).SetMinWidth(0)
-                    ).SetJustify(Layout.Justify.End)
+                    ).SetJustify(Style.Justify.End)
                     , UI.Fold(nameof(ElementExtensionsMethodChain.Open), UI.Label("Open")).Open()
                     , UI.Fold(nameof(ElementExtensionsMethodChain.Close), UI.Label("Close")).Close()
                 )

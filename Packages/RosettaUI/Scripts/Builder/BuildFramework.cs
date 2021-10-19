@@ -47,7 +47,7 @@ namespace RosettaUI.Builder
         {
             element.enableRx.SubscribeAndCallOnce((enable) => OnElementEnableChanged(element, uiObj, enable));
             element.interactableRx.SubscribeAndCallOnce((interactable) => OnElementInteractableChanged(element, uiObj, interactable));
-            element.layoutRx.SubscribeAndCallOnce((layout) => OnElementLayoutChanged(element, uiObj, layout));
+            element.styleRx.SubscribeAndCallOnce((style) => OnElementStyleChanged(element, uiObj, style));
             element.onDestroy += OnDestroyElement;
 
             if (element is ElementGroup elementGroup)
@@ -58,7 +58,7 @@ namespace RosettaUI.Builder
 
         protected abstract void OnElementEnableChanged(Element element, UIObj uiObj, bool enable);
         protected abstract void OnElementInteractableChanged(Element element, UIObj uiObj, bool interactable);
-        protected abstract void OnElementLayoutChanged(Element element, UIObj uiObj, Layout layout);
+        protected abstract void OnElementStyleChanged(Element element, UIObj uiObj, Style style);
         protected abstract void OnRebuildElementGroupChildren(ElementGroup elementGroup);
         protected abstract void OnDestroyElement(Element element);
 

@@ -89,9 +89,9 @@ namespace RosettaUI.UGUI.Builder
 
             readonly Dictionary<Element, LayoutElement> elementToLayoutElement = new Dictionary<Element, LayoutElement>();
 
-            protected override void OnElementLayoutChanged(Element element, GameObject go, Layout layout)
+            protected override void OnElementStyleChanged(Element element, GameObject go, Style style)
             {
-                if (!layout.HasValue) return;
+                if (!style.HasValue) return;
                 {
                     if (!elementToLayoutElement.TryGetValue(element, out var layoutElement))
                     {
@@ -103,13 +103,13 @@ namespace RosettaUI.UGUI.Builder
 
                     if (layoutElement)
                     {
-                        if (layout.minWidth is { } minWidth)
+                        if (style.minWidth is { } minWidth)
                         {
                             layoutElement.minWidth = minWidth;
                             layoutElement.flexibleWidth = 0;
                         }
 
-                        if (layout.minHeight is { } minHeight)
+                        if (style.minHeight is { } minHeight)
                         {
                             layoutElement.minHeight = minHeight;
                             layoutElement.flexibleHeight = 0;

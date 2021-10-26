@@ -358,7 +358,7 @@ namespace RosettaUI.UIToolkit
 
         public virtual void Show(Vector2 position, VisualElement target)
         {
-            var root = target.panel.visualTree;
+            var root = target.panel.visualTree.Q<TemplateContainer>();
 
             if (root == null)
             {

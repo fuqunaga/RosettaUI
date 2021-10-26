@@ -2,10 +2,18 @@
 
 namespace RosettaUI.Example
 {
+    [RequireComponent(typeof(RosettaUIRoot))]
     public class RosettaUIExample : MonoBehaviour, IElementCreator
     {
         public KeyCode toggleRootElementKey = KeyCode.U;
+        private RosettaUIRoot _root;
         Element _rootElement;
+
+        private void Start()
+        {
+            _root = GetComponent<RosettaUIRoot>();
+            _root.Build(CreateElement());
+        }
 
         public Element CreateElement()
         {
@@ -23,7 +31,7 @@ namespace RosettaUI.Example
         {
             if (Input.GetKeyDown(toggleRootElementKey))
             {
-                _rootElement.Enable = !_rootElement.Enable;
+                _root.enabled = !_root.enabled;
             }
         }
     }

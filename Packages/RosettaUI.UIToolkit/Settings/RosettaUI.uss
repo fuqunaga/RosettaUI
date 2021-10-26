@@ -9,8 +9,8 @@
 * override unity css
 ********************************************************************************/
 .unity-label{
-    padding-top: 2;
-    padding-bottom: 3;
+    padding-top: 2px;
+    padding-bottom: 3px;
 }
 .unity-base-field {
     flex-grow: 1;

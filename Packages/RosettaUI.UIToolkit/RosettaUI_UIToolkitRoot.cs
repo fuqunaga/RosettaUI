@@ -4,32 +4,40 @@ using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    [RequireComponent(typeof(UIDocument))]
+    [RequireComponent(typeof(UIDocument), typeof(IElementCreator))]
     public class RosettaUI_UIToolkitRoot : MonoBehaviour
     {
-        UIDocument _uiDocument;
-        Element _rootElement;
+        protected UIDocument uiDocument;
+        protected Element rootElement;
         UIToolkitBuilder _builder;
 
-        void Update()
+        protected virtual void Start()
         {
-            _rootElement.Update();
+            if (uiDocument == null)
+            {
+                uiDocument = GetComponent<UIDocument>();
+            }
+
+            var elementCreator = GetComponent<IElementCreator>();
+
+            var element = elementCreator.CreateElement();
+            Build(element);
+        }
+
+        protected virtual void Update()
+        {
+            rootElement?.Update();
         }
 
         public void Build(Element element)
         {
-            _rootElement = element;
+            rootElement = element;
 
-            if (_uiDocument == null)
-            {
-                _uiDocument = GetComponent<UIDocument>();
-            }
-
-            var root = _uiDocument.rootVisualElement;
+            var root = uiDocument.rootVisualElement;
             _builder ??= new UIToolkitBuilder();
-            var window = _builder.Build(element);
+            var visualElement = _builder.Build(element);
 
-            root.Add(window);
+            root.Add(visualElement);
         }
     }
 }

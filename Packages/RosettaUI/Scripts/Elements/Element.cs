@@ -17,9 +17,11 @@ namespace RosettaUI
         public readonly ReactiveProperty<bool> interactableRx = new ReactiveProperty<bool>(true);
         public readonly ReactiveProperty<Style> styleRx = new ReactiveProperty<Style>();
 
-        public event Action<Element> onDestroy;
-
         #endregion
+
+
+        public event Action<Element> onUpdate;
+        public event Action<Element> onDestroy;
 
 
         public bool Enable
@@ -49,7 +51,10 @@ namespace RosettaUI
             if (Enable) UpdateInternal();
         }
 
-        protected virtual void UpdateInternal() { }
+        protected virtual void UpdateInternal()
+        {
+            onUpdate?.Invoke(this);
+        }
 
         public void Destroy() => onDestroy?.Invoke(this);
     }

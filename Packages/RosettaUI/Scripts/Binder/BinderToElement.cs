@@ -108,7 +108,7 @@ namespace RosettaUI
                     var itemType = TypeUtility.GetListItemType(listBinder.ValueType);
 
 
-                    var buttonWidth = 30;
+                    var buttonWidth = 30f;
 
                     var addButton =
                         UI.Button("+", () => IListUtility.AddItemAtLast(listBinder.Get(), listType, itemType))

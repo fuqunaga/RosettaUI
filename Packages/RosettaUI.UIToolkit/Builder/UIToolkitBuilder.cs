@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using RosettaUI.Builder;
 using RosettaUI.Reactive;
 using RosettaUI.UIToolkit.PackageInternal;
@@ -24,6 +23,8 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(Row)] = Build_Row,
                 [typeof(Column)] = Build_Column,
                 [typeof(BoxElement)] = Build_Box,
+                [typeof(ScrollViewElement)] = Build_ScrollView,
+                
                 [typeof(CompositeFieldElement)] = Build_CompositeField,
                 [typeof(LabelElement)] = Build_Label,
                 [typeof(IntFieldElement)] = Build_IntField,
@@ -66,9 +67,11 @@ namespace RosettaUI.UIToolkit.Builder
         {
             if (!style.HasValue) return;
 
-            if (style.color is { } color) ve.style.color = color;
+            if (style.width is { } width) ve.style.width = width;
+            if (style.height is { } height) ve.style.height = height;
             if (style.minWidth is { } minWidth) ve.style.minWidth = minWidth;
             if (style.minHeight is { } minnHeight) ve.style.minHeight = minnHeight;
+            if (style.color is { } color) ve.style.color = color;
             if (style.justify is { } justify)
             {
                 ve.style.justifyContent = justify == Style.Justify.Start ? Justify.FlexStart : Justify.FlexEnd;
@@ -178,6 +181,11 @@ namespace RosettaUI.UIToolkit.Builder
             return Build_ElementGroupContents(box, element);
         }
 
+        VisualElement Build_ScrollView(Element element)
+        {
+            var scrollView = new ScrollView(); // TODO: support horizontal. ScrollViewMode.VerticalAndHorizontal may not work correctly 
+            return Build_ElementGroupContents(scrollView, element);
+        }
 
         private VisualElement Build_CompositeField(Element element)
         {

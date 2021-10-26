@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using UnityEngine;
+using UnityEngine.Assertions;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
@@ -38,8 +40,7 @@ namespace RosettaUI
             return Field(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, onValueChanged);
         }
 
-        public static Element Field<T>(LabelElement label, Expression<Func<T>> targetExpression,
-            Action<T> onValueChanged = null)
+        public static Element Field<T>(LabelElement label, Expression<Func<T>> targetExpression, Action<T> onValueChanged = null)
         {
             var binder = CreateBinder(targetExpression, onValueChanged);
             return Field(label, binder);
@@ -269,7 +270,7 @@ namespace RosettaUI
         #endregion
 
 
-        #region Row/Column/Box
+        #region Row/Column/Box/ScrollView
 
         public static Row Row(params Element[] elements)
         {
@@ -301,6 +302,16 @@ namespace RosettaUI
             return new BoxElement(elements);
         }
 
+        public static ScrollViewElement ScrollView(params Element[] elements)
+        {
+            return new ScrollViewElement(elements);
+        }
+
+        public static ScrollViewElement ScrollView(IEnumerable<Element> elements)
+        {
+            return new ScrollViewElement(elements);
+        }
+
         #endregion
 
 
@@ -319,22 +330,29 @@ namespace RosettaUI
         #endregion
 
 
-        #region Window
+        #region DynamicElement
+
+        public static DynamicElement DynamicElementIf(Func<bool> trigger, Func<Element> build)
+        {
+            return DynamicElementOnStatusChanged(
+                trigger,
+                (t) => !t ? null : build()
+            );
+        }
 
         public static DynamicElement DynamicElementOnStatusChanged<T>(Func<T> readStatus, Func<T, Element> build)
             where T : IEquatable<T>
         {
             return DynamicElement.Create(readStatus, build);
         }
-        
-        public static DynamicElement DynamicElementOnTrigger(Func<Element> build, Func<DynamicElement, bool> rebuildIf)
+
+        public static DynamicElement DynamicElementOnTrigger(Func<DynamicElement, bool> rebuildIf, Func<Element> build)
         {
             return new DynamicElement(build, rebuildIf);
         }
-        
 
         #endregion
-        
+
         #region Window
 
         public static WindowElement Window(params Element[] elements)
@@ -376,52 +394,83 @@ namespace RosettaUI
         public static DynamicElement ElementCreatorWindowLauncher<T>(LabelElement title = null)
             where T : Behaviour, IElementCreator
         {
-            return FindObjectObserverElement<T>(
-                t =>
+            return ElementCreatorWindowLauncher(title, typeof(T));
+        }
+
+        public static DynamicElement ElementCreatorWindowLauncher(params Type[] types) =>
+            ElementCreatorWindowLauncher(null, types);
+
+        public static DynamicElement ElementCreatorWindowLauncher(LabelElement title, params Type[] types)
+        {
+            Assert.IsTrue(types.Any());
+
+            var elements = types.Select(ElementCreatorInline).ToList();
+            title ??= types.First().ToString().Split('.').LastOrDefault();
+
+            return DynamicElementIf(
+                trigger: () =>
                 {
-                    title ??= typeof(T).ToString().Split('.').LastOrDefault();
-                    var window = Window(title, t.CreateElement());
-                    return WindowLauncher(window);
-                });
+                    var hasContents = elements.Any(dynamicElement => dynamicElement.Contents.Any());
+                    if (!hasContents)
+                    {
+                        foreach (var e in elements)
+                        {
+                            e.Update();
+                        }
+                    }
+
+                    return hasContents;
+                },
+                build: () => WindowLauncher(Window(title, elements))
+            );
         }
 
 
-        public static DynamicElement ElementCreatorInline<T>(bool rebuildIfDisabled = true)
+        public static DynamicElement ElementCreatorInline<T>()
             where T : Behaviour, IElementCreator
         {
-            return FindObjectObserverElement<T>(t => t.CreateElement(), rebuildIfDisabled);
+            return ElementCreatorInline(typeof(T));
         }
 
-        public static DynamicElement FindObjectObserverElement<T>(Func<T, Element> build, bool rebuildIfDisabled = true)
+        public static DynamicElement ElementCreatorInline(Type type)
+        {
+            Assert.IsTrue(typeof(IElementCreator).IsAssignableFrom(type));
+
+            return DynamicElementFindObject(type, t => ((IElementCreator) t).CreateElement());
+        }
+
+        public static DynamicElement DynamicElementFindObject<T>(Func<T, Element> build)
             where T : Behaviour
         {
-            T target = null;
-            var lastCheckTime = Time.realtimeSinceStartup;
-            var interval = Random.Range(1f, 1.5f); // 起動時に多くのFindObjectObserverElementが呼ばれるとFindObject()を呼ぶタイミングがかぶって重いのでランダムで散らす
+            return DynamicElementFindObject(typeof(T), (o) => build?.Invoke((T) o));
+        }
 
-            return DynamicElementOnTrigger(
-                () => target != null ? build?.Invoke(target) : null,
-                e =>
+        public static DynamicElement DynamicElementFindObject(Type type, Func<Object, Element> build)
+        {
+            Assert.IsTrue(typeof(Object).IsAssignableFrom(type));
+
+            Object target = null;
+            var lastCheckTime = Time.realtimeSinceStartup;
+            // 起動時に多くのFindObjectObserverElementが呼ばれるとFindObject()を呼ぶタイミングがかぶって重いのでランダムで散らす
+            var interval = Random.Range(1f, 1.5f);
+
+            return DynamicElementIf(
+                trigger: () =>
                 {
-                    if (!CheckTargetEnable())
+                    if (target == null)
                     {
                         var t = Time.realtimeSinceStartup;
                         if (t - lastCheckTime > interval)
                         {
                             lastCheckTime = t;
-                            target = Object.FindObjectOfType<T>();
-                            return true;
+                            target = Object.FindObjectOfType(type);
                         }
                     }
 
-                    return false;
-                }
+                    return target != null;
+                },
+                build: () => build?.Invoke(target)
             );
-
-            bool CheckTargetEnable()
-            {
-                return target != null && !(rebuildIfDisabled && !target.isActiveAndEnabled);
-            }
         }
 
         #endregion

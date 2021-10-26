@@ -214,6 +214,8 @@ MonoBehaviour:
   dropDownIndex: 0
   floatValue: 0
   intValue: 0
+  uiCustomClass:
+    floatValue: 0
 --- !u!1 &590657662
 GameObject:
   m_ObjectHideFlags: 0
@@ -426,50 +428,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 852668082}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64be97541960a314cb06a4791af6ee15, type: 3}
+  m_Script: {fileID: 11500000, guid: ed17d964104c3ba4ca7a9ffc10665c70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   toggleRootElementKey: 117
-  intValue: 0
-  uintValue: 0
-  floatValue: 0
-  stringValue: 
-  boolValue: 0
-  enumValue: 0
-  colorValue: {r: 0, g: 0, b: 0, a: 0}
-  vector2Value: {x: 0, y: 0}
-  vector3Value: {x: 0, y: 0, z: 0}
-  vector4Value: {x: 0, y: 0, z: 0, w: 0}
-  dropDownIndex: 0
-  simpleClass:
-    floatValue: 0
-    stringValue: 
-  elementCreator:
-    floatValue: 0
-  complexClass:
-    floatWithRangeValue: 0
-    vector3Value: {x: 0, y: 0, z: 0}
-    simpleClass:
-      floatValue: 0
-      stringValue: 
-    elementCreatorClass:
-      floatValue: 0
-    uiCustomClass:
-      floatValue: 0
-  intList: 010000000200000003000000
-  floatArray:
-  - 1
-  - 2
-  - 3
-  intMinMax:
-    min: 0
-    max: 0
-  floatMinMax:
-    min: 0
-    max: 0
-  vector2MinMax:
-    min: {x: 0, y: 0}
-    max: {x: 0, y: 0}
 --- !u!114 &852668084
 MonoBehaviour:
   m_ObjectHideFlags: 0

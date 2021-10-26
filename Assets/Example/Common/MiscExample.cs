@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.Example
@@ -13,6 +14,8 @@ namespace RosettaUI.Example
         public int intValue;
 
         public UICustomClass uiCustomClass;
+
+        public bool dynamicElementIf;
 
         public Element CreateElement()
         {
@@ -38,7 +41,7 @@ namespace RosettaUI.Example
                     () => dropDownIndex,
                     options: new[] {"One", "Two", "Three"}
                 )
-                , UI.Fold("Row/Column/Box/Fold"
+                , UI.Fold("Row/Column/Box/Fold/ScrollView"
                     , UI.Row(
                         UI.Label("Row0"),
                         UI.Label("Row1"),
@@ -57,17 +60,25 @@ namespace RosettaUI.Example
                     , UI.Fold("Fold",
                         UI.Fold("Fold2",
                             UI.Fold("Fold3",
-                                UI.Label("contents"
-                                )
+                                UI.Label("contents")
                             )
                         )
                     )
+                    , UI.Label(nameof(UI.ScrollView))
+                    , UI.ScrollView(
+                        Enumerable.Range(0, 100).Select(i => UI.Field("Count", () => i.ToString()))
+                    ).SetHeight(100f)
                 )
                 , UI.Fold("ElementCreator"
                     , UI.ElementCreatorWindowLauncher<ElementCreatorSimple>()
                     , UI.ElementCreatorInline<ElementCreatorSimple>()
                 )
                 , UI.Fold("DynamicElement"
+                    , UI.Field(() => dynamicElementIf)
+                    , UI.DynamicElementIf(
+                        () => dynamicElementIf,
+                        () => UI.Label(nameof(UI.DynamicElementIf))
+                        )
                     , UI.Slider("Button count", () => intValue, max: 10)
                     , UI.DynamicElementOnStatusChanged(
                         readStatus: () => intValue,
@@ -94,11 +105,11 @@ namespace RosettaUI.Example
                     , UI.Field(nameof(ElementExtensionsMethodChain.SetInteractable), () => floatValue).SetInteractable(false)
                     , UI.Label(nameof(ElementExtensionsMethodChain.SetColor)).SetColor(Color.red)
                     , UI.Row(
-                        UI.Field(nameof(ElementExtensionsMethodChain.SetMinWidth), () => floatValue).SetMinWidth(0)
+                        UI.Field(nameof(ElementExtensionsMethodChain.SetMinWidth), () => floatValue).SetMinWidth(0f)
                     )
                     , UI.Row
                     (
-                        UI.Field(nameof(ElementExtensionsMethodChain.SetMinHeight), () => floatValue).SetMinHeight(50)
+                        UI.Field(nameof(ElementExtensionsMethodChain.SetMinHeight), () => floatValue).SetMinHeight(50f)
                     )
                     , UI.Row(
                         UI.Label(nameof(ElementExtensionsMethodChain.SetJustify)).SetMinWidth(0)

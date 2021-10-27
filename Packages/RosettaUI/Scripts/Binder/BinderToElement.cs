@@ -27,7 +27,7 @@ namespace RosettaUI
                 _ when binder.ValueType.IsEnum => () => CreateEnumElement(label, binder),
 
                 IGetter<IElementCreator> ig => () => ig.Get().CreateElement(),
-                IGetter<IList> ig => () => CreateListElement(label, ig),
+                IGetter<IList> ig => () => UI.List(label, ig),
 
                 _ => () => CreateMemberFieldElement(label, binder)
             };
@@ -93,47 +93,7 @@ namespace RosettaUI
                 : new FoldElement(label, elements);
         }
 
-        public static Element CreateListElement(LabelElement label, IGetter<IList> listBinder,
-            Func<IBinder, string, Element> createItemElement = null)
-        {
-            Element element = new DynamicElement(
-                () =>
-                {
-                    var i = 0;
-                    var func = createItemElement ?? ((binder, label) => UI.Field(label, binder));
-                    var itemElements = ListBinder.CreateItemBindersFrom(listBinder)
-                        .Select(binder => func(binder, "Item" + i++));
-
-                    var listType = listBinder.ValueType;
-                    var itemType = TypeUtility.GetListItemType(listBinder.ValueType);
-
-
-                    var buttonWidth = 30f;
-
-                    var addButton =
-                        UI.Button("+", () => IListUtility.AddItemAtLast(listBinder.Get(), listType, itemType))
-                            .SetMinWidth(buttonWidth);
-                    var removeButton = UI.Button("-", () => IListUtility.RemoveItemAtLast(listBinder.Get(), itemType))
-                        .SetMinWidth(buttonWidth);
-
-                    return UI.Box(itemElements.Concat(new[]
-                        {UI.Row(addButton, removeButton).SetJustify(Style.Justify.End)}));
-                },
-                e =>
-                {
-                    var count = listBinder.Get()?.Count ?? 0;
-                    return count !=
-                           ((ElementGroup) e.Element).Children.Count - 1; // -1 for UI.Row(addButton, removeButton)
-                },
-                $"ListElements({nameof(DynamicElement)})"
-            );
-
-            return label != null
-                ? new FoldElement(label, new[] {element})
-                : element;
-        }
-
-
+    
         #region Slider
 
         public static Element CreateSliderElement(LabelElement label, IBinder binder, IGetter minGetter,

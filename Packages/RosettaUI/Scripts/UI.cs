@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -40,7 +41,8 @@ namespace RosettaUI
             return Field(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, onValueChanged);
         }
 
-        public static Element Field<T>(LabelElement label, Expression<Func<T>> targetExpression, Action<T> onValueChanged = null)
+        public static Element Field<T>(LabelElement label, Expression<Func<T>> targetExpression,
+            Action<T> onValueChanged = null)
         {
             var binder = CreateBinder(targetExpression, onValueChanged);
             return Field(label, binder);
@@ -204,6 +206,7 @@ namespace RosettaUI
 
         #region List
 
+#if false
         public static Element List<TItem, TValue>(LabelElement label, List<TItem> list,
             Func<TItem, TValue> readItemValue, Action<TItem, TValue> onItemValueChanged,
             Func<TItem, string> createItemLabel = null)
@@ -230,19 +233,72 @@ namespace RosettaUI
                 }
             );
         }
+#endif
 
-        public static Element List<T>(LabelElement label, List<T> list,
-            Func<BinderBase<T>, string, Element> createItemElement = null)
+        public static Element List<T>(LabelElement label, Func<List<T>> listGetter, Func<BinderBase<T>, int, Element> createItemElement = null)
         {
-            Func<IBinder, string, Element> createItemElementIBinder = null;
-            if (createItemElement != null)
-                createItemElementIBinder =
-                    (ibinder, itemLabel) => createItemElement(ibinder as BinderBase<T>, itemLabel);
+            Func<IBinder, int, Element> createItemElementIBinder = null;
 
-            var element = BinderToElement.CreateListElement(label, ConstGetter.Create(list), createItemElementIBinder);
-            return Fold(label, element);
+            if (createItemElement != null)
+            {
+                createItemElementIBinder = (binder, index) => createItemElement(binder as BinderBase<T>, index);
+            }
+
+            return List(label, Getter.Create(listGetter), createItemElementIBinder);
         }
 
+        public static Element List(LabelElement label, IGetter<IList> listBinder, Func<IBinder, int, Element> createItemElement = null)
+        {
+            return Fold(label,
+                Box(
+                    List(listBinder, createItemElement),
+                    DynamicElementIf(
+                        () => !listBinder.IsNull,
+                        () =>
+                        {
+                            var buttonWidth = 30f;
+                            var listType = listBinder.ValueType;
+                            var itemType = TypeUtility.GetListItemType(listBinder.ValueType);
+
+                            return Row(
+                                Button("+",
+                                        () => IListUtility.AddItemAtLast(listBinder.Get(), listType, itemType))
+                                    .SetMinWidth(buttonWidth),
+                                Button("-",
+                                        () => IListUtility.RemoveItemAtLast(listBinder.Get(), itemType))
+                                    .SetMinWidth(buttonWidth)
+                            ).SetJustify(Style.Justify.End);
+                        }
+                    ))
+            );
+        }
+
+        public static Element List<T>(Func<List<T>> listGetter, Func<IBinder<T>, int, Element> createItemElement = null)
+        {
+            Func<IBinder, int, Element> createItemElementBinder = null;
+            if (createItemElement != null)
+            {
+                createItemElementBinder = (binder, index) => createItemElement((IBinder<T>) binder, index);
+            }
+
+            return List(Getter.Create(listGetter), createItemElementBinder);
+        }
+        
+        public static Element List(IGetter<IList> listBinder, Func<IBinder, int, Element> createItemElement = null)
+        {
+            return DynamicElementOnStatusChanged(
+                readStatus: () => listBinder.Get()?.Count ?? 0,
+                build: _ =>
+                {
+                    var i = 0;
+                    createItemElement ??= ((binder, idx) => Field("Item " + idx, binder));
+                    return Column(
+                            ListBinder.CreateItemBindersFrom(listBinder).Select(binder => createItemElement(binder, i++))
+                        );
+
+                });
+        }
+        
         #endregion
 
 

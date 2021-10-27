@@ -212,10 +212,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dropDownIndex: 0
+  listValue: 
   floatValue: 0
   intValue: 0
   uiCustomClass:
     floatValue: 0
+  dynamicElementIf: 0
 --- !u!1 &590657662
 GameObject:
   m_ObjectHideFlags: 0

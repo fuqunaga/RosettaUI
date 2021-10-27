@@ -12,17 +12,17 @@ namespace RosettaUI.UIToolkit
 
         protected override void OnEnable()
         {
-            if (uiDocument != null)
+            if (uiDocument != null && uiDocument.rootVisualElement is {} ve)
             {
-                uiDocument.rootVisualElement.visible = true;
+                ve.visible = true;
             }
         }
 
         protected override void OnDisable()
         {
-            if (uiDocument != null)
+            if (uiDocument != null && uiDocument.rootVisualElement is {} ve)
             {
-                uiDocument.rootVisualElement.visible = false;
+                ve.visible = false;
             }
         }
 

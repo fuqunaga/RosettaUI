@@ -20,7 +20,7 @@ namespace RosettaUI
     }
 
 
-    public class CastGetter<TFrom, TTo> : ChildGetterBase<TFrom, TTo>
+    public class CastGetter<TFrom, TTo> : ChildGetter<TFrom, TTo>
     {
         public CastGetter(IGetter<TFrom> parentGetter) : base(parentGetter)
         {

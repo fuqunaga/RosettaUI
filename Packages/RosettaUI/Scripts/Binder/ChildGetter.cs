@@ -5,11 +5,11 @@ namespace RosettaUI
     /// <summary>
     ///     Getter, which targets a portion of the parents
     /// </summary>
-    public abstract class ChildGetterBase<TParent, TValue> : IGetter<TValue>
+    public abstract class ChildGetter<TParent, TValue> : IGetter<TValue>
     {
         protected readonly IGetter<TParent> parentGetter;
 
-        protected ChildGetterBase(IGetter<TParent> parentGetter)
+        protected ChildGetter(IGetter<TParent> parentGetter)
         {
             this.parentGetter = parentGetter;
         }

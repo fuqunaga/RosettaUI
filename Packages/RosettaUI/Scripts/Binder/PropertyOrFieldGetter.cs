@@ -19,7 +19,7 @@ namespace RosettaUI
         }
     }
 
-    public class PropertyOrFieldGetter<TParent, TValue> : ChildGetterBase<TParent, TValue>
+    public class PropertyOrFieldGetter<TParent, TValue> : ChildGetter<TParent, TValue>
     {
         private readonly Func<TParent, TValue> _getFunc;
 

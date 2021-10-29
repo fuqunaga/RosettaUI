@@ -59,7 +59,7 @@ namespace RosettaUI.Example
                         )
                     )
                 )
-                , UI.Fold("Row/Column/Box/Fold/ScrollView"
+                , UI.Fold("Row/Column/Box/Fold/ScrollView/Indent"
                     , UI.Row(
                         UI.Label("Row0"),
                         UI.Label("Row1"),
@@ -86,6 +86,16 @@ namespace RosettaUI.Example
                     , UI.ScrollView(
                         Enumerable.Range(0, 100).Select(i => UI.Field("Count", () => i.ToString()))
                     ).SetHeight(100f)
+                    , UI.Indent(
+                        UI.Field(() => "Indent0")
+                        , UI.Indent(
+                            UI.Field(() => "Indent2")
+                            , UI.Indent(
+                                UI.Field(() => "Indent3")
+                            )
+                        )
+                    )
+                    
                 )
                 , UI.Fold("ElementCreator"
                     , UI.ElementCreatorWindowLauncher<ElementCreatorSimple>()

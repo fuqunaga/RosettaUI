@@ -11,7 +11,7 @@ namespace RosettaUI.Builder
             var parent = element.Parent;
             while (parent != null)
             {
-                if (parent is FoldElement) indent++;
+                if (parent is IndentElement) indent++;
                 parent = parent.Parent;
             }
 

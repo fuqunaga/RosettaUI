@@ -7,7 +7,6 @@ namespace RosettaUI
 {
     /// <summary>
     /// 子供として任意の Element を持てる Element
-    /// コンテンツが静的な場合は IEnumerable<Elements> を直接渡す
     /// </summary>
     public abstract class ElementGroup : Element
     {

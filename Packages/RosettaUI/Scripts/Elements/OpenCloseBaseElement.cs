@@ -6,7 +6,6 @@ namespace RosettaUI
     public abstract class OpenCloseBaseElement : ElementGroupWithTitle
     { 
         public readonly ReactiveProperty<bool> isOpenRx = new ReactiveProperty<bool>();
-        protected bool isOpen;
 
         public bool IsOpen
         {

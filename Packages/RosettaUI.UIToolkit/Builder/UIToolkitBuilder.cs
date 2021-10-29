@@ -24,6 +24,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(Column)] = Build_Column,
                 [typeof(BoxElement)] = Build_Box,
                 [typeof(ScrollViewElement)] = Build_ScrollView,
+                [typeof(IndentElement)] = Build_Indent,
                 
                 [typeof(CompositeFieldElement)] = Build_CompositeField,
                 [typeof(LabelElement)] = Build_Label,
@@ -187,6 +188,14 @@ namespace RosettaUI.UIToolkit.Builder
             return Build_ElementGroupContents(scrollView, element);
         }
 
+        VisualElement Build_Indent(Element element)
+        {
+            var ve = new VisualElement();
+            ve.AddToClassList(UssClassName.Indent);
+            ve.style.marginLeft = LayoutSettings.IndentSize;
+            return Build_ElementGroupContents(ve, element);
+        }
+
         private VisualElement Build_CompositeField(Element element)
         {
             var compositeFieldElement = (CompositeFieldElement) element;
@@ -255,7 +264,10 @@ namespace RosettaUI.UIToolkit.Builder
                 label.style.paddingRight = LayoutSettings.LabelPaddingRight;
             }
 
-            if (!labelElement.IsConst) labelElement.valueRx.Subscribe(text => label.text = text);
+            if (!labelElement.IsConst)
+            {
+                labelElement.valueRx.Subscribe(text => label.text = text);
+            }
         }
 
 
@@ -454,19 +466,23 @@ namespace RosettaUI.UIToolkit.Builder
             public static readonly string UnityBaseFieldLabel = UnityBaseField + "__label";
             public static readonly string UnityBaseFieldInput = UnityBaseField + "__input";
 
-            public static readonly string CompositeField = "rosettaui-composite-field";
+            private static readonly string RosettaUI = "rosettaui";
+            
+            public static readonly string CompositeField = RosettaUI + "-composite-field";
             public static readonly string CompositeFieldContents = CompositeField + "__contents";
             public static readonly string CompositeFieldFirstChild = CompositeField + "__first-child";
 
-            public static readonly string Row = "rosettaui-row";
+            public static readonly string Row = RosettaUI + "-row";
             public static readonly string RowContents = Row + "__contents";
             public static readonly string RowContentsFirst = RowContents + "--first";
 
-            public static readonly string WindowLauncher = "rosettaui-window-launcher";
+            public static readonly string Indent = RosettaUI + "-indent";
 
-            public static readonly string DynamicElement = "rosettaui-dynamic-element";
+            public static readonly string WindowLauncher = RosettaUI + "-window-launcher";
 
-            public static readonly string MinMaxSlider = "rosettaui-min-max-slider";
+            public static readonly string DynamicElement = RosettaUI + "-dynamic-element";
+
+            public static readonly string MinMaxSlider = RosettaUI + "-min-max-slider";
             public static readonly string MinMaxSliderTextField = MinMaxSlider + "__text-field";
         }
 

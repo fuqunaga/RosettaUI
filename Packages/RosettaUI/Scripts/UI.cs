@@ -206,19 +206,20 @@ namespace RosettaUI
 
         #region List
 
-        public static Element List<TList>(Expression<Func<TList>> targetExpression, Func<IBinder, int, Element> createItemElement = null)
-            where TList : IList
+        public static Element List<T>(Expression<Func<IList<T>>> targetExpression, Func<IBinder<T>, int, Element> createItemElement = null)
         {
             var labelString = ExpressionUtility.CreateLabelString(targetExpression);
             return List(labelString, targetExpression, createItemElement);
         }
         
-        public static Element List<TList>(LabelElement label, Expression<Func<TList>> targetExpression, Func<IBinder, int, Element> createItemElement = null)
-            where TList : IList
+        public static Element List<T>(LabelElement label, Expression<Func<IList<T>>> targetExpression, Func<IBinder<T>, int, Element> createItemElement = null)
         {
             var binder = ExpressionUtility.CreateBinder(targetExpression);
+            var createItemElementIBinder = createItemElement == null
+                ? (Func<IBinder, int, Element>)null
+                : (ib, idx) => createItemElement(ib as IBinder<T>, idx);
 
-            return List(label, binder, createItemElement);
+            return List(label, binder, createItemElementIBinder);
         }
 
         public static Element List(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null)

@@ -13,12 +13,20 @@ namespace RosettaUI
             return Enumerable.Range(0, list.Count).Select(i => new ListItemBinder<T>(ConstGetter.Create(list), i));
         }
 
+        
+        
+        
         public static IEnumerable<IBinder> CreateItemBinders(IBinder listBinder)
         {
-            var type = listBinder.ValueType.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IList<>));
-            Assert.IsNotNull(type, $"{listBinder.ValueType} does not Inherit from IList<>.");
+            static bool IsIList(Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IList<>);
             
-            var itemType = type.GetGenericArguments()[0];
+            var type = listBinder.ValueType;
+            var listType = IsIList(type)
+                ? type
+                : type.GetInterfaces().FirstOrDefault(IsIList);
+            Assert.IsNotNull(listType, $"{type} does not Inherit from IList<>.");
+            
+            var itemType = listType.GetGenericArguments()[0];
             var binderType = typeof(ListItemBinder<>).MakeGenericType(itemType);
 
             var itemCount = GetCount(listBinder);

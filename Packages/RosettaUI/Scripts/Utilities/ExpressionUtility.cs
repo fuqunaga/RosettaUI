@@ -98,7 +98,7 @@ namespace RosettaUI
             /// <summary>
             /// Remove complex "this" string
             /// 
-            /// Warning: Constanct is not only "this"
+            /// Warning: Constant is not only "this"
             /// This will make that 1.ToString() > ToString()
             /// </summary>
             /// <param name="node"></param>

@@ -235,7 +235,7 @@ namespace RosettaUI
         }
 #endif
 
-        public static Element List<T>(LabelElement label, Func<List<T>> listGetter, Func<BinderBase<T>, int, Element> createItemElement = null)
+        public static Element List<T>(LabelElement label, Expression<Func<List<T>>> targetExpression, Func<BinderBase<T>, int, Element> createItemElement = null)
         {
             Func<IBinder, int, Element> createItemElementIBinder = null;
 
@@ -244,10 +244,12 @@ namespace RosettaUI
                 createItemElementIBinder = (binder, index) => createItemElement(binder as BinderBase<T>, index);
             }
 
-            return List(label, Getter.Create(listGetter), createItemElementIBinder);
+            var binder = ExpressionUtility.CreateBinder(targetExpression);
+
+            return List(label, binder, createItemElementIBinder);
         }
 
-        public static Element List(LabelElement label, IGetter<IList> listBinder, Func<IBinder, int, Element> createItemElement = null)
+        public static Element List(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null)
         {
             return Fold(label,
                 Box(
@@ -257,43 +259,26 @@ namespace RosettaUI
                         () =>
                         {
                             var buttonWidth = 30f;
-                            var listType = listBinder.ValueType;
-                            var itemType = TypeUtility.GetListItemType(listBinder.ValueType);
 
                             return Row(
-                                Button("+",
-                                        () => IListUtility.AddItemAtLast(listBinder.Get(), listType, itemType))
-                                    .SetMinWidth(buttonWidth),
-                                Button("-",
-                                        () => IListUtility.RemoveItemAtLast(listBinder.Get(), itemType))
-                                    .SetMinWidth(buttonWidth)
+                                Button("+", () => ListBinder.AddItemAtLast(listBinder)).SetMinWidth(buttonWidth),
+                                Button("-", () => ListBinder.RemoveItemAtLast(listBinder)).SetMinWidth(buttonWidth)
                             ).SetJustify(Style.Justify.End);
                         }
                     ))
             );
         }
-
-        public static Element List<T>(Func<List<T>> listGetter, Func<IBinder<T>, int, Element> createItemElement = null)
-        {
-            Func<IBinder, int, Element> createItemElementBinder = null;
-            if (createItemElement != null)
-            {
-                createItemElementBinder = (binder, index) => createItemElement((IBinder<T>) binder, index);
-            }
-
-            return List(Getter.Create(listGetter), createItemElementBinder);
-        }
         
-        public static Element List(IGetter<IList> listBinder, Func<IBinder, int, Element> createItemElement = null)
+        public static Element List(IBinder listBinder, Func<IBinder, int, Element> createItemElement = null)
         {
             return DynamicElementOnStatusChanged(
-                readStatus: () => listBinder.Get()?.Count ?? 0,
+                readStatus: () => ListBinder.GetCount(listBinder),
                 build: _ =>
                 {
                     var i = 0;
                     createItemElement ??= ((binder, idx) => Field("Item " + idx, binder));
                     return Column(
-                            ListBinder.CreateItemBindersFrom(listBinder).Select(binder => createItemElement(binder, i++))
+                            ListBinder.CreateItemBinders(listBinder).Select(binder => createItemElement(binder, i++))
                         );
 
                 });

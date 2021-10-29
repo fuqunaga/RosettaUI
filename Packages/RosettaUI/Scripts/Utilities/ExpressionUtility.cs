@@ -11,18 +11,18 @@ namespace RosettaUI
 {
     public static class ExpressionUtility
     {
-        public static IBinder<T> CreateBinder<T>(Expression<Func<T>> lambda)
+        public static IBinder<T> CreateBinder<T>(Expression<Func<T>> expression)
         {
 #if ENABLE_IL2CPP
             return IL2CPP.ExpressionUtility_IL2CPP.CreateBinder(lambda);
 #else
-            return _CreateBinder(lambda);
+            return _CreateBinder(expression);
 #endif
         }
 
-        static Binder<T> _CreateBinder<T>(Expression<Func<T>> lambda)
+        static Binder<T> _CreateBinder<T>(Expression<Func<T>> expression)
         {
-            var getFunc = lambda.Compile();
+            var getFunc = expression.Compile();
 
             Action<T> setFunc = null;
             var p = Expression.Parameter(typeof(T));
@@ -31,7 +31,7 @@ namespace RosettaUI
             // hint code https://stackoverflow.com/questions/42773488/how-can-i-find-out-if-an-expression-is-writeable
             try
             {
-                var lambdaExpr = Expression.Lambda<Action<T>>(Expression.Assign(lambda.Body, p), p);
+                var lambdaExpr = Expression.Lambda<Action<T>>(Expression.Assign(expression.Body, p), p);
                 setFunc = lambdaExpr.Compile();
             }
             catch (Exception)

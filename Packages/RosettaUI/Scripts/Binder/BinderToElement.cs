@@ -27,7 +27,7 @@ namespace RosettaUI
                 _ when binder.ValueType.IsEnum => () => CreateEnumElement(label, binder),
 
                 IGetter<IElementCreator> ig => () => ig.Get().CreateElement(),
-                IGetter<IList> ig => () => UI.List(label, ig),
+                _ when ListBinder.IsListBinder(binder) => () => UI.List(label, binder),
 
                 _ => () => CreateMemberFieldElement(label, binder)
             };

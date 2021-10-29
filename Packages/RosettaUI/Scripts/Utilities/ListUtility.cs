@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace RosettaUI
 {
-    public static class IListUtility
+    public static class ListUtility
     {
         public static IList AddItemAtLast(IList list, Type type, Type itemType)
         {
@@ -71,8 +71,7 @@ namespace RosettaUI
             if (baseItem != null)
             {
                 // is cloneable
-                var cloneable = baseItem as ICloneable;
-                if (cloneable != null)
+                if (baseItem is ICloneable cloneable)
                 {
                     ret = cloneable.Clone();
                 }

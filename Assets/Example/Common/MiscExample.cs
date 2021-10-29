@@ -9,7 +9,7 @@ namespace RosettaUI.Example
     public class MiscExample : MonoBehaviour, IElementCreator
     {
         public int dropDownIndex;
-        public List<int> listValue;
+        public List<int> listValue = new[] {1, 2, 3}.ToList();
 
         public float floatValue;
         public int intValue;
@@ -35,20 +35,31 @@ namespace RosettaUI.Example
                 );
             });
 
-
             return UI.Column(
                 UI.Button("Button", () => print("On button clicked"))
                 , UI.Dropdown("Dropdown",
                     () => dropDownIndex,
                     options: new[] {"One", "Two", "Three"}
                 )
-                , UI.List("List",
-                    () => listValue,
-                    (itemBinder, idx) => UI.Row(
-                        UI.Field("Item " + idx, itemBinder)
-                        , UI.Button("+", () => listValue[idx]++)
-                        , UI.Button("-", () => listValue[idx]--)
+                , UI.Fold("List"
+                    /*
+                    , UI.List("List",
+                        () => listValue,
+                        (itemBinder, idx) => UI.Row(
+                            UI.Field("Item " + idx, itemBinder)
+                            , UI.Button("+", () => listValue[idx]++)
+                            , UI.Button("-", () => listValue[idx]--)
+                        )
                     )
+                    , UI.List("ReadOnlyList",
+                        () => listValue.AsReadOnly(),
+                        (itemBinder, idx) => UI.Row(
+                            UI.Field("Item " + idx, itemBinder)
+                            , UI.Button("+", () => listValue[idx]++)
+                            , UI.Button("-", () => listValue[idx]--)
+                        )
+                    )
+                    */
                 )
                 , UI.Fold("Row/Column/Box/Fold/ScrollView"
                     , UI.Row(

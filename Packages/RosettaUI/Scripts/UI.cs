@@ -206,66 +206,36 @@ namespace RosettaUI
 
         #region List
 
-#if false
-        public static Element List<TItem, TValue>(LabelElement label, List<TItem> list,
-            Func<TItem, TValue> readItemValue, Action<TItem, TValue> onItemValueChanged,
-            Func<TItem, string> createItemLabel = null)
-            where TItem : class
+        public static Element List<TList>(Expression<Func<TList>> targetExpression, Func<IBinder, int, Element> createItemElement = null)
+            where TList : IList
         {
-            return List(label,
-                list,
-                (binder, defaultLabelString) =>
-                {
-                    var childBinder = new ChildBinder<TItem, TValue>(binder,
-                        readItemValue,
-                        (item, value) =>
-                        {
-                            onItemValueChanged?.Invoke(item, value);
-                            return item;
-                        }
-                    );
-
-                    var itemLabel = createItemLabel != null && !binder.IsNull
-                        ? Label(() => createItemLabel(binder.Get()))
-                        : (LabelElement) defaultLabelString;
-
-                    return Field(itemLabel, childBinder);
-                }
-            );
+            var labelString = ExpressionUtility.CreateLabelString(targetExpression);
+            return List(labelString, targetExpression, createItemElement);
         }
-#endif
-
-        public static Element List<T>(LabelElement label, Expression<Func<List<T>>> targetExpression, Func<BinderBase<T>, int, Element> createItemElement = null)
+        
+        public static Element List<TList>(LabelElement label, Expression<Func<TList>> targetExpression, Func<IBinder, int, Element> createItemElement = null)
+            where TList : IList
         {
-            Func<IBinder, int, Element> createItemElementIBinder = null;
-
-            if (createItemElement != null)
-            {
-                createItemElementIBinder = (binder, index) => createItemElement(binder as BinderBase<T>, index);
-            }
-
             var binder = ExpressionUtility.CreateBinder(targetExpression);
 
-            return List(label, binder, createItemElementIBinder);
+            return List(label, binder, createItemElement);
         }
 
         public static Element List(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null)
         {
+            var buttonWidth = 30f;
+            var buttons = ListBinder.IsReadOnly(listBinder)
+                ? null
+                : Row(
+                    Button("+", () => ListBinder.AddItemAtLast(listBinder)).SetMinWidth(buttonWidth),
+                    Button("-", () => ListBinder.RemoveItemAtLast(listBinder)).SetMinWidth(buttonWidth)
+                ).SetJustify(Style.Justify.End);
+            
             return Fold(label,
-                Box(
-                    List(listBinder, createItemElement),
-                    DynamicElementIf(
-                        () => !listBinder.IsNull,
-                        () =>
-                        {
-                            var buttonWidth = 30f;
-
-                            return Row(
-                                Button("+", () => ListBinder.AddItemAtLast(listBinder)).SetMinWidth(buttonWidth),
-                                Button("-", () => ListBinder.RemoveItemAtLast(listBinder)).SetMinWidth(buttonWidth)
-                            ).SetJustify(Style.Justify.End);
-                        }
-                    ))
+                    Box(
+                        List(listBinder, createItemElement),
+                        buttons
+                    )
             );
         }
         

@@ -42,8 +42,7 @@ namespace RosettaUI.Example
                     options: new[] {"One", "Two", "Three"}
                 )
                 , UI.Fold("List"
-                    /*
-                    , UI.List("List",
+                    , UI.List(
                         () => listValue,
                         (itemBinder, idx) => UI.Row(
                             UI.Field("Item " + idx, itemBinder)
@@ -59,7 +58,6 @@ namespace RosettaUI.Example
                             , UI.Button("-", () => listValue[idx]--)
                         )
                     )
-                    */
                 )
                 , UI.Fold("Row/Column/Box/Fold/ScrollView"
                     , UI.Row(

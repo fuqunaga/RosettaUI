@@ -212,7 +212,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dropDownIndex: 0
-  listValue: 
+  listValue: 010000000200000003000000
   floatValue: 0
   intValue: 0
   uiCustomClass:

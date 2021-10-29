@@ -49,7 +49,7 @@ namespace RosettaUI
         const string MethodCallDummyInstanceName = "MethodCallDummy...";
         static readonly SimplifyVisitor ReadableExpressionVisitor = new SimplifyVisitor();
 
-        public static string CreateLabelString<T>(Expression<Func<T>> lambda)
+        public static string CreateLabelString<T>(Expression<Func<T>> expression)
         {
 #if false
             // ReadableExpressions を使いたいが依存するのはちょっと悩ましい
@@ -58,7 +58,7 @@ namespace RosettaUI
 #else
 
             //return lambda.Body.ToString();
-            var changedExpr = ReadableExpressionVisitor.Visit(lambda.Body);
+            var changedExpr = ReadableExpressionVisitor.Visit(expression.Body);
             return changedExpr?.ToString().Replace(MethodCallDummyInstanceName + ".", "");
 #endif
         }

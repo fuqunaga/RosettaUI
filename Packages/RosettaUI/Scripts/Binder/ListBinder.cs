@@ -16,7 +16,7 @@ namespace RosettaUI
         public static IEnumerable<IBinder> CreateItemBinders(IBinder listBinder)
         {
             var type = listBinder.ValueType.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IList<>));
-            Assert.IsNotNull(type, $"{type} does not Inherit from IList<>.");
+            Assert.IsNotNull(type, $"{listBinder.ValueType} does not Inherit from IList<>.");
             
             var itemType = type.GetGenericArguments()[0];
             var binderType = typeof(ListItemBinder<>).MakeGenericType(itemType);
@@ -41,6 +41,11 @@ namespace RosettaUI
                     .Where(t => t.IsGenericType)
                     .Select(t => t.GetGenericTypeDefinition())
                     .Contains(typeof(IList<>));
+        }
+
+        public static bool IsReadOnly(IBinder binder)
+        {
+            return GetIList(binder)?.IsReadOnly ?? false;
         }
 
 

@@ -42,7 +42,7 @@ namespace RosettaUI.UGUI.Builder
                 };
             }
 
-            protected override IReadOnlyDictionary<Type, Func<Element, GameObject>> buildFuncTable => buildFuncs;
+            protected override IReadOnlyDictionary<Type, Func<Element, GameObject>> BuildFuncTable => buildFuncs;
 
             int layer;
 

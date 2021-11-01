@@ -1,18 +1,16 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 namespace RosettaUI
 {
     /// <summary>
-    ///     Top level interface
+    /// Top level interface
     /// </summary>
     public static class UI
     {
@@ -67,8 +65,7 @@ namespace RosettaUI
         }
 
 
-        public static Element Slider<T>(Expression<Func<T>> targetExpression, T min, T max,
-            Action<T> onValueChanged = null)
+        public static Element Slider<T>(Expression<Func<T>> targetExpression, T min, T max, Action<T> onValueChanged = null)
         {
             return Slider(ExpressionUtility.CreateLabelString(targetExpression),
                 targetExpression,
@@ -87,14 +84,12 @@ namespace RosettaUI
         }
 
 
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T max,
-            Action<T> onValueChanged = null)
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T max, Action<T> onValueChanged = null)
         {
             return Slider(label, targetExpression, default, max, onValueChanged);
         }
 
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T min, T max,
-            Action<T> onValueChanged = null)
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T min, T max, Action<T> onValueChanged = null)
         {
             return Slider(label,
                 targetExpression,
@@ -103,8 +98,7 @@ namespace RosettaUI
                 onValueChanged);
         }
 
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression,
-            Action<T> onValueChanged = null)
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, Action<T> onValueChanged = null)
         {
             return Slider(label, targetExpression, null, null, onValueChanged);
         }
@@ -231,13 +225,13 @@ namespace RosettaUI
                     Button("+", () => ListBinder.AddItemAtLast(listBinder)).SetMinWidth(buttonWidth),
                     Button("-", () => ListBinder.RemoveItemAtLast(listBinder)).SetMinWidth(buttonWidth)
                 ).SetJustify(Style.Justify.End);
-            
+
             return Fold(label,
                     Box(
                         List(listBinder, createItemElement),
                         buttons
                     )
-            );
+                );
         }
         
         public static Element List(IBinder listBinder, Func<IBinder, int, Element> createItemElement = null)
@@ -323,14 +317,26 @@ namespace RosettaUI
 
         #region Fold
 
-        public static FoldElement Fold(LabelElement label, params Element[] elements)
+        public static FoldElement Fold(LabelElement label, params Element[] elements) => Fold(label,  null, elements);
+
+        public static FoldElement Fold(Element barLeft, Element barRight, params Element[] elements)
+            => Fold(barLeft, barRight, elements?.AsEnumerable());
+        
+        public static FoldElement Fold(LabelElement label, IEnumerable<Element> elements) => Fold((Element)label, elements);
+
+        public static FoldElement Fold(Element barLeft, Element barRight, IEnumerable<Element> elements)
         {
-            return Fold(label, elements as IEnumerable<Element>);
+            barRight?.SetJustify(Style.Justify.End);
+            var bar = (barLeft != null || barRight != null)
+                ? Row(barLeft, barRight)
+                : null;
+
+            return Fold(bar, elements);
         }
 
-        public static FoldElement Fold(LabelElement label, IEnumerable<Element> elements)
+        public static FoldElement Fold(Element bar, IEnumerable<Element> elements)
         {
-            return new FoldElement(label, new []{Indent(elements)});
+            return new FoldElement(bar, new []{Indent(elements)});
         }
 
         #endregion
@@ -388,7 +394,7 @@ namespace RosettaUI
 
         public static WindowLauncherElement WindowLauncher(LabelElement title, WindowElement window)
         {
-            var label = title ?? window.title;
+            var label = title ?? window.bar.FirstLabel();
             return new WindowLauncherElement(label, window);
         }
 

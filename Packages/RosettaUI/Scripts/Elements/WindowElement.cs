@@ -6,7 +6,7 @@ namespace RosettaUI
 {
     public class WindowElement : OpenCloseBaseElement
     {
-        public WindowElement(LabelElement title, IEnumerable<Element> contents) : base(title, contents)
+        public WindowElement(Element bar, IEnumerable<Element> contents) : base(bar, contents)
         {}
     }
 }

@@ -4,7 +4,7 @@ namespace RosettaUI
 {
     public class FoldElement : OpenCloseBaseElement
     {
-        public FoldElement(LabelElement title, IEnumerable<Element> contents) : base(title, contents)
+        public FoldElement(Element bar, IEnumerable<Element> contents) : base(bar, contents)
         {
         }
     }

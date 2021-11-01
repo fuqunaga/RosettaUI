@@ -3,7 +3,7 @@ using RosettaUI.Reactive;
 
 namespace RosettaUI
 {
-    public abstract class OpenCloseBaseElement : ElementGroupWithTitle
+    public abstract class OpenCloseBaseElement : ElementGroupWithBar
     { 
         public readonly ReactiveProperty<bool> isOpenRx = new ReactiveProperty<bool>();
 
@@ -13,7 +13,7 @@ namespace RosettaUI
             set => isOpenRx.Value = value;
             
         }
-        protected OpenCloseBaseElement(LabelElement title, IEnumerable<Element> contents) :base(title, contents)
+        protected OpenCloseBaseElement(Element bar, IEnumerable<Element> contents) :base(bar, contents)
         {
         }
     }

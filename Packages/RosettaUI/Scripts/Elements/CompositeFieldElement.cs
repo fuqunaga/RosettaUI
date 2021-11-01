@@ -5,9 +5,9 @@ namespace RosettaUI
     /// <summary>
     /// A single line Field that combines multiple Fields
     /// </summary>
-    public class CompositeFieldElement : ElementGroupWithTitle
+    public class CompositeFieldElement : ElementGroupWithBar
     {
-        public CompositeFieldElement(LabelElement label, IEnumerable<Element> contents) : base(label, contents)
+        public CompositeFieldElement(Element label, IEnumerable<Element> contents) : base(label, contents)
         {
         }
     }

@@ -18,7 +18,7 @@ namespace RosettaUI.UIToolkit.Builder
         {
             var windowElement = (WindowElement) element;
             var window = new Window();
-            window.TitleBarContainerLeft.Add(Build(windowElement.title));
+            window.TitleBarContainerLeft.Add(Build(windowElement.bar));
             window.closeButton.clicked += () => windowElement.Enable = !windowElement.Enable;
 
             windowElement.isOpenRx.SubscribeAndCallOnce(isOpen =>
@@ -35,9 +35,9 @@ namespace RosettaUI.UIToolkit.Builder
             var foldElement = (FoldElement) element;
             var fold = new Foldout();
 
-            var title = foldElement.title;
-            fold.text = title.Value;
-
+            var toggle = fold.Q<Toggle>();
+            toggle.Add(Build(foldElement.bar));
+ 
             foldElement.isOpenRx.SubscribeAndCallOnce(isOpen => fold.value = isOpen);
 
             return Build_ElementGroupContents(fold, foldElement);
@@ -119,7 +119,7 @@ namespace RosettaUI.UIToolkit.Builder
             field.AddToClassList(UssClassName.UnityBaseField);
             field.AddToClassList(UssClassName.CompositeField);
 
-            var labelElement = compositeFieldElement.title;
+            var labelElement = compositeFieldElement.bar;
             if (labelElement != null)
             {
                 var label = Build(labelElement);

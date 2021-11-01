@@ -218,20 +218,33 @@ namespace RosettaUI
 
         public static Element List(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null)
         {
+            var isReadOnly = ListBinder.IsReadOnly(listBinder);
+
+            var countFieldWidth = 50f;
+            var field = Field("",
+                () => ListBinder.GetCount(listBinder),
+                isReadOnly ? (Action<int>) null : (count) => ListBinder.SetCount(listBinder, count)
+            ).SetWidth(countFieldWidth);
+     
             var buttonWidth = 30f;
-            var buttons = ListBinder.IsReadOnly(listBinder)
+            var buttons = isReadOnly
                 ? null
                 : Row(
-                    Button("+", () => ListBinder.AddItemAtLast(listBinder)).SetMinWidth(buttonWidth),
-                    Button("-", () => ListBinder.RemoveItemAtLast(listBinder)).SetMinWidth(buttonWidth)
+                    Button("＋", () => ListBinder.AddItemAtLast(listBinder)).SetMinWidth(buttonWidth),
+                    Button("－", () => ListBinder.RemoveItemAtLast(listBinder)).SetMinWidth(buttonWidth)
                 ).SetJustify(Style.Justify.End);
 
-            return Fold(label,
+            return Fold(
+                barLeft: label,
+                barRight: Row(field),
+                elements: new[]
+                {
                     Box(
                         List(listBinder, createItemElement),
                         buttons
                     )
-                );
+                }
+            );
         }
         
         public static Element List(IBinder listBinder, Func<IBinder, int, Element> createItemElement = null)
@@ -319,9 +332,6 @@ namespace RosettaUI
 
         public static FoldElement Fold(LabelElement label, params Element[] elements) => Fold(label,  null, elements);
 
-        public static FoldElement Fold(Element barLeft, Element barRight, params Element[] elements)
-            => Fold(barLeft, barRight, elements?.AsEnumerable());
-        
         public static FoldElement Fold(LabelElement label, IEnumerable<Element> elements) => Fold((Element)label, elements);
 
         public static FoldElement Fold(Element barLeft, Element barRight, IEnumerable<Element> elements)
@@ -365,6 +375,7 @@ namespace RosettaUI
 
         #endregion
 
+        
         #region Window
 
         public static WindowElement Window(params Element[] elements)

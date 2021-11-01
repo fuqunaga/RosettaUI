@@ -98,7 +98,7 @@ namespace RosettaUI
 
         public static Type GetListItemType(Type type)
         {
-            return type.GetGenericTypeDefinition() == typeof(IList<>)
+            return (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IList<>))
                 ? type.GetGenericArguments().First()
                 : GetReflectionCache(type).listItemType;
         }

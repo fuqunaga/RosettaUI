@@ -41,6 +41,21 @@ namespace RosettaUI
             return GetIList(binder)?.Count ?? 0;
         }
 
+        public static void SetCount(IBinder binder, int count)
+        {
+            var current = GetCount(binder);
+            var diff = count - current;
+            for (var i = 0; i < diff; ++i)
+            {
+                AddItemAtLast(binder);
+            }
+
+            for (var i = 0; i < -diff; ++i)
+            {
+                RemoveItemAtLast(binder);
+            }
+        }
+
         public static bool IsListBinder(IBinder binder)
         {
             var type = binder.ValueType;

@@ -4,8 +4,8 @@ using System.Linq;
 namespace RosettaUI
 {
     /// <summary>
-    ///     動的に内容が変化するElement
-    ///     UI実装側はbuildの結果をいれるプレースホルダー的な役割
+    /// 動的に内容が変化するElement
+    /// UI実装側はbuildの結果をいれるプレースホルダー的な役割
     /// </summary>
     public class DynamicElement : ElementGroup
     {

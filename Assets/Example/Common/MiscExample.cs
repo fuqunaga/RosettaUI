@@ -59,6 +59,15 @@ namespace RosettaUI.Example
                         )
                     )
                 )
+                , new PopupMenuElement(
+                    UI.Label(nameof(ContextMenu)),
+                    () => new[]
+                    {
+                        new MenuItem("Menu0", () => Debug.Log("Menu0")),
+                        new MenuItem("Menu1", () => Debug.Log("Menu1")),
+                        new MenuItem("Menu2", () => Debug.Log("Menu2"))
+                    }
+                )
                 , UI.Fold("Row/Column/Box/Fold/ScrollView/Indent"
                     , UI.Row(
                         UI.Label("Row0"),
@@ -95,7 +104,6 @@ namespace RosettaUI.Example
                             )
                         )
                     )
-                    
                 )
                 , UI.Fold("ElementCreator"
                     , UI.ElementCreatorWindowLauncher<ElementCreatorSimple>()

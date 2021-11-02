@@ -45,7 +45,8 @@ namespace RosettaUI.UIToolkit.Builder
                 */
                 [typeof(ButtonElement)] = Build_Button,
                 [typeof(FoldElement)] = Build_Fold,
-                [typeof(DynamicElement)] = Build_DynamicElement
+                [typeof(DynamicElement)] = Build_DynamicElement,
+                [typeof(PopupMenuElement)] = Build_PopupElement
             };
         }
 

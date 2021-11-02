@@ -33,8 +33,7 @@ namespace RosettaUI.UIToolkit
         {
         }
 
-        public PopupField(string label, List<T> choices, int defaultIndex,
-            Func<T, string> formatSelectedValueCallback = null, Func<T, string> formatListItemCallback = null)
+        public PopupField(string label, List<T> choices, int defaultIndex, Func<T, string> formatSelectedValueCallback = null, Func<T, string> formatListItemCallback = null)
             : base( label, choices,  defaultIndex, formatSelectedValueCallback ,  formatListItemCallback)
         {
         }

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using RosettaUI.Reactive;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -38,5 +39,36 @@ namespace RosettaUI.UIToolkit.Builder
             return field;
         }
 
+        private VisualElement Build_PopupElement(Element element)
+        {
+            var contextMenuElement = (PopupMenuElement) element;
+
+            var ve = new VisualElement();
+            Build_ElementGroupContents(ve, contextMenuElement);
+
+            ve.RegisterCallback<MouseDownEvent>(evt =>
+            {
+                if (evt.button == 1)
+                {
+                    var menuItems = contextMenuElement.CreateMenuItems?.Invoke();
+                    if (menuItems != null)
+                    {
+                        var menu = new GenericDropdownMenu();
+
+                        foreach (var item in menuItems)
+                        {
+                            if (item.isEnable) menu.AddItem(item.name, item.isChecked, item.action);
+                            else menu.AddDisabledItem(item.name, item.isChecked);
+                        }
+
+                        menu.DropDown(new Rect(){position = evt.mousePosition}, ve);
+                        evt.StopPropagation();
+                    }
+                }
+            });
+
+
+            return ve;
+        }
     }
 }

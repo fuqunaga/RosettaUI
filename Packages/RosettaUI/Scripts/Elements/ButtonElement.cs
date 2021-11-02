@@ -8,7 +8,7 @@ namespace RosettaUI
         
         public ButtonElement(IGetter<string> readName = null, Action onClick = null) : base(readName)
         {
-            this.OnClick = onClick;
+            OnClick = onClick;
         }
     }
 }

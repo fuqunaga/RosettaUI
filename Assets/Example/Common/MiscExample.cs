@@ -59,8 +59,8 @@ namespace RosettaUI.Example
                         )
                     )
                 )
-                , new PopupMenuElement(
-                    UI.Label(nameof(ContextMenu)),
+                , UI.Popup(
+                    UI.Box(UI.Label($"{nameof(UI.Popup)}(Right click)")),
                     () => new[]
                     {
                         new MenuItem("Menu0", () => Debug.Log("Menu0")),

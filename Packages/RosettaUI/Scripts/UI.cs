@@ -253,33 +253,61 @@ namespace RosettaUI
                 readStatus: () => ListBinder.GetCount(listBinder),
                 build: _ =>
                 {
-                    var i = 0;
                     createItemElement ??= ((binder, idx) => Field("Item " + idx, binder));
-                    return Column(
-                            ListBinder.CreateItemBinders(listBinder).Select(binder => createItemElement(binder, i++))
-                        );
 
+                    var itemBinderToElement = createItemElement;
+
+                    if (!ListBinder.IsReadOnly(listBinder))
+                    {
+                        itemBinderToElement = (binder,idx) => {
+                            var element = Popup(
+                                createItemElement(binder, idx),
+                                () => new[]
+                                {
+                                    new MenuItem("Add Element", () => ListBinder.DuplicateItem(listBinder, idx)),
+                                    new MenuItem("Remove Element", () => ListBinder.RemoveItem(listBinder, idx)),
+                                }
+                            );
+                            
+                            return element;
+                        };
+                    }
+
+                    return Column(
+                        ListBinder.CreateItemBinders(listBinder).Select(itemBinderToElement)
+                    );
                 });
         }
         
         #endregion
 
 
+        #region PopupMenu
+
+        public static PopupMenuElement Popup(Element childElement, Func<IEnumerable<MenuItem>> createMenuItems)
+        {
+            return new PopupMenuElement(childElement, createMenuItems);
+        }
+        
+        
+        #endregion
+        
+        
         #region Dropdown
 
-        public static Element Dropdown(Expression<Func<int>> targetExpression, IEnumerable<string> options,
+        public static DropdownElement Dropdown(Expression<Func<int>> targetExpression, IEnumerable<string> options,
             Action<int> onValueChanged = null)
         {
             return Dropdown(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, options,
                 onValueChanged);
         }
 
-        public static Element Dropdown(LabelElement label, Expression<Func<int>> targetExpression,
+        public static DropdownElement Dropdown(LabelElement label, Expression<Func<int>> targetExpression,
             IEnumerable<string> options, Action<int> onValueChanged = null)
         {
             var binder = CreateBinder(targetExpression, onValueChanged);
 
-            Element element = new DropdownElement(label, binder, options);
+            var element = new DropdownElement(label, binder, options);
 
             SetInteractableWithBinder(element, binder);
 

@@ -72,6 +72,26 @@ namespace RosettaUI
         }
 
 
+        public static void DuplicateItem(IBinder binder, int index)
+        {
+            var list = GetIList(binder);
+            
+            var itemType = TypeUtility.GetListItemType(binder.ValueType);
+            
+            list = ListUtility.AddItem(list, itemType, list[index], index);
+            binder.SetObject(list);
+        }
+
+        public static void RemoveItem(IBinder binder, int index)
+        {
+            var list = GetIList(binder);
+            
+            var itemType = TypeUtility.GetListItemType(binder.ValueType);
+            
+            list = ListUtility.RemoveItem(list, itemType, index);
+            binder.SetObject(list);
+        }
+
         public static void AddItemAtLast(IBinder binder)
         {
             var list = GetIList(binder);

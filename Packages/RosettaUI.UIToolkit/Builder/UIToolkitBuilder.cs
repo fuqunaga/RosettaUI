@@ -43,6 +43,7 @@ namespace RosettaUI.UIToolkit.Builder
                 /*
                 [typeof(LogSlider)] = Build_LogSlider,
                 */
+                [typeof(SpaceElement)] = Build_Space,
                 [typeof(ButtonElement)] = Build_Button,
                 [typeof(FoldElement)] = Build_Fold,
                 [typeof(DynamicElement)] = Build_DynamicElement,
@@ -117,6 +118,8 @@ namespace RosettaUI.UIToolkit.Builder
 
             public static readonly string MinMaxSlider = RosettaUI + "-min-max-slider";
             public static readonly string MinMaxSliderTextField = MinMaxSlider + "__text-field";
+            
+            public static readonly string Space = RosettaUI + "-space";
         }
 
 

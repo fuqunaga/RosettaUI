@@ -24,6 +24,7 @@
 .unity-foldout
 {
     flex-grow: 1;
+    flex-shrink: 0;
 }
 
 .unity-foldout__toggle {
@@ -88,7 +89,7 @@
 * Window
 ********************************************************************************/
 .rosettaui-window {
-    background-color: rgba(45, 45, 45, 0.9);
+    background-color: rgba(50, 50, 50, 0.9);
     position: absolute;
     border-radius: 1px;
     border-width: 4px;
@@ -223,6 +224,15 @@
 * Dynamic Element
 ********************************************************************************/
 .rosettaui-dynamic-element
+{
+    flex-grow: 1;
+    flex-shrink: 0;
+}
+
+/********************************************************************************
+* Space
+********************************************************************************/
+.rosettaui-space
 {
     flex-grow: 1;
     flex-shrink: 0;

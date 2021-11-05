@@ -36,7 +36,13 @@ namespace RosettaUI.Example
             });
 
             return UI.Column(
-                UI.Button("Button", () => print("On button clicked"))
+                UI.Row(
+                    UI.Label($"{nameof(UI.Space)} >")
+                    , UI.Space()
+                    , UI.Label($"< {nameof(UI.Space)}")
+                )
+                
+                , UI.Button("Button", () => print("On button clicked"))
                 , UI.Dropdown("Dropdown",
                     () => dropDownIndex,
                     options: new[] {"One", "Two", "Three"}

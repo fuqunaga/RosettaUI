@@ -7,6 +7,13 @@ namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
+        private static VisualElement Build_Space(Element element)
+        {
+            var ve = new VisualElement();
+            ve.AddToClassList(UssClassName.Space);
+            return ve;
+        }
+        
         private static Button Build_Button(Element element)
         {
             var buttonElement = (ButtonElement) element;

@@ -315,6 +315,12 @@ namespace RosettaUI
         }
 
         #endregion
+        
+        #region Space
+
+        public static SpaceElement Space() => new SpaceElement();
+        
+        #endregion
 
 
         #region Row/Column/Box/ScrollView/Indent
@@ -374,7 +380,7 @@ namespace RosettaUI
 
         public static FoldElement Fold(Element bar, IEnumerable<Element> elements)
         {
-            return new FoldElement(bar, new []{Indent(elements)});
+            return new FoldElement(bar, elements);
         }
 
         #endregion

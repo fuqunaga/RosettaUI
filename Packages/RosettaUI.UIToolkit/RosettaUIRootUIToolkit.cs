@@ -1,4 +1,5 @@
 using RosettaUI.UIToolkit.Builder;
+using RosettaUI.UIToolkit.PackageInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -12,7 +13,8 @@ namespace RosettaUI.UIToolkit
 
         protected override void OnEnable()
         {
-            if (uiDocument != null && uiDocument.rootVisualElement is {} ve)
+            base.OnEnable();
+            if (uiDocument != null && uiDocument.rootVisualElement is { } ve)
             {
                 ve.visible = true;
             }
@@ -20,7 +22,8 @@ namespace RosettaUI.UIToolkit
 
         protected override void OnDisable()
         {
-            if (uiDocument != null && uiDocument.rootVisualElement is {} ve)
+            base.OnEnable();
+            if (uiDocument != null && uiDocument.rootVisualElement is { } ve)
             {
                 ve.visible = false;
             }
@@ -32,11 +35,18 @@ namespace RosettaUI.UIToolkit
             {
                 uiDocument = GetComponent<UIDocument>();
             }
+
             var root = uiDocument.rootVisualElement;
             _builder ??= new UIToolkitBuilder();
             var visualElement = _builder.Build(element);
 
+            //var visualElement = new VisualElement();
             root.Add(visualElement);
         }
+
+        public override bool WillUseKeyInput()
+        {
+            return uiDocument != null && UIToolkitUtility.WillUseKeyInput(uiDocument.rootVisualElement?.panel);
+        } 
     }
 }

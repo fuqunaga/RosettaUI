@@ -29,7 +29,7 @@ namespace RosettaUI.Example
 
         void Update()
         {
-            if (Input.GetKeyDown(toggleRootElementKey))
+            if (!RosettaUIRoot.WillUseKeyInputAny() && Input.GetKeyDown(toggleRootElementKey))
             {
                 _root.enabled = !_root.enabled;
             }

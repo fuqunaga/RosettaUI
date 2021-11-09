@@ -44,8 +44,7 @@ namespace RosettaUI.UIToolkit.Builder
             where TField : BaseField<TFieldValue>, new()
         {
             var fieldElement = (FieldBaseElement<TElementValue>) element;
-            var field = CreateField<TElementValue, TFieldValue, TField>(fieldElement, onElementValueChanged,
-                fieldToElement);
+            var field = CreateField(fieldElement, onElementValueChanged, fieldToElement);
 
             var labelElement = fieldElement.label;
             if (labelElement != null)

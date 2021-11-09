@@ -34,12 +34,18 @@ namespace RosettaUI.UIToolkit.Builder
         {
             var foldElement = (FoldElement) element;
             var fold = new Foldout();
-
+            
             var toggle = fold.Q<Toggle>();
             toggle.Add(Build(foldElement.bar));
- 
+            
             foldElement.IsOpenRx.SubscribeAndCallOnce(isOpen => fold.value = isOpen);
-            fold.RegisterValueChangedCallback(evt => foldElement.IsOpen = evt.newValue);
+            fold.RegisterValueChangedCallback(evt =>
+            {
+                if (evt.target == fold)
+                {
+                    foldElement.IsOpen = evt.newValue;
+                }
+            });
 
             return Build_ElementGroupContents(fold, foldElement);
         }

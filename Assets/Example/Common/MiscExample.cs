@@ -36,12 +36,6 @@ namespace RosettaUI.Example
             });
 
             return UI.Column(
-                #if true
-                UI.Fold("FindObject"
-                    , UI.WindowLauncher<ElementCreatorSimple>()
-                    , UI.FieldIfObjectFound<ElementCreatorSimple>()
-                )
-                #else
                 UI.Row(
                     UI.Label($"{nameof(UI.Space)} >")
                     , UI.Space()
@@ -196,7 +190,6 @@ namespace RosettaUI.Example
                         , UI.Slider(() => nullElementCreator)
                     )
                 )
-#endif
             );
         }
     }

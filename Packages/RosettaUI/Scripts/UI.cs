@@ -464,36 +464,18 @@ namespace RosettaUI
             var elements = types.Select(FieldIfObjectFound).ToList();
             title ??= types.First().ToString().Split('.').LastOrDefault();
             var window = Window(title, elements);
+            window.UpdateWhenDisabled = true;
             
-#if true
             var launcher = WindowLauncher(window);
             launcher.UpdateWhenDisabled = true;
             launcher.onUpdate += _ =>
             {
-                if (!window.Enable)
-                {
-                    window.Update();
-                }
-                
-                var hasContents = elements.Any(dynamicElement => dynamicElement.Contents.Any());
-                launcher.Enable = hasContents;
+                var windowHasContents = elements.Any(dynamicElement => dynamicElement.Contents.Any());
+                launcher.Enable = windowHasContents;
             };
             launcher.onDestroy += _ => window.Destroy();
 
             return launcher;
-#else
-            return DynamicElementIf(
-                trigger: () =>
-                {
-                    var hasContents = elements.Any(dynamicElement => dynamicElement.Contents.Any());
-                    
-                    Debug.Log($"{title.Value} hasContents[{hasContents}]");
-                    
-                    return hasContents;
-                },
-                build: () => WindowLauncher(window)
-            );
-#endif
         }
 
         #endregion

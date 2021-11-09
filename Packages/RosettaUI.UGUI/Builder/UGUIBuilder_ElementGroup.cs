@@ -72,7 +72,7 @@ namespace RosettaUI.UGUI.Builder
             fold.onClose.AddListener(() => foldElement.IsOpen = false);
 
             //RegisterSetFoldOpen(foldElement, (isOpen) => fold.IsOpen = isOpen);
-            foldElement.isOpenRx.Subscribe((isOpen) => fold.IsOpen = isOpen);
+            foldElement.IsOpenRx.Subscribe((isOpen) => fold.IsOpen = isOpen);
 
 
             return go;

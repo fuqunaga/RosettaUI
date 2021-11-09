@@ -54,6 +54,12 @@ namespace RosettaUI
             return element;
         }
 
+        public static Element FieldReadOnly<T>(Func<T> getValue) => FieldReadOnly(null, getValue);
+        
+        public static Element FieldReadOnly<T>(LabelElement label, Func<T> getValue) =>
+            Field(label, Binder.Create(getValue, null));
+        
+
         #endregion
 
 
@@ -230,8 +236,8 @@ namespace RosettaUI
             var buttons = isReadOnly
                 ? null
                 : Row(
-                    Button("＋", () => ListBinder.AddItemAtLast(listBinder)).SetMinWidth(buttonWidth),
-                    Button("－", () => ListBinder.RemoveItemAtLast(listBinder)).SetMinWidth(buttonWidth)
+                    Button("＋", () => ListBinder.AddItemAtLast(listBinder)).SetWidth(buttonWidth),
+                    Button("－", () => ListBinder.RemoveItemAtLast(listBinder)).SetWidth(buttonWidth)
                 ).SetJustify(Style.Justify.End);
 
             return Fold(
@@ -392,7 +398,7 @@ namespace RosettaUI
         {
             return DynamicElementOnStatusChanged(
                 trigger,
-                (t) => !t ? null : build()
+                flag => flag ? build() : null
             );
         }
 
@@ -443,61 +449,71 @@ namespace RosettaUI
             return new WindowLauncherElement(label, window);
         }
 
-        #endregion
-
-
-        #region ElementCreator
-
-        public static DynamicElement ElementCreatorWindowLauncher<T>(LabelElement title = null)
-            where T : Behaviour, IElementCreator
+        public static WindowLauncherElement WindowLauncher<T>(LabelElement title = null)
+            where T : Object
         {
-            return ElementCreatorWindowLauncher(title, typeof(T));
+            return WindowLauncher(title, typeof(T));
         }
 
-        public static DynamicElement ElementCreatorWindowLauncher(params Type[] types) =>
-            ElementCreatorWindowLauncher(null, types);
+        public static WindowLauncherElement WindowLauncher(params Type[] types) => WindowLauncher(null, types);
 
-        public static DynamicElement ElementCreatorWindowLauncher(LabelElement title, params Type[] types)
+        public static WindowLauncherElement WindowLauncher(LabelElement title, params Type[] types)
         {
             Assert.IsTrue(types.Any());
 
-            var elements = types.Select(ElementCreatorInline).ToList();
+            var elements = types.Select(FieldIfObjectFound).ToList();
             title ??= types.First().ToString().Split('.').LastOrDefault();
+            var window = Window(title, elements);
+            
+#if true
+            var launcher = WindowLauncher(window);
+            launcher.UpdateWhenDisabled = true;
+            launcher.onUpdate += e =>
+            {
+                if (!window.Enable)
+                {
+                    window.Update();
+                }
+                
+                var hasContents = elements.Any(dynamicElement => dynamicElement.Contents.Any());
+                launcher.Enable = hasContents;
+            };
 
+            return launcher;
+#else
             return DynamicElementIf(
                 trigger: () =>
                 {
                     var hasContents = elements.Any(dynamicElement => dynamicElement.Contents.Any());
-                    if (!hasContents)
-                    {
-                        foreach (var e in elements)
-                        {
-                            e.Update();
-                        }
-                    }
-
+                    
+                    Debug.Log($"{title.Value} hasContents[{hasContents}]");
+                    
                     return hasContents;
                 },
-                build: () => WindowLauncher(Window(title, elements))
+                build: () => WindowLauncher(window)
             );
+#endif
         }
 
+        #endregion
+        
+        
+        #region FindObject
 
-        public static DynamicElement ElementCreatorInline<T>()
+        public static DynamicElement FieldIfObjectFound<T>()
             where T : Behaviour, IElementCreator
         {
-            return ElementCreatorInline(typeof(T));
+            return FieldIfObjectFound(typeof(T));
         }
 
-        public static DynamicElement ElementCreatorInline(Type type)
+        public static DynamicElement FieldIfObjectFound(Type type)
         {
-            Assert.IsTrue(typeof(IElementCreator).IsAssignableFrom(type));
-
-            return DynamicElementFindObject(type, t => ((IElementCreator) t).CreateElement());
+            return DynamicElementFindObject(type, obj => Field(null, () => obj));
         }
 
+        
         public static DynamicElement DynamicElementFindObject<T>(Func<T, Element> build)
-            where T : Behaviour
+            where T : Object
         {
             return DynamicElementFindObject(typeof(T), (o) => build?.Invoke((T) o));
         }
@@ -507,7 +523,7 @@ namespace RosettaUI
             Assert.IsTrue(typeof(Object).IsAssignableFrom(type));
 
             Object target = null;
-            var lastCheckTime = Time.realtimeSinceStartup;
+            var lastCheckTime = 0f;
             // 起動時に多くのFindObjectObserverElementが呼ばれるとFindObject()を呼ぶタイミングがかぶって重いのでランダムで散らす
             var interval = Random.Range(1f, 1.5f);
 
@@ -524,11 +540,13 @@ namespace RosettaUI
                         }
                     }
 
-                    return target != null;
+                    return target != null && !(target is Behaviour {isActiveAndEnabled: false});
                 },
                 build: () => build?.Invoke(target)
             );
         }
+        
+
 
         #endregion
 

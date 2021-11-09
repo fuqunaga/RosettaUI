@@ -6,36 +6,60 @@ namespace RosettaUI
 {
     public abstract class RosettaUIRoot : MonoBehaviour
     {
-        #region static
+        public ElementUpdater Updater { get; } = new ElementUpdater();
 
-        private static readonly HashSet<RosettaUIRoot> Roots = new HashSet<RosettaUIRoot>();
-        static void Register(RosettaUIRoot root) => Roots.Add(root);
-        static void Unregister(RosettaUIRoot root) => Roots.Remove(root);
+        #region Unity
 
-        public static bool WillUseKeyInputAny() => Roots.Any(r => r.WillUseKeyInput());
+        protected virtual void OnEnable()
+        {
+            Register(this);
+        }
+
+        protected virtual void OnDisable()
+        {
+            Unregister(this);
+        }
+
+        protected virtual void Update()
+        {
+            Updater.Update();
+        }
 
         #endregion
-        
-        
-        protected Element rootElement;
 
-        protected virtual void OnEnable() => Register(this);
-        protected virtual void OnDisable() => Unregister(this);
+        
         protected abstract void BuildInternal(Element element);
 
         public abstract bool WillUseKeyInput();
 
-        protected virtual void Update()
-        {
-            rootElement?.Update();
-        }
-
         public void Build(Element element)
         {
-            rootElement = element;
             BuildInternal(element);
+            
+            Updater.Register(element);
+            Updater.RegisterWindowRecursive(element);
         }
 
         
+        #region static
+
+        private static readonly HashSet<RosettaUIRoot> Roots = new HashSet<RosettaUIRoot>();
+
+        private static void Register(RosettaUIRoot root)
+        {
+            Roots.Add(root);
+        }
+
+        private static void Unregister(RosettaUIRoot root)
+        {
+            Roots.Remove(root);
+        }
+
+        public static bool WillUseKeyInputAny()
+        {
+            return Roots.Any(r => r.WillUseKeyInput());
+        }
+
+        #endregion
     }
 }

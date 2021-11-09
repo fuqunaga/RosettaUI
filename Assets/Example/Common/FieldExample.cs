@@ -94,6 +94,11 @@ namespace RosettaUI.Example
 
                     // IElementCreator will use CreateElement() method
                     , UI.Field(() => elementCreator)
+                    
+                    // UI.Field()'s targetExpressions cannot use blocks({}) or local functions(ExpressionTree limitations)
+                    // but UI.FieldReadOnly() can.
+                    // , UI.Field(() => { return 1;}) // compile error
+                    , UI.FieldReadOnly(nameof(UI.FieldReadOnly), () => { return 1; })
                 )
                 /*
                 , UI.Fold("Complex types"

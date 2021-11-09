@@ -20,7 +20,7 @@ namespace RosettaUI
         public static LabelElement FirstLabel(this Element element) => element.Query<LabelElement>().FirstOrDefault();
 
         
-        private struct ElementEnumerable : IEnumerable<Element>
+        private readonly struct ElementEnumerable : IEnumerable<Element>
         {
             private readonly Element _element;
 
@@ -28,7 +28,7 @@ namespace RosettaUI
             public IEnumerator<Element> GetEnumerator()
             {
                 yield return _element;
-                while (_element is ElementGroup group)
+                if (_element is ElementGroup group)
                 {
                     foreach (var child in group.Children.SelectMany(e => e.AsEnumerable()))
                     {

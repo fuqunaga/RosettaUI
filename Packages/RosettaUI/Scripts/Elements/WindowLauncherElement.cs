@@ -10,11 +10,5 @@
         }
 
         public WindowElement Window { get; }
-
-        public override void Update()
-        {
-            base.Update();
-            if (Window.Enable) Window.Update();
-        }
     }
 }

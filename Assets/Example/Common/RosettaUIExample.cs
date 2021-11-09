@@ -3,7 +3,7 @@
 namespace RosettaUI.Example
 {
     [RequireComponent(typeof(RosettaUIRoot))]
-    public class RosettaUIExample : MonoBehaviour, IElementCreator
+    public class RosettaUIExample : MonoBehaviour
     {
         public KeyCode toggleRootElementKey = KeyCode.U;
         private RosettaUIRoot _root;
@@ -15,13 +15,15 @@ namespace RosettaUI.Example
             _root.Build(CreateElement());
         }
 
-        public Element CreateElement()
+        private Element CreateElement()
         {
             _rootElement = UI.Window(
-                UI.ElementCreatorWindowLauncher<FieldExample>()
-                , UI.ElementCreatorWindowLauncher<SliderExample>()
-                , UI.ElementCreatorWindowLauncher<MinMaxSliderExample>()
-                , UI.ElementCreatorWindowLauncher<MiscExample>()
+                /*
+                UI.WindowLauncher<FieldExample>()
+                , UI.WindowLauncher<SliderExample>()
+                , UI.WindowLauncher<MinMaxSliderExample>()
+                , */
+                UI.WindowLauncher<MiscExample>()
             );
 
             return _rootElement;

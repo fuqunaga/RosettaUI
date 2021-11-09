@@ -11,15 +11,12 @@ namespace RosettaUI
     /// </summary>
     public abstract class Element
     {
-        #region For Builder
-
         public readonly ReactiveProperty<bool> enableRx = new ReactiveProperty<bool>(true);
         public readonly ReactiveProperty<bool> interactableRx = new ReactiveProperty<bool>(true);
-        public readonly ReactiveProperty<Style> styleRx = new ReactiveProperty<Style>();
+        public readonly ReactiveProperty<Style> styleRx = new ReactiveProperty<Style>(new Style());
 
-        #endregion
-
-
+        public bool UpdateWhenDisabled { get; set; }
+        
         public event Action<Element> onUpdate;
         public event Action<Element> onDestroy;
 
@@ -48,7 +45,7 @@ namespace RosettaUI
 
         public virtual void Update()
         {
-            if (Enable) UpdateInternal();
+            if (Enable || UpdateWhenDisabled) UpdateInternal();
         }
 
         protected virtual void UpdateInternal()
@@ -56,6 +53,6 @@ namespace RosettaUI
             onUpdate?.Invoke(this);
         }
 
-        public void Destroy() => onDestroy?.Invoke(this);
+        public virtual void Destroy() => onDestroy?.Invoke(this);
     }
 }

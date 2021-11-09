@@ -40,7 +40,6 @@ namespace RosettaUI.UIToolkit
             _builder ??= new UIToolkitBuilder();
             var visualElement = _builder.Build(element);
 
-            //var visualElement = new VisualElement();
             root.Add(visualElement);
         }
 

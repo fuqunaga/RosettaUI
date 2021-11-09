@@ -19,7 +19,7 @@ namespace RosettaUI
         #endregion
 
 
-        protected List<Element> elements;
+        protected List<Element> elements = new List<Element>();
         
         // Children　Update()で更新される子要素すべて
         // Contents　特殊な意味の子要素は含まれない
@@ -50,13 +50,20 @@ namespace RosettaUI
         {
             base.UpdateInternal();
 
-            if (elements != null)
+            foreach (var e in elements)
             {
-                foreach (var elem in elements)
-                {
-                    elem.Update();
-                }
+                e.Update();
             }
+        }
+
+        public override void Destroy()
+        {
+            foreach (var e in elements)
+            {
+                e.Destroy();
+            }
+            
+            base.Destroy();
         }
     }
 }

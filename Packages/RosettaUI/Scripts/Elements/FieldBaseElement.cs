@@ -12,15 +12,10 @@
             _binder = binder;
             Interactable = !binder.IsReadOnly;
         }
-
-
-        #region Internal
-
+        
         public void OnViewValueChanged(T t)
         {
             _binder?.Set(t);
         }
-
-        #endregion
     }
 }

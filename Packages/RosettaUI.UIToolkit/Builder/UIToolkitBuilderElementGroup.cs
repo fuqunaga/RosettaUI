@@ -21,7 +21,7 @@ namespace RosettaUI.UIToolkit.Builder
             window.TitleBarContainerLeft.Add(Build(windowElement.bar));
             window.closeButton.clicked += () => windowElement.Enable = !windowElement.Enable;
 
-            windowElement.isOpenRx.SubscribeAndCallOnce(isOpen =>
+            windowElement.enableRx.SubscribeAndCallOnce(isOpen =>
             {
                 if (isOpen) window.Show();
                 else window.Hide();
@@ -38,7 +38,8 @@ namespace RosettaUI.UIToolkit.Builder
             var toggle = fold.Q<Toggle>();
             toggle.Add(Build(foldElement.bar));
  
-            foldElement.isOpenRx.SubscribeAndCallOnce(isOpen => fold.value = isOpen);
+            foldElement.IsOpenRx.SubscribeAndCallOnce(isOpen => fold.value = isOpen);
+            fold.RegisterValueChangedCallback(evt => foldElement.IsOpen = evt.newValue);
 
             return Build_ElementGroupContents(fold, foldElement);
         }
@@ -141,8 +142,7 @@ namespace RosettaUI.UIToolkit.Builder
             return field;
         }
 
-        private VisualElement Build_ElementGroupContents(VisualElement container, Element element,
-            Action<VisualElement, int> setupContentsVe = null)
+        private VisualElement Build_ElementGroupContents(VisualElement container, Element element, Action<VisualElement, int> setupContentsVe = null)
         {
             var i = 0;
             foreach (var ve in Build_ElementGroupContents((ElementGroup) element))

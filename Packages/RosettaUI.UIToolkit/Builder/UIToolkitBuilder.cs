@@ -73,7 +73,9 @@ namespace RosettaUI.UIToolkit.Builder
             if (style.width is { } width) ve.style.width = width;
             if (style.height is { } height) ve.style.height = height;
             if (style.minWidth is { } minWidth) ve.style.minWidth = minWidth;
-            if (style.minHeight is { } minnHeight) ve.style.minHeight = minnHeight;
+            if (style.minHeight is { } minHeight) ve.style.minHeight = minHeight;
+            if (style.maxWidth is { } maxWidth) ve.style.maxWidth = maxWidth;
+            if (style.maxHeight is { } maxHeight) ve.style.maxHeight = maxHeight;
             if (style.color is { } color) ve.style.color = color;
             if (style.justify is { } justify)
             {

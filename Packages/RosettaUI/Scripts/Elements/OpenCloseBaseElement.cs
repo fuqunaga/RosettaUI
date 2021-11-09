@@ -4,17 +4,25 @@ using RosettaUI.Reactive;
 namespace RosettaUI
 {
     public abstract class OpenCloseBaseElement : ElementGroupWithBar
-    { 
-        public readonly ReactiveProperty<bool> isOpenRx = new ReactiveProperty<bool>();
+    {
+        public abstract ReactiveProperty<bool> IsOpenRx { get; }
 
         public bool IsOpen
         {
-            get => isOpenRx.Value;
-            set => isOpenRx.Value = value;
-            
+            get => IsOpenRx.Value;
+            set => IsOpenRx.Value = value;
         }
+        
         protected OpenCloseBaseElement(Element bar, IEnumerable<Element> contents) :base(bar, contents)
         {
+        }
+
+        public override void Update()
+        {
+            if (IsOpen)
+            {
+                base.Update();
+            }
         }
     }
 }

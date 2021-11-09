@@ -36,6 +36,12 @@ namespace RosettaUI.Example
             });
 
             return UI.Column(
+                #if true
+                UI.Fold("FindObject"
+                    , UI.WindowLauncher<ElementCreatorSimple>()
+                    , UI.FieldIfObjectFound<ElementCreatorSimple>()
+                )
+                #else
                 UI.Row(
                     UI.Label($"{nameof(UI.Space)} >")
                     , UI.Space()
@@ -111,9 +117,9 @@ namespace RosettaUI.Example
                         )
                     )
                 )
-                , UI.Fold("ElementCreator"
-                    , UI.ElementCreatorWindowLauncher<ElementCreatorSimple>()
-                    , UI.ElementCreatorInline<ElementCreatorSimple>()
+                , UI.Fold("FindObject"
+                    , UI.WindowLauncher<ElementCreatorSimple>()
+                    , UI.FieldIfObjectFound<ElementCreatorSimple>()
                 )
                 , UI.Fold("DynamicElement"
                     , UI.Field(() => dynamicElementIf)
@@ -146,15 +152,21 @@ namespace RosettaUI.Example
                     , UI.Label(nameof(ElementExtensionsMethodChain.SetEnable)).SetEnable(false) // disappear
                     , UI.Field(nameof(ElementExtensionsMethodChain.SetInteractable), () => floatValue).SetInteractable(false)
                     , UI.Label(nameof(ElementExtensionsMethodChain.SetColor)).SetColor(Color.red)
+#if true
+                    , UI.Button($"{nameof(ElementExtensionsMethodChain.SetWidth)}(100f)", null).SetWidth(100f)
+                    , UI.Button($"{nameof(ElementExtensionsMethodChain.SetHeight)}(50f)", null).SetHeight(50f)
+#else
+                    , UI.Button($"{nameof(ElementExtensionsMethodChain.SetWidth)}(100f)", null).SetWidth(100f)
+                    , UI.Button($"{nameof(ElementExtensionsMethodChain.SetMinWidth)}(200f)", null).SetMinWidth(50f)
+                    , UI.Button($"{nameof(ElementExtensionsMethodChain.SetMaxWidth)}(200f)", null).SetMaxWidth(200f)
+                    , UI.Column(
+                        UI.Button($"{nameof(ElementExtensionsMethodChain.SetHeight)}(50f)", null).SetHeight(50f)
+                        , UI.Button($"{nameof(ElementExtensionsMethodChain.SetMinHeight)}(50f)", null).SetMinHeight(50f)
+                        , UI.Button($"{nameof(ElementExtensionsMethodChain.SetMaxHeight)}(50f)", null).SetMaxHeight(50f)
+                    ).SetHeight(200f)
+#endif
                     , UI.Row(
-                        UI.Field(nameof(ElementExtensionsMethodChain.SetMinWidth), () => floatValue).SetMinWidth(0f)
-                    )
-                    , UI.Row
-                    (
-                        UI.Field(nameof(ElementExtensionsMethodChain.SetMinHeight), () => floatValue).SetMinHeight(50f)
-                    )
-                    , UI.Row(
-                        UI.Label(nameof(ElementExtensionsMethodChain.SetJustify)).SetMinWidth(0)
+                        UI.Button($"{nameof(ElementExtensionsMethodChain.SetJustify)}(Style.Justify.End)", null)
                     ).SetJustify(Style.Justify.End)
                     , UI.Fold(nameof(ElementExtensionsMethodChain.Open), UI.Label("Open")).Open()
                     , UI.Fold(nameof(ElementExtensionsMethodChain.Close), UI.Label("Close")).Close()
@@ -184,6 +196,7 @@ namespace RosettaUI.Example
                         , UI.Slider(() => nullElementCreator)
                     )
                 )
+#endif
             );
         }
     }

@@ -468,7 +468,7 @@ namespace RosettaUI
 #if true
             var launcher = WindowLauncher(window);
             launcher.UpdateWhenDisabled = true;
-            launcher.onUpdate += e =>
+            launcher.onUpdate += _ =>
             {
                 if (!window.Enable)
                 {
@@ -478,6 +478,7 @@ namespace RosettaUI
                 var hasContents = elements.Any(dynamicElement => dynamicElement.Contents.Any());
                 launcher.Enable = hasContents;
             };
+            launcher.onDestroy += _ => window.Destroy();
 
             return launcher;
 #else

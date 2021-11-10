@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SocialPlatforms;
-using UnityEngine.UIElements;
 
 namespace RosettaUI.Example
 {
@@ -112,8 +110,8 @@ namespace RosettaUI.Example
                     )
                 )
                 , UI.Fold("FindObject"
-                    , UI.WindowLauncher<ElementCreatorSimple>()
-                    , UI.FieldIfObjectFound<ElementCreatorSimple>()
+                    , UI.WindowLauncher<BehaviourExample>()
+                    , UI.FieldIfObjectFound<BehaviourExample>()
                 )
                 , UI.Fold("DynamicElement"
                     , UI.Field(() => dynamicElementIf)

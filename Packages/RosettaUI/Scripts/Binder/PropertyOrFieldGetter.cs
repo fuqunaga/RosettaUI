@@ -10,7 +10,7 @@ namespace RosettaUI
         public static IGetter Create(IGetter getter, string propertyOrFieldName)
         {
             if (getter == null) return null;
-            
+
             var parentType = getter.ValueType;
             var memberType = TypeUtility.GetPropertyOrFieldType(parentType, propertyOrFieldName);
             var getterType = typeof(PropertyOrFieldGetter<,>).MakeGenericType(parentType, memberType);

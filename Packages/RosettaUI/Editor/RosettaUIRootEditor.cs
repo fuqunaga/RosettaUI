@@ -34,7 +34,7 @@ namespace RosettaUI.Editors
             var root = target as RosettaUIRoot;
             if (root != null)
             {
-                var newDataList = root.Updater.Elements.Select(e => (e.FirstLabel()?.Value, e.Enable)).ToList();
+                var newDataList = root.updater.Elements.Select(e => (e.FirstLabel()?.Value, e.Enable)).ToList();
                 var changed = (_updateDataList.Count != newDataList.Count)
                               || _updateDataList.Zip(newDataList, (d0, d1) => d0 != d1).Any(diff => diff);
 

@@ -5,13 +5,6 @@ namespace RosettaUI
     // 型とフィールドかプロパティ名から生成されるBinder
     public static class PropertyOrFieldBinder
     {
-        /*
-        public static IBinder Create<T>(T obj, string propertyOrFieldName)
-        {
-            return CreateWithBinder(ConstBinder.Create(obj), propertyOrFieldName);
-        }
-        */
-
         public static IBinder Create(IBinder binder, string propertyOrFieldName)
         {
             var parent = binder.ValueType;
@@ -29,7 +22,6 @@ namespace RosettaUI
                 PropertyOrFieldGetterSetter<TParent, TValue>.GetGetterSetter(propertyOrFieldName).Item1,
                 PropertyOrFieldGetterSetter<TParent, TValue>.GetGetterSetter(propertyOrFieldName).Item2
             )
-
         {
         }
     }

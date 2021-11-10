@@ -10,7 +10,7 @@ namespace RosettaUI
             var memberType = TypeUtility.GetPropertyOrFieldType(valueType, propertyOrFieldName);
             var binderType = typeof(PropertyOrFieldMinMaxBinder<,>).MakeGenericType(valueType, memberType);
 
-            return (IBinder)Activator.CreateInstance(binderType, binder, propertyOrFieldName);
+            return (IBinder) Activator.CreateInstance(binderType, binder, propertyOrFieldName);
         }
     }
 

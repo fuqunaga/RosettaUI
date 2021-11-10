@@ -28,19 +28,19 @@ namespace RosettaUI
             return CreationFuncTable.Remove(typeof(T));
         }
 
-        public static bool TryGetElementCreationMethod(Type type, out CreationFunc func)
+        public static CreationFunc GetElementCreationMethod(Type type)
         {
-            return CreationFuncTable.TryGetValue(type, out func);
+            if (type == null) return null;
+            
+            if (!CreationFuncTable.TryGetValue(type, out var func))
+            {
+                func = GetElementCreationMethod(type.BaseType);
+                CreationFuncTable[type] = func;
+            }
+
+            return func;
         }
         
-        public static bool HasElementCreationFunc(Type type, out bool isOneLiner)
-        {
-            var ret = TryGetElementCreationMethod(type, out var func);
-            isOneLiner = func?.isOneLiner ?? false;
-            return ret;
-        }
-
-
         public static void RegisterProperties<T>(params string[] propertyNames)
         {
             TypeUtility.RegisterUITargetProperties(typeof(T), propertyNames);
@@ -64,7 +64,7 @@ namespace RosettaUI
 
         public UICustomScope(Func<T, Element> creationFunc, bool isOneLiner = false)
         {
-            UICustom.TryGetElementCreationMethod(typeof(T), out _creationFuncCache);
+            _creationFuncCache = UICustom.GetElementCreationMethod(typeof(T));
             UICustom.RegisterElementCreationFunc(creationFunc, isOneLiner);
         }
 

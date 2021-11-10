@@ -8,6 +8,14 @@ namespace RosettaUI
         {
             return new Binder<T>(Getter.Create(getter), setter);
         }
+
+        public static IBinder Create(object obj, Type type)
+        {
+            var binder = Create(() => obj, o => obj = o);
+            var castBinderType = typeof(CastBinder<,>).MakeGenericType(typeof(object), type);
+
+            return Activator.CreateInstance(castBinderType, binder) as IBinder;
+        }
     }
 
 

@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using UnityEngine;
 
 namespace RosettaUI
 {
@@ -50,12 +51,20 @@ namespace RosettaUI
             var setterValueParam = Expression.Parameter(typeof(TValue));
             var returnTarget = Expression.Label(typeof(TParent));
 
-            var block = Expression.Block(
-                typeof(TParent),
-                Expression.Assign(Expression.PropertyOrField(objParam, propertyOrFieldName), setterValueParam),
-                Expression.Return(returnTarget, objParam),
-                Expression.Label(returnTarget, Expression.Default(typeof(TParent)))
-            );
+            BlockExpression block = null;
+            try
+            {
+                block = Expression.Block(
+                    typeof(TParent),
+                    Expression.Assign(Expression.PropertyOrField(objParam, propertyOrFieldName), setterValueParam),
+                    Expression.Return(returnTarget, objParam),
+                    Expression.Label(returnTarget, Expression.Default(typeof(TParent)))
+                );
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
 
             return Expression.Lambda<Func<TParent, TValue, TParent>>(block, objParam, setterValueParam).Compile();
         }

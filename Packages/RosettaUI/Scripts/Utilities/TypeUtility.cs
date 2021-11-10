@@ -58,6 +58,11 @@ namespace RosettaUI
             return GetMemberData(type, propertyOrFieldName).type;
         }
 
+        public static MemberInfo GetMemberInfo(Type type, string propertyOrFieldName)
+        {
+            return GetMemberData(type, propertyOrFieldName)?.memberInfo;
+        }
+
         public static RangeAttribute GetRange(Type type, string propertyOrFieldName)
         {
             return GetMemberData(type, propertyOrFieldName).range;
@@ -124,6 +129,7 @@ namespace RosettaUI
                         pair => new MemberData
                         {
                             type = pair.Item2,
+                            memberInfo = pair.Item1,
                             range = pair.Item1.GetCustomAttribute<RangeAttribute>()
                         }
                     );
@@ -136,8 +142,9 @@ namespace RosettaUI
 
             public class MemberData
             {
-                public RangeAttribute range;
                 public Type type;
+                public MemberInfo memberInfo;
+                public RangeAttribute range;
             }
         }
     }

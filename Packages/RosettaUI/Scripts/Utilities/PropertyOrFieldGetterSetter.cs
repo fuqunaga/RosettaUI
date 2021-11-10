@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using UnityEngine;
 
 namespace RosettaUI
@@ -30,13 +31,26 @@ namespace RosettaUI
             return pair;
         }
 
+        // Expression.PropertyOrField is not use because it is not case sensitive
+        static MemberExpression PropertyOrField(Expression expression, string propertyOrFieldName)
+        {
+            var memberInfo = TypeUtility.GetMemberInfo(expression.Type, propertyOrFieldName);
+
+            return memberInfo switch
+            {
+                FieldInfo fi => Expression.Field(expression, fi),
+                PropertyInfo pi => Expression.Property(expression, pi),
+                _ => throw new ArgumentException($"{expression.Type} does not have a member '{propertyOrFieldName}'", nameof(propertyOrFieldName))
+            };
+        }
+        
         // Getter
         // Base Code:
         // return obj.propertyOrFieldName;
         static Func<TParent, TValue> CreateGetter(string propertyOrFieldName)
         {
             var objParam = Expression.Parameter(typeof(TParent));
-            return Expression.Lambda<Func<TParent, TValue>>(Expression.PropertyOrField(objParam, propertyOrFieldName), objParam).Compile();
+            return Expression.Lambda<Func<TParent, TValue>>(PropertyOrField(objParam, propertyOrFieldName), objParam).Compile();
         }
 
 
@@ -56,7 +70,7 @@ namespace RosettaUI
             {
                 block = Expression.Block(
                     typeof(TParent),
-                    Expression.Assign(Expression.PropertyOrField(objParam, propertyOrFieldName), setterValueParam),
+                    Expression.Assign(PropertyOrField(objParam, propertyOrFieldName), setterValueParam),
                     Expression.Return(returnTarget, objParam),
                     Expression.Label(returnTarget, Expression.Default(typeof(TParent)))
                 );

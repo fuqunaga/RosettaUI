@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 256655865}
   - component: {fileID: 256655866}
   m_Layer: 0
-  m_Name: ElementCreatorSimple
+  m_Name: BehaviourExample
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -166,6 +166,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 745a2b324a58a0645809582f1930d841, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  thisis: BehaviourExample
   intValue: 0
 --- !u!1 &544456410
 GameObject:

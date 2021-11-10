@@ -2,7 +2,7 @@
 
 namespace RosettaUI
 {
-    public interface IGetter 
+    public interface IGetter
     {
         bool IsNull { get; }
 

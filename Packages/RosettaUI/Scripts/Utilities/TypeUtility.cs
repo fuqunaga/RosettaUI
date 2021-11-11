@@ -101,12 +101,7 @@ namespace RosettaUI
             GetReflectionCache(type).uiTargetFieldsNameAndType.Remove(propertyName);
         }
 
-        public static Type GetListItemType(Type type)
-        {
-            return (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IList<>))
-                ? type.GetGenericArguments().First()
-                : GetReflectionCache(type).listItemType;
-        }
+        public static Type GetListItemType(Type type) => GetReflectionCache(type).listItemType;
 
         private class ReflectionCache
         {
@@ -117,7 +112,7 @@ namespace RosettaUI
 
             public ReflectionCache(Type type, IReadOnlyCollection<FieldInfo> fis, IEnumerable<PropertyInfo> pis)
             {
-                listItemType = type.GetInterfaces()
+                listItemType = type.GetInterfaces().Concat(new[] {type})
                     .Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IList<>))
                     .Select(t => t.GetGenericArguments().First())
                     .FirstOrDefault();

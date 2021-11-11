@@ -41,6 +41,8 @@ namespace RosettaUI.UIToolkit.Builder
             var maxTextField = new TTextField();
 
             var sliderElement = (MinMaxSliderElement<T>) element;
+            
+            /*
             var slider = Build_Field<MinMax<T>, Vector2, MinMaxSlider>(
                 sliderElement,
                 onElementValueChanged: (field, minMax) =>
@@ -53,6 +55,14 @@ namespace RosettaUI.UIToolkit.Builder
                 },
                 (vec2) => MinMax.Create(toValue(vec2.x), toValue(vec2.y))
             );
+            */
+            var slider = new MinMaxSlider();
+            slider.Bind(sliderElement,
+                elementValueToFieldValue: minMax => new Vector2(toFloat(minMax.min), toFloat(minMax.max)),
+                fieldValueToElementValue: vec2 => MinMax.Create(toValue(vec2.x), toValue(vec2.y))
+                );
+            SetupLabelCallback(slider, sliderElement);
+            
 
             InitRangeFieldElement(sliderElement,
                 (min) => slider.lowLimit = toFloat(min),

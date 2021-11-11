@@ -1,6 +1,4 @@
-﻿using System;
-using RosettaUI.Reactive;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -31,52 +29,23 @@ namespace RosettaUI.UIToolkit.Builder
         private static TField Build_Field<T, TField>(Element element)
             where TField : BaseField<T>, new()
         {
-            return Build_Field<T, T, TField>(element,
-                (field, v) => field.SetValueWithoutNotify(v),
-                (v) => v);
+            return Build_Field<T, TField>(element, true);
         }
-
-        private static TField Build_Field<TElementValue, TFieldValue, TField>(
-            Element element,
-            Action<TField, TElementValue> onElementValueChanged,
-            Func<TFieldValue, TElementValue> fieldToElement
-        )
-            where TField : BaseField<TFieldValue>, new()
+        
+        private static TField Build_Field<T, TField>(Element element, bool labelEnable)
+            where TField : BaseField<T>, new()
         {
-            var fieldElement = (FieldBaseElement<TElementValue>) element;
-            var field = CreateField(fieldElement, onElementValueChanged, fieldToElement);
+            var fieldBaseElement = (FieldBaseElement<T>) element;
 
-            var labelElement = fieldElement.label;
-            if (labelElement != null)
+            var field = new TField();
+            field.Bind(fieldBaseElement);
+
+            if (labelEnable)
             {
-                field.label = labelElement.Value;
-                SetupLabelCallback(field.labelElement, labelElement);
+                SetupLabelCallback(field, fieldBaseElement);
             }
 
             return field;
         }
-
-        static TField CreateField<T, TField>(FieldBaseElement<T> fieldBaseElement)
-            where TField : BaseField<T>, new()
-        {
-            return CreateField<T, T, TField>(fieldBaseElement, (field, v) => field.SetValueWithoutNotify(v), (v) => v);
-        }
-
-        private static TField CreateField<TElementValue, TFieldValue, TField>(
-            FieldBaseElement<TElementValue> fieldBaseElement,
-            //Func<TElementValue, TFieldValue> elementToFieldValue,
-            Action<TField, TElementValue> onElementValueChanged,
-            Func<TFieldValue, TElementValue> fieldToElement
-        )
-            where TField : BaseField<TFieldValue>, new()
-        {
-            var field = new TField();
-            fieldBaseElement.valueRx.SubscribeAndCallOnce(v => onElementValueChanged(field, v));
-            field.RegisterValueChangedCallback(ev => fieldBaseElement.OnViewValueChanged(fieldToElement(ev.newValue)));
-
-            return field;
-        }
-
-
     }
 }

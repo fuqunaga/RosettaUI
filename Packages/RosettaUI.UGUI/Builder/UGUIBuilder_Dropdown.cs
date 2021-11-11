@@ -32,11 +32,12 @@ namespace RosettaUI.UGUI.Builder
             dropdown.options = dropdownElement.options?.Select(str => new TMP_Dropdown.OptionData(str)).ToList();
 
             dropdown.onValueChanged.AddListener(dropdownElement.OnViewValueChanged);
-
+            
             if (!dropdownElement.IsConst)
             {
-                dropdownElement.valueRx.Subscribe((v) => dropdown.value = v);
+                dropdownElement.SubscribeValueOnUpdate(v => dropdown.value = v);
             }
+            
             SubscribeInteractable(element, dropdown, dropdown.captionText);
 
             return BuildField_AddLabelIfHas(go, dropdownElement);

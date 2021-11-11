@@ -56,8 +56,7 @@ namespace RosettaUI.UIToolkit.Builder
             var windowElement = launcherElement.Window;
             var window = (Window) Build(windowElement);
 
-            //var toggle = Build_Field<bool, Toggle>(element, false);
-            var toggle = CreateField<bool, Toggle>(launcherElement);
+            var toggle = Build_Field<bool, Toggle>(launcherElement, false);
             toggle.AddToClassList(UssClassName.WindowLauncher);
             toggle.RegisterCallback<PointerUpEvent>(evt =>
             {
@@ -67,7 +66,8 @@ namespace RosettaUI.UIToolkit.Builder
                 if (!windowElement.Enable && window.panel == null) window.Show(evt.originalMousePosition, toggle);
             });
 
-            launcherElement.label.valueRx.SubscribeAndCallOnce((v) => toggle.text = v);
+            var labelElement = launcherElement.label;
+            labelElement.SubscribeValueOnUpdateCallOnce(v => toggle.text = v);
 
             return toggle;
         }

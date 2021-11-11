@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using RosettaUI.Reactive;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -20,7 +19,8 @@ namespace RosettaUI.UIToolkit.Builder
 
             var button = new Button(buttonElement.OnClick);
 
-            buttonElement.valueRx.SubscribeAndCallOnce(str => button.text = str);
+            button.ListenValue(buttonElement);
+            // buttonElement.SubscribeValueOnUpdate(str => button.text = str);
 
             return button;
         }
@@ -38,14 +38,16 @@ namespace RosettaUI.UIToolkit.Builder
                 label = dropdownElement.label.Value
             };
 
-            SetupLabelCallback(field.labelElement, dropdownElement.label);
+            SetupLabelCallback(field, dropdownElement);
 
-            dropdownElement.valueRx.SubscribeAndCallOnce(v => field.index = v);
-            field.RegisterValueChangedCallback(ev => dropdownElement.OnViewValueChanged(field.index));
+            field.Bind(dropdownElement,
+                elementValueToFieldValue: i => (0 <= i && i < options.Count) ? options[i] : default,
+                fieldValueToElementValue: str => options.IndexOf(str)
+            );
 
             return field;
         }
-
+        
         private VisualElement Build_PopupElement(Element element)
         {
             var contextMenuElement = (PopupMenuElement) element;

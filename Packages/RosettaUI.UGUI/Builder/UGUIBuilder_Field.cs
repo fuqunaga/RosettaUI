@@ -35,7 +35,7 @@ namespace RosettaUI.UGUI.Builder
 
             if (!boolField.IsConst)
             {
-                boolField.valueRx.Subscribe((v) => toggle.isOn = v);
+                boolField.SubscribeValueOnUpdate((v) => toggle.isOn = v);
             }
 
             element.interactableRx.Subscribe( (interactable) =>
@@ -101,7 +101,7 @@ namespace RosettaUI.UGUI.Builder
 
             if (!field.IsConst)
             {
-                field.valueRx.Subscribe((v) =>
+                field.SubscribeValueOnUpdate((v) =>
                 {
                     var (success, viewValue) = tryParse(capturedInputFieldUI.text);
                     var isDifferent = !success || !(v?.Equals(viewValue) ?? (viewValue == null));

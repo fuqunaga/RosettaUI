@@ -1,4 +1,4 @@
-﻿using RosettaUI.Reactive;
+﻿using System;
 
 namespace RosettaUI
 {
@@ -7,17 +7,17 @@ namespace RosettaUI
     /// </summary>
     public abstract class ReadOnlyValueElement<T> : Element
     {
-        public readonly ReactiveProperty<T> valueRx;
         public readonly IGetter<T> getter;
-
-        public T Value => valueRx.Value;
+        internal event Action<T> listenValue;
+        
+        public T Value => getter.Get();
         
         public bool IsConst => getter.IsConst;
 
         protected ReadOnlyValueElement(IGetter<T> getter)
         {
             this.getter = getter ?? new ConstGetter<T>(default);
-            valueRx = new ReactiveProperty<T>(this.getter.Get());
+            //valueRx = new ReactiveProperty<T>(this.getter.Get());
         }
 
         protected override void UpdateInternal()
@@ -26,8 +26,28 @@ namespace RosettaUI
 
             if (!IsConst)
             {
-                valueRx.Value = getter.Get();
+                listenValue?.Invoke(getter.Get());
             }
+        }
+    }
+    
+    
+
+    public static class ReadOnlyValueElementSubscribe
+    {
+        public static void SubscribeValueOnUpdateCallOnce<T>(this ReadOnlyValueElement<T> me, Action<T> action)
+        {
+            action?.Invoke(me.Value);
+            me.SubscribeValueOnUpdate(action);
+        }
+        
+        public static void SubscribeValueOnUpdate<T>(this ReadOnlyValueElement<T>me, Action<T> action)
+        {
+            if (!me.IsConst)
+            {
+                me.listenValue += action;
+            }
+            
         }
     }
 }

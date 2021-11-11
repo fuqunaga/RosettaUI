@@ -1,5 +1,4 @@
 ﻿using RosettaUI.Builder;
-using RosettaUI.Reactive;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,13 +10,14 @@ namespace RosettaUI.UIToolkit.Builder
         {
             var labelElement = (LabelElement) element;
             var label = new Label(labelElement.Value);
-            SetupLabelCallback(label, labelElement);
-
+            SetupLabelStyle(label, labelElement);
+            label.ListenValue(labelElement);
+            
             return label;
         }
 
 
-        private static void SetupLabelCallback(Label label, LabelElement labelElement)
+        private static void SetupLabelStyle(TextElement label, LabelElement labelElement)
         {
             if (labelElement.IsLeftMost())
             {
@@ -29,12 +29,17 @@ namespace RosettaUI.UIToolkit.Builder
                 label.style.marginRight = LayoutSettings.LabelMarginRight;
                 label.style.paddingRight = LayoutSettings.LabelPaddingRight;
             }
-
-            if (!labelElement.IsConst)
+        }
+        
+        
+        static void SetupLabelCallback<T, TElementValue>(BaseField<T> field, ReadOnlyFieldElement<TElementValue> fieldBaseElement)
+        {
+            var labelElement = fieldBaseElement.label;
+            if (labelElement != null)
             {
-                labelElement.valueRx.Subscribe(text => label.text = text);
+                SetupLabelStyle(field.labelElement, labelElement);
+                field.ListenLabel(labelElement);
             }
         }
-
     }
 }

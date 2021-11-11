@@ -44,61 +44,96 @@ namespace RosettaUI.Example
         {
             SimpleClass nullClass = null;
             return UI.Column(
-                UI.Fold("Allows any type"
-                    , UI.Field(() => intValue)
-                    , UI.Field(() => uintValue)
-                    , UI.Field(() => floatValue)
-                    , UI.Field(() => stringValue)
-                    , UI.Field(() => boolValue)
-                    , UI.Field(() => enumValue)
-                    , UI.Field(() => colorValue)
-                    , UI.Field(() => vector2Value)
-                    , UI.Field(() => vector3Value)
-                    , UI.Field(() => vector4Value)
-                    , UI.Field(() => vector2IntValue)
-                    , UI.Field(() => vector3IntValue)
-                    , UI.Field(() => rectValue)
-                    , UI.Field(() => rectIntValue)
-                    , UI.Field(() => rectOffsetValue)
-                    , UI.Field(() => boundsValue)
-                    , UI.Field(() => boundsIntValue)
-                    , UI.Field(() => intList)
-                    , UI.Field(() => floatArray)
-                    , UI.Field(() => simpleClass)
-                    , UI.Field(() => classList)
+                UI.Fold("Allows any type",
+                    UI.Field(() => intValue),
+                    UI.Field(() => uintValue),
+                    UI.Field(() => floatValue),
+                    UI.Field(() => stringValue),
+                    UI.Field(() => boolValue),
+                    UI.Field(() => enumValue),
+                    UI.Field(() => colorValue),
+                    UI.Field(() => vector2Value),
+                    UI.Field(() => vector3Value),
+                    UI.Field(() => vector4Value),
+                    UI.Field(() => vector2IntValue),
+                    UI.Field(() => vector3IntValue),
+                    UI.Field(() => rectValue),
+                    UI.Field(() => rectIntValue),
+                    UI.Field(() => rectOffsetValue),
+                    UI.Field(() => boundsValue),
+                    UI.Field(() => boundsIntValue),
+                    UI.Field(() => intList),
+                    UI.Field(() => floatArray),
+                    UI.Field(() => simpleClass),
+                    UI.Field(() => classList)
+                ),
+                UI.Fold("ReadOnly",
+                    UI.FieldReadOnly(nameof(intValue), () => intValue),
+                    UI.FieldReadOnly(nameof(uintValue), () => uintValue),
+                    UI.FieldReadOnly(nameof(floatValue), () => floatValue),
+                    UI.FieldReadOnly(nameof(stringValue), () => stringValue),
+                    UI.FieldReadOnly(nameof(boolValue), () => boolValue),
+                    UI.FieldReadOnly(nameof(enumValue), () => enumValue),
+                    UI.FieldReadOnly(nameof(colorValue), () => colorValue),
+                    UI.FieldReadOnly(nameof(vector2Value), () => vector2Value),
+                    UI.FieldReadOnly(nameof(vector3Value), () => vector3Value),
+                    UI.FieldReadOnly(nameof(vector4Value), () => vector4Value),
+                    UI.FieldReadOnly(nameof(vector2IntValue), () => vector2IntValue),
+                    UI.FieldReadOnly(nameof(vector3IntValue), () => vector3IntValue),
+                    UI.FieldReadOnly(nameof(rectValue), () => rectValue),
+                    UI.FieldReadOnly(nameof(rectIntValue), () => rectIntValue),
+                    UI.FieldReadOnly(nameof(rectOffsetValue), () => rectOffsetValue),
+                    UI.FieldReadOnly(nameof(boundsValue), () => boundsValue),
+                    UI.FieldReadOnly(nameof(boundsIntValue), () => boundsIntValue),
+                    UI.FieldReadOnly(nameof(intList), () => intList),
+                    UI.FieldReadOnly(nameof(floatArray), () => floatArray),
+                    UI.FieldReadOnly(nameof(simpleClass), () => simpleClass),
+                    UI.FieldReadOnly(nameof(classList), () => classList)
                 )
-                , UI.Fold("Usage"
-                    , UI.Field("CustomLabel", () => floatValue)
-                    , UI.Field("onValueChanged",
+                , UI.Fold("Usage",
+                    UI.Field("CustomLabel", () => floatValue),
+                    UI.Field("onValueChanged",
                         targetExpression: () => floatValue,
                         onValueChanged: f => print($"{nameof(floatValue)} changed.")
-                    )
+                    ),
 
                     // non-interactable if the expression is read-only,
-                    , UI.Field(() => floatValue + 1f)
+                    UI.Field(() => floatValue + 1f),
 
                     // interactable If onValuedChanged callback is present
-                    , UI.Field(
+                    UI.Field(
                         targetExpression: () => floatValue + 1f,
                         onValueChanged: f => floatValue = f - 1f
-                    )
+                    ),
 
                     // Supports public member
-                    , UI.Field(() => vector2Value.x)
+                    UI.Field(() => vector2Value.x),
                     
                     // Null safe
-                    , UI.Field(() => nullClass)
+                    UI.Field(() => nullClass),
                     
+                    // TODO
                     // Field with range attribute will become Slider
-                    , UI.Field(() => rangeValue)
+                    //, UI.Field(() => rangeValue)
 
                     // IElementCreator will use CreateElement() method
-                    , UI.Field(() => elementCreator)
+                    UI.Field(() => elementCreator),
                     
-                    // UI.Field()'s targetExpressions cannot use blocks({}) or local functions(ExpressionTree limitations)
-                    // but UI.FieldReadOnly() can.
-                    // , UI.Field(() => { return intValue;}) // compile error
-                    , UI.FieldReadOnly(nameof(UI.FieldReadOnly), () => { return intValue; })
+                    
+                    UI.Fold("ReadOnly"
+                        , UI.Label("Use ReadOnly if you only want to display the value and not change it")
+                        , UI.FieldReadOnly(nameof(UI.FieldReadOnly), () => intValue)
+
+                        // UI.Field()'s targetExpressions cannot use blocks({}) or local functions(ExpressionTree limitations)
+                        // but UI.FieldReadOnly() can.
+                        //
+                        // , UI.Field(() => { LocalFunction(); return intValue;}) // compile error
+                        , UI.FieldReadOnly(nameof(UI.FieldReadOnly), () =>
+                        {
+                            LocalFunction();
+                            return intValue;
+                        })
+                    )
                 )
                 /*
                 , UI.Fold("Complex types"
@@ -106,6 +141,10 @@ namespace RosettaUI.Example
                 )
                 */
             );
+
+            static void LocalFunction()
+            {
+            }
         }
     }
 }

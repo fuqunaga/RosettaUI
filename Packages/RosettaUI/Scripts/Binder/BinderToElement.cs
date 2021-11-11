@@ -74,10 +74,15 @@ namespace RosettaUI
                 var fieldBinder = PropertyOrFieldBinder.Create(binder, fieldName);
 
                 var range = TypeUtility.GetRange(valueType, fieldName);
-                if (range == null) return UI.Field(fieldName, fieldBinder);
-
-                var (minGetter, maxGetter) = RangeUtility.CreateGetterMinMax(range, fieldBinder.ValueType);
-                return UI.Slider(fieldName, fieldBinder, minGetter, maxGetter);
+                if (range == null)
+                {
+                    return UI.Field(fieldName, fieldBinder);
+                }
+                else
+                {
+                    var (minGetter, maxGetter) = RangeUtility.CreateGetterMinMax(range, fieldBinder.ValueType);
+                    return UI.Slider(fieldName, fieldBinder, minGetter, maxGetter);
+                }
             });
 
 

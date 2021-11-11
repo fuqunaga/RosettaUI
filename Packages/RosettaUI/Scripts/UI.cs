@@ -54,8 +54,6 @@ namespace RosettaUI
             return element;
         }
 
-        public static Element FieldReadOnly<T>(Func<T> getValue) => FieldReadOnly(null, getValue);
-        
         public static Element FieldReadOnly<T>(LabelElement label, Func<T> getValue) =>
             Field(label, Binder.Create(getValue, null));
         
@@ -312,12 +310,20 @@ namespace RosettaUI
             IEnumerable<string> options, Action<int> onValueChanged = null)
         {
             var binder = CreateBinder(targetExpression, onValueChanged);
+            return Dropdown(label, binder, options, onValueChanged);
+        }
 
+        public static DropdownElement Dropdown(LabelElement label, IBinder<int> binder, IEnumerable<string> options, Action<int> onValueChanged = null)
+        {
             var element = new DropdownElement(label, binder, options);
-
             SetInteractableWithBinder(element, binder);
-
             return element;
+        }
+
+        public static DropdownElement DropdownReadOnly(LabelElement label, Func<int> getValue,
+            IEnumerable<string> options, Action<int> onValueChanged = null)
+        {
+            return Dropdown(label, Binder.Create(getValue, onValueChanged), options, onValueChanged);
         }
 
         #endregion
@@ -484,7 +490,7 @@ namespace RosettaUI
         #region FindObject
 
         public static DynamicElement FieldIfObjectFound<T>()
-            where T : Behaviour, IElementCreator
+            where T : Behaviour
         {
             return FieldIfObjectFound(typeof(T));
         }

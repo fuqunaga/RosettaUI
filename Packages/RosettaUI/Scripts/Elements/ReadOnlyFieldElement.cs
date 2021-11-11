@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RosettaUI
+﻿namespace RosettaUI
 {
     /// <summary>
     /// 値を持ち外部と同期するFieldElement

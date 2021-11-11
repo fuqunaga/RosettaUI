@@ -97,8 +97,8 @@ namespace RosettaUI.Example
                     
                     // UI.Field()'s targetExpressions cannot use blocks({}) or local functions(ExpressionTree limitations)
                     // but UI.FieldReadOnly() can.
-                    // , UI.Field(() => { return 1;}) // compile error
-                    , UI.FieldReadOnly(nameof(UI.FieldReadOnly), () => { return 1; })
+                    // , UI.Field(() => { return intValue;}) // compile error
+                    , UI.FieldReadOnly(nameof(UI.FieldReadOnly), () => { return intValue; })
                 )
                 /*
                 , UI.Fold("Complex types"

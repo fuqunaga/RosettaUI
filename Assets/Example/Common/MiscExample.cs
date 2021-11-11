@@ -40,11 +40,18 @@ namespace RosettaUI.Example
                     , UI.Label($"< {nameof(UI.Space)}")
                 )
                 
-                , UI.Button("Button", () => print("On button clicked"))
-                , UI.Dropdown("Dropdown",
+                , UI.Button(nameof(UI.Button), () => print("On button clicked"))
+                
+                , UI.Dropdown(nameof(UI.Dropdown),
                     () => dropDownIndex,
                     options: new[] {"One", "Two", "Three"}
                 )
+                , UI.DropdownReadOnly($"{nameof(UI.DropdownReadOnly)}(selection index will not change)",
+                    () => dropDownIndex,
+                    options: new[] {"One", "Two", "Three"},
+                    onValueChanged: idx => print($"{nameof(UI.DropdownReadOnly)} index[{idx}] selected")
+                )
+                
                 , UI.Fold("List"
                     , UI.List(
                         () => listValue,

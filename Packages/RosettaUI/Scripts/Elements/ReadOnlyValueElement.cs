@@ -7,24 +7,17 @@ namespace RosettaUI
     /// </summary>
     public abstract class ReadOnlyValueElement<T> : Element
     {
-        #region For Builder
-
         public readonly ReactiveProperty<T> valueRx;
-
-        #endregion
-
         public readonly IGetter<T> getter;
-
 
         public T Value => valueRx.Value;
         
         public bool IsConst => getter.IsConst;
 
-
-        public ReadOnlyValueElement(IGetter<T> getter)
+        protected ReadOnlyValueElement(IGetter<T> getter)
         {
             this.getter = getter ?? new ConstGetter<T>(default);
-            valueRx = new ReactiveProperty<T>(getter.Get());
+            valueRx = new ReactiveProperty<T>(this.getter.Get());
         }
 
         protected override void UpdateInternal()

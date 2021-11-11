@@ -42,7 +42,11 @@ namespace RosettaUI
 
         public static DynamicElement FieldIfObjectFound(Type type)
         {
-            return DynamicElementFindObject(type, obj => Field(null, () => obj));
+            return DynamicElementFindObject(type, obj =>
+            {
+                var binder = Binder.Create(obj, type);
+                return Field(null, binder);
+            });
         }
 
         

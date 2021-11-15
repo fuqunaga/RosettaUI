@@ -41,36 +41,26 @@ namespace RosettaUI
             return func;
         }
         
-        public static void RegisterProperties<T>(params string[] propertyNames)
+        public static void RegisterPropertyOrFields<T>(params string[] names)
         {
-            TypeUtility.RegisterUITargetProperties(typeof(T), propertyNames);
+            TypeUtility.RegisterUITargetPropertyOrFields(typeof(T), names);
         }
 
-        public static void UnregisterProperties<T>(string propertyName)
+        public static void UnregisterPropertyOrField<T>(string name)
         {
-            TypeUtility.UnregisterUITargetProperties(typeof(T), propertyName);
+            TypeUtility.UnregisterUITargetPropertyOrField(typeof(T), name);
+        }
+        
+        /// <returns>removed field name</returns>
+        public static IEnumerable<string> UnregisterPropertyOrFieldAll<T>()
+        {
+            return TypeUtility.UnregisterUITargetPropertyOrFieldAll(typeof(T));
         }
 
         public class CreationFunc
         {
             public Func<object, Element> func;
             public bool isOneLiner;
-        }
-    }
-
-    public class UICustomScope<T> : IDisposable
-    {
-        private readonly UICustom.CreationFunc _creationFuncCache;
-
-        public UICustomScope(Func<T, Element> creationFunc, bool isOneLiner = false)
-        {
-            _creationFuncCache = UICustom.GetElementCreationMethod(typeof(T));
-            UICustom.RegisterElementCreationFunc(creationFunc, isOneLiner);
-        }
-
-        public void Dispose()
-        {
-            UICustom.RegisterElementCreationFunc(typeof(T), _creationFuncCache);
         }
     }
 }

@@ -39,6 +39,9 @@ namespace RosettaUI.Example
 
         //public ComplexClass complexClass;
 
+        [Multiline]
+        public string multiLineStringValue = "this is\nmultiline\nstring";
+
 
         public Element CreateElement()
         {
@@ -89,8 +92,11 @@ namespace RosettaUI.Example
                     UI.FieldReadOnly(nameof(floatArray), () => floatArray),
                     UI.FieldReadOnly(nameof(simpleClass), () => simpleClass),
                     UI.FieldReadOnly(nameof(classList), () => classList)
-                )
-                , UI.Fold("Usage",
+                ),
+                UI.Fold("TextArea",
+                    UI.TextArea(() => multiLineStringValue)
+                ),
+                UI.Fold("Usage",
                     UI.Field("CustomLabel", () => floatValue),
                     UI.Field("onValueChanged",
                         targetExpression: () => floatValue,

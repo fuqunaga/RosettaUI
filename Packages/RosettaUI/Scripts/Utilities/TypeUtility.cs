@@ -18,14 +18,14 @@ namespace RosettaUI
 
         static void RegisterUnityBuiltinProperties()
         {
-            RegisterUITargetProperties(typeof(Vector2Int), "x", "y");
-            RegisterUITargetProperties(typeof(Vector2Int), "x", "y");
-            RegisterUITargetProperties(typeof(Vector3Int), "x", "y", "z");
-            RegisterUITargetProperties(typeof(Rect),       "x", "y", "width", "height");
-            RegisterUITargetProperties(typeof(RectInt),    "x", "y", "width", "height");
-            RegisterUITargetProperties(typeof(RectOffset), "left", "right", "top", "bottom");
-            RegisterUITargetProperties(typeof(Bounds),     "center", "extents");
-            RegisterUITargetProperties(typeof(BoundsInt),  "position", "size");
+            RegisterUITargetPropertyOrFields(typeof(Vector2Int), "x", "y");
+            RegisterUITargetPropertyOrFields(typeof(Vector2Int), "x", "y");
+            RegisterUITargetPropertyOrFields(typeof(Vector3Int), "x", "y", "z");
+            RegisterUITargetPropertyOrFields(typeof(Rect),       "x", "y", "width", "height");
+            RegisterUITargetPropertyOrFields(typeof(RectInt),    "x", "y", "width", "height");
+            RegisterUITargetPropertyOrFields(typeof(RectOffset), "left", "right", "top", "bottom");
+            RegisterUITargetPropertyOrFields(typeof(Bounds),     "center", "extents");
+            RegisterUITargetPropertyOrFields(typeof(BoundsInt),  "position", "size");
         }
         
         private static ReflectionCache GetReflectionCache(Type type)
@@ -71,34 +71,43 @@ namespace RosettaUI
 
         public static bool HasSerializableField(Type type)
         {
-            return GetReflectionCache(type).uiTargetFieldsNameAndType.Any();
+            return GetReflectionCache(type).uiTargetPropertyOrFieldsNameTypeDic.Any();
         }
 
         public static IEnumerable<string> GetUITargetFieldNames(Type type)
         {
-            return GetReflectionCache(type).uiTargetFieldsNameAndType.Keys;
+            return GetReflectionCache(type).uiTargetPropertyOrFieldsNameTypeDic.Keys;
         }
 
         public static IEnumerable<Type> GetUITargetFieldTypes(Type type)
         {
-            return GetReflectionCache(type).uiTargetFieldsNameAndType.Values;
+            return GetReflectionCache(type).uiTargetPropertyOrFieldsNameTypeDic.Values;
         }
 
-        public static void RegisterUITargetProperties(Type type, params string[] propertyNames)
+        public static void RegisterUITargetPropertyOrFields(Type type, params string[] names)
         {
             var cache = GetReflectionCache(type);
-            foreach (var name in propertyNames)
+            foreach (var name in names)
             {
                 if (cache.memberDataTable.TryGetValue(name, out var data))
                 {
-                    cache.uiTargetFieldsNameAndType[name] = data.type;
+                    cache.uiTargetPropertyOrFieldsNameTypeDic[name] = data.type;
                 }
             }
         }
 
-        public static void UnregisterUITargetProperties(Type type, string propertyName)
+        public static void UnregisterUITargetPropertyOrField(Type type, string name)
         {
-            GetReflectionCache(type).uiTargetFieldsNameAndType.Remove(propertyName);
+            GetReflectionCache(type).uiTargetPropertyOrFieldsNameTypeDic.Remove(name);
+        }
+
+        public static IEnumerable<string> UnregisterUITargetPropertyOrFieldAll(Type type)
+        {
+            var cache = GetReflectionCache(type);
+            var resistedNames = cache.uiTargetPropertyOrFieldsNameTypeDic.Keys;
+            cache.uiTargetPropertyOrFieldsNameTypeDic.Clear();
+
+            return resistedNames;
         }
 
         public static Type GetListItemType(Type type) => GetReflectionCache(type).listItemType;
@@ -108,7 +117,7 @@ namespace RosettaUI
             public readonly Type listItemType;
 
             public readonly Dictionary<string, MemberData> memberDataTable;
-            public readonly Dictionary<string, Type> uiTargetFieldsNameAndType;
+            public readonly Dictionary<string, Type> uiTargetPropertyOrFieldsNameTypeDic;
 
             public ReflectionCache(Type type, IReadOnlyCollection<FieldInfo> fis, IEnumerable<PropertyInfo> pis)
             {
@@ -130,7 +139,7 @@ namespace RosettaUI
                     );
 
 
-                uiTargetFieldsNameAndType = fis
+                uiTargetPropertyOrFieldsNameTypeDic = fis
                     .Where(fi => fi.IsPublic || fi.GetCustomAttribute<SerializeField>() != null)
                     .ToDictionary(fi => fi.Name, fi => fi.FieldType);
             }

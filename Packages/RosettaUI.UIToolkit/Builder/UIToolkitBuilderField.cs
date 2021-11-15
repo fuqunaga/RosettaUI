@@ -13,6 +13,18 @@ namespace RosettaUI.UIToolkit.Builder
             return intField;
         }
 
+        private static VisualElement Build_TextField(Element element)
+        {
+            var textFieldElement = (TextFieldElement) element;
+
+            var textField = Build_Field<string, TextField>(element);
+            if (textFieldElement.MultiLine)
+            {
+                textField.multiline = true;
+            }
+
+            return textField;
+        }
 
         private static VisualElement Build_ColorField(Element element)
         {

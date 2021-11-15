@@ -1,29 +1,32 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace RosettaUI
 {
     public static class ElementExtensionsMethodChain
     {
-        public static Element SetEnable(this Element e, bool enable)
+        public static T SetEnable<T>(this T e, bool enable)
+            where T : Element
         {
             e.Enable = enable;
             return e;
         }
 
-        public static Element SetInteractable(this Element e, bool interactable)
+        public static T SetInteractable<T>(this T e, bool interactable)
+            where T : Element
         {
             e.Interactable = interactable;
             return e;
         }
 
-        public static Element SetWidth(this Element element, float width)
+        public static T SetWidth<T>(this T element, float width)
+            where T : Element
         {
             element.Style.width = width;
             return element;
         }
 
-        public static Element SetHeight(this Element element, float height)
+        public static T SetHeight<T>(this T element, float height)
+            where T : Element
         {
             element.Style.height = height;
             return element;

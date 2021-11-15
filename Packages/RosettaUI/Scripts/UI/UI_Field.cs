@@ -25,7 +25,7 @@ namespace RosettaUI
             return element;
         }
 
-        public static Element FieldReadOnly<T>(LabelElement label, Func<T> getValue) =>
-            Field(label, Binder.Create(getValue, null));
+        public static Element FieldReadOnly<T>(LabelElement label, Func<T> getValue)
+            => Field(label, Binder.Create(getValue, null));
     }
 }

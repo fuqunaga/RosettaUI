@@ -16,9 +16,17 @@ namespace RosettaUI
         
         #region Button
 
-        public static ButtonElement Button(LabelElement label, Action onClick)
+        public static ButtonElement Button(LabelElement label, Action onClick = null)
         {
             return new ButtonElement(label?.getter, onClick);
+        }
+
+        public static ButtonElement Button(LabelElement label, Action<ButtonElement> onClick)
+        {
+            var button = Button(label);
+            button.onClick += () => onClick(button);
+
+            return button;
         }
 
         #endregion

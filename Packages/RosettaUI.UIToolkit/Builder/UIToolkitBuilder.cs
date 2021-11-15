@@ -27,7 +27,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(LabelElement)] = Build_Label,
                 [typeof(IntFieldElement)] = Build_IntField,
                 [typeof(FloatFieldElement)] = Build_Field<float, FloatField>,
-                [typeof(StringFieldElement)] = Build_Field<string, TextField>,
+                [typeof(TextFieldElement)] = Build_TextField,
                 [typeof(BoolFieldElement)] = Build_Field<bool, Toggle>,
                 [typeof(ColorFieldElement)] = Build_ColorField,
 

@@ -19,7 +19,7 @@ namespace RosettaUI.UGUI.Builder
 
         static GameObject Build_StringField(Element element)
         {
-            return Build_InputField((StringFieldElement)element, resource.inputField, TMP_InputField.ContentType.Standard, str => (true, str));
+            return Build_InputField((TextFieldElement)element, resource.inputField, TMP_InputField.ContentType.Standard, str => (true, str));
         }
 
         static GameObject Build_BoolField(Element element)

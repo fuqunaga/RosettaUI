@@ -166,8 +166,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 745a2b324a58a0645809582f1930d841, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  thisis: BehaviourExample
+  classNameIs: BehaviourExample
   intValue: 0
+  protectedValue: 0
 --- !u!1 &544456410
 GameObject:
   m_ObjectHideFlags: 0
@@ -310,6 +311,11 @@ MonoBehaviour:
   - floatValue: 1
     stringValue: First
   rangeValue: 0
+  multiLineStringValue: 'this is
+
+    multiline
+
+    string'
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0

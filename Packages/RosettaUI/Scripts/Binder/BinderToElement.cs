@@ -20,7 +20,7 @@ namespace RosettaUI
                 IBinder<int> bb => () => new IntFieldElement(label, bb),
                 IBinder<uint> bb => () => new IntFieldElement(label, new CastBinder<uint, int>(bb), true),
                 IBinder<float> bb => () => new FloatFieldElement(label, bb),
-                IBinder<string> bb => () => new StringFieldElement(label, bb),
+                IBinder<string> bb => () => new TextFieldElement(label, bb),
                 IBinder<bool> bb => () => new BoolFieldElement(label, bb),
                 IBinder<Color> bb => () => new ColorFieldElement(label, bb),
                 _ when binder.ValueType.IsEnum => () => CreateEnumElement(label, binder),
@@ -45,7 +45,7 @@ namespace RosettaUI
                 ret = DynamicElement.Create(
                     () => getter.IsNull,
                     isNull => isNull
-                        ? new StringFieldElement(label, NullStrBinder).SetInteractable(false)
+                        ? new TextFieldElement(label, NullStrBinder).SetInteractable(false)
                         : createElement(),
                     $"NullGuard({nameof(DynamicElement)})"
                 );

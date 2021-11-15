@@ -30,7 +30,7 @@ namespace RosettaUI.UGUI.Builder
                     [typeof(LabelElement)] = (e) => Build_Label((LabelElement)e),
                     [typeof(IntFieldElement)] = Build_IntField,
                     [typeof(FloatFieldElement)] = Build_FloatField,
-                    [typeof(StringFieldElement)] = Build_StringField,
+                    [typeof(TextFieldElement)] = Build_StringField,
                     [typeof(BoolFieldElement)] = Build_BoolField,
                     [typeof(ButtonElement)] = Build_Button,
                     [typeof(DropdownElement)] = Build_Dropdown,

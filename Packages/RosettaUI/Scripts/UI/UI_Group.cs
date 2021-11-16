@@ -53,9 +53,8 @@ namespace RosettaUI
 
         public static FoldElement Fold(Element barLeft, Element barRight, IEnumerable<Element> elements)
         {
-            barRight?.SetJustify(Style.Justify.End);
             var bar = (barLeft != null || barRight != null)
-                ? Row(barLeft, barRight)
+                ? Row(barLeft, Space(), barRight)
                 : null;
 
             return Fold(bar, elements);

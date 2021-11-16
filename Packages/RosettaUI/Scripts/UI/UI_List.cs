@@ -28,7 +28,7 @@ namespace RosettaUI
             var isReadOnly = ListBinder.IsReadOnly(listBinder);
 
             var countFieldWidth = 50f;
-            var field = Field("",
+            var field = Field(null,
                 () => ListBinder.GetCount(listBinder),
                 isReadOnly ? (Action<int>) null : (count) => ListBinder.SetCount(listBinder, count)
             ).SetWidth(countFieldWidth);
@@ -37,13 +37,14 @@ namespace RosettaUI
             var buttons = isReadOnly
                 ? null
                 : Row(
+                    Space(),
                     Button("＋", () => ListBinder.AddItemAtLast(listBinder)).SetWidth(buttonWidth),
                     Button("－", () => ListBinder.RemoveItemAtLast(listBinder)).SetWidth(buttonWidth)
-                ).SetJustify(Style.Justify.End);
+                );
 
             return Fold(
                 barLeft: label,
-                barRight: Row(field),
+                barRight: field,
                 elements: new[]
                 {
                     Box(

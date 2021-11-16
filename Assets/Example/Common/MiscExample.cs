@@ -131,7 +131,7 @@ namespace RosettaUI.Example
                         readStatus: () => intValue,
                         build: (status) =>
                         {
-                            var buttons = Enumerable.Range(0, intValue).Select(i => UI.Button(i.ToString(), null));
+                            var buttons = Enumerable.Range(0, intValue).Select(i => UI.Button(i.ToString()));
                             var label = UI.Label(nameof(UI.DynamicElementOnStatusChanged));
                             return UI.Row(
                                 new Element[] {label}.Concat(buttons)
@@ -152,8 +152,8 @@ namespace RosettaUI.Example
                     , UI.Field(nameof(ElementExtensionsMethodChain.SetInteractable), () => floatValue).SetInteractable(false)
                     , UI.Label(nameof(ElementExtensionsMethodChain.SetColor)).SetColor(Color.red)
 #if true
-                    , UI.Button($"{nameof(ElementExtensionsMethodChain.SetWidth)}(100f)", null).SetWidth(100f)
-                    , UI.Button($"{nameof(ElementExtensionsMethodChain.SetHeight)}(50f)", null).SetHeight(50f)
+                    , UI.Button($"{nameof(ElementExtensionsMethodChain.SetWidth)}(100f)").SetWidth(100f)
+                    , UI.Button($"{nameof(ElementExtensionsMethodChain.SetHeight)}(50f)").SetHeight(50f)
 #else
                     , UI.Button($"{nameof(ElementExtensionsMethodChain.SetWidth)}(100f)", null).SetWidth(100f)
                     , UI.Button($"{nameof(ElementExtensionsMethodChain.SetMinWidth)}(200f)", null).SetMinWidth(50f)
@@ -165,7 +165,7 @@ namespace RosettaUI.Example
                     ).SetHeight(200f)
 #endif
                     , UI.Row(
-                        UI.Button($"{nameof(ElementExtensionsMethodChain.SetJustify)}(Style.Justify.End)", null)
+                        UI.Button($"{nameof(ElementExtensionsMethodChain.SetJustify)}(Style.Justify.End)")
                     ).SetJustify(Style.Justify.End)
                     , UI.Fold(nameof(ElementExtensionsMethodChain.Open), UI.Label("Open")).Open()
                     , UI.Fold(nameof(ElementExtensionsMethodChain.Close), UI.Label("Close")).Close()

@@ -72,16 +72,17 @@ namespace RosettaUI
             var elements = TypeUtility.GetUITargetFieldNames(valueType).Select(fieldName =>
             {
                 var fieldBinder = PropertyOrFieldBinder.Create(binder, fieldName);
+                var fieldLabel = UICustom.ModifyPropertyOrFieldLabel(valueType, fieldName);
 
                 var range = TypeUtility.GetRange(valueType, fieldName);
                 if (range == null)
                 {
-                    return UI.Field(fieldName, fieldBinder);
+                    return UI.Field(fieldLabel, fieldBinder);
                 }
                 else
                 {
                     var (minGetter, maxGetter) = RangeUtility.CreateGetterMinMax(range, fieldBinder.ValueType);
-                    return UI.Slider(fieldName, fieldBinder, minGetter, maxGetter);
+                    return UI.Slider(fieldLabel, fieldBinder, minGetter, maxGetter);
                 }
             });
 
@@ -147,11 +148,12 @@ namespace RosettaUI
                 binder.ValueType,
                 fieldName =>
                 {
+                    var fieldLabel = UICustom.ModifyPropertyOrFieldLabel(binder.ValueType, fieldName);
                     var fieldBinder = PropertyOrFieldBinder.Create(binder, fieldName);
                     var fieldMinGetter = PropertyOrFieldGetter.Create(minGetter, fieldName);
                     var fieldMaxGetter = PropertyOrFieldGetter.Create(maxGetter, fieldName);
 
-                    return UI.Slider(fieldName, fieldBinder, fieldMinGetter, fieldMaxGetter);
+                    return UI.Slider(fieldLabel, fieldBinder, fieldMinGetter, fieldMaxGetter);
                 });
         }
 

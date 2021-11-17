@@ -22,6 +22,7 @@ namespace RosettaUI.Example
                 , UI.WindowLauncher<SliderExample>()
                 , UI.WindowLauncher<MinMaxSliderExample>()
                 , UI.WindowLauncher<MiscExample>()
+                , UI.WindowLauncher<UICustomExample>()
             );
 
             return _rootElement;

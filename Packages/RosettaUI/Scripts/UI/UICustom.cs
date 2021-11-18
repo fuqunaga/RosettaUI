@@ -18,10 +18,11 @@ namespace RosettaUI
         
         private static readonly Dictionary<Type, CreationFunc> CreationFuncTable = new Dictionary<Type, CreationFunc>();
 
-        private static readonly Dictionary<Type, Dictionary<string, string>> propertyOrFieldLabelModifiers =
-            new Dictionary<Type, Dictionary<string, string>>();
+        private static readonly Dictionary<Type, Dictionary<string, string>> PropertyOrFieldLabelModifiers = new Dictionary<Type, Dictionary<string, string>>();
 
-        
+        private static readonly Dictionary<string, string> PropertyOrFieldLabelModifiersAnyType = new Dictionary<string, string>();
+
+
         #region CreationFunc
         
         public static void RegisterElementCreationFunc<T>(Func<T, Element> creationFunc, bool isOneLiner = false)
@@ -83,22 +84,38 @@ namespace RosettaUI
         
         
         #region PropertyOrFieldLabelModifier
+
+        public static string RegisterPropertyOrFieldLabelModifier(string from, string to)
+        {
+            PropertyOrFieldLabelModifiersAnyType.TryGetValue(from, out var prev);
+            PropertyOrFieldLabelModifiersAnyType[from] = to;
+
+            return prev;
+        }
+
+        public static bool UnregisterPropertyOrFieldLabelModifier(string from)
+        {
+            return PropertyOrFieldLabelModifiersAnyType.Remove(from);
+        }
         
-        public static void RegisterPropertyOrFieldLabelModifier<T>(string from, string to)
+        public static string RegisterPropertyOrFieldLabelModifier<T>(string from, string to)
         {
             var type = typeof(T);
-            if (!propertyOrFieldLabelModifiers.TryGetValue(type, out var dic) || dic == null)
+            if (!PropertyOrFieldLabelModifiers.TryGetValue(type, out var dic) || dic == null)
             {
                 dic = new Dictionary<string, string>();
-                propertyOrFieldLabelModifiers[type] = dic;
+                PropertyOrFieldLabelModifiers[type] = dic;
             }
 
+            dic.TryGetValue(from, out var prev);
             dic[from] = to;
+
+            return prev;
         }
         
         public static bool UnregisterPropertyOrFieldLabelModifier<T>(string from)
         {
-            if (propertyOrFieldLabelModifiers.TryGetValue(typeof(T), out var dic) && dic != null)
+            if (PropertyOrFieldLabelModifiers.TryGetValue(typeof(T), out var dic) && dic != null)
             {
                 return dic.Remove(from);
             }
@@ -108,7 +125,7 @@ namespace RosettaUI
 
         public static void UnregisterPropertyOrFieldLabelModifierAll<T>()
         {
-            if (propertyOrFieldLabelModifiers.TryGetValue(typeof(T), out var dic) && dic != null)
+            if (PropertyOrFieldLabelModifiers.TryGetValue(typeof(T), out var dic) && dic != null)
             {
                 dic.Clear();
             }
@@ -116,13 +133,19 @@ namespace RosettaUI
 
         public static string ModifyPropertyOrFieldLabel(Type type, string propertyOrFieldName)
         {
-            if (propertyOrFieldLabelModifiers.TryGetValue(type, out var dic) && dic != null)
+            if (PropertyOrFieldLabelModifiers.TryGetValue(type, out var dic) && dic != null)
             {
                 if ( dic.TryGetValue(propertyOrFieldName, out var label))
                 {
                     return label;
                 }
             }
+
+            if (PropertyOrFieldLabelModifiersAnyType.TryGetValue(propertyOrFieldName, out var to))
+            {
+                return to;
+            }
+            
 
             return propertyOrFieldName;
         }

@@ -11,7 +11,14 @@ namespace RosettaUI
         protected ElementGroupWithBar(Element bar, IEnumerable<Element> contents)
         {
             this.bar = bar;
-            SetElements(new[] { this.bar }.Concat(contents));
+            
+            var children = new[] {bar}.AsEnumerable();
+            if (contents != null)
+            {
+                children = children.Concat(contents);
+            }
+
+            SetElements(children);
         }
     }
 }

@@ -94,7 +94,8 @@ namespace RosettaUI.Example
                     UI.FieldReadOnly(nameof(classList), () => classList)
                 ),
                 UI.Fold("TextArea",
-                    UI.TextArea(() => multiLineStringValue)
+                    UI.TextArea(() => multiLineStringValue),
+                    UI.TextAreaReadOnly(() => multiLineStringValue)
                 ),
                 UI.Fold("Usage",
                     UI.Field("CustomLabel", () => floatValue),

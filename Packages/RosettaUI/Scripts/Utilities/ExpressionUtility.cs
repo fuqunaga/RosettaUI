@@ -11,7 +11,7 @@ namespace RosettaUI
 {
     public static class ExpressionUtility
     {
-        public static Func<T> CreateGetter<T>(Expression<Func<T>> expression) => expression.Compile();
+        public static Func<T> CreateReadFunc<T>(Expression<Func<T>> expression) => expression.Compile();
         
         public static IBinder<T> CreateBinder<T>(Expression<Func<T>> expression)
         {

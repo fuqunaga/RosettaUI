@@ -31,8 +31,7 @@ namespace RosettaUI.UIToolkit.Builder
         static VisualElement Build_MinMaxSlider_Float(Element element) =>
             Build_MinMaxSlider<float, FloatField>(element, (f) => f, (f) => f);
 
-        private static VisualElement Build_MinMaxSlider<T, TTextField>(Element element, Func<T, float> toFloat,
-            Func<float, T> toValue)
+        private static VisualElement Build_MinMaxSlider<T, TTextField>(Element element, Func<T, float> toFloat, Func<float, T> toValue)
             where TTextField : TextInputBaseField<T>, new()
         {
             if (toValue == null) throw new ArgumentNullException(nameof(toValue));
@@ -41,26 +40,49 @@ namespace RosettaUI.UIToolkit.Builder
             var maxTextField = new TTextField();
 
             var sliderElement = (MinMaxSliderElement<T>) element;
-            
-            /*
-            var slider = Build_Field<MinMax<T>, Vector2, MinMaxSlider>(
-                sliderElement,
-                onElementValueChanged: (field, minMax) =>
-                {
-                    var vec2 = new Vector2(toFloat(minMax.min), toFloat(minMax.max));
 
-                    field.SetValueWithoutNotify(vec2);
-                    minTextField.SetValueWithoutNotify(minMax.min);
-                    maxTextField.SetValueWithoutNotify(minMax.max);
-                },
-                (vec2) => MinMax.Create(toValue(vec2.x), toValue(vec2.y))
-            );
-            */
+
             var slider = new MinMaxSlider();
+#if false
             slider.Bind(sliderElement,
                 elementValueToFieldValue: minMax => new Vector2(toFloat(minMax.min), toFloat(minMax.max)),
                 fieldValueToElementValue: vec2 => MinMax.Create(toValue(vec2.x), toValue(vec2.y))
-                );
+            );
+            
+              
+            slider.RegisterValueChangedCallback(evt =>
+            {
+                var vec2 = evt.newValue;
+                minTextField.SetValueWithoutNotify(toValue(vec2.x));
+                maxTextField.SetValueWithoutNotify(toValue(vec2.y));
+            });
+#else
+
+            sliderElement.SubscribeValueOnUpdateCallOnce(minMax =>
+                {
+                    var min = toFloat(minMax.min);
+                    var max = toFloat(minMax.max);
+                    
+                    slider.SetValueWithoutNotifyIfNotEqual(new Vector2(min, max));
+                    minTextField.SetValueWithoutNotifyIfNotEqual(minMax.min);
+                    maxTextField.SetValueWithoutNotifyIfNotEqual(minMax.max);
+                }
+            );
+
+            slider.RegisterValueChangedCallback(evt =>
+            {
+                var vec2 = evt.newValue;
+                var min = toValue(vec2.x);
+                var max = toValue(vec2.y);
+                
+                sliderElement.OnViewValueChanged(MinMax.Create(min, max));
+                
+                minTextField.SetValueWithoutNotify(min);
+                maxTextField.SetValueWithoutNotify(max);
+            });
+#endif
+            
+
             SetupLabelCallback(slider, sliderElement);
             
 

@@ -9,7 +9,7 @@ namespace RosettaUI
         static IBinder<T> CreateReadOnlyBinder<T>(Expression<Func<T>> targetExpression)
         {
             return Binder.Create(
-                ExpressionUtility.CreateGetter(targetExpression),
+                ExpressionUtility.CreateReadFunc(targetExpression),
                 null
             );
         }

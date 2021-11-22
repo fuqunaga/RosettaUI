@@ -30,7 +30,7 @@ namespace RosettaUI
         public static Element FieldReadOnly<T>(Expression<Func<T>> targetExpression)
             => FieldReadOnly(
                 ExpressionUtility.CreateLabelString(targetExpression),
-                ExpressionUtility.CreateGetter(targetExpression
+                ExpressionUtility.CreateReadFunc(targetExpression
                 ));
 
         public static Element FieldReadOnly<T>(LabelElement label, Func<T> readValue)

@@ -38,19 +38,19 @@ namespace RosettaUI.Example
                 )
                 , UI.Fold("Usage"
                     , UI.MinMaxSlider("CustomLabel", () => floatMinMax)
-                    , UI.MinMaxSlider("Custom min max", () => floatMinMax, min: -1f, max: 2f)
-                    , UI.MinMaxSlider("Custom min max", () => vector2MinMax, min: Vector2.zero, max: new Vector2(360f, 100f)) 
-                    , UI.MinMaxSlider("onValueChanged",
-                        targetExpression: () => floatMinMax,
-                        onValueChanged: f => print($"{nameof(floatMinMax)} changed."))
+                    , UI.MinMaxSlider("Custom min max", () => floatMinMax, min: -1f, max: 1f)
+                    , UI.MinMaxSlider("Custom min max", () => vector2MinMax, min: Vector2.one * -1f, max: Vector2.one) 
+                    , UI.MinMaxSlider("ValueChangedCallback", () => floatMinMax)
+                        .RegisterValueChangeCallback(() => print($"{nameof(floatMinMax)} changed."))
 
                     // non-interactable if the expression is read-only,
-                    , UI.MinMaxSlider(() => MinMax.Create(floatMinMax.min + 0.1f, floatMinMax.max + 0.1f))
+                    , UI.MinMaxSlider("min,max + 0.1f",
+                        () => MinMax.Create(floatMinMax.min + 0.1f, floatMinMax.max + 0.1f))
 
-                    // interactable If onValuedChanged callback is present
-                    , UI.MinMaxSlider(
-                        targetExpression: () => MinMax.Create(floatMinMax.min + 0.1f, floatMinMax.max + 0.1f),
-                        onValueChanged: f => floatMinMax = MinMax.Create(f.min - 0.1f, f.max - 0.1f))
+                    // interactable if (label,readValue,writeValue) style
+                    , UI.MinMaxSlider("min,max + 0.1f",
+                        () => MinMax.Create(floatMinMax.min + 0.1f, floatMinMax.max + 0.1f),
+                        f => floatMinMax = MinMax.Create(f.min - 0.1f, f.max - 0.1f))
                     )
             );
         }

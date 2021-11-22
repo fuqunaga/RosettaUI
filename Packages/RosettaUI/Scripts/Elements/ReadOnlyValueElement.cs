@@ -17,7 +17,6 @@ namespace RosettaUI
         protected ReadOnlyValueElement(IGetter<T> getter)
         {
             this.getter = getter ?? new ConstGetter<T>(default);
-            //valueRx = new ReactiveProperty<T>(this.getter.Get());
         }
 
         protected override void UpdateInternal()

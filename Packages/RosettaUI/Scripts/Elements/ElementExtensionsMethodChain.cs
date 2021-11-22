@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace RosettaUI
 {
@@ -71,16 +72,26 @@ namespace RosettaUI
             return element;
         }
 
-        public static FoldElement Open(this FoldElement fold)
+        public static Element RegisterValueChangeCallback(this Element element, Action onValueChanged)
         {
-            fold.IsOpen = true;
+            element.onViewValueChanged += onValueChanged;
+            return element; 
+        }
+        public static Element UnregisterValueChangeCallback(this Element element, Action onValueChanged)
+        {
+            element.onViewValueChanged -= onValueChanged;
+            return element;
+        }
+
+        public static FoldElement SetOpenFlag(this FoldElement fold, bool flag)
+        {
+            fold.IsOpen = flag;
             return fold;
         }
-        public static FoldElement Close(this FoldElement fold)
-        {
-            fold.IsOpen = false;
-            return fold;
-        }
+
+        public static FoldElement Open(this FoldElement fold) => fold.SetOpenFlag(true);
+
+        public static FoldElement Close(this FoldElement fold) => fold.SetOpenFlag(false);
 
 
     }

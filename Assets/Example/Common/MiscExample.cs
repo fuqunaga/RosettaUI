@@ -122,7 +122,7 @@ namespace RosettaUI.Example
                 , UI.Fold("ChildValueChangedCallback",
                     UI.Field(() => intValue),
                     UI.Field(() => floatValue)
-                ).RegisterValueChangeCallback(e => Debug.Log($"OnChildValueChanged"))
+                ).RegisterValueChangeCallback(() => Debug.Log($"OnChildValueChanged"))
                 , UI.Fold("FindObject"
                     , UI.WindowLauncher<BehaviourExample>()
                     , UI.FieldIfObjectFound<BehaviourExample>()

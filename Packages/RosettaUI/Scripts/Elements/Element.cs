@@ -18,6 +18,7 @@ namespace RosettaUI
         public bool UpdateWhenDisabled { get; set; }
         
         public event Action<Element> onUpdate;
+        public event Action onViewValueChanged;
         public event Action<Element> onDestroy;
 
 
@@ -54,5 +55,11 @@ namespace RosettaUI
         }
 
         public virtual void Destroy() => onDestroy?.Invoke(this);
+
+        protected void NotifyViewValueChanged()
+        {
+            onViewValueChanged?.Invoke();
+            Parent?.NotifyViewValueChanged();
+        }
     }
 }

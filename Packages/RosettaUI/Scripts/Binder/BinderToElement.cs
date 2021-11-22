@@ -39,7 +39,7 @@ namespace RosettaUI
 
         private static Element NullGuard(LabelElement label, IGetter getter, Func<Element> createElement)
         {
-            Element ret = null;
+            Element ret;
 
             if (getter.IsNullable && getter.ValueType != typeof(string))
                 ret = DynamicElement.Create(

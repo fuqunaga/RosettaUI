@@ -6,7 +6,6 @@
     public abstract class FieldBaseElement<T> : ReadOnlyFieldElement<T>
     {
         private readonly IBinder<T> _binder;
-
         public FieldBaseElement(LabelElement label, IBinder<T> binder) : base(label, binder)
         {
             _binder = binder;
@@ -16,6 +15,7 @@
         public void OnViewValueChanged(T t)
         {
             _binder?.Set(t);
+            NotifyViewValueChanged();
         }
     }
 }

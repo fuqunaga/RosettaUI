@@ -44,7 +44,7 @@ namespace RosettaUI
         public static DropdownElement Dropdown(LabelElement label, Expression<Func<int>> targetExpression,
             IEnumerable<string> options, Action<int> onValueChanged = null)
         {
-            var binder = CreateBinder(targetExpression, onValueChanged);
+            var binder = CreateBinder(targetExpression);
             return Dropdown(label, binder, options, onValueChanged);
         }
 

@@ -5,17 +5,19 @@ namespace RosettaUI
 {
     public static partial class UI
     {
-        public static Element Field<T>(Expression<Func<T>> targetExpression, Action<T> onValueChanged = null)
+        public static Element Field<T>(Expression<Func<T>> targetExpression)
         {
-            return Field(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, onValueChanged);
+            return Field(ExpressionUtility.CreateLabelString(targetExpression), targetExpression);
         }
 
-        public static Element Field<T>(LabelElement label, Expression<Func<T>> targetExpression,
-            Action<T> onValueChanged = null)
+        public static Element Field<T>(LabelElement label, Expression<Func<T>> targetExpression)
         {
-            var binder = CreateBinder(targetExpression, onValueChanged);
+            var binder = CreateBinder(targetExpression);
             return Field(label, binder);
         }
+
+        public static Element Field<T>(LabelElement label, Func<T> readValue, Action<T> writeValue)
+            => Field(label, Binder.Create(readValue, writeValue));
 
         public static Element Field(LabelElement label, IBinder binder)
         {
@@ -25,7 +27,14 @@ namespace RosettaUI
             return element;
         }
 
-        public static Element FieldReadOnly<T>(LabelElement label, Func<T> getValue)
-            => Field(label, Binder.Create(getValue, null));
+        public static Element FieldReadOnly<T>(Expression<Func<T>> targetExpression)
+            => FieldReadOnly(
+                ExpressionUtility.CreateLabelString(targetExpression),
+                ExpressionUtility.CreateGetter(targetExpression
+                ));
+
+        public static Element FieldReadOnly<T>(LabelElement label, Func<T> readValue)
+            => Field(label, readValue, null);
+
     }
 }

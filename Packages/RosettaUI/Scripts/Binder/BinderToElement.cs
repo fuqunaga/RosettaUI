@@ -119,8 +119,7 @@ namespace RosettaUI
 
         #region Slider
 
-        public static Element CreateSliderElement(LabelElement label, IBinder binder, IGetter minGetter,
-            IGetter maxGetter)
+        public static Element CreateSliderElement(LabelElement label, IBinder binder, IGetter minGetter, IGetter maxGetter)
         {
             return binder switch
             {

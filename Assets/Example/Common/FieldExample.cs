@@ -98,18 +98,16 @@ namespace RosettaUI.Example
                 ),
                 UI.Fold("Usage",
                     UI.Field("CustomLabel", () => floatValue),
-                    UI.Field("onValueChanged",
-                        targetExpression: () => floatValue,
-                        onValueChanged: f => print($"{nameof(floatValue)} changed.")
-                    ),
+                    UI.Field("ValueChangedCallback", () => floatValue)
+                        .RegisterValueChangeCallback(() => print($"{nameof(floatValue)} changed.")),
 
-                    // non-interactable if the expression is read-only,
+                    // non-interactable if the expression is not assignable,
                     UI.Field(() => floatValue + 1f),
 
-                    // interactable If onValuedChanged callback is present
-                    UI.Field(
-                        targetExpression: () => floatValue + 1f,
-                        onValueChanged: f => floatValue = f - 1f
+                    // interactable if (label,readValue,writeValue) style
+                    UI.Field($"{nameof(floatValue)}  + 1f",
+                        () => floatValue + 1f,
+                        f => floatValue = f - 1f
                     ),
 
                     // Supports public member
@@ -126,15 +124,17 @@ namespace RosettaUI.Example
                     UI.Field(() => elementCreator),
                     
                     
-                    UI.Fold("ReadOnly"
-                        , UI.Label("Use ReadOnly if you only want to display the value and not change it")
-                        , UI.FieldReadOnly(nameof(UI.FieldReadOnly), () => intValue)
+                    UI.Fold("ReadOnly",
+                        UI.Label("ReadOnly: only display the value"),
+                        UI.FieldReadOnly(() => intValue),
 
-                        // UI.Field()'s targetExpressions cannot use blocks({}) or local functions(ExpressionTree limitations)
-                        // but UI.FieldReadOnly() can.
+                        // UI.Field()'s targetExpressions cannot use ?.(null-conditional operator), {}(blocks) or local functions(ExpressionTree limitations)
+                        // but UI.FieldReadOnly(label, readValue) and UI.Field(label, readValue, writeValue) can
                         //
-                        // , UI.Field(() => { LocalFunction(); return intValue;}) // compile error
-                        , UI.FieldReadOnly(nameof(UI.FieldReadOnly), () =>
+                        // UI.Field(() => stringValue?.Length), // compile error
+                        // UI.Field(() => { LocalFunction(); return intValue;}) // compile error
+                        
+                        UI.FieldReadOnly(nameof(UI.FieldReadOnly), () =>
                         {
                             LocalFunction();
                             return intValue;

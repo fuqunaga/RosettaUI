@@ -5,67 +5,92 @@ namespace RosettaUI
 {
     public static partial class UI
     {
-        public static Element Slider<T>(Expression<Func<T>> targetExpression, T max, Action<T> onValueChanged = null)
-        {
-            return Slider(targetExpression, default, max, onValueChanged);
-        }
+        public static Element Slider<T>(Expression<Func<T>> targetExpression)
+            => Slider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression);
+
+        public static Element Slider<T>(Expression<Func<T>> targetExpression, T max)
+            => Slider(targetExpression, default, max);
 
 
-        public static Element Slider<T>(Expression<Func<T>> targetExpression, T min, T max, Action<T> onValueChanged = null)
-        {
-            return Slider(ExpressionUtility.CreateLabelString(targetExpression),
+        public static Element Slider<T>(Expression<Func<T>> targetExpression, T min, T max)
+            => Slider(ExpressionUtility.CreateLabelString(targetExpression),
                 targetExpression,
-                ConstGetter.Create(min),
-                ConstGetter.Create(max),
-                onValueChanged);
-        }
+                min,
+                max
+            );
 
-        public static Element Slider<T>(Expression<Func<T>> targetExpression, Action<T> onValueChanged = null)
+
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression)
         {
-            return Slider(ExpressionUtility.CreateLabelString(targetExpression),
-                targetExpression,
-                null,
-                null,
-                onValueChanged);
+            var (rangeMinGetter, rangeMaxGetter) = CreateMinMaxGetterFromRangeAttribute(targetExpression);
+            return Slider(label, CreateBinder(targetExpression), rangeMinGetter, rangeMaxGetter);
         }
-
-
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T max, Action<T> onValueChanged = null)
+        
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T max)
         {
-            return Slider(label, targetExpression, default, max, onValueChanged);
+            return Slider(label, targetExpression, default, max);
         }
 
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T min, T max, Action<T> onValueChanged = null)
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T min, T max)
         {
             return Slider(label,
-                targetExpression,
+                CreateBinder(targetExpression),
                 ConstGetter.Create(min),
-                ConstGetter.Create(max),
-                onValueChanged);
+                ConstGetter.Create(max)
+                );
         }
+        
+        
+        public static Element Slider<T>(LabelElement label, Func<T> readValue, Action<T> writeValue) 
+            => Slider(label, Binder.Create(readValue, writeValue), null, null);
 
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, Action<T> onValueChanged = null)
+        public static Element Slider<T>(LabelElement label, Func<T> readValue, Action<T> writeValue, T max) 
+            => Slider(label, readValue, writeValue, max, default);
+
+        public static Element Slider<T>(LabelElement label, Func<T> readValue, Action<T> writeValue, T min, T max)
         {
-            return Slider(label, targetExpression, null, null, onValueChanged);
+            return Slider(label, 
+                Binder.Create(readValue, writeValue), 
+                ConstGetter.Create(min), 
+                ConstGetter.Create(max));
         }
 
-        public static Element Slider<T>(LabelElement label,
-            Expression<Func<T>> targetExpression,
-            IGetter minGetter,
-            IGetter maxGetter,
-            Action<T> onValueChanged = null)
+        
+
+        public static Element SliderReadOnly<T>(Expression<Func<T>> targetExpression)
         {
-            var binder = CreateBinder(targetExpression, onValueChanged);
-            if (minGetter == null || maxGetter == null)
-            {
-                var (rangeMinGetter, rangeMaxGetter) = CreateMinMaxGetterFromRangeAttribute(targetExpression);
-                minGetter ??= rangeMinGetter;
-                maxGetter ??= rangeMaxGetter;
-            }
-
-            return Slider(label, binder, minGetter, maxGetter);
+            var (rangeMinGetter, rangeMaxGetter) = CreateMinMaxGetterFromRangeAttribute(targetExpression);
+            return Slider(ExpressionUtility.CreateLabelString(targetExpression),
+                CreateReadOnlyBinder(targetExpression),
+                rangeMinGetter,
+                rangeMaxGetter
+            );
         }
 
+        public static Element SliderReadOnly<T>(Expression<Func<T>> targetExpression, T max)
+            => SliderReadOnly(targetExpression, default, max);
+
+        public static Element SliderReadOnly<T>(Expression<Func<T>> targetExpression, T min, T max)
+        {
+            return Slider(ExpressionUtility.CreateLabelString(targetExpression),
+                CreateReadOnlyBinder(targetExpression),
+                ConstGetter.Create(min),
+                ConstGetter.Create(max)
+            );
+        }
+
+
+        public static Element SliderReadOnly<T>(LabelElement label, Func<T> readValue)
+            => Slider(label, Binder.Create(readValue, null), null, null);
+        
+        public static Element SliderReadOnly<T>(LabelElement label, Func<T> readValue, T max)
+            => SliderReadOnly(label, readValue, default, max);
+
+        public static Element SliderReadOnly<T>(LabelElement label, Func<T> readValue, T min, T max)
+            => Slider(label, readValue, null, min, max);
+        
+        
+        
         public static Element Slider(LabelElement label, IBinder binder, IGetter minGetter, IGetter maxGetter)
         {
             var contents = BinderToElement.CreateSliderElement(label, binder, minGetter, maxGetter);

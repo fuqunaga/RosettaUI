@@ -6,15 +6,17 @@ namespace RosettaUI
 {
     public static partial class UI
     {
-        static IBinder<T> CreateBinder<T>(Expression<Func<T>> targetExpression, Action<T> onValueChanged)
+        static IBinder<T> CreateReadOnlyBinder<T>(Expression<Func<T>> targetExpression)
         {
-            var binder = ExpressionUtility.CreateBinder(targetExpression);
-            if (binder != null)
-            {
-                binder.onValueChanged += onValueChanged;
-            }
-
-            return binder;
+            return Binder.Create(
+                ExpressionUtility.CreateGetter(targetExpression),
+                null
+            );
+        }
+        
+        static IBinder<T> CreateBinder<T>(Expression<Func<T>> targetExpression)
+        {
+            return ExpressionUtility.CreateBinder(targetExpression);
         }
 
 

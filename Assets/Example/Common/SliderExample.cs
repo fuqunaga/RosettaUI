@@ -20,7 +20,7 @@ namespace RosettaUI.Example
         public SimpleClass simpleClass;
 
         public string stringValue;
-        [Range(-100f, 100f)] public float rangeValue;
+        [Range(-1f, 1f)] public float rangeValue;
 
         public Element CreateElement()
         {
@@ -45,18 +45,17 @@ namespace RosettaUI.Example
                 , UI.Fold("Usage"
                     , UI.Slider("CustomLabel", () => floatValue)
                     , UI.Slider("Custom min max", () => floatValue, -1f, 2f)
-                    , UI.Slider("Custom min max", () => vector2Value, Vector2.zero, new Vector2(360f, 100f)) 
-                    , UI.Slider("onValueChanged",
-                        targetExpression: () => floatValue,
-                        onValueChanged: f => print($"{nameof(floatValue)} changed."))
+                    , UI.Slider("Custom min max", () => vector2Value, Vector2.one * -1, Vector2.one) 
+                    , UI.Slider("ValueChangedCallback", targetExpression: () => floatValue)
+                        .RegisterValueChangeCallback(() =>  print($"{nameof(floatValue)} changed."))
 
                     // non-interactable if the expression is read-only,
                     , UI.Slider(() => floatValue + 0.1f)
 
-                    // interactable If onValuedChanged callback is present
-                    , UI.Slider(
-                        targetExpression: () => floatValue + 0.1f,
-                        onValueChanged: f => floatValue = f - 0.1f
+                    // interactable if (label,readValue,writeValue) style
+                    , UI.Slider($"{nameof(floatValue)} + 0.1f",
+                        () => floatValue + 0.1f,
+                        f => floatValue = f - 0.1f
                     )
 
                     // Supports public member

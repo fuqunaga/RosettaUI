@@ -51,7 +51,7 @@ namespace RosettaUI
             IGetter<T> maxGetter,
             Action<MinMax<T>> onValueChanged = null)
         {
-            var binder = CreateBinder(targetExpression, onValueChanged);
+            var binder = CreateBinder(targetExpression);
             return MinMaxSlider(label, binder, minGetter, maxGetter);
         }
 

@@ -11,6 +11,7 @@ namespace RosettaUI.Example
 
         public float floatValue;
         public int intValue;
+        public bool boolValue;
 
         public UICustomClass uiCustomClass;
 
@@ -102,6 +103,8 @@ namespace RosettaUI.Example
                             )
                         )
                     )
+                    , UI.Fold(UI.Field("CustomBar", () => boolValue), null)
+                    , UI.Fold(UI.Button("LeftBar"), UI.Button("RightBar"), null)
                     , UI.Label(nameof(UI.ScrollView))
                     , UI.ScrollView(
                         Enumerable.Range(0, 100).Select(i => UI.Field("Count", () => i.ToString()))
@@ -116,6 +119,10 @@ namespace RosettaUI.Example
                         )
                     )
                 )
+                , UI.Fold("ChildValueChangedCallback",
+                    UI.Field(() => intValue),
+                    UI.Field(() => floatValue)
+                ).RegisterValueChangeCallback(e => Debug.Log($"OnChildValueChanged"))
                 , UI.Fold("FindObject"
                     , UI.WindowLauncher<BehaviourExample>()
                     , UI.FieldIfObjectFound<BehaviourExample>()

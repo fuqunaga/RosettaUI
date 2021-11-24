@@ -66,10 +66,7 @@ namespace RosettaUI
                     .Contains(typeof(IList<>));
         }
 
-        public static bool IsReadOnly(IBinder binder)
-        {
-            return GetIList(binder)?.IsReadOnly ?? false;
-        }
+        public static bool IsReadOnly(IBinder binder) => binder.IsReadOnly || (GetIList(binder)?.IsReadOnly ?? false);
 
 
         public static void DuplicateItem(IBinder binder, int index)

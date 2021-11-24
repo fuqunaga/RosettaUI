@@ -7,20 +7,36 @@ namespace RosettaUI
 {
     public static partial class UI
     {
-        public static Element List<T>(Expression<Func<IList<T>>> targetExpression, Func<IBinder<T>, int, Element> createItemElement = null)
+        public static Element List<T>(Expression<Func<IList<T>>> targetExpression, Func<IBinder<T>, int, Element> createItemElement = null) 
+            => List(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, createItemElement);
+
+        public static Element List<T>(LabelElement label, Expression<Func<IList<T>>> targetExpression, Func<IBinder<T>, int, Element> createItemElement = null) 
+            => List(label, ExpressionUtility.CreateBinder(targetExpression), createItemElement);
+
+        public static Element List<T>(LabelElement label, Func<IList<T>> readValue, Action<IList<T>> writeValue, Func<IBinder<T>, int, Element> createItemElement = null) 
+            => List(label, Binder.Create(readValue, writeValue), createItemElement);
+
+        public static Element ListReadOnly<T>(Expression<Func<IList<T>>> targetExpression, Func<IBinder<T>, int, Element> createItemElement = null)
         {
             var labelString = ExpressionUtility.CreateLabelString(targetExpression);
-            return List(labelString, targetExpression, createItemElement);
+            var binder = CreateReadOnlyBinder(targetExpression);
+            return List(labelString, binder, createItemElement);
         }
         
-        public static Element List<T>(LabelElement label, Expression<Func<IList<T>>> targetExpression, Func<IBinder<T>, int, Element> createItemElement = null)
+        public static Element ListReadOnly<T>(LabelElement label, Func<IList<T>> readValue, Func<IBinder<T>, int, Element> createItemElement = null)
         {
-            var binder = ExpressionUtility.CreateBinder(targetExpression);
+            var binder = Binder.Create(readValue, null);
+            return List(label, binder, createItemElement);
+        }
+        
+
+        public static Element List<T>(LabelElement label, IBinder listBinder, Func<IBinder<T>, int, Element> createItemElement = null)
+        {
             var createItemElementIBinder = createItemElement == null
                 ? (Func<IBinder, int, Element>)null
                 : (ib, idx) => createItemElement(ib as IBinder<T>, idx);
 
-            return List(label, binder, createItemElementIBinder);
+            return List(label, listBinder, createItemElementIBinder);
         }
 
         public static Element List(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null)
@@ -65,7 +81,8 @@ namespace RosettaUI
 
                     var itemBinderToElement = createItemElement;
 
-                    if (!ListBinder.IsReadOnly(listBinder))
+                    var isReadOnly = ListBinder.IsReadOnly(listBinder);
+                    if (!isReadOnly)
                     {
                         itemBinderToElement = (binder,idx) => {
                             var element = Popup(
@@ -83,7 +100,7 @@ namespace RosettaUI
 
                     return Column(
                         ListBinder.CreateItemBinders(listBinder).Select(itemBinderToElement)
-                    );
+                    ).SetInteractable(!isReadOnly);
                 });
         }
     }

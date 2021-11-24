@@ -8,6 +8,7 @@ namespace RosettaUI.Example
     {
         public int dropDownIndex;
         public List<int> listValue = new[] {1, 2, 3}.ToList();
+        public int[] arrayValue = new[] {1, 2, 3};
 
         public float floatValue;
         public int intValue;
@@ -51,25 +52,34 @@ namespace RosettaUI.Example
                     () => dropDownIndex,
                     options: new[] {"One", "Two", "Three"},
                     onValueChanged: idx => print($"{nameof(UI.DropdownReadOnly)} index[{idx}] selected")
-                )
+                ),
                 
-                , UI.Fold("List"
-                    , UI.List(
+                UI.Fold("List",
+                    UI.List(
+                        () => arrayValue,
+                        (itemBinder, idx) => UI.Row(
+                            UI.Field("Item " + idx, itemBinder),
+                            UI.Button("+", () => arrayValue[idx]++),
+                            UI.Button("-", () => arrayValue[idx]--)
+                        )
+                    ),
+                    UI.List(
                         () => listValue,
                         (itemBinder, idx) => UI.Row(
-                            UI.Field("Item " + idx, itemBinder)
-                            , UI.Button("+", () => listValue[idx]++)
-                            , UI.Button("-", () => listValue[idx]--)
+                            UI.Field("Item " + idx, itemBinder),
+                            UI.Button("+", () => listValue[idx]++),
+                            UI.Button("-", () => listValue[idx]--)
                         )
-                    )
-                    , UI.List("ReadOnlyList",
+                    ),
+                    UI.List("ReadOnlyList",
                         () => listValue.AsReadOnly(),
                         (itemBinder, idx) => UI.Row(
-                            UI.Field("Item " + idx, itemBinder)
-                            , UI.Button("+", () => listValue[idx]++)
-                            , UI.Button("-", () => listValue[idx]--)
+                            UI.Field("Item " + idx, itemBinder),
+                            UI.Button("+", () => listValue[idx]++),
+                            UI.Button("-", () => listValue[idx]--)
                         )
-                    )
+                    ),
+                    UI.ListReadOnly(() => listValue)
                 )
                 , UI.Popup(
                     UI.Box(UI.Label($"{nameof(UI.Popup)}(Right click)")),

@@ -32,7 +32,7 @@ namespace RosettaUI.Builder
                     uiObj = func(element);
                     RegisterUIObj(element, uiObj);
 
-                    Initialize(uiObj, element);
+                    Initialize(element, uiObj);
                 }
                 else
                 {
@@ -43,7 +43,7 @@ namespace RosettaUI.Builder
             return uiObj;
         }
 
-        protected virtual void Initialize(TUIObj uiObj, Element element)
+        protected virtual void Initialize(Element element, TUIObj uiObj)
         {
             element.enableRx.SubscribeAndCallOnce((enable) => OnElementEnableChanged(element, uiObj, enable));
             element.interactableRx.SubscribeAndCallOnce((interactable) => OnElementInteractableChanged(element, uiObj, interactable));

@@ -52,9 +52,9 @@ namespace RosettaUI.UGUI.Builder
                 return Build(element);
             }
 
-            protected override void Initialize(GameObject uiObj, Element element)
+            protected void Initialize(GameObject uiObj, Element element)
             {
-                base.Initialize(uiObj, element);
+                base.Initialize(element, uiObj);
 
                 SetLayerRecursive(uiObj.transform, layer);
 

@@ -28,7 +28,7 @@ namespace RosettaUI
             _setter = setter;
         }
 
-        public override bool IsReadOnly => _setter == null && base.IsReadOnly;
+        public override bool IsReadOnly => _setter == null;
 
         protected override void SetInternal(T t)
         {

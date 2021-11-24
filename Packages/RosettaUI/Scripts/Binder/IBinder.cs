@@ -12,7 +12,6 @@ namespace RosettaUI
 
     public interface IBinder<T> : IBinder, IGetter<T>
     {
-        event Action<T> onValueChanged;
         void Set(T v);
     }
 
@@ -30,13 +29,9 @@ namespace RosettaUI
             this.getter = getter;
         }
 
-        public event Action<T> onValueChanged;
-
         public void Set(T v)
         {
             if (!IsConst) SetInternal(v);
-
-            onValueChanged?.Invoke(v);
         }
 
         protected abstract void SetInternal(T t);
@@ -62,7 +57,7 @@ namespace RosettaUI
 
         #region IBinder
 
-        public virtual bool IsReadOnly => onValueChanged == null;
+        public abstract bool IsReadOnly { get; }
 
         public virtual object GetObject()
         {

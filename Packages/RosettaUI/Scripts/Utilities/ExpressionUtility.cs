@@ -24,16 +24,32 @@ namespace RosettaUI
 
         static Binder<T> _CreateBinder<T>(Expression<Func<T>> expression)
         {
+            var type = typeof(T);
             var getFunc = expression.Compile();
 
             Action<T> setFunc = null;
-            var p = Expression.Parameter(typeof(T));
-
+            var p = Expression.Parameter(type);
+            
+            // for UI.List()
+            // 
+            //   var array = new int[];
+            //   UI.List(() => array);
+            
+            // T is IList<int>
+            // bodyType is System.Int32[]
+            // 
+            // so without casting, the setter will be null.
+            var bodyType = expression.Body.Type;
+            var rightHand = (type == bodyType)
+                ? (Expression)p
+                : Expression.Convert(p, bodyType);
+            
+            
             // check writable
             // hint code https://stackoverflow.com/questions/42773488/how-can-i-find-out-if-an-expression-is-writeable
             try
             {
-                var lambdaExpr = Expression.Lambda<Action<T>>(Expression.Assign(expression.Body, p), p);
+                var lambdaExpr = Expression.Lambda<Action<T>>(Expression.Assign(expression.Body, rightHand), p);
                 setFunc = lambdaExpr.Compile();
             }
             catch (Exception)

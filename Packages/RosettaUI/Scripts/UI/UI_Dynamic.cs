@@ -10,16 +10,15 @@ namespace RosettaUI
     {
         #region DynamicElement
 
-        public static DynamicElement DynamicElementIf(Func<bool> trigger, Func<Element> build)
+        public static DynamicElement DynamicElementIf(Func<bool> condition, Func<Element> build)
         {
             return DynamicElementOnStatusChanged(
-                trigger,
+                condition,
                 flag => flag ? build() : null
             );
         }
 
         public static DynamicElement DynamicElementOnStatusChanged<T>(Func<T> readStatus, Func<T, Element> build)
-            where T : IEquatable<T>
         {
             return DynamicElement.Create(readStatus, build);
         }
@@ -65,8 +64,8 @@ namespace RosettaUI
             // 起動時に多くのFindObjectObserverElementが呼ばれるとFindObject()を呼ぶタイミングがかぶって重いのでランダムで散らす
             var interval = Random.Range(1f, 1.5f);
 
-            return DynamicElementIf(
-                trigger: () =>
+            return DynamicElementOnStatusChanged(
+                readStatus: () =>
                 {
                     if (target == null)
                     {
@@ -78,10 +77,9 @@ namespace RosettaUI
                         }
                     }
 
-                    return target != null && !(target is Behaviour {isActiveAndEnabled: false});
+                    return target is Behaviour {isActiveAndEnabled: false} ? null : target;
                 },
-                build: () => build?.Invoke(target)
-            );
+                build: tgt => tgt != null ? build?.Invoke(tgt) : null);
         }
 
         #endregion

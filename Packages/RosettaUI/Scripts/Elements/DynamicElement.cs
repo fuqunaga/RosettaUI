@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace RosettaUI
@@ -10,7 +11,6 @@ namespace RosettaUI
     public class DynamicElement : ElementGroup
     {
         public static DynamicElement Create<T>(Func<T> readStatus, Func<T, Element> buildWithStatus, string displayName = null)
-            where T : IEquatable<T>
         {
             var status = readStatus();
 
@@ -19,7 +19,7 @@ namespace RosettaUI
                 e =>
                 {
                     var newStatus = readStatus();
-                    var rebuild = !newStatus.Equals(status);
+                    var rebuild = !EqualityComparer<T>.Default.Equals(newStatus, status);
                     if (rebuild) status = newStatus;
                     return rebuild;
                 },

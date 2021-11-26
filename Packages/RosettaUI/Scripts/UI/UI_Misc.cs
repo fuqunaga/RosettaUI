@@ -34,32 +34,29 @@ namespace RosettaUI
         
         #region Dropdown
 
-        public static DropdownElement Dropdown(Expression<Func<int>> targetExpression, IEnumerable<string> options,
-            Action<int> onValueChanged = null)
-        {
-            return Dropdown(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, options,
-                onValueChanged);
-        }
+        public static DropdownElement Dropdown(Expression<Func<int>> targetExpression, IEnumerable<string> options) 
+            => Dropdown(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, options);
 
-        public static DropdownElement Dropdown(LabelElement label, Expression<Func<int>> targetExpression,
-            IEnumerable<string> options, Action<int> onValueChanged = null)
-        {
-            var binder = CreateBinder(targetExpression);
-            return Dropdown(label, binder, options, onValueChanged);
-        }
+        public static DropdownElement Dropdown(LabelElement label, Expression<Func<int>> targetExpression, IEnumerable<string> options) 
+            => Dropdown(label, CreateBinder(targetExpression), options);
 
-        public static DropdownElement Dropdown(LabelElement label, IBinder<int> binder, IEnumerable<string> options, Action<int> onValueChanged = null)
+        public static DropdownElement Dropdown(LabelElement label, IBinder<int> binder, IEnumerable<string> options)
         {
             var element = new DropdownElement(label, binder, options);
             SetInteractableWithBinder(element, binder);
             return element;
         }
 
-        public static DropdownElement DropdownReadOnly(LabelElement label, Func<int> getValue,
-            IEnumerable<string> options, Action<int> onValueChanged = null)
-        {
-            return Dropdown(label, Binder.Create(getValue, onValueChanged), options, onValueChanged);
-        }
+        public static DropdownElement Dropdown(LabelElement label, Func<int> readValue, Action<int> writeValue, IEnumerable<string> options) 
+            => Dropdown(label, Binder.Create(readValue, writeValue), options);
+
+        
+        public static DropdownElement DropdownReadOnly(Expression<Func<int>> targetExpression, IEnumerable<string> options)
+            => Dropdown(ExpressionUtility.CreateLabelString(targetExpression), CreateReadOnlyBinder(targetExpression),
+                options);
+
+        public static DropdownElement DropdownReadOnly(LabelElement label, Func<int> readValue, IEnumerable<string> options) 
+            => Dropdown(label, Binder.Create(readValue, null), options);
 
         #endregion
 

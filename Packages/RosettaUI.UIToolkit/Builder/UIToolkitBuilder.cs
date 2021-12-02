@@ -67,8 +67,19 @@ namespace RosettaUI.UIToolkit.Builder
         {
             if (!style.HasValue) return;
 
-            if (style.width is { } width) ve.style.width = width;
-            if (style.height is { } height) ve.style.height = height;
+            var isFixedSize = false;
+
+            if (style.width is { } width)
+            {
+                ve.style.width = width;
+                isFixedSize = true;
+            }
+
+            if (style.height is { } height)
+            {
+                ve.style.height = height;
+                isFixedSize = true;
+            }
             if (style.minWidth is { } minWidth) ve.style.minWidth = minWidth;
             if (style.minHeight is { } minHeight) ve.style.minHeight = minHeight;
             if (style.maxWidth is { } maxWidth) ve.style.maxWidth = maxWidth;
@@ -77,6 +88,13 @@ namespace RosettaUI.UIToolkit.Builder
             if (style.justify is { } justify)
             {
                 ve.style.justifyContent = justify == Style.Justify.Start ? Justify.FlexStart : Justify.FlexEnd;
+            }
+
+
+            if (isFixedSize)
+            {
+                ve.style.flexGrow = 0;
+                ve.style.flexShrink = 1;
             }
         }
 

@@ -73,10 +73,13 @@ namespace RosettaUI
             var binder = CreateBinder(targetExpression);
             return MinMaxSlider(label, binder, minGetter, maxGetter);
         }
-
+        
         public static Element MinMaxSlider(LabelElement label, IBinder binder, IGetter minGetter, IGetter maxGetter)
+            => MinMaxSlider(label, binder, new SliderOption() {minGetter = minGetter, maxGetter = maxGetter});
+
+        public static Element MinMaxSlider(LabelElement label, IBinder binder, SliderOption option)
         {
-            var contents = BinderToElement.CreateMinMaxSliderElement(label, binder, minGetter, maxGetter);
+            var contents = BinderToElement.CreateMinMaxSliderElement(label, binder, option);
             if (contents == null) return null;
 
             SetInteractableWithBinder(contents, binder);

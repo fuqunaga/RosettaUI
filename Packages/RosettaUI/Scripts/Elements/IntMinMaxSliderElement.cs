@@ -2,11 +2,8 @@
 {
     public class IntMinMaxSliderElement : MinMaxSliderElement<int>
     {
-        public IntMinMaxSliderElement(LabelElement label, IBinder<MinMax<int>> binder, IGetter<int> minGetter, IGetter<int> maxGetter)
-            : base(label, binder,
-                minGetter ?? IntSliderElement.MinGetterDefault,
-                maxGetter ?? IntSliderElement.MaxGetterDefault
-                )
+        public IntMinMaxSliderElement(LabelElement label, IBinder<MinMax<int>> binder, SliderOption<int> option)
+            : base(label, binder, option.SetMinMaxGetterIfNotExist(IntSliderElement.MinGetterDefault,IntSliderElement.MaxGetterDefault))
         {
         }
     }

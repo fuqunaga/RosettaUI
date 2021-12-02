@@ -1,10 +1,18 @@
 ﻿namespace RosettaUI
 {
-    public abstract class SliderElement<T> : RangeFieldElement<T, T>
+    public abstract class SliderElement<T> : SliderBaseElement<T, T>
+    {
+        public SliderElement(LabelElement label, IBinder<T> binder, SliderOption<T> option) 
+            : base(label, binder, option)
+        {
+        }
+    }
+    
+    public abstract class SliderBaseElement<T, TRange> : RangeFieldElement<T, TRange>
     {
         public readonly bool showInputField;
         
-        public SliderElement(LabelElement label, IBinder<T> binder, SliderOption<T> option) 
+        public SliderBaseElement(LabelElement label, IBinder<T> binder, SliderOption<TRange> option) 
             : base(label, binder, option.minGetter, option.maxGetter)
         {
             this.showInputField = option.showInputField;

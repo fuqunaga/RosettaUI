@@ -1,12 +1,9 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-
-namespace RosettaUI
+﻿namespace RosettaUI
 {
-    public abstract class MinMaxSliderElement<T> : RangeFieldElement<MinMax<T>, T>
+    public abstract class MinMaxSliderElement<T> : SliderBaseElement<MinMax<T>, T>
     {
-        public MinMaxSliderElement(LabelElement label, IBinder<MinMax<T>> binder, IGetter<T> minGetter, IGetter<T> maxGetter)
-            : base(label, binder, minGetter, maxGetter)
+        public MinMaxSliderElement(LabelElement label, IBinder<MinMax<T>> binder, SliderOption<T> option)
+            : base(label, binder, option)
         {
         }
     }

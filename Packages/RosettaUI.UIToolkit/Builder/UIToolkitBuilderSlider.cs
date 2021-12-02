@@ -35,37 +35,35 @@ namespace RosettaUI.UIToolkit.Builder
             where TTextField : TextInputBaseField<T>, new()
         {
             if (toValue == null) throw new ArgumentNullException(nameof(toValue));
-
-            var minTextField = new TTextField();
-            var maxTextField = new TTextField();
-
-            var sliderElement = (MinMaxSliderElement<T>) element;
-
-
-            var slider = new MinMaxSlider();
-#if false
-            slider.Bind(sliderElement,
-                elementValueToFieldValue: minMax => new Vector2(toFloat(minMax.min), toFloat(minMax.max)),
-                fieldValueToElementValue: vec2 => MinMax.Create(toValue(vec2.x), toValue(vec2.y))
-            );
             
-              
-            slider.RegisterValueChangedCallback(evt =>
+            var sliderElement = (MinMaxSliderElement<T>) element;
+            
+            var slider = new MinMaxSlider();
+            SetupLabelCallback(slider, sliderElement);
+
+
+            TTextField minTextField = null;
+            TTextField maxTextField = null;
+            if (sliderElement.showInputField)
             {
-                var vec2 = evt.newValue;
-                minTextField.SetValueWithoutNotify(toValue(vec2.x));
-                maxTextField.SetValueWithoutNotify(toValue(vec2.y));
-            });
-#else
+                minTextField = new TTextField();
+                maxTextField = new TTextField();
+
+                minTextField.RegisterValueChangedCallback((evt) => slider.minValue = toFloat(evt.newValue));
+                maxTextField.RegisterValueChangedCallback((evt) => slider.maxValue = toFloat(evt.newValue));
+
+                minTextField.AddToClassList(UssClassName.MinMaxSliderTextField);
+                maxTextField.AddToClassList(UssClassName.MinMaxSliderTextField);
+            }
+            
 
             sliderElement.SubscribeValueOnUpdateCallOnce(minMax =>
                 {
                     var min = toFloat(minMax.min);
                     var max = toFloat(minMax.max);
-                    
+
                     slider.SetValueWithoutNotifyIfNotEqual(new Vector2(min, max));
-                    minTextField.SetValueWithoutNotifyIfNotEqual(minMax.min);
-                    maxTextField.SetValueWithoutNotifyIfNotEqual(minMax.max);
+                    UpdateMinMaxTextField(minMax.min, minMax.max);
                 }
             );
 
@@ -76,36 +74,31 @@ namespace RosettaUI.UIToolkit.Builder
                 var max = toValue(vec2.y);
                 
                 sliderElement.OnViewValueChanged(MinMax.Create(min, max));
-                
-                minTextField.SetValueWithoutNotify(min);
-                maxTextField.SetValueWithoutNotify(max);
+                UpdateMinMaxTextField(min, max);
             });
-#endif
-            
-
-            SetupLabelCallback(slider, sliderElement);
-            
 
             InitRangeFieldElement(sliderElement,
                 (min) => slider.lowLimit = toFloat(min),
                 (max) => slider.highLimit = toFloat(max)
             );
 
-            minTextField.RegisterValueChangedCallback((evt) => slider.minValue = toFloat(evt.newValue));
-            maxTextField.RegisterValueChangedCallback((evt) => slider.maxValue = toFloat(evt.newValue));
-
-
             var row = CreateRowVisualElement();
-
             row.AddToClassList(UssClassName.MinMaxSlider);
-            minTextField.AddToClassList(UssClassName.MinMaxSliderTextField);
-            maxTextField.AddToClassList(UssClassName.MinMaxSliderTextField);
-
             row.Add(slider);
             row.Add(minTextField);
             row.Add(maxTextField);
 
             return row;
+
+            
+            void UpdateMinMaxTextField(T min, T max)
+            {
+                if (sliderElement.showInputField)
+                {
+                    minTextField.SetValueWithoutNotifyIfNotEqual(min);
+                    maxTextField.SetValueWithoutNotifyIfNotEqual(max);
+                }
+            }
         }
 
 

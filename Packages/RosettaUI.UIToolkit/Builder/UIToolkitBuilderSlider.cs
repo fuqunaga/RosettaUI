@@ -21,7 +21,7 @@ namespace RosettaUI.UIToolkit.Builder
                 (max) => slider.highValue = max
             );
 
-            slider.showInputField = true;
+            slider.showInputField = sliderElement.showInputField;
             return slider;
         }
 

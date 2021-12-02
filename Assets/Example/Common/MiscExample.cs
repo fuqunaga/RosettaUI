@@ -50,8 +50,7 @@ namespace RosettaUI.Example
                 )
                 , UI.DropdownReadOnly($"{nameof(UI.DropdownReadOnly)}(selection index will not change)",
                     () => dropDownIndex,
-                    options: new[] {"One", "Two", "Three"},
-                    onValueChanged: idx => print($"{nameof(UI.DropdownReadOnly)} index[{idx}] selected")
+                    options: new[] {"One", "Two", "Three"}
                 ),
                 
                 UI.Fold("List",

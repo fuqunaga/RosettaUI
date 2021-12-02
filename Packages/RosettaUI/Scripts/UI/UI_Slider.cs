@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using UnityEngine.UI;
 
 namespace RosettaUI
 {
@@ -88,12 +89,15 @@ namespace RosettaUI
 
         public static Element SliderReadOnly<T>(LabelElement label, Func<T> readValue, T min, T max)
             => Slider(label, readValue, null, min, max);
-        
-        
-        
+
+
+
         public static Element Slider(LabelElement label, IBinder binder, IGetter minGetter, IGetter maxGetter)
+            => Slider(label, binder, new SliderOption() {minGetter = minGetter, maxGetter = maxGetter});
+        
+        public static Element Slider(LabelElement label, IBinder binder, SliderOption option)
         {
-            var contents = BinderToElement.CreateSliderElement(label, binder, minGetter, maxGetter);
+            var contents = BinderToElement.CreateSliderElement(label, binder, option);
             if (contents == null) return null;
 
             SetInteractableWithBinder(contents, binder);

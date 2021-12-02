@@ -83,6 +83,20 @@ namespace RosettaUI
             return element;
         }
 
+
+        public static Element RegisterUpdateCallback(this Element element, Action<Element> onUpdate)
+        {
+            element.onUpdate += onUpdate;
+            return element;
+        }
+
+        public static Element UnregisterUpdateCallback(this Element element, Action<Element> onUpdate)
+        {
+            element.onUpdate -= onUpdate;
+            return element;
+        }
+        
+        
         public static FoldElement SetOpenFlag(this FoldElement fold, bool flag)
         {
             fold.IsOpen = flag;

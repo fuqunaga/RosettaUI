@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace RosettaUI
 {
@@ -119,41 +120,54 @@ namespace RosettaUI
 
         #region Slider
 
-        public static Element CreateSliderElement(LabelElement label, IBinder binder, IGetter minGetter, IGetter maxGetter)
+        public static Element CreateSliderElement(LabelElement label, IBinder binder, SliderOption option)
         {
             return binder switch
             {
-                IBinder<int> bb => new IntSliderElement(label, bb, (IGetter<int>) minGetter, (IGetter<int>) maxGetter),
+                IBinder<int> bb => new IntSliderElement(label, bb, option.Cast<int>()),
                 IBinder<uint> bb => new IntSliderElement(label,
                     new CastBinder<uint, int>(bb),
-                    CastGetter.Create<uint, int>((IGetter<uint>) minGetter),
-                    CastGetter.Create<uint, int>((IGetter<uint>) maxGetter)
+                    CreateOptionUintToInt(option)
                 ),
-                IBinder<float> bb => new FloatSliderElement(label,
-                    bb,
-                    (IGetter<float>) minGetter,
-                    (IGetter<float>) maxGetter
+                IBinder<float> bb => new FloatSliderElement(label, bb, option.Cast<float>()
                 ),
-                _ => CreateCompositeSliderElement(label, binder, minGetter, maxGetter)
+                _ => CreateCompositeSliderElement(label, binder, option)
                      ?? CreateFieldElement(label, binder)
             };
+
+            static SliderOption<int> CreateOptionUintToInt(SliderOption option)
+            {
+                return new SliderOption<int>()
+                {
+                    minGetter = CastGetter.Create<uint, int>((IGetter<uint>) option.minGetter),
+                    maxGetter = CastGetter.Create<uint, int>((IGetter<uint>) option.maxGetter),
+                    showInputField = option.showInputField
+                };
+            }
         }
 
 
-        private static Element CreateCompositeSliderElement(LabelElement label, IBinder binder, IGetter minGetter,
-            IGetter maxGetter)
+        private static Element CreateCompositeSliderElement(LabelElement label, IBinder binder, SliderOption option)
         {
-            return _CreateCompositeSliderElementBase(label, binder,
+            return _CreateCompositeSliderElementBase(
+                label,
+                binder,
                 binder.ValueType,
                 fieldName =>
                 {
                     var fieldLabel = UICustom.ModifyPropertyOrFieldLabel(binder.ValueType, fieldName);
                     var fieldBinder = PropertyOrFieldBinder.Create(binder, fieldName);
-                    var fieldMinGetter = PropertyOrFieldGetter.Create(minGetter, fieldName);
-                    var fieldMaxGetter = PropertyOrFieldGetter.Create(maxGetter, fieldName);
+                    
+                    var fieldOption = new SliderOption(option)
+                    {
+                        minGetter = PropertyOrFieldGetter.Create(option.minGetter, fieldName),
+                        maxGetter = PropertyOrFieldGetter.Create(option.maxGetter, fieldName),
+                    };
 
-                    return UI.Slider(fieldLabel, fieldBinder, fieldMinGetter, fieldMaxGetter);
-                });
+
+                    return UI.Slider(fieldLabel, fieldBinder, fieldOption);
+                }
+            );
         }
 
         #endregion

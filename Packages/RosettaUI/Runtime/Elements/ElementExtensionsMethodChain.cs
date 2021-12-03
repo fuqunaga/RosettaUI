@@ -22,54 +22,47 @@ namespace RosettaUI
         public static T SetWidth<T>(this T element, float width)
             where T : Element
         {
-            element.Style.width = width;
+            element.Style.Width = width;
             return element;
         }
 
         public static T SetHeight<T>(this T element, float height)
             where T : Element
         {
-            element.Style.height = height;
+            element.Style.Height = height;
             return element;
         }
 
         public static Element SetMinWidth(this Element element, float minWidth)
         {
-            element.Style.minWidth = minWidth;
+            element.Style.MinWidth = minWidth;
             return element;
         }
 
         public static Element SetMinHeight(this Element element, float minHeight)
         {
-            element.Style.minHeight = minHeight;
+            element.Style.MinHeight = minHeight;
             return element;
         }
         
         public static Element SetMaxWidth(this Element element, float maxWidth)
         {
-            element.Style.maxWidth = maxWidth;
+            element.Style.MaxWidth = maxWidth;
             return element;
         }
 
         public static Element SetMaxHeight(this Element element, float maxHeight)
         {
-            element.Style.maxHeight = maxHeight;
+            element.Style.MaxHeight = maxHeight;
             return element;
         }
 
         public static Element SetColor(this Element element, Color color)
         {
-            element.Style.color = color;
+            element.Style.Color = color;
             return element;
         }
-
-
-        public static Element SetJustify(this Element element, Style.Justify justify)
-        {
-            element.Style.justify = justify;
-            return element;
-        }
-
+        
         public static Element RegisterValueChangeCallback(this Element element, Action onValueChanged)
         {
             element.onViewValueChanged += onValueChanged;

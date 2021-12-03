@@ -188,9 +188,6 @@ namespace RosettaUI.Example
                         , UI.Button($"{nameof(ElementExtensionsMethodChain.SetMaxHeight)}(50f)", null).SetMaxHeight(50f)
                     ).SetHeight(200f)
 #endif
-                    , UI.Row(
-                        UI.Button($"{nameof(ElementExtensionsMethodChain.SetJustify)}(Style.Justify.End)")
-                    ).SetJustify(Style.Justify.End)
                     , UI.Fold(nameof(ElementExtensionsMethodChain.Open), UI.Label("Open")).Open()
                     , UI.Fold(nameof(ElementExtensionsMethodChain.Close), UI.Label("Close")).Close()
                 )

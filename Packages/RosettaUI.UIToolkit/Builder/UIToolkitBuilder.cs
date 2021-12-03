@@ -66,32 +66,25 @@ namespace RosettaUI.UIToolkit.Builder
 
         protected override void OnElementStyleChanged(Element element, VisualElement ve, Style style)
         {
-            if (!style.HasValue) return;
-
             var isFixedSize = false;
 
-            if (style.width is { } width)
+            if (style.Width is { } width)
             {
                 ve.style.width = width;
                 isFixedSize = true;
             }
 
-            if (style.height is { } height)
+            if (style.Height is { } height)
             {
                 ve.style.height = height;
                 isFixedSize = true;
             }
-            if (style.minWidth is { } minWidth) ve.style.minWidth = minWidth;
-            if (style.minHeight is { } minHeight) ve.style.minHeight = minHeight;
-            if (style.maxWidth is { } maxWidth) ve.style.maxWidth = maxWidth;
-            if (style.maxHeight is { } maxHeight) ve.style.maxHeight = maxHeight;
-            if (style.color is { } color) ve.style.color = color;
-            if (style.justify is { } justify)
-            {
-                ve.style.justifyContent = justify == Style.Justify.Start ? Justify.FlexStart : Justify.FlexEnd;
-            }
-
-
+            if (style.MinWidth is { } minWidth) ve.style.minWidth = minWidth;
+            if (style.MinHeight is { } minHeight) ve.style.minHeight = minHeight;
+            if (style.MaxWidth is { } maxWidth) ve.style.maxWidth = maxWidth;
+            if (style.MaxHeight is { } maxHeight) ve.style.maxHeight = maxHeight;
+            if (style.Color is { } color) ve.style.color = color;
+   
             if (isFixedSize)
             {
                 ve.style.flexGrow = 0;

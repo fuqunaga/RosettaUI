@@ -13,7 +13,6 @@ namespace RosettaUI
     {
         public readonly ReactiveProperty<bool> enableRx = new ReactiveProperty<bool>(true);
         public readonly ReactiveProperty<bool> interactableRx = new ReactiveProperty<bool>(true);
-        public readonly ReactiveProperty<Style> styleRx = new ReactiveProperty<Style>(new Style());
 
         public bool UpdateWhenDisabled { get; set; }
         
@@ -34,13 +33,8 @@ namespace RosettaUI
             set => interactableRx.Value = value;
         }
 
-        public Style Style
-        {
-            get => styleRx.Value;
-            set => styleRx.Value = value;
-        }
-
-
+        public Style Style { get; } = new Style();
+        
         public Element Parent { get; internal set; }
 
 

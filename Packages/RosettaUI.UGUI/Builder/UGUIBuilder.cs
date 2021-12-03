@@ -91,6 +91,7 @@ namespace RosettaUI.UGUI.Builder
 
             protected override void OnElementStyleChanged(Element element, GameObject go, Style style)
             {
+#if false
                 if (!style.HasValue) return;
                 {
                     if (!elementToLayoutElement.TryGetValue(element, out var layoutElement))
@@ -116,6 +117,7 @@ namespace RosettaUI.UGUI.Builder
                         }
                     }
                 }
+#endif
             }
 
             protected override void OnRebuildElementGroupChildren(ElementGroup elementGroup)

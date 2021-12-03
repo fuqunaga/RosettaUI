@@ -64,7 +64,7 @@ namespace RosettaUI.Builder
                 element.interactableRx.SubscribeAndCallOnce((interactable) => OnElementInteractableChanged(element, uiObj, interactable));
             }
 
-            element.styleRx.SubscribeAndCallOnce((style) => OnElementStyleChanged(element, uiObj, style));
+            element.Style.SubscribeAndCallOnce((style) => OnElementStyleChanged(element, uiObj, style));
             element.onDestroy += OnDestroyElement;
 
             if (element is ElementGroup elementGroup)

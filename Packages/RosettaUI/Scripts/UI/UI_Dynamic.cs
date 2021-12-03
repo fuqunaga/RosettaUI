@@ -77,7 +77,8 @@ namespace RosettaUI
                         }
                     }
 
-                    return target is Behaviour {isActiveAndEnabled: false} ? null : target;
+                    //return target is Behaviour {isActiveAndEnabled: false} ? null : target;
+                    return target;
                 },
                 build: tgt => tgt != null ? build?.Invoke(tgt) : null);
         }

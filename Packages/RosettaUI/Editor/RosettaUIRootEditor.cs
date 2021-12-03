@@ -4,6 +4,9 @@ using UnityEditor;
 
 namespace RosettaUI.Editors
 {
+    /// <summary>
+    /// Display the Element to be updated in the RosettaUIRoot inspector.
+    /// </summary>
     [CustomEditor(typeof(RosettaUIRoot), true)]
     public class RosettaUIRootEditor : Editor
     {

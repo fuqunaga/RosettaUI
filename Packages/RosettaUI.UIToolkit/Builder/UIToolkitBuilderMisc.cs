@@ -13,6 +13,24 @@ namespace RosettaUI.UIToolkit.Builder
             return ve;
         }
         
+        private static VisualElement Build_Image(Element element)
+        {
+            var imageElement = (ImageElement) element;
+            var ve = new Image
+            {
+                scaleMode = ScaleMode.ScaleToFit,
+                style =
+                {
+                    alignSelf = Align.FlexStart
+                }
+            };
+
+            imageElement.SubscribeValueOnUpdateCallOnce(tex => ve.image = tex);
+            
+            return ve;
+        }
+
+        
         private static Button Build_Button(Element element)
         {
             var buttonElement = (ButtonElement) element;

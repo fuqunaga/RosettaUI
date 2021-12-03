@@ -33,7 +33,6 @@ namespace RosettaUI
             return element;
         }
 
-#if false
         public static Element SetMinWidth(this Element element, float minWidth)
         {
             element.Style.minWidth = minWidth;
@@ -57,7 +56,6 @@ namespace RosettaUI
             element.Style.maxHeight = maxHeight;
             return element;
         }
-#endif        
 
         public static Element SetColor(this Element element, Color color)
         {

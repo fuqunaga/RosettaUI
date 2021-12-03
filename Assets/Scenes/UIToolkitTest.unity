@@ -215,11 +215,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dropDownIndex: 0
   listValue: 010000000200000003000000
+  arrayValue: 010000000200000003000000
   floatValue: 0
   intValue: 0
+  boolValue: 0
   uiCustomClass:
     floatValue: 0
   dynamicElementIf: 0
+  texture: {fileID: 2800000, guid: f8fa76ac67c34254da2b9c9b263733c3, type: 3}
 --- !u!1 &590657662
 GameObject:
   m_ObjectHideFlags: 0
@@ -452,6 +455,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c1a79f2a71f11a4798ceb8c3e616401, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  simpleClass:
+    floatValue: 0
+    stringValue: 
+  vector2Value: {x: 0, y: 0}
 --- !u!1 &852668082
 GameObject:
   m_ObjectHideFlags: 0

@@ -41,6 +41,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(LogSlider)] = Build_LogSlider,
                 */
                 [typeof(SpaceElement)] = Build_Space,
+                [typeof(ImageElement)] = Build_Image,
                 [typeof(ButtonElement)] = Build_Button,
                 [typeof(FoldElement)] = Build_Fold,
                 [typeof(DynamicElement)] = Build_DynamicElement,

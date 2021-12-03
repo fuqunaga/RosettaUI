@@ -18,6 +18,8 @@ namespace RosettaUI.Example
 
         public bool dynamicElementIf;
 
+        public Texture texture;
+
         public Element CreateElement()
         {
             string nullString = null;
@@ -35,14 +37,20 @@ namespace RosettaUI.Example
                 );
             });
 
+            
             return UI.Column(
                 UI.Row(
                     UI.Label($"{nameof(UI.Space)} >")
                     , UI.Space()
                     , UI.Label($"< {nameof(UI.Space)}")
-                )
+                ),
                 
-                , UI.Button(nameof(UI.Button), () => print("On button clicked"))
+                UI.Row(
+                    UI.Label(nameof(UI.Image)),
+                    UI.Image(() => texture).SetMaxWidth(200f).SetMaxHeight(200f)
+                ),
+                
+                UI.Button(nameof(UI.Button), () => print("On button clicked"))
                 
                 , UI.Dropdown(nameof(UI.Dropdown),
                     () => dropDownIndex,

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using UnityEngine;
 
 namespace RosettaUI
 {
@@ -13,6 +14,19 @@ namespace RosettaUI
         
         #endregion
         
+        
+        #region Image
+
+        public static ImageElement Image(Texture texture)
+            => Image(ConstGetter.Create(texture));
+        
+        public static ImageElement Image(Func<Texture> readValue)
+            => Image(Getter.Create(readValue));
+
+        public static ImageElement Image(IGetter<Texture> getter)
+            => new ImageElement(getter);
+        
+        #endregion
         
         #region Button
 

@@ -91,7 +91,8 @@ namespace RosettaUI.UIToolkit
             closeButton = new CloseButton();
             closeButton.clicked += Hide;
 
-            RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
+            RegisterCallback<PointerDownEvent>(OnPointerDownTrickleDown, TrickleDown.TrickleDown);
+            RegisterCallback<PointerDownEvent>(OnPointerDown);
             RegisterCallback<MouseMoveEvent>(OnMouseMove);
             RegisterCallback<MouseOutEvent>(OnMouseOut);
         }
@@ -99,29 +100,26 @@ namespace RosettaUI.UIToolkit
 
         #region Event
 
+        protected virtual void OnPointerDownTrickleDown(PointerDownEvent evt)
+        {
+            BringToFront();
+        }
+
         protected virtual void OnPointerDown(PointerDownEvent evt)
         {
-            if (evt.tricklesDown)
+            if (evt.button == 0)
             {
-                BringToFront();
-            }
-
-            if (evt.bubbles)
-            {
-                if (evt.button == 0)
+                if (resizeEdge != ResizeEdge.None)
                 {
-                    if (resizeEdge != ResizeEdge.None)
-                    {
-                        StartResizeWindow();
-                    }
-                    else
-                    {
-                        StartDragWindow(evt.localPosition);
-                    }
-
-                    RegisterPanelCallback();
-                    evt.StopPropagation();
+                    StartResizeWindow();
                 }
+                else
+                {
+                    StartDragWindow(evt.localPosition);
+                }
+
+                RegisterPanelCallback();
+                evt.StopPropagation();
             }
         }
 

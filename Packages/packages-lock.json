@@ -61,7 +61,7 @@
     },
     "com.unity.textcore": {
       "version": "1.0.0-preview.3",
-      "depth": 1,
+      "depth": 2,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -98,7 +98,7 @@
     },
     "com.unity.ui": {
       "version": "1.0.0-preview.16",
-      "depth": 0,
+      "depth": 1,
       "source": "registry",
       "dependencies": {
         "nuget.moq": "1.0.0",
@@ -134,14 +134,14 @@
     },
     "nuget.castle-core": {
       "version": "1.0.1",
-      "depth": 1,
+      "depth": 2,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "nuget.moq": {
       "version": "1.0.0",
-      "depth": 1,
+      "depth": 2,
       "source": "registry",
       "dependencies": {
         "nuget.castle-core": "1.0.1"

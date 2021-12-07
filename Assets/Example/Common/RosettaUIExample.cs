@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace RosettaUI.Example
 {
@@ -18,11 +19,17 @@ namespace RosettaUI.Example
         private Element CreateElement()
         {
             _rootElement = UI.Window(
+                UI.Label(nameof(Label)),
+                UI.Label(nameof(Label))
+                
+
+#if false
                 UI.WindowLauncher<FieldExample>()
                 , UI.WindowLauncher<SliderExample>()
                 , UI.WindowLauncher<MinMaxSliderExample>()
                 , UI.WindowLauncher<MiscExample>()
                 , UI.WindowLauncher<UICustomExample>()
+#endif
             );
 
             return _rootElement;

@@ -3,6 +3,7 @@
     --fixed-field-width-s: 80px;
     --slider-min-width: 248px;
     --cursor-resize-horizontal: resource("cursor_ew");
+    font-size: 18px;
 }
 
 /********************************************************************************
@@ -11,6 +12,7 @@
 .unity-label{
     padding-top: 2px;
     padding-bottom: 3px;
+    color: #BCBCBC;
 }
 .unity-base-field {
     flex-grow: 1;

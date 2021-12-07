@@ -5,7 +5,6 @@
   "description": "Code-based multi gui interface for UI Toolkit",
   "unity": "2020.3",
   "dependencies": {
-    "com.unity.ui": "1.0.0-preview.16",
     "ga.fuquna.rosettaui": "0.0.0"
   },
   "author": {

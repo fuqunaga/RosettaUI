@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+#if false
 namespace RosettaUI.UIToolkit.PackageInternal
 {
     /// <summary>
@@ -217,3 +218,4 @@ namespace RosettaUI.UIToolkit.PackageInternal
         }
     }
 }
+#endif

@@ -7,13 +7,14 @@ namespace RosettaUI.UIToolkit.PackageInternal
     {
         public ClampFreeSlider()
         {
-            clamped = false;
+            //clamped = false;
         }
         
+        /*
         internal override float SliderNormalizeValue(float currentValue, float lowerValue, float higherValue)
         {
             return Mathf.Clamp01((currentValue - lowerValue) / (higherValue - lowerValue));
         }
-
+        */
     }
 }

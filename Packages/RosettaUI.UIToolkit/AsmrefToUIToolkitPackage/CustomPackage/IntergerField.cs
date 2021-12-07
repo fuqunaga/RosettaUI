@@ -1,10 +1,27 @@
-using System;
-using System.Globalization;
-using UnityEngine;
+#define AvoidInternal
+
+
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.PackageInternal
 {
+    #if AvoidInternal
+
+    public class IntegerField : TextInputBaseField<int>
+    {
+        public bool isUnsigned { get; set; }
+        
+        public IntegerField() : this(null, -1, char.MinValue, null)
+        {
+        }
+
+        protected IntegerField(string label, int maxLength, char maskChar, TextInputBase textInputBase) : base(label, maxLength, maskChar, textInputBase)
+        {
+        }
+    }
+    
+    #else
+    
     /// <summary>
     /// Makes a text field for entering an integer.
     /// </summary>
@@ -78,12 +95,15 @@ namespace RosettaUI.UIToolkit.PackageInternal
         /// Constructor.
         /// </summary>
         /// <param name="maxLength">Maximum number of characters the field can take.</param>
-        public IntegerField(string label, int maxLength = kMaxLengthNone)
+        
+        // TODO: internal
+        public IntegerField(string label, int maxLength = /*kMaxLengthNone*/-1)
             : base(label, maxLength, new IntegerInput())
         {
             AddToClassList(ussClassName);
             labelElement.AddToClassList(labelUssClassName);
-            visualInput.AddToClassList(inputUssClassName);
+            // TODO: internal
+            //visualInput.AddToClassList(inputUssClassName);
             AddLabelDragger<int>();
         }
 
@@ -140,4 +160,5 @@ namespace RosettaUI.UIToolkit.PackageInternal
             protected override int StringToValue(string str) => parentIntegerField.StringToValue(str);
         }
     }
+    #endif
 }

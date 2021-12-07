@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using Cursor = UnityEngine.UIElements.Cursor;
 
 namespace RosettaUI.UIToolkit
 {
@@ -32,18 +31,10 @@ namespace RosettaUI.UIToolkit
             };
         }
 
-        public static Cursor GetCursor(CursorType cursorType)
+        public static CursorData.Data GetCursor(CursorType cursorType)
         {
-            if (CursorTable.TryGetValue(cursorType, out var data))
-            {
-                return new Cursor()
-                {
-                    texture = data.tex,
-                    hotspot = data.hotspot
-                };
-            }
-
-            return default;
+            CursorTable.TryGetValue(cursorType, out var data);
+            return data;
         }
     }
 }

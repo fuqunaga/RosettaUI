@@ -182,7 +182,8 @@ namespace RosettaUI.UIToolkit.PackageInternal
                 dragging = false;
                 m_DragElement.ReleasePointer(pointerId);
                 if (evt is IMouseEvent)
-                    m_DragElement.panel.ProcessPointerCapture(PointerId.mousePointerId);
+                    //TODO: internal
+                    //m_DragElement.panel.ProcessPointerCapture(PointerId.mousePointerId);
 
 #if CommentOutForRuntime
                 EditorGUIUtility.SetWantsMouseJumping(0);

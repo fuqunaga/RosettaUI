@@ -24,7 +24,9 @@ namespace RosettaUI.UIToolkit.PackageInternal
         private new static readonly string labelUssClassName = ussClassName + "__label";
         private new static readonly string inputUssClassName = ussClassName + "__input";
 
-        ColorInput colorInput => (ColorInput)visualInput;
+        // TODO: internal
+        //ColorInput colorInput => (ColorInput)visualInput;
+        private ColorInput colorInput { get; } = new ColorInput();
 
         public event Action<Vector2, ColorField> showColorPickerFunc;
 
@@ -42,9 +44,12 @@ namespace RosettaUI.UIToolkit.PackageInternal
         {
             AddToClassList(ussClassName);
             labelElement.AddToClassList(labelUssClassName);
+            
+            // TODO : internal
+            /*
             visualInput.AddToClassList(inputUssClassName);
-
             visualInput.RegisterCallback<ClickEvent>(OnClick);
+            */
         }
 
         public override void SetValueWithoutNotify(Color color)

@@ -1,7 +1,8 @@
-using System;
+#define AvoidInternal
+
+
 using UnityEngine;
 using UnityEngine.UIElements;
-
 
 namespace RosettaUI.UIToolkit.PackageInternal
 {
@@ -52,6 +53,7 @@ namespace RosettaUI.UIToolkit.PackageInternal
         void StopDragging();
     }
 
+#if !AvoidInternal
     /// <summary>
     /// Base class for text fields.
     /// </summary>
@@ -170,6 +172,7 @@ namespace RosettaUI.UIToolkit.PackageInternal
             }
         }
 
+#if !AvoidInternal
         // Implements a control with a value of type T backed by a text.
         /// <summary>
         /// This is the inner representation of the Text input.
@@ -338,7 +341,9 @@ namespace RosettaUI.UIToolkit.PackageInternal
                 }
             }
         }
+#endif
     }
+#endif
 
     // Derive from BaseFieldTraits in order to not inherit from TextInputBaseField UXML attributes.
     /// <summary>

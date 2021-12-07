@@ -4,6 +4,14 @@ using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.PackageInternal
 {
+#if true
+    // TODO: not implement
+    public class PopupField<T>
+    {
+        
+    }
+    
+#else
     /// <summary>
     /// Generic popup selection field.
     /// </summary>
@@ -182,4 +190,5 @@ namespace RosettaUI.UIToolkit.PackageInternal
             value = menuItem;
         }
     }
+#endif
 }

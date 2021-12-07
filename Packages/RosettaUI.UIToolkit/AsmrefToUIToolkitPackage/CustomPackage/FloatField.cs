@@ -1,6 +1,13 @@
+#define AvoidInternal
+
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.UIElements;
+
+
+
+
+#if !AvoidInternal
 
 namespace RosettaUI.UIToolkit.PackageInternal
 {
@@ -74,6 +81,7 @@ namespace RosettaUI.UIToolkit.PackageInternal
         /// Constructor.
         /// </summary>
         /// <param name="maxLength">Maximum number of characters the field can take.</param>
+        
         public FloatField(string label, int maxLength = kMaxLengthNone)
             : base(label, maxLength, new FloatInput())
         {
@@ -133,3 +141,4 @@ namespace RosettaUI.UIToolkit.PackageInternal
         }
     }
 }
+#endif

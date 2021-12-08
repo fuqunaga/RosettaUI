@@ -19,13 +19,8 @@ namespace RosettaUI.Example
         private Element CreateElement()
         {
             _rootElement = UI.Window(
-                UI.Label(nameof(Label)),
-                UI.Label(nameof(Label)),
-                UI.Label(nameof(Label)),
-                UI.Button(nameof(UI.Button))
-
-#if false
                 UI.WindowLauncher<FieldExample>()
+#if false
                 , UI.WindowLauncher<SliderExample>()
                 , UI.WindowLauncher<MinMaxSliderExample>()
                 , UI.WindowLauncher<MiscExample>()

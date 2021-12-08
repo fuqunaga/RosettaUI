@@ -19,7 +19,7 @@ namespace RosettaUI.UIToolkit
 
         public ModalWindow() : base(false)
         {
-            closeButton = new CloseButton();
+            closeButton = new WindowTitleButton();
             closeButton.clicked += Hide;
             closeButton.visible = false;
 

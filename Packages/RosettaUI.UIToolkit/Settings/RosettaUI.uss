@@ -3,6 +3,7 @@
     --fixed-field-width-s: 80px;
     --slider-min-width: 248px;
     --cursor-resize-horizontal: resource("cursor_ew");
+    --close-icon: resource("close");
     font-size: 18px;
 }
 
@@ -11,7 +12,7 @@
 ********************************************************************************/
 .unity-label{
     padding-top: 2px;
-    padding-bottom: 3px;
+    padding-bottom: 2px;
     color: #BCBCBC;
 }
 .unity-base-field {
@@ -90,14 +91,18 @@
 * Window
 ********************************************************************************/
 .rosettaui-window {
+    --window-border-width: 8px;
+    --window-border-width-inverse: -8px;
+    
     background-color: rgba(50, 50, 50, 0.9);
     position: absolute;
     border-radius: 1px;
-    border-width: 4px;
-    padding-left: 15px;
+    border-width: var(--window-border-width);
+    /*padding-left: 15px;*/
 }
 
 .rosettaui-window__titlebar-container {
+    margin: var(--window-border-width-inverse) var(--window-border-width-inverse) 0px var(--window-border-width-inverse);
     flex-direction: row;
 }
 
@@ -106,11 +111,21 @@
     margin-left: auto;
 }
 
-.rosettaui-closebutton {
-    border-width: 0;
-    border-radius: 0;
-    align-self: flex-end;
+.rosettaui-window-title-button {
+    padding: 4px 20px;
+    height: 100%;
+    align-items: center;
 }
+.rosettaui-window-title-button:hover {
+    background-color: #D01010;
+}
+
+.rosettaui-window-title-button__icon {
+    background-image: var(--close-icon);
+    width: 16px;
+    height: 16px;
+}
+
 
 /********************************************************************************
 * Modal Window

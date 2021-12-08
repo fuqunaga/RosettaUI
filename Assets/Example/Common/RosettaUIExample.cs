@@ -20,8 +20,9 @@ namespace RosettaUI.Example
         {
             _rootElement = UI.Window(
                 UI.Label(nameof(Label)),
-                UI.Label(nameof(Label))
-                
+                UI.Label(nameof(Label)),
+                UI.Label(nameof(Label)),
+                UI.Button(nameof(UI.Button))
 
 #if false
                 UI.WindowLauncher<FieldExample>()

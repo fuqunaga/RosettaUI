@@ -88,7 +88,7 @@ namespace RosettaUI.UIToolkit
             titleBarContainer.Add(titleBarContainerRight);
             Add(titleBarContainer);
 
-            closeButton = new CloseButton();
+            closeButton = new WindowTitleButton();
             closeButton.clicked += Hide;
 
             RegisterCallback<PointerDownEvent>(OnPointerDownTrickleDown, TrickleDown.TrickleDown);

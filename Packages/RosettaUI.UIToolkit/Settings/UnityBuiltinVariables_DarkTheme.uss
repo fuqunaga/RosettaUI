@@ -1,0 +1,141 @@
+ /*https://docs.unity3d.com/Manual/UIE-USS-UnityVariables.html */
+:root {
+/*metrics*/
+    --unity-metrics-default-border_radius: 3px;
+    --unity-metrics-inspector_titlebar-height: 22px;
+    --unity-metrics-single_line-height: 18px;
+    --unity-metrics-single_line_large-height: 2 s0px;
+    --unity-metrics-single_line_small-height: 16px;
+    --unity-metrics-toolbar-height: 21px;
+    --unity-metrics-toolbar_button-height: 20px;
+/*colors*/
+    /*alternated_rows*/
+    --unity-colors-alternated_rows-background: #3F3F3F;
+    /*app_toolbar*/
+    --unity-colors-app_toolbar-background: #191919;
+    /* app_toolbar_button*/
+    --unity-colors-app_toolbar_button-background: #383838;
+    --unity-colors-app_toolbar_button-background-checked: #6A6A6A;
+    --unity-colors-app_toolbar_button-background-hover: #424242;
+    --unity-colors-app_toolbar_button-background-pressed: #6A6A6A;
+    --unity-colors-app_toolbar_button-border: #191919;
+    --unity-colors-app_toolbar_button-border_accent: #222222;
+    /*box*/
+    --unity-colors-box-background: rgba(40, 40, 40, 0.3019608);
+    --unity-colors-box-border: transparent;
+    /*button*/
+    --unity-colors-button-background: #585858;
+    --unity-colors-button-background-focus: #6E6E6E;
+    --unity-colors-button-background-hover: #676767;
+    --unity-colors-button-background-pressed: #353535;
+    --unity-colors-button-border: #303030;
+    --unity-colors-button-border_accent: #242424;
+    --unity-colors-button-border-pressed: #0D0D0D;
+    --unity-colors-button-text: #EEEEEE;
+    /*default*/
+    --unity-colors-default-background: #282828;
+    --unity-colors-default-border: #232323;
+    --unity-colors-default-text: #D2D2D2;
+    --unity-colors-default-text-hover: #BDBDBD;
+    /*dropdown*/
+    --unity-colors-dropdown-background: #515151;
+    --unity-colors-dropdown-background-hover: #585858;
+    --unity-colors-dropdown-border: #303030;
+    --unity-colors-dropdown-border_accent: #242424;
+    --unity-colors-dropdown-text: #E4E4E4;
+    /*error*/
+    --unity-colors-error-text: #D32222;
+    /*helpbox*/
+    --unity-colors-helpbox-background: rgba(96, 96, 96, 0.2039216);
+    --unity-colors-helpbox-border: #232323;
+    --unity-colors-helpbox-text: #BDBDBD;
+    /*highlight*/
+    --unity-colors-highlight-background: #2C5D87;
+    --unity-colors-highlight-background-hover: rgba(256, 256, 256, 0.0627451);
+    --unity-colors-highlight-background-inactive: #4D4D4D;
+    --unity-colors-highlight-text: #4C7EFF;
+    --unity-colors-highlight-text-inactive: #FFFFFF;
+    /*input_field*/
+    --unity-colors-input_field-background: #2A2A2A;
+    --unity-colors-input_field-border: #212121;
+    --unity-colors-input_field-border_accent: #0D0D0D;
+    --unity-colors-input_field-border-focus: #3A79BB;
+    --unity-colors-input_field-border-hover: #656565;
+    /*inspector_titlebar*/
+    --unity-colors-inspector_titlebar-background: #3E3E3E;
+    --unity-colors-inspector_titlebar-background-hover: #474747;
+    --unity-colors-inspector_titlebar-border: #1A1A1A;
+    --unity-colors-inspector_titlebar-border_accent: #303030;
+    /*label*/
+    --unity-colors-label-text: #C4C4C4;
+    --unity-colors-label-text-focus: #81B4FF;
+    /*link*/
+    --unity-colors-link-text: #4C7EFF;
+    /*object_field*/
+    --unity-colors-object_field-background: #282828;
+    --unity-colors-object_field-border: #202020;
+    --unity-colors-object_field-border-focus: #3A79BB;
+    --unity-colors-object_field-border-hover: #656565;
+    /*object_field_button*/
+    --unity-colors-object_field_button-background: #373737;
+    --unity-colors-object_field_button-background-hover: #4C4C4C;
+    /*play_mode*/
+    --unity-colors-play_mode-background: #606060;
+    /*popup*/
+    --unity-colors-popup-background: #313131;
+    /*preview*/
+    --unity-colors-preview-background: #313131;
+    --unity-colors-preview-border: #232323;
+    --unity-colors-preview-text: #BDBDBD;
+    /*preview_overlay*/
+    --unity-colors-preview_overlay-text: #DEDEDE;
+    /*progress*/
+    --unity-colors-progress-background: #303030;
+    /*scrollbar_button*/
+    --unity-colors-scrollbar_button-background: rgba(0, 0, 0, 0.05098039);
+    --unity-colors-scrollbar_button-background-hover: #494949;
+    /*scrollbar_groove*/
+    --unity-colors-scrollbar_groove-background: rgba(0, 0, 0, 0.05098039);
+    --unity-colors-scrollbar_groove-border: rgba(0, 0, 0, 0.1019608);
+    /*scrollbar_thumb*/
+    --unity-colors-scrollbar_thumb-background: #5F5F5F;
+    --unity-colors-scrollbar_thumb-background-hover: #686868;
+    --unity-colors-scrollbar_thumb-border: #323232;
+    --unity-colors-scrollbar_thumb-border-hover: #686868;
+    /*slider_groove*/
+    --unity-colors-slider_groove-background: #5E5E5E;
+    --unity-colors-slider_groove-background-disabled: #575757;
+    /*slider_thumb*/
+    --unity-colors-slider_thumb-background: #999999;
+    --unity-colors-slider_thumb-background-disabled: #666666;
+    --unity-colors-slider_thumb-background-hover: #EAEAEA;
+    --unity-colors-slider_thumb-border: #999999;
+    --unity-colors-slider_thumb-border-disabled: #666666;
+    /*slider_thumb_halo*/
+    --unity-colors-slider_thumb_halo-background: rgba(16, 111, 205, 0.5019608);
+    /*tab*/
+    --unity-colors-tab-background: #353535;
+    --unity-colors-tab-background-checked: #3C3C3C;
+    --unity-colors-tab-background-hover: #303030;
+    --unity-colors-tab-text: #BDBDBD;
+    /*toolbar*/
+    --unity-colors-toolbar-background: #3C3C3C;
+    --unity-colors-toolbar-border: #232323;
+    /*toolbar_button*/
+    --unity-colors-toolbar_button-background: #3C3C3C;
+    --unity-colors-toolbar_button-background-checked: #505050;
+    --unity-colors-toolbar_button-background-focus: #464646;
+    --unity-colors-toolbar_button-background-hover: #464646;
+    --unity-colors-toolbar_button-border: #232323;
+    --unity-colors-toolbar_button-text: #C4C4C4;
+    --unity-colors-toolbar_button-text-checked: #C4C4C4;
+    --unity-colors-toolbar_button-text-hover: #BDBDBD;
+    /*visited_link*/
+    --unity-colors-visited_link-text: #FF00FF;
+    /*warning*/
+    --unity-colors-warning-text: #F4BC02;
+    /*window*/
+    --unity-colors-window-background: #383838;
+    --unity-colors-window-border: #242424;
+    --unity-colors-window-text: #BDBDBD
+}

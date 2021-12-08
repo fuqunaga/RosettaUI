@@ -5,85 +5,12 @@
     --cursor-resize-horizontal: resource("cursor_ew");
     --close-icon: resource("close");
     font-size: 18px;
-}
+    --window-color: rgba(45,45,45,0.9);
+    
+    /* builtin values darktheme */
+    /* https://docs.unity3d.com/Manual/UIE-USS-UnityVariables.html */
 
-/********************************************************************************
-* override unity css
-********************************************************************************/
-.unity-label{
-    padding-top: 2px;
-    padding-bottom: 2px;
-    color: #BCBCBC;
-}
-.unity-base-field {
-    flex-grow: 1;
-}
-
-.unity-base-field__input {
-    cursor: arrow;
-    flex-grow: 1;
-}
-
-.unity-foldout
-{
-    flex-shrink: 0;
-}
-
-.unity-foldout__toggle {
-    margin-left: -15px;
-}
-
-.unity-foldout__toggle .unity-text-element
-{
-    margin-left: 1px
-}
-
-.unity-foldout__toggle .unity-text-element,
-.unity-toggle__label
-{
-    padding-top: 2px;
-    padding-bottom: 3px;
-}
-
-.unity-foldout__toggle > .unity-toggle__input,
-.unity-foldout__toggle .unity-base-field
-{
-    flex-grow: 0;
-}
-
-.unity-base-slider__text-field,
-.rosettaui-min-max-slider__text-field
-{
-    flex-grow: 0;
-    min-width: var(--fixed-field-width-s);
-}
-
-.unity-base-slider--horizontal .unity-base-slider__text-field
-{
-    width: auto;
-}
-
-.unity-base-slider--horizontal .unity-base-slider__drag-container
-{
-    min-width: var(--slider-min-width);
-}
-
-.unity-min-max-slider
-{
-    flex-grow: 1;
-}
-
-.unity-min-max-slider__input
-{
-    min-width: var(--slider-min-width);
-    margin-right: 3px;
-}
-
-.unity-base-field__label--with-dragger,
-.unity-min-max-slider__min-thumb,
-.unity-min-max-slider__max-thumb
-{
-    cursor: var(--cursor-resize-horizontal) 29 4;
+    color: var(--unity-colors-label-text);
 }
 
 
@@ -91,10 +18,10 @@
 * Window
 ********************************************************************************/
 .rosettaui-window {
-    --window-border-width: 8px;
-    --window-border-width-inverse: -8px;
+    --window-border-width: 4px;
+    --window-border-width-inverse: -4px;
     
-    background-color: rgba(50, 50, 50, 0.9);
+    background-color: var(--window-color);
     position: absolute;
     border-radius: 1px;
     border-width: var(--window-border-width);
@@ -115,6 +42,7 @@
     padding: 4px 20px;
     height: 100%;
     align-items: center;
+    flex-direction: row;
 }
 .rosettaui-window-title-button:hover {
     background-color: #D01010;
@@ -122,8 +50,8 @@
 
 .rosettaui-window-title-button__icon {
     background-image: var(--close-icon);
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
 }
 
 
@@ -211,7 +139,7 @@
 ********************************************************************************/
 .rosettaui-window-launcher 
 {
-    margin: 0 0 0 -15px;
+    /*margin: 0 0 0 -15px;*/
     padding: 2px 3px 2px 0;
 }
 
@@ -234,6 +162,8 @@
 {
     -unity-background-image-tint-color: darkgray;
     background-image: resource("RosettaUI_WindowIcon");
+    background-color: transparent;
+    border-color: transparent;
 }
 
 /********************************************************************************

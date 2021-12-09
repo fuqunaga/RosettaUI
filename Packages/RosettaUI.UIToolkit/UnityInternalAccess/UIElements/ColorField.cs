@@ -6,6 +6,7 @@ namespace RosettaUI.UIToolkit.PackageInternal
 {
     public class ColorField : BaseField<Color>
     {
+        /*
         #region Uxml
 
         /// <summary>
@@ -19,7 +20,8 @@ namespace RosettaUI.UIToolkit.PackageInternal
         public new class UxmlTraits : TextValueFieldTraits<float, UxmlFloatAttributeDescription> { }
 
         #endregion
-
+        */
+        
         private new static readonly string ussClassName = "rosettaui-color-field";
         private new static readonly string labelUssClassName = ussClassName + "__label";
         private new static readonly string inputUssClassName = ussClassName + "__input";

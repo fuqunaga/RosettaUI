@@ -1,9 +1,12 @@
-#define AvoidInternal
+//#define AvoidInternal
 
+using RosettaUI.UIToolkit;
 using UnityEngine.UIElements;
+using FloatField = UnityEditor.UIElements.FloatField;
 
 namespace RosettaUI.UIToolkit
 {
+    
 #if AvoidInternal
     public class FloatField : TextInputBaseField<float>
     {

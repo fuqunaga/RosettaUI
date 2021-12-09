@@ -1,16 +1,13 @@
 {
-    "name": "RosettaUI.UIToolkit",
+    "name": "Unity.UIElements",
     "rootNamespace": "",
-    "references": [
-        "GUID:2b1b0416520827b409049c7e4d90bcc1",
-        "GUID:2d4534a5f6b965d4d836067a71671abf"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
-    "autoReferenced": true,
+    "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false

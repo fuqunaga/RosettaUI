@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using RosettaUI.Builder;
 using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine.UIElements;
+using IntegerField = UnityEditor.UIElements.IntegerField;
 
 namespace RosettaUI.UIToolkit.Builder
 {
@@ -25,7 +26,8 @@ namespace RosettaUI.UIToolkit.Builder
                 
                 [typeof(CompositeFieldElement)] = Build_CompositeField,
                 [typeof(LabelElement)] = Build_Label,
-                [typeof(IntFieldElement)] = Build_IntField,
+                [typeof(IntFieldElement)] = Build_Field<int, IntegerField>,
+                [typeof(UIntFieldElement)] = Build_Field<uint, UIntField>,
                 [typeof(FloatFieldElement)] = Build_Field<float, FloatField>,
                 [typeof(TextFieldElement)] = Build_TextField,
                 [typeof(BoolFieldElement)] = Build_Field<bool, Toggle>,

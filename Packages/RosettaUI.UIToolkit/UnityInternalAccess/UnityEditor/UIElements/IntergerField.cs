@@ -144,11 +144,11 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         {
         }
 
-        private class IntegerInput : TextValueField<int>.TextValueInput
+        protected class IntegerInput : TextValueField<int>.TextValueInput
         {
             private IntegerField parentIntegerField => (IntegerField) this.parent;
 
-            internal IntegerInput() => this.formatString = EditorGUI.kIntFieldFormatString;
+            public IntegerInput() => this.formatString = EditorGUI.kIntFieldFormatString;
 
             protected override string allowedCharacters => EditorGUI.s_AllowedCharactersForInt;
 

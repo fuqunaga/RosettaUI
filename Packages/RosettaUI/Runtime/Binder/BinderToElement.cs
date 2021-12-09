@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace RosettaUI
 {
@@ -18,12 +17,12 @@ namespace RosettaUI
                 _ when UICustom.GetElementCreationMethod(valueType) is { } creationFunc => () =>
                     creationFunc.func(binder.GetObject()),
 
-                IBinder<int> bb => () => new IntFieldElement(label, bb),
-                IBinder<uint> bb => () => new IntFieldElement(label, new CastBinder<uint, int>(bb), true),
-                IBinder<float> bb => () => new FloatFieldElement(label, bb),
-                IBinder<string> bb => () => new TextFieldElement(label, bb),
-                IBinder<bool> bb => () => new BoolFieldElement(label, bb),
-                IBinder<Color> bb => () => new ColorFieldElement(label, bb),
+                IBinder<int> ib => () => new IntFieldElement(label, ib),
+                IBinder<uint> ib => () => new UIntFieldElement(label, ib),
+                IBinder<float> ib => () => new FloatFieldElement(label, ib),
+                IBinder<string> ib => () => new TextFieldElement(label, ib),
+                IBinder<bool> ib => () => new BoolFieldElement(label, ib),
+                IBinder<Color> ib => () => new ColorFieldElement(label, ib),
                 _ when binder.ValueType.IsEnum => () => CreateEnumElement(label, binder),
 
                 _ when binder.GetObject() is IElementCreator elementCreator => elementCreator.CreateElement,

@@ -6,14 +6,6 @@ namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        private static VisualElement Build_IntField(Element element)
-        {
-            var intField = Build_Field<int, IntegerField>(element);
-            //intField.isUnsigned = ((IntFieldElement) element).isUnsigned;
-
-            return intField;
-        }
-
         private static VisualElement Build_TextField(Element element)
         {
             var textFieldElement = (TextFieldElement) element;

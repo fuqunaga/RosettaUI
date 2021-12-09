@@ -51,7 +51,8 @@ namespace RosettaUI.Example
                 UI.Field(() => intValue),
                 UI.Field(() => uintValue),
                 UI.Field(() => floatValue),
-                UI.Field(() => stringValue)
+                UI.Field(() => stringValue),
+                UI.Field(() => boolValue)
 #else
                 UI.Fold("Allows any type",
                     UI.Field(() => intValue),

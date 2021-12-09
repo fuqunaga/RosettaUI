@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace RosettaUI.UIToolkit.PackageInternal
+namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
     class NumericFieldDraggerUtility
     {

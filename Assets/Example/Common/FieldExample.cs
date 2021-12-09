@@ -47,9 +47,12 @@ namespace RosettaUI.Example
         {
             SimpleClass nullClass = null;
             return UI.Column(
-                UI.Field(() => stringValue),
-                UI.Field(() => floatValue)
-                #if false
+#if true
+                UI.Field(() => intValue),
+                UI.Field(() => uintValue),
+                UI.Field(() => floatValue),
+                UI.Field(() => stringValue)
+#else
                 UI.Fold("Allows any type",
                     UI.Field(() => intValue),
                     UI.Field(() => uintValue),
@@ -150,7 +153,7 @@ namespace RosettaUI.Example
                     , UI.Field(() => complexClass)
                 )
                 */
-                #endif
+#endif
             );
 
             static void LocalFunction()

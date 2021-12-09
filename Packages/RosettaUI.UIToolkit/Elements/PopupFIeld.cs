@@ -2,7 +2,7 @@
 
 namespace RosettaUI.UIToolkit
 {
-    public class PopupField<T> : PackageInternal.PopupField<T>
+    public class PopupField<T> : UnityInternalAccess.PopupField<T>
     {
 #if !AvoidInternal
         public new class UxmlFactory : UxmlFactory<PopupField<T>, UxmlTraits>

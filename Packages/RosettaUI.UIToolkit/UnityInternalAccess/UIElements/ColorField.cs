@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace RosettaUI.UIToolkit.PackageInternal
+namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
     public class ColorField : BaseField<Color>
     {

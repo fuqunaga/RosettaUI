@@ -1,4 +1,4 @@
-﻿namespace RosettaUI.UIToolkit.PackageInternal
+﻿namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
     public sealed class EditorGUI
     {
@@ -10,5 +10,10 @@
         {
             double.TryParse(str, out num);
         }
+        
+        internal static string kIntFieldFormatString = "#######0";
+        internal static readonly string s_AllowedCharactersForInt = "0123456789-+";
+        
+        internal static bool StringToLong(string str, out long value) => long.TryParse(str, out value);
     }
 }

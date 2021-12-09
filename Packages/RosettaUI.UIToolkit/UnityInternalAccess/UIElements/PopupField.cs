@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
-namespace RosettaUI.UIToolkit.PackageInternal
+namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
 #if true
     // TODO: not implement

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using RosettaUI.Builder;
-using RosettaUI.UIToolkit.PackageInternal;
+using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder

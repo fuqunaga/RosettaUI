@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace RosettaUI.UIToolkit.PackageInternal
+namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
     public interface IValueField<T>
     {

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using RosettaUI.UIToolkit.UnityInternalAccess;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -8,7 +9,7 @@ namespace RosettaUI.UIToolkit.Builder
         private static VisualElement Build_IntField(Element element)
         {
             var intField = Build_Field<int, IntegerField>(element);
-            intField.isUnsigned = ((IntFieldElement) element).isUnsigned;
+            //intField.isUnsigned = ((IntFieldElement) element).isUnsigned;
 
             return intField;
         }

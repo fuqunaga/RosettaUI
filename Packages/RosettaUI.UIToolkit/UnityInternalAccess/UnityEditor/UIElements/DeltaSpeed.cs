@@ -1,4 +1,4 @@
-﻿namespace RosettaUI.UIToolkit.PackageInternal
+﻿namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
     public enum DeltaSpeed
     {

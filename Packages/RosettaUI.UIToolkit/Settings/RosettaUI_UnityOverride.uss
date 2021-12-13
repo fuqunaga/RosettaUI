@@ -1,8 +1,5 @@
-/********************************************************************************
-* override unity css
-********************************************************************************/
 .unity-label{
-    margin: 2px;
+    margin: 1px;
     padding: 2px;
     color: var(--unity-colors-label-text);
 }
@@ -11,24 +8,25 @@
 /*    !*flex-grow: 1;*!*/
 /*}*/
 
-.unity-base-field:focus > .unity-base-field__label {
-    color: var(--unity-colors-highlight-text);
-}
 .unity-base-field__input {
     cursor: arrow;
     flex-grow: 1;
-    padding: 0px 4px;
+    padding: 0 4px;
     border-width: 1px;
     margin-left: 2px;
+    min-width: var(--fixed-field-width-s);
     background-color: var(--unity-colors-input_field-background);
     border-color: var(--unity-colors-input_field-border);
-    min-width: var(--fixed-field-width-s);
     --unity-cursor-color: var(--unity-colors-label-text);
 }
 
 
 .unity-base-field:hover > .unity-base-field__input {
     border-color: var(--unity-colors-input_field-border-hover);
+}
+
+.unity-base-field:focus > .unity-base-field__label {
+    color: var(--unity-colors-highlight-text);
 }
 
 .unity-base-field:focus > .unity-base-field__input {
@@ -89,6 +87,16 @@
     -unity-background-image-tint-color: initial;
 }
 
+
+/********************************************************************************
+* foldout
+********************************************************************************/
+.unity-foldout__toggle > .unity-toggle__input > .unity-toggle__checkmark
+{
+    -unity-background-image-tint-color: var(--gray-button-tint);
+}
+
+/*
 .unity-foldout
 {
     flex-shrink: 0;
@@ -109,12 +117,14 @@
     padding-top: 2px;
     padding-bottom: 3px;
 }
+*/
 
 .unity-foldout__toggle > .unity-toggle__input,
 .unity-foldout__toggle .unity-base-field
 {
     flex-grow: 0;
 }
+
 
 .unity-base-slider__text-field,
 .rosettaui-min-max-slider__text-field

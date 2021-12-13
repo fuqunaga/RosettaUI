@@ -14,22 +14,24 @@
 .unity-base-field:focus > .unity-base-field__label {
     color: var(--unity-colors-highlight-text);
 }
-
 .unity-base-field__input {
     cursor: arrow;
     flex-grow: 1;
     padding: 0px 4px;
     border-width: 1px;
+    margin-left: 2px;
     background-color: var(--unity-colors-input_field-background);
     border-color: var(--unity-colors-input_field-border);
     min-width: var(--fixed-field-width-s);
     --unity-cursor-color: var(--unity-colors-label-text);
 }
 
-.unity-base-text-field:hover > .unity-base-text-field__input {
+
+.unity-base-field:hover > .unity-base-field__input {
     border-color: var(--unity-colors-input_field-border-hover);
 }
-.unity-base-text-field:focus > .unity-base-text-field__input {
+
+.unity-base-field:focus > .unity-base-field__input {
     border-color: var(--unity-colors-input_field-border-focus);
 }
 
@@ -38,7 +40,6 @@
 ********************************************************************************/
 .unity-toggle__input {
     flex-basis: initial;
-    margin-left: 2px;
     border-width: initial;
     padding: initial;
     min-width: auto;
@@ -61,11 +62,6 @@
 /********************************************************************************
 * popup
 ********************************************************************************/
-.unity-base-popup-field__input
-{
-    margin-left: 2px;
-}
-
 .unity-base-popup-field:hover >.unity-base-popup-field__input,
 .unity-base-popup-field:active >.unity-base-popup-field__input
 {
@@ -75,7 +71,7 @@
 
 .unity-base-popup-field__arrow
 {
-    -unity-background-image-tint-color: #A0A0A0;
+    -unity-background-image-tint-color: var(--gray-button-tint);
 }
 
 
@@ -92,13 +88,6 @@
 {
     -unity-background-image-tint-color: initial;
 }
-/*
---unity-colors-dropdown-background: #515151;
---unity-colors-dropdown-background-hover: #585858;
---unity-colors-dropdown-border: #303030;
---unity-colors-dropdown-border_accent: #242424;
---unity-colors-dropdown-text: #E4E4E4;
-*/
 
 .unity-foldout
 {

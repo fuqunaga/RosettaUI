@@ -6,29 +6,11 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
     public class ColorField : BaseField<Color>
     {
-        /*
-        #region Uxml
-
-        /// <summary>
-        /// Instantiates a <see cref="ColorField"/> using the data read from a UXML file.
-        /// </summary>
-        public new class UxmlFactory : UxmlFactory<ColorField, UxmlTraits> { }
-
-        /// <summary>
-        /// Defines <see cref="UxmlTraits"/> for the <see cref="ColorField"/>.
-        /// </summary>
-        public new class UxmlTraits : TextValueFieldTraits<float, UxmlFloatAttributeDescription> { }
-
-        #endregion
-        */
-        
         private new static readonly string ussClassName = "rosettaui-color-field";
         private new static readonly string labelUssClassName = ussClassName + "__label";
         private new static readonly string inputUssClassName = ussClassName + "__input";
-
-        // TODO: internal
-        //ColorInput colorInput => (ColorInput)visualInput;
-        private ColorInput colorInput { get; } = new ColorInput();
+        
+        ColorInput colorInput => (ColorInput)visualInput;
 
         public event Action<Vector2, ColorField> showColorPickerFunc;
 
@@ -37,21 +19,13 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         /// </summary>
         public ColorField() : this(null) { }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="maxLength">Maximum number of characters the field can take.</param>
-        public ColorField(string label)
-            : base(label, new ColorInput())
+        public ColorField(string label) : base(label, new ColorInput())
         {
             AddToClassList(ussClassName);
             labelElement.AddToClassList(labelUssClassName);
             
-            // TODO : internal
-            /*
             visualInput.AddToClassList(inputUssClassName);
             visualInput.RegisterCallback<ClickEvent>(OnClick);
-            */
         }
 
         public override void SetValueWithoutNotify(Color color)

@@ -4,12 +4,10 @@
     --slider-min-width: 248px;
     --cursor-resize-horizontal: resource("cursor_ew");
     --close-icon: resource("close");
-    font-size: 18px;
     --window-color: rgba(45,45,45,0.9);
+    --gray-button-tint: #A0A0A0;
     
-    /* builtin values darktheme */
-    /* https://docs.unity3d.com/Manual/UIE-USS-UnityVariables.html */
-
+    font-size: 18px;
     color: var(--unity-colors-default-text);
 }
 
@@ -52,6 +50,7 @@
     background-image: var(--close-icon);
     width: 14px;
     height: 14px;
+    -unity-background-image-tint-color: var(--gray-button-tint);
 }
 
 
@@ -107,8 +106,7 @@
 * ColorField
 ********************************************************************************/
 .rosettaui-color-field__input {
-    border-width: 1px;
-    border-radius: 3px;
+    padding: 0px;
 }
 
 

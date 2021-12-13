@@ -10,7 +10,7 @@
     /* builtin values darktheme */
     /* https://docs.unity3d.com/Manual/UIE-USS-UnityVariables.html */
 
-    color: var(--unity-colors-label-text);
+    color: var(--unity-colors-default-text);
 }
 
 

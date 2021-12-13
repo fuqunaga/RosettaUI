@@ -1,6 +1,4 @@
-﻿#define AvoidInternal
-
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -50,9 +48,6 @@ namespace RosettaUI.UIToolkit.Builder
             var dropdownElement = (DropdownElement) element;
             var options = dropdownElement.options.ToList();
 
-#if AvoidInternal
-            return null;
-#else
             var field = new PopupField<string>(
                 options,
                 dropdownElement.Value
@@ -69,7 +64,6 @@ namespace RosettaUI.UIToolkit.Builder
             );
 
             return field;
-#endif
         }
         
         private VisualElement Build_PopupElement(Element element)

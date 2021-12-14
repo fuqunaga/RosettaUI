@@ -12,7 +12,6 @@ namespace RosettaUI
         public static IEnumerable<Element> AsEnumerable(this Element element) => new ElementEnumerable(element);
 
         public static IEnumerable<T> Query<T>(this Element element)
-            where T : Element
         {
             foreach(var e in element.AsEnumerable())
             {
@@ -21,6 +20,10 @@ namespace RosettaUI
         }
 
         public static LabelElement FirstLabel(this Element element) => element.Query<LabelElement>().FirstOrDefault();
+        
+        public static LabelElement FirstFieldLabel(this Element element) => element.Query<IFieldElement>().FirstOrDefault()?.Label;
+
+    
 
         public static bool ValidateSingleParent(this Element element)
         {

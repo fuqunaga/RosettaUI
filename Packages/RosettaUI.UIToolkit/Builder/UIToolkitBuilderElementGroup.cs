@@ -38,6 +38,9 @@ namespace RosettaUI.UIToolkit.Builder
             
             var toggle = fold.Q<Toggle>();
             toggle.Add(Build(foldElement.bar));
+            // Foldout直下のToggleはmarginLeftがdefault.uss で書き換わるので上書きしておく
+            // セレクタ例： .unity-foldout--depth-1 > .unity-fold__toggle
+            toggle.style.marginLeft = 0;
             
             foldElement.IsOpenRx.SubscribeAndCallOnce(isOpen => fold.value = isOpen);
             fold.RegisterValueChangedCallback(evt =>

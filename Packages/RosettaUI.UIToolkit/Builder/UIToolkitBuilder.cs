@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using RosettaUI.Builder;
 using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 using FloatField = RosettaUI.UIToolkit.UnityInternalAccess.FloatField;
 using IntegerField = UnityEditor.UIElements.IntegerField;
@@ -58,18 +59,32 @@ namespace RosettaUI.UIToolkit.Builder
 
         protected override void SetTreeViewIndent(Element element, VisualElement uiObj, int indentLevel)
         {
-            var marginLeft = uiObj.resolvedStyle.marginLeft;
-            uiObj.style.marginLeft = marginLeft + indentLevel * LayoutSettings.IndentSize;
-
-            if (element is LabelElement)
+            uiObj.schedule.Execute(() =>
             {
-                uiObj.style.minWidth = Mathf.Max(0f, LayoutSettings.LabelWidth - indentLevel * LayoutSettings.IndentSize);
+                // Foldout自体でインデントしてしまうと子要素すべてがインデントしてしまうので、FoldoutのインデントはToggle部分で行う
+                // インデントは親でまとめて行わず各要素ごとに行う設計
+                if (uiObj is Foldout fold)
+                {
+                    uiObj = fold.Q<Toggle>();
+                }
+                
+                var indentSize = indentLevel * LayoutSettings.IndentSize;
+                var marginLeft = uiObj.resolvedStyle.marginLeft;
+                uiObj.style.marginLeft = marginLeft + indentSize;
 
-                // Foldout直下のラベルはmarginRight、paddingRightがUnityDefaultCommon*.uss で書き換わるので上書きしておく
-                // セレクタ例： .unity-foldout--depth-1 > .unity-base-field > .unity-base-field__label
-                uiObj.style.marginRight = LayoutSettings.LabelMarginRight;
-                uiObj.style.paddingRight = LayoutSettings.LabelPaddingRight;
-            }
+                var label = (element is not Row and not WindowLauncherElement) ? element.FirstFieldLabel() : null;
+                if ( label != null)
+                {
+                    var labelObj = GetUIObj(label);
+                    Assert.IsNotNull(labelObj, $"UIObj is not found. {element.GetType()} > Label[{label.Value}]");
+                    labelObj.style.minWidth = Mathf.Max(0f, LayoutSettings.LabelWidth - indentSize);
+
+                    // Foldout直下のラベルはmarginRight、paddingRightがUnityDefaultCommon*.uss で書き換わるので上書きしておく
+                    // セレクタ例： .unity-foldout--depth-1 > .unity-base-field > .unity-base-field__label
+                    labelObj.style.marginRight = LayoutSettings.LabelMarginRight;
+                    labelObj.style.paddingRight = LayoutSettings.LabelPaddingRight;
+                }
+            });
         }
 
 

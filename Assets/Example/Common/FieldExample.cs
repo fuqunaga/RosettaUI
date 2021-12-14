@@ -48,8 +48,8 @@ namespace RosettaUI.Example
             SimpleClass nullClass = null;
             return UI.Column(
                 UI.Field(() => intValue),
-#if true
-                UI.Fold("FoldTest")
+#if false
+                UI.Field(() => vector2Value)
 #else
                 UI.Fold("Allows any type",
                     UI.Field(() => intValue),

@@ -4,7 +4,7 @@
     /// 値を持ち外部と同期するFieldElement
     /// ラベル付きのReadOnlyValueElement
     /// </summary>
-    public abstract class ReadOnlyFieldElement<T> : ReadOnlyValueElement<T>
+    public abstract class ReadOnlyFieldElement<T> : ReadOnlyValueElement<T>, IFieldElement
     {
         public LabelElement Label { get; protected set; }
 

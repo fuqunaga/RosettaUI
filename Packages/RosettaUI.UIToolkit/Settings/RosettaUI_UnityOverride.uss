@@ -39,6 +39,7 @@
 ********************************************************************************/
 .unity-toggle__input {
     flex-basis: initial;
+    flex-grow: 0;
     border-width: var(--input-border-width);
     padding: initial;
     min-width: auto;
@@ -88,9 +89,11 @@
 ********************************************************************************/
 .unity-foldout__toggle > .unity-toggle__input{
     border-width: 0;
+    margin-left: 0;
 }
 .unity-foldout__toggle > .unity-toggle__input > .unity-toggle__checkmark
 {
+    margin: 0 2px;
     -unity-background-image-tint-color: var(--gray-button-tint);
 }
 
@@ -121,6 +124,11 @@
 .unity-foldout__toggle .unity-base-field
 {
     flex-grow: 0;
+}
+
+
+.unity-foldout__content{
+    margin-left: 0;
 }
 
 

@@ -8,9 +8,7 @@ namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        
-
-        private static VisualElement Build_Slider<T, TSlider>(Element element)
+        private VisualElement Build_Slider<T, TSlider>(Element element)
             where T : IComparable<T>
             where TSlider : BaseSlider<T>, new()
         {
@@ -26,13 +24,13 @@ namespace RosettaUI.UIToolkit.Builder
             return slider;
         }
 
-        static VisualElement Build_MinMaxSlider_Int(Element element) =>
+        VisualElement Build_MinMaxSlider_Int(Element element) =>
             Build_MinMaxSlider<int, IntegerField>(element, (i) => i, (f) => (int) f);
 
-        static VisualElement Build_MinMaxSlider_Float(Element element) =>
+        VisualElement Build_MinMaxSlider_Float(Element element) =>
             Build_MinMaxSlider<float, FloatField>(element, (f) => f, (f) => f);
 
-        private static VisualElement Build_MinMaxSlider<T, TTextField>(Element element, Func<T, float> toFloat, Func<float, T> toValue)
+        private VisualElement Build_MinMaxSlider<T, TTextField>(Element element, Func<T, float> toFloat, Func<float, T> toValue)
             where TTextField : TextInputBaseField<T>, new()
         {
             if (toValue == null) throw new ArgumentNullException(nameof(toValue));
@@ -40,7 +38,7 @@ namespace RosettaUI.UIToolkit.Builder
             var sliderElement = (MinMaxSliderElement<T>) element;
             
             var slider = new MinMaxSlider();
-            SetupLabelCallback(slider, sliderElement);
+            SetupFieldLabel(slider, sliderElement);
 
 
             TTextField minTextField = null;

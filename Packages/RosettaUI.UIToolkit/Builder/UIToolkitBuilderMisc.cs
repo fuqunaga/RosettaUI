@@ -44,7 +44,7 @@ namespace RosettaUI.UIToolkit.Builder
             return button;
         }
 
-        private static VisualElement Build_Dropdown(Element element)
+        private VisualElement Build_Dropdown(Element element)
         {
             var dropdownElement = (DropdownElement) element;
             var options = dropdownElement.options.ToList();
@@ -57,7 +57,7 @@ namespace RosettaUI.UIToolkit.Builder
                 label = dropdownElement.Label.Value
             };
 
-            SetupLabelCallback(field, dropdownElement);
+            SetupFieldLabel(field, dropdownElement);
 
             field.Bind(dropdownElement,
                 elementValueToFieldValue: i => (0 <= i && i < options.Count) ? options[i] : default,

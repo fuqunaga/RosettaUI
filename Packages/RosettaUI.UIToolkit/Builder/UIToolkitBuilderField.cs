@@ -6,7 +6,7 @@ namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        private static VisualElement Build_TextField(Element element)
+        private VisualElement Build_TextField(Element element)
         {
             var textFieldElement = (TextFieldElement) element;
 
@@ -19,7 +19,7 @@ namespace RosettaUI.UIToolkit.Builder
             return textField;
         }
 
-        private static VisualElement Build_ColorField(Element element)
+        private VisualElement Build_ColorField(Element element)
         {
             var colorField = Build_Field<Color, ColorField>(element);
 
@@ -31,13 +31,13 @@ namespace RosettaUI.UIToolkit.Builder
             return colorField;
         }
 
-        private static TField Build_Field<T, TField>(Element element)
+        private TField Build_Field<T, TField>(Element element)
             where TField : BaseField<T>, new()
         {
             return Build_Field<T, TField>(element, true);
         }
         
-        private static TField Build_Field<T, TField>(Element element, bool labelEnable)
+        private TField Build_Field<T, TField>(Element element, bool labelEnable)
             where TField : BaseField<T>, new()
         {
             var fieldBaseElement = (FieldBaseElement<T>) element;
@@ -47,7 +47,7 @@ namespace RosettaUI.UIToolkit.Builder
 
             if (labelEnable)
             {
-                SetupLabelCallback(field, fieldBaseElement);
+                SetupFieldLabel(field, fieldBaseElement);
             }
 
             return field;

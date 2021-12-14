@@ -46,8 +46,7 @@ namespace RosettaUI.Builder
 
         protected virtual void CalcTreeViewIndent(Element element, TUIObj uiObj)
         {
-            var isTarget = element is not ElementGroup or FoldElement;
-            if (isTarget && element.IsLeftMost())
+            if (element.IsTreeViewIndentTarget())
             {
                 SetTreeViewIndent(element, uiObj, element.GetIndentLevel());
             }

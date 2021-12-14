@@ -34,13 +34,15 @@ namespace RosettaUI.UIToolkit.Builder
         }
         
         
-        static void SetupLabelCallback<T, TElementValue>(BaseField<T> field, ReadOnlyFieldElement<TElementValue> fieldBaseElement)
+        void SetupFieldLabel<T, TElementValue>(BaseField<T> field, ReadOnlyFieldElement<TElementValue> fieldBaseElement)
         {
             var labelElement = fieldBaseElement.Label;
             if (labelElement != null)
             {
                 SetupLabelStyle(field.labelElement, labelElement);
                 field.ListenLabel(labelElement);
+
+                RegisterUIObj(labelElement, field.labelElement);
             }
         }
     }

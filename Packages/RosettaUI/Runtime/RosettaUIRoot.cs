@@ -7,11 +7,11 @@ namespace RosettaUI
 {
     public abstract class RosettaUIRoot : MonoBehaviour
     {
-        public readonly ElementUpdater updater = new ElementUpdater();
+        public readonly ElementUpdater updater = new();
 
-        private readonly List<Element> _elements = new List<Element>();
+        private readonly List<Element> _elements = new();
 
-        private readonly Queue<Func<Element>> _createElementOnEnableQueue = new Queue<Func<Element>>();
+        private readonly Queue<Func<Element>> _createElementOnEnableQueue = new();
         
         #region Unity
 

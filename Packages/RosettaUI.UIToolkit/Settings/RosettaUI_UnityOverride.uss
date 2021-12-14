@@ -12,7 +12,8 @@
     cursor: arrow;
     flex-grow: 1;
     padding: 0 4px;
-    border-width: 1px;
+    border-width: var(--input-border-width);
+    border-radius: 3px;
     margin-left: 2px;
     min-width: var(--fixed-field-width-s);
     background-color: var(--unity-colors-input_field-background);
@@ -38,7 +39,7 @@
 ********************************************************************************/
 .unity-toggle__input {
     flex-basis: initial;
-    border-width: initial;
+    border-width: var(--input-border-width);
     padding: initial;
     min-width: auto;
     background-color: initial;
@@ -48,14 +49,8 @@
     -unity-background-image-tint-color: initial;
     background-color: var(--unity-colors-input_field-background);
     border-color: var(--unity-colors-input_field-border);
-    border-width: 1px;
+    border-width: 0;
 }
-
-
-.unity-toggle:hover > .unity-toggle__input > .unity-toggle__checkmark {
-    border-color: var(--unity-colors-input_field-border-hover);
-}
-
 
 /********************************************************************************
 * popup
@@ -91,6 +86,9 @@
 /********************************************************************************
 * foldout
 ********************************************************************************/
+.unity-foldout__toggle > .unity-toggle__input{
+    border-width: 0;
+}
 .unity-foldout__toggle > .unity-toggle__input > .unity-toggle__checkmark
 {
     -unity-background-image-tint-color: var(--gray-button-tint);

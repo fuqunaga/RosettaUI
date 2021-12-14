@@ -2,10 +2,12 @@
     --fixed-field-width-m: 105px;
     --fixed-field-width-s: 80px;
     --slider-min-width: 248px;
+    --input-border-width: 2px;
     --cursor-resize-horizontal: resource("cursor_ew");
     --close-icon: resource("close");
     --window-color: rgba(45,45,45,0.9);
     --gray-button-tint: #A0A0A0;
+    
     
     font-size: 18px;
     color: var(--unity-colors-default-text);

@@ -27,7 +27,8 @@ namespace RosettaUI.UIToolkit.Builder
                 else window.Hide();
             });
 
-            return Build_ElementGroupContents(window, element);
+            Build_ElementGroupContents(window.contentContainer, element);
+            return window;
         }
 
         private VisualElement Build_Fold(Element element)

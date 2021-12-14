@@ -1,4 +1,5 @@
 using System;
+using RosettaUI.Reactive;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -32,15 +33,17 @@ namespace RosettaUI.UIToolkit
 
         public readonly bool resizable;
 
-        static readonly string ussClassName = "rosettaui-window";
-        static readonly string ussClassNameTitleBarContainer = ussClassName + "__titlebar-container";
-        static readonly string ussClassNameTitleBarContainerLeft = ussClassNameTitleBarContainer + "__left";
-        static readonly string ussClassNameTitleBarContainerRight = ussClassNameTitleBarContainer + "__right";
-
-
-        readonly VisualElement titleBarContainer = new VisualElement();
-        readonly VisualElement titleBarContainerLeft = new VisualElement();
-        readonly VisualElement titleBarContainerRight = new VisualElement();
+        static readonly string UssClassName = "rosettaui-window";
+        static readonly string UssClassNameTitleBarContainer = UssClassName + "__titlebar-container";
+        static readonly string UssClassNameTitleBarContainerLeft = UssClassNameTitleBarContainer + "__left";
+        static readonly string UssClassNameTitleBarContainerRight = UssClassNameTitleBarContainer + "__right";
+        static readonly string UssClassNameContentContainer = UssClassName + "__content-container";
+       
+        readonly VisualElement _titleBarContainer = new VisualElement();
+        readonly VisualElement _titleBarContainerLeft = new VisualElement();
+        readonly VisualElement _titleBarContainerRight = new VisualElement();
+        readonly VisualElement _contentContainer = new VisualElement();
+        
 
         Button _closeButton;
 
@@ -50,8 +53,8 @@ namespace RosettaUI.UIToolkit
 
         ResizeEdge resizeEdge;
 
-        public VisualElement TitleBarContainerLeft => titleBarContainerLeft;
-        public VisualElement TitleBarContainerRight => titleBarContainerRight;
+        public VisualElement TitleBarContainerLeft => _titleBarContainerLeft;
+        public VisualElement TitleBarContainerRight => _titleBarContainerRight;
 
 
         public Button closeButton
@@ -63,33 +66,36 @@ namespace RosettaUI.UIToolkit
                 {
                     if (_closeButton != null)
                     {
-                        titleBarContainerRight.Remove(_closeButton);
+                        _titleBarContainerRight.Remove(_closeButton);
                     }
 
                     _closeButton = value;
-                    titleBarContainerRight.Add(_closeButton);
+                    _titleBarContainerRight.Add(_closeButton);
                 }
             }
         }
 
+        public override VisualElement contentContainer => _contentContainer;
 
         public Window(bool resizable = true)
         {
             this.resizable = resizable;
 
-            AddToClassList(ussClassName);
+            AddToClassList(UssClassName);
 
-            titleBarContainer.AddToClassList(ussClassNameTitleBarContainer);
-            titleBarContainerLeft.AddToClassList(ussClassNameTitleBarContainerLeft);
-            titleBarContainerRight.AddToClassList(ussClassNameTitleBarContainerRight);
-
-
-            titleBarContainer.Add(titleBarContainerLeft);
-            titleBarContainer.Add(titleBarContainerRight);
-            Add(titleBarContainer);
+            _titleBarContainer.AddToClassList(UssClassNameTitleBarContainer);
+            _titleBarContainerLeft.AddToClassList(UssClassNameTitleBarContainerLeft);
+            _titleBarContainerRight.AddToClassList(UssClassNameTitleBarContainerRight);
+            
+            _titleBarContainer.Add(_titleBarContainerLeft);
+            _titleBarContainer.Add(_titleBarContainerRight);
+            hierarchy.Add(_titleBarContainer);
 
             closeButton = new WindowTitleButton();
             closeButton.clicked += Hide;
+            
+            _contentContainer.AddToClassList(UssClassNameContentContainer);
+            hierarchy.Add(_contentContainer);
 
             RegisterCallback<PointerDownEvent>(OnPointerDownTrickleDown, TrickleDown.TrickleDown);
             RegisterCallback<PointerDownEvent>(OnPointerDown);

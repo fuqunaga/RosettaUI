@@ -122,7 +122,7 @@ namespace RosettaUI.UGUI.Builder
 
         static GameObject BuildField_AddLabelIfHas<T>(GameObject go, FieldBaseElement<T> field)
         {
-            var label = field.label;
+            var label = field.Label;
             if (label != null)
             {
                 var parent = Build_RowAt((string)label, field);

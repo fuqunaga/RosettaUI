@@ -19,22 +19,24 @@ namespace RosettaUI.UIToolkit.Builder
 
         private static void SetupLabelStyle(TextElement label, LabelElement labelElement)
         {
+            /*
             if (labelElement.IsLeftMost())
             {
                 label.style.minWidth = Mathf.Max(0f,
-                    LayoutSettings.LabelWidth - labelElement.GetIndent() * LayoutSettings.IndentSize);
+                    LayoutSettings.LabelWidth - labelElement.GetIndentLevel() * LayoutSettings.IndentSize);
 
                 // Foldout直下のラベルはmarginRight、paddingRightがUnityDefaultCommon*.uss で書き換わるので上書きしておく
                 // セレクタ例： .unity-foldout--depth-1 > .unity-base-field > .unity-base-field__label
                 label.style.marginRight = LayoutSettings.LabelMarginRight;
                 label.style.paddingRight = LayoutSettings.LabelPaddingRight;
             }
+            */
         }
         
         
         static void SetupLabelCallback<T, TElementValue>(BaseField<T> field, ReadOnlyFieldElement<TElementValue> fieldBaseElement)
         {
-            var labelElement = fieldBaseElement.label;
+            var labelElement = fieldBaseElement.Label;
             if (labelElement != null)
             {
                 SetupLabelStyle(field.labelElement, labelElement);

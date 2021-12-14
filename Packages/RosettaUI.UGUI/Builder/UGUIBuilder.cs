@@ -54,7 +54,7 @@ namespace RosettaUI.UGUI.Builder
 
             protected void Initialize(GameObject uiObj, Element element)
             {
-                base.Initialize(element, uiObj);
+                base.SetDefaultCallbacks(element, uiObj);
 
                 SetLayerRecursive(uiObj.transform, layer);
 
@@ -69,6 +69,10 @@ namespace RosettaUI.UGUI.Builder
             }
 
 
+            protected override void SetTreeViewIndent(Element element, GameObject uiObj, int indentLevel)
+            {
+                throw new NotImplementedException();
+            }
 
             protected override void OnElementEnableChanged(Element _, GameObject uiObj, bool enable)
             {

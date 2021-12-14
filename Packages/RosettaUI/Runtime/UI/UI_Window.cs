@@ -10,20 +10,11 @@ namespace RosettaUI
     {
         #region Window
 
-        public static WindowElement Window(params Element[] elements)
-        {
-            return Window(null, elements);
-        }
+        public static WindowElement Window(params Element[] elements) => Window(null, Indent(elements));
 
-        public static WindowElement Window(LabelElement title, params Element[] elements)
-        {
-            return new WindowElement(title, elements);
-        }
+        public static WindowElement Window(LabelElement title, params Element[] elements) => new(title, elements.AsEnumerable());
 
-        public static WindowElement Window(LabelElement title, IEnumerable<Element> elements)
-        {
-            return new WindowElement(title, elements);
-        }
+        public static WindowElement Window(LabelElement title, IEnumerable<Element> elements) => new(title, new[]{Indent(elements)});
 
         #endregion
         
@@ -37,7 +28,7 @@ namespace RosettaUI
 
         public static WindowLauncherElement WindowLauncher(LabelElement title, WindowElement window)
         {
-            var label = title ?? window.bar.FirstLabel();
+            var label = title ?? window.bar?.FirstLabel()?.Clone();
             return new WindowLauncherElement(label, window);
         }
 

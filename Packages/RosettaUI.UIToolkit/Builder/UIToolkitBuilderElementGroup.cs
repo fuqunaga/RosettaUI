@@ -67,7 +67,7 @@ namespace RosettaUI.UIToolkit.Builder
                 if (!windowElement.Enable && window.panel == null) window.Show(evt.originalMousePosition, toggle);
             });
 
-            var labelElement = launcherElement.label;
+            var labelElement = launcherElement.Label;
             labelElement.SubscribeValueOnUpdateCallOnce(v => toggle.text = v);
 
             return toggle;
@@ -114,8 +114,12 @@ namespace RosettaUI.UIToolkit.Builder
         VisualElement Build_Indent(Element element)
         {
             var ve = new VisualElement();
+            
+            /*
             ve.AddToClassList(UssClassName.Indent);
             ve.style.marginLeft = LayoutSettings.IndentSize;
+            */
+            
             return Build_ElementGroupContents(ve, element);
         }
 

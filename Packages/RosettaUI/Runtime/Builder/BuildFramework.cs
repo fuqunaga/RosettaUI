@@ -32,7 +32,8 @@ namespace RosettaUI.Builder
                     uiObj = func(element);
                     RegisterUIObj(element, uiObj);
 
-                    Initialize(element, uiObj);
+                    CalcTreeViewIndent(element, uiObj);
+                    SetDefaultCallbacks(element, uiObj);
                 }
                 else
                 {
@@ -43,7 +44,16 @@ namespace RosettaUI.Builder
             return uiObj;
         }
 
-        protected virtual void Initialize(Element element, TUIObj uiObj)
+        protected virtual void CalcTreeViewIndent(Element element, TUIObj uiObj)
+        {
+            var isTarget = element is not ElementGroup or FoldElement;
+            if (isTarget && element.IsLeftMost())
+            {
+                SetTreeViewIndent(element, uiObj, element.GetIndentLevel());
+            }
+        }
+
+        protected virtual void SetDefaultCallbacks(Element element, TUIObj uiObj)
         {
             element.enableRx.SubscribeAndCallOnce((enable) => OnElementEnableChanged(element, uiObj, enable));
             
@@ -73,6 +83,8 @@ namespace RosettaUI.Builder
             }
         }
 
+        protected abstract void SetTreeViewIndent(Element element, TUIObj uiObj, int indentLevel);
+        
         protected abstract void OnElementEnableChanged(Element element, TUIObj uiObj, bool enable);
         protected abstract void OnElementInteractableChanged(Element element, TUIObj uiObj, bool interactable);
         protected abstract void OnElementStyleChanged(Element element, TUIObj uiObj, Style style);

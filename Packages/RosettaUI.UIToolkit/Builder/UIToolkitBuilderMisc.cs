@@ -54,7 +54,7 @@ namespace RosettaUI.UIToolkit.Builder
                 dropdownElement.Value
             )
             {
-                label = dropdownElement.label.Value
+                label = dropdownElement.Label.Value
             };
 
             SetupLabelCallback(field, dropdownElement);

@@ -9,6 +9,6 @@ namespace RosettaUI
         {
         }
 
-        public override ReactiveProperty<bool> IsOpenRx { get; } = new ReactiveProperty<bool>();
+        public override ReactiveProperty<bool> IsOpenRx { get; } = new();
     }
 }

@@ -5,13 +5,13 @@ namespace RosettaUI.Builder
 {
     public static class LayoutHint
     {
-        public static int GetIndent(this Element element)
+        public static int GetIndentLevel(this Element element)
         {
             var indent = 0;
             var parent = element.Parent;
             while (parent != null)
             {
-                if (parent is IndentElement || parent is FoldElement) indent++;
+                if (parent is IndentElement or FoldElement) indent++;
                 parent = parent.Parent;
             }
 
@@ -23,18 +23,17 @@ namespace RosettaUI.Builder
             var parent = element.Parent;
             while(parent != null)
             {
-                ElementGroup parentGroup = parent switch
+                switch (parent)
                 {
-                    Row r => r,
-                    CompositeFieldElement c => c,
-                    _ => null
-                };
+                    case Row row when row.Children.FirstOrDefault() != element:
+                        return false;
 
-                if ((parentGroup != null) && (parentGroup.Children.FirstOrDefault() != element))
-                {
-                    return false;
+                    case CompositeFieldElement c when c.Children.FirstOrDefault() != element:
+                        return false;
+                    
+                    case ElementGroupWithBar eb when eb.bar == element:
+                        return false;
                 }
-
 
                 element = parent;
                 parent = element.Parent;

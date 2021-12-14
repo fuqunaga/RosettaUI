@@ -11,8 +11,8 @@ namespace RosettaUI
     /// </summary>
     public abstract class Element
     {
-        public readonly ReactiveProperty<bool> enableRx = new ReactiveProperty<bool>(true);
-        public readonly ReactiveProperty<bool> interactableRx = new ReactiveProperty<bool>(true);
+        public readonly ReactiveProperty<bool> enableRx = new(true);
+        public readonly ReactiveProperty<bool> interactableRx = new(true);
 
         public bool UpdateWhenDisabled { get; set; }
         
@@ -33,9 +33,15 @@ namespace RosettaUI
             set => interactableRx.Value = value;
         }
 
-        public Style Style { get; } = new Style();
+        public Style Style { get; } = new();
         
-        public Element Parent { get; internal set; }
+        public Element Parent { get; private set; }
+
+        public void SetParent(Element element)
+        {
+            this.ValidateSingleParent();
+            Parent = element;
+        }
 
 
         public virtual void Update()

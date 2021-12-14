@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace RosettaUI
 {
@@ -19,7 +21,7 @@ namespace RosettaUI
         #endregion
 
 
-        protected List<Element> elements = new List<Element>();
+        protected List<Element> elements = new();
         
         // Children　Update()で更新される子要素すべて
         // Contents　特殊な意味の子要素は含まれない
@@ -42,7 +44,7 @@ namespace RosettaUI
             this.elements = elements.Where(e => e != null).ToList();
             foreach (var e in this.elements)
             {
-                e.Parent = this;
+                e.SetParent(this);
             }
         }
 

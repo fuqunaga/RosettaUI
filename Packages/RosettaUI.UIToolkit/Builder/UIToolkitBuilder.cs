@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using RosettaUI.Builder;
 using RosettaUI.UIToolkit.UnityInternalAccess;
+using UnityEngine;
 using UnityEngine.UIElements;
+using FloatField = RosettaUI.UIToolkit.UnityInternalAccess.FloatField;
 using IntegerField = UnityEditor.UIElements.IntegerField;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -53,6 +55,22 @@ namespace RosettaUI.UIToolkit.Builder
 
 
         protected override IReadOnlyDictionary<Type, Func<Element, VisualElement>> BuildFuncTable => _buildFuncTable;
+
+        protected override void SetTreeViewIndent(Element element, VisualElement uiObj, int indentLevel)
+        {
+            var marginLeft = uiObj.resolvedStyle.marginLeft;
+            uiObj.style.marginLeft = marginLeft + indentLevel * LayoutSettings.IndentSize;
+
+            if (element is LabelElement)
+            {
+                uiObj.style.minWidth = Mathf.Max(0f, LayoutSettings.LabelWidth - indentLevel * LayoutSettings.IndentSize);
+
+                // Foldout直下のラベルはmarginRight、paddingRightがUnityDefaultCommon*.uss で書き換わるので上書きしておく
+                // セレクタ例： .unity-foldout--depth-1 > .unity-base-field > .unity-base-field__label
+                uiObj.style.marginRight = LayoutSettings.LabelMarginRight;
+                uiObj.style.paddingRight = LayoutSettings.LabelPaddingRight;
+            }
+        }
 
 
         protected override void OnElementEnableChanged(Element _, VisualElement ve, bool enable)
@@ -133,16 +151,6 @@ namespace RosettaUI.UIToolkit.Builder
             public static readonly string MinMaxSliderTextField = MinMaxSlider + "__text-field";
             
             public static readonly string Space = RosettaUI + "-space";
-        }
-
-
-        private static class LayoutSettings
-        {
-            public static readonly float LabelWidth = 150f;
-            public static readonly float IndentSize = 15f;
-
-            public static readonly float LabelMarginRight = 2f;
-            public static readonly float LabelPaddingRight = 2f;
         }
     }
 }

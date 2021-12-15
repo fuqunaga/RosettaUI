@@ -45,6 +45,14 @@
     border-color: var(--unity-colors-input_field-border-focus);
 }
 
+
+.unity-base-field__label--with-dragger{
+    cursor: var(--cursor-resize-horizontal) 29 4;
+}
+.unity-base-field__label--with-dragger:disabled {
+    cursor: initial;
+}
+
 /********************************************************************************
 * toggle
 ********************************************************************************/
@@ -201,7 +209,6 @@
     margin-right: 3px;
 }
 
-.unity-base-field__label--with-dragger,
 .unity-min-max-slider__min-thumb,
 .unity-min-max-slider__max-thumb
 {

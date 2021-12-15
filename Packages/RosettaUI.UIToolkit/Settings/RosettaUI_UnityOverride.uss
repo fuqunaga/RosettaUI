@@ -21,6 +21,10 @@
     --unity-cursor-color: var(--unity-colors-label-text);
 }
 
+.unity-base-field--no-label > .unity-base-field__input {
+    min-width: initial;
+}
+
 
 .unity-base-field:hover > .unity-base-field__input {
     border-color: var(--unity-colors-input_field-border-hover);

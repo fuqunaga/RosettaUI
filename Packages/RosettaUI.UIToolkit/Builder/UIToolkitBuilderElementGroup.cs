@@ -158,8 +158,12 @@ namespace RosettaUI.UIToolkit.Builder
 
         private VisualElement Build_ElementGroupContents(VisualElement container, Element element, Action<VisualElement, int> setupContentsVe = null)
         {
+            var group = (ElementGroup) element;
+
+            container.name = group.DisplayName;
+                
             var i = 0;
-            foreach (var ve in Build_ElementGroupContents((ElementGroup) element))
+            foreach (var ve in Build_ElementGroupContents(group))
             {
                 setupContentsVe?.Invoke(ve, i);
                 container.Add(ve);

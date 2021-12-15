@@ -9,5 +9,7 @@ namespace RosettaUI
         public IndentElement(IEnumerable<Element> elements) : base(elements)
         {
         }
+        
+        public override bool IsTreeViewIndentGroup => true;
     }
 }

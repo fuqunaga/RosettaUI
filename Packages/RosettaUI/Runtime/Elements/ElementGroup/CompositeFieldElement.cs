@@ -13,5 +13,6 @@ namespace RosettaUI
         {
         }
 
+        public override bool IsTreeViewIndentGroup => false;
     }
 }

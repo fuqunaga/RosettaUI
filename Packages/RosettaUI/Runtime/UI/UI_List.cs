@@ -43,7 +43,7 @@ namespace RosettaUI
         {
             var isReadOnly = ListBinder.IsReadOnly(listBinder);
 
-            var countFieldWidth = 50f;
+            var countFieldWidth = 80f;
             var field = Field(null,
                 () => ListBinder.GetCount(listBinder),
                 isReadOnly ? (Action<int>) null : (count) => ListBinder.SetCount(listBinder, count)

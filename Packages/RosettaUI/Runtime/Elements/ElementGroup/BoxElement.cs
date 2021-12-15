@@ -7,5 +7,6 @@ namespace RosettaUI
         public BoxElement(Element element) : this(new[] { element }) { }
 
         public BoxElement(IEnumerable<Element> elements) : base(elements) { }
+        public override bool IsTreeViewIndentGroup => true;
     }
 }

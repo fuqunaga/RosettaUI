@@ -30,15 +30,10 @@ namespace RosettaUI.Builder
         {
             return IsValidElement(element) && IsValidParent(element) && element.IsLeftMost();
             
-            static bool IsValidElement(Element e) => e is not ElementGroup or Row or CompositeFieldElement or FoldElement;
-            static bool IsValidParent(Element e) => e.Parent switch
-            {
-                Column => true,
-                IndentElement => true,
-                FoldElement f => f.Contents.Contains(e),
-                DynamicElement d => IsValidParent(d.Parent),
-                _ => false
-            };
+            static bool IsValidElement(Element e) => e is not ElementGroup or Row or CompositeFieldElement or FoldElement or BoxElement;
+
+            static bool IsValidParent(Element e) => e.Parent is ElementGroup {IsTreeViewIndentGroup : true} group && group.Contents.Contains(e);
+       
         }
         
         public static bool IsLeftMost(this Element element)

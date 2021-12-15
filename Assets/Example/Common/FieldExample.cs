@@ -49,7 +49,7 @@ namespace RosettaUI.Example
             return UI.Column(
                 UI.Field(() => intValue),
 #if false
-                UI.Field(() => vector2Value)
+                UI.Field(() => intList)
 #else
                 UI.Fold("Allows any type",
                     UI.Field(() => intValue),

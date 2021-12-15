@@ -7,5 +7,7 @@ namespace RosettaUI
         public Column(IEnumerable<Element> children) : base(children)
         {
         }
+
+        public override bool IsTreeViewIndentGroup => true;
     }
 }

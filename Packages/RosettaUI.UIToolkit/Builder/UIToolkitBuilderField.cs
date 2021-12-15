@@ -36,7 +36,7 @@ namespace RosettaUI.UIToolkit.Builder
         {
             return Build_Field<T, TField>(element, true);
         }
-        
+
         private TField Build_Field<T, TField>(Element element, bool labelEnable)
             where TField : BaseField<T>, new()
         {

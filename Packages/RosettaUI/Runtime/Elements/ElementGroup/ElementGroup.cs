@@ -31,6 +31,7 @@ namespace RosettaUI
 
         public virtual string DisplayName => GetType().Name;
 
+        public virtual bool IsTreeViewIndentGroup => Parent is ElementGroup {IsTreeViewIndentGroup: true};
 
         protected ElementGroup() { }
 

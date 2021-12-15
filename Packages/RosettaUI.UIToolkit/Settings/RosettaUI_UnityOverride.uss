@@ -101,29 +101,6 @@
     -unity-background-image-tint-color: var(--gray-button-tint);
 }
 
-/*
-.unity-foldout
-{
-    flex-shrink: 0;
-}
-
-.unity-foldout__toggle {
-    margin-left: -15px;
-}
-
-.unity-foldout__toggle .unity-text-element
-{
-    margin-left: 1px
-}
-
-.unity-foldout__toggle .unity-text-element,
-.unity-toggle__label
-{
-    padding-top: 2px;
-    padding-bottom: 3px;
-}
-*/
-
 .unity-foldout__toggle > .unity-toggle__input,
 .unity-foldout__toggle .unity-base-field
 {

@@ -83,7 +83,11 @@
 /********************************************************************************
 * Composite Field
 ********************************************************************************/
-.rosettaui-composite-field,
+.rosettaui-composite-field
+{
+    flex-direction: row;
+    margin: 0;
+}
 .rosettaui-composite-field__contents
 {
     flex-direction: row;

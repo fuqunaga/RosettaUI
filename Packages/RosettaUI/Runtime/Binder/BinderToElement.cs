@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using RosettaUI.Reactive;
 using UnityEngine;
 
 namespace RosettaUI
@@ -88,7 +89,7 @@ namespace RosettaUI
 
 
             Element ret = null;
-            if (binder.IsOneliner())
+            if (TypeUtility.IsSingleLine(binder.ValueType))
                 ret = new CompositeFieldElement(label, elements);
             else if (label != null)
                 ret = new FoldElement(label, elements);
@@ -98,7 +99,7 @@ namespace RosettaUI
             return ret;
         }
 
-        private static Element _CreateCompositeSliderElementBase(LabelElement label, IGetter binder, Type valueType,
+        private static Element _CreateCompositeSliderElementBase(LabelElement label, IBinder binder, Type valueType,
             Func<string, Element> createFieldElementFunc)
         {
             var fieldNames = TypeUtility.GetUITargetFieldNames(valueType).ToList();
@@ -112,7 +113,25 @@ namespace RosettaUI
             // 評価を遅延させる
             Element CreateElementFunc()
             {
-                return new FoldElement(label, elements);
+                if (TypeUtility.IsSingleLine(binder.ValueType))
+                {
+                    var titleField = CreateMemberFieldElement(new LabelElement(label), binder);
+                    var bar = UI.Row(label, titleField);
+
+                    var fold = new FoldElement(bar, elements);
+                    
+                    fold.IsOpenRx.SubscribeAndCallOnce(isOpen =>
+                    {
+                        label.Enable = isOpen;
+                        titleField.Enable = !isOpen;
+                    });
+
+                    return fold;
+                }
+                else
+                {
+                    return new FoldElement(label, elements);
+                }
             }
         }
 

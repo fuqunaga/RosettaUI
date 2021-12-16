@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -9,7 +10,7 @@ namespace RosettaUI
 {
     public static class TypeUtility
     {
-        private static readonly Dictionary<Type, ReflectionCache> ReflectionCacheTable = new Dictionary<Type, ReflectionCache>();
+        private static readonly Dictionary<Type, ReflectionCache> ReflectionCacheTable = new();
 
         static TypeUtility()
         {
@@ -112,6 +113,57 @@ namespace RosettaUI
 
         public static Type GetListItemType(Type type) => GetReflectionCache(type).listItemType;
 
+        
+        
+        
+        #region SingleLine
+        
+        private static readonly Dictionary<Type, bool> SingleLineDic = new();
+
+        public static bool IsSingleLine(Type valueType)
+        {
+            static bool IsSimpleType(Type t)
+            {
+                return t.IsPrimitive || t == typeof(string) || t.IsEnum;
+            }
+
+            if (UICustom.GetElementCreationMethod(valueType) is { } creationFunc) return creationFunc.isOneLiner;
+
+            if (!SingleLineDic.TryGetValue(valueType, out var ret))
+            {
+                if (typeof(IElementCreator).IsAssignableFrom(valueType) || typeof(IList).IsAssignableFrom(valueType))
+                {
+                    ret = false;
+                }
+                else if (IsSimpleType(valueType))
+                {
+                    ret = true;
+                }
+                else
+                {
+                    const int oneLinerMaxCount = 3;
+                    const int nameMaxLength = 3;
+
+                    var fieldTypes = GetUITargetFieldTypes(valueType).ToList();
+                    var fieldNames = GetUITargetFieldNames(valueType);
+
+                    ret = fieldTypes.Count <= oneLinerMaxCount
+                          && fieldTypes.All(IsSimpleType)
+                          && fieldNames.All(name => name.Length <= nameMaxLength
+                                                    && GetRange(valueType, name) == null);
+                }
+
+                SingleLineDic[valueType] = ret;
+            }
+
+            return ret;
+        }
+        
+        #endregion
+        
+        
+        #region Type Define
+        
         private class ReflectionCache
         {
             public readonly Type listItemType;
@@ -151,5 +203,7 @@ namespace RosettaUI
                 public RangeAttribute range;
             }
         }
+        
+        #endregion
     }
 }

@@ -69,12 +69,19 @@ namespace RosettaUI.UIToolkit.Builder
                 var marginLeft = uiObj.resolvedStyle.marginLeft;
                 uiObj.style.marginLeft = marginLeft + indentSize;
 
-                var label = (element is not Row and not FoldElement and not WindowLauncherElement) ? element.FirstFieldLabel() : null;
+
+                var (label, uiLeftWidth) = element switch
+                {
+                    Row or WindowLauncherElement => (null,0),
+                    FoldElement f => (f.bar.FirstFieldLabel(), LayoutSettings.IndentSize),
+                    _ => (element.FirstFieldLabel(),0)
+                };
+                
                 if ( label != null)
                 {
                     var labelObj = GetUIObj(label);
                     Assert.IsNotNull(labelObj, $"UIObj is not found. {element.GetType()} > Label[{label.Value}]");
-                    labelObj.style.minWidth = Mathf.Max(0f, LayoutSettings.LabelWidth - indentSize);
+                    labelObj.style.minWidth = Mathf.Max(0f, LayoutSettings.LabelWidth - indentSize - uiLeftWidth);
 
                     // Foldout直下のラベルはmarginRight、paddingRightがUnityDefaultCommon*.uss で書き換わるので上書きしておく
                     // セレクタ例： .unity-foldout--depth-1 > .unity-base-field > .unity-base-field__label

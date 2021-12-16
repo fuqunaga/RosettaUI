@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RosettaUI.Example
@@ -32,23 +33,39 @@ namespace RosettaUI.Example
                     , UI.Slider(() => uintValue)
                     )
 #else
-                UI.Fold("Slider"
-                    , UI.Slider(() => intValue)
-                    , UI.Slider(() => uintValue)
-                    , UI.Slider(() => floatValue)
-                    , UI.Slider(() => vector2Value)
-                    , UI.Slider(() => vector3Value)
-                    , UI.Slider(() => vector4Value)
-                    , UI.Slider(() => vector2IntValue)
-                    , UI.Slider(() => vector3IntValue)
-                    , UI.Slider(() => rectValue)
-                    , UI.Slider(() => rectIntValue)
-                    , UI.Slider(() => rectOffsetValue)
-                    , UI.Slider(() => boundsValue)
-                    , UI.Slider(() => boundsIntValue)
-                    , UI.Slider(() => simpleClass)
-                )
-                , UI.Fold("Usage"
+                UI.Fold("Slider",
+                    UI.Slider(() => intValue),
+                    UI.Slider(() => uintValue),
+                    UI.Slider(() => floatValue),
+                    UI.Slider(() => vector2Value),
+                    UI.Slider(() => vector3Value),
+                    UI.Slider(() => vector4Value),
+                    UI.Slider(() => vector2IntValue),
+                    UI.Slider(() => vector3IntValue),
+                    UI.Slider(() => rectValue),
+                    UI.Slider(() => rectIntValue),
+                    UI.Slider(() => rectOffsetValue),
+                    UI.Slider(() => boundsValue),
+                    UI.Slider(() => boundsIntValue),
+                    UI.Slider(() => simpleClass)
+                ),
+                UI.Fold("ReadOnly",
+                    UI.SliderReadOnly(() => intValue),
+                    UI.SliderReadOnly(() => uintValue),
+                    UI.SliderReadOnly(() => floatValue),
+                    UI.SliderReadOnly(() => vector2Value),
+                    UI.SliderReadOnly(() => vector3Value),
+                    UI.SliderReadOnly(() => vector4Value),
+                    UI.SliderReadOnly(() => vector2IntValue),
+                    UI.SliderReadOnly(() => vector3IntValue),
+                    UI.SliderReadOnly(() => rectValue),
+                    UI.SliderReadOnly(() => rectIntValue),
+                    UI.SliderReadOnly(() => rectOffsetValue),
+                    UI.SliderReadOnly(() => boundsValue),
+                    UI.SliderReadOnly(() => boundsIntValue),
+                    UI.SliderReadOnly(() => simpleClass)
+                ),
+                UI.Fold("Usage"
                     , UI.Slider("CustomLabel", () => floatValue)
                     , UI.Slider("Custom min max", () => floatValue, -1f, 2f)
                     , UI.Slider("Custom min max", () => vector2Value, Vector2.one * -1, Vector2.one) 

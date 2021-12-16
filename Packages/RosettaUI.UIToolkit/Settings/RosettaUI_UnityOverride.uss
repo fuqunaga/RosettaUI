@@ -38,7 +38,7 @@
     border-color: var(--unity-colors-input_field-border);
     /*--unity-cursor-color: var(--unity-colors-label-text);*/
 }
-.unity-base-field__input:disabled {
+.unity-base-text-field__input:disabled {
     background-color: var(--unity-colors-highlight-background-inactive);
 }
 
@@ -53,8 +53,6 @@
 .unity-base-text-field:disabled > .unity-base-field__input {
     border-color: var(--unity-colors-input_field-border));
 }
-
-
 
 .unity-base-field__label--with-dragger{
     cursor: var(--cursor-resize-horizontal) 29 4;

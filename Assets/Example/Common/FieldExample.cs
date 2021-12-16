@@ -47,9 +47,12 @@ namespace RosettaUI.Example
         {
             SimpleClass nullClass = null;
             return UI.Column(
-                UI.Field(() => intValue),
 #if false
-                UI.Field(() => intList)
+                
+                 UI.Fold("Allows any type",
+                    UI.Field(() => intValue),
+                    UI.Field(() => uintValue)
+                    )
 #else
                 UI.Fold("Allows any type",
                     UI.Field(() => intValue),

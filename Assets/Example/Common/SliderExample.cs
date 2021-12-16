@@ -26,6 +26,12 @@ namespace RosettaUI.Example
         {
             SimpleClass nullClass = null;
             return UI.Column(
+#if false
+                UI.Fold("Slider"
+                    , UI.Slider(() => intValue)
+                    , UI.Slider(() => uintValue)
+                    )
+#else
                 UI.Fold("Slider"
                     , UI.Slider(() => intValue)
                     , UI.Slider(() => uintValue)
@@ -70,6 +76,7 @@ namespace RosettaUI.Example
                     // Min and max will be set automatically if there is a range attribute, 
                     , UI.Slider(() => rangeValue)
                 )
+#endif
             );
         }
     }

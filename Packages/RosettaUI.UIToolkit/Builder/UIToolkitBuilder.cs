@@ -64,12 +64,12 @@ namespace RosettaUI.UIToolkit.Builder
                 {
                     uiObj = fold.Q<Toggle>();
                 }
-                
+
                 var indentSize = indentLevel * LayoutSettings.IndentSize;
                 var marginLeft = uiObj.resolvedStyle.marginLeft;
                 uiObj.style.marginLeft = marginLeft + indentSize;
 
-                var label = (element is not Row and not WindowLauncherElement) ? element.FirstFieldLabel() : null;
+                var label = (element is not Row and not FoldElement and not WindowLauncherElement) ? element.FirstFieldLabel() : null;
                 if ( label != null)
                 {
                     var labelObj = GetUIObj(label);

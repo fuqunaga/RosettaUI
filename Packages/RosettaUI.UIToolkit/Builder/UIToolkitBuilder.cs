@@ -42,9 +42,6 @@ namespace RosettaUI.UIToolkit.Builder
 
                 [typeof(IntMinMaxSliderElement)] = Build_MinMaxSlider_Int,
                 [typeof(FloatMinMaxSliderElement)] = Build_MinMaxSlider_Float,
-                /*
-                [typeof(LogSlider)] = Build_LogSlider,
-                */
                 [typeof(SpaceElement)] = Build_Space,
                 [typeof(ImageElement)] = Build_Image,
                 [typeof(ButtonElement)] = Build_Button,

@@ -7,14 +7,9 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
     {
         public ClampFreeSliderInt()
         {
-            //clamped = false;
+            clamped = false;
         }
-
-        /*
         internal override float SliderNormalizeValue(int currentValue, int lowerValue, int higherValue)
-        {
-            return Mathf.Clamp01((currentValue - (float) lowerValue) / (higherValue - (float) lowerValue));
-        }
-        */
+            => Mathf.Clamp01(base.SliderNormalizeValue(currentValue, lowerValue, higherValue)); 
     }
 }

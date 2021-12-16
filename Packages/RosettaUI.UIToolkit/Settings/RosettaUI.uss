@@ -7,7 +7,7 @@
     --close-icon: resource("close");
     --window-color: rgba(45,45,45,0.9);
     --gray-button-tint: #A0A0A0;
-    
+    --highlight-blue: rgb(0, 150, 230);
     
     font-size: 18px;
     color: var(--unity-colors-default-text);

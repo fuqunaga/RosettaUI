@@ -7,7 +7,12 @@
     --close-icon: resource("close");
     --window-color: rgba(45,45,45,0.9);
     --gray-button-tint: #A0A0A0;
-    --highlight-blue: rgb(0, 150, 230);
+    --rosettaui-highlight-blue: rgb(0, 150, 230);
+    --rosettaui-slider-dragger-height: 14px;
+    --rosettaui-slider-dragger-border-radius: 7px;
+    --rosettaui-slider-tracker-margin-top: -2px;
+    --rosettaui-slider-tracker-height: 4px;
+    --rosettaui-slider-tracker-border-radius: 3px;
     
     font-size: 18px;
     color: var(--unity-colors-default-text);

@@ -21,22 +21,37 @@ namespace RosettaUI.Example
         public Element CreateElement()
         {
             return UI.Column(
-                UI.Fold("MinMaxSlider"
-                    , UI.MinMaxSlider(() => intMinMax)
-                    , UI.MinMaxSlider(() => uintMinMax)
-                    , UI.MinMaxSlider(() => floatMinMax)
-                    , UI.MinMaxSlider(() => vector2MinMax)
-                    , UI.MinMaxSlider(() => vector3MinMax)
-                    , UI.MinMaxSlider(() => vector4MinMax)
-                    , UI.MinMaxSlider(() => vector2IntMinMax)
-                    , UI.MinMaxSlider(() => vector3IntMinMax)
-                    , UI.MinMaxSlider(() => rectMinMax)
-                    , UI.MinMaxSlider(() => rectIntMinMax)
-                    , UI.MinMaxSlider(() => rectOffsetMinMax)
-                    , UI.MinMaxSlider(() => boundsMinMax)
-                    , UI.MinMaxSlider(() => boundsIntMinMax)
-                )
-                , UI.Fold("Usage"
+                UI.Fold("MinMaxSlider",
+                    UI.MinMaxSlider(() => intMinMax),
+                    UI.MinMaxSlider(() => uintMinMax),
+                    UI.MinMaxSlider(() => floatMinMax),
+                    UI.MinMaxSlider(() => vector2MinMax),
+                    UI.MinMaxSlider(() => vector3MinMax),
+                    UI.MinMaxSlider(() => vector4MinMax),
+                    UI.MinMaxSlider(() => vector2IntMinMax),
+                    UI.MinMaxSlider(() => vector3IntMinMax),
+                    UI.MinMaxSlider(() => rectMinMax),
+                    UI.MinMaxSlider(() => rectIntMinMax),
+                    UI.MinMaxSlider(() => rectOffsetMinMax),
+                    UI.MinMaxSlider(() => boundsMinMax),
+                    UI.MinMaxSlider(() => boundsIntMinMax)
+                ),
+                UI.Fold("ReadOnly",
+                    UI.MinMaxSliderReadOnly(() => intMinMax),
+                    UI.MinMaxSliderReadOnly(() => uintMinMax),
+                    UI.MinMaxSliderReadOnly(() => floatMinMax),
+                    UI.MinMaxSliderReadOnly(() => vector2MinMax),
+                    UI.MinMaxSliderReadOnly(() => vector3MinMax),
+                    UI.MinMaxSliderReadOnly(() => vector4MinMax),
+                    UI.MinMaxSliderReadOnly(() => vector2IntMinMax),
+                    UI.MinMaxSliderReadOnly(() => vector3IntMinMax),
+                    UI.MinMaxSliderReadOnly(() => rectMinMax),
+                    UI.MinMaxSliderReadOnly(() => rectIntMinMax),
+                    UI.MinMaxSliderReadOnly(() => rectOffsetMinMax),
+                    UI.MinMaxSliderReadOnly(() => boundsMinMax),
+                    UI.MinMaxSliderReadOnly(() => boundsIntMinMax)
+                ),
+                UI.Fold("Usage"
                     , UI.MinMaxSlider("CustomLabel", () => floatMinMax)
                     , UI.MinMaxSlider("Custom min max", () => floatMinMax, min: -1f, max: 1f)
                     , UI.MinMaxSlider("Custom min max", () => vector2MinMax, min: Vector2.one * -1f, max: Vector2.one) 

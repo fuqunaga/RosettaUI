@@ -16,13 +16,5 @@ namespace RosettaUI
         protected OpenCloseBaseElement(Element bar, IEnumerable<Element> contents) :base(bar, contents)
         {
         }
-
-        public override void Update()
-        {
-            if (IsOpen)
-            {
-                base.Update();
-            }
-        }
     }
 }

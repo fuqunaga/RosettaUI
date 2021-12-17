@@ -27,11 +27,8 @@ namespace RosettaUI.Example
         {
             SimpleClass nullClass = null;
             return UI.Column(
-#if false
-                UI.Fold("Slider"
-                    , UI.Slider(() => intValue)
-                    , UI.Slider(() => uintValue)
-                    )
+#if true
+                UI.Slider(() => vector2Value)
 #else
                 UI.Fold("Slider",
                     UI.Slider(() => intValue),

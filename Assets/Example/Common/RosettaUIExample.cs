@@ -20,9 +20,10 @@ namespace RosettaUI.Example
             _rootElement = UI.Window(
                 UI.WindowLauncher<FieldExample>(),
                 UI.WindowLauncher<SliderExample>(),
-                UI.WindowLauncher<MinMaxSliderExample>()
+                UI.WindowLauncher<MinMaxSliderExample>(),
+                UI.WindowLauncher<MiscExample>()
 #if false
-                , UI.WindowLauncher<MiscExample>()
+                
                 , UI.WindowLauncher<UICustomExample>()
 #endif
             );

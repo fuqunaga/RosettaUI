@@ -27,6 +27,7 @@ namespace RosettaUI.Example
             SimpleClass nullOneLineClass = null;
             ComplexClass nullMultiLineClass = null;
             ElementCreator nullElementCreator = null;
+            var scrollViewItemCount = 10;
 
 
             UICustom.RegisterElementCreationFunc<UICustomClass>((uiCustomClass) =>
@@ -40,9 +41,9 @@ namespace RosettaUI.Example
             
             return UI.Column(
                 UI.Row(
-                    UI.Label($"{nameof(UI.Space)} >")
-                    , UI.Space()
-                    , UI.Label($"< {nameof(UI.Space)}")
+                    UI.Label($"{nameof(UI.Space)} >"),
+                    UI.Space(),
+                    UI.Label($"< {nameof(UI.Space)}")
                 ),
                 
                 UI.Row(
@@ -50,13 +51,13 @@ namespace RosettaUI.Example
                     UI.Image(() => texture).SetMaxWidth(200f).SetMaxHeight(200f)
                 ),
                 
-                UI.Button(nameof(UI.Button), () => print("On button clicked"))
+                UI.Button(nameof(UI.Button), () => print("On button clicked")),
                 
-                , UI.Dropdown(nameof(UI.Dropdown),
+                UI.Dropdown(nameof(UI.Dropdown),
                     () => dropDownIndex,
                     options: new[] {"One", "Two", "Three"}
-                )
-                , UI.DropdownReadOnly($"{nameof(UI.DropdownReadOnly)}(selection index will not change)",
+                ),
+                UI.DropdownReadOnly($"{nameof(UI.DropdownReadOnly)}(selection index will not change)",
                     () => dropDownIndex,
                     options: new[] {"One", "Two", "Three"}
                 ),
@@ -87,8 +88,8 @@ namespace RosettaUI.Example
                         )
                     ),
                     UI.ListReadOnly(() => listValue)
-                )
-                , UI.Popup(
+                ),
+                UI.Popup(
                     UI.Box(UI.Label($"{nameof(UI.Popup)}(Right click)")),
                     () => new[]
                     {
@@ -96,62 +97,67 @@ namespace RosettaUI.Example
                         new MenuItem("Menu1", () => Debug.Log("Menu1")),
                         new MenuItem("Menu2", () => Debug.Log("Menu2"))
                     }
-                )
-                , UI.Fold("Row/Column/Box/Fold/ScrollView/Indent"
-                    , UI.Row(
+                ),
+                UI.Fold("Row/Column/Box/Fold/ScrollView/Indent",
+                    UI.Row(
                         UI.Label("Row0"),
                         UI.Label("Row1"),
                         UI.Label("Row2")
-                    )
-                    , UI.Column(
+                    ),
+                    UI.Column(
                         UI.Label("Column0"),
                         UI.Label("Column1"),
                         UI.Label("Column2")
-                    )
-                    , UI.Box(
+                    ),
+                    UI.Box(
                         UI.Label("Box0"),
                         UI.Label("Box1"),
                         UI.Label("Box2")
-                    )
-                    , UI.Fold("Fold",
+                    ),
+                    UI.Fold("Fold",
                         UI.Fold("Fold2",
                             UI.Fold("Fold3",
                                 UI.Label("contents")
                             )
                         )
-                    )
-                    , UI.Fold(UI.Field("CustomBar", () => boolValue), null)
-                    , UI.Fold(UI.Button("LeftBar"), UI.Button("RightBar"), null)
-                    , UI.Label(nameof(UI.ScrollView))
-                    , UI.ScrollView(
-                        Enumerable.Range(0, 100).Select(i => UI.Field("Count", () => i.ToString()))
-                    ).SetHeight(100f)
-                    , UI.Indent(
-                        UI.Field(() => "Indent0")
-                        , UI.Indent(
-                            UI.Field(() => "Indent2")
-                            , UI.Indent(
+                    ),
+                    UI.Fold(UI.Field("CustomBar", () => boolValue), null),
+                    UI.Fold(UI.Button("LeftBar"), UI.Button("RightBar"), null),
+                    UI.Label(nameof(UI.ScrollView)),
+                    UI.Slider(() => scrollViewItemCount),
+                    UI.ScrollView(
+                        UI.DynamicElementOnStatusChanged(
+                            () => scrollViewItemCount,
+                            count => UI.Column(Enumerable.Range(0, count)
+                                .Select(i => UI.Field("Count" + i, () => i.ToString())))
+                        )
+                    ).SetHeight(300f),
+                    UI.Indent(
+                        UI.Field(() => "Indent0"),
+                        UI.Indent(
+                            UI.Field(() => "Indent2"),
+                            UI.Indent(
                                 UI.Field(() => "Indent3")
                             )
                         )
                     )
-                )
-                , UI.Fold("ChildValueChangedCallback",
+                ),
+                UI.Fold("ChildValueChangedCallback",
                     UI.Field(() => intValue),
                     UI.Field(() => floatValue)
-                ).RegisterValueChangeCallback(() => Debug.Log($"OnChildValueChanged"))
-                , UI.Fold("FindObject"
-                    , UI.WindowLauncher<BehaviourExample>()
-                    , UI.FieldIfObjectFound<BehaviourExample>()
-                )
-                , UI.Fold("DynamicElement"
-                    , UI.Field(() => dynamicElementIf)
-                    , UI.DynamicElementIf(
+                ).RegisterValueChangeCallback(() => Debug.Log($"OnChildValueChanged")),
+                UI.Fold("FindObject",
+                    UI.WindowLauncher<BehaviourExample>(),
+                    UI.FieldIfObjectFound<BehaviourExample>()
+                ),
+                UI.Fold("DynamicElement",
+                    UI.Field(() => dynamicElementIf),
+                    UI.DynamicElementIf(
                         () => dynamicElementIf,
                         () => UI.Label(nameof(UI.DynamicElementIf))
-                        )
-                    , UI.Slider("Button count", () => intValue, max: 10)
-                    , UI.DynamicElementOnStatusChanged(
+                        ),
+                    UI.Slider("Button count", () => intValue, max: 10),
+                    UI.DynamicElementOnStatusChanged(
                         readStatus: () => intValue,
                         build: (status) =>
                         {
@@ -161,8 +167,8 @@ namespace RosettaUI.Example
                                 new Element[] {label}.Concat(buttons)
                             );
                         })
-                    /*
-                    , UI.Box(
+                    /*,
+                    UI.Box(
                         UI.Slider("DynamicElementOnTrigger if > 0.5f", () => floatValue),
                         UI.DynamicElementOnTrigger(
                             build: () => UI.Label("> 0.5f"),
@@ -170,50 +176,50 @@ namespace RosettaUI.Example
                         )
                     )
                     */
-                )
-                , UI.Fold("Methods"
-                    , UI.Label(nameof(ElementExtensionsMethodChain.SetEnable)).SetEnable(false) // disappear
-                    , UI.Field(nameof(ElementExtensionsMethodChain.SetInteractable), () => floatValue).SetInteractable(false)
-                    , UI.Label(nameof(ElementExtensionsMethodChain.SetColor)).SetColor(Color.red)
+                ),
+                UI.Fold("Methods",
+                    UI.Label(nameof(ElementExtensionsMethodChain.SetEnable)).SetEnable(false), // disappear,
+                    UI.Field(nameof(ElementExtensionsMethodChain.SetInteractable), () => floatValue).SetInteractable(false),
+                    UI.Label(nameof(ElementExtensionsMethodChain.SetColor)).SetColor(Color.red),
 #if true
-                    , UI.Button($"{nameof(ElementExtensionsMethodChain.SetWidth)}(100f)").SetWidth(100f)
-                    , UI.Button($"{nameof(ElementExtensionsMethodChain.SetHeight)}(50f)").SetHeight(50f)
+                    UI.Button($"{nameof(ElementExtensionsMethodChain.SetWidth)}(100f)").SetWidth(100f),
+                    UI.Button($"{nameof(ElementExtensionsMethodChain.SetHeight)}(50f)").SetHeight(50f),
 #else
-                    , UI.Button($"{nameof(ElementExtensionsMethodChain.SetWidth)}(100f)", null).SetWidth(100f)
-                    , UI.Button($"{nameof(ElementExtensionsMethodChain.SetMinWidth)}(200f)", null).SetMinWidth(50f)
-                    , UI.Button($"{nameof(ElementExtensionsMethodChain.SetMaxWidth)}(200f)", null).SetMaxWidth(200f)
-                    , UI.Column(
-                        UI.Button($"{nameof(ElementExtensionsMethodChain.SetHeight)}(50f)", null).SetHeight(50f)
-                        , UI.Button($"{nameof(ElementExtensionsMethodChain.SetMinHeight)}(50f)", null).SetMinHeight(50f)
-                        , UI.Button($"{nameof(ElementExtensionsMethodChain.SetMaxHeight)}(50f)", null).SetMaxHeight(50f)
-                    ).SetHeight(200f)
+                    UI.Button($"{nameof(ElementExtensionsMethodChain.SetWidth)}(100f)", null).SetWidth(100f),
+                    UI.Button($"{nameof(ElementExtensionsMethodChain.SetMinWidth)}(200f)", null).SetMinWidth(50f),
+                    UI.Button($"{nameof(ElementExtensionsMethodChain.SetMaxWidth)}(200f)", null).SetMaxWidth(200f),
+                    UI.Column(
+                        UI.Button($"{nameof(ElementExtensionsMethodChain.SetHeight)}(50f)", null).SetHeight(50f),
+                        UI.Button($"{nameof(ElementExtensionsMethodChain.SetMinHeight)}(50f)", null).SetMinHeight(50f),
+                        UI.Button($"{nameof(ElementExtensionsMethodChain.SetMaxHeight)}(50f)", null).SetMaxHeight(50f)
+                    ).SetHeight(200f),
 #endif
-                    , UI.Fold(nameof(ElementExtensionsMethodChain.Open), UI.Label("Open")).Open()
-                    , UI.Fold(nameof(ElementExtensionsMethodChain.Close), UI.Label("Close")).Close()
-                )
-                , UI.Fold("UI Customize"
-                    , UI.Field(() => uiCustomClass)
+                    UI.Fold(nameof(ElementExtensionsMethodChain.Open), UI.Label("Open")).Open(),
+                    UI.Fold(nameof(ElementExtensionsMethodChain.Close), UI.Label("Close")).Close()
+                ),
+                UI.Fold("UI Customize",
+                    UI.Field(() => uiCustomClass)
                     // Element Creator in class/Array
-                )
-                , UI.Fold("Null"
-                    , UI.Box(
-                        UI.Label("Field")
-                        , UI.Field(() => nullString)
-                        , UI.Field(() => nullList)
-                        , UI.Row(
+                ),
+                UI.Fold("Null",
+                    UI.Box(
+                        UI.Label("Field"),
+                        UI.Field(() => nullString),
+                        UI.Field(() => nullList),
+                        UI.Row(
                             UI.Field(nameof(nullOneLineClass), () => nullOneLineClass),
                             UI.Button("Toggle null",
                                 () => { nullOneLineClass = nullOneLineClass != null ? null : new SimpleClass(); })
-                        )
-                        , UI.Field(nameof(nullMultiLineClass), () => nullMultiLineClass)
-                        , UI.Field(nameof(nullElementCreator), () => nullElementCreator)
-                    )
-                    , UI.Box(
-                        UI.Label("Slider")
-                        , UI.Slider(() => nullList)
-                        , UI.Slider(() => nullOneLineClass)
-                        , UI.Slider(() => nullMultiLineClass)
-                        , UI.Slider(() => nullElementCreator)
+                        ),
+                        UI.Field(nameof(nullMultiLineClass), () => nullMultiLineClass),
+                        UI.Field(nameof(nullElementCreator), () => nullElementCreator)
+                    ),
+                    UI.Box(
+                        UI.Label("Slider"),
+                        UI.Slider(() => nullList),
+                        UI.Slider(() => nullOneLineClass),
+                        UI.Slider(() => nullMultiLineClass),
+                        UI.Slider(() => nullElementCreator)
                     )
                 )
             );

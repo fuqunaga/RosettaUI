@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 using FloatField = RosettaUI.UIToolkit.UnityInternalAccess.FloatField;
-using IntegerField = UnityEditor.UIElements.IntegerField;
 
 namespace RosettaUI.UIToolkit.Builder
 {

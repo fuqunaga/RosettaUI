@@ -1,8 +1,6 @@
 using System;
 using System.Globalization;
-using UnityEditor.UIElements;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
@@ -134,6 +132,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         {
         }
 
+#if false
         /// <summary>
         ///        <para>
         /// Defines UxmlTraits for the IntegerField.
@@ -143,6 +142,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         public new class UxmlTraits : TextValueFieldTraits<int, UxmlIntAttributeDescription>
         {
         }
+#endif
 
         protected class IntegerInput : TextValueField<int>.TextValueInput
         {

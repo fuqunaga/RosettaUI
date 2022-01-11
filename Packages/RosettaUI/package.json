@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "displayName": "RosettaUI",
   "description": "Code-based multi gui interface",
-  "unity": "2020.3",
+  "unity": "2021.2",
   "author": {
     "name": "fuqunaga",
     "email": "fukhid@gmail.com",

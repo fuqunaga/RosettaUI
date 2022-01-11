@@ -11,7 +11,8 @@ namespace RosettaUI
     /// </summary>
     public class DynamicElement : ElementGroup
     {
-        public static DynamicElement Create<T>(Func<T> readStatus, Func<T, Element> buildWithStatus, string displayName = null)
+        public static DynamicElement Create<T>(Func<T> readStatus, Func<T, Element> buildWithStatus,
+            string displayName = null)
         {
             var status = readStatus();
 
@@ -28,8 +29,7 @@ namespace RosettaUI
             );
         }
 
-        
-        
+
         private readonly Func<Element> _build;
         private readonly string _displayName;
         private readonly Func<DynamicElement, bool> _rebuildIf;
@@ -46,9 +46,6 @@ namespace RosettaUI
 
         public override string DisplayName => string.IsNullOrEmpty(_displayName) ? base.DisplayName : _displayName;
 
-        public Element Element => elements?.FirstOrDefault();
-
-
         private void BuildElement()
         {
             SetElements(new[] {_build?.Invoke()});
@@ -58,7 +55,11 @@ namespace RosettaUI
         {
             if (_rebuildIf?.Invoke(this) ?? false)
             {
-                Element?.Destroy();
+                foreach (var e in elements)
+                {
+                    e?.Destroy();
+                }
+
                 BuildElement();
                 RebuildChildren();
             }

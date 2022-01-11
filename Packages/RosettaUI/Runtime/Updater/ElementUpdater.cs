@@ -5,9 +5,9 @@ namespace RosettaUI
 {
     public class ElementUpdater
     {
-        private readonly HashSet<Element> _elements = new HashSet<Element>();
-        private readonly Queue<Element> _registerQueue = new Queue<Element>();
-        private readonly Queue<Element> _unregisterQueue = new Queue<Element>();
+        private readonly HashSet<Element> _elements = new();
+        private readonly Queue<Element> _registerQueue = new();
+        private readonly Queue<Element> _unregisterQueue = new();
 
         public IReadOnlyCollection<Element> Elements => _elements;
 
@@ -29,6 +29,7 @@ namespace RosettaUI
                     RegisterWindowRecursive(e);
                 }
 
+                elementGroup.onRebuildChildren -= RegisterWindowRecursive;
                 elementGroup.onRebuildChildren += RegisterWindowRecursive;
             }
         }

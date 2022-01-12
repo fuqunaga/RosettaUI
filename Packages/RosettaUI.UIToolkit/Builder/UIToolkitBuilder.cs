@@ -25,7 +25,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(BoxElement)] = Build_Box,
                 [typeof(ScrollViewElement)] = Build_ScrollView,
                 [typeof(IndentElement)] = Build_Indent,
-                [typeof(IndentElement)] = Build_Indent,
+                [typeof(PageElement)] = Build_Column,
                 
                 [typeof(CompositeFieldElement)] = Build_CompositeField,
                 [typeof(LabelElement)] = Build_Label,

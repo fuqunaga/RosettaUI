@@ -10,7 +10,7 @@ namespace RosettaUI
                 
         #region Space
 
-        public static SpaceElement Space() => new SpaceElement();
+        public static SpaceElement Space() => new();
         
         #endregion
         

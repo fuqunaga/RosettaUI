@@ -9,7 +9,7 @@ namespace RosettaUI.Builder
         {
             var indent = 0;
             var parent = element.Parent;
-            while (parent != null)
+            while (parent != null && parent is not PageElement)
             {
                 if (parent is IndentElement or FoldElement) indent++;
                 parent = parent.Parent;
@@ -28,7 +28,7 @@ namespace RosettaUI.Builder
         {
             return IsValidElement(element) && IsValidParent(element) && element.IsLeftMost();
             
-            static bool IsValidElement(Element e) => e is not ElementGroup or RowElement or CompositeFieldElement or FoldElement or BoxElement;
+            static bool IsValidElement(Element e) => e is not ElementGroup or CompositeFieldElement or FoldElement or BoxElement;
 
             static bool IsValidParent(Element e) => e.Parent is ElementGroup {IsTreeViewIndentGroup : true} group && group.Contents.Contains(e);
        
@@ -37,7 +37,7 @@ namespace RosettaUI.Builder
         public static bool IsLeftMost(this Element element)
         {
             var parent = element.Parent;
-            while(parent != null)
+            while(parent != null && parent is not PageElement)
             {
                 switch (parent)
                 {

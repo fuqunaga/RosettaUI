@@ -20,6 +20,11 @@ namespace RosettaUI.Example
 
         public Texture texture;
 
+        [Multiline]
+        public string multiLineStringValue = "this is\nmultiline\nstring";
+
+
+        
         public Element CreateElement()
         {
             string nullString = null;
@@ -45,7 +50,11 @@ namespace RosettaUI.Example
                     UI.Space(),
                     UI.Label($"< {nameof(UI.Space)}")
                 ),
-                
+                UI.Box(
+                    UI.Label("TextArea"),
+                    UI.TextArea(() => multiLineStringValue),
+                    UI.TextAreaReadOnly(() => multiLineStringValue)
+                ),
                 UI.Row(
                     UI.Label(nameof(UI.Image)),
                     UI.Image(() => texture).SetMaxWidth(200f).SetMaxHeight(200f)

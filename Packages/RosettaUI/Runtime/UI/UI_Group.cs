@@ -42,6 +42,11 @@ namespace RosettaUI
         {
             return new IndentElement(elements);
         }
+        
+        public static PageElement Page(params Element[] elements) => Page(elements.AsEnumerable());
+
+        public static PageElement Page(IEnumerable<Element> elements) => new(new[] {Indent(elements)});
+        
         #endregion
 
 

@@ -9,6 +9,7 @@ namespace RosettaUI
         {
         }
 
+        /*
         public override string DisplayName
         {
             get
@@ -22,6 +23,8 @@ namespace RosettaUI
                 };
             }
         }
+        */
+        
         public override bool IsTreeViewIndentGroup => false;
     }
 }

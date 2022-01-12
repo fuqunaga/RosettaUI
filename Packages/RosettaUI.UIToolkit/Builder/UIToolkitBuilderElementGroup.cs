@@ -19,7 +19,7 @@ namespace RosettaUI.UIToolkit.Builder
             var windowElement = (WindowElement) element;
             var window = new Window();
             window.TitleBarContainerLeft.Add(Build(windowElement.bar));
-            window.closeButton.clicked += () => windowElement.Enable = !windowElement.Enable;
+            window.CloseButton.clicked += () => windowElement.Enable = !windowElement.Enable;
 
             windowElement.enableRx.SubscribeAndCallOnce(isOpen =>
             {

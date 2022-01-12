@@ -39,25 +39,24 @@ namespace RosettaUI.UIToolkit
         static readonly string UssClassNameTitleBarContainerRight = UssClassNameTitleBarContainer + "__right";
         static readonly string UssClassNameContentContainer = UssClassName + "__content-container";
        
-        readonly VisualElement _titleBarContainer = new VisualElement();
-        readonly VisualElement _titleBarContainerLeft = new VisualElement();
-        readonly VisualElement _titleBarContainerRight = new VisualElement();
-        readonly VisualElement _contentContainer = new VisualElement();
+        readonly VisualElement _titleBarContainer = new();
+        readonly VisualElement _contentContainer = new();
         
 
         Button _closeButton;
 
-        DragMode dragMode;
+        DragMode _dragMode;
 
-        Vector2 draggingLocalPosition;
+        Vector2 _draggingLocalPosition;
 
-        ResizeEdge resizeEdge;
+        ResizeEdge _resizeEdge;
 
-        public VisualElement TitleBarContainerLeft => _titleBarContainerLeft;
-        public VisualElement TitleBarContainerRight => _titleBarContainerRight;
+        public VisualElement TitleBarContainerLeft { get; } = new();
+
+        public VisualElement TitleBarContainerRight { get; } = new();
 
 
-        public Button closeButton
+        public Button CloseButton
         {
             get => _closeButton;
             set
@@ -66,11 +65,11 @@ namespace RosettaUI.UIToolkit
                 {
                     if (_closeButton != null)
                     {
-                        _titleBarContainerRight.Remove(_closeButton);
+                        TitleBarContainerRight.Remove(_closeButton);
                     }
 
                     _closeButton = value;
-                    _titleBarContainerRight.Add(_closeButton);
+                    TitleBarContainerRight.Add(_closeButton);
                 }
             }
         }
@@ -84,15 +83,15 @@ namespace RosettaUI.UIToolkit
             AddToClassList(UssClassName);
 
             _titleBarContainer.AddToClassList(UssClassNameTitleBarContainer);
-            _titleBarContainerLeft.AddToClassList(UssClassNameTitleBarContainerLeft);
-            _titleBarContainerRight.AddToClassList(UssClassNameTitleBarContainerRight);
+            TitleBarContainerLeft.AddToClassList(UssClassNameTitleBarContainerLeft);
+            TitleBarContainerRight.AddToClassList(UssClassNameTitleBarContainerRight);
             
-            _titleBarContainer.Add(_titleBarContainerLeft);
-            _titleBarContainer.Add(_titleBarContainerRight);
+            _titleBarContainer.Add(TitleBarContainerLeft);
+            _titleBarContainer.Add(TitleBarContainerRight);
             hierarchy.Add(_titleBarContainer);
 
-            closeButton = new WindowTitleButton();
-            closeButton.clicked += Hide;
+            CloseButton = new WindowTitleButton();
+            CloseButton.clicked += Hide;
             
             _contentContainer.AddToClassList(UssClassNameContentContainer);
             hierarchy.Add(_contentContainer);
@@ -115,7 +114,7 @@ namespace RosettaUI.UIToolkit
         {
             if (evt.button == 0)
             {
-                if (resizeEdge != ResizeEdge.None)
+                if (_resizeEdge != ResizeEdge.None)
                 {
                     StartResizeWindow();
                 }
@@ -131,12 +130,12 @@ namespace RosettaUI.UIToolkit
 
         protected virtual void OnPointerMoveOnRoot(PointerMoveEvent evt)
         {
-            if (dragMode != DragMode.None)
+            if (_dragMode != DragMode.None)
             {
                 // 画面外でボタンをUpされた場合検知できないので、現在押下中かどうかで判定する
                 if ((evt.pressedButtons & 0x1) != 0)
                 {
-                    switch (dragMode)
+                    switch (_dragMode)
                     {
                         case DragMode.DragWindow:
                             UpdateDragWindow(evt.position);
@@ -159,7 +158,7 @@ namespace RosettaUI.UIToolkit
         {
             if (evt.button == 0)
             {
-                dragMode = DragMode.None;
+                _dragMode = DragMode.None;
                 FinishDrag();
             }
         }
@@ -167,7 +166,7 @@ namespace RosettaUI.UIToolkit
 
         protected virtual void OnMouseMove(MouseMoveEvent evt)
         {
-            if (resizable && dragMode == DragMode.None)
+            if (resizable && _dragMode == DragMode.None)
             {
                 UpdateResizeEdgeAndCursor(evt.localMousePosition);
             }
@@ -175,7 +174,7 @@ namespace RosettaUI.UIToolkit
 
         protected virtual void OnMouseOut(MouseOutEvent evt)
         {
-            if (dragMode != DragMode.ResizeWindow)
+            if (_dragMode != DragMode.ResizeWindow)
             {
                 CursorManager.ResetCursor();
             }
@@ -186,7 +185,7 @@ namespace RosettaUI.UIToolkit
 
         void FinishDrag()
         {
-            dragMode = DragMode.None;
+            _dragMode = DragMode.None;
             UnregisterPanelCallback();
 
             ResetCursor();
@@ -194,7 +193,7 @@ namespace RosettaUI.UIToolkit
 
         void ResetCursor()
         {
-            if (resizeEdge != ResizeEdge.None)
+            if (_resizeEdge != ResizeEdge.None)
             {
                 CursorManager.ResetCursor();
             }
@@ -204,14 +203,14 @@ namespace RosettaUI.UIToolkit
 
         void StartDragWindow(Vector2 localPosition)
         {
-            dragMode = DragMode.DragWindow;
-            draggingLocalPosition = localPosition;
+            _dragMode = DragMode.DragWindow;
+            _draggingLocalPosition = localPosition;
         }
 
 
         void UpdateDragWindow(Vector2 position)
         {
-            var pos = position - draggingLocalPosition;
+            var pos = position - _draggingLocalPosition;
 
             style.left = pos.x;
             style.top = pos.y;
@@ -241,7 +240,7 @@ namespace RosettaUI.UIToolkit
 
         void StartResizeWindow()
         {
-            dragMode = DragMode.ResizeWindow;
+            _dragMode = DragMode.ResizeWindow;
         }
 
         private void UpdateResizeWindow(Vector2 position)
@@ -249,7 +248,7 @@ namespace RosettaUI.UIToolkit
             SetResizeCursor();
 
 
-            if (resizeEdge.HasFlag(ResizeEdge.Top))
+            if (_resizeEdge.HasFlag(ResizeEdge.Top))
             {
                 var diff = resolvedStyle.top - position.y;
 
@@ -257,13 +256,13 @@ namespace RosettaUI.UIToolkit
                 style.minHeight = diff + layout.height;
             }
 
-            if (resizeEdge.HasFlag(ResizeEdge.Bottom))
+            if (_resizeEdge.HasFlag(ResizeEdge.Bottom))
             {
                 var top = resolvedStyle.top;
                 style.minHeight = position.y - top;
             }
 
-            if (resizeEdge.HasFlag(ResizeEdge.Left))
+            if (_resizeEdge.HasFlag(ResizeEdge.Left))
             {
                 var diff = resolvedStyle.left - position.x;
 
@@ -271,7 +270,7 @@ namespace RosettaUI.UIToolkit
                 style.minWidth = diff + layout.width;
             }
 
-            if (resizeEdge.HasFlag(ResizeEdge.Right))
+            if (_resizeEdge.HasFlag(ResizeEdge.Right))
             {
                 var left = resolvedStyle.left;
                 style.minWidth = position.x - left;
@@ -285,7 +284,6 @@ namespace RosettaUI.UIToolkit
             var bottom = localPosition.y >= resolvedStyle.height - resolvedStyle.borderBottomWidth;
             var left = localPosition.x <= resolvedStyle.borderLeftWidth;
             var right = localPosition.x >= resolvedStyle.width - resolvedStyle.borderRightWidth;
-
 
             var edge = ResizeEdge.None;
             if (top)
@@ -337,14 +335,16 @@ namespace RosettaUI.UIToolkit
 
         void UpdateResizeEdgeAndCursor(Vector2 localPosition)
         {
-            resizeEdge = CalcEdge(localPosition);
+            _resizeEdge = CalcEdge(localPosition);
             SetResizeCursor();
         }
 
         void SetResizeCursor()
         {
-            var cursorType = ToCursorType(resizeEdge);
+            var cursorType = ToCursorType(_resizeEdge);
 
+            // カーソルを元に戻すのはOnMouseOutイベントで行う
+            // ここので元に戻すと子要素でカーソルを変化させてもここで上書きしてしまう
             if (cursorType != CursorType.Default)
             {
                 CursorManager.SetCursor(cursorType);

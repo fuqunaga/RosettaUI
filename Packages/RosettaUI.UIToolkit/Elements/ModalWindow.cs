@@ -19,9 +19,9 @@ namespace RosettaUI.UIToolkit
 
         public ModalWindow() : base(false)
         {
-            closeButton = new WindowTitleButton();
-            closeButton.clicked += Hide;
-            closeButton.visible = false;
+            CloseButton = new WindowTitleButton();
+            CloseButton.clicked += Hide;
+            CloseButton.visible = false;
 
             _eventBlockerElement = new VisualElement();
             _eventBlockerElement.AddToClassList(ussClassNameEventBlocker);

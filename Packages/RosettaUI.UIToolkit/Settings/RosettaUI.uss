@@ -28,7 +28,7 @@
 ********************************************************************************/
 .rosettaui-window {
     --window-border-width: 4px;
-    --window-border-width-inverse: -4px;
+    /*--window-border-width-inverse: -4px;*/
     
     background-color: var(--window-color);
     position: absolute;
@@ -38,7 +38,8 @@
 }
 
 .rosettaui-window__titlebar-container {
-    margin: var(--window-border-width-inverse) var(--window-border-width-inverse) 0px var(--window-border-width-inverse);
+    /*margin: var(--window-border-width-inverse) var(--window-border-width-inverse) 0px var(--window-border-width-inverse);*/
+    margin: 2px;
     flex-direction: row;
 }
 
@@ -64,6 +65,9 @@
     -unity-background-image-tint-color: var(--gray-button-tint);
 }
 
+.rosettaui-window__content-container{
+    flex-grow: 1;
+}
 
 /********************************************************************************
 * Modal Window

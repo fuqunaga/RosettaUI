@@ -2,9 +2,9 @@
 
 namespace RosettaUI
 {
-    public class Column : ElementGroup
+    public class ColumnElement : ElementGroup
     {
-        public Column(IEnumerable<Element> children) : base(children)
+        public ColumnElement(IEnumerable<Element> children) : base(children)
         {
         }
 

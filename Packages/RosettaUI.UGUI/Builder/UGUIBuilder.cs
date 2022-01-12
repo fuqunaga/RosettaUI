@@ -25,8 +25,8 @@ namespace RosettaUI.UGUI.Builder
                 {
                     [typeof(WindowElement)] = (e) => Build_ElementGroup(e, resource.window),
                     [typeof(BoxElement)] = (e) => Build_ElementGroup(e, resource.panel),
-                    [typeof(Row)] = Build_Row,
-                    [typeof(Column)] = Build_Column,
+                    [typeof(RowElement)] = Build_Row,
+                    [typeof(ColumnElement)] = Build_Column,
                     [typeof(LabelElement)] = (e) => Build_Label((LabelElement)e),
                     [typeof(IntFieldElement)] = Build_IntField,
                     [typeof(FloatFieldElement)] = Build_FloatField,

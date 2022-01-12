@@ -28,7 +28,7 @@ namespace RosettaUI.Builder
         {
             return IsValidElement(element) && IsValidParent(element) && element.IsLeftMost();
             
-            static bool IsValidElement(Element e) => e is not ElementGroup or Row or CompositeFieldElement or FoldElement or BoxElement;
+            static bool IsValidElement(Element e) => e is not ElementGroup or RowElement or CompositeFieldElement or FoldElement or BoxElement;
 
             static bool IsValidParent(Element e) => e.Parent is ElementGroup {IsTreeViewIndentGroup : true} group && group.Contents.Contains(e);
        
@@ -41,7 +41,7 @@ namespace RosettaUI.Builder
             {
                 switch (parent)
                 {
-                    case Row row when row.Children.FirstOrDefault() != element:
+                    case RowElement row when row.Children.FirstOrDefault() != element:
                         return false;
 
                     case CompositeFieldElement c:

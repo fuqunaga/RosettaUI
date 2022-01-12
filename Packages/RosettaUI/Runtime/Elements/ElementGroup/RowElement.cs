@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace RosettaUI
 {
-    public class Row : ElementGroup
+    public class RowElement : ElementGroup
     {
-        public Row(IEnumerable<Element> children) : base(children)
+        public RowElement(IEnumerable<Element> children) : base(children)
         {
         }
 

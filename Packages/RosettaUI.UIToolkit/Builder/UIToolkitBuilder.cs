@@ -20,10 +20,11 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 [typeof(WindowElement)] = Build_Window,
                 [typeof(WindowLauncherElement)] = Build_WindowLauncher,
-                [typeof(Row)] = Build_Row,
-                [typeof(Column)] = Build_Column,
+                [typeof(RowElement)] = Build_Row,
+                [typeof(ColumnElement)] = Build_Column,
                 [typeof(BoxElement)] = Build_Box,
                 [typeof(ScrollViewElement)] = Build_ScrollView,
+                [typeof(IndentElement)] = Build_Indent,
                 [typeof(IndentElement)] = Build_Indent,
                 
                 [typeof(CompositeFieldElement)] = Build_CompositeField,
@@ -71,7 +72,7 @@ namespace RosettaUI.UIToolkit.Builder
 
                 var (label, uiLeftWidth) = element switch
                 {
-                    Row or WindowLauncherElement => (null,0),
+                    RowElement or WindowLauncherElement => (null,0),
                     FoldElement f => (f.bar.FirstFieldLabel(), LayoutSettings.IndentSize),
                     _ => (element.FirstFieldLabel(),0)
                 };

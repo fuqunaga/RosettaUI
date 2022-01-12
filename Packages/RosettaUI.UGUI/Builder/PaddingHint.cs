@@ -11,7 +11,7 @@ namespace RosettaUI.UGUI.Builder
             var parent = element.Parent;
             while (parent != null)
             {
-                if (parent is Row)
+                if (parent is RowElement)
                 {
                     ret = false;
                     break;

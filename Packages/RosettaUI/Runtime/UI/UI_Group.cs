@@ -8,18 +8,18 @@ namespace RosettaUI
         
         #region Row/Column/Box/ScrollView/Indent
 
-        public static Row Row(params Element[] elements) => Row(elements.AsEnumerable());
+        public static RowElement Row(params Element[] elements) => Row(elements.AsEnumerable());
 
-        public static Row Row(IEnumerable<Element> elements)
+        public static RowElement Row(IEnumerable<Element> elements)
         {
-            return new Row(elements);
+            return new RowElement(elements);
         }
 
-        public static Column Column(params Element[] elements) => Column(elements.AsEnumerable());
+        public static ColumnElement Column(params Element[] elements) => Column(elements.AsEnumerable());
 
-        public static Column Column(IEnumerable<Element> elements)
+        public static ColumnElement Column(IEnumerable<Element> elements)
         {
-            return new Column(elements);
+            return new ColumnElement(elements);
         }
 
         public static BoxElement Box(params Element[] elements) => Box(elements.AsEnumerable());

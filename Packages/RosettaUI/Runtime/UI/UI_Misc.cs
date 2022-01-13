@@ -14,7 +14,6 @@ namespace RosettaUI
         
         #endregion
         
-        
         #region Image
 
         public static ImageElement Image(Texture texture)
@@ -86,6 +85,11 @@ namespace RosettaUI
         #endregion
 
 
+        #region HelpBox
 
+        public static HelpBoxElement HelpBox(LabelElement message, HelpBoxType helpBoxType = HelpBoxType.None) 
+            => new(message, helpBoxType);
+
+        #endregion
     }
 }

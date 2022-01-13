@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace RosettaUI.Example
 {
@@ -123,6 +124,12 @@ namespace RosettaUI.Example
                         UI.Label("Box1"),
                         UI.Label("Box2")
                     ),
+                    
+                    UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.None)}", HelpBoxType.None),
+                    UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.Info)}", HelpBoxType.Info),
+                    UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.Warning)}", HelpBoxType.Warning),
+                    UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.Error)}", HelpBoxType.Error),
+                    
                     UI.Fold("Fold",
                         UI.Fold("Fold2",
                             UI.Fold("Fold3",

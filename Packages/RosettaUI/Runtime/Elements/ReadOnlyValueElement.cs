@@ -46,7 +46,6 @@ namespace RosettaUI
             {
                 me.listenValue += action;
             }
-            
         }
     }
 }

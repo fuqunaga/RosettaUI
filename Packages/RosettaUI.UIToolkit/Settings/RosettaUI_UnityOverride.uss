@@ -176,6 +176,16 @@
 }
 
 /********************************************************************************
+* help box
+********************************************************************************/
+.unity-help-box{
+    background-color: var(--rosettaui-color-box-background);
+    border-color: var(--unity-colors-input_field-border);
+    /*border-width: 2px;*/
+}
+
+
+/********************************************************************************
 * button
 ********************************************************************************/
 .unity-button {
@@ -345,6 +355,6 @@
     -unity-slice-top: 8;
     -unity-slice-bottom: 8;
     border-width: 0;
-    left: 2;
+    left: 2px;
     width: 14px;
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using RosettaUI.Reactive;
 using UnityEngine.UIElements;
 
@@ -107,6 +109,29 @@ namespace RosettaUI.UIToolkit.Builder
             var box = new Box();
             return Build_ElementGroupContents(box, element);
         }
+        
+        private VisualElement Build_HelpBox(Element element)
+        {
+            var helpBoxElement = (HelpBoxElement) element;
+        
+            var helpBox = new HelpBox(null, GetHelpBoxMessageType(helpBoxElement.helpBoxType));
+            helpBoxElement.label.SubscribeValueOnUpdateCallOnce(str => helpBox.text = str);
+
+            return helpBox;
+
+            static HelpBoxMessageType GetHelpBoxMessageType(HelpBoxType helpBoxType)
+            {
+                return helpBoxType switch
+                {
+                    HelpBoxType.None => HelpBoxMessageType.None,
+                    HelpBoxType.Info => HelpBoxMessageType.Info,
+                    HelpBoxType.Warning => HelpBoxMessageType.Warning,
+                    HelpBoxType.Error => HelpBoxMessageType.Error,
+                    _ => throw new ArgumentOutOfRangeException(nameof(helpBoxType), helpBoxType, null)
+                };
+            }
+        }
+        
 
         VisualElement Build_ScrollView(Element element)
         {
@@ -117,12 +142,6 @@ namespace RosettaUI.UIToolkit.Builder
         VisualElement Build_Indent(Element element)
         {
             var ve = new VisualElement();
-            
-            /*
-            ve.AddToClassList(UssClassName.Indent);
-            ve.style.marginLeft = LayoutSettings.IndentSize;
-            */
-            
             return Build_ElementGroupContents(ve, element);
         }
 

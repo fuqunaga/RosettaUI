@@ -55,24 +55,7 @@ namespace RosettaUI.Builder
         protected virtual void SetDefaultCallbacks(Element element, TUIObj uiObj)
         {
             element.enableRx.SubscribeAndCallOnce((enable) => OnElementEnableChanged(element, uiObj, enable));
-            
-            // foldElement always can be opened and closed
-            if (element is FoldElement foldElement)
-            {
-                foldElement.interactableRx.SubscribeAndCallOnce(interactable =>
-                {
-                    foldElement.bar.Interactable &= interactable;
-                    foreach (var c in foldElement.Contents)
-                    {
-                        c.Interactable &= interactable;
-                    }
-                });
-            }
-            else
-            {
-                element.interactableRx.SubscribeAndCallOnce((interactable) => OnElementInteractableChanged(element, uiObj, interactable));
-            }
-
+            element.interactableRx.SubscribeAndCallOnce((interactable) => OnElementInteractableChanged(element, uiObj, interactable));
             element.Style.SubscribeAndCallOnce((style) => OnElementStyleChanged(element, uiObj, style));
             element.onDestroy += OnDestroyElement;
 

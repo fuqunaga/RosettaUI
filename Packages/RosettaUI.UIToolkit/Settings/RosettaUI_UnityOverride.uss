@@ -96,6 +96,48 @@
     background-color: var(--unity-colors-highlight-background-inactive);
 }
 
+
+/********************************************************************************
+* foldout
+********************************************************************************/
+.unity-foldout .unity-base-field__label{
+    min-width: initial; /* remove unity value */
+}
+
+.unity-foldout__toggle
+{
+    margin: 0;
+}
+
+.unity-foldout__toggle > .unity-toggle__input,
+.unity-foldout__toggle:disabled > .unity-toggle__input /* remove  .unity-toggle:disabled > .unity-toggle__input*/
+{
+    border-width: 0;
+    margin-left: 0;
+    background-color: initial;
+}
+.unity-foldout__toggle > .unity-toggle__input > .unity-toggle__checkmark
+{
+    margin: 0 2px;
+    -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
+}
+
+.unity-foldout__toggle > .unity-toggle__input,
+.unity-foldout__toggle .unity-base-field
+{
+    flex-grow: 0;
+}
+
+.unity-foldout__content{
+    margin-left: 0;
+}
+
+/* remove .unity-toggle > .unity-toggle__input:disabled > .unity-toggle__checkmark */
+.unity-foldout__toggle > .unity-toggle__input:disabled > .unity-toggle__checkmark{
+    background-color: initial;
+}
+
+
 /********************************************************************************
 * popup
 ********************************************************************************/
@@ -137,41 +179,6 @@
 }
 
 
-/********************************************************************************
-* foldout
-********************************************************************************/
-.unity-foldout .unity-base-field__label{
-    min-width: initial; /* remove unity value */
-}
-
-.unity-foldout__toggle
-{
-    margin: 0;
-}
-
-.unity-foldout__toggle > .unity-toggle__input{
-    border-width: 0;
-    margin-left: 0;
-    background-color: initial;
-}
-.unity-foldout__toggle > .unity-toggle__input > .unity-toggle__checkmark
-{
-    margin: 0 2px;
-    -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
-}
-
-.unity-foldout__toggle > .unity-toggle__input
-{
-    flex-grow: 0;
-}
-.unity-foldout__toggle .unity-base-field{
-    flex-grow: 0;
-}
-
-
-.unity-foldout__content{
-    margin-left: 0;
-}
 
 
 /********************************************************************************

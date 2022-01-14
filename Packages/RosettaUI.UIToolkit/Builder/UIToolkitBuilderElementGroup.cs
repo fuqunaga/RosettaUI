@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using RosettaUI.Reactive;
+using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -40,7 +41,11 @@ namespace RosettaUI.UIToolkit.Builder
             
             var toggle = fold.Q<Toggle>();
             toggle.Add(Build(foldElement.bar));
-            // Foldout直下のToggleはmarginLeftがdefault.uss で書き換わるので上書きしておく
+            
+            // disable 中でもクリック可能
+            UIToolkitUtility.SetAcceptClicksIfDisabled(toggle);
+            
+            // Foldout 直下の Toggle は marginLeft が default.uss で書き換わるので上書きしておく
             // セレクタ例： .unity-foldout--depth-1 > .unity-fold__toggle
             toggle.style.marginLeft = 0;
             

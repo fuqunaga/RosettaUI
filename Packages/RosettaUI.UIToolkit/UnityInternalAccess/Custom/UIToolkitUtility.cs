@@ -19,5 +19,10 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
 
             return false;
         }
+
+        public static void SetAcceptClicksIfDisabled(BaseBoolField baseBoolField, bool flag = true)
+        {
+            baseBoolField.m_Clickable.acceptClicksIfDisabled = flag;
+        }
     }
 }

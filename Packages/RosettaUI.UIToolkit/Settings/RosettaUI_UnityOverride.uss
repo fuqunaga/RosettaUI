@@ -109,6 +109,11 @@
     margin: 0;
 }
 
+.unity-foldout__toggle:hover
+{
+    background-color: var(--unity-colors-input_field-border-hover);
+}
+
 .unity-foldout__toggle > .unity-toggle__input,
 .unity-foldout__toggle:disabled > .unity-toggle__input /* remove  .unity-toggle:disabled > .unity-toggle__input*/
 {

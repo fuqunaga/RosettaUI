@@ -69,7 +69,7 @@ namespace RosettaUI.UGUI.Builder
             }
 
 
-            protected override void SetTreeViewIndent(Element element, GameObject uiObj, int indentLevel)
+            protected override void SetTreeViewIndent(Element element, GameObject uiObj, int indentLevelSelf, int indentLevel)
             {
                 throw new NotImplementedException();
             }

@@ -223,13 +223,13 @@
     background-color: var(--unity-colors-button-background-hover);
 }
 
-    /*--unity-colors-button-background-focus: #6E6E6E;*/
+    /*--unity-colors-button-background-focus: #6e6e6e;*/
     /*--unity-colors-button-background-hover: #676767;*/
     /*--unity-colors-button-background-pressed: #353535;*/
     /*--unity-colors-button-border: #303030;*/
     /*--unity-colors-button-border_accent: #242424;*/
-    /*--unity-colors-button-border-pressed: #0D0D0D;*/
-    /*--unity-colors-button-text: #EEEEEE;*/
+    /*--unity-colors-button-border-pressed: #0d0d0d;*/
+    /*--unity-colors-button-text: #eeeeee;*/
 
 
 /********************************************************************************
@@ -271,8 +271,8 @@
 
 /********************************************************************************
 * min max slider
-*  unity-min-max-slider__dragger に9Sliceの画像をセットしておいて
-*  C#側の UnityEngine.UIElements.MinMaxSlider が
+*  unity-min-max-slider__dragger に9sliceの画像をセットしておいて
+*  c#側の unityengine.uielements.minmaxslider が
 *  min/max-thumbを自動的に求めるコードになっている
 ********************************************************************************/
 .unity-min-max-slider{

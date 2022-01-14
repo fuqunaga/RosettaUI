@@ -55,25 +55,17 @@ namespace RosettaUI.UIToolkit.Builder
 
         protected override IReadOnlyDictionary<Type, Func<Element, VisualElement>> BuildFuncTable => _buildFuncTable;
 
-        protected override void SetTreeViewIndent(Element element, VisualElement uiObj, int indentLevel)
+        protected override void SetTreeViewIndent(Element element, VisualElement uiObj, int indentLevelSelf, int indentLevel)
         {
             uiObj.schedule.Execute(() =>
             {
-                // Foldout自体でインデントしてしまうと子要素すべてがインデントしてしまうので、FoldoutのインデントはToggle部分で行う
-                // インデントは親でまとめて行わず各要素ごとに行う設計
-                if (uiObj is Foldout fold)
-                {
-                    uiObj = fold.Q<Toggle>();
-                }
-
-                var indentSize = indentLevel * LayoutSettings.IndentSize;
                 var marginLeft = uiObj.resolvedStyle.marginLeft;
-                uiObj.style.marginLeft = marginLeft + indentSize;
+                uiObj.style.marginLeft = marginLeft + indentLevelSelf * LayoutSettings.IndentSize;
 
 
                 var (label, uiLeftWidth) = element switch
                 {
-                    RowElement or WindowLauncherElement => (null,0),
+                    RowElement or WindowLauncherElement or BoxElement => (null,0),
                     FoldElement f => (f.bar.FirstFieldLabel(), LayoutSettings.IndentSize),
                     _ => (element.FirstFieldLabel(),0)
                 };
@@ -82,7 +74,7 @@ namespace RosettaUI.UIToolkit.Builder
                 {
                     var labelObj = GetUIObj(label);
                     Assert.IsNotNull(labelObj, $"UIObj is not found. {element.GetType()} > Label[{label.Value}]");
-                    labelObj.style.minWidth = Mathf.Max(0f, LayoutSettings.LabelWidth - indentSize - uiLeftWidth);
+                    labelObj.style.minWidth = Mathf.Max(0f, LayoutSettings.LabelWidth - indentLevel * LayoutSettings.IndentSize - uiLeftWidth);
 
                     // Foldout直下のラベルはmarginRight、paddingRightがUnityDefaultCommon*.uss で書き換わるので上書きしておく
                     // セレクタ例： .unity-foldout--depth-1 > .unity-base-field > .unity-base-field__label

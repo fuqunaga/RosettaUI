@@ -48,7 +48,10 @@ namespace RosettaUI.Builder
         {
             if (element.IsTreeViewIndentTarget())
             {
-                SetTreeViewIndent(element, uiObj, element.GetIndentLevel());
+                var indent = element.GetIndentLevel();
+                var parentIndent = element.GetParentIndentLevel();
+                var indentSelf = indent - parentIndent;
+                SetTreeViewIndent(element, uiObj, indentSelf, indent);
             }
         }
 
@@ -65,7 +68,7 @@ namespace RosettaUI.Builder
             }
         }
 
-        protected abstract void SetTreeViewIndent(Element element, TUIObj uiObj, int indentLevel);
+        protected abstract void SetTreeViewIndent(Element element, TUIObj uiObj, int indentLevelSelf, int indentLevel);
         
         protected abstract void OnElementEnableChanged(Element element, TUIObj uiObj, bool enable);
         protected abstract void OnElementInteractableChanged(Element element, TUIObj uiObj, bool interactable);

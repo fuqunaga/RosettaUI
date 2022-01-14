@@ -63,9 +63,10 @@ namespace RosettaUI
                 barRight: field,
                 elements: new[]
                 {
-                    Box(
+                    Box(Indent(
                         List(listBinder, createItemElement),
                         buttons
+                        )
                     )
                 }
             );

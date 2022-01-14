@@ -46,7 +46,7 @@ namespace RosettaUI.Example
             return UI.Column(
                 UI.Row(
                     UI.Page(
-                        UI.Label("<b>UI.Field()</b>"),
+                        UI.Label("<b>UI.Field(() => target)</b>"),
                         UI.Indent(
                             UI.Field(() => intValue),
                             UI.Field(() => uintValue),
@@ -72,82 +72,93 @@ namespace RosettaUI.Example
                         )
                     ),
                     UI.Page(
-                        UI.Label("<b>UI.FieldReadOnly()</b>"),
+                        UI.Label("<b>UI.FieldReadOnly(() => target)</b>"),
                         UI.Indent(
-                            UI.FieldReadOnly(nameof(intValue), () => intValue),
-                            UI.FieldReadOnly(nameof(uintValue), () => uintValue),
-                            UI.FieldReadOnly(nameof(floatValue), () => floatValue),
-                            UI.FieldReadOnly(nameof(stringValue), () => stringValue),
-                            UI.FieldReadOnly(nameof(boolValue), () => boolValue),
-                            UI.FieldReadOnly(nameof(enumValue), () => enumValue),
-                            UI.FieldReadOnly(nameof(colorValue), () => colorValue),
-                            UI.FieldReadOnly(nameof(vector2Value), () => vector2Value),
-                            UI.FieldReadOnly(nameof(vector3Value), () => vector3Value),
-                            UI.FieldReadOnly(nameof(vector4Value), () => vector4Value),
-                            UI.FieldReadOnly(nameof(vector2IntValue), () => vector2IntValue),
-                            UI.FieldReadOnly(nameof(vector3IntValue), () => vector3IntValue),
-                            UI.FieldReadOnly(nameof(rectValue), () => rectValue),
-                            UI.FieldReadOnly(nameof(rectIntValue), () => rectIntValue),
-                            UI.FieldReadOnly(nameof(rectOffsetValue), () => rectOffsetValue),
-                            UI.FieldReadOnly(nameof(boundsValue), () => boundsValue),
-                            UI.FieldReadOnly(nameof(boundsIntValue), () => boundsIntValue),
-                            UI.FieldReadOnly(nameof(intList), () => intList),
-                            UI.FieldReadOnly(nameof(floatArray), () => floatArray),
-                            UI.FieldReadOnly(nameof(simpleClass), () => simpleClass),
-                            UI.FieldReadOnly(nameof(classList), () => classList)
+                            UI.FieldReadOnly(() => intValue),
+                            UI.FieldReadOnly(() => uintValue),
+                            UI.FieldReadOnly(() => floatValue),
+                            UI.FieldReadOnly(() => stringValue),
+                            UI.FieldReadOnly(() => boolValue),
+                            UI.FieldReadOnly(() => enumValue),
+                            UI.FieldReadOnly(() => colorValue),
+                            UI.FieldReadOnly(() => vector2Value),
+                            UI.FieldReadOnly(() => vector3Value),
+                            UI.FieldReadOnly(() => vector4Value),
+                            UI.FieldReadOnly(() => vector2IntValue),
+                            UI.FieldReadOnly(() => vector3IntValue),
+                            UI.FieldReadOnly(() => rectValue),
+                            UI.FieldReadOnly(() => rectIntValue),
+                            UI.FieldReadOnly(() => rectOffsetValue),
+                            UI.FieldReadOnly(() => boundsValue),
+                            UI.FieldReadOnly(() => boundsIntValue),
+                            UI.FieldReadOnly(() => intList),
+                            UI.FieldReadOnly(() => floatArray),
+                            UI.FieldReadOnly(() => simpleClass),
+                            UI.FieldReadOnly(() => classList)
                         )
                     )
                 ),
                 UI.Space().SetHeight(10f),
                 UI.Page(
-                    UI.Label("<b>Usage</b>"),
+                    UI.Label("<b>Tips</b>"),
                     UI.Indent(
+                        UI.Label("<b>UI.Field(\"CustomLabel\", () => floatValue)</b>"),
                         UI.Field("CustomLabel", () => floatValue),
+                        UI.Space().SetHeight(10f),
+                        
+                        UI.Label("<b>Element.RegisterValueChangeCallback()</b>"),
                         UI.Field("ValueChangedCallback", () => floatValue)
                             .RegisterValueChangeCallback(() => print($"{nameof(floatValue)} changed.")),
-
-                        // non-interactable if the expression is not assignable,
+                        UI.Space().SetHeight(10f),
+                        
+                        UI.Label("<b>non-interactable if the expression is not assignable</b>"),
                         UI.Field(() => floatValue + 1f),
-
-                        // interactable if (label,readValue,writeValue) style
+                        UI.Label("interactable if set label and writeValue func"),
                         UI.Field($"{nameof(floatValue)}  + 1f",
                             () => floatValue + 1f,
                             f => floatValue = f - 1f
-                        ),
-
-                        // Supports public member
+                            ),
+                        UI.Space().SetHeight(10f),
+                        
+                        UI.Label("<b>Supports public member</b>"),
                         UI.Field(() => vector2Value.x),
-
-                        // Null safe
+                        UI.Space().SetHeight(10f),
+                        
+                        UI.Label("<b>Null safe</b>"),
                         UI.Field(() => nullClass),
+                        UI.Space().SetHeight(10f),
+                        
 
                         // TODO
                         // Field with range attribute will become Slider
                         //, UI.Field(() => rangeValue)
 
-                        // IElementCreator will use CreateElement() method
+                        UI.Label("<b>If the target is IElementCreator, use CreateElement()</b>"),
                         UI.Field(() => elementCreator),
-                        UI.Fold("ReadOnly",
-                            UI.Label("ReadOnly: only display the value"),
-                            UI.FieldReadOnly(() => intValue),
-
-                            // UI.Field()'s targetExpressions cannot use ?.(null-conditional operator), {}(blocks) or local functions(ExpressionTree limitations)
-                            // but UI.FieldReadOnly(label, readValue) and UI.Field(label, readValue, writeValue) can
-                            //
-                            // UI.Field(() => stringValue?.Length), // compile error
-                            // UI.Field(() => { LocalFunction(); return intValue;}) // compile error
-                            UI.FieldReadOnly(nameof(UI.FieldReadOnly), () =>
+                        UI.Space().SetHeight(10f),
+                        
+                        UI.Label(
+                            "<b>ExpressionTree limitation</b>\n" +
+                            "UI.Field()'s targetExpressions cannot use ?.(null-conditional operator), {}(blocks) or local functions.\n" +
+                            "but UI.FieldReadOnly(label, readValue) and UI.Field(label, readValue, writeValue) can."
+                            ),
+                        UI.HelpBox(
+                            "// UI.Field(() => stringValue?.Length), // compile error\n" +
+                            "// UI.Field(() => { LocalFunction(); return intValue;}) // compile error"
+                        ),
+                        UI.FieldReadOnly("UI.FieldReadOnly(label, readValue)", () =>
+                        {
+                            LocalFunction();
+                            return intValue;
+                        }),
+                        UI.Field("UI.Field(label, readValue, writeValue)",
+                            () =>
                             {
                                 LocalFunction();
                                 return intValue;
-                            })
-                        )
+                            },
+                            i => intValue = i)
                     )
-                    /*
-                    , UI.Fold("Complex types"
-                        , UI.Field(() => complexClass)
-                    )
-                    */
                 )
             );
 

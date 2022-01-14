@@ -22,7 +22,7 @@ namespace RosettaUI.Builder
         
         public static int GetIndentLevel(this Element element)
         {
-            var indent = element.AsIndentParentEnumerable().Count(parent => parent is IndentElement or FoldElement or BoxElement);
+            var indent = element.AsIndentParentEnumerable().Count(parent => parent is IndentElement or FoldElement);
                        
             // Cancelling the  indent of icons width
             if (element is FoldElement)

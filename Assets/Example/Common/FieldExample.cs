@@ -106,24 +106,26 @@ namespace RosettaUI.Example
                         UI.Field("CustomLabel", () => floatValue),
                         UI.Space().SetHeight(10f),
                         
+                        UI.Label("<b>UI.Field(() => vector2Value.x)</b>"),
+                        UI.Label("Supports public field/property"),
+                        UI.Field(() => vector2Value.x),
+                        UI.Space().SetHeight(10f),
+
                         UI.Label("<b>Element.RegisterValueChangeCallback()</b>"),
                         UI.Field("ValueChangedCallback", () => floatValue)
                             .RegisterValueChangeCallback(() => print($"{nameof(floatValue)} changed.")),
                         UI.Space().SetHeight(10f),
-                        
-                        UI.Label("<b>non-interactable if the expression is not assignable</b>"),
+
+                        UI.Label("<b>UI.Field(() => floatValue + 1f),</b>"),
+                        UI.Label("Non-interactable if the expression is not assignable"),
                         UI.Field(() => floatValue + 1f),
-                        UI.Label("interactable if set label and writeValue func"),
+                        UI.Label("Interactable if set label and writeValue func"),
                         UI.Field($"{nameof(floatValue)}  + 1f",
                             () => floatValue + 1f,
                             f => floatValue = f - 1f
-                            ),
+                        ),
                         UI.Space().SetHeight(10f),
-                        
-                        UI.Label("<b>Supports public member</b>"),
-                        UI.Field(() => vector2Value.x),
-                        UI.Space().SetHeight(10f),
-                        
+
                         UI.Label("<b>Null safe</b>"),
                         UI.Field(() => nullClass),
                         UI.Space().SetHeight(10f),

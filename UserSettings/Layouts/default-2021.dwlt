@@ -14,15 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PixelRect:
     serializedVersion: 2
-    x: 3134.6667
-    y: 202
-    width: 1341.3334
-    height: 813.3334
+    x: 2696.6667
+    y: 667.3334
+    width: 1763.3334
+    height: 984.6667
   m_ShowMode: 0
-  m_Title: UI Toolkit Debugger
+  m_Title: UI Toolkit Event Debugger
   m_RootView: {fileID: 4}
-  m_MinSize: {x: 101, y: 123}
-  m_MaxSize: {x: 4001, y: 4023}
+  m_MinSize: {x: 640, y: 501}
+  m_MaxSize: {x: 4000, y: 4021}
   m_Maximized: 0
 --- !u!114 &2
 MonoBehaviour:
@@ -58,16 +58,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: UIElementsDebugger
+  m_Name: UIElementsEventsDebugger
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1341.3334
-    height: 813.3334
-  m_MinSize: {x: 100, y: 100}
+    width: 1763.3334
+    height: 984.6667
+  m_MinSize: {x: 640, y: 480}
   m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 18}
   m_Panes:
@@ -92,12 +92,12 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1341.3334
-    height: 813.3334
-  m_MinSize: {x: 101, y: 123}
-  m_MaxSize: {x: 4001, y: 4023}
+    width: 1763.3334
+    height: 984.6667
+  m_MinSize: {x: 640, y: 501}
+  m_MaxSize: {x: 4000, y: 4021}
   vertical: 0
-  controlID: 9931
+  controlID: 3097
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -174,7 +174,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 17
+  controlID: 115
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -250,7 +250,7 @@ MonoBehaviour:
   m_MinSize: {x: 400, y: 200}
   m_MaxSize: {x: 32384, y: 16192}
   vertical: 0
-  controlID: 69
+  controlID: 25
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -372,7 +372,7 @@ MonoBehaviour:
   m_MinSize: {x: 400, y: 200}
   m_MaxSize: {x: 32384, y: 16192}
   vertical: 1
-  controlID: 70
+  controlID: 26
 --- !u!114 &16
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -399,7 +399,7 @@ MonoBehaviour:
   m_MinSize: {x: 400, y: 100}
   m_MaxSize: {x: 32384, y: 8096}
   vertical: 0
-  controlID: 71
+  controlID: 27
 --- !u!114 &17
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -435,33 +435,245 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 13956, guid: 0000000000000000e000000000000000, type: 0}
+  m_Script: {fileID: 13957, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MinSize: {x: 100, y: 100}
+  m_MinSize: {x: 640, y: 480}
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
-    m_Text: UI Toolkit Debugger
+    m_Text: UI Toolkit Event Debugger
     m_Image: {fileID: 0}
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 3134.6667
-    y: 202
-    width: 1341.3334
-    height: 792.3334
+    x: 2696.6667
+    y: 667.3334
+    width: 1763.3334
+    height: 963.6667
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
   m_DebuggerImpl:
     m_LastVisualTreeName: RosettaUI_DefaultPanelSettings
-  m_DebuggerContext:
-    m_SelectedElementIndex: 554
-    m_ShowLayoutBound: 0
-    m_ShowRepaintOverlay: 0
-    m_ShowDrawStats: 0
-    m_BreakBatches: 0
+    m_AutoScroll: 1
+    m_MaxLogLines: 0
+    m_MaxLogLineCount: 5000
+    m_DisplayHistogramDurationMode: 0
+    m_PlaybackSpeed: 1
+    m_StateList:
+    - key: 21
+      value: 0
+    - key: 48
+      value: 0
+    - key: 17
+      value: 0
+    - key: 49
+      value: 0
+    - key: 50
+      value: 0
+    - key: 51
+      value: 0
+    - key: 52
+      value: 0
+    - key: 53
+      value: 0
+    - key: 54
+      value: 0
+    - key: 32
+      value: 0
+    - key: 33
+      value: 0
+    - key: 28
+      value: 0
+    - key: 7
+      value: 0
+    - key: 34
+      value: 0
+    - key: 8
+      value: 0
+    - key: 55
+      value: 0
+    - key: 14
+      value: 1
+    - key: 29
+      value: 1
+    - key: 16
+      value: 0
+    - key: 10
+      value: 0
+    - key: 11
+      value: 0
+    - key: 12
+      value: 0
+    - key: 56
+      value: 0
+    - key: 27
+      value: 0
+    - key: 5
+      value: 0
+    - key: 6
+      value: 0
+    - key: 43
+      value: 0
+    - key: 42
+      value: 0
+    - key: 3
+      value: 0
+    - key: 4
+      value: 0
+    - key: 30
+      value: 0
+    - key: 35
+      value: 1
+    - key: 57
+      value: 1
+    - key: 36
+      value: 1
+    - key: 22
+      value: 1
+    - key: 1
+      value: 0
+    - key: 9
+      value: 0
+    - key: 13
+      value: 0
+    - key: 18
+      value: 0
+    - key: 58
+      value: 0
+    - key: 19
+      value: 0
+    - key: 20
+      value: 0
+    - key: 39
+      value: 0
+    - key: 45
+      value: 0
+    - key: 47
+      value: 0
+    - key: 44
+      value: 0
+    - key: 46
+      value: 0
+    - key: 23
+      value: 0
+    - key: 15
+      value: 0
+    - key: 59
+      value: 0
+    - key: 60
+      value: 0
+    - key: 61
+      value: 0
+    - key: 62
+      value: 0
+    - key: 2
+      value: 0
+    - key: 24
+      value: 0
+    - key: 37
+      value: 0
+    - key: 25
+      value: 0
+    - key: 41
+      value: 0
+    - key: 26
+      value: 0
+    - key: 63
+      value: 0
+    - key: 64
+      value: 0
+    - key: 65
+      value: 0
+    - key: 66
+      value: 0
+    - key: 67
+      value: 0
+    - key: 68
+      value: 0
+    - key: 69
+      value: 0
+    - key: 70
+      value: 0
+    - key: 71
+      value: 0
+    - key: 72
+      value: 0
+    - key: 73
+      value: 0
+    - key: 74
+      value: 0
+    - key: 75
+      value: 0
+    - key: 76
+      value: 0
+    - key: 77
+      value: 0
+    - key: 78
+      value: 0
+    - key: 40
+      value: 0
+    - key: 79
+      value: 0
+    - key: 80
+      value: 0
+    - key: 81
+      value: 0
+    - key: 82
+      value: 0
+    - key: 83
+      value: 0
+    - key: 84
+      value: 0
+    - key: 85
+      value: 0
+    - key: 86
+      value: 0
+    - key: 87
+      value: 0
+    - key: 88
+      value: 0
+    - key: 89
+      value: 0
+    - key: 90
+      value: 0
+    - key: 91
+      value: 0
+    - key: 92
+      value: 0
+    - key: 93
+      value: 0
+    - key: 94
+      value: 0
+    - key: 0
+      value: 0
+    - key: -1
+      value: 0
+    - key: -2
+      value: 0
+    - key: -3
+      value: 0
+    - key: -4
+      value: 0
+    - key: -5
+      value: 1
+    - key: -6
+      value: 0
+    - key: -7
+      value: 0
+    - key: -8
+      value: 1
+    - key: -9
+      value: 0
+    - key: -10
+      value: 0
+    - key: -11
+      value: 0
+    - key: -12
+      value: 0
+    - key: -13
+      value: 0
 --- !u!114 &19
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -515,10 +727,10 @@ MonoBehaviour:
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 156}
-    m_SelectedIDs: 724d0000
-    m_LastClickedID: 19826
-    m_ExpandedIDs: 00000000004d0000024d0000044d0000064d0000084d00000a4d00000c4d00000e4d0000104d0000124d0000144d0000164d0000824d0000ffffff7f
+    scrollPos: {x: 0, y: 396}
+    m_SelectedIDs: 784d0000
+    m_LastClickedID: 19832
+    m_ExpandedIDs: 00000000004d0000024d0000044d0000064d0000084d00000a4d00000c4d00000e4d0000104d0000124d0000144d0000164d0000184d0000ffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -546,7 +758,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000004d0000024d0000044d0000064d0000084d00000a4d00000c4d00000e4d0000104d0000124d0000144d0000164d0000
+    m_ExpandedIDs: 00000000004d0000024d0000044d0000064d0000084d00000a4d00000c4d00000e4d0000104d0000124d0000144d0000164d0000184d0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -674,9 +886,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 644c0000
-      m_LastClickedID: 19556
-      m_ExpandedIDs: 3afbffff764c0000
+      m_SelectedIDs: 764c0000
+      m_LastClickedID: 19574
+      m_ExpandedIDs: 3afbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 

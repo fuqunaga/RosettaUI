@@ -48,7 +48,7 @@ namespace RosettaUI.Example
                         )
                     ),
                     UI.Page(
-                        UI.Label("<b>UI.SliderReadOnly(() => intValue)</b>"),
+                        UI.Label("<b>UI.SliderReadOnly(() => target)</b>"),
                         UI.Indent(
                             UI.SliderReadOnly(() => intValue),
                             UI.SliderReadOnly(() => uintValue),

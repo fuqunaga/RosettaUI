@@ -1,5 +1,5 @@
 :root {
-    --fixed-field-width-m: 105px;
+    --fixed-field-width-m: 110px;
     --fixed-field-width-s: 80px;
     --slider-min-width: 248px;
     --input-border-width: 2px;
@@ -11,11 +11,15 @@
     --rosettaui-highlight-gray: #808080;
     --rosettaui-highlight-dark-gray: #606060;
     --rosettaui-highlight-blue: rgb(0, 150, 230);
-    --rosettaui-slider-dragger-height: 14px;
-    --rosettaui-slider-dragger-border-radius: 7px;
-    --rosettaui-slider-tracker-margin-top: -2px;
+
     --rosettaui-slider-tracker-height: 4px;
+    --rosettaui-slider-tracker-margin-top: -2px; /* half of height */
     --rosettaui-slider-tracker-border-radius: 3px;
+    
+    --rosettaui-slider-dragger-height: 14px;
+    --rosettaui-slider-dragger-margin-top: -7px; /* half of height */
+    --rosettaui-slider-dragger-border-radius: 7px;
+    
     --rosettaui-scloller-size: 18px;
     
     font-size: 18px;

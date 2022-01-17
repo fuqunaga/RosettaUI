@@ -29,6 +29,12 @@ namespace RosettaUI.UIToolkit.Builder
                 if (isOpen) window.Show();
                 else window.Hide();
             });
+            
+            // Focusable.ExecuteDefaultEvent() 内の this.focusController?.SwitchFocusOnEvent(evt) で
+            // NavigationMoveEvent 方向にフォーカスを移動しようとする
+            // キー入力をしている場合などにフォーカスが移ってしまうのは避けたいのでWindow単位で抑制しておく
+            // UnityデフォルトでもTextFieldは抑制できているが、IntegerField.inputFieldでは出来ていないなど挙動に一貫性がない
+            window.RegisterCallback<NavigationMoveEvent>(evt => evt.PreventDefault());
 
             Build_ElementGroupContents(window.contentContainer, element);
             return window;

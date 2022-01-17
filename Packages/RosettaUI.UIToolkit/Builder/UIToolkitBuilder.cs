@@ -59,9 +59,7 @@ namespace RosettaUI.UIToolkit.Builder
         {
             uiObj.schedule.Execute(() =>
             {
-                var marginLeft = uiObj.resolvedStyle.marginLeft;
-                uiObj.style.marginLeft = marginLeft + indentLevelSelf * LayoutSettings.IndentSize;
-
+                uiObj.style.marginLeft = LayoutSettings.MarginLeftOfIndent + indentLevelSelf * LayoutSettings.IndentSize;
 
                 var (label, uiLeftWidth) = element switch
                 {

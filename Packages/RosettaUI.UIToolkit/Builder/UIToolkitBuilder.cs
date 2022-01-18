@@ -114,6 +114,7 @@ namespace RosettaUI.UIToolkit.Builder
             if (style.MaxWidth is { } maxWidth) ve.style.maxWidth = maxWidth;
             if (style.MaxHeight is { } maxHeight) ve.style.maxHeight = maxHeight;
             if (style.Color is { } color) ve.style.color = color;
+            if (style.BackgroundColor is { } backgroundColor) ve.style.backgroundColor = backgroundColor;
    
             if (isFixedSize)
             {

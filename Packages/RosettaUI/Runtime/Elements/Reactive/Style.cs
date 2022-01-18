@@ -16,6 +16,7 @@ namespace RosettaUI
         float? _maxWidth;
         float? _maxHeight;
         Color? _color;
+        Color? _backgroundColor;
 
         public float? Width
         {
@@ -56,6 +57,12 @@ namespace RosettaUI
         {
             get => _color;
             set => SetValue(ref _color, value);
+        }
+
+        public Color? BackgroundColor
+        {
+            get => _backgroundColor;
+            set => SetValue(ref _backgroundColor, value);
         }
         
         #endregion

@@ -63,6 +63,12 @@ namespace RosettaUI
             return element;
         }
         
+        public static Element SetBackgroundColor(this Element element, Color color)
+        {
+            element.Style.BackgroundColor = color;
+            return element;
+        }
+        
         public static Element RegisterValueChangeCallback(this Element element, Action onValueChanged)
         {
             element.onViewValueChanged += onValueChanged;

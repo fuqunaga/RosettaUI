@@ -72,7 +72,7 @@ namespace RosettaUI.Builder
     }
 
 
-    static class ElementIndentParentExtension
+    static class ElementIndentParentEnumerableExtension
     {
         public static IEnumerable<Element> AsIndentParentEnumerable(this Element element) =>
             new ElementIndentParentEnumerable(element);

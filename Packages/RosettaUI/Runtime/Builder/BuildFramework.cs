@@ -50,7 +50,7 @@ namespace RosettaUI.Builder
             {
                 var indent = element.GetIndentLevel();
                 var parentIndent = element.GetParentIndentLevel();
-                var indentSelf = indent - parentIndent;
+                var indentSelf = Mathf.Max(0, indent - parentIndent);
                 SetTreeViewIndent(element, uiObj, indentSelf, indent);
             }
         }

@@ -1,85 +1,91 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
+using UnityEngine.Assertions;
 
 namespace RosettaUI
 {
     public static partial class UI
     {
-        public static Element MinMaxSlider<T>(Expression<Func<MinMax<T>>> targetExpression) 
-            => MinMaxSlider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, null, null);
+        public static Element MinMaxSlider<TMinMax>(Expression<Func<TMinMax>> targetExpression) 
+            => MinMaxSlider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, null);
 
-        public static Element MinMaxSlider<T>(Expression<Func<MinMax<T>>> targetExpression, T max) 
-            => MinMaxSlider(targetExpression, default, max);
-
-
-        public static Element MinMaxSlider<T>(Expression<Func<MinMax<T>>> targetExpression, T min, T max) 
-            => MinMaxSlider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression,
-                ConstGetter.Create(min), ConstGetter.Create(max));
-
-
-        public static Element MinMaxSlider<T>(LabelElement label, Expression<Func<MinMax<T>>> targetExpression) 
-            => MinMaxSlider(label, targetExpression, null, null);
-
-        public static Element MinMaxSlider<T>(LabelElement label, Expression<Func<MinMax<T>>> targetExpression, T max) 
-            => MinMaxSlider(label, targetExpression, default, max);
-
-        public static Element MinMaxSlider<T>(LabelElement label, Expression<Func<MinMax<T>>> targetExpression, T min, T max) 
-            => MinMaxSlider(label, targetExpression, ConstGetter.Create(min), ConstGetter.Create(max));
+        public static Element MinMaxSlider<TMinMax>(Expression<Func<TMinMax>> targetExpression, TMinMax range) 
+            => MinMaxSlider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, range);
         
+        public static Element MinMaxSlider<TMinMax>(LabelElement label, Expression<Func<TMinMax>> targetExpression) 
+            => MinMaxSlider(label, targetExpression, null);
+        
+        public static Element MinMaxSlider<TMinMax>(LabelElement label, Expression<Func<TMinMax>> targetExpression, TMinMax range) 
+            => MinMaxSlider(label, targetExpression, ConstGetter.Create(range));
 
-        public static Element MinMaxSlider<T>(LabelElement label, Func<MinMax<T>> readValue, Action<MinMax<T>> writeValue) 
-            => MinMaxSlider(label, Binder.Create(readValue, writeValue), null, null);
-
-        public static Element MinMaxSlider<T>(LabelElement label, Func<MinMax<T>> readValue,  Action<MinMax<T>> writeValue, T max) 
-            => MinMaxSlider(label, readValue, writeValue, default, max);
-
-        public static Element MinMaxSlider<T>(LabelElement label, Func<MinMax<T>> readValue, Action<MinMax<T>> writeValue, T min, T max) 
-            => MinMaxSlider(label, Binder.Create(readValue, writeValue), ConstGetter.Create(min), ConstGetter.Create(max));
+        public static Element MinMaxSlider<TMinMax>(LabelElement label, Func<TMinMax> readValue, Action<TMinMax> writeValue) 
+            => MinMaxSlider(label, Binder.Create(readValue, writeValue), null);
+        
+        public static Element MinMaxSlider<TMinMax>(LabelElement label, Func<TMinMax> readValue, Action<TMinMax> writeValue, TMinMax range) 
+            => MinMaxSlider(label, Binder.Create(readValue, writeValue), ConstGetter.Create(range));
 
 
-
-        public static Element MinMaxSliderReadOnly<T>(Expression<Func<MinMax<T>>> targetExpression)
+        public static Element MinMaxSliderReadOnly<TMinMax>(Expression<Func<TMinMax>> targetExpression)
             => MinMaxSliderReadOnly(
                 ExpressionUtility.CreateLabelString(targetExpression), 
                 ExpressionUtility.CreateReadFunc(targetExpression)
                 );
 
-        public static Element MinMaxSliderReadOnly<T>(Expression<Func<MinMax<T>>> targetExpression, T max) 
-            => MinMaxSliderReadOnly(targetExpression, default, max);
-
-
-        public static Element MinMaxSliderReadOnly<T>(Expression<Func<MinMax<T>>> targetExpression, T min, T max)
+        public static Element MinMaxSliderReadOnly<TMinMax>(Expression<Func<TMinMax>> targetExpression, TMinMax range)
             => MinMaxSliderReadOnly(
                 ExpressionUtility.CreateLabelString(targetExpression),
                 ExpressionUtility.CreateReadFunc(targetExpression), 
-                min, max);
+                range);
         
-        public static Element MinMaxSliderReadOnly<T>(LabelElement label, Func<MinMax<T>> readValue) 
+        public static Element MinMaxSliderReadOnly<TMinMax>(LabelElement label, Func<TMinMax> readValue) 
             => MinMaxSlider(label, readValue, null);
-
-        public static Element MinMaxSliderReadOnly<T>(LabelElement label, Func<MinMax<T>> readValue, T max) 
-            => MinMaxSlider(label, readValue, default, max);
-
-        public static Element MinMaxSliderReadOnly<T>(LabelElement label, Func<MinMax<T>> readValue, T min, T max) 
-            => MinMaxSlider(label, Binder.Create(readValue, null), ConstGetter.Create(min), ConstGetter.Create(max));
+        
+        public static Element MinMaxSliderReadOnly<TMinMax>(LabelElement label, Func<TMinMax> readValue, TMinMax range) 
+            => MinMaxSlider(label, Binder.Create(readValue, null), ConstGetter.Create(range));
         
 
-        public static Element MinMaxSlider<T>(LabelElement label,
-            Expression<Func<MinMax<T>>> targetExpression,
-            IGetter<T> minGetter,
-            IGetter<T> maxGetter
+        public static Element MinMaxSlider<TMinMax>(LabelElement label,
+            Expression<Func<TMinMax>> targetExpression,
+            IGetter<TMinMax> rangeGetter
             )
         {
             var binder = CreateBinder(targetExpression);
-            return MinMaxSlider(label, binder, minGetter, maxGetter);
-        }
-        
-        public static Element MinMaxSlider(LabelElement label, IBinder binder, IGetter minGetter, IGetter maxGetter)
-            => MinMaxSlider(label, binder, new SliderOption() {minGetter = minGetter, maxGetter = maxGetter});
 
+            return MinMaxSlider(label, binder, rangeGetter);
+        }
+
+        public static Element MinMaxSlider<TMinMax>(LabelElement label, IBinder<TMinMax> minMaxBinder, IGetter<TMinMax> rangeGetter)
+        {
+            IBinder binder = minMaxBinder;
+            var (minName, maxName) = TypeUtility.GetMinMaxPropertyOrFieldName(typeof(TMinMax));
+            Assert.IsTrue(minName != null && maxName != null, $"{typeof(TMinMax)} does not have members for MinMaxSlider.\nRequired member names [{string.Join(",", TypeUtility.MinMaxMemberNamePairs.Select(pair => $"({pair.Item1}, {pair.Item2})"))}]");
+            
+            var minMaxType = minMaxBinder.ValueType;
+            var isInnerType =  minMaxType.IsGenericType && minMaxType.GetGenericTypeDefinition() == typeof(MinMax<>);
+            if (!isInnerType)
+            {
+                binder = ConvertMinMaxBinder(minMaxBinder);
+            }
+            
+            var minGetter = PropertyOrFieldGetter.Create(rangeGetter, minName);
+            var maxGetter = PropertyOrFieldGetter.Create(rangeGetter, maxName);
+            
+            return MinMaxSlider(label, binder, new SliderOption() {minGetter = minGetter, maxGetter = maxGetter});  
+            
+            IBinder ConvertMinMaxBinder(IBinder binderFrom)
+            {
+                var fieldType = TypeUtility.GetPropertyOrFieldType(typeof(TMinMax), minName);
+                var binderType = typeof(ConvertToMinMaxBinder<,>).MakeGenericType(typeof(TMinMax), fieldType);
+                
+                return (IBinder)Activator.CreateInstance(binderType, binderFrom);
+            }
+        }
+
+        private static readonly SliderOption SliderOptionEmpty = new();
         public static Element MinMaxSlider(LabelElement label, IBinder binder, SliderOption option)
         {
-            var contents = BinderToElement.CreateMinMaxSliderElement(label, binder, option);
+            var contents = BinderToElement.CreateMinMaxSliderElement(label, binder, option ?? SliderOptionEmpty);
             if (contents == null) return null;
 
             SetInteractableWithBinder(contents, binder);

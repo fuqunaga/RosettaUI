@@ -75,12 +75,12 @@ namespace RosettaUI
             return GetReflectionCache(type).uiTargetPropertyOrFieldsNameTypeDic.Any();
         }
 
-        public static IEnumerable<string> GetUITargetFieldNames(Type type)
+        public static IReadOnlyCollection<string> GetUITargetFieldNames(Type type)
         {
             return GetReflectionCache(type).uiTargetPropertyOrFieldsNameTypeDic.Keys;
         }
 
-        public static IEnumerable<Type> GetUITargetFieldTypes(Type type)
+        public static IReadOnlyCollection<Type> GetUITargetFieldTypes(Type type)
         {
             return GetReflectionCache(type).uiTargetPropertyOrFieldsNameTypeDic.Values;
         }
@@ -113,7 +113,20 @@ namespace RosettaUI
 
         public static Type GetListItemType(Type type) => GetReflectionCache(type).listItemType;
 
+
+        #region MinMax
         
+        
+        public static readonly ValueTuple<string,string>[] MinMaxMemberNamePairs = {("min", "max"), ("Min", "Max"), ("x", "y")};
+        
+        public static (string, string) GetMinMaxPropertyOrFieldName(Type type)
+        {
+            var memberNames = GetReflectionCache(type).memberDataTable.Keys;
+            
+            return MinMaxMemberNamePairs.FirstOrDefault(pair => memberNames.Contains(pair.Item1) && memberNames.Contains(pair.Item2));
+        }
+        
+        #endregion
         
         
         #region SingleLine
@@ -205,5 +218,7 @@ namespace RosettaUI
         }
         
         #endregion
+
+
     }
 }

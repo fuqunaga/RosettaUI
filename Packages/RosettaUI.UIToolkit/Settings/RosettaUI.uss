@@ -1,5 +1,5 @@
 :root {
-    --fixed-field-width-m: 110px;
+    --fixed-field-width-m: 120px; /* マイナスfloat値が収まる枠 */
     --fixed-field-width-s: 80px;
     --slider-min-width: 248px;
     --input-border-width: 2px;

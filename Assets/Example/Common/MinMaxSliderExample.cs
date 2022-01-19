@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using UnityEngine;
 
 namespace RosettaUI.Example
@@ -18,6 +20,17 @@ namespace RosettaUI.Example
         public MinMax<Bounds> boundsMinMax;
         public MinMax<BoundsInt> boundsIntMinMax;
 
+        [Serializable]
+        public struct MyMinMax<T>
+        {
+            public T Min;
+            public T Max;
+        }
+
+        public MyMinMax<float> myMinMax;
+
+        public Vector2 vector2Value;
+        
         public Element CreateElement()
         {
             return UI.Column(
@@ -67,25 +80,15 @@ namespace RosettaUI.Example
                             UI.MinMaxSlider("CustomLabel", () => floatMinMax),
                             UI.Space().SetHeight(10f),
 
-                            UI.Label("<b>UI.MinMaxSlider(\"Custom min max\", () => floatMinMax, -1f, 1f)</b>"),
-                            UI.MinMaxSlider("Custom min max", () => floatMinMax, -1f, 1f),
-                            UI.Label(
-                                "<b>UI.MinMaxSlider(\"Custom min max\", () => vector2MinMax, Vector2.one * -1f, Vector2.one)</b>"),
-                            UI.MinMaxSlider("Custom min max", () => vector2MinMax, Vector2.one * -1f, Vector2.one)
+                            UI.Label("<b>UI.MinMaxSlider(\"Custom min max\", () => floatMinMax, MinMax.Create(-1f, 1f))</b>"),
+                            UI.MinMaxSlider("Custom min max", () => floatMinMax, MinMax.Create(-1f, 1f)),
+                            UI.Label("<b>UI.MinMaxSlider(\"Custom min max\", () => vector2MinMax, MinMax.Create(Vector2.one * -1f, Vector2.one))</b>"),
+                            UI.MinMaxSlider("Custom min max", () => vector2MinMax, MinMax.Create(Vector2.one * -1f, Vector2.one)),
+                            UI.Space().SetHeight(10f),
 
-#if false
-                            //TODO: type free minmax
-                            //TODO: MinMax unsupported type will fall back to UI.Slider()
-
-                            // non-interactable if the expression is read-only,
-                            , UI.MinMaxSlider("min,max + 0.1f",
-                                () => MinMax.Create(floatMinMax.min + 0.1f, floatMinMax.max + 0.1f))
-
-                            // interactable if (label,readValue,writeValue) style
-                            , UI.MinMaxSlider("min,max + 0.1f",
-                                () => MinMax.Create(floatMinMax.min + 0.1f, floatMinMax.max + 0.1f),
-                                f => floatMinMax = MinMax.Create(f.min - 0.1f, f.max - 0.1f))
-#endif
+                            UI.Label($"Supports any type that has a specific member pair [{string.Join(",", TypeUtility.MinMaxMemberNamePairs.Select(pair => $"({pair.Item1}, {pair.Item2})"))}]"),
+                            UI.MinMaxSlider(() => myMinMax),
+                            UI.MinMaxSlider(() => vector2Value)
                         )
                     )
             );

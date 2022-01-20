@@ -1,4 +1,4 @@
-namespace RosettaUI.UIToolkit.Builder
+namespace RosettaUI.Builder
 {
     public static class LayoutSettings
     {

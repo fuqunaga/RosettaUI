@@ -4,16 +4,17 @@
     /// 値を持ち外部と同期するFieldElement
     /// ラベル付きのReadOnlyValueElement
     /// </summary>
-    public abstract class ReadOnlyFieldElement<T> : ReadOnlyValueElement<T>, IFieldElement
+    public abstract class ReadOnlyFieldElement<T> : ReadOnlyValueElement<T>
     {
-        public LabelElement Label { get; protected set; }
+        public LabelElement Label { get; }
 
         public ReadOnlyFieldElement(LabelElement label, IGetter<T> getter) : base(getter)
         {
             if (label != null)
             {
                 Label = label;
-                label.SetParent(this);
+                Label.SetParent(this);
+                Label.isPrefix = true;
             }
         }
 

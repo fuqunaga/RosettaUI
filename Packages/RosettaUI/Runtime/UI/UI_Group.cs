@@ -39,9 +39,9 @@ namespace RosettaUI
 
         public static IndentElement Indent(params Element[] elements) => Indent(elements.AsEnumerable());
         
-        public static IndentElement Indent(IEnumerable<Element> elements)
+        public static IndentElement Indent(IEnumerable<Element> elements, int level = 1)
         {
-            return new IndentElement(elements);
+            return new IndentElement(elements, level);
         }
         
         public static PageElement Page(params Element[] elements) => Page(elements.AsEnumerable());
@@ -68,7 +68,7 @@ namespace RosettaUI
 
         public static FoldElement Fold(Element bar, IEnumerable<Element> elements)
         {
-            return new FoldElement(bar, new[] {Indent(elements)});
+            return new FoldElement(bar, new[] {Indent(elements, 2)});
         }
 
         #endregion

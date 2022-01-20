@@ -21,10 +21,7 @@ namespace RosettaUI
 
         public static LabelElement FirstLabel(this Element element) => element.Query<LabelElement>().FirstOrDefault();
         
-        public static LabelElement FirstFieldLabel(this Element element) => element.Query<IFieldElement>().FirstOrDefault()?.Label;
-
-    
-
+        
         public static bool ValidateSingleParent(this Element element)
         {
             var invalid = element.Parent != null;

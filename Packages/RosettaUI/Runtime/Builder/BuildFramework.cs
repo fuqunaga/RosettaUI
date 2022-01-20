@@ -30,10 +30,7 @@ namespace RosettaUI.Builder
                 if (BuildFuncTable.TryGetValue(element.GetType(), out var func))
                 {
                     uiObj = func(element);
-                    RegisterUIObj(element, uiObj);
-
-                    CalcTreeViewIndent(element, uiObj);
-                    SetDefaultCallbacks(element, uiObj);
+                    SetupUIObj(element, uiObj);
                 }
                 else
                 {
@@ -44,21 +41,32 @@ namespace RosettaUI.Builder
             return uiObj;
         }
 
-        protected virtual void CalcTreeViewIndent(Element element, TUIObj uiObj)
+        protected virtual void SetupUIObj(Element element, TUIObj uiObj)
         {
-            if (element.IsTreeViewIndentTarget())
+            RegisterUIObj(element, uiObj);
+
+            SetDefaultCallbacks(element, uiObj);
+
+            if (element is LabelElement {isPrefix: true} label && label.IsLeftMost())
             {
-                var indent = element.GetIndentLevel();
-                var parentIndent = element.GetParentIndentLevel();
-                var indentSelf = Mathf.Max(0, indent - parentIndent);
-                SetTreeViewIndent(element, uiObj, indentSelf, indent);
+                CalcPrefixLabelIndent(label);
             }
+        }
+
+
+        protected virtual void CalcPrefixLabelIndent(LabelElement label)
+        {
+            label.SetBackgroundColor(Color.red);
+
+            var indentLevel = label.GetIndentLevel();
+            label.SetMinWidth(Mathf.Max(0f, LayoutSettings.LabelWidth - indentLevel * LayoutSettings.IndentSize));
         }
 
         protected virtual void SetDefaultCallbacks(Element element, TUIObj uiObj)
         {
             element.enableRx.SubscribeAndCallOnce((enable) => OnElementEnableChanged(element, uiObj, enable));
-            element.interactableRx.SubscribeAndCallOnce((interactable) => OnElementInteractableChanged(element, uiObj, interactable));
+            element.interactableRx.SubscribeAndCallOnce((interactable) =>
+                OnElementInteractableChanged(element, uiObj, interactable));
             element.Style.SubscribeAndCallOnce((style) => OnElementStyleChanged(element, uiObj, style));
             element.onDestroy += OnDestroyElement;
 
@@ -68,8 +76,6 @@ namespace RosettaUI.Builder
             }
         }
 
-        protected abstract void SetTreeViewIndent(Element element, TUIObj uiObj, int indentLevelSelf, int indentLevel);
-        
         protected abstract void OnElementEnableChanged(Element element, TUIObj uiObj, bool enable);
         protected abstract void OnElementInteractableChanged(Element element, TUIObj uiObj, bool interactable);
         protected abstract void OnElementStyleChanged(Element element, TUIObj uiObj, Style style);

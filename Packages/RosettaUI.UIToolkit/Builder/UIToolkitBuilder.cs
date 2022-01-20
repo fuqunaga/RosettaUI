@@ -55,34 +55,6 @@ namespace RosettaUI.UIToolkit.Builder
 
         protected override IReadOnlyDictionary<Type, Func<Element, VisualElement>> BuildFuncTable => _buildFuncTable;
 
-        protected override void SetTreeViewIndent(Element element, VisualElement uiObj, int indentLevelSelf, int indentLevel)
-        {
-            uiObj.schedule.Execute(() =>
-            {
-                uiObj.style.marginLeft = LayoutSettings.MarginLeftOfIndent + indentLevelSelf * LayoutSettings.IndentSize;
-
-                var (label, uiLeftWidth) = element switch
-                {
-                    RowElement or WindowLauncherElement or BoxElement => (null,0),
-                    FoldElement f => (f.bar.FirstFieldLabel(), LayoutSettings.IndentSize),
-                    _ => (element.FirstFieldLabel(),0)
-                };
-                
-                if ( label != null)
-                {
-                    var labelObj = GetUIObj(label);
-                    Assert.IsNotNull(labelObj, $"UIObj is not found. {element.GetType()} > Label[{label.Value}]");
-                    labelObj.style.minWidth = Mathf.Max(0f, LayoutSettings.LabelWidth - indentLevel * LayoutSettings.IndentSize - uiLeftWidth);
-
-                    // Foldout直下のラベルはmarginRight、paddingRightがUnityDefaultCommon*.uss で書き換わるので上書きしておく
-                    // セレクタ例： .unity-foldout--depth-1 > .unity-base-field > .unity-base-field__label
-                    labelObj.style.marginRight = LayoutSettings.LabelMarginRight;
-                    labelObj.style.paddingRight = LayoutSettings.LabelPaddingRight;
-                }
-            });
-        }
-
-
         protected override void OnElementEnableChanged(Element _, VisualElement ve, bool enable)
         {
             ve.style.display = enable ? DisplayStyle.Flex : DisplayStyle.None;

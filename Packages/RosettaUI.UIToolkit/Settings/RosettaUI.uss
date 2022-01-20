@@ -103,8 +103,10 @@
 .rosettaui-composite-field
 {
     flex-direction: row;
-    margin: 0;
+    margin-top: 0;
+    margin-bottom: 0;
 }
+
 .rosettaui-composite-field__contents
 {
     flex-direction: row;

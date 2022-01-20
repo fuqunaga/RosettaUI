@@ -106,7 +106,7 @@
 
 .unity-foldout__toggle
 {
-    margin: 0;
+    margin: 2px 0;
 }
 
 .unity-foldout__toggle:hover

@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Linq;
+using RosettaUI.Builder;
 using RosettaUI.Reactive;
 using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine.UIElements;
@@ -54,6 +53,12 @@ namespace RosettaUI.UIToolkit.Builder
             // Foldout 直下の Toggle は marginLeft が default.uss で書き換わるので上書きしておく
             // セレクタ例： .unity-foldout--depth-1 > .unity-fold__toggle
             toggle.style.marginLeft = 0;
+            
+            // Indentがあるなら１レベルキャンセル
+            if (foldElement.GetIndentLevel() > 0)
+            {
+                fold.style.marginLeft = -LayoutSettings.IndentSize;
+            }
             
             foldElement.IsOpenRx.SubscribeAndCallOnce(isOpen => fold.value = isOpen);
             fold.RegisterValueChangedCallback(evt =>
@@ -152,7 +157,16 @@ namespace RosettaUI.UIToolkit.Builder
 
         VisualElement Build_Indent(Element element)
         {
-            var ve = new VisualElement();
+            var indentElement = (IndentElement) element;
+            
+            var ve = new VisualElement
+            {
+                style =
+                {
+                    marginLeft = LayoutSettings.IndentSize * indentElement.level
+                }
+            };
+
             return Build_ElementGroupContents(ve, element);
         }
 

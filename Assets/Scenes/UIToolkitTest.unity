@@ -170,6 +170,53 @@ MonoBehaviour:
   classNameIs: BehaviourExample
   intValue: 0
   protectedValue: 0
+--- !u!1 &431533197
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 431533198}
+  - component: {fileID: 431533199}
+  m_Layer: 0
+  m_Name: BehaviourExample
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &431533198
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 431533197}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 554616669}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &431533199
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 431533197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 745a2b324a58a0645809582f1930d841, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  classNameIs: BehaviourExample
+  intValue: 0
+  protectedValue: 0
 --- !u!1 &544456410
 GameObject:
   m_ObjectHideFlags: 0
@@ -225,6 +272,56 @@ MonoBehaviour:
     floatValue: 0
   dynamicElementIf: 0
   texture: {fileID: 2800000, guid: f8fa76ac67c34254da2b9c9b263733c3, type: 3}
+  multiLineStringValue: 'this is
+
+    multiline
+
+    string'
+--- !u!1 &554616668
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 554616669}
+  - component: {fileID: 554616670}
+  m_Layer: 0
+  m_Name: LayoutExample
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &554616669
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 554616668}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 431533198}
+  m_Father: {fileID: 852668086}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &554616670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 554616668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 404483382d8141c6aed0d2f4e27f3444, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &590657662
 GameObject:
   m_ObjectHideFlags: 0
@@ -317,11 +414,6 @@ MonoBehaviour:
   - floatValue: 1
     stringValue: First
   rangeValue: 0
-  multiLineStringValue: 'this is
-
-    multiline
-
-    string'
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -446,7 +538,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 852668086}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &741235377
 MonoBehaviour:
@@ -524,6 +616,7 @@ Transform:
   - {fileID: 1740173063}
   - {fileID: 1922449324}
   - {fileID: 544456411}
+  - {fileID: 554616669}
   - {fileID: 741235376}
   m_Father: {fileID: 0}
   m_RootOrder: 2
@@ -824,3 +917,7 @@ MonoBehaviour:
     max:
       m_Position: {x: 0, y: 0, z: 0}
       m_Size: {x: 0, y: 0, z: 0}
+  myMinMax:
+    Min: 0
+    Max: 0
+  vector2Value: {x: 0, y: 0}

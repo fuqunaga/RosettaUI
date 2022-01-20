@@ -92,7 +92,7 @@ namespace RosettaUI
             if (TypeUtility.IsSingleLine(binder.ValueType))
                 ret = new CompositeFieldElement(label, elements);
             else if (label != null)
-                ret = new FoldElement(label, elements);
+                ret = UI.Fold(label, elements);
             else
                 ret = UI.Column(elements);
 
@@ -118,7 +118,7 @@ namespace RosettaUI
                     var titleField = CreateMemberFieldElement(new LabelElement(label), binder);
                     var bar = UI.Row(label, titleField);
 
-                    var fold = new FoldElement(bar, elements);
+                    var fold = UI.Fold(bar, elements);
                     
                     fold.IsOpenRx.SubscribeAndCallOnce(isOpen =>
                     {
@@ -130,7 +130,7 @@ namespace RosettaUI
                 }
                 else
                 {
-                    return new FoldElement(label, elements);
+                    return UI.Fold(label, elements);
                 }
             }
         }

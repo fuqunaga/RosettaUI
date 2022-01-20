@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace RosettaUI
 {
@@ -67,7 +68,7 @@ namespace RosettaUI
 
         public static FoldElement Fold(Element bar, IEnumerable<Element> elements)
         {
-            return new FoldElement(bar, elements);
+            return new FoldElement(bar, new[] {Indent(elements)});
         }
 
         #endregion

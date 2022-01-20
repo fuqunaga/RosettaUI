@@ -21,7 +21,7 @@ namespace RosettaUI
         #endregion
 
 
-        protected List<Element> elements = new();
+        protected List<Element> elements;
         
         // Children　Update()で更新される子要素すべて
         // Contents　特殊な意味の子要素は含まれない
@@ -42,7 +42,7 @@ namespace RosettaUI
 
         protected void SetElements(IEnumerable<Element> elements)
         {
-            this.elements = elements.Where(e => e != null).ToList();
+            this.elements = elements?.Where(e => e != null).ToList() ?? new List<Element>();
             foreach (var e in this.elements)
             {
                 e.SetParent(this);

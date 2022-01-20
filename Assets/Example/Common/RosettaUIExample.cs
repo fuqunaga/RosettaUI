@@ -18,10 +18,15 @@ namespace RosettaUI.Example
         private Element CreateElement()
         {
             _rootElement = UI.Window(
+#if false
+                UI.WindowLauncher<LayoutExample>()
+#else
                 UI.WindowLauncher<FieldExample>(),
                 UI.WindowLauncher<SliderExample>(),
                 UI.WindowLauncher<MinMaxSliderExample>(),
+                UI.WindowLauncher<LayoutExample>(),
                 UI.WindowLauncher<MiscExample>()
+#endif
 #if false
                 
                 , UI.WindowLauncher<UICustomExample>()

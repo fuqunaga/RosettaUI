@@ -11,7 +11,5 @@ namespace RosettaUI
         {
             this.level = level;
         }
-        
-        public override bool IsTreeViewIndentGroup => true;
     }
 }

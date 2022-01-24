@@ -55,6 +55,24 @@ namespace RosettaUI.UIToolkit.Builder
 
         protected override IReadOnlyDictionary<Type, Func<Element, VisualElement>> BuildFuncTable => _buildFuncTable;
 
+        
+        protected override void CalcPrefixLabelWidthWithIndent(LabelElement label, VisualElement ve)
+        {
+            ve.ScheduleToUseResolvedLayoutBeforeRendering(() =>
+            {
+                var marginLeft = 0f;
+
+                for (Element element = label;
+                     element != null && !LayoutHint.IsIndentOrigin(element);
+                     element = element.Parent)
+                {
+                    marginLeft += GetUIObj(element).layout.xMin;
+                }
+                
+                ve.style.minWidth = LayoutSettings.LabelWidth - marginLeft;
+            });
+        }
+        
         protected override void OnElementEnableChanged(Element _, VisualElement ve, bool enable)
         {
             ve.style.display = enable ? DisplayStyle.Flex : DisplayStyle.None;

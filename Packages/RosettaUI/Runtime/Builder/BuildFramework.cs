@@ -49,19 +49,13 @@ namespace RosettaUI.Builder
 
             if (element is LabelElement {isPrefix: true} label && label.IsLeftMost())
             {
-                CalcPrefixLabelIndent(label);
+                CalcPrefixLabelWidthWithIndent(label, uiObj);
             }
         }
 
 
-        protected virtual void CalcPrefixLabelIndent(LabelElement label)
-        {
-            label.SetBackgroundColor(Color.red);
-
-            var indentLevel = label.GetIndentLevel();
-            label.SetMinWidth(Mathf.Max(0f, LayoutSettings.LabelWidth - indentLevel * LayoutSettings.IndentSize));
-        }
-
+        protected abstract void CalcPrefixLabelWidthWithIndent(LabelElement label, TUIObj uiObj);
+        
         protected virtual void SetDefaultCallbacks(Element element, TUIObj uiObj)
         {
             element.enableRx.SubscribeAndCallOnce((enable) => OnElementEnableChanged(element, uiObj, enable));

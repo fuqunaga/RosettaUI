@@ -6,7 +6,6 @@ namespace RosettaUI
 {
     public static partial class UI
     {
-        
         #region Row/Column/Box/ScrollView/Indent
 
         public static RowElement Row(params Element[] elements) => Row(elements.AsEnumerable());
@@ -38,33 +37,29 @@ namespace RosettaUI
         }
 
         public static IndentElement Indent(params Element[] elements) => Indent(elements.AsEnumerable());
-        
+
         public static IndentElement Indent(IEnumerable<Element> elements, int level = 1)
         {
             return new IndentElement(elements, level);
         }
-        
+
         public static PageElement Page(params Element[] elements) => Page(elements.AsEnumerable());
 
         public static PageElement Page(IEnumerable<Element> elements) => new(new[] {Indent(elements)});
-        
+
         #endregion
 
 
         #region Fold
 
-        public static FoldElement Fold(LabelElement label, params Element[] elements) => Fold(label,  null, elements);
+        public static FoldElement Fold(LabelElement label, params Element[] elements) =>
+            Fold((Element) label, elements.AsEnumerable());
 
-        public static FoldElement Fold(LabelElement label, IEnumerable<Element> elements) => Fold((Element)label, elements);
+        public static FoldElement Fold(LabelElement label, IEnumerable<Element> elements) =>
+            Fold((Element) label, elements);
 
-        public static FoldElement Fold(Element barLeft, Element barRight, IEnumerable<Element> elements)
-        {
-            var bar = (barLeft != null || barRight != null)
-                ? Row(barLeft, Space(), barRight)
-                : null;
-
-            return Fold(bar, elements);
-        }
+        public static FoldElement Fold(Element barLeft, Element barRight, IEnumerable<Element> elements) =>
+            Fold(Row(barLeft, Space(), barRight), elements);
 
         public static FoldElement Fold(Element bar, IEnumerable<Element> elements)
         {

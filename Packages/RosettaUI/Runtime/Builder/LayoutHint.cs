@@ -1,44 +1,47 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Overlays;
 using UnityEngine;
 
 namespace RosettaUI.Builder
 {
     public static class LayoutHint
     {
-        public static int GetIndentLevel(this Element element)
-            => Mathf.Max(0, element.AsIndentParentEnumerable().Sum(pair =>
+        public static bool IsIndentOrigin(Element element) => element is PageElement or WindowElement;
+
+
+        /// <summary>
+        /// 子のマイナスインデントを許容しないElement
+        /// マイナスインデントは親の左側をはみ出るので Box や Fold では絵的にまずい
+        /// </summary>
+        public static bool IsIndentWall(Element element)
+            => element is BoxElement or FoldElement || IsIndentOrigin(element);
+        
+        public static bool CanMinusIndent(this Element element)
+        {
+            for (var e = element.Parent;
+                 e != null && !IsIndentWall(e);
+                 e = e.Parent)
             {
-                var (currentElement, parent) = pair;
-                
-                return parent switch
-                {
-                    IndentElement indentElement => indentElement.level,
-                    FoldElement foldElement => foldElement.bar != currentElement ? -1 : 0,
-                    _ => 0
-                };
-            }));
+                if (e is IndentElement) return true;
+            }
+
+            return false;
+        }
         
 
         public static bool IsLeftMost(this Element element)
         {
-            foreach (var (currentElement, parent) in element.AsIndentParentEnumerable())
+            foreach (var current in element.AsIndentEnumerable())
             {
-                switch (parent)
+                switch (current.Parent)
                 {
-                    case RowElement row when row.Children.FirstOrDefault() != currentElement:
+                    case RowElement row when row.Children.FirstOrDefault() != current:
                         return false;
 
                     case CompositeFieldElement c:
-                    {
-                        if (c.Children.FirstOrDefault() != currentElement)
-                        {
-                            return false;
-                        }
-
-                        break;
-                    }
+                        return c.Children.FirstOrDefault() == current;
                 }
             }
 
@@ -47,27 +50,26 @@ namespace RosettaUI.Builder
     }
 
 
-    static class ElementIndentParentEnumerableExtension
+    static class ElementIndentEnumerableExtension
     {
-        public static IEnumerable<(Element, Element)> AsIndentParentEnumerable(this Element element) =>
+        public static IEnumerable<Element> AsIndentEnumerable(this Element element) =>
             new ElementIndentParentEnumerable(element);
 
 
-        readonly struct ElementIndentParentEnumerable : IEnumerable<(Element, Element)>
+        readonly struct ElementIndentParentEnumerable : IEnumerable<Element>
         {
             private readonly Element _element;
 
             public ElementIndentParentEnumerable(Element element) => _element = element;
 
-            public IEnumerator<(Element,Element)> GetEnumerator()
+            public IEnumerator<Element> GetEnumerator()
             {
-                var element = _element;
-                var parent = element.Parent;
-                for (;
-                     parent != null && parent is not PageElement;
-                     element = parent, parent = element.Parent)
+                
+                for (var element = _element;
+                     element != null && !LayoutHint.IsIndentOrigin(element);
+                     element = element.Parent)
                 {
-                    yield return (element, parent);
+                    yield return element;
                 }
             }
 

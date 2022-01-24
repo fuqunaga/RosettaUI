@@ -2,6 +2,7 @@
 using RosettaUI.Builder;
 using RosettaUI.Reactive;
 using RosettaUI.UIToolkit.UnityInternalAccess;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -55,10 +56,12 @@ namespace RosettaUI.UIToolkit.Builder
             toggle.style.marginLeft = 0;
             
             // Indentがあるなら１レベルキャンセル
-            if (foldElement.GetIndentLevel() > 0)
+            if (foldElement.CanMinusIndent())
             {
                 fold.style.marginLeft = -LayoutSettings.IndentSize;
             }
+
+            
             
             foldElement.IsOpenRx.SubscribeAndCallOnce(isOpen => fold.value = isOpen);
             fold.RegisterValueChangedCallback(evt =>
@@ -69,7 +72,8 @@ namespace RosettaUI.UIToolkit.Builder
                 }
             });
 
-            return Build_ElementGroupContents(fold, foldElement);
+            var ret =  Build_ElementGroupContents(fold, foldElement);
+            return ret;
         }
 
         private VisualElement Build_WindowLauncher(Element element)

@@ -6,7 +6,5 @@ namespace RosettaUI
     {
         public WindowElement(Element bar, IEnumerable<Element> contents) : base(bar, contents)
         {}
-        
-        public override bool IsTreeViewIndentGroup => true;
     }
 }

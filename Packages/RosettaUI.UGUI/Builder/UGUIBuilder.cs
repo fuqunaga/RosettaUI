@@ -68,6 +68,11 @@ namespace RosettaUI.UGUI.Builder
                 }
             }
 
+            protected override void CalcPrefixLabelWidthWithIndent(LabelElement label, GameObject uiObj)
+            {
+                throw new NotImplementedException();
+            }
+
             protected override void OnElementEnableChanged(Element _, GameObject uiObj, bool enable)
             {
                 uiObj.SetActive(enable);

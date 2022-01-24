@@ -13,7 +13,5 @@ namespace RosettaUI
         {
             label.isPrefix = true;
         }
-
-        public override bool IsTreeViewIndentGroup => false;
     }
 }

@@ -81,7 +81,7 @@ namespace RosettaUI
         protected virtual void UpdateInternal()
         {
             onUpdate?.Invoke(this);
-            foreach(var e in Children) e.Update();
+            foreach(var e in _children) e.Update();
         }
 
         public virtual void Destroy()

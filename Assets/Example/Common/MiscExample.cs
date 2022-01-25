@@ -21,11 +21,9 @@ namespace RosettaUI.Example
 
         public Texture texture;
 
-        [Multiline]
-        public string multiLineStringValue = "this is\nmultiline\nstring";
+        [Multiline] public string multiLineStringValue = "this is\nmultiline\nstring";
 
 
-        
         public Element CreateElement()
         {
             string nullString = null;
@@ -44,34 +42,112 @@ namespace RosettaUI.Example
                 );
             });
 
-            
-            return UI.Column(
+
+            return UI.Page(
                 UI.Row(
-                    UI.Label($"{nameof(UI.Space)} >"),
-                    UI.Space(),
-                    UI.Label($"< {nameof(UI.Space)}")
+                    UI.Page(
+                        UI.Label("<b>UI.TextArea()</b>"),
+                        UI.TextArea(nameof(UI.TextArea), () => multiLineStringValue),
+                        UI.TextAreaReadOnly(nameof(UI.TextAreaReadOnly), () => multiLineStringValue),
+                        UI.Space().SetHeight(10f),
+                        UI.Row(
+                            UI.Label("<b>UI.Image()</b>", true),
+                            UI.Image(() => texture).SetMaxWidth(200f).SetMaxHeight(200f)
+                        ),
+                        UI.Space().SetHeight(10f),
+                        UI.Row(
+                            UI.Label("<b>UI.Button()</b>", true),
+                            UI.Button(nameof(UI.Button), () => print("On button clicked"))
+                        ),
+                        UI.Space().SetHeight(10f),
+                        UI.Label("<b>UI.Dropdown()</b>"),
+                        UI.Dropdown(nameof(UI.Dropdown),
+                            () => dropDownIndex,
+                            options: new[] {"One", "Two", "Three"}
+                        ),
+                        UI.DropdownReadOnly($"{nameof(UI.DropdownReadOnly)}(selection index will not change)",
+                            () => dropDownIndex,
+                            options: new[] {"One", "Two", "Three"}
+                        ),
+                        UI.Space().SetHeight(10f),
+                        UI.Row(
+                            UI.Label("<b>UI.Popup()</b>", true),
+                            UI.Popup(
+                                UI.Box(UI.Label($"{nameof(UI.Popup)}(Right click)")),
+                                () => new[]
+                                {
+                                    new MenuItem("Menu0", () => Debug.Log("Menu0")),
+                                    new MenuItem("Menu1", () => Debug.Log("Menu1")),
+                                    new MenuItem("Menu2", () => Debug.Log("Menu2"))
+                                }
+                            )
+                        ),
+                        UI.Space().SetHeight(10f),
+                        UI.Row(
+                            UI.Label("<b>UI.HelpBox()</b>", true),
+                            UI.Column(
+                                UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.None)}", HelpBoxType.None),
+                                UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.Info)}", HelpBoxType.Info),
+                                UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.Warning)}",
+                                    HelpBoxType.Warning),
+                                UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.Error)}", HelpBoxType.Error)
+                            )
+                        ),
+                        UI.Space().SetHeight(10f),
+                        UI.Row(
+                            UI.Label("<b>UI.Space()</b>", true),
+                            UI.Space().SetBackgroundColor(Color.gray)
+                        ),
+                        UI.Space().SetHeight(10f)
+                    ),
+                    UI.Page(
+                        UI.Label("<b>UI.WindowLauncher()</b>"),
+                        UI.WindowLauncher(
+                            UI.Window(
+                                UI.Label("This is window.")
+                            )
+                        ),
+                        UI.WindowLauncher<BehaviourExample>(),
+                        UI.Space().SetHeight(10f),
+                        UI.Label("<b>UI.FieldIfObjectFound</b>"),
+                        UI.Box(
+                            UI.FieldIfObjectFound<BehaviourExample>()
+                        ),
+                        UI.Space().SetHeight(10f),
+                        
+                        UI.Label("<b>UI.DynamicElementIf()</b>"),
+                        UI.Field(() => dynamicElementIf),
+                        UI.DynamicElementIf(
+                            () => dynamicElementIf,
+                            () => UI.Label(nameof(UI.DynamicElementIf))
+                        ),
+                        UI.Space().SetHeight(10f),
+                        
+                        UI.Label("<b>UI.DynamicElementOnStatusChanged()</b>"),
+                        UI.Slider("Button count", () => intValue, max: 10),
+                        UI.DynamicElementOnStatusChanged(
+                            readStatus: () => intValue,
+                            build: (status) =>
+                            {
+                                var buttons = Enumerable.Range(0, intValue)
+                                    .Select(i => UI.Button(i.ToString()));
+                                var label = UI.Label(nameof(UI.DynamicElementOnStatusChanged));
+                                return UI.Row(
+                                    new Element[] {label}.Concat(buttons)
+                                );
+                            })
+                    )
                 ),
+                UI.Space().SetHeight(10f),
+                /*,
                 UI.Box(
-                    UI.Label("TextArea"),
-                    UI.TextArea(() => multiLineStringValue),
-                    UI.TextAreaReadOnly(() => multiLineStringValue)
-                ),
-                UI.Row(
-                    UI.Label(nameof(UI.Image)),
-                    UI.Image(() => texture).SetMaxWidth(200f).SetMaxHeight(200f)
-                ),
-                
-                UI.Button(nameof(UI.Button), () => print("On button clicked")),
-                
-                UI.Dropdown(nameof(UI.Dropdown),
-                    () => dropDownIndex,
-                    options: new[] {"One", "Two", "Three"}
-                ),
-                UI.DropdownReadOnly($"{nameof(UI.DropdownReadOnly)}(selection index will not change)",
-                    () => dropDownIndex,
-                    options: new[] {"One", "Two", "Three"}
-                ),
-                
+                    UI.Slider("DynamicElementOnTrigger if > 0.5f", () => floatValue),
+                    UI.DynamicElementOnTrigger(
+                        build: () => UI.Label("> 0.5f"),
+                        rebuildIf: (e) => floatValue > 0.5f
+                    )
+                )
+                */
                 UI.Fold("List",
                     UI.List(
                         () => arrayValue,
@@ -99,103 +175,17 @@ namespace RosettaUI.Example
                     ),
                     UI.ListReadOnly(() => listValue)
                 ),
-                UI.Popup(
-                    UI.Box(UI.Label($"{nameof(UI.Popup)}(Right click)")),
-                    () => new[]
-                    {
-                        new MenuItem("Menu0", () => Debug.Log("Menu0")),
-                        new MenuItem("Menu1", () => Debug.Log("Menu1")),
-                        new MenuItem("Menu2", () => Debug.Log("Menu2"))
-                    }
-                ),
-                UI.Fold("Row/Column/Box/Fold/ScrollView/Indent",
-                    UI.Row(
-                        UI.Label("Row0"),
-                        UI.Label("Row1"),
-                        UI.Label("Row2")
-                    ),
-                    UI.Column(
-                        UI.Label("Column0"),
-                        UI.Label("Column1"),
-                        UI.Label("Column2")
-                    ),
-                    UI.Box(
-                        UI.Label("Box0"),
-                        UI.Label("Box1"),
-                        UI.Label("Box2")
-                    ),
-                    
-                    UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.None)}", HelpBoxType.None),
-                    UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.Info)}", HelpBoxType.Info),
-                    UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.Warning)}", HelpBoxType.Warning),
-                    UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.Error)}", HelpBoxType.Error),
-                    
-                    UI.Fold("Fold",
-                        UI.Fold("Fold2",
-                            UI.Fold("Fold3",
-                                UI.Label("contents")
-                            )
-                        )
-                    ),
-                    UI.Fold(UI.Field("CustomBar", () => boolValue), null),
-                    UI.Fold(UI.Button("LeftBar"), UI.Button("RightBar"), null),
-                    UI.Label(nameof(UI.ScrollView)),
-                    UI.Slider(() => scrollViewItemCount),
-                    UI.ScrollView(
-                        UI.DynamicElementOnStatusChanged(
-                            () => scrollViewItemCount,
-                            count => UI.Column(Enumerable.Range(0, count)
-                                .Select(i => UI.Field("Count" + i, () => i.ToString())))
-                        )
-                    ).SetHeight(300f),
-                    UI.Indent(
-                        UI.Field(() => "Indent0"),
-                        UI.Indent(
-                            UI.Field(() => "Indent2"),
-                            UI.Indent(
-                                UI.Field(() => "Indent3")
-                            )
-                        )
-                    )
-                ),
+                UI.Fold(UI.Field("CustomBar", () => boolValue), null),
+                UI.Fold(UI.Button("LeftBar"), UI.Button("RightBar"), null),
+                
                 UI.Fold("ChildValueChangedCallback",
                     UI.Field(() => intValue),
                     UI.Field(() => floatValue)
                 ).RegisterValueChangeCallback(() => Debug.Log($"OnChildValueChanged")),
-                UI.Fold("FindObject",
-                    UI.WindowLauncher<BehaviourExample>(),
-                    UI.FieldIfObjectFound<BehaviourExample>()
-                ),
-                UI.Fold("DynamicElement",
-                    UI.Field(() => dynamicElementIf),
-                    UI.DynamicElementIf(
-                        () => dynamicElementIf,
-                        () => UI.Label(nameof(UI.DynamicElementIf))
-                        ),
-                    UI.Slider("Button count", () => intValue, max: 10),
-                    UI.DynamicElementOnStatusChanged(
-                        readStatus: () => intValue,
-                        build: (status) =>
-                        {
-                            var buttons = Enumerable.Range(0, intValue).Select(i => UI.Button(i.ToString()));
-                            var label = UI.Label(nameof(UI.DynamicElementOnStatusChanged));
-                            return UI.Row(
-                                new Element[] {label}.Concat(buttons)
-                            );
-                        })
-                    /*,
-                    UI.Box(
-                        UI.Slider("DynamicElementOnTrigger if > 0.5f", () => floatValue),
-                        UI.DynamicElementOnTrigger(
-                            build: () => UI.Label("> 0.5f"),
-                            rebuildIf: (e) => floatValue > 0.5f
-                        )
-                    )
-                    */
-                ),
                 UI.Fold("Methods",
                     UI.Label(nameof(ElementExtensionsMethodChain.SetEnable)).SetEnable(false), // disappear,
-                    UI.Field(nameof(ElementExtensionsMethodChain.SetInteractable), () => floatValue).SetInteractable(false),
+                    UI.Field(nameof(ElementExtensionsMethodChain.SetInteractable), () => floatValue)
+                        .SetInteractable(false),
                     UI.Label(nameof(ElementExtensionsMethodChain.SetColor)).SetColor(Color.red),
 #if true
                     UI.Button($"{nameof(ElementExtensionsMethodChain.SetWidth)}(100f)").SetWidth(100f),

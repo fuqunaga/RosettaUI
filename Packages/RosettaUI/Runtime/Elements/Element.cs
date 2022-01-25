@@ -84,7 +84,7 @@ namespace RosettaUI
             foreach(var e in _children) e.Update();
         }
 
-        public virtual void Destroy()
+        protected void DestroyChildren()
         {
             foreach (var child in _children)
             {
@@ -92,7 +92,11 @@ namespace RosettaUI
                 child.Destroy();
             }
             _children.Clear();
-
+        }
+        
+        public virtual void Destroy()
+        {
+            DestroyChildren();
             Parent?.RemoveChild(this);
 
             onDestroy?.Invoke(this);

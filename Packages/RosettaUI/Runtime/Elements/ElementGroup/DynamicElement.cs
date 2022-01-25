@@ -53,10 +53,7 @@ namespace RosettaUI
         {
             if (_rebuildIf?.Invoke(this) ?? false)
             {
-                foreach (var e in Children)
-                {
-                    e?.Destroy();
-                }
+                DestroyChildren();
 
                 BuildElement();
                 RebuildChildren();

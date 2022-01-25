@@ -13,7 +13,7 @@ namespace RosettaUI
 
         public event Action<ElementGroup> onRebuildChildren;
 
-        public void RebuildChildren() => onRebuildChildren?.Invoke(this);
+        protected void RebuildChildren() => onRebuildChildren?.Invoke(this);
 
         #endregion
 

@@ -46,7 +46,7 @@ namespace RosettaUI
 
             var elements = types.Select(FieldIfObjectFound).ToList();
             title ??= types.First().ToString().Split('.').LastOrDefault();
-            var window = Window(title, elements);
+            var window = Window(title, Page(elements));
             window.UpdateWhenDisabled = true;
             
             var launcher = WindowLauncher(window);

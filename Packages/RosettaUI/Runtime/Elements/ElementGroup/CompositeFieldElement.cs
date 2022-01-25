@@ -5,13 +5,14 @@ namespace RosettaUI
     /// <summary>
     /// A single line Field that combines multiple Fields
     /// </summary>
-    public class CompositeFieldElement : ElementGroupWithBar
+    public class CompositeFieldElement : ElementGroupWithHeader
     {
-        public LabelElement Label => bar as LabelElement;
+        public readonly LabelElement label;
         
         public CompositeFieldElement(LabelElement label, IEnumerable<Element> contents) : base(label, contents)
         {
-            label.isPrefix = true;
+            this.label = label;
+            this.label.isPrefix = true;
         }
     }
 }

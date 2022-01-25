@@ -21,7 +21,7 @@ namespace RosettaUI.UIToolkit.Builder
         {
             var windowElement = (WindowElement) element;
             var window = new Window();
-            window.TitleBarContainerLeft.Add(Build(windowElement.bar));
+            window.TitleBarContainerLeft.Add(Build(windowElement.header));
             window.CloseButton.clicked += () => windowElement.Enable = !windowElement.Enable;
 
             windowElement.enableRx.SubscribeAndCallOnce(isOpen =>
@@ -46,7 +46,7 @@ namespace RosettaUI.UIToolkit.Builder
             var fold = new Foldout();
             
             var toggle = fold.Q<Toggle>();
-            toggle.Add(Build(foldElement.bar));
+            toggle.Add(Build(foldElement.header));
             
             // disable 中でもクリック可能
             UIToolkitUtility.SetAcceptClicksIfDisabled(toggle);
@@ -92,7 +92,7 @@ namespace RosettaUI.UIToolkit.Builder
                 if (!windowElement.Enable && window.panel == null) window.Show(evt.originalMousePosition, toggle);
             });
 
-            var labelElement = launcherElement.Label;
+            var labelElement = launcherElement.label;
             labelElement.SubscribeValueOnUpdateCallOnce(v => toggle.text = v);
 
             return toggle;
@@ -182,7 +182,7 @@ namespace RosettaUI.UIToolkit.Builder
             field.AddToClassList(UssClassName.UnityBaseField);
             field.AddToClassList(UssClassName.CompositeField);
 
-            var labelElement = compositeFieldElement.bar;
+            var labelElement = compositeFieldElement.header;
             if (labelElement != null)
             {
                 var label = Build(labelElement);

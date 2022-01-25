@@ -4,24 +4,23 @@ namespace RosettaUI
 {
     public static class Getter
     {
-        public static Getter<T> Create<T>(Func<T> func) => new Getter<T>(func);
+        public static Getter<T> Create<T>(Func<T> func) => new(func);
     }
 
-    public class Getter<T> : IGetter<T>
+    public class Getter<T> : GetterBase<T>
     {
         readonly Func<T> _func;
-
-        public virtual bool IsConst => false;
-
-
+        
         public Getter(Func<T> func) => _func = func;
 
-        public T Get() => (_func != null) ? _func() : default;
+        protected override T GetRaw() => (_func != null) ? _func() : default;
 
-        public Type ValueType => typeof(T);
+        public override bool IsNull => Get() == null;
 
-        public bool IsNull => Get() == null;
-
-        public bool IsNullable => typeof(T).IsClass;
+        public override bool IsNullable => typeof(T).IsClass;
+        
+        public override bool IsConst => false;
+        
+        public override Type ValueType => typeof(T);
     }
 }

@@ -16,5 +16,7 @@ namespace RosettaUI
     public interface IGetter<out T> : IGetter
     {
         T Get();
+
+        void ClearCache();
     }
 }

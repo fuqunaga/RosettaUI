@@ -1,5 +1,6 @@
 ﻿using RosettaUI.Reactive;
 using System;
+using System.Collections.Generic;
 
 namespace RosettaUI
 {
@@ -11,6 +12,10 @@ namespace RosettaUI
     /// </summary>
     public abstract class Element
     {
+        private readonly List<Element> _children = new();
+        public IReadOnlyList<Element> Children => _children;
+
+
         public readonly ReactiveProperty<bool> enableRx = new(true);
         public readonly ReactiveProperty<bool> interactableRx = new(true);
 
@@ -43,6 +48,30 @@ namespace RosettaUI
             Parent = element;
         }
 
+        protected void AddChild(Element element)
+        {
+            _children.Add(element);
+            element.SetParent(this);
+        }
+
+        protected void RemoveChild(Element element)
+        {
+            element.Parent = null;
+            _children.Remove(element);
+        }
+
+        public virtual void ClearGetterCache()
+        {
+            ClearGetterCacheInternal();
+            foreach (var element in _children)
+            {
+                element.ClearGetterCache();
+            }
+        }
+        
+        protected virtual void ClearGetterCacheInternal()
+        {
+        }
 
         public virtual void Update()
         {
@@ -52,9 +81,22 @@ namespace RosettaUI
         protected virtual void UpdateInternal()
         {
             onUpdate?.Invoke(this);
+            foreach(var e in Children) e.Update();
         }
 
-        public virtual void Destroy() => onDestroy?.Invoke(this);
+        public virtual void Destroy()
+        {
+            foreach (var child in _children)
+            {
+                child.Parent = null;
+                child.Destroy();
+            }
+            _children.Clear();
+
+            Parent?.RemoveChild(this);
+
+            onDestroy?.Invoke(this);
+        }
 
         protected void NotifyViewValueChanged()
         {

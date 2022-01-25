@@ -58,12 +58,9 @@ namespace RosettaUI
             public IEnumerator<Element> GetEnumerator()
             {
                 yield return _element;
-                if (_element is ElementGroup group)
+                foreach (var child in _element.Children.SelectMany(e => e.AsEnumerable()))
                 {
-                    foreach (var child in group.Children.SelectMany(e => e.AsEnumerable()))
-                    {
-                        yield return child;
-                    }
+                    yield return child;
                 }
             }
 

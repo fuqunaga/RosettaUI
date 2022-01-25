@@ -54,7 +54,7 @@ namespace RosettaUI.UIToolkit.Builder
                 dropdownElement.Value
             )
             {
-                label = dropdownElement.Label.Value
+                label = dropdownElement.label.Value
             };
 
             SetupFieldLabel(field, dropdownElement);

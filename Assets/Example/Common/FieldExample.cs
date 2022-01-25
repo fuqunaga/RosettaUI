@@ -23,7 +23,7 @@ namespace RosettaUI.Example
         public RectOffset rectOffsetValue;
         public Bounds boundsValue;
         public BoundsInt boundsIntValue;
-        public List<int> intList = new List<int>(new[] {1, 2, 3});
+        public List<int> intList = new(new[] {1, 2, 3});
         public float[] floatArray = {1f, 2f, 3f};
         public SimpleClass simpleClass;
 
@@ -43,6 +43,7 @@ namespace RosettaUI.Example
         public Element CreateElement()
         {
             SimpleClass nullClass = null;
+            
             return UI.Column(
                 UI.Row(
                     UI.Page(

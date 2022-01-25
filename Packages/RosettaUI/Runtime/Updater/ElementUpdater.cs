@@ -49,9 +49,10 @@ namespace RosettaUI
         public void Update()
         {
             ProcessQueue();
-           
+            
             foreach (var e in _elements)
             {
+                e.ClearGetterCache();
                 e.Update();
             }
         }

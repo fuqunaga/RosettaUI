@@ -2,9 +2,9 @@
 
 namespace RosettaUI
 {
-    public class WindowElement : ElementGroupWithBar
+    public class WindowElement : ElementGroupWithHeader
     {
-        public WindowElement(Element bar, IEnumerable<Element> contents) : base(bar, contents)
+        public WindowElement(Element header, IEnumerable<Element> contents) : base(header, contents)
         {}
     }
 }

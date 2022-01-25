@@ -43,7 +43,7 @@ namespace RosettaUI.UGUI.Builder
             var foldElement = (FoldElement)element;
 
             // TODO: supports foldElement.bar
-            var go = Instantiate(foldElement.bar.FirstLabel()?.Value, resource.fold);
+            var go = Instantiate(foldElement.header.FirstLabel()?.Value, resource.fold);
             var trans = go.transform;
 
             // build title row
@@ -53,7 +53,7 @@ namespace RosettaUI.UGUI.Builder
 
             var titleLayoutGroup = fold.button.GetComponent<HorizontalOrVerticalLayoutGroup>();
             titleLayoutGroup.padding = CalcPadding(true, CalcSelfIndent(foldElement), false);
-            var titleGo = Build_Label(foldElement.bar);
+            var titleGo = Build_Label(foldElement.header);
             fold.SetTitleContents(titleGo.transform);
 
             // build contents

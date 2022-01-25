@@ -15,7 +15,7 @@ namespace RosettaUI.UIToolkit.Builder
         
         void SetupFieldLabel<T, TElementValue>(BaseField<T> field, ReadOnlyFieldElement<TElementValue> fieldBaseElement)
         {
-            var labelElement = fieldBaseElement.Label;
+            var labelElement = fieldBaseElement.label;
             if (labelElement != null)
             {
                 field.ListenLabel(labelElement);

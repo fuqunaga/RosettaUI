@@ -6,22 +6,17 @@
     /// </summary>
     public abstract class ReadOnlyFieldElement<T> : ReadOnlyValueElement<T>
     {
-        public LabelElement Label { get; }
+        public readonly LabelElement label;
 
         public ReadOnlyFieldElement(LabelElement label, IGetter<T> getter) : base(getter)
         {
             if (label != null)
             {
-                Label = label;
-                Label.SetParent(this);
-                Label.isPrefix = true;
+                this.label = label;
+                this.label.isPrefix = true;
+                
+                AddChild(this.label);
             }
-        }
-
-        protected override void UpdateInternal()
-        {
-            Label?.Update();
-            base.UpdateInternal();
         }
     }
 }

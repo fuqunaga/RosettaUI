@@ -26,11 +26,18 @@ namespace RosettaUI
         public bool IsMinConst => _minGetter.IsConst;
         public bool IsMaxConst => _maxGetter.IsConst;
 
-        public override void Update()
+        protected override void UpdateInternal()
         {
-            base.Update();
+            base.UpdateInternal();
             if (!IsMinConst) minRx.Value = _minGetter.Get();
             if (!IsMaxConst) maxRx.Value = _maxGetter.Get();
+        }
+
+        protected override void ClearGetterCacheInternal()
+        {
+            base.ClearGetterCacheInternal();
+            _minGetter.ClearCache();
+            _maxGetter.ClearCache();
         }
     }
 }

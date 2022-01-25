@@ -19,6 +19,9 @@ namespace RosettaUI
             this.getter = getter ?? new ConstGetter<T>(default);
         }
 
+        protected override void ClearGetterCacheInternal() => getter.ClearCache();
+        
+
         protected override void UpdateInternal()
         {
             base.UpdateInternal();

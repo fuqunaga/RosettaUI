@@ -4,7 +4,7 @@ namespace RosettaUI
 {
     public static class ConstGetter
     {
-        public static ConstGetter<T> Create<T>(T obj) => new ConstGetter<T>(obj);
+        public static ConstGetter<T> Create<T>(T obj) => new(obj);
 
         public static IGetter Create(object obj, Type type)
         {
@@ -13,11 +13,21 @@ namespace RosettaUI
         }
     }
 
-    public class ConstGetter<T> : Getter<T>
+    public class ConstGetter<T> : IGetter<T>
     {
-        public ConstGetter(T obj) : base(() => obj)
-        { }
+        private readonly T _obj;
 
-        public override bool IsConst => true;
+        public ConstGetter(T obj) => _obj = obj;
+
+        public bool IsNull => _obj is null;
+        public bool IsNullable => typeof(T).IsClass;
+        public bool IsConst => true;
+        public Type ValueType => typeof(T);
+
+        public T Get() => _obj;
+
+        public void ClearCache()
+        {
+        }
     }
 }

@@ -49,11 +49,11 @@ namespace RosettaUI
             SetElements(new[] {_build?.Invoke()});
         }
 
-        public override void Update()
+        protected override void UpdateInternal()
         {
             if (_rebuildIf?.Invoke(this) ?? false)
             {
-                foreach (var e in elements)
+                foreach (var e in Children)
                 {
                     e?.Destroy();
                 }
@@ -63,7 +63,7 @@ namespace RosettaUI
             }
             else
             {
-                if (Enable) UpdateInternal();
+                base.UpdateInternal();
             }
         }
     }

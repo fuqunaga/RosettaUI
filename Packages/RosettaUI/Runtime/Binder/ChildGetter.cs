@@ -5,7 +5,7 @@ namespace RosettaUI
     /// <summary>
     ///     Getter, which targets a portion of the parents
     /// </summary>
-    public abstract class ChildGetter<TParent, TValue> : IGetter<TValue>
+    public abstract class ChildGetter<TParent, TValue> : GetterBase<TValue>
     {
         protected readonly IGetter<TParent> parentGetter;
 
@@ -17,11 +17,17 @@ namespace RosettaUI
         protected abstract TValue GetFromChild(TParent get);
 
 
-        public TValue Get() => GetFromChild(parentGetter.Get());
+        protected override TValue GetRaw() => GetFromChild(parentGetter.Get());
 
-        public bool IsNull => parentGetter.IsNull;
-        public bool IsNullable => parentGetter.IsNull;
-        public bool IsConst => parentGetter.IsNull;
-        public Type ValueType => typeof(TValue);
+        public override void ClearCache()
+        {
+            base.ClearCache();
+            parentGetter.ClearCache();
+        }
+
+        public override bool IsNull => parentGetter.IsNull;
+        public override bool IsNullable => parentGetter.IsNullable;
+        public override bool IsConst => parentGetter.IsConst;
+        public override Type ValueType => typeof(TValue);
     }
 }

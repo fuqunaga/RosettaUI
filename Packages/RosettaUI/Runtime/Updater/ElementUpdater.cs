@@ -19,7 +19,7 @@ namespace RosettaUI
             }
             else if (element is WindowLauncherElement windowLauncherElement)
             {
-                RegisterWindowRecursive(windowLauncherElement.Window);
+                RegisterWindowRecursive(windowLauncherElement.window);
             }
             
             if (element is ElementGroup elementGroup)

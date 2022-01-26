@@ -94,16 +94,14 @@ namespace RosettaUI
         }
         
         
-        public static FoldElement SetOpenFlag(this FoldElement fold, bool flag)
+        public static OpenCloseBaseElement SetOpenFlag(this OpenCloseBaseElement element, bool flag)
         {
-            fold.IsOpen = flag;
-            return fold;
+            element.IsOpen = flag;
+            return element;
         }
 
-        public static FoldElement Open(this FoldElement fold) => fold.SetOpenFlag(true);
+        public static OpenCloseBaseElement Open(this OpenCloseBaseElement element) => element.SetOpenFlag(true);
 
-        public static FoldElement Close(this FoldElement fold) => fold.SetOpenFlag(false);
-
-
+        public static OpenCloseBaseElement Close(this OpenCloseBaseElement element) => element.SetOpenFlag(false);
     }
 }

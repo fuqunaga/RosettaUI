@@ -26,7 +26,12 @@ namespace RosettaUI.UIToolkit.Builder
 
             windowElement.enableRx.SubscribeAndCallOnce(isOpen =>
             {
-                if (isOpen) window.Show();
+                if (isOpen)
+                {
+                    window.BringToFront();
+                    window.Show();
+                }
+                
                 else window.Hide();
             });
             
@@ -79,23 +84,26 @@ namespace RosettaUI.UIToolkit.Builder
         private VisualElement Build_WindowLauncher(Element element)
         {
             var launcherElement = (WindowLauncherElement) element;
-            var windowElement = launcherElement.Window;
+            var windowElement = launcherElement.window;
             var window = (Window) Build(windowElement);
 
             var toggle = Build_Field<bool, Toggle>(launcherElement, false);
             toggle.AddToClassList(UssClassName.WindowLauncher);
-            toggle.RegisterCallback<PointerUpEvent>(evt =>
-            {
-                // panel==null（初回）はクリックした場所に出る
-                // 以降は以前の位置に出る
-                // Toggleの値が変わるのはこのイベントの後
-                if (!windowElement.Enable && window.panel == null) window.Show(evt.originalMousePosition, toggle);
-            });
+            toggle.RegisterCallback<PointerUpEvent>(OnPointUpEventFirst);
 
             var labelElement = launcherElement.label;
             labelElement.SubscribeValueOnUpdateCallOnce(v => toggle.text = v);
 
             return toggle;
+
+            void OnPointUpEventFirst(PointerUpEvent evt)
+            {
+                toggle.UnregisterCallback<PointerUpEvent>(OnPointUpEventFirst);
+                // panel==null（初回）はクリックした場所に出る
+                // 以降は以前の位置に出る
+                // Toggleの値が変わるのはこのイベントの後
+                if (!windowElement.Enable && window.panel == null) window.Show(evt.originalMousePosition, toggle);
+            }
         }
 
         private VisualElement Build_Row(Element element)

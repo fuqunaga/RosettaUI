@@ -2,13 +2,13 @@
 {
     public class WindowLauncherElement : BoolFieldElement
     {
+        public readonly WindowElement window;
+        
         public WindowLauncherElement(LabelElement label, WindowElement window) :
-            base(label, Binder.Create(() => window.Enable, v => window.Enable = v))
+            base(label, Binder.Create(() => window.IsOpen, v => window.IsOpen = v))
         {
-            Window = window;
-            Window.Enable = false;
+            this.window = window;
+            this.window.IsOpen = false;
         }
-
-        public WindowElement Window { get; }
     }
 }

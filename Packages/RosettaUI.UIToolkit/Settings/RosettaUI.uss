@@ -167,12 +167,18 @@
 
 .rosettaui-window-launcher:hover
 {
-    background-color: #404040;
+    background-color: var(--rosettaui-highlight-dark-gray);
 }
 
 .rosettaui-window-launcher:checked
 {
-    background-color: #484848;
+    background-color: var(--unity-colors-highlight-background);
+}
+
+.rosettaui-window-launcher .unity-toggle__input
+{
+    background-color: transparent;
+    border-width: 0;
 }
 
 .rosettaui-window-launcher .unity-toggle__checkmark,

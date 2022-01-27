@@ -31,10 +31,14 @@ namespace RosettaUI
 
         public static ScrollViewElement ScrollView(params Element[] elements) => ScrollView(elements.AsEnumerable());
 
-        public static ScrollViewElement ScrollView(IEnumerable<Element> elements)
-        {
-            return new ScrollViewElement(elements);
-        }
+        public static ScrollViewElement ScrollView(ScrollViewType scrollViewType, params Element[] elements) =>
+            ScrollView(scrollViewType, elements.AsEnumerable());
+
+        public static ScrollViewElement ScrollView(IEnumerable<Element> elements) =>
+            ScrollView(ScrollViewType.VerticalAndHorizontal, elements);
+
+        public static ScrollViewElement ScrollView(ScrollViewType scrollViewType, IEnumerable<Element> elements) =>
+            new ScrollViewElement(elements, scrollViewType);
 
         public static IndentElement Indent(params Element[] elements) => Indent(elements.AsEnumerable());
 

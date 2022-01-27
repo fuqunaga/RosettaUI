@@ -4,8 +4,11 @@ namespace RosettaUI
 {
     public class ScrollViewElement : ElementGroup
     {
-        public ScrollViewElement(IEnumerable<Element> contents) : base(contents)
+        public readonly ScrollViewType type;
+        
+        public ScrollViewElement(IEnumerable<Element> contents, ScrollViewType type = ScrollViewType.VerticalAndHorizontal) : base(contents)
         {
+            this.type = type;
         }
     }
 }

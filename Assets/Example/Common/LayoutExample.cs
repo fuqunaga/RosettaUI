@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Codice.CM.Common.Tree;
 using UnityEngine;
 
 namespace RosettaUI.Example
@@ -13,7 +14,7 @@ namespace RosettaUI.Example
 
         public Element CreateElement()
         {
-            var scrollViewItemCount = 100;
+            var scrollViewItemCount = 50;
             
             return UI.Column(
                 UI.Row(
@@ -64,51 +65,111 @@ namespace RosettaUI.Example
                                     UI.Label("Indent2")
                                 )
                             )
-                        )
-                    ).SetMinWidth(500f),
-                    
-                    UI.Page(
+                        ),
+                        
+                        UI.Space().SetHeight(10f),
                         UI.Label("<b>UI.Page()</b>"),
                         UI.Label("Adjust the width of the prefix labels."),
-                        UI.Row(
-                            UI.Label("Page").SetWidth(80f),
-                            UI.Box(
-                                UI.Page(
-                                    UI.Field(() => intValue),
-                                    UI.Fold("Fold0",
-                                        UI.Field(() => floatValue),
-                                        UI.Fold("Fold1",
-                                            UI.Field(() => stringValue)
+                        UI.Column(
+                            UI.Row(
+                                UI.Label("Page").SetWidth(80f),
+                                UI.Box(
+                                    UI.Page(
+                                        UI.Field(() => intValue),
+                                        UI.Fold("Fold0",
+                                            UI.Field(() => floatValue),
+                                            UI.Fold("Fold1",
+                                                UI.Field(() => stringValue)
+                                            ).Open()
                                         ).Open()
-                                    ).Open()
-                                ))
-                        ),
-                        UI.Row(
-                            UI.Label("Column").SetWidth(80f),
-                            UI.Box(
-                                UI.Column(
-                                    UI.Field(() => intValue),
-                                    UI.Fold("Fold0",
-                                        UI.Field(() => floatValue),
-                                        UI.Fold("Fold",
-                                            UI.Field(() => stringValue)
+                                    ))
+                            ),
+                            UI.Row(
+                                UI.Label("Column").SetWidth(80f),
+                                UI.Box(
+                                    UI.Column(
+                                        UI.Field(() => intValue),
+                                        UI.Fold("Fold0",
+                                            UI.Field(() => floatValue),
+                                            UI.Fold("Fold",
+                                                UI.Field(() => stringValue)
+                                            ).Open()
                                         ).Open()
-                                    ).Open()
+                                    )
                                 )
                             )
                         )
                     ),
+     
                     
                     UI.Page(
                         UI.Label("<b>UI.ScrollView()</b>"),
                         UI.Slider(() => scrollViewItemCount),
-                        UI.ScrollView(
-                            UI.DynamicElementOnStatusChanged(
-                                () => scrollViewItemCount,
-                                count => UI.Column(Enumerable.Range(0, count)
-                                    .Select(i => UI.Field("Count" + i, () => i.ToString())))
-                            )
-                        ).SetHeight(300f)
+                        UI.Space().SetHeight(10f),
+                        
+                        UI.Label("Vertical"),
+                        UI.Box(
+                            UI.ScrollView(
+                                ScrollViewType.Vertical,
+                                UI.DynamicElementOnStatusChanged(
+                                    () => scrollViewItemCount,
+                                    count => UI.Column(
+                                        Enumerable.Range(0, count)
+                                            .Select(i => UI.Field("Item" + i, () => i.ToString()))
+                                    )
+                                )
+                            ).SetHeight(300f)
+                        ),
+                        UI.Space().SetHeight(10f),
+                        
+                        UI.Label("Horizontal"),
+                        UI.Box(
+                            UI.ScrollView(
+                                ScrollViewType.Horizontal,
+                                UI.DynamicElementOnStatusChanged(
+                                    () => scrollViewItemCount,
+                                    count => UI.Row(
+                                        Enumerable.Range(0, count).Select(i => UI.Column(
+                                                UI.Label("Item" + i),
+                                                UI.Field(null, () => i.ToString())
+                                            )
+                                        )
+                                    )
+                                )
+                            ).SetWidth(700f)
+                        ),
+                        UI.Space().SetHeight(10f),
+                        
+                        
+                        UI.Label("VerticalAndHorizontal"),
+                        UI.Box(
+                            UI.ScrollView(
+                                ScrollViewType.VerticalAndHorizontal,
+                                UI.DynamicElementOnStatusChanged(
+                                    () => scrollViewItemCount,
+                                    count =>
+                                    {
+                                        var rows = new List<Element>();
+
+                                        const int chunkSize = 5;
+                                        var i = 0;
+                                        for (var remain = count; remain > 0; remain -= chunkSize)
+                                        {
+                                            var size = Mathf.Min(chunkSize, remain);
+                                            rows.Add(
+                                                UI.Row(
+                                                    Enumerable.Range(0, size).Select(_ =>
+                                                        UI.Field("Item" + (i++), () => i.ToString()))
+                                                )
+                                            );
+                                        }
+
+                                        return UI.Column(rows);
+                                    }
+                                )
+                            ).SetWidth(700f).SetHeight(300f)
+                        ),
+                        UI.Space().SetHeight(10f)
                     )
                 ),
                 UI.Space().SetHeight(10f),

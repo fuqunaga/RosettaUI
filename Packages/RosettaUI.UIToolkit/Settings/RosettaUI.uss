@@ -20,7 +20,7 @@
     --rosettaui-slider-dragger-margin-top: -7px; /* half of height */
     --rosettaui-slider-dragger-border-radius: 7px;
     
-    --rosettaui-scloller-size: 18px;
+    --rosettaui-scroller-size: 18px;
     
     font-size: 18px;
     color: var(--unity-colors-default-text);

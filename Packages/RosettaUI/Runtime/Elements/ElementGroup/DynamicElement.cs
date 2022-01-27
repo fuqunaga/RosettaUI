@@ -53,7 +53,7 @@ namespace RosettaUI
         {
             if (_rebuildIf?.Invoke(this) ?? false)
             {
-                DestroyChildren();
+                DestroyChildren(true);
 
                 BuildElement();
                 RebuildChildren();

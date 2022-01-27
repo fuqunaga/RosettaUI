@@ -74,7 +74,7 @@ namespace RosettaUI.Builder
         protected abstract void OnElementInteractableChanged(Element element, TUIObj uiObj, bool interactable);
         protected abstract void OnElementStyleChanged(Element element, TUIObj uiObj, Style style);
         protected abstract void OnRebuildElementGroupChildren(ElementGroup elementGroup);
-        protected abstract void OnDestroyElement(Element element);
+        protected abstract void OnDestroyElement(Element element, bool isDestroyRoot);
 
 
         protected IEnumerable<TUIObj> Build_ElementGroupContents(ElementGroup elementGroup)

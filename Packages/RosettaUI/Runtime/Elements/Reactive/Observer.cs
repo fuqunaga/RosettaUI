@@ -1,24 +1,22 @@
 using System;
 
-
 namespace RosettaUI.Reactive
 {
-
     public class Observer<T> : IObserver<T>
     {
-        Action<T> onNext;
-        Action<Exception> onError;
-        Action onComplete;
+        readonly Action<T> _onNext;
+        readonly Action<Exception> _onError;
+        readonly Action _onComplete;
 
         public Observer(Action<T> onNext = null, Action<Exception> onError = null, Action onComplete = null)
         {
-            this.onNext = onNext;
-            this.onError = onError;
-            this.onComplete = onComplete;
+            _onNext = onNext;
+            _onError = onError;
+            _onComplete = onComplete;
         }
 
-        public void OnNext(T value) => onNext?.Invoke(value);
-        public void OnError(Exception error) => onError?.Invoke(error);
-        public void OnCompleted() => onComplete?.Invoke();
+        public void OnNext(T value) => _onNext?.Invoke(value);
+        public void OnError(Exception error) => _onError?.Invoke(error);
+        public void OnCompleted() => _onComplete?.Invoke();
     }
 }

@@ -39,8 +39,8 @@ namespace RosettaUI.Reactive
 
             public UnsubscribeObj(List<IObserver<T>> observers, IObserver<T> observer)
             {
-                this._observers = observers;
-                this._observer = observer;
+                _observers = observers;
+                _observer = observer;
             }
 
             public void Dispose()

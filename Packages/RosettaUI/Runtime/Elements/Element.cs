@@ -23,7 +23,7 @@ namespace RosettaUI
         
         public event Action<Element> onUpdate;
         public event Action onViewValueChanged;
-        public event Action<Element> onDestroy;
+        public event Action<Element, bool> onDestroy;
 
 
         public bool Enable
@@ -84,22 +84,22 @@ namespace RosettaUI
             foreach(var e in _children) e.Update();
         }
 
-        protected void DestroyChildren()
+        protected void DestroyChildren(bool isDestroyRoot)
         {
             foreach (var child in _children)
             {
                 child.Parent = null;
-                child.Destroy();
+                child.Destroy(isDestroyRoot);
             }
             _children.Clear();
         }
         
-        public virtual void Destroy()
+        public virtual void Destroy(bool isDestroyRoot = true)
         {
-            DestroyChildren();
+            onDestroy?.Invoke(this, isDestroyRoot);
             Parent?.RemoveChild(this);
-
-            onDestroy?.Invoke(this);
+            
+            DestroyChildren(false);
         }
 
         protected void NotifyViewValueChanged()

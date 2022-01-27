@@ -137,11 +137,14 @@ namespace RosettaUI.UGUI.Builder
             }
 
 
-            protected override void OnDestroyElement(Element element)
+            protected override void OnDestroyElement(Element element, bool isDestroyRoot)
             {
                 var go = GetUIObj(element);
 
-                Object.Destroy(go);
+                if (isDestroyRoot)
+                {
+                    Object.Destroy(go);
+                }
 
                 UnregisterUIObj(element);
 

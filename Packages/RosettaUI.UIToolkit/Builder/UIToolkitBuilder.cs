@@ -72,10 +72,14 @@ namespace RosettaUI.UIToolkit.Builder
                 ve.style.minWidth = LayoutSettings.LabelWidth - marginLeft;
             });
         }
-        
+
         protected override void OnElementEnableChanged(Element _, VisualElement ve, bool enable)
         {
-            ve.style.display = enable ? DisplayStyle.Flex : DisplayStyle.None;
+            var display = enable ? DisplayStyle.Flex : DisplayStyle.None;
+            if (ve.resolvedStyle.display != display)
+            {
+                ve.style.display = display;
+            }
         }
 
         protected override void OnElementInteractableChanged(Element _, VisualElement ve, bool interactable)
@@ -119,10 +123,15 @@ namespace RosettaUI.UIToolkit.Builder
             Build_ElementGroupContents(groupVe, elementGroup);
         }
 
-        protected override void OnDestroyElement(Element element)
+        protected override void OnDestroyElement(Element element, bool isDestroyRoot)
         {
             var ve = GetUIObj(element);
-            ve?.RemoveFromHierarchy();
+            
+            if (isDestroyRoot)
+            {
+                ve?.RemoveFromHierarchy();
+            }
+
             UnregisterUIObj(element);
         }
 

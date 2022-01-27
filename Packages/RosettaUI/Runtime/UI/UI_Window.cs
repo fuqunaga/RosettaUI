@@ -56,7 +56,7 @@ namespace RosettaUI
                 var windowHasContents = elements.Any(dynamicElement => dynamicElement.Contents.Any());
                 launcher.Enable = windowHasContents;
             };
-            launcher.onDestroy += _ => window.Destroy();
+            launcher.onDestroy += (_,_) => window.Destroy();
 
             return launcher;
         }

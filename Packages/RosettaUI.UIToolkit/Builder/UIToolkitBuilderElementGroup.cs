@@ -3,6 +3,7 @@ using RosettaUI.Builder;
 using RosettaUI.Reactive;
 using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine;
+using UnityEngine.Profiling;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -232,7 +233,7 @@ namespace RosettaUI.UIToolkit.Builder
             var group = (ElementGroup) element;
 
             container.name = group.DisplayName;
-                
+            
             var i = 0;
             foreach (var ve in Build_ElementGroupContents(group))
             {
@@ -240,7 +241,7 @@ namespace RosettaUI.UIToolkit.Builder
                 container.Add(ve);
                 i++;
             }
-
+            
             return container;
         }
 

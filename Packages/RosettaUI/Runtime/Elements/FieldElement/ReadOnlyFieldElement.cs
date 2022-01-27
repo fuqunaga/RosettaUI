@@ -12,8 +12,12 @@
         {
             if (label != null)
             {
+                if (label.labelType == LabelType.Auto)
+                {
+                    label.labelType = LabelType.Prefix;
+                }
+                
                 this.label = label;
-                this.label.isPrefix = true;
                 
                 AddChild(this.label);
             }

@@ -31,8 +31,6 @@ namespace RosettaUI.Example
             SimpleClass nullOneLineClass = null;
             ComplexClass nullMultiLineClass = null;
             ElementCreator nullElementCreator = null;
-            var scrollViewItemCount = 10;
-
 
             UICustom.RegisterElementCreationFunc<UICustomClass>((uiCustomClass) =>
             {
@@ -51,12 +49,12 @@ namespace RosettaUI.Example
                         UI.TextAreaReadOnly(nameof(UI.TextAreaReadOnly), () => multiLineStringValue),
                         UI.Space().SetHeight(10f),
                         UI.Row(
-                            UI.Label("<b>UI.Image()</b>", true),
+                            UI.Label("<b>UI.Image()</b>", LabelType.Prefix),
                             UI.Image(() => texture).SetMaxWidth(200f).SetMaxHeight(200f)
                         ),
                         UI.Space().SetHeight(10f),
                         UI.Row(
-                            UI.Label("<b>UI.Button()</b>", true),
+                            UI.Label("<b>UI.Button()</b>", LabelType.Prefix),
                             UI.Button(nameof(UI.Button), () => print("On button clicked"))
                         ),
                         UI.Space().SetHeight(10f),
@@ -71,7 +69,7 @@ namespace RosettaUI.Example
                         ),
                         UI.Space().SetHeight(10f),
                         UI.Row(
-                            UI.Label("<b>UI.Popup()</b>", true),
+                            UI.Label("<b>UI.Popup()</b>", LabelType.Prefix),
                             UI.Popup(
                                 UI.Box(UI.Label($"{nameof(UI.Popup)}(Right click)")),
                                 () => new[]
@@ -84,7 +82,7 @@ namespace RosettaUI.Example
                         ),
                         UI.Space().SetHeight(10f),
                         UI.Row(
-                            UI.Label("<b>UI.HelpBox()</b>", true),
+                            UI.Label("<b>UI.HelpBox()</b>", LabelType.Prefix),
                             UI.Column(
                                 UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.None)}", HelpBoxType.None),
                                 UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.Info)}", HelpBoxType.Info),
@@ -95,7 +93,7 @@ namespace RosettaUI.Example
                         ),
                         UI.Space().SetHeight(10f),
                         UI.Row(
-                            UI.Label("<b>UI.Space()</b>", true),
+                            UI.Label("<b>UI.Space()</b>", LabelType.Prefix),
                             UI.Space().SetBackgroundColor(Color.gray)
                         ),
                         UI.Space().SetHeight(10f)

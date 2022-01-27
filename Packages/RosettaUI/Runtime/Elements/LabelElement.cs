@@ -4,7 +4,7 @@ namespace RosettaUI
 {
     public class LabelElement : ReadOnlyValueElement<string>
     {
-        public bool isPrefix;
+        public LabelType labelType;
         
         public LabelElement(IGetter<string> label) : base(label) { }
 

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Codice.CM.Common.Tree;
 using UnityEngine;
 
 namespace RosettaUI.Example
@@ -10,7 +9,19 @@ namespace RosettaUI.Example
         public int intValue;
         public float floatValue;
         public string stringValue;
-        public List<int> list;
+
+
+        public Element CreateExampleElement(string title, params Element[] contents)
+        {
+            return UI.Column(
+                UI.Label($"<b>{title}</b>"),
+                UI.Page(
+                    UI.Box(contents)
+                ),
+                UI.Space().SetHeight(10f)
+            );
+        }
+        
 
         public Element CreateElement()
         {
@@ -18,34 +29,23 @@ namespace RosettaUI.Example
             
             return UI.Column(
                 UI.Row(
-                    UI.Page(
-                        UI.Label("<b>UI.Box()</b>"),
-                        UI.Box(
-                            UI.Label("box style frame")
-                        ),
-                        UI.Space().SetHeight(10f),
-                        
-                        UI.Label("<b>UI.Row()</b>"),
-                        UI.Box(
+                    UI.Column(
+                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.Box), UI.Label("box style frame")),
+                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.Row),
                             UI.Row(
                                 UI.Label("Element0"),
                                 UI.Label("Element1"),
                                 UI.Label("Element2")
                             )
                         ),
-                        UI.Space().SetHeight(10f),
-                        
-                        UI.Label("<b>UI.Column()</b>"),
-                        UI.Box(
+                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.Column),
                             UI.Column(
                                 UI.Label("Element0"),
                                 UI.Label("Element1"),
                                 UI.Label("Element2")
                             )
                         ),
-                        UI.Space().SetHeight(10f),
-                        UI.Label("<b>UI.Fold()</b>"),
-                        UI.Box(
+                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.Fold),
                             UI.Fold("Fold0",
                                 UI.Fold("Fold1",
                                     UI.Fold("Fold2",
@@ -54,10 +54,7 @@ namespace RosettaUI.Example
                                 )
                             )
                         ),
-                        UI.Space().SetHeight(10f),
-                        
-                        UI.Label("<b>UI.Indent()</b>"),
-                        UI.Box(
+                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.Indent),
                             UI.Label("No indent"),
                             UI.Indent(
                                 UI.Label("Indent1"),
@@ -66,48 +63,43 @@ namespace RosettaUI.Example
                                 )
                             )
                         ),
-                        
-                        UI.Space().SetHeight(10f),
-                        UI.Label("<b>UI.Page()</b>"),
-                        UI.Label("Adjust the width of the prefix labels."),
-                        UI.Column(
-                            UI.Row(
-                                UI.Label("Page").SetWidth(80f),
-                                UI.Box(
-                                    UI.Page(
-                                        UI.Field(() => intValue),
-                                        UI.Fold("Fold0",
-                                            UI.Field(() => floatValue),
-                                            UI.Fold("Fold1",
-                                                UI.Field(() => stringValue)
+                        ExampleTemplate.UIFunctionColumn(nameof(UI.Page),
+                            UI.Label("Adjust the width of the prefix labels."),
+                            UI.Column(
+                                UI.Row(
+                                    UI.Label("Page").SetWidth(80f),
+                                    UI.Box(
+                                        UI.Page(
+                                            UI.Field(() => intValue),
+                                            UI.Fold("Fold0",
+                                                UI.Field(() => floatValue),
+                                                UI.Fold("Fold1",
+                                                    UI.Field(() => stringValue)
+                                                ).Open()
                                             ).Open()
-                                        ).Open()
-                                    ))
-                            ),
-                            UI.Row(
-                                UI.Label("Column").SetWidth(80f),
-                                UI.Box(
-                                    UI.Column(
-                                        UI.Field(() => intValue),
-                                        UI.Fold("Fold0",
-                                            UI.Field(() => floatValue),
-                                            UI.Fold("Fold",
-                                                UI.Field(() => stringValue)
+                                        ))
+                                ),
+                                UI.Row(
+                                    UI.Label("Column").SetWidth(80f),
+                                    UI.Box(
+                                        UI.Column(
+                                            UI.Field(() => intValue),
+                                            UI.Fold("Fold0",
+                                                UI.Field(() => floatValue),
+                                                UI.Fold("Fold",
+                                                    UI.Field(() => stringValue)
+                                                ).Open()
                                             ).Open()
-                                        ).Open()
+                                        )
                                     )
                                 )
                             )
                         )
                     ),
-     
-                    
-                    UI.Page(
-                        UI.Label("<b>UI.ScrollView()</b>"),
-                        UI.Indent(
-                            UI.Slider(() => scrollViewItemCount),
-                            UI.Space().SetHeight(10f),
-                            UI.Label("Vertical"),
+                    ExampleTemplate.UIFunctionColumnBox(nameof(UI.ScrollView),
+                        UI.Slider(() => scrollViewItemCount),
+                        ExampleTemplate.BlankLine(),
+                        ExampleTemplate.TitleIndent("Vertical",
                             UI.Box(
                                 UI.ScrollView(
                                     ScrollViewType.Vertical,
@@ -119,9 +111,9 @@ namespace RosettaUI.Example
                                         )
                                     )
                                 ).SetHeight(300f)
-                            ),
-                            UI.Space().SetHeight(10f),
-                            UI.Label("Horizontal"),
+                            )
+                        ),
+                        ExampleTemplate.TitleIndent("Horizontal",
                             UI.Box(
                                 UI.ScrollView(
                                     ScrollViewType.Horizontal,
@@ -136,9 +128,10 @@ namespace RosettaUI.Example
                                         )
                                     )
                                 ).SetWidth(700f)
-                            ),
-                            UI.Space().SetHeight(10f),
-                            UI.Label("VerticalAndHorizontal"),
+                            )
+                        ),
+                        
+                        ExampleTemplate.TitleIndent("VerticalAndHorizontal",
                             UI.Box(
                                 UI.ScrollView(
                                     ScrollViewType.VerticalAndHorizontal,
@@ -167,12 +160,11 @@ namespace RosettaUI.Example
                                         }
                                     )
                                 ).SetWidth(700f).SetHeight(300f)
-                            ),
-                            UI.Space().SetHeight(10f)
+                            )
                         )
                     )
                 ),
-                UI.Space().SetHeight(10f),
+                ExampleTemplate.BlankLine(),
                 
                 UI.Label("<b>Tips()</b>"),
                 UI.Page(

@@ -34,63 +34,58 @@ namespace RosettaUI.Example
         public Element CreateElement()
         {
             return UI.Column(
-                    UI.Row(
-                        UI.Page(
-                            UI.Label("<b>UI.MinMaxSlider(() => target)</b>"),
-                            UI.Indent(
-                                UI.MinMaxSlider(() => intMinMax),
-                                UI.MinMaxSlider(() => uintMinMax),
-                                UI.MinMaxSlider(() => floatMinMax),
-                                UI.MinMaxSlider(() => vector2MinMax),
-                                UI.MinMaxSlider(() => vector3MinMax),
-                                UI.MinMaxSlider(() => vector4MinMax),
-                                UI.MinMaxSlider(() => vector2IntMinMax),
-                                UI.MinMaxSlider(() => vector3IntMinMax),
-                                UI.MinMaxSlider(() => rectMinMax),
-                                UI.MinMaxSlider(() => rectIntMinMax),
-                                UI.MinMaxSlider(() => rectOffsetMinMax),
-                                UI.MinMaxSlider(() => boundsMinMax),
-                                UI.MinMaxSlider(() => boundsIntMinMax)
-                            )
-                        ),
-                        UI.Page(
-                            UI.Label("<b>UI.MinMaxSliderReadOnly(() => target)</b>"),
-                            UI.Indent(
-                                UI.MinMaxSliderReadOnly(() => intMinMax),
-                                UI.MinMaxSliderReadOnly(() => uintMinMax),
-                                UI.MinMaxSliderReadOnly(() => floatMinMax),
-                                UI.MinMaxSliderReadOnly(() => vector2MinMax),
-                                UI.MinMaxSliderReadOnly(() => vector3MinMax),
-                                UI.MinMaxSliderReadOnly(() => vector4MinMax),
-                                UI.MinMaxSliderReadOnly(() => vector2IntMinMax),
-                                UI.MinMaxSliderReadOnly(() => vector3IntMinMax),
-                                UI.MinMaxSliderReadOnly(() => rectMinMax),
-                                UI.MinMaxSliderReadOnly(() => rectIntMinMax),
-                                UI.MinMaxSliderReadOnly(() => rectOffsetMinMax),
-                                UI.MinMaxSliderReadOnly(() => boundsMinMax),
-                                UI.MinMaxSliderReadOnly(() => boundsIntMinMax)
-                            )
-                        )
+                UI.Row(
+                    ExampleTemplate.UIFunctionColumn(nameof(UI.MinMaxSlider),
+                        UI.MinMaxSlider(() => intMinMax),
+                        UI.MinMaxSlider(() => uintMinMax),
+                        UI.MinMaxSlider(() => floatMinMax),
+                        UI.MinMaxSlider(() => vector2MinMax),
+                        UI.MinMaxSlider(() => vector3MinMax),
+                        UI.MinMaxSlider(() => vector4MinMax),
+                        UI.MinMaxSlider(() => vector2IntMinMax),
+                        UI.MinMaxSlider(() => vector3IntMinMax),
+                        UI.MinMaxSlider(() => rectMinMax),
+                        UI.MinMaxSlider(() => rectIntMinMax),
+                        UI.MinMaxSlider(() => rectOffsetMinMax),
+                        UI.MinMaxSlider(() => boundsMinMax),
+                        UI.MinMaxSlider(() => boundsIntMinMax)
                     ),
-                    UI.Space().SetHeight(10f),
-                    UI.Page(
-                        UI.Label("<b>Tips</b>"),
-                        UI.Indent(
-                            UI.Label("<b>UI.MinMaxSlider(\"CustomLabel\", () => floatMinMax)</b>"),
-                            UI.MinMaxSlider("CustomLabel", () => floatMinMax),
-                            UI.Space().SetHeight(10f),
-
-                            UI.Label("<b>UI.MinMaxSlider(\"Custom min max\", () => floatMinMax, MinMax.Create(-1f, 1f))</b>"),
-                            UI.MinMaxSlider("Custom min max", () => floatMinMax, MinMax.Create(-1f, 1f)),
-                            UI.Label("<b>UI.MinMaxSlider(\"Custom min max\", () => vector2MinMax, MinMax.Create(Vector2.one * -1f, Vector2.one))</b>"),
-                            UI.MinMaxSlider("Custom min max", () => vector2MinMax, MinMax.Create(Vector2.one * -1f, Vector2.one)),
-                            UI.Space().SetHeight(10f),
-
-                            UI.Label($"Supports any type that has a specific member pair [{string.Join(",", TypeUtility.MinMaxMemberNamePairs.Select(pair => $"({pair.Item1}, {pair.Item2})"))}]"),
-                            UI.MinMaxSlider(() => myMinMax),
-                            UI.MinMaxSlider(() => vector2Value)
-                        )
+                    ExampleTemplate.UIFunctionColumn(nameof(UI.MinMaxSliderReadOnly),
+                        UI.MinMaxSliderReadOnly(() => intMinMax),
+                        UI.MinMaxSliderReadOnly(() => uintMinMax),
+                        UI.MinMaxSliderReadOnly(() => floatMinMax),
+                        UI.MinMaxSliderReadOnly(() => vector2MinMax),
+                        UI.MinMaxSliderReadOnly(() => vector3MinMax),
+                        UI.MinMaxSliderReadOnly(() => vector4MinMax),
+                        UI.MinMaxSliderReadOnly(() => vector2IntMinMax),
+                        UI.MinMaxSliderReadOnly(() => vector3IntMinMax),
+                        UI.MinMaxSliderReadOnly(() => rectMinMax),
+                        UI.MinMaxSliderReadOnly(() => rectIntMinMax),
+                        UI.MinMaxSliderReadOnly(() => rectOffsetMinMax),
+                        UI.MinMaxSliderReadOnly(() => boundsMinMax),
+                        UI.MinMaxSliderReadOnly(() => boundsIntMinMax)
                     )
+                ),
+                UI.Column(
+                    UI.Label("<b>Tips</b>"),
+                    UI.Indent(
+                        UI.Label("<b>UI.MinMaxSlider(\"CustomLabel\", () => floatMinMax)</b>"),
+                        UI.MinMaxSlider("CustomLabel", () => floatMinMax),
+                        UI.Space().SetHeight(10f),
+                        UI.Label(
+                            "<b>UI.MinMaxSlider(\"Custom min max\", () => floatMinMax, MinMax.Create(-1f, 1f))</b>"),
+                        UI.MinMaxSlider("Custom min max", () => floatMinMax, MinMax.Create(-1f, 1f)),
+                        UI.Label(
+                            "<b>UI.MinMaxSlider(\"Custom min max\", () => vector2MinMax, MinMax.Create(Vector2.one * -1f, Vector2.one))</b>"),
+                        UI.MinMaxSlider("Custom min max", () => vector2MinMax,
+                            MinMax.Create(Vector2.one * -1f, Vector2.one)),
+                        UI.Space().SetHeight(10f),
+                        UI.Label(
+                            $"Supports any type that has a specific member pair [{string.Join(",", TypeUtility.MinMaxMemberNamePairs.Select(pair => $"({pair.Item1}, {pair.Item2})"))}]"),
+                        UI.MinMaxSlider(() => myMinMax),
+                        UI.MinMaxSlider(() => vector2Value)
+                    )
+                )
             );
         }
     }

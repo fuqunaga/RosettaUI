@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace RosettaUI.Example
 {
@@ -43,33 +42,28 @@ namespace RosettaUI.Example
 
             return UI.Page(
                 UI.Row(
-                    UI.Page(
-                        UI.Label("<b>UI.TextArea()</b>"),
-                        UI.TextArea(nameof(UI.TextArea), () => multiLineStringValue),
-                        UI.TextAreaReadOnly(nameof(UI.TextAreaReadOnly), () => multiLineStringValue),
-                        UI.Space().SetHeight(10f),
-                        UI.Row(
-                            UI.Label("<b>UI.Image()</b>", LabelType.Prefix),
+                    UI.Column(
+                        ExampleTemplate.UIFunctionColumn(nameof(UI.TextArea),
+                            UI.TextArea(nameof(UI.TextArea), () => multiLineStringValue),
+                            UI.TextAreaReadOnly(nameof(UI.TextAreaReadOnly), () => multiLineStringValue)
+                        ),
+                        ExampleTemplate.UIFunctionRow(nameof(UI.Image),
                             UI.Image(() => texture).SetMaxWidth(200f).SetMaxHeight(200f)
                         ),
-                        UI.Space().SetHeight(10f),
-                        UI.Row(
-                            UI.Label("<b>UI.Button()</b>", LabelType.Prefix),
+                        ExampleTemplate.UIFunctionRow(nameof(UI.Button),
                             UI.Button(nameof(UI.Button), () => print("On button clicked"))
                         ),
-                        UI.Space().SetHeight(10f),
-                        UI.Label("<b>UI.Dropdown()</b>"),
-                        UI.Dropdown(nameof(UI.Dropdown),
-                            () => dropDownIndex,
-                            options: new[] {"One", "Two", "Three"}
+                        ExampleTemplate.UIFunctionColumn(nameof(UI.Dropdown),
+                            UI.Dropdown(nameof(UI.Dropdown),
+                                () => dropDownIndex,
+                                options: new[] {"One", "Two", "Three"}
+                            ),
+                            UI.DropdownReadOnly($"{nameof(UI.DropdownReadOnly)}(selection index will not change)",
+                                () => dropDownIndex,
+                                options: new[] {"One", "Two", "Three"}
+                            )
                         ),
-                        UI.DropdownReadOnly($"{nameof(UI.DropdownReadOnly)}(selection index will not change)",
-                            () => dropDownIndex,
-                            options: new[] {"One", "Two", "Three"}
-                        ),
-                        UI.Space().SetHeight(10f),
-                        UI.Row(
-                            UI.Label("<b>UI.Popup()</b>", LabelType.Prefix),
+                        ExampleTemplate.UIFunctionRow(nameof(UI.Popup),
                             UI.Popup(
                                 UI.Box(UI.Label($"{nameof(UI.Popup)}(Right click)")),
                                 () => new[]
@@ -80,9 +74,7 @@ namespace RosettaUI.Example
                                 }
                             )
                         ),
-                        UI.Space().SetHeight(10f),
-                        UI.Row(
-                            UI.Label("<b>UI.HelpBox()</b>", LabelType.Prefix),
+                        ExampleTemplate.UIFunctionRow(nameof(UI.HelpBox),
                             UI.Column(
                                 UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.None)}", HelpBoxType.None),
                                 UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.Info)}", HelpBoxType.Info),
@@ -91,12 +83,9 @@ namespace RosettaUI.Example
                                 UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.Error)}", HelpBoxType.Error)
                             )
                         ),
-                        UI.Space().SetHeight(10f),
-                        UI.Row(
-                            UI.Label("<b>UI.Space()</b>", LabelType.Prefix),
+                        ExampleTemplate.UIFunctionRow(nameof(UI.Space),
                             UI.Space().SetBackgroundColor(Color.gray)
-                        ),
-                        UI.Space().SetHeight(10f)
+                        )
                     ),
                     UI.Page(
                         UI.Label("<b>UI.WindowLauncher()</b>"),

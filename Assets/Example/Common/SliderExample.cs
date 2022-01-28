@@ -28,47 +28,41 @@ namespace RosettaUI.Example
             SimpleClass nullClass = null;
             return UI.Column(
                 UI.Row(
-                    UI.Page(
-                        UI.Label("<b>UI.Slider(() => target)</b>"),
-                        UI.Indent(
-                            UI.Slider(() => intValue),
-                            UI.Slider(() => uintValue),
-                            UI.Slider(() => floatValue),
-                            UI.Slider(() => vector2Value),
-                            UI.Slider(() => vector3Value),
-                            UI.Slider(() => vector4Value),
-                            UI.Slider(() => vector2IntValue),
-                            UI.Slider(() => vector3IntValue),
-                            UI.Slider(() => rectValue),
-                            UI.Slider(() => rectIntValue),
-                            UI.Slider(() => rectOffsetValue),
-                            UI.Slider(() => boundsValue),
-                            UI.Slider(() => boundsIntValue),
-                            UI.Slider(() => simpleClass)
-                        )
+                    ExampleTemplate.UIFunctionColumn(nameof(UI.Slider),
+                        UI.Slider(() => intValue),
+                        UI.Slider(() => uintValue),
+                        UI.Slider(() => floatValue),
+                        UI.Slider(() => vector2Value),
+                        UI.Slider(() => vector3Value),
+                        UI.Slider(() => vector4Value),
+                        UI.Slider(() => vector2IntValue),
+                        UI.Slider(() => vector3IntValue),
+                        UI.Slider(() => rectValue),
+                        UI.Slider(() => rectIntValue),
+                        UI.Slider(() => rectOffsetValue),
+                        UI.Slider(() => boundsValue),
+                        UI.Slider(() => boundsIntValue),
+                        UI.Slider(() => simpleClass)
                     ),
-                    UI.Page(
-                        UI.Label("<b>UI.SliderReadOnly(() => target)</b>"),
-                        UI.Indent(
-                            UI.SliderReadOnly(() => intValue),
-                            UI.SliderReadOnly(() => uintValue),
-                            UI.SliderReadOnly(() => floatValue),
-                            UI.SliderReadOnly(() => vector2Value),
-                            UI.SliderReadOnly(() => vector3Value),
-                            UI.SliderReadOnly(() => vector4Value),
-                            UI.SliderReadOnly(() => vector2IntValue),
-                            UI.SliderReadOnly(() => vector3IntValue),
-                            UI.SliderReadOnly(() => rectValue),
-                            UI.SliderReadOnly(() => rectIntValue),
-                            UI.SliderReadOnly(() => rectOffsetValue),
-                            UI.SliderReadOnly(() => boundsValue),
-                            UI.SliderReadOnly(() => boundsIntValue),
-                            UI.SliderReadOnly(() => simpleClass)
-                        )
+                    ExampleTemplate.UIFunctionColumn(nameof(UI.SliderReadOnly),
+                        UI.SliderReadOnly(() => intValue),
+                        UI.SliderReadOnly(() => uintValue),
+                        UI.SliderReadOnly(() => floatValue),
+                        UI.SliderReadOnly(() => vector2Value),
+                        UI.SliderReadOnly(() => vector3Value),
+                        UI.SliderReadOnly(() => vector4Value),
+                        UI.SliderReadOnly(() => vector2IntValue),
+                        UI.SliderReadOnly(() => vector3IntValue),
+                        UI.SliderReadOnly(() => rectValue),
+                        UI.SliderReadOnly(() => rectIntValue),
+                        UI.SliderReadOnly(() => rectOffsetValue),
+                        UI.SliderReadOnly(() => boundsValue),
+                        UI.SliderReadOnly(() => boundsIntValue),
+                        UI.SliderReadOnly(() => simpleClass)
                     )
                 ),
-                UI.Space().SetHeight(10f),
-                UI.Page(
+
+                UI.Column(
                     UI.Label("<b>Tips</b>"),
                     UI.Indent(
                         UI.Label("<b>UI.Slider(\"CustomLabel\", () => floatValue)</b>"),

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Reactive;
 using UnityEngine;
@@ -9,9 +10,21 @@ namespace RosettaUI
     {
         private static readonly BinderBase<string> NullStrBinder = ConstBinder.Create("null");
 
+        private static Element CreateCircularReferenceElement(LabelElement label, Type type) =>
+            new CompositeFieldElement(label,
+                new[]
+                {
+                    new HelpBoxElement($"[{type}] Circular reference detected.", HelpBoxType.Error)
+                }).SetInteractable(false);
         public static Element CreateFieldElement(LabelElement label, IBinder binder)
         {
             var valueType = binder.ValueType;
+            using var typeHistory = BinderTypeHistory.Get(valueType);
+            
+            if ( typeHistory == null)
+            {
+                return CreateCircularReferenceElement(label, valueType);
+            }
 
             Func<Element> createElementFunc = binder switch
             {
@@ -104,6 +117,12 @@ namespace RosettaUI
         {
             var fieldNames = TypeUtility.GetUITargetFieldNames(valueType).ToList();
             if (!fieldNames.Any()) return null;
+
+            using var typeHistory = BinderTypeHistory.Get(valueType);
+            if (typeHistory == null)
+            {
+                return CreateCircularReferenceElement(label, valueType);
+            }
 
             var elements = fieldNames.Select(createFieldElementFunc);
 
@@ -231,5 +250,22 @@ namespace RosettaUI
         }
 
         #endregion
+        
+
+        class BinderTypeHistory : IDisposable
+        {
+            private static readonly HashSet<Type> History = new();
+            public static BinderTypeHistory Get(Type type) => History.Add(type) ? new BinderTypeHistory(type) : null;
+
+            
+            private readonly Type _type;
+
+            private BinderTypeHistory(Type type) => _type = type;
+
+            public void Dispose()
+            {
+                History.Remove(_type);
+            }
+        }
     }
 }

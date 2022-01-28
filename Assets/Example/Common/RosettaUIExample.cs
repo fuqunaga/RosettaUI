@@ -22,7 +22,8 @@ namespace RosettaUI.Example
                 UI.WindowLauncher<SliderExample>(),
                 UI.WindowLauncher<MinMaxSliderExample>(),
                 UI.WindowLauncher<LayoutExample>(),
-                UI.WindowLauncher<MiscExample>()
+                UI.WindowLauncher<MiscExample>(),
+                UI.WindowLauncher<SafetyExample>()
 #if false
                 
                 , UI.WindowLauncher<UICustomExample>()

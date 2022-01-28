@@ -25,7 +25,6 @@ namespace RosettaUI.Example
 
         public Element CreateElement()
         {
-            SimpleClass nullClass = null;
             return UI.Column(
                 UI.Row(
                     ExampleTemplate.UIFunctionColumn(nameof(UI.Slider),
@@ -90,10 +89,6 @@ namespace RosettaUI.Example
                         ),
                         UI.Space().SetHeight(10f),
 
-                        UI.Label("<b>Null safe</b>"),
-                        UI.Slider(() => nullClass),
-                        UI.Space().SetHeight(10f),
-                        
                         UI.Label("<b>UI.Slider(() => stringValue)</b>"),
                         UI.Label("Unsupported types will fall back to UI.Field()"),
                         UI.Slider(() => stringValue),

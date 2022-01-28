@@ -42,8 +42,6 @@ namespace RosettaUI.Example
 
         public Element CreateElement()
         {
-            SimpleClass nullClass = null;
-            
             return UI.Column(
                 UI.Row(
                     ExampleTemplate.UIFunctionColumn(nameof(UI.Field),
@@ -119,11 +117,6 @@ namespace RosettaUI.Example
                             f => floatValue = f - 1f
                         ),
                         UI.Space().SetHeight(10f),
-
-                        UI.Label("<b>Null safe</b>"),
-                        UI.Field(() => nullClass),
-                        UI.Space().SetHeight(10f),
-                        
 
                         // TODO
                         // Field with range attribute will become Slider

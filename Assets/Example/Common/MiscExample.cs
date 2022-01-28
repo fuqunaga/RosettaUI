@@ -25,12 +25,6 @@ namespace RosettaUI.Example
 
         public Element CreateElement()
         {
-            string nullString = null;
-            List<float> nullList = null;
-            SimpleClass nullOneLineClass = null;
-            ComplexClass nullMultiLineClass = null;
-            ElementCreator nullElementCreator = null;
-
             UICustom.RegisterElementCreationFunc<UICustomClass>((uiCustomClass) =>
             {
                 return UI.Column(
@@ -193,27 +187,6 @@ namespace RosettaUI.Example
                 UI.Fold("UI Customize",
                     UI.Field(() => uiCustomClass)
                     // Element Creator in class/Array
-                ),
-                UI.Fold("Null",
-                    UI.Box(
-                        UI.Label("Field"),
-                        UI.Field(() => nullString),
-                        UI.Field(() => nullList),
-                        UI.Row(
-                            UI.Field(nameof(nullOneLineClass), () => nullOneLineClass),
-                            UI.Button("Toggle null",
-                                () => { nullOneLineClass = nullOneLineClass != null ? null : new SimpleClass(); })
-                        ),
-                        UI.Field(nameof(nullMultiLineClass), () => nullMultiLineClass),
-                        UI.Field(nameof(nullElementCreator), () => nullElementCreator)
-                    ),
-                    UI.Box(
-                        UI.Label("Slider"),
-                        UI.Slider(() => nullList),
-                        UI.Slider(() => nullOneLineClass),
-                        UI.Slider(() => nullMultiLineClass),
-                        UI.Slider(() => nullElementCreator)
-                    )
                 )
             );
         }

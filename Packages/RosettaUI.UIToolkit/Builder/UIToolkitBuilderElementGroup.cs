@@ -2,8 +2,6 @@
 using RosettaUI.Builder;
 using RosettaUI.Reactive;
 using RosettaUI.UIToolkit.UnityInternalAccess;
-using UnityEngine;
-using UnityEngine.Profiling;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -66,8 +64,6 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 fold.style.marginLeft = -LayoutSettings.IndentSize;
             }
-
-            
             
             foldElement.IsOpenRx.SubscribeAndCallOnce(isOpen => fold.value = isOpen);
             fold.RegisterValueChangedCallback(evt =>

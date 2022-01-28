@@ -5,7 +5,7 @@
     --input-border-width: 2px;
     --cursor-resize-horizontal: resource("cursor_ew");
     --close-icon: resource("close");
-    --window-color: rgba(45,45,45,0.9);
+    --window-color: rgba(45,45,45,0.8);
     --rosettaui-gray-button-tint: #A0A0A0;
     --rosettaui-color-box-background: rgba(100,100,100,0.3);
     --rosettaui-highlight-gray: #808080;
@@ -88,12 +88,12 @@
     flex: 1 0 auto;
 }
 
-.rosettaui-row__contents > .unity-base-field__label {
-    min-width: 15px;
-    margin-left: 3px;
-    margin-right: 0;
-    flex: 0 0 auto;
-}
+/*.rosettaui-row__contents > .unity-base-field__label {*/
+/*    min-width: 15px;*/
+/*    margin-left: 3px;*/
+/*    margin-right: 0;*/
+/*    flex: 0 0 auto;*/
+/*}*/
 
 
 /********************************************************************************

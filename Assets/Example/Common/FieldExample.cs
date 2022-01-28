@@ -96,17 +96,17 @@ namespace RosettaUI.Example
                     UI.Indent(
                         UI.Label("<b>UI.Field(\"CustomLabel\", () => floatValue)</b>"),
                         UI.Field("CustomLabel", () => floatValue),
-                        UI.Space().SetHeight(10f),
+                        ExampleTemplate.BlankLine(),
                         
                         UI.Label("<b>UI.Field(() => vector2Value.x)</b>"),
                         UI.Label("Supports public field/property"),
                         UI.Field(() => vector2Value.x),
-                        UI.Space().SetHeight(10f),
+                        ExampleTemplate.BlankLine(),
 
                         UI.Label("<b>Element.RegisterValueChangeCallback()</b>"),
                         UI.Field("ValueChangedCallback", () => floatValue)
                             .RegisterValueChangeCallback(() => print($"{nameof(floatValue)} changed.")),
-                        UI.Space().SetHeight(10f),
+                        ExampleTemplate.BlankLine(),
 
                         UI.Label("<b>UI.Field(() => floatValue + 1f),</b>"),
                         UI.Label("Non-interactable if the expression is not assignable"),
@@ -116,7 +116,7 @@ namespace RosettaUI.Example
                             () => floatValue + 1f,
                             f => floatValue = f - 1f
                         ),
-                        UI.Space().SetHeight(10f),
+                        ExampleTemplate.BlankLine(),
 
                         // TODO
                         // Field with range attribute will become Slider
@@ -124,7 +124,7 @@ namespace RosettaUI.Example
 
                         UI.Label("<b>If the target is IElementCreator, use CreateElement()</b>"),
                         UI.Field(() => elementCreator),
-                        UI.Space().SetHeight(10f),
+                        ExampleTemplate.BlankLine(),
                         
                         UI.Label(
                             "<b>ExpressionTree limitation</b>\n" +

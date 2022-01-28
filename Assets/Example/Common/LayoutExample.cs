@@ -96,7 +96,7 @@ namespace RosettaUI.Example
                             )
                         )
                     ),
-                    ExampleTemplate.UIFunctionColumnBox(nameof(UI.ScrollView),
+                    ExampleTemplate.UIFunctionColumn(nameof(UI.ScrollView),
                         UI.Slider(() => scrollViewItemCount),
                         ExampleTemplate.BlankLine(),
                         ExampleTemplate.TitleIndent("Vertical",

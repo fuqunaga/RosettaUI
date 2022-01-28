@@ -2,7 +2,7 @@
 
 namespace RosettaUI.Example
 {
-    public class ExampleTemplate
+    public static class ExampleTemplate
     {
         public static SpaceElement BlankLine() => UI.Space().SetHeight(10f);
         

@@ -41,7 +41,7 @@ namespace RosettaUI
 
         public static DynamicElement FieldIfObjectFound(Type type)
         {
-            return DynamicElementFindObject(type, obj =>
+            return DynamicElementIfObjectFound(type, obj =>
             {
                 var binder = Binder.Create(obj, type);
                 return Field(null, binder);
@@ -49,13 +49,13 @@ namespace RosettaUI
         }
 
         
-        public static DynamicElement DynamicElementFindObject<T>(Func<T, Element> build)
+        public static DynamicElement DynamicElementIfObjectFound<T>(Func<T, Element> build)
             where T : Object
         {
-            return DynamicElementFindObject(typeof(T), (o) => build?.Invoke((T) o));
+            return DynamicElementIfObjectFound(typeof(T), (o) => build?.Invoke((T) o));
         }
 
-        public static DynamicElement DynamicElementFindObject(Type type, Func<Object, Element> build)
+        public static DynamicElement DynamicElementIfObjectFound(Type type, Func<Object, Element> build)
         {
             Assert.IsTrue(typeof(Object).IsAssignableFrom(type));
 

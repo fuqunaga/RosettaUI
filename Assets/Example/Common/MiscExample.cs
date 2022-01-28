@@ -34,7 +34,7 @@ namespace RosettaUI.Example
             });
 
 
-            return UI.Page(
+            return UI.Column(
                 UI.Row(
                     UI.Column(
                         ExampleTemplate.UIFunctionColumn(nameof(UI.TextArea),
@@ -81,45 +81,43 @@ namespace RosettaUI.Example
                             UI.Space().SetBackgroundColor(Color.gray)
                         )
                     ),
+                    
                     UI.Page(
-                        UI.Label("<b>UI.WindowLauncher()</b>"),
-                        UI.WindowLauncher(
-                            UI.Window(
-                                UI.Label("This is window.")
-                            )
+                        ExampleTemplate.UIFunctionColumn(nameof(UI.WindowLauncher),
+                            UI.WindowLauncher(
+                                UI.Window(
+                                    UI.Label("This is window.")
+                                )
+                            ),
+                            UI.WindowLauncher<BehaviourExample>()
                         ),
-                        UI.WindowLauncher<BehaviourExample>(),
-                        UI.Space().SetHeight(10f),
-                        UI.Label("<b>UI.FieldIfObjectFound</b>"),
-                        UI.Box(
+                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.FieldIfObjectFound),
                             UI.FieldIfObjectFound<BehaviourExample>()
                         ),
-                        UI.Space().SetHeight(10f),
-                        
-                        UI.Label("<b>UI.DynamicElementIf()</b>"),
-                        UI.Field(() => dynamicElementIf),
-                        UI.DynamicElementIf(
-                            () => dynamicElementIf,
-                            () => UI.Label(nameof(UI.DynamicElementIf))
+                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.DynamicElementIf),
+                            UI.Field(() => dynamicElementIf),
+                            UI.DynamicElementIf(
+                                () => dynamicElementIf,
+                                () => UI.Label(nameof(UI.DynamicElementIf))
+                            )
                         ),
-                        UI.Space().SetHeight(10f),
-                        
-                        UI.Label("<b>UI.DynamicElementOnStatusChanged()</b>"),
-                        UI.Slider("Button count", () => intValue, max: 10),
-                        UI.DynamicElementOnStatusChanged(
-                            readStatus: () => intValue,
-                            build: (status) =>
-                            {
-                                var buttons = Enumerable.Range(0, intValue)
-                                    .Select(i => UI.Button(i.ToString()));
-                                var label = UI.Label(nameof(UI.DynamicElementOnStatusChanged));
-                                return UI.Row(
-                                    new Element[] {label}.Concat(buttons)
-                                );
-                            })
+                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.DynamicElementOnStatusChanged),
+                            UI.Slider("Button count", () => intValue, max: 10),
+                            UI.DynamicElementOnStatusChanged(
+                                readStatus: () => intValue,
+                                build: (status) =>
+                                {
+                                    var buttons = Enumerable.Range(0, intValue)
+                                        .Select(i => UI.Button(i.ToString()));
+                                    var label = UI.Label(nameof(UI.DynamicElementOnStatusChanged));
+                                    return UI.Row(
+                                        new Element[] {label}.Concat(buttons)
+                                    );
+                                })
+                        )
                     )
                 ),
-                UI.Space().SetHeight(10f),
+                
                 /*,
                 UI.Box(
                     UI.Slider("DynamicElementOnTrigger if > 0.5f", () => floatValue),

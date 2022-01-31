@@ -14,9 +14,19 @@ namespace RosettaUI.Example
                 UI.Indent(elements),
                 BlankLine()
             );
-        
+
+        public static Element TitlePage(string title, params Element[] elements) =>
+            UI.Column(
+                UI.Label(title),
+                UI.Page(elements),
+                BlankLine()
+            );
+
         public static Element UIFunctionColumn(string functionName, params Element[] elements) =>
             TitleIndent(UIFunctionStr(functionName), elements);
+        
+        public static Element UIFunctionPage(string functionName, params Element[] elements) =>
+            TitlePage(UIFunctionStr(functionName), elements);
         
         public static Element UIFunctionRow(string functionName, params Element[] elements) =>
             UI.Column(

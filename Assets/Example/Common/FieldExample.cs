@@ -44,7 +44,7 @@ namespace RosettaUI.Example
         {
             return UI.Column(
                 UI.Row(
-                    ExampleTemplate.UIFunctionColumn(nameof(UI.Field),
+                    ExampleTemplate.UIFunctionPage(nameof(UI.Field),
                         UI.Field(() => intValue),
                         UI.Field(() => uintValue),
                         UI.Field(() => floatValue),
@@ -67,7 +67,7 @@ namespace RosettaUI.Example
                         UI.Field(() => simpleClass),
                         UI.Field(() => classList)
                     ),
-                    ExampleTemplate.UIFunctionColumn(nameof(UI.FieldReadOnly),
+                    ExampleTemplate.UIFunctionPage(nameof(UI.FieldReadOnly),
                         UI.FieldReadOnly(() => intValue),
                         UI.FieldReadOnly(() => uintValue),
                         UI.FieldReadOnly(() => floatValue),

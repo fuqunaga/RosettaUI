@@ -35,7 +35,7 @@ namespace RosettaUI.Example
         {
             return UI.Column(
                 UI.Row(
-                    ExampleTemplate.UIFunctionColumn(nameof(UI.MinMaxSlider),
+                    ExampleTemplate.UIFunctionPage(nameof(UI.MinMaxSlider),
                         UI.MinMaxSlider(() => intMinMax),
                         UI.MinMaxSlider(() => uintMinMax),
                         UI.MinMaxSlider(() => floatMinMax),
@@ -50,7 +50,7 @@ namespace RosettaUI.Example
                         UI.MinMaxSlider(() => boundsMinMax),
                         UI.MinMaxSlider(() => boundsIntMinMax)
                     ),
-                    ExampleTemplate.UIFunctionColumn(nameof(UI.MinMaxSliderReadOnly),
+                    ExampleTemplate.UIFunctionPage(nameof(UI.MinMaxSliderReadOnly),
                         UI.MinMaxSliderReadOnly(() => intMinMax),
                         UI.MinMaxSliderReadOnly(() => uintMinMax),
                         UI.MinMaxSliderReadOnly(() => floatMinMax),

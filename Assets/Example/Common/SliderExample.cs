@@ -27,7 +27,7 @@ namespace RosettaUI.Example
         {
             return UI.Column(
                 UI.Row(
-                    ExampleTemplate.UIFunctionColumn(nameof(UI.Slider),
+                    ExampleTemplate.UIFunctionPage(nameof(UI.Slider),
                         UI.Slider(() => intValue),
                         UI.Slider(() => uintValue),
                         UI.Slider(() => floatValue),
@@ -43,7 +43,7 @@ namespace RosettaUI.Example
                         UI.Slider(() => boundsIntValue),
                         UI.Slider(() => simpleClass)
                     ),
-                    ExampleTemplate.UIFunctionColumn(nameof(UI.SliderReadOnly),
+                    ExampleTemplate.UIFunctionPage(nameof(UI.SliderReadOnly),
                         UI.SliderReadOnly(() => intValue),
                         UI.SliderReadOnly(() => uintValue),
                         UI.SliderReadOnly(() => floatValue),

@@ -204,6 +204,7 @@
     background-color: var(--rosettaui-color-box-background);
     border-color: var(--unity-colors-input_field-border);
     border-width: 2px;
+    margin: 2px 4px 4px 0;
 }
 
 /********************************************************************************

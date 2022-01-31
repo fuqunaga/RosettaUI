@@ -119,10 +119,20 @@
 /********************************************************************************
 * ColorField
 ********************************************************************************/
-.rosettaui-color-field__input {
-    padding: 0px;
+.rosettaui-color-field__input:hover {
+    border-color: var(--unity-colors-input_field-border-hover);
 }
 
+.rosettaui-color-field__input:focus {
+    border-color: var(--unity-colors-input_field-border-focus);
+}
+
+.rosettaui-color-field__input,
+.rosettaui-color-field__input:disabled
+{
+    padding: 0;
+    border-color: var(--unity-colors-input_field-border);
+}
 
 .rosettaui-color-field__input-rgb {
     flex-grow: 1;

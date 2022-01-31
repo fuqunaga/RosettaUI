@@ -22,6 +22,8 @@
     
     --rosettaui-scroller-size: 18px;
     
+    --rosettaui-color-input-background: #222222;
+    
     font-size: 18px;
     color: var(--unity-colors-default-text);
 }

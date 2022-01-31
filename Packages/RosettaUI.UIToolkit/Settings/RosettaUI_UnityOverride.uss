@@ -32,14 +32,16 @@
 }
 
 .unity-base-text-field__input,
-.unity-base-popup-field__input
+.unity-base-popup-field__input,
+.unity-base-text-field__input:disabled
 {
-    background-color: var(--unity-colors-input_field-background);
+    background-color: var(--rosettaui-color-input-background);
     border-color: var(--unity-colors-input_field-border);
 }
-.unity-base-text-field__input:disabled {
-    background-color: var(--unity-colors-highlight-background-inactive);
-}
+
+/*.unity-base-text-field__input:disabled {*/
+/*    background-color: var(--unity-colors-highlight-background-inactive);*/
+/*}*/
 
 .unity-base-text-field:hover > .unity-base-field__input {
     border-color: var(--unity-colors-input_field-border-hover);
@@ -67,15 +69,6 @@
 /********************************************************************************
 * toggle
 ********************************************************************************/
-.unity-toggle__input {
-    flex-basis: initial;
-    flex-grow: 0;
-    padding: initial;
-    min-width: auto;
-    background-color: var(--unity-colors-input_field-background);
-    border-color: var(--unity-colors-input_field-border);
-}
-
 .unity-toggle:hover > .unity-toggle__input {
     border-color: var(--unity-colors-input_field-border-hover);
 }
@@ -84,23 +77,23 @@
     border-color: var(--unity-colors-input_field-border-focus);
 }
 
-.unity-toggle:disabled > .unity-toggle__input {
-    background-color: var(--unity-colors-highlight-background-inactive);
-    border-color: var(--unity-colors-input_field-border));
+.unity-toggle__input,
+.unity-toggle:disabled > .unity-toggle__input{
+    flex-basis: initial;
+    flex-grow: 0;
+    padding: initial;
+    min-width: auto;
+    border-color: var(--unity-colors-input_field-border);
+    background-color: var(--rosettaui-color-input-background);
 }
 
-
-.unity-toggle__checkmark {
+.unity-toggle__checkmark,
+.unity-toggle > .unity-toggle__input:disabled > .unity-toggle__checkmark{
     -unity-background-image-tint-color: initial;
-    background-color: var(--unity-colors-input_field-background);
+    background-color: transparent;
     /*border-color: var(--unity-colors-input_field-border);*/
     border-width: 0;
 }
-
-.unity-toggle > .unity-toggle__input:disabled > .unity-toggle__checkmark{
-    background-color: var(--unity-colors-highlight-background-inactive);
-}
-
 
 /********************************************************************************
 * foldout

@@ -89,7 +89,7 @@
 
 .unity-toggle__checkmark,
 .unity-toggle > .unity-toggle__input:disabled > .unity-toggle__checkmark{
-    -unity-background-image-tint-color: initial;
+    -unity-background-image-tint-color: var(--unity-colors-default-text);
     background-color: transparent;
     /*border-color: var(--unity-colors-input_field-border);*/
     border-width: 0;

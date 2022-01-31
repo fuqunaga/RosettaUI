@@ -5,7 +5,7 @@
     --input-border-width: 2px;
     --cursor-resize-horizontal: resource("cursor_ew");
     --close-icon: resource("close");
-    --window-color: rgba(45,45,45,0.8);
+    
     --rosettaui-gray-button-tint: #A0A0A0;
     --rosettaui-color-box-background: rgba(100,100,100,0.3);
     --rosettaui-highlight-gray: #808080;
@@ -22,7 +22,7 @@
     
     --rosettaui-scroller-size: 18px;
     
-    --rosettaui-color-input-background: #222222;
+    --rosettaui-color-input-background: #181818;
     
     font-size: 18px;
     color: var(--unity-colors-default-text);
@@ -32,13 +32,13 @@
 * Window
 ********************************************************************************/
 .rosettaui-window {
-    --window-border-width: 4px;
-    /*--window-border-width-inverse: -4px;*/
+    --rosettaui-window-color: rgba(45,45,45,0.9);
+    --rosettaui-window-border-width: 4px;
     
-    background-color: var(--window-color);
+    background-color: var(--rosettaui-window-color);
     position: absolute;
     border-radius: 1px;
-    border-width: var(--window-border-width);
+    border-width: var(--rosettaui-window-border-width);
     /*padding-left: 15px;*/
 }
 

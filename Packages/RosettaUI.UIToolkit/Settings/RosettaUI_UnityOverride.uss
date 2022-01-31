@@ -247,6 +247,7 @@
     height: var(--rosettaui-slider-dragger-height);
     margin-top: -7px;
     border-radius: var(--rosettaui-slider-dragger-border-radius);
+    background-color: var(--unity-colors-slider_thumb-background);
 }
 
 .unity-base-slider--horizontal:focus .unity-base-slider__dragger {
@@ -299,6 +300,7 @@
     -unity-slice-left: 14;
     -unity-slice-right: 14;
     border-width: 0;
+    -unity-background-image-tint-color:#EEEEEE;
 }
 
 .unity-min-max-slider__dragger,

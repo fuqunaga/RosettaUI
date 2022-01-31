@@ -153,16 +153,14 @@
 .unity-base-popup-field:hover >.unity-base-popup-field__input,
 .unity-base-popup-field:active >.unity-base-popup-field__input
 {
-    background-color: var(--unity-colors-popup-background);
-    /*border-color: var(--unity-colors-popup-background);*/
+    background-color: var(--rosettaui-color-input-background);
 }
 
 .unity-base-popup-field:disabled >.unity-base-popup-field__input
 {
-    background-color: var(--unity-colors-highlight-background-inactive);
+    background-color: var(--rosettaui-color-input-background);
     border-color: var(--unity-colors-input_field-border);
 }
-
 
 .unity-base-popup-field__arrow
 {

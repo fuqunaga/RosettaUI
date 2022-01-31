@@ -88,14 +88,6 @@
     flex: 1 0 auto;
 }
 
-/*.rosettaui-row__contents > .unity-base-field__label {*/
-/*    min-width: 15px;*/
-/*    margin-left: 3px;*/
-/*    margin-right: 0;*/
-/*    flex: 0 0 auto;*/
-/*}*/
-
-
 /********************************************************************************
 * Composite Field
 ********************************************************************************/
@@ -109,11 +101,6 @@
 .rosettaui-composite-field__contents
 {
     flex-direction: row;
-}
-
-.rosettaui-composite-field__first-child
-{
-    margin-left: 0;
 }
 
 .rosettaui-composite-field__contents .unity-base-field__label {

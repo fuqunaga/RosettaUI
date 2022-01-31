@@ -107,11 +107,7 @@ namespace RosettaUI.UIToolkit.Builder
         {
             var row = CreateRowVisualElement();
 
-            return Build_ElementGroupContents(row, element, (ve, i) =>
-            {
-                //ve.AddToClassList(UssClassName.RowContents);
-                if (i == 0) ve.AddToClassList(UssClassName.RowContentsFirst);
-            });
+            return Build_ElementGroupContents(row, element);
         }
 
         private static VisualElement CreateRowVisualElement()
@@ -213,13 +209,7 @@ namespace RosettaUI.UIToolkit.Builder
             var contentContainer = new VisualElement();
             contentContainer.AddToClassList(UssClassName.CompositeFieldContents);
             field.Add(contentContainer);
-            Build_ElementGroupContents(contentContainer, element, (ve, idx) =>
-            {
-                if (idx == 0)
-                {
-                    ve.AddToClassList(UssClassName.CompositeFieldFirstChild);
-                }
-            });
+            Build_ElementGroupContents(contentContainer, element);
 
             return field;
         }

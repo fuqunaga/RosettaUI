@@ -10,6 +10,7 @@
 
 .unity-base-field {
     flex-grow: 1;
+    margin-left: 0;
 }
 
 .unity-base-field__input{

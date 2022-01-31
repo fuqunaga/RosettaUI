@@ -145,11 +145,8 @@ namespace RosettaUI.UIToolkit.Builder
             
             public static readonly string CompositeField = RosettaUI + "-composite-field";
             public static readonly string CompositeFieldContents = CompositeField + "__contents";
-            public static readonly string CompositeFieldFirstChild = CompositeField + "__first-child";
 
             public static readonly string Row = RosettaUI + "-row";
-            public static readonly string RowContents = Row + "__contents";
-            public static readonly string RowContentsFirst = RowContents + "--first";
 
             public static readonly string Indent = RosettaUI + "-indent";
 

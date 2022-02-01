@@ -51,16 +51,18 @@ namespace RosettaUI
 
         protected override void UpdateInternal()
         {
+            CheckAndRebuild();
+            base.UpdateInternal();
+        }
+
+        public void CheckAndRebuild()
+        {
             if (_rebuildIf?.Invoke(this) ?? false)
             {
                 DestroyChildren(true);
 
                 BuildElement();
                 RebuildChildren();
-            }
-            else
-            {
-                base.UpdateInternal();
             }
         }
     }

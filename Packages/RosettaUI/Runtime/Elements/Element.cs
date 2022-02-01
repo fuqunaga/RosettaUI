@@ -19,7 +19,7 @@ namespace RosettaUI
         public readonly ReactiveProperty<bool> enableRx = new(true);
         public readonly ReactiveProperty<bool> interactableRx = new(true);
 
-        public bool UpdateWhenDisabled { get; set; }
+        public bool UpdateWhileDisabled { get; set; }
         
         public event Action<Element> onUpdate;
         public event Action onViewValueChanged;
@@ -75,7 +75,7 @@ namespace RosettaUI
 
         public virtual void Update()
         {
-            if (Enable || UpdateWhenDisabled) UpdateInternal();
+            if (Enable || UpdateWhileDisabled) UpdateInternal();
         }
 
         protected virtual void UpdateInternal()

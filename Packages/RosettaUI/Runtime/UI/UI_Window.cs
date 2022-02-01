@@ -47,14 +47,24 @@ namespace RosettaUI
             var elements = types.Select(FieldIfObjectFound).ToList();
             title ??= types.First().ToString().Split('.').LastOrDefault();
             var window = Window(title, Page(elements));
-            window.UpdateWhenDisabled = true;
             
             var launcher = WindowLauncher(window);
-            launcher.UpdateWhenDisabled = true;
+            launcher.UpdateWhileDisabled = true;
             launcher.onUpdate += _ =>
             {
+                // window.Enable == false のときは各elementsが更新されないのでCheckAndRebuild()で内容の有無だけ更新する
+                if (!window.Enable)
+                {
+                    foreach(var e in elements) e.CheckAndRebuild();
+                }
+                
                 var windowHasContents = elements.Any(dynamicElement => dynamicElement.Contents.Any());
                 launcher.Enable = windowHasContents;
+                
+                if (!windowHasContents && window.IsOpen)
+                {
+                    window.Close();
+                }
             };
             launcher.onDestroy += (_,_) => window.Destroy();
 

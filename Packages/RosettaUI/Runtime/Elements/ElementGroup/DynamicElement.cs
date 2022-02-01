@@ -27,7 +27,8 @@ namespace RosettaUI
             );
         }
 
-
+        public event Action<ElementGroup> onRebuildChildren;
+        
         private readonly Func<Element> _build;
         private readonly string _displayName;
         private readonly Func<DynamicElement, bool> _rebuildIf;
@@ -48,6 +49,8 @@ namespace RosettaUI
         {
             SetElements(new[] {_build?.Invoke()});
         }
+
+        private void RebuildChildren() => onRebuildChildren?.Invoke(this);
 
         protected override void UpdateInternal()
         {

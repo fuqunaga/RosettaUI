@@ -9,14 +9,6 @@ namespace RosettaUI
     /// </summary>
     public abstract class ElementGroup : Element
     {
-        #region For Builder
-
-        public event Action<ElementGroup> onRebuildChildren;
-
-        protected void RebuildChildren() => onRebuildChildren?.Invoke(this);
-
-        #endregion
-
         // Children　Update()で更新される子要素すべて
         // Contents　特殊な意味の子要素は含まれない
         // WindowのタイトルバーなどはChildrenに含むがContentsには含まない

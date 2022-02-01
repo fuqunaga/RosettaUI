@@ -29,8 +29,11 @@ namespace RosettaUI
                     RegisterWindowRecursive(e);
                 }
 
-                elementGroup.onRebuildChildren -= RegisterWindowRecursive;
-                elementGroup.onRebuildChildren += RegisterWindowRecursive;
+                if (element is DynamicElement dynamicElement)
+                {
+                    dynamicElement.onRebuildChildren -= RegisterWindowRecursive;
+                    dynamicElement.onRebuildChildren += RegisterWindowRecursive;
+                }
             }
         }
         

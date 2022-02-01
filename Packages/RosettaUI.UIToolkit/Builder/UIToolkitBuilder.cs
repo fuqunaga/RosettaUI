@@ -9,7 +9,7 @@ using FloatField = RosettaUI.UIToolkit.UnityInternalAccess.FloatField;
 
 namespace RosettaUI.UIToolkit.Builder
 {
-    public partial class UIToolkitBuilder : BuildFramework<VisualElement>
+    public partial class UIToolkitBuilder : BuilderBase<VisualElement>
     {
         private readonly Dictionary<Type, Func<Element, VisualElement>> _buildFuncTable;
 

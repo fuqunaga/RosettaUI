@@ -15,7 +15,7 @@ namespace RosettaUI.UGUI.Builder
         public static UGUISettings settings;
 
 
-        class UGUIBuilderImpl : BuildFramework<GameObject>
+        class UGUIBuilderImpl : BuilderBase<GameObject>
         {
             readonly Dictionary<Type, Func<Element, GameObject>> buildFuncs;
 

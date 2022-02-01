@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace RosettaUI.Builder
 {
-    public abstract class BuildFramework<TUIObj>
+    public abstract class BuilderBase<TUIObj>
     {
         protected abstract IReadOnlyDictionary<Type, Func<Element, TUIObj>> BuildFuncTable { get; }
         readonly Dictionary<Element, TUIObj> _elementToUIObj = new Dictionary<Element, TUIObj>();
@@ -64,9 +64,9 @@ namespace RosettaUI.Builder
             element.Style.SubscribeAndCallOnce((style) => OnElementStyleChanged(element, uiObj, style));
             element.onDestroy += OnDestroyElement;
 
-            if (element is ElementGroup elementGroup)
+            if (element is DynamicElement dynamicElement)
             {
-                elementGroup.onRebuildChildren += OnRebuildElementGroupChildren;
+                dynamicElement.onRebuildChildren += OnRebuildElementGroupChildren;
             }
         }
 

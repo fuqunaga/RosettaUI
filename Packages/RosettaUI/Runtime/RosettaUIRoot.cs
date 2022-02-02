@@ -10,6 +10,7 @@ namespace RosettaUI
         public readonly ElementUpdater updater = new();
 
         private readonly List<Element> _elements = new();
+        public IReadOnlyList<Element> Elements => _elements;
 
         private readonly Queue<Func<Element>> _createElementOnEnableQueue = new();
         

@@ -19,6 +19,14 @@ namespace RosettaUI
             }
         }
 
+        public static IEnumerable<Element> Parents(this Element element)
+        {
+            for (var parent = element.Parent; parent != null; parent = parent.Parent)
+            {
+                yield return parent;
+            }
+        }
+
         public static LabelElement FirstLabel(this Element element) => element.Query<LabelElement>().FirstOrDefault();
         
         

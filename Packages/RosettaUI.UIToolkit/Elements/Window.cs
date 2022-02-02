@@ -50,6 +50,8 @@ namespace RosettaUI.UIToolkit
         Vector2 _draggingLocalPosition;
 
         ResizeEdge _resizeEdge;
+        
+        public bool IsMoved { get; protected set; }
 
         public VisualElement TitleBarContainerLeft { get; } = new();
 
@@ -144,6 +146,10 @@ namespace RosettaUI.UIToolkit
                         case DragMode.ResizeWindow:
                             UpdateResizeWindow(evt.position);
                             break;
+                        
+                        case DragMode.None:
+                        default:
+                            break;
                     }
                 }
                 else
@@ -214,6 +220,8 @@ namespace RosettaUI.UIToolkit
 
             style.left = pos.x;
             style.top = pos.y;
+
+            IsMoved = true;
         }
 
 

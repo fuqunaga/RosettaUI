@@ -2,10 +2,7 @@ using System;
 using System.Collections.Generic;
 using RosettaUI.Builder;
 using RosettaUI.UIToolkit.UnityInternalAccess;
-using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.UIElements;
-using FloatField = RosettaUI.UIToolkit.UnityInternalAccess.FloatField;
 
 namespace RosettaUI.UIToolkit.Builder
 {

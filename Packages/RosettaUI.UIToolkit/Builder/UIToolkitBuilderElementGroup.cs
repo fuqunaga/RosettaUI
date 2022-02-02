@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using RosettaUI.Builder;
 using RosettaUI.Reactive;
 using RosettaUI.UIToolkit.UnityInternalAccess;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -22,16 +25,19 @@ namespace RosettaUI.UIToolkit.Builder
             window.TitleBarContainerLeft.Add(Build(windowElement.header));
             window.CloseButton.clicked += () => windowElement.Enable = !windowElement.Enable;
 
-            windowElement.enableRx.SubscribeAndCallOnce(isOpen =>
+            windowElement.IsOpenRx.SubscribeAndCallOnce(isOpen =>
             {
                 if (isOpen)
                 {
                     window.BringToFront();
                     window.Show();
                 }
-                
-                else window.Hide();
+                else
+                {
+                    window.Hide();
+                }
             });
+            
             
             // Focusable.ExecuteDefaultEvent() 内の this.focusController?.SwitchFocusOnEvent(evt) で
             // NavigationMoveEvent 方向にフォーカスを移動しようとする
@@ -77,6 +83,9 @@ namespace RosettaUI.UIToolkit.Builder
             return ret;
         }
 
+
+        private static readonly Dictionary<WindowElement, List<WindowElement>> WindowLauncherOpenedWindowTable = new();
+
         private VisualElement Build_WindowLauncher(Element element)
         {
             var launcherElement = (WindowLauncherElement) element;
@@ -90,15 +99,78 @@ namespace RosettaUI.UIToolkit.Builder
             var labelElement = launcherElement.label;
             labelElement.SubscribeValueOnUpdateCallOnce(v => toggle.text = v);
 
-            return toggle;
+            
 
+            return toggle;
+            
+            
+
+            // ほかのWindowにかぶらない位置を計算する
+            // 一度ドラッグしたWindowはその位置を覚えてこの処理の対象にはならない
             void OnPointUpEventFirst(PointerUpEvent evt)
             {
-                toggle.UnregisterCallback<PointerUpEvent>(OnPointUpEventFirst);
-                // panel==null（初回）はクリックした場所に出る
-                // 以降は以前の位置に出る
                 // Toggleの値が変わるのはこのイベントの後
-                if (!windowElement.Enable && window.panel == null) window.Show(evt.originalMousePosition, toggle);
+                if (windowElement.Enable) return;
+                
+                var pos = evt.originalMousePosition;
+                var parentWindowElement = launcherElement.Parents().OfType<WindowElement>().FirstOrDefault();
+
+                // Auto layout
+                if (parentWindowElement != null && GetUIObj(parentWindowElement) is Window parentWindow)
+                {
+                    const float delta = 5f;
+                    var area = parentWindow.panel.visualTree.layout;
+                    
+                    var rect = parentWindow.layout;
+                    var x = rect.xMax + delta;
+                    if (x < area.xMax)
+                    {
+                        pos = new Vector2(x, rect.yMin);
+                    }
+
+                    if (!WindowLauncherOpenedWindowTable.TryGetValue(parentWindowElement, out var openedWindows))
+                    {
+                        openedWindows = WindowLauncherOpenedWindowTable[parentWindowElement] = new List<WindowElement>();
+                    }
+
+                    var lastIndex = openedWindows.FindLastIndex(w => w is {IsOpen: true} && GetUIObj(w) is Window {IsMoved: false});
+                    if (lastIndex >= 0)
+                    {
+                        var removeIndex = lastIndex + 1;
+                        openedWindows.RemoveRange(removeIndex, openedWindows.Count - removeIndex);
+                    }
+
+                    var lastOpenedWindowElement = openedWindows.LastOrDefault();
+                    if (lastOpenedWindowElement != null &&  GetUIObj(lastOpenedWindowElement) is Window targetWindow)
+                    {
+                        var targetWindowRect = targetWindow.layout;
+
+                        if ( Vector2.Distance(pos,targetWindowRect.position) < delta)
+                        {
+                            
+                            var areaYHalf = area.center.y;
+
+                            var yMax = targetWindowRect.yMax;
+                            if (yMax < areaYHalf)
+                            {
+                                pos.y = yMax + delta;
+                            }
+                            else
+                            {
+                                var newX = targetWindowRect.xMax + delta; 
+                                if (newX < area.xMax)
+                                {
+                                    pos.x = newX;
+                                }
+                            }
+                        }
+                    }
+                    
+                    openedWindows.Add(windowElement);
+                }
+
+
+                window.Show(pos, toggle);
             }
         }
 

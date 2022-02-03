@@ -6,7 +6,21 @@ namespace RosettaUI.Example
 {
     public class MiscExample : MonoBehaviour, IElementCreator
     {
+        public struct FindObjectOption
+        {
+            public bool supportMultiple;
+            public bool includeInactive;
+        }
+        
+        
+        [Multiline] public string multiLineStringValue = "this is\nmultiline\nstring";
+        public Texture texture;
         public int dropDownIndex;
+        public FindObjectOption windowLauncherOptions;
+        public FindObjectOption fieldIfObjectFoundOptions;
+
+        
+        
         public List<int> listValue = new[] {1, 2, 3}.ToList();
         public int[] arrayValue = new[] {1, 2, 3};
 
@@ -18,11 +32,13 @@ namespace RosettaUI.Example
 
         public bool dynamicElementIf;
 
-        public Texture texture;
+        
 
-        [Multiline] public string multiLineStringValue = "this is\nmultiline\nstring";
+        
 
 
+
+        
         public Element CreateElement()
         {
             UICustom.RegisterElementCreationFunc<UICustomClass>((uiCustomClass) =>
@@ -89,10 +105,25 @@ namespace RosettaUI.Example
                                     UI.Label("This is window.")
                                 )
                             ),
-                            UI.WindowLauncher<BehaviourExample>()
+                            UI.Box(
+                                UI.Field("options", () => windowLauncherOptions),
+                                UI.DynamicElementOnStatusChanged(
+                                    () => windowLauncherOptions,
+                                    _ => UI.WindowLauncher<BehaviourExample>(
+                                        windowLauncherOptions.supportMultiple,
+                                        windowLauncherOptions.includeInactive)
+                                )
+                            )
                         ),
                         ExampleTemplate.UIFunctionColumnBox(nameof(UI.FieldIfObjectFound),
-                            UI.FieldIfObjectFound<BehaviourExample>()
+                            UI.Field("options", () => fieldIfObjectFoundOptions),
+                            UI.DynamicElementOnStatusChanged(
+                                () => fieldIfObjectFoundOptions,
+                                _ => UI.FieldIfObjectFound<BehaviourExample>(
+                                    fieldIfObjectFoundOptions.supportMultiple,
+                                    fieldIfObjectFoundOptions.includeInactive
+                                )
+                            )
                         ),
                         ExampleTemplate.UIFunctionColumnBox(nameof(UI.DynamicElementIf),
                             UI.Field(() => dynamicElementIf),

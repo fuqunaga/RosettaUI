@@ -45,35 +45,6 @@ namespace RosettaUI
         #endregion
 
         
-        #region Dropdown
-
-        public static DropdownElement Dropdown(Expression<Func<int>> targetExpression, IEnumerable<string> options) 
-            => Dropdown(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, options);
-
-        public static DropdownElement Dropdown(LabelElement label, Expression<Func<int>> targetExpression, IEnumerable<string> options) 
-            => Dropdown(label, CreateBinder(targetExpression), options);
-
-        public static DropdownElement Dropdown(LabelElement label, IBinder<int> binder, IEnumerable<string> options)
-        {
-            var element = new DropdownElement(label, binder, options);
-            SetInteractableWithBinder(element, binder);
-            return element;
-        }
-
-        public static DropdownElement Dropdown(LabelElement label, Func<int> readValue, Action<int> writeValue, IEnumerable<string> options) 
-            => Dropdown(label, Binder.Create(readValue, writeValue), options);
-
-        
-        public static DropdownElement DropdownReadOnly(Expression<Func<int>> targetExpression, IEnumerable<string> options)
-            => Dropdown(ExpressionUtility.CreateLabelString(targetExpression), CreateReadOnlyBinder(targetExpression),
-                options);
-
-        public static DropdownElement DropdownReadOnly(LabelElement label, Func<int> readValue, IEnumerable<string> options) 
-            => Dropdown(label, Binder.Create(readValue, null), options);
-
-        #endregion
-
-        
         #region PopupMenu
 
         public static PopupMenuElement Popup(Element childElement, Func<IEnumerable<MenuItem>> createMenuItems)

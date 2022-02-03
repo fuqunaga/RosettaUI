@@ -52,11 +52,8 @@ namespace RosettaUI.UIToolkit.Builder
             var field = new PopupField<string>(
                 options,
                 dropdownElement.Value
-            )
-            {
-                label = dropdownElement.label.Value
-            };
-
+            );
+      
             SetupFieldLabel(field, dropdownElement);
 
             field.Bind(dropdownElement,

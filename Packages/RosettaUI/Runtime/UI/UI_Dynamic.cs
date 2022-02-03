@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.PlayerLoop;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
@@ -32,26 +33,26 @@ namespace RosettaUI
         
         #region FindObject
 
-        public static DynamicElement FieldIfObjectFound<T>()
+        public static DynamicElement FieldIfObjectFound<T>(bool supportMultiple = false, bool includeInactive = false)
             where T : Object
         {
-            return FieldIfObjectFound(typeof(T));
+            return FieldIfObjectFound(typeof(T), supportMultiple, includeInactive);
         }
 
-        public static DynamicElement FieldIfObjectFound(Type type)
+        public static DynamicElement FieldIfObjectFound(Type type,  bool supportMultiple = false, bool includeInactive = false)
         {
             return DynamicElementIfObjectFound(type, obj =>
             {
                 var binder = Binder.Create(obj, type);
                 return Field(null, binder);
-            });
+            }, supportMultiple, includeInactive);
         }
 
         
-        public static DynamicElement DynamicElementIfObjectFound<T>(Func<T, Element> build)
+        public static DynamicElement DynamicElementIfObjectFound<T>(Func<T, Element> build,  bool supportMultiple = false, bool includeInactive = false)
             where T : Object
         {
-            return DynamicElementIfObjectFound(typeof(T), (o) => build?.Invoke((T) o));
+            return DynamicElementIfObjectFound(typeof(T), (o) => build?.Invoke((T) o), supportMultiple, includeInactive);
         }
 
         public static DynamicElement DynamicElementIfObjectFound(Type type, Func<Object, Element> build,
@@ -66,12 +67,14 @@ namespace RosettaUI
             var intervalMinMax = UISettings.dynamicElementIfObjectFoundInterval;
             var interval = Random.Range(intervalMinMax.min, intervalMinMax.max);
 
+            var currentObjectHash = 0;
             Func<Element> buildFunc = supportMultiple ? BuildMultipleTarget : BuildFirstTarget;
+            
   
             return DynamicElementOnStatusChanged(
                 readStatus: () =>
                 {
-                    targets?.RemoveAll(t => t == null);
+                    targets?.RemoveAll(t => t == null || (!includeInactive && t is Behaviour {isActiveAndEnabled: false}));
                     
                     var time = Time.realtimeSinceStartup;
                     if (time - lastCheckTime > interval)
@@ -79,7 +82,9 @@ namespace RosettaUI
                         lastCheckTime = time;
                         if (targets == null || !targets.Any() || supportMultiple)
                         {
-                            targets = Object.FindObjectsOfType(type, includeInactive).ToList();
+                            targets = Object.FindObjectsOfType(type, includeInactive)
+                                .OrderBy(o => o.name)
+                                .ToList();
                         }
                     }
 
@@ -101,25 +106,43 @@ namespace RosettaUI
             {
                 if (targets == null || !targets.Any()) return null;
 
-                var options = targets.Select(obj => obj.name);
+                var options = targets.Select(obj => obj.name).ToList();
                 var contents = targets.Select(build).ToList();
 
                 var currentIdx = 0;
-                
+                if (currentObjectHash != 0)
+                {
+                    var idx = targets.FindIndex(t => t.GetHashCode() == currentObjectHash);
+                    if (idx >= 0)
+                    {
+                        currentIdx = idx;
+                    }
+                    else
+                    {
+                        currentObjectHash = 0;
+                    }
+                }
+
+                UpdateContentsEnable();
+
                 return Column(
                     Row(Label(type.Name),
                         Space(),
-                        Dropdown(() => currentIdx, options)
-                            .RegisterValueChangeCallback(() =>
-                            {
-                                for (var i = 0; i < contents.Count; ++i)
-                                {
-                                    contents[i].Enable = i == currentIdx;
-                                }
-                            })
+                        Dropdown(null, () => currentIdx, options)
+                            .RegisterValueChangeCallback(UpdateContentsEnable)
                     ),
                     Indent(contents)
                 );
+
+                void UpdateContentsEnable()
+                {
+                    for (var i = 0; i < contents.Count; ++i)
+                    {
+                        contents[i].Enable = i == currentIdx;
+                    }
+
+                    currentObjectHash = targets[currentIdx].GetHashCode();
+                }
             }
         }
         #endregion

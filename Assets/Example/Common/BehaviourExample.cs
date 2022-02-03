@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 
-
 namespace RosettaUI.Example
 {
-    public class BehaviourExample : MonoBehaviour
+    public class BehaviourExample : MonoBehaviour, IElementCreator
     {
-        public string classNameIs = nameof(BehaviourExample);
-        public int intValue;
-        [SerializeField]
-        protected int protectedValue;
+        public Element CreateElement()
+            => UI.Column(
+                UI.FieldReadOnly(() => name),
+                UI.FieldReadOnly(() => isActiveAndEnabled)
+            );
     }
 }

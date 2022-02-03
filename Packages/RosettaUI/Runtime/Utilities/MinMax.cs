@@ -17,7 +17,7 @@ namespace RosettaUI
 
     public static class MinMax
     {
-        public static MinMax<T> Create<T>(T min, T max) => new MinMax<T>()
+        public static MinMax<T> Create<T>(T min, T max) => new()
         {
             min = min,
             max = max

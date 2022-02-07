@@ -102,8 +102,30 @@ namespace RosettaUI.UIToolkit
             RegisterCallback<PointerDownEvent>(OnPointerDown);
             RegisterCallback<MouseMoveEvent>(OnMouseMove);
             RegisterCallback<MouseOutEvent>(OnMouseOut);
+            
+            // レイアウト負荷軽減のためWindow単位でサイズを固定したい
+            // でも内包したElementで自動的にサイズは広がってほしいので
+            // 一時的にAutoにしてレイアウト計算し固定し直す
+            RegisterCallback<GeometryChangedEvent>(_ =>
+            {
+                if (style.display == DisplayStyle.None) return;
+
+                UpdateSize();
+            });
         }
 
+        void UpdateSize()
+        {
+            style.width = StyleKeyword.Auto;
+            style.height = StyleKeyword.Auto;
+            
+            schedule.Execute(() =>
+            {
+                var rect = layout;
+                style.width = rect.width;
+                style.height = rect.height;
+            });
+        }
 
         #region Event
 
@@ -283,6 +305,8 @@ namespace RosettaUI.UIToolkit
                 var left = resolvedStyle.left;
                 style.minWidth = position.x - left;
             }
+            
+            UpdateSize();
         }
 
 

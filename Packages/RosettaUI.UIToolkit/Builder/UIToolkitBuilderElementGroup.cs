@@ -191,7 +191,7 @@ namespace RosettaUI.UIToolkit.Builder
         private VisualElement Build_Column(Element element)
         {
             var column = new VisualElement();
-            //column.AddToClassList(FieldClassName.Column);
+            column.AddToClassList(UssClassName.Column);
 
             return Build_ElementGroupContents(column, element);
         }
@@ -290,7 +290,7 @@ namespace RosettaUI.UIToolkit.Builder
             var group = (ElementGroup) element;
 
             container.name = group.DisplayName;
-            
+
             var i = 0;
             foreach (var ve in Build_ElementGroupContents(group))
             {

@@ -136,16 +136,14 @@ namespace RosettaUI.UIToolkit.Builder
         {
             public static readonly string UnityBaseField = "unity-base-field";
             public static readonly string UnityBaseFieldLabel = UnityBaseField + "__label";
-            public static readonly string UnityBaseFieldInput = UnityBaseField + "__input";
 
             private static readonly string RosettaUI = "rosettaui";
             
             public static readonly string CompositeField = RosettaUI + "-composite-field";
             public static readonly string CompositeFieldContents = CompositeField + "__contents";
-
+            
+            public static readonly string Column = RosettaUI + "-column";
             public static readonly string Row = RosettaUI + "-row";
-
-            public static readonly string Indent = RosettaUI + "-indent";
 
             public static readonly string WindowLauncher = RosettaUI + "-window-launcher";
 

@@ -50,9 +50,6 @@ namespace RosettaUI.UIToolkit.Builder
 
                 minTextField.RegisterValueChangedCallback((evt) => slider.minValue = toFloat(evt.newValue));
                 maxTextField.RegisterValueChangedCallback((evt) => slider.maxValue = toFloat(evt.newValue));
-
-                minTextField.AddToClassList(UssClassName.MinMaxSliderTextField);
-                maxTextField.AddToClassList(UssClassName.MinMaxSliderTextField);
             }
             
 

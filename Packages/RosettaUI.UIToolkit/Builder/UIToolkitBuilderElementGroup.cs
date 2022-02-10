@@ -14,7 +14,6 @@ namespace RosettaUI.UIToolkit.Builder
         private VisualElement Build_DynamicElement(Element element)
         {
             var ve = new VisualElement();
-            ve.AddToClassList(UssClassName.DynamicElement);
             return Build_ElementGroupContents(ve, element);
         }
 

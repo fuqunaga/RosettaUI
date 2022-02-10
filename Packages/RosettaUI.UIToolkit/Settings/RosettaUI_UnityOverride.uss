@@ -9,7 +9,6 @@
 }
 
 .unity-base-field {
-    flex-grow: 1;
     margin-left: 0;
 }
 
@@ -98,10 +97,12 @@
 /********************************************************************************
 * foldout
 ********************************************************************************/
+/*
 .unity-foldout{
     flex-grow: 1;
     flex-shrink: 0;
 }
+*/
 
 .unity-foldout .unity-base-field__label{
     min-width: initial; /* remove unity value */
@@ -131,10 +132,18 @@
     -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
 }
 
+/*
 .unity-foldout__toggle > .unity-toggle__input,
 .unity-foldout__toggle .unity-base-field
 {
     flex-grow: 0;
+}
+*/
+ 
+
+.unity-foldout__toggle > .rosettaui-row
+{
+    flex-grow: 1;
 }
 
 .unity-foldout__content{
@@ -279,9 +288,11 @@
 *  c#側の unityengine.uielements.minmaxslider が
 *  min/max-thumbを自動的に求めるコードになっている
 ********************************************************************************/
+/*
 .unity-min-max-slider{
     flex-grow: 1;
 }
+*/
 
 .unity-min-max-slider__input {
     border-width: 0;
@@ -317,7 +328,8 @@
 }
 
 
-.rosettaui-min-max-slider__text-field{
+.rosettaui-min-max-slider > .unity-base-text-field
+{
     flex-grow: 0;
     width: var(--fixed-field-width-m);
 }

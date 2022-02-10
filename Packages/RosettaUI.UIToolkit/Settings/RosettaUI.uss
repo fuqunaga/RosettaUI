@@ -26,6 +26,7 @@
     
     font-size: 18px;
     color: var(--unity-colors-default-text);
+    flex: 0 0 auto;
 }
 
 /********************************************************************************
@@ -90,7 +91,17 @@
 
 .rosettaui-row {
     flex-direction: row;
-    flex: 1 0 auto;
+    /*flex: 1 0 auto;*/
+}
+
+.rosettaui-row > * {
+    flex-grow: 1;
+}
+
+.rosettaui-row > .unity-label,
+.rosettaui-row > .unity-button
+{
+    flex-grow: 0;
 }
 
 /********************************************************************************
@@ -195,15 +206,6 @@
     background-image: resource("RosettaUI_WindowIcon");
     background-color: transparent;
     border-color: transparent;
-}
-
-/********************************************************************************
-* Dynamic Element
-********************************************************************************/
-.rosettaui-dynamic-element
-{
-    flex-grow: 1;
-    flex-shrink: 0;
 }
 
 /********************************************************************************

@@ -129,7 +129,7 @@ namespace RosettaUI.UIToolkit
             if (_svTexture == null)
             {
                 var size = ColorPickerHelper.defaultSvTextureSize;
-                _svTexture = new Texture2D(size.x, size.y);
+                _svTexture = ColorPickerHelper.CreateTexture(size.x, size.y);
             }
 
             _svHandler = this.Q("handler-sv");

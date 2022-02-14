@@ -169,6 +169,22 @@
     background-color: white;
 }
 
+.rosettaui-color-field__overlap-text {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+/*
+.rosettaui-color-field__overlap-text--light {
+    color:white;
+}
+*/
+
+.rosettaui-color-field__overlap-text--dark {
+    color: #101010;
+}
+
 
 /********************************************************************************
 * Window Launcher

@@ -6,11 +6,11 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
     public class ColorField : BaseField<Color>
     {
-        private new static readonly string ussClassName = "rosettaui-color-field";
-        private new static readonly string labelUssClassName = ussClassName + "__label";
-        private new static readonly string inputUssClassName = ussClassName + "__input";
+        public new static readonly string ussClassName = "rosettaui-color-field";
+        public new static readonly string labelUssClassName = ussClassName + "__label";
+        public new static readonly string inputUssClassName = ussClassName + "__input";
         
-        ColorInput colorInput => (ColorInput)visualInput;
+        protected ColorInput colorInput => (ColorInput)visualInput;
 
         public event Action<Vector2, ColorField> showColorPickerFunc;
 
@@ -39,7 +39,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             showColorPickerFunc?.Invoke(evt.position, this);
         }
 
-        class ColorInput : VisualElement
+        public class ColorInput : VisualElement
         {
             public VisualElement rgbField;
             public VisualElement alphaField;

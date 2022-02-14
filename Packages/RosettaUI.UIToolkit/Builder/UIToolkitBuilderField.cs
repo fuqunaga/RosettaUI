@@ -1,5 +1,4 @@
-﻿using RosettaUI.UIToolkit.UnityInternalAccess;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder

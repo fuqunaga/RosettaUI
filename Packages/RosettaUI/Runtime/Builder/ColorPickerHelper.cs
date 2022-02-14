@@ -4,10 +4,17 @@ namespace RosettaUI.Builder
 {
     public static class ColorPickerHelper
     {
-        public static Vector2Int defaultCheckerBoardSize = new Vector2Int(312, 24);
-        public static Vector2Int defaultSvTextureSize = new Vector2Int(140, 140);
-        public static Vector2Int defaultHueTextureSize = new Vector2Int(280, 24);
+        public static Vector2Int defaultCheckerBoardSize = new(312, 24);
+        public static Vector2Int defaultSvTextureSize = new(140, 140);
+        public static Vector2Int defaultHueTextureSize = new(280, 24);
 
+        public static Texture2D CreateTexture(int width, int height) =>
+            new(width, height, TextureFormat.RGB24, false)
+            {
+                wrapMode = TextureWrapMode.Clamp
+            };
+        
+        
         #region CheckerBoard
 
         static Texture2D _checkerBoardTexture;
@@ -17,7 +24,9 @@ namespace RosettaUI.Builder
 
         static Texture2D CreateCheckerBoardTexture(Vector2Int size, int gridSize, Color col0, Color col1)
         {
-            var tex = new Texture2D(size.x, size.y);
+            var tex = CreateTexture(size.x, size.y);
+            tex.filterMode = FilterMode.Point;
+            
             for (var y = 0; y < size.y; y++)
             {
                 var flagY = ((y / gridSize) % 2 == 0);
@@ -45,7 +54,8 @@ namespace RosettaUI.Builder
             var width = size.x;
             var height = size.y;
 
-            var tex = new Texture2D(width, height);
+            var tex = CreateTexture(width, height);
+            
             for (var y = 0; y < height; y++)
             {
                 var h = 1f * y / height;

@@ -53,10 +53,11 @@ namespace RosettaUI.UIToolkit
         private VisualElement _svHandler;
         private VisualElement _svCircle;
         private VisualElement _hueHandler;
-        private VisualElement _hueCircle;
+        private VisualElement _hueCursor;
 
         private readonly SliderSet _sliderSet;
 
+        private float _hueCircleThickness;
 
         private Vector3 _hsv;
         private float _alpha;
@@ -135,14 +136,26 @@ namespace RosettaUI.UIToolkit
             _svHandler = this.Q("handler-sv");
             _svCircle = _svHandler.Q("circle");
             _hueHandler = this.Q("handler-h");
-            _hueCircle = _hueHandler.Q("circle");
+            _hueCursor = _hueHandler.Q("circle");
 
             _svHandler.style.backgroundImage = _svTexture;
-            _hueHandler.style.backgroundImage = ColorPickerHelper.HueTexture;
-            _hueCircle.style.left = Length.Percent(50f);
+
+            _hueHandler.schedule.Execute(() =>
+            {
+                (_hueHandler.style.backgroundImage, _hueCircleThickness) = ColorPickerHelper.GetHueCircleTextureAndThickness(_hueHandler.resolvedStyle.width);
+
+                var cursorSize = _hueCircleThickness * 1.1f; // 画像内に影がついている関係で、画像のサイズ＝カーソルの直径ではない。ので見た目が合うように少し拡大しておく
+                var cursorStyle = _hueCursor.style;
+                cursorStyle.width = cursorSize;
+                cursorStyle.height = cursorSize;
+                cursorStyle.marginLeft = cursorSize * -0.5f;
+                cursorStyle.marginTop = cursorSize * -0.5f;
+                
+                UpdateHueCursor(Hsv.x);
+            });
 
             PointerDrag.RegisterCallback(_svHandler, OnPointerMoveOnPanel_SV);
-            PointerDrag.RegisterCallback(_hueHandler, OnPointerMoveOnPanel_Hue);
+            PointerDrag.RegisterCallback(_hueHandler, OnPointerMoveOnPanel_Hue, CheckPointIsValid_Hue);
         }
 
         private void InitPreview()
@@ -171,16 +184,36 @@ namespace RosettaUI.UIToolkit
             evt.StopPropagation();
         }
 
+        bool CheckPointIsValid_Hue(PointerDownEvent evt)
+        {
+            var pos = evt.localPosition;
+            
+            var circleSize =_hueHandler.resolvedStyle.width;
+            var center = Vector2.one * circleSize * 0.5f;
+            var maxRadius = circleSize * 0.5f;
+            
+            var distance = Vector2.Distance(pos, center);
+            
+            return (maxRadius - _hueCircleThickness <= distance && distance <= maxRadius);
+        }
+        
         private void OnPointerMoveOnPanel_Hue(PointerMoveEvent evt)
         {
             var localPos = _hueHandler.WorldToLocal(evt.position);
 
+#if true
+            var hsv = Hsv;
+            hsv.x = LocalPosToHue(localPos);
+            Hsv = hsv;
+
+#else
             var hueLayout = _hueHandler.layout;
             var yRate = localPos.y / hueLayout.height;
 
             var hsv = Hsv;
             hsv.x = 1f - Mathf.Clamp01(yRate);
             Hsv = hsv;
+#endif
 
             evt.StopPropagation();
         }
@@ -197,13 +230,44 @@ namespace RosettaUI.UIToolkit
             svCircleStyle.left = Length.Percent(hsv.y * 100f);
             svCircleStyle.top = Length.Percent((1f - hsv.z) * 100f);
 
-            var hueCircleStyle = _hueCircle.style;
-            hueCircleStyle.top = Length.Percent((1f - hsv.x) * 100f);
+            UpdateHueCursor(hsv.x);
 
             _sliderSet.OnColorChanged();
 
             onColorChanged?.Invoke(Color);
         }
+
+        void UpdateHueCursor(float h)
+        {
+            var pos = HueToLocalPos(h);
+            
+            var s = _hueCursor.style;
+            s.top = pos.y;
+            s.left = pos.x;
+        }
+
+
+        Vector2 HueToLocalPos(float h)
+        {
+            var circleSize =_hueHandler.resolvedStyle.width; 
+            var radius = (circleSize * 0.5f) - (_hueCircleThickness * 0.5f);
+            
+            var rad = h * Mathf.PI * 2f;
+            return new Vector2(Mathf.Cos(rad), -Mathf.Sin(rad)) * radius
+                      + (Vector2.one * circleSize * 0.5f);
+        }
+
+        float LocalPosToHue(Vector2 pos)
+        {
+            var circleSize =_hueHandler.resolvedStyle.width;
+
+            var p = pos - (Vector2.one * circleSize * 0.5f);
+
+            var f = Mathf.Atan2(-p.y, p.x) / (Mathf.PI * 2f);
+            if (f < 0f) f += 1f;
+            return f;
+        }
+        
 
         class SliderSet
         {

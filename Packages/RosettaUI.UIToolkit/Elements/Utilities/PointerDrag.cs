@@ -1,20 +1,24 @@
+using System;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
     public static class PointerDrag
     {
-        public static void RegisterCallback(VisualElement target, EventCallback<PointerMoveEvent> onPointerMoveOnPanel)
+        public static void RegisterCallback(VisualElement target, EventCallback<PointerMoveEvent> onPointerMoveOnPanel, Func<PointerDownEvent, bool> checkPointerIsValid = null)
         {
             VisualElement root; 
             
             target.RegisterCallback<PointerDownEvent>((evt) =>
             {
-                root = target.panel.visualTree;
-                root.RegisterCallback<PointerMoveEvent>(onPointerMoveOnPanel);
-                root.RegisterCallback<PointerUpEvent>(OnPointerUpOnPanel);
+                if (checkPointerIsValid?.Invoke(evt) ?? true)
+                {
+                    root = target.panel.visualTree;
+                    root.RegisterCallback<PointerMoveEvent>(onPointerMoveOnPanel);
+                    root.RegisterCallback<PointerUpEvent>(OnPointerUpOnPanel);
 
-                evt.StopPropagation();
+                    evt.StopPropagation();
+                }
             });
 
             void OnPointerUpOnPanel(PointerUpEvent evt)

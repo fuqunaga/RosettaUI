@@ -1,15 +1,17 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RosettaUI.Builder
 {
     public static class ColorPickerHelper
     {
-        public static Vector2Int defaultCheckerBoardSize = new(312, 24);
+        public static Vector2Int defaultCheckerBoardSize = new(120, 25);
+        public static int defaultCheckerBoardGridSize = 5;
         public static Vector2Int defaultSvTextureSize = new(140, 140);
-        public static Vector2Int defaultHueTextureSize = new(280, 24);
+        public static float defaultHueCircleThicknessRate = 0.1f;
 
-        public static Texture2D CreateTexture(int width, int height) =>
-            new(width, height, TextureFormat.RGB24, false)
+        public static Texture2D CreateTexture(int width, int height, TextureFormat format = TextureFormat.RGB24) =>
+            new(width, height, format, false)
             {
                 wrapMode = TextureWrapMode.Clamp
             };
@@ -20,12 +22,13 @@ namespace RosettaUI.Builder
         static Texture2D _checkerBoardTexture;
 
         public static Texture2D CheckerBoardTexture => _checkerBoardTexture ??=
-            CreateCheckerBoardTexture(defaultCheckerBoardSize, 4, Color.white, Color.HSVToRGB(0f, 0f, 0.8f));
+            CreateCheckerBoardTexture(defaultCheckerBoardSize, defaultCheckerBoardGridSize, Color.white, Color.HSVToRGB(0f, 0f, 0.8f));
 
         static Texture2D CreateCheckerBoardTexture(Vector2Int size, int gridSize, Color col0, Color col1)
         {
             var tex = CreateTexture(size.x, size.y);
             tex.filterMode = FilterMode.Point;
+            tex.wrapMode = TextureWrapMode.Repeat;
             
             for (var y = 0; y < size.y; y++)
             {
@@ -37,7 +40,6 @@ namespace RosettaUI.Builder
                 }
             }
 
-            tex.wrapMode = TextureWrapMode.Repeat;
             tex.Apply();
             return tex;
         }
@@ -46,22 +48,60 @@ namespace RosettaUI.Builder
 
         #region Hue texture
 
-        private static Texture2D _hueTexture;
-        public static Texture2D HueTexture => _hueTexture ??= CreateHueTexture(defaultHueTextureSize);
+        private static readonly Dictionary<float, Texture2D> HueCircleTextureDic = new();
 
-        static Texture2D CreateHueTexture(Vector2Int size)
+        public static (Texture2D, int) GetHueCircleTextureAndThickness(float size)
         {
-            var width = size.x;
-            var height = size.y;
-
-            var tex = CreateTexture(width, height);
+            var thickness = Mathf.RoundToInt(defaultHueCircleThicknessRate * size);
             
-            for (var y = 0; y < height; y++)
+            if (!HueCircleTextureDic.TryGetValue(size, out var tex))
             {
-                var h = 1f * y / height;
-                var color = Color.HSVToRGB(h, 1f, 1f);
-                for (var x = 0; x < width; x++)
+                tex = HueCircleTextureDic[size] =  CreateHueTexture(Mathf.CeilToInt(size), thickness);
+            }
+
+            return (tex, thickness);
+        }
+
+        static Texture2D CreateHueTexture(int size, int circleThickness)
+        {
+            var thickness = circleThickness;
+            
+            var tex = CreateTexture(size, size, TextureFormat.RGBA32);
+
+            var sizeHalf = size / 2;
+
+            var minRadius = sizeHalf - thickness;
+            var minRadiusSq = minRadius * minRadius;
+            var maxRadius = sizeHalf;
+            var maxRadiusSq = maxRadius * maxRadius;
+
+            var transparent = Color.clear;
+            var blendWidth = 2f;
+            
+            for (var y = 0; y < size; y++)
+            {
+                for (var x = 0; x < size; x++)
                 {
+                    var pos = new Vector2(x - sizeHalf + 0.5f, y - sizeHalf + 0.5f);
+                    
+                    var color = transparent;
+
+                    var radiusSq = pos.sqrMagnitude;
+                    if  (minRadiusSq <= radiusSq && radiusSq <= maxRadiusSq)
+                    {
+                        var distance = pos.magnitude;
+                        var alpha = Mathf.Min(
+                            Mathf.InverseLerp(0f, blendWidth, distance - minRadius),
+                            Mathf.InverseLerp(0f, blendWidth, maxRadius - distance)
+                        );
+                    
+                    
+                        var h = Mathf.Atan2(pos.y, pos.x) / (Mathf.PI * 2f);
+                        if (h < 0f) h += 1f;
+                        color = Color.HSVToRGB(h, 1f, 1f);
+                        color.a = alpha;
+                    }
+                    
                     tex.SetPixel(x, y, color);
                 }
             }
@@ -78,44 +118,6 @@ namespace RosettaUI.Builder
             var width = texture.width;
             var height = texture.height;
 
-#if true
-            // optimize ref: Color.HSVToRGB()
-            float f = hue * 6f;
-            int num3 = (int) Mathf.Floor(f);
-            float num4 = f - (float) num3;
-
-            for (var x = 0; x < width; x++)
-            {
-                var s = (float) x / width;
-                float num1 = s;
-                float num5 = /* num2 * */(1f - num1);
-                float num6 = /* num2 * */(float) (1.0 - (double) num1 * (double) num4);
-                float num7 = /* num2 * */(float) (1.0 - (double) num1 * (1.0 - (double) num4));
-
-                var rgbBase = num3 switch
-                {
-                    -1 => new Vector3(1f, num5, num6),
-                    0 => new Vector3(1f, num7, num5),
-                    1 => new Vector3(num6, 1f, num5),
-                    2 => new Vector3(num5, 1f, num7),
-                    3 => new Vector3(num5, num6, 1f),
-                    4 => new Vector3(num7, num5, 1f),
-                    5 => new Vector3(1f, num5, num6),
-                    6 => new Vector3(1f, num7, num6),
-                    _ => default
-                };
-
-                for (var y = 0; y < height; y++)
-                {
-                    var v = (float) y / height;
-                    float num2 = v;
-                    var rgb = rgbBase * num2;
-                    texture.SetPixel(x, y, new Color(rgb.x, rgb.y, rgb.z));
-                }
-            }
-
-#else
-            // base code
             for (var y = 0; y < height; y++)
             {
                 var v = (float)y / height;
@@ -126,7 +128,6 @@ namespace RosettaUI.Builder
                     texture.SetPixel(x, y, c);
                 }
             }
-#endif
 
             texture.Apply();
         }

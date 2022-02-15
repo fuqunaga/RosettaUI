@@ -10,10 +10,10 @@
     </engine:VisualElement>
 
     <engine:VisualElement name = "handler" class="rosettaui-colorpicker__handler">
-        <engine:VisualElement name="handler-sv" class="rosettaui-colorpicker__handler-sv">
-            <engine:VisualElement name="circle" class="rosettaui-colorpicker-circle" />
-        </engine:VisualElement>
         <engine:VisualElement name="handler-h" class="rosettaui-colorpicker__handler-h">
+            <engine:VisualElement name="circle" class="rosettaui-colorpicker__handler-h__circle" />
+        </engine:VisualElement>
+        <engine:VisualElement name="handler-sv" class="rosettaui-colorpicker__handler-sv">
             <engine:VisualElement name="circle" class="rosettaui-colorpicker-circle" />
         </engine:VisualElement>
     </engine:VisualElement>

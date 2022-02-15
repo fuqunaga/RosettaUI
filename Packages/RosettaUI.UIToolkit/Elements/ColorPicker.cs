@@ -127,22 +127,20 @@ namespace RosettaUI.UIToolkit
 
         private void InitHsvHandlers()
         {
-            if (_svTexture == null)
-            {
-                var size = ColorPickerHelper.defaultSvTextureSize;
-                _svTexture = ColorPickerHelper.CreateTexture(size.x, size.y);
-            }
-
             _svHandler = this.Q("handler-sv");
             _svCircle = _svHandler.Q("circle");
             _hueHandler = this.Q("handler-h");
             _hueCursor = _hueHandler.Q("circle");
+            
+            PointerDrag.RegisterCallback(_svHandler, OnPointerMoveOnPanel_SV, CheckPointerIsValid_SV);
+            PointerDrag.RegisterCallback(_hueHandler, OnPointerMoveOnPanel_Hue, CheckPointIsValid_Hue);
 
-            _svHandler.style.backgroundImage = _svTexture;
-
-            _hueHandler.schedule.Execute(() =>
+            
+            schedule.Execute(() =>
             {
-                (_hueHandler.style.backgroundImage, _hueCircleThickness) = ColorPickerHelper.GetHueCircleTextureAndThickness(_hueHandler.resolvedStyle.width);
+                // Hue Circle
+                var hueCircleSize = _hueHandler.resolvedStyle.width;
+                (_hueHandler.style.backgroundImage, _hueCircleThickness) = ColorPickerHelper.GetHueCircleTextureAndThickness(hueCircleSize);
 
                 var cursorSize = _hueCircleThickness * 1.1f; // 画像内に影がついている関係で、画像のサイズ＝カーソルの直径ではない。ので見た目が合うように少し拡大しておく
                 var cursorStyle = _hueCursor.style;
@@ -151,11 +149,21 @@ namespace RosettaUI.UIToolkit
                 cursorStyle.marginLeft = cursorSize * -0.5f;
                 cursorStyle.marginTop = cursorSize * -0.5f;
                 
-                UpdateHueCursor(Hsv.x);
-            });
+                // SV Circle
+                var svCircleSize = _svHandler.resolvedStyle.width; 
+                
+                if (_svTexture == null)
+                {
+                    var size = ColorPickerHelper.defaultSvTextureSize;
+                    _svTexture = ColorPickerHelper.CreateTexture(size.x, size.y);
+                }
 
-            PointerDrag.RegisterCallback(_svHandler, OnPointerMoveOnPanel_SV);
-            PointerDrag.RegisterCallback(_hueHandler, OnPointerMoveOnPanel_Hue, CheckPointIsValid_Hue);
+                _svHandler.style.backgroundImage = _svTexture;
+                
+                
+                // 表示更新
+                OnColorChanged();
+            });
         }
 
         private void InitPreview()
@@ -168,21 +176,6 @@ namespace RosettaUI.UIToolkit
             _previewPrev.RegisterCallback<PointerDownEvent>((_) => Color = PrevColor);
         }
 
-        private void OnPointerMoveOnPanel_SV(PointerMoveEvent evt)
-        {
-            var localPos = _svHandler.WorldToLocal(evt.position);
-
-            var svLayout = _svHandler.layout;
-            var size = new Vector2(svLayout.width, svLayout.height);
-            var xyRate = localPos / size;
-
-            var hsv = Hsv;
-            hsv.y = Mathf.Clamp01(xyRate.x);
-            hsv.z = 1f - Mathf.Clamp01(xyRate.y);
-            Hsv = hsv;
-
-            evt.StopPropagation();
-        }
 
         bool CheckPointIsValid_Hue(PointerDownEvent evt)
         {
@@ -201,30 +194,56 @@ namespace RosettaUI.UIToolkit
         {
             var localPos = _hueHandler.WorldToLocal(evt.position);
 
-#if true
             var hsv = Hsv;
             hsv.x = LocalPosToHue(localPos);
             Hsv = hsv;
-
-#else
-            var hueLayout = _hueHandler.layout;
-            var yRate = localPos.y / hueLayout.height;
-
-            var hsv = Hsv;
-            hsv.x = 1f - Mathf.Clamp01(yRate);
-            Hsv = hsv;
-#endif
-
+            
             evt.StopPropagation();
         }
 
+        bool CheckPointerIsValid_SV(PointerDownEvent evt)
+        {
+            var pos = evt.localPosition;
+
+            var circleSize = _svHandler.resolvedStyle.width;
+            var radius = circleSize * 0.5f;
+            var center = Vector2.one * radius;
+            
+            var distance = Vector2.Distance(pos, center);
+
+            return distance <= radius;
+        }
+        
+        private void OnPointerMoveOnPanel_SV(PointerMoveEvent evt)
+        {
+            var localPos = _svHandler.WorldToLocal(evt.position);
+            var radius = _svHandler.resolvedStyle.width * 0.5f;
+            var posOnCircle = (localPos - Vector2.one * radius) / radius;
+
+            var posOnSquare = ColorPickerHelper.CircleToSquare(posOnCircle);
+            if (posOnSquare.sqrMagnitude > 1f)
+            {
+                posOnSquare.Normalize();
+            }
+            var sv = (posOnSquare + Vector2.one) * 0.5f; // map: -1~1 > 0~1
+
+            var hsv = Hsv;
+            hsv.y = sv.x;
+            hsv.z = 1f - sv.y;
+            Hsv = hsv;
+
+            evt.StopPropagation();
+        }
 
         void OnColorChanged()
         {
             _previewCurr.style.backgroundColor = Color;
 
             var hsv = Hsv;
-            ColorPickerHelper.UpdateSvTexture(_svTexture, hsv.x);
+            if (_svTexture != null)
+            {
+                ColorPickerHelper.UpdateSvCircleTexture(_svTexture, hsv.x);
+            }
 
             var svCircleStyle = _svCircle.style;
             svCircleStyle.left = Length.Percent(hsv.y * 100f);

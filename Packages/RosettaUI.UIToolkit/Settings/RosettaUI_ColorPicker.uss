@@ -22,28 +22,31 @@
 {
     width: 360px;
     height: 360px;
+    flex-shrink: 0;
 }
 
 .rosettaui-colorpicker__handler-h
 {
+    position: absolute;
     width: 100%;
     height: 100%;
-    flex: 0 0 auto;
+    flex-shrink: 0;
 }
 
 .rosettaui-colorpicker__handler-h__circle
 {
-    position: relative;
     background-image: resource("circle_big");
 }
 
 
 .rosettaui-colorpicker__handler-sv
 {
-    position: relative;
-    /*width: 280px;*/
-    /*height: 280px;*/
-    /*margin: 4px;*/
+    position: absolute;
+    width: 70%;
+    height: 70%;
+    top: 15%;
+    left: 15%;
+    flex-shrink: 0;
 }
 
 

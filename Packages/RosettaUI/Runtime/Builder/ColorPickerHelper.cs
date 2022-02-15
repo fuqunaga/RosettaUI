@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace RosettaUI.Builder
 {
@@ -10,7 +12,7 @@ namespace RosettaUI.Builder
         public static Vector2Int defaultSvTextureSize = new(140, 140);
         public static float defaultHueCircleThicknessRate = 0.1f;
 
-        public static Texture2D CreateTexture(int width, int height, TextureFormat format = TextureFormat.RGB24) =>
+        public static Texture2D CreateTexture(int width, int height, TextureFormat format = TextureFormat.RGBA32) =>
             new(width, height, format, false)
             {
                 wrapMode = TextureWrapMode.Clamp
@@ -26,7 +28,7 @@ namespace RosettaUI.Builder
 
         static Texture2D CreateCheckerBoardTexture(Vector2Int size, int gridSize, Color col0, Color col1)
         {
-            var tex = CreateTexture(size.x, size.y);
+            var tex = CreateTexture(size.x, size.y, TextureFormat.RGB24);
             tex.filterMode = FilterMode.Point;
             tex.wrapMode = TextureWrapMode.Repeat;
             
@@ -66,7 +68,7 @@ namespace RosettaUI.Builder
         {
             var thickness = circleThickness;
             
-            var tex = CreateTexture(size, size, TextureFormat.RGBA32);
+            var tex = CreateTexture(size, size);
 
             var sizeHalf = size / 2;
 
@@ -75,7 +77,6 @@ namespace RosettaUI.Builder
             var maxRadius = sizeHalf;
             var maxRadiusSq = maxRadius * maxRadius;
 
-            var transparent = Color.clear;
             var blendWidth = 2f;
             
             for (var y = 0; y < size; y++)
@@ -84,7 +85,7 @@ namespace RosettaUI.Builder
                 {
                     var pos = new Vector2(x - sizeHalf + 0.5f, y - sizeHalf + 0.5f);
                     
-                    var color = transparent;
+                    var color = Color.clear;;
 
                     var radiusSq = pos.sqrMagnitude;
                     if  (minRadiusSq <= radiusSq && radiusSq <= maxRadiusSq)
@@ -113,23 +114,73 @@ namespace RosettaUI.Builder
         #endregion
 
 
-        public static void UpdateSvTexture(Texture2D texture, float hue)
+        /// <summary>
+        /// 横軸S縦軸Vの正方形でのSVを計算し、それを円形にマップする
+        /// </summary>
+        public static void UpdateSvCircleTexture(Texture2D texture, float hue)
         {
-            var width = texture.width;
-            var height = texture.height;
+            Assert.AreEqual(texture.width, texture.height);
+            
+            var size = texture.width;
+            var radius = size * 0.5f;
+            var center = Vector2.one * radius;
+            
+            var blendWidth = 1f;
+            var blendWidthNormalized = blendWidth / radius;
 
-            for (var y = 0; y < height; y++)
+            for (var y = 0; y < size; y++)
             {
-                var v = (float)y / height;
-                for (var x = 0; x < width; x++)
+                for (var x = 0; x < size; x++)
                 {
-                    var s = (float)x / width;
-                    var c = Color.HSVToRGB(hue, s, v);
-                    texture.SetPixel(x, y, c);
+                    var color = Color.clear;
+                    
+                    var pos = (new Vector2(x + 0.5f, y + 0.5f) - center) / radius;
+                    if (pos.sqrMagnitude <= 1f)
+                    {
+                        var posOnSquare = CircleToSquare(pos);
+                        var sv = (posOnSquare + Vector2.one) * 0.5f; // map -1~1 > 0~1
+
+                        color = Color.HSVToRGB(hue, sv.x, sv.y);
+                        color.a = Mathf.InverseLerp(1f, 1f - blendWidthNormalized, pos.magnitude);
+                    }
+                    
+                    texture.SetPixel(x, y, color);
                 }
             }
 
             texture.Apply();
+        }
+
+
+        /// <summary>
+        /// 半径１の円内の座標を１辺２(-1~1)の正方形に射影する
+        /// </summary>
+        /// <param name="posOnCircle"></param>
+        /// <returns></returns>
+        public static Vector2 CircleToSquare(Vector2 posOnCircle)
+        {
+            // 小さい少数の割り算などの誤差対策でスケールする
+            var scaleForError = 1000f;
+                        
+            var absX = Mathf.Abs(posOnCircle.x) * scaleForError;
+            var absY = Mathf.Abs(posOnCircle.y) * scaleForError;
+                        
+            // 中心から(x,y)方向の正方形輪郭までの距離
+            //
+            // absY>=absX, absY<absX の場合分けを整理した形
+            // 
+            // if (absY>=absX){
+            //   xOnSquare = absX / absY;
+            //   toSquareSideDistance = new Vector2(xOnSquare, 1f).magnitude;
+            // }
+            // else ...
+                        
+            var xOrYOnSquare = (absY >= absX) ? absX / absY : absY / absX;
+            var toSquareSideDistance =
+                Mathf.Sqrt(xOrYOnSquare * xOrYOnSquare + scaleForError * scaleForError) / scaleForError;
+
+            var posOnSquare = posOnCircle * toSquareSideDistance;
+            return posOnSquare;
         }
         
         static void FillArea(int xSize, int ySize, Color[] retval, Color topLeftColor, Color rightGradient, Color downGradient, bool convertToGamma)

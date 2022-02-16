@@ -50,10 +50,11 @@ namespace RosettaUI.UIToolkit
 
         private VisualElement _previewPrev;
         private VisualElement _previewCurr;
-        private VisualElement _svHandler;
-        private VisualElement _svCircle;
         private VisualElement _hueHandler;
         private VisualElement _hueCursor;
+        private VisualElement _svHandler;
+        private VisualElement _svCursor;
+
 
         private readonly SliderSet _sliderSet;
 
@@ -127,13 +128,13 @@ namespace RosettaUI.UIToolkit
 
         private void InitHsvHandlers()
         {
-            _svHandler = this.Q("handler-sv");
-            _svCircle = _svHandler.Q("circle");
             _hueHandler = this.Q("handler-h");
             _hueCursor = _hueHandler.Q("circle");
-            
-            PointerDrag.RegisterCallback(_svHandler, OnPointerMoveOnPanel_SV, CheckPointerIsValid_SV);
+            _svHandler = this.Q("handler-sv");
+            _svCursor = _svHandler.Q("circle");
+
             PointerDrag.RegisterCallback(_hueHandler, OnPointerMoveOnPanel_Hue, CheckPointIsValid_Hue);
+            PointerDrag.RegisterCallback(_svHandler, OnPointerMoveOnPanel_SV, CheckPointerIsValid_SV);
 
             
             schedule.Execute(() =>
@@ -219,17 +220,18 @@ namespace RosettaUI.UIToolkit
             var localPos = _svHandler.WorldToLocal(evt.position);
             var radius = _svHandler.resolvedStyle.width * 0.5f;
             var posOnCircle = (localPos - Vector2.one * radius) / radius;
+            if (posOnCircle.sqrMagnitude >= 1f)
+            {
+                posOnCircle.Normalize();
+            }
 
             var posOnSquare = ColorPickerHelper.CircleToSquare(posOnCircle);
-            if (posOnSquare.sqrMagnitude > 1f)
-            {
-                posOnSquare.Normalize();
-            }
+      
             var sv = (posOnSquare + Vector2.one) * 0.5f; // map: -1~1 > 0~1
 
             var hsv = Hsv;
-            hsv.y = sv.x;
-            hsv.z = 1f - sv.y;
+            hsv.y = Mathf.Clamp01(sv.x);
+            hsv.z = Mathf.Clamp01(1f - sv.y);
             Hsv = hsv;
 
             evt.StopPropagation();
@@ -245,10 +247,8 @@ namespace RosettaUI.UIToolkit
                 ColorPickerHelper.UpdateSvCircleTexture(_svTexture, hsv.x);
             }
 
-            var svCircleStyle = _svCircle.style;
-            svCircleStyle.left = Length.Percent(hsv.y * 100f);
-            svCircleStyle.top = Length.Percent((1f - hsv.z) * 100f);
 
+            UpdateSvCursor(hsv.y, hsv.z);
             UpdateHueCursor(hsv.x);
 
             _sliderSet.OnColorChanged();
@@ -286,7 +286,26 @@ namespace RosettaUI.UIToolkit
             if (f < 0f) f += 1f;
             return f;
         }
-        
+
+
+        void UpdateSvCursor(float s, float v)
+        {
+            var xy = new Vector2(s, v) * 2f - Vector2.one; //map: 0~1 > -1~1
+
+            var uv = ColorPickerHelper.SquareToCircle(xy);
+
+            // カーソルを円に収めるために少しだけ縮める
+            var cursorSize = _svCursor.resolvedStyle.width;
+            var parentSize = _svHandler.resolvedStyle.width;
+            uv *= (1f - cursorSize / parentSize); 
+            
+            var circleXY = (uv + Vector2.one) * 0.5f; // map: -1~1 > 0~1
+
+            var svCircleStyle = _svCursor.style;
+            svCircleStyle.left = Length.Percent(circleXY.x * 100f);
+            svCircleStyle.top = Length.Percent((1f - circleXY.y) * 100f);
+        }
+       
 
         class SliderSet
         {

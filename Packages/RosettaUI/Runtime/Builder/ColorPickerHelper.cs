@@ -143,7 +143,7 @@ namespace RosettaUI.Builder
                         color = Color.HSVToRGB(hue, sv.x, sv.y);
                         color.a = Mathf.InverseLerp(1f, 1f - blendWidthNormalized, pos.magnitude);
                     }
-                    
+
                     texture.SetPixel(x, y, color);
                 }
             }
@@ -152,36 +152,50 @@ namespace RosettaUI.Builder
         }
 
 
+        
+        static readonly float TwoSqrt2 = 2f * Mathf.Sqrt(2f);
+        
         /// <summary>
         /// 半径１の円内の座標を１辺２(-1~1)の正方形に射影する
+        /// http://squircular.blogspot.com/2015/09/mapping-circle-to-square.html
         /// </summary>
-        /// <param name="posOnCircle"></param>
-        /// <returns></returns>
-        public static Vector2 CircleToSquare(Vector2 posOnCircle)
+        public static Vector2 CircleToSquare(Vector2 uv)
         {
-            // 小さい少数の割り算などの誤差対策でスケールする
-            var scaleForError = 1000f;
-                        
-            var absX = Mathf.Abs(posOnCircle.x) * scaleForError;
-            var absY = Mathf.Abs(posOnCircle.y) * scaleForError;
-                        
-            // 中心から(x,y)方向の正方形輪郭までの距離
-            //
-            // absY>=absX, absY<absX の場合分けを整理した形
-            // 
-            // if (absY>=absX){
-            //   xOnSquare = absX / absY;
-            //   toSquareSideDistance = new Vector2(xOnSquare, 1f).magnitude;
-            // }
-            // else ...
-                        
-            var xOrYOnSquare = (absY >= absX) ? absX / absY : absY / absX;
-            var toSquareSideDistance =
-                Mathf.Sqrt(xOrYOnSquare * xOrYOnSquare + scaleForError * scaleForError) / scaleForError;
+            var u = uv.x;
+            var v = uv.y;
 
-            var posOnSquare = posOnCircle * toSquareSideDistance;
-            return posOnSquare;
+            var u2 = u * u;
+            var v2 = v * v;
+
+            var subTermX = 2f + u2 - v2;
+            var subTermY = 2f - u2 + v2;
+            var termX1 = subTermX + u * TwoSqrt2;
+            var termX2 = subTermX - u * TwoSqrt2;
+            var termY1 = subTermY + v * TwoSqrt2;
+            var termY2 = subTermY - v * TwoSqrt2;
+
+            return new Vector2(
+                0.5f * Mathf.Sqrt(termX1) - 0.5f * Mathf.Sqrt(termX2),
+                0.5f * Mathf.Sqrt(termY1) - 0.5f * Mathf.Sqrt(termY2)
+            );
         }
+
+        /// <summary>
+        /// １辺２(-1~1)の正方形内の座標を半径１の円に射影する
+        /// http://squircular.blogspot.com/2015/09/mapping-circle-to-square.html
+        /// </summary>
+        public static Vector2 SquareToCircle(Vector2 xy)
+        {
+            var x = xy.x;
+            var y = xy.y;
+            return new Vector2(
+                x * Mathf.Sqrt(1f - y * y * 0.5f),
+                y * Mathf.Sqrt(1f - x * x * 0.5f)
+            );
+        }
+        
+        
+        
         
         static void FillArea(int xSize, int ySize, Color[] retval, Color topLeftColor, Color rightGradient, Color downGradient, bool convertToGamma)
         {

@@ -14,15 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PixelRect:
     serializedVersion: 2
-    x: 2770
-    y: 512.6667
-    width: 1592
-    height: 789.3334
+    x: 2445.3335
+    y: 210.66667
+    width: 1014
+    height: 761.3334
   m_ShowMode: 0
-  m_Title: UI Toolkit Debugger
+  m_Title: Test Runner
   m_RootView: {fileID: 4}
-  m_MinSize: {x: 101, y: 123}
-  m_MaxSize: {x: 4001, y: 4023}
+  m_MinSize: {x: 100, y: 121}
+  m_MaxSize: {x: 4000, y: 4021}
   m_Maximized: 0
 --- !u!114 &2
 MonoBehaviour:
@@ -58,17 +58,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: UIElementsDebugger
+  m_Name: TestRunnerWindow
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1592
-    height: 789.3334
-  m_MinSize: {x: 100, y: 100}
-  m_MaxSize: {x: 4000, y: 4000}
+    width: 1014
+    height: 761.3334
+  m_MinSize: {x: 100, y: 121}
+  m_MaxSize: {x: 4000, y: 4021}
   m_ActualView: {fileID: 19}
   m_Panes:
   - {fileID: 19}
@@ -92,12 +92,12 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1592
-    height: 789.3334
-  m_MinSize: {x: 101, y: 123}
-  m_MaxSize: {x: 4001, y: 4023}
+    width: 1014
+    height: 761.3334
+  m_MinSize: {x: 100, y: 121}
+  m_MaxSize: {x: 4000, y: 4021}
   vertical: 0
-  controlID: 35782
+  controlID: 68935
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -115,7 +115,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 738.6667
     y: 0
-    width: 917.99994
+    width: 727.3333
     height: 436
   m_MinSize: {x: 880, y: 216}
   m_MaxSize: {x: 4000, y: 4000}
@@ -139,9 +139,9 @@ MonoBehaviour:
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 2203
+    x: 2162.6667
     y: 0
-    width: 357
+    width: 397.33325
     height: 871
   m_MinSize: {x: 275, y: 50}
   m_MaxSize: {x: 4000, y: 4000}
@@ -201,7 +201,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 100}
   m_MaxSize: {x: 24288, y: 8096}
   vertical: 0
-  controlID: 152
+  controlID: 138
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -217,9 +217,9 @@ MonoBehaviour:
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 1349
+    x: 1348.6666
     y: 0
-    width: 309
+    width: 308.66675
     height: 871
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 4000, y: 4000}
@@ -243,9 +243,9 @@ MonoBehaviour:
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 1658
+    x: 1657.3334
     y: 0
-    width: 545
+    width: 505.33337
     height: 871
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 4000, y: 4000}
@@ -277,7 +277,7 @@ MonoBehaviour:
   m_MinSize: {x: 400, y: 200}
   m_MaxSize: {x: 32384, y: 16192}
   vertical: 0
-  controlID: 19
+  controlID: 217
 --- !u!114 &12
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -293,9 +293,9 @@ MonoBehaviour:
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 1656.6666
+    x: 1466
     y: 0
-    width: 903.3334
+    width: 1094
     height: 436
   m_MinSize: {x: 231, y: 271}
   m_MaxSize: {x: 10001, y: 10021}
@@ -399,7 +399,7 @@ MonoBehaviour:
   m_MinSize: {x: 400, y: 200}
   m_MaxSize: {x: 32384, y: 16192}
   vertical: 1
-  controlID: 20
+  controlID: 218
 --- !u!114 &17
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -426,7 +426,7 @@ MonoBehaviour:
   m_MinSize: {x: 400, y: 100}
   m_MaxSize: {x: 32384, y: 8096}
   vertical: 0
-  controlID: 21
+  controlID: 219
 --- !u!114 &18
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -444,7 +444,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1349
+    width: 1348.6666
     height: 871
   m_MinSize: {x: 201, y: 221}
   m_MaxSize: {x: 4001, y: 4021}
@@ -462,33 +462,225 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 13956, guid: 0000000000000000e000000000000000, type: 0}
+  m_Script: {fileID: 13401, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
   m_EditorClassIdentifier: 
   m_MinSize: {x: 100, y: 100}
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
-    m_Text: UI Toolkit Debugger
+    m_Text: Test Runner
     m_Image: {fileID: 0}
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 2770
-    y: 512.6667
-    width: 1592
-    height: 768.3334
+    x: 2445.3335
+    y: 210.66667
+    width: 1014
+    height: 740.3334
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
-  m_DebuggerImpl:
-    m_LastVisualTreeName: RosettaUI_DefaultPanelSettings
-  m_DebuggerContext:
-    m_SelectedElementIndex: 745
-    m_ShowLayoutBound: 0
-    m_ShowRepaintOverlay: 0
-    m_ShowDrawStats: 0
-    m_BreakBatches: 0
+  m_Spl:
+    ID: 68965
+    splitterInitialOffset: 0
+    currentActiveSplitter: -1
+    realSizes:
+    - 502.66666
+    - 167.33334
+    relativeSizes:
+    - 0.75
+    - 0.25
+    minSizes:
+    - 32
+    - 32
+    maxSizes:
+    - 0
+    - 0
+    lastTotalSize: 670
+    splitSize: 6
+    xOffset: 0
+    m_Version: 1
+    oldRealSizes: 
+    oldMinSizes: 
+    oldMaxSizes: 
+    oldSplitSize: 0
+  m_TestTypeToolbarIndex: 1
+  m_PlayModeTestListGUI:
+    m_Window: {fileID: 0}
+    m_NewResultList: []
+    m_ResultText: 
+    m_ResultStacktrace: 
+    m_TestListState:
+      scrollPos: {x: 0, y: 0}
+      m_SelectedIDs: 
+      m_LastClickedID: 0
+      m_ExpandedIDs: 
+      m_RenameOverlay:
+        m_UserAcceptedRename: 0
+        m_Name: 
+        m_OriginalName: 
+        m_EditFieldRect:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        m_UserData: 0
+        m_IsWaitingForDelay: 0
+        m_IsRenaming: 0
+        m_OriginalEventType: 11
+        m_IsRenamingFilename: 0
+        m_ClientGUIView: {fileID: 0}
+      m_SearchString: 
+    m_TestRunnerUIFilter:
+      PassedHidden: 0
+      FailedHidden: 0
+      NotRunHidden: 0
+      m_SearchString: 
+      selectedCategoryMask: 0
+      availableCategories: []
+    m_SelectedOption: 0
+  m_EditModeTestListGUI:
+    m_Window: {fileID: 19}
+    m_NewResultList:
+    - id: 1000
+      uniqueId: '[RosettaUI][suite]'
+      name: RosettaUI
+      fullName: RosettaUI
+      resultStatus: 2
+      duration: 0.0991709
+      messages: One or more child tests had errors
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 
+      parentUniqueId: 
+    - id: 1003
+      uniqueId: '[RosettaUI.Tests.dll][suite]'
+      name: RosettaUI.Tests.dll
+      fullName: C:/unity/RosettaUI/Library/ScriptAssemblies/RosettaUI.Tests.dll
+      resultStatus: 2
+      duration: 0.0556711
+      messages: One or more child tests had errors
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 1000
+      parentUniqueId: '[RosettaUI][suite]'
+    - id: 1004
+      uniqueId: RosettaUI.Tests.dll/[RosettaUI][suite]
+      name: RosettaUI
+      fullName: RosettaUI
+      resultStatus: 2
+      duration: 0.0475177
+      messages: One or more child tests had errors
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 1003
+      parentUniqueId: '[RosettaUI.Tests.dll][suite]'
+    - id: 1005
+      uniqueId: RosettaUI.Tests.dll/RosettaUI/[RosettaUI.Tests][RosettaUI.Test][suite]
+      name: Test
+      fullName: RosettaUI.Test
+      resultStatus: 2
+      duration: 0.0454721
+      messages: One or more child tests had errors
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 1004
+      parentUniqueId: RosettaUI.Tests.dll/[RosettaUI][suite]
+    - id: 1001
+      uniqueId: RosettaUI.Tests.dll/RosettaUI/Test/[RosettaUI.Tests][RosettaUI.Test.ColorPickerHelperTest][suite]
+      name: ColorPickerHelperTest
+      fullName: RosettaUI.Test.ColorPickerHelperTest
+      resultStatus: 2
+      duration: 0.0439749
+      messages: One or more child tests had errors
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 1005
+      parentUniqueId: RosettaUI.Tests.dll/RosettaUI/[RosettaUI.Tests][RosettaUI.Test][suite]
+    - id: 1002
+      uniqueId: RosettaUI.Tests.dll/RosettaUI/Test/ColorPickerHelperTest/[RosettaUI.Tests][RosettaUI.Test.ColorPickerHelperTest.Test_CircleToSquare]
+      name: Test_CircleToSquare
+      fullName: RosettaUI.Test.ColorPickerHelperTest.Test_CircleToSquare
+      resultStatus: 2
+      duration: 0.0268623
+      messages: "  Expected: (1.00, 0.58)\r\n  But was:  (1.00, 0.58)\r\n"
+      output: 
+      stacktrace: 'at RosettaUI.Test.ColorPickerHelperTest.Test_CircleToSquare ()
+        [0x001ad] in C:\unity\RosettaUI\Assets\Tests\ColorPickerHelperTest.cs:27
+
+'
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1001
+      parentUniqueId: RosettaUI.Tests.dll/RosettaUI/Test/[RosettaUI.Tests][RosettaUI.Test.ColorPickerHelperTest][suite]
+    m_ResultText: "Test_CircleToSquare (0.027s)\n---\nExpected: (1.00, 0.58)\r\n 
+      But was:  (1.00, 0.58)\n---\nat RosettaUI.Test.ColorPickerHelperTest.Test_CircleToSquare
+      () [0x001ad] in C:\\unity\\RosettaUI\\Assets\\Tests\\ColorPickerHelperTest.cs:27"
+    m_ResultStacktrace: 'at RosettaUI.Test.ColorPickerHelperTest.Test_CircleToSquare
+      () [0x001ad] in C:\unity\RosettaUI\Assets\Tests\ColorPickerHelperTest.cs:27
+
+'
+    m_TestListState:
+      scrollPos: {x: 0, y: 0}
+      m_SelectedIDs: 25a88a63
+      m_LastClickedID: 1670031397
+      m_ExpandedIDs: 742d67865c801edfb0f70beb321e7e5bd998476fffffff7f
+      m_RenameOverlay:
+        m_UserAcceptedRename: 0
+        m_Name: 
+        m_OriginalName: 
+        m_EditFieldRect:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        m_UserData: 0
+        m_IsWaitingForDelay: 0
+        m_IsRenaming: 0
+        m_OriginalEventType: 11
+        m_IsRenamingFilename: 0
+        m_ClientGUIView: {fileID: 0}
+      m_SearchString: 
+    m_TestRunnerUIFilter:
+      PassedHidden: 0
+      FailedHidden: 0
+      NotRunHidden: 0
+      m_SearchString: 
+      selectedCategoryMask: 0
+      availableCategories:
+      - Uncategorized
 --- !u!114 &20
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -511,7 +703,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 2658.6667
     y: 944
-    width: 915.99994
+    width: 725.3333
     height: 415
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
@@ -549,16 +741,16 @@ MonoBehaviour:
         m_PaneScroll: {x: 0, y: 0}
         m_ViewType: 0
         updateViewLive: 1
-        m_CurrentFrameIndex: 15227
+        m_CurrentFrameIndex: 172
         m_HierarchyOverruledThreadFromSelection: 0
         m_ProfilerViewFilteringOptions: 1
         m_FrameDataHierarchyView:
           m_Serialized: 1
           m_TreeViewState:
-            scrollPos: {x: 0, y: 128}
-            m_SelectedIDs: 89010000
+            scrollPos: {x: 0, y: 160}
+            m_SelectedIDs: eb000000
             m_LastClickedID: 0
-            m_ExpandedIDs: 04000000500000005d0000009300000009010000
+            m_ExpandedIDs: 04000000360000004300000086000000
             m_RenameOverlay:
               m_UserAcceptedRename: 0
               m_Name: 
@@ -578,7 +770,7 @@ MonoBehaviour:
             m_SearchString: 
           m_MultiColumnHeaderState:
             m_Columns:
-            - width: 399
+            - width: 206
               sortedAscending: 1
               headerContent:
                 m_Text: Overview
@@ -1004,7 +1196,7 @@ MonoBehaviour:
                 m_SortedColumns: 03000000
           m_FullThreadName: Main Thread
           m_ThreadName: Main Thread
-          <threadId>k__BackingField: 15040
+          <threadId>k__BackingField: 6564
           <threadIndex>k__BackingField: 0
           m_GroupName: 
     - rid: 7746663149039517697
@@ -1524,9 +1716,9 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 3576.6667
+    x: 3386
     y: 944
-    width: 902.3334
+    width: 1093
     height: 415
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
@@ -1545,22 +1737,22 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Packages/ga.fuquna.rosettaui.uitoolkit/Settings
+    - Assets/Tests
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 16
   m_LastFolders:
-  - Packages/ga.fuquna.rosettaui.uitoolkit/Settings
+  - Assets/Tests
   m_LastFoldersGridSize: 16
   m_LastProjectPath: C:\unity\RosettaUI
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 544d0000
-    m_LastClickedID: 19796
-    m_ExpandedIDs: 000000004c4d00004e4d0000504d0000524d0000544d0000a24d0000ffffff7f
+    m_SelectedIDs: a4640000
+    m_LastClickedID: 25764
+    m_ExpandedIDs: 000000004c4d0000504d0000544d0000564d0000ffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1588,7 +1780,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000004c4d00004e4d0000504d0000524d0000544d0000
+    m_ExpandedIDs: 000000004c4d00004e4d0000504d0000524d0000544d0000564d0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1619,18 +1811,18 @@ MonoBehaviour:
     m_ExpandedInstanceIDs: c623000050660000426a0000fe510000d64c00008c4c0000904c00000a4d00005a4d0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
+      m_Name: NewTestScript
+      m_OriginalName: NewTestScript
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 0
+      m_UserData: 25772
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 11
+      m_OriginalEventType: 0
       m_IsRenamingFilename: 1
       m_ClientGUIView: {fileID: 12}
     m_CreateAssetUtility:
@@ -1664,9 +1856,9 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 4123.3335
+    x: 4082.6667
     y: 72.66667
-    width: 356
+    width: 396.33325
     height: 850
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
@@ -1705,9 +1897,9 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 3578
+    x: 3577.3335
     y: 72.66667
-    width: 543
+    width: 503.33337
     height: 850
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
@@ -1716,9 +1908,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: a04c0000
-      m_LastClickedID: 19616
-      m_ExpandedIDs: 26fbffffb24c0000
+      m_SelectedIDs: a8640000
+      m_LastClickedID: 0
+      m_ExpandedIDs: c495feff5a97fefff697feff9298feffa89afeffc89bfeff4ea1feff90a2feff32a5feffdaa6feff00aefeffdab2feffecb4feff4cccfefff2cdfeff7acffeff02d6feff76d9feff86dbfeff26fbffffb24c0000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -1762,9 +1954,9 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 3269.3335
+    x: 3268.6667
     y: 72.66667
-    width: 307
+    width: 306.66675
     height: 850
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
@@ -2069,7 +2261,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 1920
     y: 72.66667
-    width: 1348
+    width: 1347.6666
     height: 850
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
@@ -2081,7 +2273,7 @@ MonoBehaviour:
   m_ShowGizmos: 0
   m_TargetDisplay: 0
   m_ClearColor: {r: 0, g: 0, b: 0, a: 0}
-  m_TargetSize: {x: 2022, y: 1243.5}
+  m_TargetSize: {x: 2021.5, y: 1243.5}
   m_TextureFilterMode: 0
   m_TextureHideFlags: 61
   m_RenderIMGUI: 1
@@ -2096,8 +2288,8 @@ MonoBehaviour:
     m_VRangeLocked: 0
     hZoomLockedByDefault: 0
     vZoomLockedByDefault: 0
-    m_HBaseRangeMin: -674
-    m_HBaseRangeMax: 674
+    m_HBaseRangeMin: -673.8334
+    m_HBaseRangeMax: 673.8334
     m_VBaseRangeMin: -414.5
     m_VBaseRangeMax: 414.5
     m_HAllowExceedBaseRangeMin: 1
@@ -2117,23 +2309,23 @@ MonoBehaviour:
       serializedVersion: 2
       x: 0
       y: 21
-      width: 1348
+      width: 1347.6666
       height: 829
-    m_Scale: {x: 1, y: 1}
-    m_Translation: {x: 674, y: 414.5}
+    m_Scale: {x: 0.9999999, y: 0.9999999}
+    m_Translation: {x: 673.8333, y: 414.5}
     m_MarginLeft: 0
     m_MarginRight: 0
     m_MarginTop: 0
     m_MarginBottom: 0
     m_LastShownAreaInsideMargins:
       serializedVersion: 2
-      x: -674
-      y: -414.5
-      width: 1348
-      height: 829
+      x: -673.8334
+      y: -414.50006
+      width: 1347.6667
+      height: 829.0001
     m_MinimalGUI: 1
-  m_defaultScale: 1
-  m_LastWindowPixelSize: {x: 2022, y: 1275}
+  m_defaultScale: 0.9999999
+  m_LastWindowPixelSize: {x: 2021.5, y: 1275}
   m_ClearInEditMode: 1
   m_NoCameraWarning: 1
   m_LowResolutionForAspectRatios: 00000000000000000000

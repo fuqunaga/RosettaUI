@@ -5,7 +5,10 @@ namespace RosettaUI.UIToolkit
 {
     public static class PointerDrag
     {
-        public static void RegisterCallback(VisualElement target, EventCallback<PointerMoveEvent> onPointerMoveOnPanel, Func<PointerDownEvent, bool> checkPointerIsValid = null)
+        public static void RegisterCallback(VisualElement target,
+            EventCallback<PointerMoveEvent> onPointerMoveOnPanel,
+            Func<PointerDownEvent, bool> checkPointerIsValid = null,
+            bool callMoveEventOnPointerDown = false)
         {
             VisualElement root; 
             
@@ -16,6 +19,11 @@ namespace RosettaUI.UIToolkit
                     root = target.panel.visualTree;
                     root.RegisterCallback<PointerMoveEvent>(onPointerMoveOnPanel);
                     root.RegisterCallback<PointerUpEvent>(OnPointerUpOnPanel);
+
+                    if (callMoveEventOnPointerDown)
+                    {
+                        onPointerMoveOnPanel?.Invoke( PointerMoveEvent.GetPooled(evt));
+                    }
 
                     evt.StopPropagation();
                 }

@@ -166,7 +166,7 @@ namespace RosettaUI.Example
                 ),
                 ExampleTemplate.BlankLine(),
                 
-                UI.Label("<b>Tips()</b>"),
+                UI.Label("<b>Tips</b>"),
                 UI.Page(
                     UI.Label("Fold ignores one level of indentation for label alignment"),
                     UI.Box(

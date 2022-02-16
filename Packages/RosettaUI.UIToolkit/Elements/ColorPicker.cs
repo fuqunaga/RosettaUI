@@ -10,7 +10,9 @@ namespace RosettaUI.UIToolkit
         #region static interface
 
         private static ModalWindow _window;
-        private static ColorPicker _colorPicker;
+        private static ColorPicker _colorPickerInstance;
+
+        public static int textDigit = 3;
 
         public static void Show(Vector2 position, VisualElement target, Color initialColor,
             Action<Color> onColorChanged)
@@ -18,22 +20,22 @@ namespace RosettaUI.UIToolkit
             if (_window == null)
             {
                 _window = new ModalWindow();
-                _colorPicker = new ColorPicker();
-                _window.Add(_colorPicker);
+                _colorPickerInstance = new ColorPicker();
+                _window.Add(_colorPickerInstance);
             }
 
             _window.Show(position, target);
 
             // Show()前はPanelが設定されていないのでコールバック系はShow()
-            _colorPicker.PrevColor = initialColor;
-            _colorPicker.onColorChanged += onColorChanged;
-            _colorPicker.RegisterCallback<DetachFromPanelEvent>(OnDetach);
+            _colorPickerInstance.PrevColor = initialColor;
+            _colorPickerInstance.onColorChanged += onColorChanged;
+            _colorPickerInstance.RegisterCallback<DetachFromPanelEvent>(OnDetach);
 
 
             void OnDetach(DetachFromPanelEvent _)
             {
-                _colorPicker.onColorChanged -= onColorChanged;
-                _colorPicker.UnregisterCallback<DetachFromPanelEvent>(OnDetach);
+                _colorPickerInstance.onColorChanged -= onColorChanged;
+                _colorPickerInstance.UnregisterCallback<DetachFromPanelEvent>(OnDetach);
             }
         }
 
@@ -133,8 +135,8 @@ namespace RosettaUI.UIToolkit
             _svHandler = this.Q("handler-sv");
             _svCursor = _svHandler.Q("circle");
 
-            PointerDrag.RegisterCallback(_hueHandler, OnPointerMoveOnPanel_Hue, CheckPointIsValid_Hue);
-            PointerDrag.RegisterCallback(_svHandler, OnPointerMoveOnPanel_SV, CheckPointerIsValid_SV);
+            PointerDrag.RegisterCallback(_hueHandler, OnPointerMoveOnPanel_Hue, CheckPointIsValid_Hue, true);
+            PointerDrag.RegisterCallback(_svHandler, OnPointerMoveOnPanel_SV, CheckPointerIsValid_SV, true);
 
             
             schedule.Execute(() =>
@@ -151,8 +153,6 @@ namespace RosettaUI.UIToolkit
                 cursorStyle.marginTop = cursorSize * -0.5f;
                 
                 // SV Circle
-                var svCircleSize = _svHandler.resolvedStyle.width; 
-                
                 if (_svTexture == null)
                 {
                     var size = ColorPickerHelper.defaultSvTextureSize;
@@ -228,10 +228,10 @@ namespace RosettaUI.UIToolkit
             var posOnSquare = ColorPickerHelper.CircleToSquare(posOnCircle);
       
             var sv = (posOnSquare + Vector2.one) * 0.5f; // map: -1~1 > 0~1
-
+            
             var hsv = Hsv;
             hsv.y = Mathf.Clamp01(sv.x);
-            hsv.z = Mathf.Clamp01(1f - sv.y);
+            hsv.z = Mathf.Clamp01(1f - sv.y);　// 数値表示が枠に収まるように端数を丸める
             Hsv = hsv;
 
             evt.StopPropagation();
@@ -246,7 +246,6 @@ namespace RosettaUI.UIToolkit
             {
                 ColorPickerHelper.UpdateSvCircleTexture(_svTexture, hsv.x);
             }
-
 
             UpdateSvCursor(hsv.y, hsv.z);
             UpdateHueCursor(hsv.x);
@@ -294,10 +293,12 @@ namespace RosettaUI.UIToolkit
 
             var uv = ColorPickerHelper.SquareToCircle(xy);
 
+            /*
             // カーソルを円に収めるために少しだけ縮める
             var cursorSize = _svCursor.resolvedStyle.width;
             var parentSize = _svHandler.resolvedStyle.width;
-            uv *= (1f - cursorSize / parentSize); 
+            uv *= (1f - cursorSize / parentSize);
+            */ 
             
             var circleXY = (uv + Vector2.one) * 0.5f; // map: -1~1 > 0~1
 
@@ -305,10 +306,21 @@ namespace RosettaUI.UIToolkit
             svCircleStyle.left = Length.Percent(circleXY.x * 100f);
             svCircleStyle.top = Length.Percent((1f - circleXY.y) * 100f);
         }
-       
 
         class SliderSet
         {
+            static Vector3 Round(Vector3 value, int digit)
+            {
+                var scale = Mathf.Pow(10f, digit);
+                var v = value * scale;
+
+                return new Vector3(
+                    Mathf.Round(v.x),
+                    Mathf.Round(v.y),
+                    Mathf.Round(v.x)
+                ) / scale;
+            }
+
             #region Type Define
 
             enum SliderType
@@ -390,13 +402,17 @@ namespace RosettaUI.UIToolkit
                                     color[index] = Mathf.Clamp01(value);
                                     Color = color;
                                     break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
                             }
                         }
                     }
                 }
             }
 
-            public void OnColorChanged()
+            public void OnColorChanged() => UpdateView();
+ 
+            void UpdateView()
             {
                 var vec3 = _sliderType switch
                 {
@@ -404,6 +420,8 @@ namespace RosettaUI.UIToolkit
                     SliderType.Rgb => (Vector3) (Vector4) Color,
                     _ => throw new ArgumentException()
                 };
+
+                vec3 = Round(vec3, textDigit); // 数値表示が枠に収まるように端数を丸める
 
                 _slider0.SetValueWithoutNotify(vec3.x);
                 _slider1.SetValueWithoutNotify(vec3.y);
@@ -416,6 +434,7 @@ namespace RosettaUI.UIToolkit
             {
                 var newType = _sliderType == SliderType.Hsv ? SliderType.Rgb : SliderType.Hsv;
                 SetSliderType(newType);
+                UpdateView();
             }
 
             void SetSliderType(SliderType sliderType)

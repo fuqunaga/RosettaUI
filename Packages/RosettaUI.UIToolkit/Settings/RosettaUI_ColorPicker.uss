@@ -4,11 +4,12 @@
 
 .rosettaui-colorpicker__preview 
 {
-    width: 120px;
+    width: 100px;
     height: 25px;
     margin: 4px;
     align-self: flex-end;
     flex-direction: row;
+    border-radius: 5px;
 }
 
 .rosettaui-colorpicker__preview-prev,
@@ -75,4 +76,11 @@
 {
     flex-grow: 0;
     width: 80px;
+}
+
+.rosettaui-texture-slider .unity-base-slider__tracker,
+.rosettaui-texture-slider .unity-base-slider__tracker:hover
+{
+    border-width: 0;
+    background-color: transparent;
 }

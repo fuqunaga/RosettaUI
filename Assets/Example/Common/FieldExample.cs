@@ -112,7 +112,7 @@ namespace RosettaUI.Example
                         UI.Label("Non-interactable if the expression is not assignable"),
                         UI.Field(() => floatValue + 1f),
                         UI.Label("Interactable if set label and writeValue func"),
-                        UI.Field($"{nameof(floatValue)}  + 1f",
+                        UI.Field($"({nameof(floatValue)}  + 1f)",
                             () => floatValue + 1f,
                             f => floatValue = f - 1f
                         ),

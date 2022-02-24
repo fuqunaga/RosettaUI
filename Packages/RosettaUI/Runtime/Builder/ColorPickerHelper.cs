@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -7,7 +8,7 @@ namespace RosettaUI.Builder
 {
     public static class ColorPickerHelper
     {
-        public static Vector2Int defaultCheckerBoardSize = new(120, 25);
+        public static Vector2Int defaultCheckerBoardSize = new(100, 25);
         public static int defaultCheckerBoardGridSize = 5;
         public static Vector2Int defaultSvTextureSize = new(140, 140);
         public static float defaultHueCircleThicknessRate = 0.1f;
@@ -23,24 +24,32 @@ namespace RosettaUI.Builder
 
         static Texture2D _checkerBoardTexture;
 
-        public static Texture2D CheckerBoardTexture => _checkerBoardTexture ??=
-            CreateCheckerBoardTexture(defaultCheckerBoardSize, defaultCheckerBoardGridSize, Color.white, Color.HSVToRGB(0f, 0f, 0.8f));
+        public static Texture2D CheckerBoardTexture => _checkerBoardTexture ??= CreateCheckerBoardTexture(defaultCheckerBoardSize, defaultCheckerBoardGridSize);
 
+        public static Texture2D CreateCheckerBoardTexture(Vector2Int size, int gridSize)
+            => CreateCheckerBoardTexture(size, gridSize, Color.white, Color.HSVToRGB(0f, 0f, 0.8f));
+        
         static Texture2D CreateCheckerBoardTexture(Vector2Int size, int gridSize, Color col0, Color col1)
         {
             var tex = CreateTexture(size.x, size.y, TextureFormat.RGB24);
             tex.filterMode = FilterMode.Point;
             tex.wrapMode = TextureWrapMode.Repeat;
-            
+
+            var colorArray = ArrayPool<Color>.Shared.Rent(size.x * size.y);
+            var colors = colorArray.AsSpan();
+
             for (var y = 0; y < size.y; y++)
             {
                 var flagY = ((y / gridSize) % 2 == 0);
                 for (var x = 0; x < size.x; x++)
                 {
                     var flagX = ((x / gridSize) % 2 == 0);
-                    tex.SetPixel(x, y, (flagX ^ flagY) ? col0 : col1);
+                    colors[x + y * size.x] = (flagX ^ flagY) ? col0 : col1;
                 }
             }
+
+            tex.SetPixels(colorArray);
+            ArrayPool<Color>.Shared.Return(colorArray);
 
             tex.Apply();
             return tex;
@@ -78,7 +87,10 @@ namespace RosettaUI.Builder
             var maxRadiusSq = maxRadius * maxRadius;
 
             var blendWidth = 2f;
-            
+
+            var colorArray = ArrayPool<Color>.Shared.Rent(size * size);
+            var colors = colorArray.AsSpan();
+
             for (var y = 0; y < size; y++)
             {
                 for (var x = 0; x < size; x++)
@@ -102,10 +114,14 @@ namespace RosettaUI.Builder
                         color = Color.HSVToRGB(h, 1f, 1f);
                         color.a = alpha;
                     }
-                    
-                    tex.SetPixel(x, y, color);
+
+                    colors[x + y * size] = color;
                 }
             }
+
+            tex.SetPixels(colorArray);
+
+            ArrayPool<Color>.Shared.Return(colorArray);
 
             tex.Apply();
             return tex;
@@ -113,6 +129,7 @@ namespace RosettaUI.Builder
 
         #endregion
 
+        #region SV texture
 
         /// <summary>
         /// 横軸S縦軸Vの正方形でのSVを計算し、それを円形にマップする
@@ -127,6 +144,9 @@ namespace RosettaUI.Builder
             
             var blendWidth = 1f;
             var blendWidthNormalized = blendWidth / radius;
+
+            var colorArray = ArrayPool<Color>.Shared.Rent(size * size);
+            var colors = colorArray.AsSpan();
 
             for (var y = 0; y < size; y++)
             {
@@ -143,10 +163,14 @@ namespace RosettaUI.Builder
                         color = Color.HSVToRGB(hue, sv.x, sv.y);
                         color.a = Mathf.InverseLerp(1f, 1f - blendWidthNormalized, pos.magnitude);
                     }
-
-                    texture.SetPixel(x, y, color);
+                    
+                    colors[x + y * size] = color;
                 }
             }
+            
+            texture.SetPixels(colorArray);
+            
+            ArrayPool<Color>.Shared.Return(colorArray);
 
             texture.Apply();
         }
@@ -194,9 +218,69 @@ namespace RosettaUI.Builder
             );
         }
         
+        #endregion
+
         
+        #region Slider
+
+        public static void WriteHueSliderTexture(Texture2D tex)
+        {
+            var width = tex.width;
+            WriteSliderTexture(tex, (x) =>
+            {
+                var h = (x + 0.5f) / width;
+                return Color.HSVToRGB(h, 1f, 1f);
+            });
+        }
+
+        public static void UpdateSSliderTexture(Texture2D tex, float hue, float v)
+        {
+            var width = tex.width;
+
+            // v==0でも真っ黒にしない
+            // Unity のカラーピッカーの挙動参考
+            var lerpV = Mathf.Lerp(0.2f, 1f, v);
+            
+            WriteSliderTexture(tex, (x) =>
+            {
+                var s = (x + 0.5f) / width;
+                return Color.HSVToRGB(hue, s, lerpV);
+            });
+        }
         
+        public static void UpdateVSliderTexture(Texture2D tex, float hue, float s)
+        {
+            var width = tex.width;
+            
+            WriteSliderTexture(tex, (x) =>
+            {
+                var v = (x + 0.5f) / width;
+                return Color.HSVToRGB(hue, s, v);
+            });
+        }
         
+
+        static void WriteSliderTexture(Texture2D tex, Func<float, Color> xToColor)
+        {
+            var width = tex.width;
+            var colorArray = ArrayPool<Color>.Shared.Rent(width);
+            var colors = colorArray.AsSpan();
+
+            for (var x = 0; x < width; x++)
+            {
+                colors[x] = xToColor(x);
+            }
+
+            tex.SetPixels(colorArray);
+            ArrayPool<Color>.Shared.Return(colorArray);
+            tex.Apply();
+        }
+        
+#endregion
+
+        
+#if false
+
         static void FillArea(int xSize, int ySize, Color[] retval, Color topLeftColor, Color rightGradient, Color downGradient, bool convertToGamma)
         {
             // Calc the deltas for stepping.
@@ -220,5 +304,7 @@ namespace RosettaUI.Builder
                 p += downDelta;
             }
         }
+        
+#endif
     }
 }

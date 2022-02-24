@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -11,8 +12,7 @@ namespace RosettaUI.UIToolkit
 
         private static ModalWindow _window;
         private static ColorPicker _colorPickerInstance;
-
-        public static int textDigit = 3;
+        public static int TextDigit { get; set; } = 3;
 
         public static void Show(Vector2 position, VisualElement target, Color initialColor,
             Action<Color> onColorChanged)
@@ -254,6 +254,7 @@ namespace RosettaUI.UIToolkit
 
             onColorChanged?.Invoke(Color);
         }
+       
 
         void UpdateHueCursor(float h)
         {
@@ -309,6 +310,8 @@ namespace RosettaUI.UIToolkit
 
         class SliderSet
         {
+            private static readonly string USSClassNameTextureSlider = "rosettaui-texture-slider";
+            
             static Vector3 Round(Vector3 value, int digit)
             {
                 var scale = Mathf.Pow(10f, digit);
@@ -317,7 +320,7 @@ namespace RosettaUI.UIToolkit
                 return new Vector3(
                     Mathf.Round(v.x),
                     Mathf.Round(v.y),
-                    Mathf.Round(v.x)
+                    Mathf.Round(v.z)
                 ) / scale;
             }
 
@@ -331,6 +334,8 @@ namespace RosettaUI.UIToolkit
 
             #endregion
 
+            private bool _isInitialized;
+
             private readonly ColorPicker _colorPicker;
 
             private readonly Button _sliderTypeButton;
@@ -339,8 +344,12 @@ namespace RosettaUI.UIToolkit
             private readonly Slider _slider2;
             private readonly Slider _slider3;
 
+            private Texture2D _sliderTexture0;
+            private Texture2D _sliderTexture1;
+            private Texture2D _sliderTexture2;
+            
+            
             private SliderType _sliderType;
-
 
             private Color Color
             {
@@ -367,19 +376,36 @@ namespace RosettaUI.UIToolkit
                 _sliderTypeButton = colorPicker.Q<Button>("slider-type-button");
                 _sliderTypeButton.clicked += ToggleSliderType;
 
-                _slider0 = InitSlider("slider0", 0);
-                _slider1 = InitSlider("slider1", 1);
-                _slider2 = InitSlider("slider2", 2);
-                _slider3 = InitSlider("slider3", 3);
+                _slider0 = InitSlider("slider0", 0, true);
+                _slider1 = InitSlider("slider1", 1, true);
+                _slider2 = InitSlider("slider2", 2, true);
+                _slider3 = InitSlider("slider3", 3, false);
 
-                SetSliderType(SliderType.Hsv);
-
-                Slider InitSlider(string name, int idx)
+                _colorPicker.schedule.Execute(() =>
                 {
-                    var ret = _colorPicker.Q<Slider>(name);
-                    ret.highValue = 1f;
-                    ret.RegisterValueChangedCallback((evt) => OnSliderValueChanged(evt.newValue, idx));
-                    return ret;
+                    _sliderTexture0 = InitSliderTexture(_slider0);
+                    _sliderTexture1 = InitSliderTexture(_slider1);
+                    _sliderTexture2 = InitSliderTexture(_slider2);
+
+                    _isInitialized = true;
+                    
+                    SetSliderType(SliderType.Hsv);
+                    UpdateView();
+                });
+
+                Slider InitSlider(string name, int idx, bool isTextureSlider)
+                {
+                    var slider = _colorPicker.Q<Slider>(name);
+                    slider.highValue = 1f;
+                    slider.RegisterValueChangedCallback((evt) => OnSliderValueChanged(evt.newValue, idx));
+                    
+                    if (isTextureSlider)
+                    {
+                        slider.AddToClassList(USSClassNameTextureSlider);
+                    }
+                    
+                    return slider;
+                    
                     
                     void OnSliderValueChanged(float value, int index)
                     {
@@ -410,10 +436,25 @@ namespace RosettaUI.UIToolkit
                 }
             }
 
+            static Texture2D InitSliderTexture(VisualElement slider)
+            {
+                var tracker = slider.Q("unity-tracker");
+                var tex = ColorPickerHelper.CreateTexture(
+                    Mathf.CeilToInt(tracker.resolvedStyle.width),
+                    1,
+                    TextureFormat.RGB24);
+
+                tracker.style.backgroundImage = tex;
+
+                return tex;
+            }
+
             public void OnColorChanged() => UpdateView();
  
             void UpdateView()
             {
+                if (!_isInitialized) return;
+                
                 var vec3 = _sliderType switch
                 {
                     SliderType.Hsv => Hsv,
@@ -421,12 +462,25 @@ namespace RosettaUI.UIToolkit
                     _ => throw new ArgumentException()
                 };
 
-                vec3 = Round(vec3, textDigit); // 数値表示が枠に収まるように端数を丸める
+                vec3 = Round(vec3, TextDigit); // 数値表示が枠に収まるように端数を丸める
 
                 _slider0.SetValueWithoutNotify(vec3.x);
                 _slider1.SetValueWithoutNotify(vec3.y);
                 _slider2.SetValueWithoutNotify(vec3.z);
                 _slider3.SetValueWithoutNotify(Alpha);
+
+                switch (_sliderType)
+                {
+                    case SliderType.Hsv:
+                        ColorPickerHelper.UpdateSSliderTexture(_sliderTexture1, Hsv.x, Hsv.z);
+                        ColorPickerHelper.UpdateVSliderTexture(_sliderTexture2, Hsv.x, Hsv.y);
+                        break;
+                        
+                    case SliderType.Rgb:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
 
 
@@ -447,6 +501,7 @@ namespace RosettaUI.UIToolkit
                     case SliderType.Hsv:
                         buttonText = "HSV";
                         SetSliderLabels("H", "S", "V", "A");
+                        ColorPickerHelper.WriteHueSliderTexture(_sliderTexture0);
                         break;
 
                     case SliderType.Rgb:

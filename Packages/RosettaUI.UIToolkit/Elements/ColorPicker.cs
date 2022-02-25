@@ -85,11 +85,17 @@ namespace RosettaUI.UIToolkit
             }
             private set
             {
-                Color.RGBToHSV(value, out var h, out var s, out var v);
-                _hsv = new Vector3(h, s, v);
-                _alpha = value.a;
+                if (Color != value)
+                {
+                    Color.RGBToHSV(value, out var h, out var s, out var v);
+                    var oldHsv = Hsv;
+                    _hsv = new Vector3(h, s, v);
+                    _alpha = value.a;
 
-                OnColorChanged();
+                    OnHsvChanged(_hsv, oldHsv);
+                    OnAlphaChanged();
+                    OnColorChanged();
+                }
             }
         }
 
@@ -101,7 +107,9 @@ namespace RosettaUI.UIToolkit
             {
                 if (_hsv == value) return;
 
+                var old = _hsv;
                 _hsv = value;
+                OnHsvChanged(_hsv, old);
                 OnColorChanged();
             }
         }
@@ -113,6 +121,7 @@ namespace RosettaUI.UIToolkit
             {
                 if (_alpha == value) return;
                 _alpha = value;
+                OnAlphaChanged();
                 OnColorChanged();
             }
         }
@@ -163,7 +172,9 @@ namespace RosettaUI.UIToolkit
                 
                 
                 // 表示更新
-                OnColorChanged();
+                UpdateSvCircle();
+                UpdateHueCursor(Hsv.x);
+                UpdateSvCursor(Hsv.y, Hsv.z);
             });
         }
 
@@ -237,21 +248,35 @@ namespace RosettaUI.UIToolkit
             evt.StopPropagation();
         }
 
+        void OnHsvChanged(Vector3 newValue, Vector3 oldValue)
+        {
+            var hChanged = newValue.x != oldValue.x;
+            var sChanged = newValue.y != oldValue.y; 
+            var vChanged = newValue.z != oldValue.z;
+            
+            if ( hChanged )
+            {
+                UpdateSvCircle();
+                UpdateHueCursor(newValue.x);
+            }
+
+
+            if (sChanged || vChanged)
+            {
+                UpdateSvCursor(newValue.y, newValue.z);
+            }
+            
+            _sliderSet.OnHsvChanged(hChanged, sChanged, vChanged);
+        }
+
+        void OnAlphaChanged()
+        {
+            _sliderSet.OnAlphaChanged();
+        }
+
         void OnColorChanged()
         {
             _previewCurr.style.backgroundColor = Color;
-
-            var hsv = Hsv;
-            if (_svTexture != null)
-            {
-                ColorPickerHelper.UpdateSvCircleTexture(_svTexture, hsv.x);
-            }
-
-            UpdateSvCursor(hsv.y, hsv.z);
-            UpdateHueCursor(hsv.x);
-
-            _sliderSet.OnColorChanged();
-
             onColorChanged?.Invoke(Color);
         }
        
@@ -308,6 +333,15 @@ namespace RosettaUI.UIToolkit
             svCircleStyle.top = Length.Percent((1f - circleXY.y) * 100f);
         }
 
+        void UpdateSvCircle()
+        {
+            if (_svTexture != null)
+            {
+                ColorPickerHelper.UpdateSvCircleTexture(_svTexture, Hsv.x);
+            }
+        }
+        
+
         class SliderSet
         {
             private static readonly string USSClassNameTextureSlider = "rosettaui-texture-slider";
@@ -322,6 +356,12 @@ namespace RosettaUI.UIToolkit
                     Mathf.Round(v.y),
                     Mathf.Round(v.z)
                 ) / scale;
+            }
+
+            static float Round(float value, int digit)
+            {
+                var scale = Mathf.Pow(10f, digit);
+                return Mathf.Round(value * scale) / scale;
             }
 
             #region Type Define
@@ -390,7 +430,6 @@ namespace RosettaUI.UIToolkit
                     _isInitialized = true;
                     
                     SetSliderType(SliderType.Hsv);
-                    UpdateView();
                 });
 
                 Slider InitSlider(string name, int idx, bool isTextureSlider)
@@ -449,38 +488,66 @@ namespace RosettaUI.UIToolkit
                 return tex;
             }
 
-            public void OnColorChanged() => UpdateView();
- 
-            void UpdateView()
+            public void OnHsvChanged(bool hChanged, bool sChanged, bool vChanged)
             {
                 if (!_isInitialized) return;
                 
-                var vec3 = _sliderType switch
-                {
-                    SliderType.Hsv => Hsv,
-                    SliderType.Rgb => (Vector3) (Vector4) Color,
-                    _ => throw new ArgumentException()
-                };
-
-                vec3 = Round(vec3, TextDigit); // 数値表示が枠に収まるように端数を丸める
-
-                _slider0.SetValueWithoutNotify(vec3.x);
-                _slider1.SetValueWithoutNotify(vec3.y);
-                _slider2.SetValueWithoutNotify(vec3.z);
-                _slider3.SetValueWithoutNotify(Alpha);
-
                 switch (_sliderType)
                 {
                     case SliderType.Hsv:
-                        ColorPickerHelper.UpdateSSliderTexture(_sliderTexture1, Hsv.x, Hsv.z);
-                        ColorPickerHelper.UpdateVSliderTexture(_sliderTexture2, Hsv.x, Hsv.y);
+                        OnHsvChanged_Hsv(hChanged, sChanged, vChanged);
                         break;
-                        
                     case SliderType.Rgb:
+                        OnHsvChanged_Rgb();
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+            }
+
+            public void OnAlphaChanged()
+            {
+                _slider3.SetValueWithoutNotify(Round(Alpha, TextDigit));
+            }
+
+            private void OnHsvChanged_Hsv(bool hChanged, bool sChanged, bool vChanged)
+            {
+                Set3SliderValuesWithoutNotify(Hsv);
+
+                if (hChanged || vChanged)
+                {
+                    ColorPickerHelper.UpdateSSliderTexture(_sliderTexture1, Hsv.x, Hsv.z);
+                }
+
+                if (hChanged || sChanged)
+                {
+                    ColorPickerHelper.UpdateVSliderTexture(_sliderTexture2, Hsv.x, Hsv.y);
+                }
+            }
+
+            private void OnHsvChanged_Rgb()
+            {
+                var color = Color;
+                Set3SliderValuesWithoutNotify((Vector4)color);
+                
+                ColorPickerHelper.UpdateRSliderTexture(_sliderTexture0, color);
+                ColorPickerHelper.UpdateGSliderTexture(_sliderTexture1, color);
+                ColorPickerHelper.UpdateBSliderTexture(_sliderTexture2, color);
+            }
+
+            void Set3SliderValuesWithoutNotify(Vector3 value)
+            {
+                var v = Round(value, TextDigit); // 数値表示が枠に収まるように端数を丸める
+
+                _slider0.SetValueWithoutNotify(v.x);
+                _slider1.SetValueWithoutNotify(v.y);
+                _slider2.SetValueWithoutNotify(v.z);
+            }
+
+            void UpdateViewAll()
+            {
+                OnHsvChanged(true, true, true);
+                OnAlphaChanged();
             }
 
 
@@ -488,7 +555,6 @@ namespace RosettaUI.UIToolkit
             {
                 var newType = _sliderType == SliderType.Hsv ? SliderType.Rgb : SliderType.Hsv;
                 SetSliderType(newType);
-                UpdateView();
             }
 
             void SetSliderType(SliderType sliderType)
@@ -511,6 +577,8 @@ namespace RosettaUI.UIToolkit
                 }
 
                 _sliderTypeButton.text = buttonText;
+
+                UpdateViewAll();
 
                 void SetSliderLabels(string label0, string label1, string label2, string label3)
                 {

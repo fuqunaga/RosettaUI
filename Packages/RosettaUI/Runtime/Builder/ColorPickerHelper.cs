@@ -225,12 +225,7 @@ namespace RosettaUI.Builder
 
         public static void WriteHueSliderTexture(Texture2D tex)
         {
-            var width = tex.width;
-            WriteSliderTexture(tex, (x) =>
-            {
-                var h = (x + 0.5f) / width;
-                return Color.HSVToRGB(h, 1f, 1f);
-            });
+            WriteSliderTexture(tex, rate => Color.HSVToRGB(rate, 1f, 1f));
         }
 
         public static void UpdateSSliderTexture(Texture2D tex, float hue, float v)
@@ -240,35 +235,41 @@ namespace RosettaUI.Builder
             // v==0でも真っ黒にしない
             // Unity のカラーピッカーの挙動参考
             var lerpV = Mathf.Lerp(0.2f, 1f, v);
-            
-            WriteSliderTexture(tex, (x) =>
-            {
-                var s = (x + 0.5f) / width;
-                return Color.HSVToRGB(hue, s, lerpV);
-            });
+
+            WriteSliderTexture(tex, rate => Color.HSVToRGB(hue, rate, lerpV));
         }
         
         public static void UpdateVSliderTexture(Texture2D tex, float hue, float s)
         {
-            var width = tex.width;
-            
-            WriteSliderTexture(tex, (x) =>
+            WriteSliderTexture(tex, rate => Color.HSVToRGB(hue, s, rate));
+        }
+
+        public static void UpdateRSliderTexture(Texture2D tex, Color color) => UpdateRgbSliderTexture(tex, color, 0);
+        public static void UpdateGSliderTexture(Texture2D tex, Color color) => UpdateRgbSliderTexture(tex, color, 1);
+        public static void UpdateBSliderTexture(Texture2D tex, Color color) => UpdateRgbSliderTexture(tex, color, 2);
+        
+        static void UpdateRgbSliderTexture(Texture2D tex, Color color, int index)
+        {
+            WriteSliderTexture(tex, rate =>
             {
-                var v = (x + 0.5f) / width;
-                return Color.HSVToRGB(hue, s, v);
+                color[index] = rate;
+                return color;
             });
         }
         
 
-        static void WriteSliderTexture(Texture2D tex, Func<float, Color> xToColor)
+        static void WriteSliderTexture(Texture2D tex, Func<float, Color> rateToColor)
         {
             var width = tex.width;
+            var invWidth = 1f / width;
+            
             var colorArray = ArrayPool<Color>.Shared.Rent(width);
             var colors = colorArray.AsSpan();
 
             for (var x = 0; x < width; x++)
             {
-                colors[x] = xToColor(x);
+                var rate = (x + 0.5f) * invWidth;
+                colors[x] = rateToColor(rate);
             }
 
             tex.SetPixels(colorArray);

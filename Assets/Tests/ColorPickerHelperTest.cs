@@ -1,4 +1,3 @@
-using System;
 using NUnit.Framework;
 using RosettaUI.Builder;
 using UnityEngine;
@@ -11,7 +10,7 @@ namespace RosettaUI.Test
         public void Test_CircleToSquare()
         {
             var invSqrt2 = 1f / Mathf.Sqrt(2f);
-            var rad30 = 30.0 * Math.PI / 180.0;
+            //var rad30 = 30.0 * Math.PI / 180.0;
 
             Assert.AreEqual(Vector2.zero, ColorPickerHelper.CircleToSquare(Vector2.zero));
             

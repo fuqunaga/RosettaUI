@@ -2,7 +2,6 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace RosettaUI.Builder
 {
@@ -10,7 +9,6 @@ namespace RosettaUI.Builder
     {
         public static Vector2Int defaultCheckerBoardSize = new(100, 25);
         public static int defaultCheckerBoardGridSize = 5;
-        public static Vector2Int defaultSvTextureSize = new(140, 140);
         public static float defaultHueCircleThicknessRate = 0.1f;
 
         public static Texture2D CreateTexture(int width, int height, TextureFormat format = TextureFormat.RGBA32) =>
@@ -18,7 +16,12 @@ namespace RosettaUI.Builder
             {
                 wrapMode = TextureWrapMode.Clamp
             };
-        
+
+        public static RenderTexture CreateRenderTexture(int width, int height) => 
+            new(width, height, 0)
+            {
+                wrapMode = TextureWrapMode.Clamp
+            };
         
         #region CheckerBoard
 
@@ -131,11 +134,48 @@ namespace RosettaUI.Builder
 
         #region SV texture
 
+        public static Material svCircleMaterial;
+
+        public static class SvCircleShaderParam
+        {
+            public static readonly int TargetSize = Shader.PropertyToID("_TargetSize");
+            public static readonly int BlendWidthNormalized = Shader.PropertyToID("_BlendWidthNormalized");
+            public static readonly int Hue = Shader.PropertyToID("_Hue");
+        }
+
         /// <summary>
         /// 横軸S縦軸Vの正方形でのSVを計算し、それを円形にマップする
         /// </summary>
-        public static void UpdateSvCircleTexture(Texture2D texture, float hue)
+        public static void UpdateSvDiskTexture(RenderTexture rt, float hue)
         {
+#if true
+            svCircleMaterial.SetVector(SvCircleShaderParam.TargetSize, new Vector2(rt.width, rt.height));
+            svCircleMaterial.SetFloat(SvCircleShaderParam.BlendWidthNormalized, 2f / rt.width);
+            svCircleMaterial.SetFloat(SvCircleShaderParam.Hue, hue);
+
+            var tmp = RenderTexture.active;
+            RenderTexture.active = rt;
+            
+            GL.PushMatrix();
+            GL.LoadOrtho();
+            
+            svCircleMaterial.SetPass(0);
+            
+            GL.Begin(GL.QUADS);
+            GL.MultiTexCoord2(0, 0.0f, 0.0f);
+            GL.Vertex3(0.0f, 0.0f, 0.0f);
+            GL.MultiTexCoord2(0, 1.0f, 0.0f);
+            GL.Vertex3(1.0f, 0.0f, 0.0f);
+            GL.MultiTexCoord2(0, 1.0f, 1.0f);
+            GL.Vertex3(1.0f, 1.0f, 0.0f);
+            GL.MultiTexCoord2(0, 0.0f, 1.0f);
+            GL.Vertex3(0.0f, 1.0f, 0.0f);
+            GL.End();
+            GL.PopMatrix();
+
+            RenderTexture.active = tmp;
+
+#else
             Assert.AreEqual(texture.width, texture.height);
             
             var size = texture.width;
@@ -163,7 +203,7 @@ namespace RosettaUI.Builder
                         color = Color.HSVToRGB(hue, sv.x, sv.y);
                         color.a = Mathf.InverseLerp(1f, 1f - blendWidthNormalized, pos.magnitude);
                     }
-                    
+
                     colors[x + y * size] = color;
                 }
             }
@@ -173,6 +213,7 @@ namespace RosettaUI.Builder
             ArrayPool<Color>.Shared.Return(colorArray);
 
             texture.Apply();
+#endif
         }
 
 

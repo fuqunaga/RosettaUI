@@ -1,12 +1,32 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RosettaUI.Builder;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace RosettaUI
 {
     public abstract class RosettaUIRoot : MonoBehaviour
     {
+        [Serializable]
+        public class Resource
+        {
+            public Material colorPickerSvCircleMaterial;
+
+            public void OnValidate()
+            {
+                const string p = "Packages/ga.fuquna.rosettaui/Runtime/Builder/ColorPickerHelper/SvDisk.mat";
+                if (colorPickerSvCircleMaterial == null)
+                {
+                    colorPickerSvCircleMaterial = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(p);
+                    Assert.IsNotNull(colorPickerSvCircleMaterial);
+                }
+            }
+        }
+
+        public Resource resource;
+
         public readonly ElementUpdater updater = new();
 
         private readonly List<Element> _elements = new();
@@ -15,6 +35,10 @@ namespace RosettaUI
         private readonly Queue<Func<Element>> _createElementOnEnableQueue = new();
         
         #region Unity
+        
+#if UNITY_EDITOR
+        void OnValidate() => resource.OnValidate();
+#endif
 
         protected virtual void OnEnable()
         {
@@ -56,6 +80,8 @@ namespace RosettaUI
 
         public void Build(Element element)
         {
+            ColorPickerHelper.svCircleMaterial = resource.colorPickerSvCircleMaterial;
+            
             BuildInternal(element);
             
             updater.Register(element);

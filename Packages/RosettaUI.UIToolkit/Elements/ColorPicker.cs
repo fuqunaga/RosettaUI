@@ -44,7 +44,7 @@ namespace RosettaUI.UIToolkit
         #region static members
 
         private static VisualTreeAsset _visualTreeAsset;
-        private static Texture2D _svTexture;
+        private static RenderTexture _svTexture;
 
         #endregion
 
@@ -161,18 +161,14 @@ namespace RosettaUI.UIToolkit
                 cursorStyle.marginLeft = cursorSize * -0.5f;
                 cursorStyle.marginTop = cursorSize * -0.5f;
                 
-                // SV Circle
-                if (_svTexture == null)
-                {
-                    var size = ColorPickerHelper.defaultSvTextureSize;
-                    _svTexture = ColorPickerHelper.CreateTexture(size.x, size.y);
-                }
-
-                _svHandler.style.backgroundImage = _svTexture;
-                
+                // SV Disk
+                var width = Mathf.CeilToInt(_svHandler.resolvedStyle.width);
+                var height = Mathf.CeilToInt(_svHandler.resolvedStyle.height);
+                _svTexture = ColorPickerHelper.CreateRenderTexture(width, height);
+                _svHandler.style.backgroundImage = Background.FromRenderTexture(_svTexture);
                 
                 // 表示更新
-                UpdateSvCircle();
+                UpdateSvDisk();
                 UpdateHueCursor(Hsv.x);
                 UpdateSvCursor(Hsv.y, Hsv.z);
             });
@@ -256,7 +252,7 @@ namespace RosettaUI.UIToolkit
             
             if ( hChanged )
             {
-                UpdateSvCircle();
+                UpdateSvDisk();
                 UpdateHueCursor(newValue.x);
             }
 
@@ -328,16 +324,16 @@ namespace RosettaUI.UIToolkit
             
             var circleXY = (uv + Vector2.one) * 0.5f; // map: -1~1 > 0~1
 
-            var svCircleStyle = _svCursor.style;
-            svCircleStyle.left = Length.Percent(circleXY.x * 100f);
-            svCircleStyle.top = Length.Percent((1f - circleXY.y) * 100f);
+            var cursorStyle = _svCursor.style;
+            cursorStyle.left = Length.Percent(circleXY.x * 100f);
+            cursorStyle.top = Length.Percent((1f - circleXY.y) * 100f);
         }
 
-        void UpdateSvCircle()
+        void UpdateSvDisk()
         {
             if (_svTexture != null)
             {
-                ColorPickerHelper.UpdateSvCircleTexture(_svTexture, Hsv.x);
+                ColorPickerHelper.UpdateSvDiskTexture(_svTexture, Hsv.x);
             }
         }
         

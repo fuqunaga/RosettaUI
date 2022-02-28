@@ -21,7 +21,7 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _BlendWidthNormalized: 0.014285714
-    - _Hue: 0.5816158
+    - _BlendWidthNormalized: 0.007936508
+    - _Hue: 0.5833333
     m_Colors: []
   m_BuildTextureStacks: []

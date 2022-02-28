@@ -9,24 +9,6 @@ namespace RosettaUI
 {
     public abstract class RosettaUIRoot : MonoBehaviour
     {
-        [Serializable]
-        public class Resource
-        {
-            public Shader colorPickerSvDiskShader;
-
-            public void OnValidate()
-            {
-                const string p = "Packages/ga.fuquna.rosettaui/Runtime/Builder/ColorPickerHelper/SvDisk.shader";
-                if (colorPickerSvDiskShader == null)
-                {
-                    colorPickerSvDiskShader = UnityEditor.AssetDatabase.LoadAssetAtPath<Shader>(p);
-                    Assert.IsNotNull(colorPickerSvDiskShader);
-                }
-            }
-        }
-
-        public Resource resource;
-
         public readonly ElementUpdater updater = new();
 
         private readonly List<Element> _elements = new();
@@ -36,10 +18,6 @@ namespace RosettaUI
         
         #region Unity
         
-#if UNITY_EDITOR
-        void OnValidate() => resource.OnValidate();
-#endif
-
         protected virtual void OnEnable()
         {
             while (_createElementOnEnableQueue.Count > 0)
@@ -80,8 +58,6 @@ namespace RosettaUI
 
         public void Build(Element element)
         {
-            ColorPickerHelper.svDiskShader = resource.colorPickerSvDiskShader;
-            
             BuildInternal(element);
             
             updater.Register(element);

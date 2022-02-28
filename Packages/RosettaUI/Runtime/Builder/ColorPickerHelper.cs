@@ -11,6 +11,8 @@ namespace RosettaUI.Builder
         public static int defaultCheckerBoardGridSize = 5;
         public static float defaultHueCircleThicknessRate = 0.1f;
 
+        public static string svDiskMaterialPath = "SvDisk";
+
         public static Texture2D CreateTexture(int width, int height, TextureFormat format = TextureFormat.RGBA32) =>
             new(width, height, format, false)
             {
@@ -141,7 +143,6 @@ namespace RosettaUI.Builder
             public static readonly int Hue = Shader.PropertyToID("_Hue");
         }
         
-        public static Shader svDiskShader;
         private static Material _svDiskMaterial;
 
         /// <summary>
@@ -150,11 +151,8 @@ namespace RosettaUI.Builder
         public static void UpdateSvDiskTexture(RenderTexture rt, float hue)
         {
 #if true
-            if (_svDiskMaterial == null)
-            {
-                _svDiskMaterial = new Material(svDiskShader);
-            }
-            
+            _svDiskMaterial ??= Resources.Load<Material>(svDiskMaterialPath);
+
             _svDiskMaterial.SetVector(SvCircleShaderParam.TargetSize, new Vector2(rt.width, rt.height));
             _svDiskMaterial.SetFloat(SvCircleShaderParam.BlendWidthNormalized, 2f / rt.width);
             _svDiskMaterial.SetFloat(SvCircleShaderParam.Hue, hue);

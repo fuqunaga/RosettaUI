@@ -1,5 +1,4 @@
 using System;
-using System.Linq.Expressions;
 using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -57,8 +56,9 @@ namespace RosettaUI.UIToolkit
         private VisualElement _svHandler;
         private VisualElement _svCursor;
 
-
         private readonly SliderSet _sliderSet;
+        
+        private TextField _hex;
 
         private float _hueCircleThickness;
 
@@ -134,8 +134,18 @@ namespace RosettaUI.UIToolkit
             InitPreview();
             InitHsvHandlers();
             _sliderSet = new SliderSet(this);
+            InitHex();
         }
+        
+        private void InitPreview()
+        {
+            var preview = this.Q("preview");
+            _previewPrev = this.Q("preview-prev");
+            _previewCurr = this.Q("preview-curr");
 
+            preview.style.backgroundImage = ColorPickerHelper.CheckerBoardTexture;
+            _previewPrev.RegisterCallback<PointerDownEvent>((_) => Color = PrevColor);
+        }
 
         private void InitHsvHandlers()
         {
@@ -174,16 +184,25 @@ namespace RosettaUI.UIToolkit
             });
         }
 
-        private void InitPreview()
+        void InitHex()
         {
-            var preview = this.Q("preview");
-            _previewPrev = this.Q("preview-prev");
-            _previewCurr = this.Q("preview-curr");
+            _hex = this.Q<TextField>("hex");
+            
+            _hex.RegisterValueChangedCallback(evt =>
+            {
+                var str = evt.newValue;
+                if (ColorPickerHelper.HexToColor(str) is { } col32)
+                {
+                    Color col = col32;
+                    col.a = Alpha;
+                    Color = col;
+                }
+            });
 
-            preview.style.backgroundImage = ColorPickerHelper.CheckerBoardTexture;
-            _previewPrev.RegisterCallback<PointerDownEvent>((_) => Color = PrevColor);
+            _hex.RegisterCallback<BlurEvent>(_ => UpdateHex()); // 変な文字列を修正。入力中は維持的に文字数が足りなかったりしてもいいので、フォーカスが外れる際に修正する
+            
+            UpdateHex();
         }
-
 
         bool CheckPointIsValid_Hue(PointerDownEvent evt)
         {
@@ -273,6 +292,7 @@ namespace RosettaUI.UIToolkit
         void OnColorChanged()
         {
             _previewCurr.style.backgroundColor = Color;
+            UpdateHex();
             onColorChanged?.Invoke(Color);
         }
        
@@ -336,6 +356,11 @@ namespace RosettaUI.UIToolkit
                 ColorPickerHelper.UpdateSvDiskTexture(_svTexture, Hsv.x);
             }
         }
+
+        void UpdateHex()
+        {
+            _hex.value = ColorPickerHelper.ColorToHex(Color);
+        }
         
 
         class SliderSet
@@ -383,7 +408,6 @@ namespace RosettaUI.UIToolkit
             private Texture2D _sliderTexture0;
             private Texture2D _sliderTexture1;
             private Texture2D _sliderTexture2;
-            
             
             private SliderType _sliderType;
 

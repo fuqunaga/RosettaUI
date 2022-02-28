@@ -84,3 +84,14 @@
     border-width: 0;
     background-color: transparent;
 }
+
+.rosettaui-colorpicker__hex > .unity-text-field__label
+{
+    flex-grow: 1;
+    min-width: auto;
+}
+.rosettaui-colorpicker__hex > .unity-text-field__input
+{
+    flex-grow: 0;
+    min-width: 150px;
+}

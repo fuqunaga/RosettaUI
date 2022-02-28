@@ -370,7 +370,7 @@ MonoBehaviour:
   stringValue: 
   boolValue: 0
   enumValue: 0
-  colorValue: {r: 0.77099997, g: 0.366225, b: 0.19274999, a: 0.7372549}
+  colorValue: {r: 0, g: 0.06666667, b: 0.13333334, a: 0.7372549}
   vector2Value: {x: 0, y: 0}
   vector3Value: {x: 0, y: 0, z: 0}
   vector4Value: {x: 0, y: 0, z: 0, w: 0}
@@ -598,8 +598,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de292b76e20316349842181a7da14d32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resource:
-    colorPickerSvCircleMaterial: {fileID: 0}
 --- !u!4 &852668086
 Transform:
   m_ObjectHideFlags: 0

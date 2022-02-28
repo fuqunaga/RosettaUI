@@ -1,6 +1,7 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 
 namespace RosettaUI.Builder
@@ -265,7 +266,7 @@ namespace RosettaUI.Builder
         
         #endregion
 
-        
+
         #region Slider
 
         public static void WriteHueSliderTexture(Texture2D tex)
@@ -321,9 +322,33 @@ namespace RosettaUI.Builder
             ArrayPool<Color>.Shared.Return(colorArray);
             tex.Apply();
         }
-        
-#endregion
 
+        #endregion
+
+        #region Hex
+
+        public static Color32? HexToColor(string hex)
+        {
+            if (string.IsNullOrEmpty(hex)) return null;
+        
+            hex = hex.Replace ("0x", ""); //in case the string is formatted 0xFFFFFF
+            hex = hex.Replace ("#", "");  //in case the string is formatted #FFFFFF
+
+            if (hex.Length != 6) return null;
+            
+            var provider = CultureInfo.InvariantCulture;
+            
+           if ( !byte.TryParse(hex.AsSpan(0,2), NumberStyles.HexNumber, provider, out var r) ) return null;
+           if ( !byte.TryParse(hex.AsSpan(2,2), NumberStyles.HexNumber, provider, out var g) ) return null;
+           if ( !byte.TryParse(hex.AsSpan(4,2), NumberStyles.HexNumber, provider, out var b) ) return null;
+
+            return new Color32(r,g,b,0);
+        }
+
+        public static string ColorToHex(Color32 color)
+            => color.r.ToString("X2") + color.g.ToString("X2") + color.b.ToString("X2");
+        
+        #endregion
         
 #if false
 

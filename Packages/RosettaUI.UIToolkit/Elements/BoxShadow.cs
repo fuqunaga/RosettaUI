@@ -11,9 +11,5 @@ namespace RosettaUI.UIToolkit
             pickingMode = PickingMode.Ignore;
             AddToClassList(UssClassName);
         } 
-
-        protected override void ExecuteDefaultAction(EventBase evt)
-        {
-        }
     }
 }

@@ -30,12 +30,29 @@
 }
 
 /********************************************************************************
+* boxshadow
+********************************************************************************/
+.rosettaui-box-shadow {
+    position: absolute;
+    background-image: resource("box-shadow");
+    -unity-background-image-tint-color: rgba(0,4,16,0.4);
+
+    border-width: 22px 25px 24px 21px;
+
+    -unity-slice-top: 22;
+    -unity-slice-right: 25;
+    -unity-slice-bottom: 24;
+    -unity-slice-left: 21;
+}
+
+
+/********************************************************************************
 * Window
 ********************************************************************************/
 .rosettaui-window {
-    --rosettaui-window-color: rgba(45,45,45,0.9);
+    --rosettaui-window-color: rgba(45, 45, 45, 0.9);
     --rosettaui-window-border-width: 4px;
-    
+
     background-color: var(--rosettaui-window-color);
     position: absolute;
     border-radius: 1px;

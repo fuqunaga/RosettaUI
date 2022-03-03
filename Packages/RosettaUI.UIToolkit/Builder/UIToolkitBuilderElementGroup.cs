@@ -47,21 +47,7 @@ namespace RosettaUI.UIToolkit.Builder
             Build_ElementGroupContents(window.contentContainer, element);
 
             // add box shadow
-            var boxShadow = new BoxShadow();
-            window.hierarchy.Insert(0, boxShadow);
-            window.RegisterCallback<GeometryChangedEvent>(evt =>
-            {
-                var style = boxShadow.style;
-                var resolveStyle = boxShadow.resolvedStyle;
-                
-                style.width = evt.newRect.width + resolveStyle.borderLeftWidth + resolveStyle.borderRightWidth - 2f;
-                style.height = evt.newRect.height + resolveStyle.borderTopWidth + resolveStyle.borderBottomWidth- 2f;
-                
-                var windowStyle = window.resolvedStyle;
-
-                style.marginLeft = -(resolveStyle.borderLeftWidth + windowStyle.borderLeftWidth) + 0.5f;
-                style.marginTop = -(resolveStyle.borderTopWidth + windowStyle.borderTopWidth) + 0.5f;
-            });
+            window.AddBoxShadow();
             
             return window;
         }

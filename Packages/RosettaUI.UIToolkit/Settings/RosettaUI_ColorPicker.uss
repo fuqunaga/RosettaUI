@@ -1,7 +1,6 @@
 /********************************************************************************
 * ColorPicker
 ********************************************************************************/
-
 .rosettaui-colorpicker__preview 
 {
     width: 100px;
@@ -9,14 +8,23 @@
     margin: 4px;
     align-self: flex-end;
     flex-direction: row;
+
     border-radius: 5px;
 }
 
-.rosettaui-colorpicker__preview-prev,
+.rosettaui-colorpicker__preview-prev
+{
+    width: 50%;
+    height: 100%;
+
+    border-radius: 5px 0 0 5px;
+}
 .rosettaui-colorpicker__preview-curr
 {
     width: 50%;
     height: 100%;
+
+    border-radius: 0 5px 5px 0;
 }
 
 .rosettaui-colorpicker__handler

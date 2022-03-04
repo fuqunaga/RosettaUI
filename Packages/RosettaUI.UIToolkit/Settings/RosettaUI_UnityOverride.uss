@@ -223,7 +223,8 @@
     border-radius: 3px;
     border-width: 2px;
     padding: 2px 4px;
-    margin: 2px 4px;
+    margin: 2px;
+    min-width: 30px;
     
     border-color: var(--unity-colors-button-border);
     background-color: var(--unity-colors-button-background);

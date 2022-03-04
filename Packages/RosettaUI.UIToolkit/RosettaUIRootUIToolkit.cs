@@ -34,6 +34,16 @@ namespace RosettaUI.UIToolkit
             if (uiDocument == null)
             {
                 uiDocument = GetComponent<UIDocument>();
+                uiDocument.rootVisualElement.RegisterCallback<AttachToPanelEvent>(evt =>
+                {
+                    if (evt.target is VisualElement ve)
+                    {
+                        if (ve.ClassListContains(GenericDropdownMenu.ussClassName))
+                        {
+                         Debug.Log("hoge");   
+                        }
+                    }
+                });
             }
 
             var root = uiDocument.rootVisualElement;

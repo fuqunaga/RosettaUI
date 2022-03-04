@@ -2,6 +2,7 @@
 using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityInternalAccess.Custom;
 
 namespace RosettaUI.UIToolkit.Builder
 {
@@ -49,10 +50,11 @@ namespace RosettaUI.UIToolkit.Builder
             var dropdownElement = (DropdownElement) element;
             var options = dropdownElement.options.ToList();
 
-            var field = new PopupField<string>(
+            var field = new PopupFieldCustomMenu<string>(
                 options,
                 dropdownElement.Value
             );
+            field.onMenuCreated += menu => menu.AddBoxShadow(); 
       
             SetupFieldLabel(field, dropdownElement);
 
@@ -79,6 +81,7 @@ namespace RosettaUI.UIToolkit.Builder
                     if (menuItems != null)
                     {
                         var menu = new GenericDropdownMenu();
+                        menu.AddBoxShadow();
 
                         foreach (var item in menuItems)
                         {
@@ -91,7 +94,6 @@ namespace RosettaUI.UIToolkit.Builder
                     }
                 }
             });
-
 
             return ve;
         }

@@ -13,26 +13,37 @@ namespace RosettaUI
             return Enumerable.Range(0, list.Count).Select(i => new ListItemBinder<T>(ConstGetter.Create(list), i));
         }
 
-        
-        
-        
-        public static IEnumerable<IBinder> CreateItemBinders(IBinder listBinder)
+        public static Type GetItemBinderType(Type type)
         {
             static bool IsIList(Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IList<>);
             
-            var type = listBinder.ValueType;
             var listType = IsIList(type)
                 ? type
                 : type.GetInterfaces().FirstOrDefault(IsIList);
             Assert.IsNotNull(listType, $"{type} does not Inherit from IList<>.");
             
-            var itemType = listType.GetGenericArguments()[0];
-            var binderType = typeof(ListItemBinder<>).MakeGenericType(itemType);
-
-            var itemCount = GetCount(listBinder);
-            return Enumerable.Range(0, itemCount)
-                .Select(i => Activator.CreateInstance(binderType, listBinder, i) as IBinder);
+            var itemType =  listType.GetGenericArguments()[0];
+            return typeof(ListItemBinder<>).MakeGenericType(itemType);
         }
+        
+        public static IEnumerable<IBinder> CreateItemBinders(IBinder listBinder)
+        {
+            var itemBinderType = GetItemBinderType(listBinder.ValueType);
+            var itemCount = GetCount(listBinder);
+            
+            return Enumerable.Range(0, itemCount)
+                //.Select(i => Activator.CreateInstance(binderType, listBinder, i) as IBinder);
+                .Select(i => CreateItemBinderAt(listBinder, i, itemBinderType));
+        }
+
+        public static IBinder CreateItemBinderAt(IBinder listBinder, int index)
+        {
+            var itemBinderType = GetItemBinderType(listBinder.ValueType);
+            return CreateItemBinderAt(listBinder, index, itemBinderType);
+        }
+
+        private static IBinder CreateItemBinderAt(IBinder listBinder, int index, Type itemBinderType)
+            => Activator.CreateInstance(itemBinderType, listBinder, index) as IBinder;
 
         public static IList GetIList(IBinder binder) => binder.GetObject() as IList;
         

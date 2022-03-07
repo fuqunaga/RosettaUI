@@ -39,7 +39,14 @@ namespace RosettaUI
             return List(label, listBinder, createItemElementIBinder);
         }
 
+
         public static Element List(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null)
+        {
+            createItemElement ??= ((binder, idx) => Field("Item " + idx, binder));
+            return new ListViewElement(label, listBinder, createItemElement);
+        } 
+
+        public static Element List_(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null)
         {
             var isReadOnly = ListBinder.IsReadOnly(listBinder);
 
@@ -49,13 +56,12 @@ namespace RosettaUI
                 isReadOnly ? (Action<int>) null : (count) => ListBinder.SetCount(listBinder, count)
             ).SetWidth(countFieldWidth);
      
-            var buttonWidth = 30f;
             var buttons = isReadOnly
                 ? null
                 : Row(
                     Space(),
-                    Button("＋", () => ListBinder.AddItemAtLast(listBinder)).SetWidth(buttonWidth),
-                    Button("－", () => ListBinder.RemoveItemAtLast(listBinder)).SetWidth(buttonWidth)
+                    Button("＋", () => ListBinder.AddItemAtLast(listBinder)),
+                    Button("－", () => ListBinder.RemoveItemAtLast(listBinder))
                 );
 
             return Fold(

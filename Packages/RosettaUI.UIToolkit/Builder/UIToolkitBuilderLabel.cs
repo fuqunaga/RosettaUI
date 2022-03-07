@@ -20,7 +20,6 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 field.ListenLabel(labelElement);
 
-                RegisterUIObj(labelElement, field.labelElement);
                 SetupUIObj(labelElement, field.labelElement);
             }
         }

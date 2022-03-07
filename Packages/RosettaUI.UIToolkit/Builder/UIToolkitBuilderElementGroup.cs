@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Builder;
@@ -6,6 +7,7 @@ using RosettaUI.Reactive;
 using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityInternalAccess.Custom;
 
 namespace RosettaUI.UIToolkit.Builder
 {
@@ -286,6 +288,54 @@ namespace RosettaUI.UIToolkit.Builder
             Build_ElementGroupContents(contentContainer, element);
 
             return field;
+        }
+
+
+        private VisualElement Build_ListView(Element element)
+        {
+            var listViewElement = (ListViewElement) element;
+
+            var listView = new ListViewCustom(listViewElement.GetIList(),
+                makeItem: () => new VisualElement(),
+                bindItem: (ve,idx) =>
+                {
+                    ve.Clear();
+
+                    element = listViewElement.GetOrCreateItemElement(idx);
+                    var itemVe = Build(element);
+                    ve.Add(itemVe);
+                })
+            {
+                reorderable = true,
+                reorderMode = ListViewReorderMode.Animated,
+                showFoldoutHeader = true,
+                showAddRemoveFooter = true,
+                virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight
+            };
+            
+            
+            listViewElement.Label.SubscribeValueOnUpdateCallOnce(str => listView.headerTitle = str);
+
+            var lastListItemCount = listViewElement.GetListItemCount();
+            
+            listView.itemsSourceChanged += () =>
+            {
+                listViewElement.SetIList(listView.itemsSource);
+                lastListItemCount = listViewElement.GetListItemCount();
+            };
+            
+            listViewElement.onUpdate += _=>
+            {
+                var listItemCount = listViewElement.GetListItemCount();
+                if ( lastListItemCount != listItemCount)
+                {
+                    lastListItemCount = listItemCount;
+                    listView.OnListSizeChangedExternal();
+                }
+            };
+
+
+            return listView;
         }
 
         private VisualElement Build_ElementGroupContents(VisualElement container, Element element, Action<VisualElement, int> setupContentsVe = null)

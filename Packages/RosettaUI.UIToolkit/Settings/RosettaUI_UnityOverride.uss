@@ -524,3 +524,8 @@
 {
     color: var(--unity-colors-default-text); /* remove unity default */
 }
+
+.unity-list-view__size-field
+{
+    top: 5px;
+}

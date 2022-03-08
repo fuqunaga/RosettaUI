@@ -314,7 +314,7 @@ namespace RosettaUI.UIToolkit.Builder
             
             
             ApplyMinusIndentIfPossible(listView, listViewElement);
-            listView.schedule.Execute(() => ApplyIndent(listView.Q<Foldout>().contentContainer));
+            listView.ScheduleToUseResolvedLayoutBeforeRendering(() => ApplyIndent(listView.Q<Foldout>().contentContainer));
             
             listViewElement.Label.SubscribeValueOnUpdateCallOnce(str => listView.headerTitle = str);
 

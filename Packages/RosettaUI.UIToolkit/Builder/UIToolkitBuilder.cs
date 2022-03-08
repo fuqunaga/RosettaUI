@@ -58,13 +58,17 @@ namespace RosettaUI.UIToolkit.Builder
         {
             ve.ScheduleToUseResolvedLayoutBeforeRendering(() =>
             {
-                var marginLeft = 0f;
-
-                for (Element element = label;
-                     element != null && !LayoutHint.IsIndentOrigin(element);
+                var marginLeft = ve.worldBound.xMin;
+                
+                for (var element = label.Parent;
+                     element != null;
                      element = element.Parent)
                 {
-                    marginLeft += GetUIObj(element).layout.xMin;
+                    if (LayoutHint.IsIndentOrigin(element))
+                    {
+                        marginLeft -= GetUIObj(element).worldBound.xMin;
+                        break;
+                    }
                 }
                 
                 ve.style.minWidth = LayoutSettings.LabelWidth - marginLeft;

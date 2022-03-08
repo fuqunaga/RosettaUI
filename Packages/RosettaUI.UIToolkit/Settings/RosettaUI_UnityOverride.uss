@@ -54,11 +54,16 @@
     border-color: var(--unity-colors-input_field-border));
 }
 
-.unity-base-field__label--with-dragger{
-    cursor: var(--cursor-resize-horizontal) 29 4;
-}
-.unity-base-field__label--with-dragger:disabled {
+ /* status なしのデフォルトでカーソル指定がないと hover の指定で warning メッセージが出る*/
+.unity-base-field__label--with-dragger,
+.unity-base-field__label--with-dragger:disabled
+{
     cursor: initial;
+}
+
+.unity-base-field__label--with-dragger:hover
+{
+    cursor: var(--cursor-resize-horizontal) 29 4;
 }
 
 .unity-base-text-field__input {
@@ -97,13 +102,6 @@
 /********************************************************************************
 * foldout
 ********************************************************************************/
-/*
-.unity-foldout{
-    flex-grow: 1;
-    flex-shrink: 0;
-}
-*/
-
 .unity-foldout .unity-base-field__label{
     min-width: initial; /* remove unity value */
 }
@@ -520,4 +518,9 @@
 .unity-list-view__reorderable-handle-bar
 {
     opacity: 0.4;
+}
+
+.unity-foldout__toggle > .unity-toggle__input:focus > .unity-label
+{
+    color: var(--unity-colors-default-text); /* remove unity default */
 }

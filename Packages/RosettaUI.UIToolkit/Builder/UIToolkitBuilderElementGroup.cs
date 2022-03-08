@@ -70,10 +70,7 @@ namespace RosettaUI.UIToolkit.Builder
             toggle.style.marginLeft = 0;
             
             // Indentがあるなら１レベルキャンセル
-            if (foldElement.CanMinusIndent())
-            {
-                fold.style.marginLeft = -LayoutSettings.IndentSize;
-            }
+            ApplyMinusIndentIfPossible(fold, foldElement);
             
             foldElement.IsOpenRx.SubscribeAndCallOnce(isOpen => fold.value = isOpen);
             fold.RegisterValueChangedCallback(evt =>
@@ -254,14 +251,9 @@ namespace RosettaUI.UIToolkit.Builder
         VisualElement Build_Indent(Element element)
         {
             var indentElement = (IndentElement) element;
-            
-            var ve = new VisualElement
-            {
-                style =
-                {
-                    marginLeft = LayoutSettings.IndentSize * indentElement.level
-                }
-            };
+
+            var ve = new VisualElement();
+            ApplyIndent(ve, indentElement.level);
 
             return Build_ElementGroupContents(ve, element);
         }
@@ -304,6 +296,7 @@ namespace RosettaUI.UIToolkit.Builder
                     var e = listViewElement.GetOrCreateItemElement(idx);
                     e.SetEnable(true);
                     var itemVe = Build(e);
+                    ApplyIndent(itemVe);
                     ve.Add(itemVe);
                 })
             {
@@ -319,6 +312,9 @@ namespace RosettaUI.UIToolkit.Builder
                 }
             };
             
+            
+            ApplyMinusIndentIfPossible(listView, listViewElement);
+            listView.schedule.Execute(() => ApplyIndent(listView.Q<Foldout>().contentContainer));
             
             listViewElement.Label.SubscribeValueOnUpdateCallOnce(str => listView.headerTitle = str);
 
@@ -361,5 +357,19 @@ namespace RosettaUI.UIToolkit.Builder
             return container;
         }
 
+
+        static void ApplyMinusIndentIfPossible(VisualElement ve, Element element)
+        {
+            // Indentがあるなら１レベルキャンセル
+            if (element.CanMinusIndent())
+            {
+                ve.style.marginLeft = -LayoutSettings.IndentSize;
+            }
+        }
+
+        static void ApplyIndent(VisualElement ve, int indentLevel = 1)
+        {
+            ve.style.marginLeft = LayoutSettings.IndentSize * indentLevel;
+        }
     }
 }

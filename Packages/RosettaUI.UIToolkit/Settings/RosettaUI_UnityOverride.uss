@@ -470,3 +470,54 @@
     -unity-slice-left: 8;
     -unity-slice-right: 8;
 }
+
+
+/********************************************************************************
+* ListView
+********************************************************************************/
+.unity-list-view__scroll-view--with-footer,
+.unity-list-view__footer
+{
+    background-color: var(--rosettaui-color-box-background);
+    border-width: 0;
+    /*border-color: var(--unity-colors-input_field-border);*/
+    /*border-width: 2px;*/
+    /*margin: 2px 4px 4px 0;*/
+}
+
+.unity-list-view__footer > .unity-button
+{
+    background-color: transparent;
+}
+
+.unity-list-view__footer > .unity-button:focus {
+    background-color: var(--unity-colors-button-background-focus);
+}
+.unity-list-view__footer > .unity-button:hover {
+    background-color: var(--unity-colors-button-background-hover);
+}
+
+
+.unity-list-view__item:hover,
+.unity-collection-view__item--selected,
+.unity-collection-view__item:hover:enabled,
+.unity-collection-view:focus .unity-collection-view__item--selected
+{
+    background-color: initial;
+}
+
+.unity-list-view__reorderable-item__container
+{
+    padding-left: 0;
+}
+
+.unity-list-view__reorderable-handle
+{
+    min-width: 26px;
+    align-items: center;
+}   
+
+.unity-list-view__reorderable-handle-bar
+{
+    opacity: 0.4;
+}

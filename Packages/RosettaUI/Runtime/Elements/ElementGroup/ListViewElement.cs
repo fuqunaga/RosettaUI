@@ -16,22 +16,6 @@ namespace RosettaUI
             _createItemElement = createItemElement;
         }
 
-        protected override void UpdateInternal()
-        {
-            var count = ListBinder.GetCount(binder);
-            while(Contents.Count() > count)
-            {
-                Contents.Last().Destroy();
-            }
-
-            while(Contents.Count() < count)
-            {
-                AddItemElementAtLast();
-            }
-
-            base.UpdateInternal();
-        }
-
         public IList GetIList() => ListBinder.GetIList(binder);
 
         public void SetIList(IList iList) => binder.SetObject(iList);
@@ -53,14 +37,6 @@ namespace RosettaUI
             }
 
             return element;
-        }
-
-        void AddItemElementAtLast()
-        {
-            var i = Contents.Count();
-            var itemBinder = ListBinder.CreateItemBinderAt(binder, i);
-            var element = _createItemElement(itemBinder, i);
-            AddChild(element);
         }
     }
 }

@@ -127,7 +127,7 @@ namespace RosettaUI
     {
         public ListItemBinder(IGetter<IList<T>> listGetter, int idx) : 
             base(new Binder<IList<T>>(listGetter, null),
-                (list) => list[idx],
+                (list) => (0<=idx && idx<list.Count) ? list[idx] :default,
                 (list, v) => {
                     if ( idx < list.Count ) list[idx] = v;
                     return list; 

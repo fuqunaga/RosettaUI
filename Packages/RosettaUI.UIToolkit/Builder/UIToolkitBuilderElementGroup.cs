@@ -301,8 +301,9 @@ namespace RosettaUI.UIToolkit.Builder
                 {
                     ve.Clear();
 
-                    element = listViewElement.GetOrCreateItemElement(idx);
-                    var itemVe = Build(element);
+                    var e = listViewElement.GetOrCreateItemElement(idx);
+                    e.SetEnable(true);
+                    var itemVe = Build(e);
                     ve.Add(itemVe);
                 })
             {
@@ -310,7 +311,12 @@ namespace RosettaUI.UIToolkit.Builder
                 reorderMode = ListViewReorderMode.Animated,
                 showFoldoutHeader = true,
                 showAddRemoveFooter = true,
-                virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight
+                virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+                unbindItem = (_, idx) =>
+                {
+                    var e = listViewElement.GetOrCreateItemElement(idx);
+                    e.SetEnable(false);
+                }
             };
             
             

@@ -447,7 +447,7 @@
 }
 .unity-scroller .unity-scroller__slider:focus .unity-base-slider__dragger
 {
-    -unity-background-image-tint-color: var(--unity-colors-highlight-background);
+    -unity-background-image-tint-color: var(--rosettaui-highlight-dark-blue);
 }
 
 
@@ -473,10 +473,46 @@
 /********************************************************************************
 * ListView
 ********************************************************************************/
-.unity-list-view__scroll-view--with-footer,
+.unity-foldout__toggle > .unity-toggle__input:focus > .unity-label
+{
+    color: var(--unity-colors-default-text); /* remove unity default */
+}
+
+.unity-list-view__item,
+.unity-list-view__item:hover,
+.unity-collection-view__item:hover:enabled,
+.unity-collection-view__item--selected
+{
+    background-color: var(--rosettaui-color-list-background);
+}
+
+.unity-collection-view:focus .unity-collection-view__item--selected
+{
+    background-color: var(--rosettaui-highlight-dark-blue);
+}
+
+.unity-list-view__reorderable-item__container
+{
+    padding-left: 0;
+}
+
+.unity-list-view__reorderable-handle
+{
+    margin-top: 15px;
+    min-width: 26px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.unity-list-view__reorderable-handle-bar
+{
+    opacity: 0.4;
+}
+
+/*.unity-list-view__scroll-view--with-footer,*/
 .unity-list-view__footer
 {
-    background-color: var(--rosettaui-color-box-background);
+    background-color: var(--rosettaui-color-list-background);
     border-width: 0;
     /*border-color: var(--unity-colors-input_field-border);*/
     /*border-width: 2px;*/
@@ -496,36 +532,6 @@
 }
 
 
-.unity-list-view__item:hover,
-.unity-collection-view__item--selected,
-.unity-collection-view__item:hover:enabled,
-.unity-collection-view:focus .unity-collection-view__item--selected
-{
-    background-color: initial;
-}
-
-.unity-list-view__reorderable-item__container
-{
-    padding-left: 0;
-}
-
-.unity-list-view__reorderable-handle
-{
-    min-width: 26px;
-    top: 15px;
-    justify-content: flex-start;
-    align-items: center;
-}   
-
-.unity-list-view__reorderable-handle-bar
-{
-    opacity: 0.4;
-}
-
-.unity-foldout__toggle > .unity-toggle__input:focus > .unity-label
-{
-    color: var(--unity-colors-default-text); /* remove unity default */
-}
 
 .unity-list-view__size-field
 {

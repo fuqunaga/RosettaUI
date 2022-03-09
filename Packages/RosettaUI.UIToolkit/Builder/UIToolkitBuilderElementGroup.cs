@@ -287,27 +287,15 @@ namespace RosettaUI.UIToolkit.Builder
 
             var listView = new ListViewCustom(listViewElement.GetIList(),
                 makeItem: () => new VisualElement(),
-                bindItem: (ve,idx) =>
-                {
-                    ve.Clear();
-
-                    var e = listViewElement.GetOrCreateItemElement(idx);
-                    e.SetEnable(true);
-                    var itemVe = Build(e);
-                    ApplyIndent(itemVe);
-                    ve.Add(itemVe);
-                })
+                bindItem: BindItem
+            )
             {
                 reorderable = true,
                 reorderMode = ListViewReorderMode.Animated,
                 showFoldoutHeader = true,
                 showAddRemoveFooter = true,
                 virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
-                unbindItem = (_, idx) =>
-                {
-                    var e = listViewElement.GetOrCreateItemElement(idx);
-                    e.SetEnable(false);
-                }
+                unbindItem = UnbindItem
             };
             
             
@@ -336,6 +324,34 @@ namespace RosettaUI.UIToolkit.Builder
 
 
             return listView;
+
+            
+            void BindItem(VisualElement ve, int idx)
+            {
+                ve.Clear();
+
+                var e = listViewElement.GetOrCreateItemElement(idx);
+                e.SetEnable(true);
+
+                var itemVe = GetUIObj(e);
+                if (itemVe == null)
+                {
+                    itemVe = Build(e);
+                    ApplyIndent(itemVe);
+                }
+                else
+                {
+                    e.Update();　// 表示前に最新の値をUIに通知
+                }
+
+                ve.Add(itemVe);
+            }
+            
+            void UnbindItem(VisualElement _, int idx)
+            {
+                var e = listViewElement.GetOrCreateItemElement(idx);
+                e.SetEnable(false);
+            }
         }
 
         private VisualElement Build_ElementGroupContents(VisualElement container, Element element, Action<VisualElement, int> setupContentsVe = null)

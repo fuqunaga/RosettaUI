@@ -25,9 +25,5 @@ namespace RosettaUI
         public Type ValueType => typeof(T);
 
         public T Get() => _obj;
-
-        public void ClearCache()
-        {
-        }
     }
 }

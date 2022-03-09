@@ -30,12 +30,6 @@ namespace RosettaUI
             parent = SetToParent(parent, value);
             parentBinder.Set(parent);
         }
-        
-        public override void ClearCache()
-        {
-            base.ClearCache();
-            parentBinder.ClearCache();
-        }
     }
 
     public class ChildBinder<TParent, TValue> : ChildBinderBase<TParent, TValue>

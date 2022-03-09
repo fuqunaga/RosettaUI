@@ -19,12 +19,6 @@ namespace RosettaUI
 
         protected override TValue GetRaw() => GetFromChild(parentGetter.Get());
 
-        public override void ClearCache()
-        {
-            base.ClearCache();
-            parentGetter.ClearCache();
-        }
-
         public override bool IsNull => parentGetter.IsNull;
         public override bool IsNullable => parentGetter.IsNullable;
         public override bool IsConst => parentGetter.IsConst;

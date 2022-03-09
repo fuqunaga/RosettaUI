@@ -35,8 +35,6 @@ namespace RosettaUI
 
         public virtual T Get() => getter.Get();
 
-        public virtual void ClearCache() => getter.ClearCache();
-
         #endregion
 
 

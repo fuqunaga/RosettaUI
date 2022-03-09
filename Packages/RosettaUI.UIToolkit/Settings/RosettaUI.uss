@@ -7,10 +7,10 @@
     --close-icon: resource("close");
     
     --rosettaui-gray-button-tint: #A0A0A0;
-    --rosettaui-color-box-background: rgba(100,100,100,0.3);
     --rosettaui-highlight-gray: #808080;
     --rosettaui-highlight-dark-gray: #606060;
     --rosettaui-highlight-blue: rgb(0, 150, 230);
+    --rosettaui-highlight-dark-blue: var(--unity-colors-highlight-background);
 
     --rosettaui-slider-tracker-height: 4px;
     --rosettaui-slider-tracker-margin-top: -2px; /* half of height */
@@ -23,6 +23,8 @@
     --rosettaui-scroller-size: 18px;
     
     --rosettaui-color-input-background: #181818;
+    --rosettaui-color-box-background: rgba(100,100,100,0.3);
+    --rosettaui-color-list-background: var(--rosettaui-color-box-background);
     
     font-size: 18px;
     color: var(--unity-colors-default-text);

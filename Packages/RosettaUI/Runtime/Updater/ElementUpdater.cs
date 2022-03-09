@@ -52,12 +52,15 @@ namespace RosettaUI
         public void Update()
         {
             ProcessQueue();
-            
+
+            Getter.EnableCache();
+
             foreach (var e in _elements)
             {
-                e.ClearGetterCache();
                 e.Update();
             }
+            
+            Getter.DisableCache();
         }
 
         /// <summary>

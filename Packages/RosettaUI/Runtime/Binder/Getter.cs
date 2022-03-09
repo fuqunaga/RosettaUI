@@ -5,6 +5,20 @@ namespace RosettaUI
     public static class Getter
     {
         public static Getter<T> Create<T>(Func<T> func) => new(func);
+        
+        public static bool CacheEnable { get; private set; }
+        public static uint CacheId { get; private set; }
+
+        public static void EnableCache()
+        {
+            CacheEnable = true;
+            CacheId++;
+        }
+
+        public static void DisableCache()
+        {
+            CacheEnable = false;
+        }
     }
 
     public class Getter<T> : GetterBase<T>

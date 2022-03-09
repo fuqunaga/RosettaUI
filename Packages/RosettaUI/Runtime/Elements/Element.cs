@@ -60,19 +60,6 @@ namespace RosettaUI
             _children.Remove(element);
         }
 
-        public virtual void ClearGetterCache()
-        {
-            ClearGetterCacheInternal();
-            foreach (var element in _children)
-            {
-                element.ClearGetterCache();
-            }
-        }
-        
-        protected virtual void ClearGetterCacheInternal()
-        {
-        }
-
         public virtual void Update()
         {
             if (Enable || UpdateWhileDisabled) UpdateInternal();

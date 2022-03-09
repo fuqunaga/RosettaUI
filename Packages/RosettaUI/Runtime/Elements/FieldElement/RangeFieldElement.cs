@@ -32,12 +32,5 @@ namespace RosettaUI
             if (!IsMinConst) minRx.Value = _minGetter.Get();
             if (!IsMaxConst) maxRx.Value = _maxGetter.Get();
         }
-
-        protected override void ClearGetterCacheInternal()
-        {
-            base.ClearGetterCacheInternal();
-            _minGetter.ClearCache();
-            _maxGetter.ClearCache();
-        }
     }
 }

@@ -4,21 +4,21 @@ namespace RosettaUI
 {
     public abstract class GetterBase<T> : IGetter<T>
     {
-        private bool _hasCache;
+        private uint _cacheId;
         private T _cache;
 
         public virtual T Get()
         {
-            if (!_hasCache)
+            if (!Getter.CacheEnable) return GetRaw();
+
+            if (Getter.CacheId != _cacheId)
             {
                 _cache = GetRaw();
-                _hasCache = true;
+                _cacheId = Getter.CacheId;
             }
-            
+
             return _cache;
         }
-
-        public virtual void ClearCache() => _hasCache = false;
 
         protected abstract T GetRaw();
         public abstract bool IsNull { get; }

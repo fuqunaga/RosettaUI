@@ -1,6 +1,6 @@
 ﻿using UnityEngine.UIElements;
 
-namespace UnityInternalAccess.Custom
+namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
     /// <summary>
     /// MinMaxSliderCustom

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine.UIElements;
 
-namespace UnityInternalAccess.Custom
+namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
     public class PopupFieldCustomMenu<T> : PopupField<T>
     {

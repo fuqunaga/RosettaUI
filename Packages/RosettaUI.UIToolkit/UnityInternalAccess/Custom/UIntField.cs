@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Globalization;
-using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine;
 
-namespace RosettaUI.UIToolkit
+namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
     public class UIntField : TextValueField<uint>
     {

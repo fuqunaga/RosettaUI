@@ -1,5 +1,3 @@
-#define AvoidInternal
-
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.UnityInternalAccess

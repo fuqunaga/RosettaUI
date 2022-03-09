@@ -111,8 +111,6 @@ namespace RosettaUI
             return resistedNames;
         }
 
-        public static Type GetListItemType(Type type) => GetReflectionCache(type).listItemType;
-
 
         #region MinMax
         
@@ -179,18 +177,11 @@ namespace RosettaUI
         
         private class ReflectionCache
         {
-            public readonly Type listItemType;
-
             public readonly Dictionary<string, MemberData> memberDataTable;
             public readonly Dictionary<string, Type> uiTargetPropertyOrFieldsNameTypeDic;
 
             public ReflectionCache(Type type, IReadOnlyCollection<FieldInfo> fis, IEnumerable<PropertyInfo> pis)
             {
-                listItemType = type.GetInterfaces().Concat(new[] {type})
-                    .Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IList<>))
-                    .Select(t => t.GetGenericArguments().First())
-                    .FirstOrDefault();
-                
                 memberDataTable = fis.Select(fi => (fi as MemberInfo, fi.FieldType))
                     .Concat(pis.Select(pi => (pi as MemberInfo, pi.PropertyType)))
                     .ToDictionary(

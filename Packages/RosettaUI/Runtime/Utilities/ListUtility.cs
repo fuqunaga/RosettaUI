@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
@@ -7,6 +9,23 @@ namespace RosettaUI
 {
     public static class ListUtility
     {
+        private static readonly Dictionary<Type, Type> ListItemTypeTable = new();
+        
+        public static Type GetItemType(Type type)
+        {
+            if (!ListItemTypeTable.TryGetValue(type, out var itemType))
+            {
+                itemType = type.GetInterfaces().Concat(new[] {type})
+                    .Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IList<>))
+                    .Select(t => t.GetGenericArguments().First())
+                    .FirstOrDefault();
+
+                ListItemTypeTable[type] = itemType;
+            }
+
+            return itemType;
+        } 
+        
         public static IList AddItemAtLast(IList list, Type type, Type itemType)
         {
             if (list == null)
@@ -14,7 +33,7 @@ namespace RosettaUI
                 list = (IList)Activator.CreateInstance(type, 0);
             }
 
-            var baseItem = list.Count > 0 ? list[list.Count - 1] : null;
+            var baseItem = list.Count > 0 ? list[^1] : null;
 
             return AddItem(list, itemType, baseItem, list.Count);
         }

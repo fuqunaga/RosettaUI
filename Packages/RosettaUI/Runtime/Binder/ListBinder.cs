@@ -84,7 +84,7 @@ namespace RosettaUI
         {
             var list = GetIList(binder);
             
-            var itemType = TypeUtility.GetListItemType(binder.ValueType);
+            var itemType = ListUtility.GetItemType(binder.ValueType);
             
             list = ListUtility.AddItem(list, itemType, list[index], index);
             binder.SetObject(list);
@@ -94,7 +94,7 @@ namespace RosettaUI
         {
             var list = GetIList(binder);
             
-            var itemType = TypeUtility.GetListItemType(binder.ValueType);
+            var itemType = ListUtility.GetItemType(binder.ValueType);
             
             list = ListUtility.RemoveItem(list, itemType, index);
             binder.SetObject(list);
@@ -105,7 +105,7 @@ namespace RosettaUI
             var list = GetIList(binder);
             
             var listType = binder.ValueType;
-            var itemType = TypeUtility.GetListItemType(binder.ValueType);
+            var itemType = ListUtility.GetItemType(binder.ValueType);
 
 
             list = ListUtility.AddItemAtLast(list, listType, itemType);
@@ -116,7 +116,7 @@ namespace RosettaUI
         {
             var list = GetIList(binder);
             
-            var itemType = TypeUtility.GetListItemType(binder.ValueType);
+            var itemType = ListUtility.GetItemType(binder.ValueType);
             list = ListUtility.RemoveItemAtLast(list, itemType);
             binder.SetObject(list);
         }

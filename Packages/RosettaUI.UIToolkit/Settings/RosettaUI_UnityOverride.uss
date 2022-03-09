@@ -512,6 +512,8 @@
 .unity-list-view__reorderable-handle
 {
     min-width: 26px;
+    top: 15px;
+    justify-content: flex-start;
     align-items: center;
 }   
 

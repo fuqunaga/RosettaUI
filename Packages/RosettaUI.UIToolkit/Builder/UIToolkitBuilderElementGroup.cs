@@ -297,13 +297,14 @@ namespace RosettaUI.UIToolkit.Builder
                 virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
                 unbindItem = UnbindItem
             };
-            
-            
+
             ApplyMinusIndentIfPossible(listView, listViewElement);
             listView.ScheduleToUseResolvedLayoutBeforeRendering(() => ApplyIndent(listView.Q<Foldout>().contentContainer));
             
             listViewElement.Label.SubscribeValueOnUpdateCallOnce(str => listView.headerTitle = str);
+            UIToolkitUtility.SetAcceptClicksIfDisabled(listView.Q<Toggle>());
 
+            
             var lastListItemCount = listViewElement.GetListItemCount();
             
             listView.itemsSourceChanged += () =>

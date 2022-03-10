@@ -84,7 +84,7 @@ namespace RosettaUI
                 readStatus: () => ListBinder.GetCount(listBinder),
                 build: _ =>
                 {
-                    createItemElement ??= ((binder, idx) => Field("Item " + idx, binder));
+                    createItemElement ??= ((binder, idx) => Field("Element " + idx, binder));
 
                     var itemBinderToElement = createItemElement;
 
@@ -92,6 +92,7 @@ namespace RosettaUI
                     if (!isReadOnly)
                     {
                         itemBinderToElement = (binder,idx) => {
+#if false
                             var element = Popup(
                                 createItemElement(binder, idx),
                                 () => new[]
@@ -100,8 +101,12 @@ namespace RosettaUI
                                     new MenuItem("Remove Element", () => ListBinder.RemoveItem(listBinder, idx)),
                                 }
                             );
+
                             
                             return element;
+#else
+                            return ListViewElement.AddPopupMenu(createItemElement(binder, idx), binder, idx);
+#endif
                         };
                     }
 

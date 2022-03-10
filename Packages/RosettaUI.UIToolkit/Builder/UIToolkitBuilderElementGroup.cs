@@ -304,18 +304,28 @@ namespace RosettaUI.UIToolkit.Builder
             listViewElement.Label.SubscribeValueOnUpdateCallOnce(str => listView.headerTitle = str);
             UIToolkitUtility.SetAcceptClicksIfDisabled(listView.Q<Toggle>());
 
+
+            var lastListItemCount = listView.itemsSource.Count;
             
-            var lastListItemCount = listViewElement.GetListItemCount();
             
-            listView.itemsSourceChanged += () =>
-            {
-                listViewElement.SetIList(listView.itemsSource);
-                lastListItemCount = listViewElement.GetListItemCount();
-            };
+            // list が Array の場合、参照先が変わる
+            // ListView 内で変更される場合も、Inspector などで ListView 外で変わる場合もある
+            
+            // ListView 内での参照先変更を通知
+            listView.itemsSourceChanged += () => listViewElement.SetIList(listView.itemsSource);
             
             listViewElement.onUpdate += _=>
             {
-                var listItemCount = listViewElement.GetListItemCount();
+                var list = listViewElement.GetIList();
+                
+                // ListView 外での参照先変更を ListView に通知
+                if (listView.itemsSource != list)
+                {
+                    listView.itemsSource = list;
+                }
+                
+                // ListView 外での要素数の変更を通知
+                var listItemCount = listView.itemsSource.Count;
                 if ( lastListItemCount != listItemCount)
                 {
                     lastListItemCount = listItemCount;
@@ -323,13 +333,15 @@ namespace RosettaUI.UIToolkit.Builder
                 }
             };
 
-
             return listView;
 
             
             void BindItem(VisualElement ve, int idx)
             {
-                ve.Clear();
+                Debug.Log(nameof(BindItem) + idx);
+                
+                if ( ve.childCount > 0)
+                ve.RemoveAt(0);
 
                 var e = listViewElement.GetOrCreateItemElement(idx);
                 e.SetEnable(true);
@@ -350,6 +362,8 @@ namespace RosettaUI.UIToolkit.Builder
             
             void UnbindItem(VisualElement _, int idx)
             {
+                Debug.Log(nameof(UnbindItem) + idx);
+                
                 var e = listViewElement.GetOrCreateItemElement(idx);
                 e.SetEnable(false);
             }

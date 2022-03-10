@@ -27,7 +27,18 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         {
         }
 
-        public void OnListSizeChangedExternal() => RefreshItems();
+        /// <summary>
+        /// refs:
+        /// BaseListView.OnItemsSourceSizeChanged()
+        /// https://github.com/Unity-Technologies/UnityCsReference/blob/d0fe81a19ce788fd1d94f826cf797aafc37db8ea/ModuleOverrides/com.unity.ui/Core/Controls/BaseListView.cs#L420-L426
+        /// </summary>
+        public void OnListSizeChangedExternal()
+        {
+            if (itemsSource.IsFixedSize)
+                Rebuild();
+            else
+                RefreshItems();
+        }
 
 
         #region Avoid error when IList item is ValueType

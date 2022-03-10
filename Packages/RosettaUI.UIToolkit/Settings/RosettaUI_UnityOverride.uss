@@ -473,6 +473,13 @@
 /********************************************************************************
 * ListView
 ********************************************************************************/
+.unity-list-view__empty-label
+{
+    height: 34px;
+    padding-left: 8px;
+    background-color: var(--rosettaui-color-list-background);
+}
+
 .unity-foldout__toggle > .unity-toggle__input:focus > .unity-label
 {
     color: var(--unity-colors-default-text); /* remove unity default */

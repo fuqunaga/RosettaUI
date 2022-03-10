@@ -313,6 +313,8 @@ namespace RosettaUI.UIToolkit.Builder
             
             // ListView 内での参照先変更を通知
             listView.itemsSourceChanged += () => listViewElement.SetIList(listView.itemsSource);
+
+            listView.itemsSourceSizeChanged += () => lastListItemCount = listView.itemsSource.Count;
             
             listViewElement.onUpdate += _=>
             {
@@ -340,8 +342,7 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 Debug.Log(nameof(BindItem) + idx);
                 
-                if ( ve.childCount > 0)
-                ve.RemoveAt(0);
+                ve.Clear();
 
                 var e = listViewElement.GetOrCreateItemElement(idx);
                 e.SetEnable(true);

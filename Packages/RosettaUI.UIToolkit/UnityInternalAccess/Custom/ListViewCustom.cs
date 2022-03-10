@@ -14,6 +14,8 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
     /// </summary>
     public class ListViewCustom : ListView
     {
+        public event Action itemsSourceSizeChanged;
+        
         public ListViewCustom() : base()
         {
         }
@@ -25,6 +27,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             Action<VisualElement, int> bindItem = null)
             : base(itemsSource, itemHeight, makeItem, bindItem)
         {
+            viewController.itemsSourceSizeChanged += () => itemsSourceSizeChanged?.Invoke();
         }
 
         /// <summary>
@@ -104,8 +107,11 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
                     CollectionPool<List<int>, int>.Release(intList);
                 }
                 this.RaiseOnSizeChanged();
-                if (!this.itemsSource.IsFixedSize)
-                    return;
+                
+                // これがあるとアイテムをAddしたときにちらつく
+                // if (!this.itemsSource.IsFixedSize)
+                //     return;
+                
                 this.view.Rebuild();
             }
         }

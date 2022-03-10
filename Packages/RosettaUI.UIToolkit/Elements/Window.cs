@@ -1,8 +1,6 @@
 using System;
-using RosettaUI.Reactive;
 using UnityEngine;
 using UnityEngine.UIElements;
-
 
 namespace RosettaUI.UIToolkit
 {
@@ -207,16 +205,33 @@ namespace RosettaUI.UIToolkit
 
         #region DragWindow
 
+        private bool _beforeDrag;
+        
         void StartDragWindow(Vector2 localPosition)
         {
             _dragMode = DragMode.DragWindow;
             _draggingLocalPosition = localPosition;
+
+            _beforeDrag = true;
         }
 
 
         void UpdateDragWindow(Vector2 position)
         {
             var pos = position - _draggingLocalPosition;
+            
+            // ListView の reorderable でアイテムをドラッグするときに Window が少し動いてしまう問題対策
+            // ListView は一定距離 PointerMove で移動しないとドラッグ判定にはならないためその間 Window のドラッグが成立してしまう
+            // Window も遊びを入れることで対処
+            // refs: https://github.com/Unity-Technologies/UnityCsReference/blob/9b50c8698e84387d83073f53e07524cfc31dd919/ModuleOverrides/com.unity.ui/Core/DragAndDrop/DragEventsProcessor.cs#L204-L205
+            if (_beforeDrag)
+            {
+                var current = new Vector2(resolvedStyle.left, resolvedStyle.top);
+                var diff = pos - current;
+
+                if (Mathf.Abs(diff.x) < 5f && Mathf.Abs(diff.y) < 5f) return;
+                _beforeDrag = false;
+            }
 
             style.left = pos.x;
             style.top = pos.y;

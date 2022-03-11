@@ -72,7 +72,7 @@ namespace RosettaUI.UIToolkit.Builder
             var ve = new VisualElement();
             Build_ElementGroupContents(ve, contextMenuElement);
 
-            ve.RegisterCallback<MouseDownEvent>(evt =>
+            ve.RegisterCallback<PointerDownEvent>(evt =>
             {
                 if (evt.button == 1)
                 {
@@ -88,8 +88,9 @@ namespace RosettaUI.UIToolkit.Builder
                             else menu.AddDisabledItem(item.name, item.isChecked);
                         }
 
-                        menu.DropDown(new Rect(){position = evt.mousePosition}, ve);
+                        menu.DropDown(new Rect(){position = evt.position}, ve);
                         evt.StopPropagation();
+                        evt.PreventDefault();
                     }
                 }
             });

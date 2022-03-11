@@ -61,7 +61,7 @@
     cursor: initial;
 }
 
-.unity-base-field__label--with-dragger:hover
+.unity-base-field__label--with-dragger:hover:enabled
 {
     cursor: var(--cursor-resize-horizontal) 29 4;
 }

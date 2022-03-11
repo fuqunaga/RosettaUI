@@ -340,8 +340,6 @@ namespace RosettaUI.UIToolkit.Builder
             
             void BindItem(VisualElement ve, int idx)
             {
-                Debug.Log(nameof(BindItem) + idx);
-                
                 ve.Clear();
 
                 var e = listViewElement.GetOrCreateItemElement(idx);
@@ -363,8 +361,6 @@ namespace RosettaUI.UIToolkit.Builder
             
             void UnbindItem(VisualElement _, int idx)
             {
-                Debug.Log(nameof(UnbindItem) + idx);
-                
                 var e = listViewElement.GetOrCreateItemElement(idx);
                 e.SetEnable(false);
             }

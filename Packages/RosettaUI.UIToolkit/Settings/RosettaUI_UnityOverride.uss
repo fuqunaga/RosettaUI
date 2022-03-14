@@ -473,11 +473,15 @@
 /********************************************************************************
 * ListView
 ********************************************************************************/
+.unity-collection-view__scroll-view
+{
+    background-color: var(--rosettaui-color-list-background);
+}
+
 .unity-list-view__empty-label
 {
     height: 34px;
     padding-left: 8px;
-    background-color: var(--rosettaui-color-list-background);
 }
 
 .unity-foldout__toggle > .unity-toggle__input:focus > .unity-label
@@ -490,7 +494,7 @@
 .unity-collection-view__item:hover:enabled,
 .unity-collection-view__item--selected
 {
-    background-color: var(--rosettaui-color-list-background);
+    background-color: transparent; /* remove unity default */
 }
 
 .unity-collection-view:focus .unity-collection-view__item--selected

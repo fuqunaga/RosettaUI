@@ -30,6 +30,37 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             viewController.itemsSourceSizeChanged += () => itemsSourceSizeChanged?.Invoke();
         }
 
+        #region 画面外 Drag 対策
+        
+        /// <summary>
+        /// ListViewDragger/ListViewDraggerAnimated はアイテムをドラッグした状態で GameView 外で PointerUpしても認識できず中途半端な状態でDragを継続しようとしてしまう
+        /// ListViewDraggerAnimated はそのまま操作すると表示が崩れる場合がある
+        /// 
+        /// 対策
+        /// 　Drag 中の PointerMove イベントでボタンを押していなければ Drag 中断する対策を行う
+        /// </summary>
+        
+        internal override ListViewDragger CreateDragger() => reorderMode == ListViewReorderMode.Simple ? new ListViewDragger(this) : new ListViewDraggerAnimatedCustom(this);
+
+        private class ListViewDraggerAnimatedCustom : ListViewDraggerAnimated
+        {
+            public ListViewDraggerAnimatedCustom(BaseVerticalCollectionView listView) : base(listView)
+            {
+                m_Target.RegisterCallback<PointerMoveEvent>(CheckButtonIsKeptDown);
+            }
+
+            private void CheckButtonIsKeptDown(PointerMoveEvent evt)
+            {
+                if (m_Target.HasPointerCapture(evt.pointerId) && (evt.pressedButtons & 0x01) == 0)
+                {
+                    using var e = PointerUpEvent.GetPooled(evt);
+                    OnPointerUpEvent(e);
+                }
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// refs:
         /// BaseListView.OnItemsSourceSizeChanged()
@@ -70,8 +101,8 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             public override void AddItems(int itemCount)
             {
                 this.EnsureItemSourceCanBeResized();
-                int count = this.itemsSource.Count;
-                List<int> intList = CollectionPool<List<int>, int>.Get();
+                var count = this.itemsSource.Count;
+                var intList = CollectionPool<List<int>, int>.Get();
                 try
                 {
 #if true
@@ -86,8 +117,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
 #else
                     if (this.itemsSource.IsFixedSize)
                     {
-                        this.itemsSource =
- (IList) ListViewControllerCustom.AddToArray((Array) this.itemsSource, itemCount);
+                        this.itemsSource = (IList) ListViewControllerCustom.AddToArray((Array) this.itemsSource, itemCount);
                         for (int index = 0; index < itemCount; ++index)
                             intList.Add(count + index);
                     }

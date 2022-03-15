@@ -155,6 +155,8 @@ namespace RosettaUI.UIToolkit.Builder
             public static readonly string MinMaxSlider = RosettaUI + "-min-max-slider";
            
             public static readonly string Space = RosettaUI + "-space";
+            
+            public static readonly string DynamicElement = RosettaUI + "-dynamic-element";
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace RosettaUI
 {
@@ -20,19 +19,6 @@ namespace RosettaUI
 
         public static BoxElement Box(IEnumerable<Element> elements) => new(elements);
 
-        
-        public static ScrollViewElement ScrollView(params Element[] elements) => ScrollView(elements.AsEnumerable());
-
-        public static ScrollViewElement ScrollView(ScrollViewType scrollViewType, params Element[] elements) =>
-            ScrollView(scrollViewType, elements.AsEnumerable());
-
-        public static ScrollViewElement ScrollView(IEnumerable<Element> elements) =>
-            ScrollView(ScrollViewType.VerticalAndHorizontal, elements);
-
-        public static ScrollViewElement ScrollView(ScrollViewType scrollViewType, IEnumerable<Element> elements) =>
-            new ScrollViewElement(elements, scrollViewType);
-
-        
         public static IndentElement Indent(params Element[] elements) => Indent(elements.AsEnumerable());
 
         public static IndentElement Indent(IEnumerable<Element> elements, int level = 1) => new(elements, level);

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace RosettaUI.Example
 {
@@ -101,65 +102,75 @@ namespace RosettaUI.Example
                         ExampleTemplate.BlankLine(),
                         ExampleTemplate.TitleIndent("Vertical",
                             UI.Box(
-                                UI.ScrollView(
-                                    ScrollViewType.Vertical,
+                                UI.ScrollViewVertical(300f,
                                     UI.DynamicElementOnStatusChanged(
                                         () => scrollViewItemCount,
                                         count => UI.Column(
                                             Enumerable.Range(0, count)
-                                                .Select(i => UI.Field("Item" + i, () => i.ToString()))
+                                                .Select(i =>
+                                                {
+                                                    var str = i.ToString();
+                                                    return UI.Field("Item" + str, () => str);
+                                                })
                                         )
                                     )
-                                ).SetHeight(300f)
+                                )
                             )
                         ),
                         ExampleTemplate.TitleIndent("Horizontal",
                             UI.Box(
-                                UI.ScrollView(
-                                    ScrollViewType.Horizontal,
+                                UI.ScrollViewHorizontal(700f,
                                     UI.DynamicElementOnStatusChanged(
                                         () => scrollViewItemCount,
                                         count => UI.Row(
-                                            Enumerable.Range(0, count).Select(i => UI.Column(
-                                                    UI.Label("Item" + i),
-                                                    UI.Field(null, () => i.ToString())
-                                                )
+                                            Enumerable.Range(0, count).Select(i =>
+                                                {
+                                                    var str = i.ToString();
+                                                    return UI.Column(
+                                                        UI.Label("Item" + str),
+                                                        UI.Field(null, () => str)
+                                                    );
+                                                }
                                             )
                                         )
                                     )
-                                ).SetWidth(700f)
+                                )
                             )
                         ),
                         
                         ExampleTemplate.TitleIndent("VerticalAndHorizontal",
                             UI.Box(
-                                UI.ScrollView(
-                                    ScrollViewType.VerticalAndHorizontal,
+                                UI.ScrollViewVerticalAndHorizontal(700f, 300f,
                                     UI.DynamicElementOnStatusChanged(
                                         () => scrollViewItemCount,
                                         count =>
                                         {
-                                            var rows = new List<Element>();
-
-                                            const int chunkSize = 5;
-                                            var i = 0;
-                                            for (var remain = count; remain > 0; remain -= chunkSize)
+                                            using (CollectionPool<List<Element>, Element>.Get(out var rows))
                                             {
-                                                var size = Mathf.Min(chunkSize, remain);
-                                                rows.Add(
-                                                    UI.Row(
-                                                        Enumerable.Range(0, size).Select(_ =>
-                                                            UI.Field(
-                                                                UI.Label("Item" + (i++), LabelType.Standard),
-                                                                () => i.ToString()))
-                                                    )
-                                                );
-                                            }
+                                                const int chunkSize = 5;
+                                                var i = 0;
+                                                for (var remain = count; remain > 0; remain -= chunkSize)
+                                                {
+                                                    var size = Mathf.Min(chunkSize, remain);
+                                                    rows.Add(
+                                                        UI.Row(
+                                                            Enumerable.Range(0, size).Select(_ =>
+                                                            {
+                                                                var idx = i++;
+                                                                var str = idx.ToString();
+                                                                return UI.Field(
+                                                                    UI.Label("Item" + idx, LabelType.Standard),
+                                                                    () => str);
+                                                            })
+                                                        )
+                                                    );
+                                                }
 
-                                            return UI.Column(rows);
+                                                return UI.Column(rows);
+                                            }
                                         }
                                     )
-                                ).SetWidth(700f).SetHeight(300f)
+                                )
                             )
                         )
                     )

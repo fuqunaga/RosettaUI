@@ -152,33 +152,7 @@ namespace RosettaUI.Example
                     )
                 )
                 */
-                UI.Fold("List",
-                    UI.List(
-                        () => arrayValue,
-                        (itemBinder, idx) => UI.Row(
-                            UI.Field("Item " + idx, itemBinder),
-                            UI.Button("+", () => arrayValue[idx]++),
-                            UI.Button("-", () => arrayValue[idx]--)
-                        )
-                    ),
-                    UI.List(
-                        () => listValue,
-                        (itemBinder, idx) => UI.Row(
-                            UI.Field("Item " + idx, itemBinder),
-                            UI.Button("+", () => listValue[idx]++),
-                            UI.Button("-", () => listValue[idx]--)
-                        )
-                    ),
-                    UI.List("ReadOnlyList",
-                        () => listValue.AsReadOnly(),
-                        (itemBinder, idx) => UI.Row(
-                            UI.Field("Item " + idx, itemBinder),
-                            UI.Button("+", () => listValue[idx]++),
-                            UI.Button("-", () => listValue[idx]--)
-                        )
-                    ),
-                    UI.ListReadOnly(() => listValue)
-                ),
+       
                 UI.Fold(UI.Field("CustomBar", () => boolValue), null),
                 UI.Fold(UI.Button("LeftBar"), UI.Button("RightBar"), null),
                 

@@ -28,6 +28,10 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             : base(itemsSource, itemHeight, makeItem, bindItem)
         {
             viewController.itemsSourceSizeChanged += () => itemsSourceSizeChanged?.Invoke();
+            
+            // disable scroll view
+            scrollView.verticalScrollerVisibility = ScrollerVisibility.Hidden;
+            scrollView.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
         }
 
         #region 画面外 Drag 対策

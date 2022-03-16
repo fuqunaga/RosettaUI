@@ -53,12 +53,14 @@
 ********************************************************************************/
 .rosettaui-window {
     --rosettaui-window-color: rgba(45, 45, 45, 0.9);
-    --rosettaui-window-border-width: 4px;
+    --rosettaui-window-border-width: 2px;
+    --rosettaui-window-border-color: rgba(5, 5, 5, 0.2);
 
     background-color: var(--rosettaui-window-color);
     position: absolute;
     border-radius: 1px;
     border-width: var(--rosettaui-window-border-width);
+    border-color: var(--rosettaui-window-border-color);
     /*padding-left: 15px;*/
 }
 

@@ -303,10 +303,11 @@ namespace RosettaUI.UIToolkit
 
         ResizeEdge CalcEdge(Vector2 localPosition)
         {
-            var top = localPosition.y <= resolvedStyle.borderTopWidth;
-            var bottom = localPosition.y >= resolvedStyle.height - resolvedStyle.borderBottomWidth;
-            var left = localPosition.x <= resolvedStyle.borderLeftWidth;
-            var right = localPosition.x >= resolvedStyle.width - resolvedStyle.borderRightWidth;
+            const float edgeWidth = 4f;
+            var top = localPosition.y <= edgeWidth;
+            var bottom = localPosition.y >= resolvedStyle.height - edgeWidth;
+            var left = localPosition.x <= edgeWidth;
+            var right = localPosition.x >= resolvedStyle.width - edgeWidth;
 
             var edge = ResizeEdge.None;
             if (top)

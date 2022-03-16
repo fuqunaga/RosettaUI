@@ -26,13 +26,13 @@ namespace RosettaUI.Editors
         {
             if (_isOpen)
             {
-                UpdateDatas();
+                UpdateDataList();
             }
         }
 
 
-        private List<(string, bool)> _updateDataList = new List<(string, bool)>();
-        private void UpdateDatas()
+        private List<(string, bool)> _updateDataList = new();
+        private void UpdateDataList()
         {
             var root = target as RosettaUIRoot;
             if (root != null)

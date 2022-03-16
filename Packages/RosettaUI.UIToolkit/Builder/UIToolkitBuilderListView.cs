@@ -105,8 +105,6 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 if (srcIdx == dstIdx) return;
                 
-                Debug.Log($"{srcIdx} > {dstIdx}");
-                
                 var src = GetUIObj(listViewElement.GetContentAt(srcIdx));              
                 var srcFolds = src.Query<Foldout>().Build();
                 var srcFoldValues = srcFolds.Select(f => f.value).ToList();

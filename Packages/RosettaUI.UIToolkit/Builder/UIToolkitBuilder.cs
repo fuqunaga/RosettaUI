@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using RosettaUI.Builder;
 using RosettaUI.UIToolkit.UnityInternalAccess;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -53,13 +54,16 @@ namespace RosettaUI.UIToolkit.Builder
 
         protected override IReadOnlyDictionary<Type, Func<Element, VisualElement>> BuildFuncTable => _buildFuncTable;
 
-        
+
         protected override void CalcPrefixLabelWidthWithIndent(LabelElement label, VisualElement ve)
         {
-            ve.ScheduleToUseResolvedLayoutBeforeRendering(() =>
+            // ve.ScheduleToUseResolvedLayoutBeforeRendering(() => // こちらだとFold内のListで１つめの要素のインデントが崩れるのでGeometryChangedEventで常に呼んでおく
+            ve.RegisterCallback<GeometryChangedEvent>(evt =>
             {
+                if (evt.oldRect == evt.newRect) return;
+
                 var marginLeft = ve.worldBound.xMin;
-                
+
                 for (var element = label.Parent;
                      element != null;
                      element = element.Parent)
@@ -70,7 +74,7 @@ namespace RosettaUI.UIToolkit.Builder
                         break;
                     }
                 }
-                
+
                 ve.style.minWidth = LayoutSettings.LabelWidth - marginLeft;
             });
         }

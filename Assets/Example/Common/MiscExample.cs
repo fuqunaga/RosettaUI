@@ -33,12 +33,6 @@ namespace RosettaUI.Example
         public bool dynamicElementIf;
 
         
-
-        
-
-
-
-        
         public Element CreateElement()
         {
             UICustom.RegisterElementCreationFunc<UICustomClass>((uiCustomClass) =>

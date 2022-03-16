@@ -473,6 +473,11 @@
 /********************************************************************************
 * ListView
 ********************************************************************************/
+.unity-collection-view
+{
+    max-height: initial; /* remove unity default */
+}
+
 .unity-collection-view__scroll-view
 {
     background-color: var(--rosettaui-color-list-background);
@@ -541,8 +546,6 @@
 .unity-list-view__footer > .unity-button:hover {
     background-color: var(--unity-colors-button-background-hover);
 }
-
-
 
 .unity-list-view__size-field
 {

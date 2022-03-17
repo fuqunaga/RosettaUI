@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
@@ -22,7 +23,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
 
         public ListViewCustom(
             IList itemsSource,
-            float itemHeight = -1f,
+            float itemHeight = ItemHeightUnset,
             Func<VisualElement> makeItem = null,
             Action<VisualElement, int> bindItem = null)
             : base(itemsSource, itemHeight, makeItem, bindItem)
@@ -33,37 +34,6 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             scrollView.verticalScrollerVisibility = ScrollerVisibility.Hidden;
             scrollView.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
         }
-
-        #region 画面外 Drag 対策
-        
-        /// <summary>
-        /// ListViewDragger/ListViewDraggerAnimated はアイテムをドラッグした状態で GameView 外で PointerUpしても認識できず中途半端な状態でDragを継続しようとしてしまう
-        /// ListViewDraggerAnimated はそのまま操作すると表示が崩れる場合がある
-        /// 
-        /// 対策
-        /// 　Drag 中の PointerMove イベントでボタンを押していなければ Drag 中断する対策を行う
-        /// </summary>
-        
-        internal override ListViewDragger CreateDragger() => reorderMode == ListViewReorderMode.Simple ? new ListViewDragger(this) : new ListViewDraggerAnimatedCustom(this);
-
-        private class ListViewDraggerAnimatedCustom : ListViewDraggerAnimated
-        {
-            public ListViewDraggerAnimatedCustom(BaseVerticalCollectionView listView) : base(listView)
-            {
-                m_Target.RegisterCallback<PointerMoveEvent>(CheckButtonIsKeptDown);
-            }
-
-            private void CheckButtonIsKeptDown(PointerMoveEvent evt)
-            {
-                if (m_Target.HasPointerCapture(evt.pointerId) && (evt.pressedButtons & 0x01) == 0)
-                {
-                    using var e = PointerUpEvent.GetPooled(evt);
-                    OnPointerUpEvent(e);
-                }
-            }
-        }
-
-        #endregion
 
         /// <summary>
         /// refs:
@@ -78,6 +48,55 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
                 RefreshItems();
         }
 
+        #region 画面外 Drag 対策 / サイズの異なるアイテムの移動でScrolViewの高さがおかしくなる対策
+        
+        /// <summary>
+        /// 1. ListViewDragger/ListViewDraggerAnimated はアイテムをドラッグした状態で GameView 外で PointerUpしても認識できず中途半端な状態でDragを継続しようとしてしまう
+        /// 2. ListViewDraggerAnimated は高さの異なる Item が２つある状態で移動すると ScrollView 全体の高さがどちらかの2倍？になることがある（すばやく Drag&Drop すると発生しやすい）
+        ///
+        /// 対策
+        /// 1. Drag 中の PointerMove イベントでボタンを押していなければ Drag 中断する対策を行う
+        /// 2. OnDrop() で Rebuild() する（要素を一度消してサイズを再計算させる）
+        /// </summary>
+        
+        internal override ListViewDragger CreateDragger() => reorderMode == ListViewReorderMode.Simple ? new ListViewDragger(this) : new ListViewDraggerAnimatedCustom(this);
+
+        private class ListViewDraggerAnimatedCustom : ListViewDraggerAnimated
+        {
+            // 1.
+            public ListViewDraggerAnimatedCustom(BaseVerticalCollectionView listView) : base(listView)
+            {
+                m_Target.RegisterCallback<PointerMoveEvent>(CheckButtonIsKeptDown);
+            }
+
+            private void CheckButtonIsKeptDown(PointerMoveEvent evt)
+            {
+                if (m_Target.HasPointerCapture(evt.pointerId) && (evt.pressedButtons & 0x01) == 0)
+                {
+                    using var e = PointerUpEvent.GetPooled(evt);
+                    OnPointerUpEvent(e);
+                }
+            }
+
+            // 2.
+            protected override void OnDrop(Vector3 pointerPosition)
+            {
+                base.OnDrop(pointerPosition);
+                
+                // Rebuild() で消したアイテムは通常は DynamicHeightVirtualizationController 内で schedule.Execute() で復活するので１フレームアイテムが無い状態で表示されてしまう
+                // https://github.com/Unity-Technologies/UnityCsReference/blob/d0fe81a19ce788fd1d94f826cf797aafc37db8ea/ModuleOverrides/com.unity.ui/Core/Collections/Virtualization/DynamicHeightVirtualizationController.cs#L49
+                targetListView.Rebuild();
+
+                // Rebuild() で消したアイテムをすぐ復活させるため DynamicHeightVirtualizationController.Fill() を呼びたい
+                // 内部で Fill() が呼ばれるように DynamicHeightVirtualizationController.Resize(size,0) を呼ぶ
+                var size = targetScrollView.layout.size;
+                targetListView.virtualizationController.Resize(size, 0);
+            }
+        }
+
+        #endregion
+
+
 
         #region Avoid error when IList item is ValueType
         
@@ -85,22 +104,11 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
 
         class ListViewControllerCustom : ListViewController
         {
-            /*
-            private static Array AddToArray(Array source, int itemCount)
-            {
-                Array instance = Array.CreateInstance(source.GetType().GetElementType() ?? throw new InvalidOperationException("Cannot resize source, because its size is fixed."), source.Length + itemCount);
-                Array.Copy(source, instance, source.Length);
-                return instance;
-            }
-            */
-            
             private void EnsureItemSourceCanBeResized()
             {
                 if (this.itemsSource.IsFixedSize && !this.itemsSource.GetType().IsArray)
                     throw new InvalidOperationException("Cannot add or remove items from source, because its size is fixed.");
             }
-
-            private static readonly Dictionary<Type, object> DefaultValuTable = new();
 
             public override void AddItems(int itemCount)
             {
@@ -109,7 +117,6 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
                 var intList = CollectionPool<List<int>, int>.Get();
                 try
                 {
-#if true
                     var type = itemsSource.GetType();
                     var itemType = ListUtility.GetItemType(type);
                     for (var i = 0; i < itemCount; ++i)
@@ -118,22 +125,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
                         intList.Add(count + i);
                     }
 
-#else
-                    if (this.itemsSource.IsFixedSize)
-                    {
-                        this.itemsSource = (IList) ListViewControllerCustom.AddToArray((Array) this.itemsSource, itemCount);
-                        for (int index = 0; index < itemCount; ++index)
-                            intList.Add(count + index);
-                    }
-                    else
-                    {
-                        for (int index = 0; index < itemCount; ++index)
-                        {
-                            intList.Add(count + index);
-                            this.itemsSource.Add((object) null);
-                        }
-                    }
-#endif
+
                     this.RaiseItemsAdded((IEnumerable<int>) intList);
                 }
                 finally

@@ -10,12 +10,15 @@ namespace RosettaUI
     {
         private static readonly BinderBase<string> NullStrBinder = ConstBinder.Create("null");
 
-        private static Element CreateCircularReferenceElement(LabelElement label, Type type) =>
-            new CompositeFieldElement(label,
+        private static Element CreateCircularReferenceElement(LabelElement label, Type type)
+        {
+            return new CompositeFieldElement(label,
                 new[]
                 {
                     new HelpBoxElement($"[{type}] Circular reference detected.", HelpBoxType.Error)
                 }).SetInteractable(false);
+        }
+
         public static Element CreateFieldElement(LabelElement label, IBinder binder)
         {
             var valueType = binder.ValueType;
@@ -40,18 +43,30 @@ namespace RosettaUI
                 _ when binder.ValueType.IsEnum => () => CreateEnumElement(label, binder),
 
                 _ when binder.GetObject() is IElementCreator elementCreator => elementCreator.CreateElement,
-                _ when ListBinder.IsListBinder(binder) => () => UI.List(label, binder),
+                _ when ListBinder.IsListBinder(binder) => CreateLitView(label, binder),
 
                 _ => () => CreateMemberFieldElement(label, binder)
             };
 
+            return NullGuardIfNeed(label, binder, createElementFunc);
 
-            return valueType.IsValueType || valueType == typeof(string)
-                ? createElementFunc()
-                : NullGuard(label, binder, createElementFunc);
+            
+            Func<Element> CreateLitView(LabelElement l, IBinder b)
+            {
+                ListViewOption option = null;
+                if (b is IPropertyOrFieldBinder pfBinder)
+                {
+                    option = new ListViewOption(
+                        TypeUtility.IsReorderable(pfBinder.ParentBinder.ValueType, pfBinder.PropertyOrFieldName),
+                        false
+                        );
+                }
+                
+                return () => CreateListViewElementWithoutNullGuard(l, b, null, option);
+            }
         }
 
-        private static Element NullGuard(LabelElement label, IGetter getter, Func<Element> createElement)
+        private static Element NullGuardIfNeed(LabelElement label, IGetter getter, Func<Element> createElement)
         {
             Element ret;
 
@@ -126,7 +141,7 @@ namespace RosettaUI
 
             var elements = fieldNames.Select(createFieldElementFunc);
 
-            return NullGuard(label, binder, CreateElementFunc);
+            return NullGuardIfNeed(label, binder, CreateElementFunc);
 
             // NullGuard前にelements.ToList()などで評価していまうとbinder.Get()のオブジェクトがnullであるケースがある
             // 評価を遅延させる
@@ -249,6 +264,19 @@ namespace RosettaUI
                 });
         }
 
+        #endregion
+        
+        #region ListView
+
+        public static Element CreateListViewElement(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
+            => NullGuardIfNeed(label, listBinder, () => CreateListViewElementWithoutNullGuard(label, listBinder, createItemElement, option));
+            
+        private static Element CreateListViewElementWithoutNullGuard(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
+        {
+            createItemElement ??= ((binder, idx) => UI.Field("Item " + idx, binder));
+            return new ListViewElement(label, listBinder, createItemElement, option);
+        } 
+        
         #endregion
         
 

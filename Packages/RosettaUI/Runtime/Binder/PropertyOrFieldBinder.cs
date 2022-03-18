@@ -15,14 +15,24 @@ namespace RosettaUI
         }
     }
 
-    public class PropertyOrFieldBinder<TParent, TValue> : ChildBinder<TParent, TValue>
+    public interface IPropertyOrFieldBinder
     {
+        IBinder ParentBinder { get; }
+        string PropertyOrFieldName { get; }
+    }
+
+    public class PropertyOrFieldBinder<TParent, TValue> : ChildBinder<TParent, TValue>, IPropertyOrFieldBinder
+    {
+        public IBinder ParentBinder => parentBinder;
+        public string PropertyOrFieldName { get; protected set; }
+
         public PropertyOrFieldBinder(IBinder<TParent> parentBinder, string propertyOrFieldName)
             : base(parentBinder,
                 PropertyOrFieldGetterSetter<TParent, TValue>.GetGetterSetter(propertyOrFieldName).Item1,
                 PropertyOrFieldGetterSetter<TParent, TValue>.GetGetterSetter(propertyOrFieldName).Item2
             )
         {
+            PropertyOrFieldName = propertyOrFieldName;
         }
     }
 }

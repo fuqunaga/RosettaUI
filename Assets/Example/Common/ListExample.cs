@@ -8,15 +8,24 @@ namespace RosettaUI.Example
 {
     public class ListExample : MonoBehaviour, IElementCreator
     {
+        [Serializable]
+        public class NonReorderableClass
+        {
+            [NonReorderable]
+            public List<SimpleClass> classList;
+        }
+        
         public int[] intArray = {1, 2, 3};
         public List<int> intList = new[] {1, 2, 3}.ToList();
-
         public SimpleClass[] classArray = {new() {stringValue = "1"}, new() {stringValue = "2"}, new() {stringValue = "2"}};
-
         public List<SimpleClass> classList = new SimpleClass[]{new() {stringValue = "1"}, new() {stringValue = "2"}, new() {stringValue = "2"}}.ToList();
 
+        public NonReorderableClass nonReorderableClass;
+        
         public Element CreateElement()
         {
+            nonReorderableClass.classList = classList;
+            
             return UI.Row(
                 ExampleTemplate.UIFunctionPage(nameof(UI.List),
                     UI.List(() => intArray),
@@ -46,7 +55,11 @@ namespace RosettaUI.Example
                     UI.List(
                         "FixedSize",
                         () => classArray,
-                        new ListViewOption(reorderable:true, fixedSize:true))
+                        new ListViewOption(reorderable: true, fixedSize: true)),
+                    UI.Field(
+                        "<b>UI.Field()</b> NonReorderableAttribute member",
+                        () => nonReorderableClass
+                    )
                 )
             );
         }

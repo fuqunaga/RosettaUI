@@ -49,13 +49,9 @@ namespace RosettaUI
 
             return List(label, listBinder, createItemElementIBinder, option);
         }
-
-
+        
         public static Element List(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
-        {
-            createItemElement ??= ((binder, idx) => Field("Item " + idx, binder));
-            return new ListViewElement(label, listBinder, createItemElement, option);
-        } 
+            => BinderToElement.CreateListViewElement(label, listBinder, createItemElement, option);
 
         public static Element List_(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null)
         {

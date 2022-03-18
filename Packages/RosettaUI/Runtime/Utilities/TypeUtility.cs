@@ -69,6 +69,12 @@ namespace RosettaUI
             return GetMemberData(type, propertyOrFieldName).range;
         }
 
+        public static bool IsReorderable(Type type, string propertyOrFieldName)
+        {
+            return GetMemberData(type, propertyOrFieldName).isReorderable;
+        }
+
+        
 
         public static bool HasSerializableField(Type type)
         {
@@ -190,7 +196,8 @@ namespace RosettaUI
                         {
                             type = pair.Item2,
                             memberInfo = pair.Item1,
-                            range = pair.Item1.GetCustomAttribute<RangeAttribute>()
+                            range = pair.Item1.GetCustomAttribute<RangeAttribute>(),
+                            isReorderable = pair.Item1.GetCustomAttribute<NonReorderableAttribute>() == null
                         }
                     );
 
@@ -205,6 +212,7 @@ namespace RosettaUI
                 public Type type;
                 public MemberInfo memberInfo;
                 public RangeAttribute range;
+                public bool isReorderable;
             }
         }
         

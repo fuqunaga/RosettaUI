@@ -17,57 +17,38 @@ namespace RosettaUI.Example
 
         public Element CreateElement()
         {
-            return
-                UI.Row(
-                    ExampleTemplate.UIFunctionPage(nameof(UI.List),
-                        UI.List(() => intArray),
-                        UI.List(() => intList),
-                        UI.List(() => classArray),
-                        UI.List(() => classList)
+            return UI.Row(
+                ExampleTemplate.UIFunctionPage(nameof(UI.List),
+                    UI.List(() => intArray),
+                    UI.List(() => intList),
+                    UI.List(() => classArray),
+                    UI.List(() => classList)
+                ),
+                ExampleTemplate.UIFunctionPage(nameof(UI.ListReadOnly),
+                    UI.ListReadOnly(() => intArray),
+                    UI.ListReadOnly(() => intList),
+                    UI.ListReadOnly(() => classArray),
+                    UI.ListReadOnly(() => classList)
+                ),
+                ExampleTemplate.TitlePage("<b>Tips</b>",
+                    UI.List("CustomItemElement",
+                        () => intArray,
+                        (itemBinder, idx) => UI.Row(
+                            UI.Field("Item " + idx, itemBinder),
+                            UI.Button("+", () => intArray[idx]++),
+                            UI.Button("-", () => intArray[idx]--)
+                        )
                     ),
-                    ExampleTemplate.UIFunctionPage(nameof(UI.ListReadOnly),
-                        UI.ListReadOnly(() => intArray),
-                        UI.ListReadOnly(() => intList),
-                        UI.ListReadOnly(() => classArray),
-                        UI.ListReadOnly(() => classList)
-                    ),
-                    ExampleTemplate.TitlePage(ExampleTemplate.UIFunctionStr(nameof(UI.List)) + " Custom Item Element", 
-                        UI.List(() => intArray, CreateItemElementIntArray),
-                        UI.List(() => intList, CreateItemElementIntList),
-                        UI.List(() => classArray, CreateItemElementSimpleClass),
-                        UI.List(() => classList, CreateItemElementSimpleClass)
-                    ),
-                    ExampleTemplate.TitlePage(ExampleTemplate.UIFunctionStr(nameof(UI.ListReadOnly)) + " Custom Item Element",
-                        UI.ListReadOnly(() => intArray, CreateItemElementIntArray),
-                        UI.ListReadOnly(() => intList, CreateItemElementIntList),
-                        UI.ListReadOnly(() => classArray, CreateItemElementSimpleClass),
-                        UI.ListReadOnly(() => classList, CreateItemElementSimpleClass)
-                    )
-                );
-            
-
-            Element CreateItemElementIntArray(IBinder itemBinder, int idx)
-            {
-                return UI.Row(
-                    UI.Field("Item " + idx, itemBinder),
-                    UI.Button("+", () => intArray[idx]++),
-                    UI.Button("-", () => intArray[idx]--)
-                );
-            }
-            
-            Element CreateItemElementIntList(IBinder itemBinder, int idx)
-            {
-                return UI.Row(
-                    UI.Field("Item " + idx, itemBinder),
-                    UI.Button("+", () => intList[idx]++),
-                    UI.Button("-", () => intList[idx]--)
-                );
-            }
-
-            Element CreateItemElementSimpleClass(IBinder itemBinder, int idx)
-            {
-                return UI.Slider("Item " + idx, itemBinder, new SliderOption());
-            }
+                    UI.List(
+                        "NonReorderable",
+                        () => intList,
+                        new ListViewOption(reorderable:false, fixedSize:false)),
+                    UI.List(
+                        "FixedSize",
+                        () => classArray,
+                        new ListViewOption(reorderable:true, fixedSize:true))
+                )
+            );
         }
     }
 }

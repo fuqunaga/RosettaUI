@@ -6,14 +6,17 @@ namespace RosettaUI
 {
     public class ListViewElement : ElementGroupWithHeader
     {
-        public readonly IBinder binder;
+        private readonly IBinder binder;
+        public readonly ListViewOption option;
+        
         private readonly Func<IBinder, int, Element> _createItemElement;
         public LabelElement Label => (LabelElement)header;
         
-        public ListViewElement(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement) : base(label, null)
+        public ListViewElement(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement, ListViewOption option) : base(label, null)
         {
             binder = listBinder;
             _createItemElement = createItemElement;
+            this.option = option ?? ListViewOption.Default;
 
             Interactable = !listBinder.IsReadOnly && !GetIList().IsReadOnly;
         }
@@ -56,6 +59,21 @@ namespace RosettaUI
                     new MenuItem("Remove Element", () => ListBinder.RemoveItem(binder, idx)),
                 }
             );
+        }
+    }
+
+    public class ListViewOption
+    {
+        private static ListViewOption _default;
+        public static ListViewOption Default => _default ?? new (true, false);
+        
+        public readonly bool reorderable;
+        public readonly bool fixedSize;
+
+        public ListViewOption(bool reorderable, bool fixedSize)
+        {
+            this.reorderable = reorderable;
+            this.fixedSize = fixedSize;
         }
     }
 }

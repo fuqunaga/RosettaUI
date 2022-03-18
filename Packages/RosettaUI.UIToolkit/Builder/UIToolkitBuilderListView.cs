@@ -13,19 +13,25 @@ namespace RosettaUI.UIToolkit.Builder
         private VisualElement Build_ListView(Element element)
         {
             var listViewElement = (ListViewElement) element;
+            var option = listViewElement.option;
 
             var listView = new ListViewCustom(listViewElement.GetIList(),
                 makeItem: () => new VisualElement(),
                 bindItem: BindItem
             )
             {
-                reorderable = true,
-                reorderMode = ListViewReorderMode.Animated,
+                reorderable = option.reorderable,
+                reorderMode = option.reorderable ? ListViewReorderMode.Animated : ListViewReorderMode.Simple,
                 showFoldoutHeader = true,
-                showAddRemoveFooter = true,
+                showAddRemoveFooter = !option.fixedSize,
                 virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
                 unbindItem = UnbindItem
             };
+
+            if (option.fixedSize)
+            {
+                listView.Q<TextField>().SetEnabled(false);
+            }
 
             ApplyMinusIndentIfPossible(listView, listViewElement);
             listView.ScheduleToUseResolvedLayoutBeforeRendering(() =>

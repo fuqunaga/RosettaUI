@@ -166,7 +166,7 @@ namespace RosettaUI.Example
                         .SetInteractable(false),
                     UI.Label(nameof(ElementExtensionsMethodChain.SetColor)).SetColor(Color.red),
 #if true
-                    UI.Button($"{nameof(ElementExtensionsMethodChain.SetWidth)}(100f)").SetWidth(100f),
+                    UI.Button($"{nameof(ElementExtensionsMethodChain.SetWidth)}(300f)").SetWidth(300f),
                     UI.Button($"{nameof(ElementExtensionsMethodChain.SetHeight)}(50f)").SetHeight(50f),
 #else
                     UI.Button($"{nameof(ElementExtensionsMethodChain.SetWidth)}(100f)", null).SetWidth(100f),

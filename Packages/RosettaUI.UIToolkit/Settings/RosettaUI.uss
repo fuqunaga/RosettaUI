@@ -240,7 +240,7 @@
 .rosettaui-window-launcher .unity-toggle__input:focus:checked .unity-toggle__checkmark 
 {
     -unity-background-image-tint-color: darkgray;
-    background-image: resource("RosettaUI_WindowIcon");
+    background-image: resource("open-in-new");
     background-color: transparent;
     border-color: transparent;
 }

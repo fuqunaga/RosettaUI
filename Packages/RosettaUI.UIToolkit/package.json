@@ -1,0 +1,15 @@
+{
+  "name": "ga.fuquna.rosettaui.uitoolkit",
+  "version": "0.0.0",
+  "displayName": "RosettaUI.UIToolkit",
+  "description": "Code-based multi gui interface for UI Toolkit",
+  "unity": "2020.3",
+  "dependencies": {
+    "ga.fuquna.rosettaui": "0.0.0"
+  },
+  "author": {
+    "name": "fuqunaga",
+    "email": "fukhid@gmail.com",
+    "url": "https://fuquna.ga"
+  }
+}

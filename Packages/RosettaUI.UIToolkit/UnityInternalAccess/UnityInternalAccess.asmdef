@@ -1,0 +1,16 @@
+{
+    "name": "Unity.UIElements",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2b1b0416520827b409049c7e4d90bcc1"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

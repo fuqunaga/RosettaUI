@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
 
@@ -25,41 +24,46 @@ namespace RosettaUI.Example
         public Element CreateElement()
         {
             nonReorderableClass.classList = classList;
-            
-            return UI.Row(
-                ExampleTemplate.UIFunctionPage(nameof(UI.List),
-                    UI.List(() => intArray),
-                    UI.List(() => intList),
-                    UI.List(() => classArray),
-                    UI.List(() => classList)
-                ),
-                ExampleTemplate.UIFunctionPage(nameof(UI.ListReadOnly),
-                    UI.ListReadOnly(() => intArray),
-                    UI.ListReadOnly(() => intList),
-                    UI.ListReadOnly(() => classArray),
-                    UI.ListReadOnly(() => classList)
+
+            return UI.Column(
+                UI.Row(
+                    ExampleTemplate.UIFunctionPage(nameof(UI.List),
+                        UI.List(() => intArray),
+                        UI.List(() => intList),
+                        UI.List(() => classArray),
+                        UI.List(() => classList)
+                    ),
+                    ExampleTemplate.UIFunctionPage(nameof(UI.ListReadOnly),
+                        UI.ListReadOnly(() => intArray),
+                        UI.ListReadOnly(() => intList),
+                        UI.ListReadOnly(() => classArray),
+                        UI.ListReadOnly(() => classList)
+                    ),
+                    ExampleTemplate.TitlePage("<b>Options</b>",
+                        UI.List("CustomItemElement",
+                            () => intArray,
+                            (itemBinder, idx) => UI.Row(
+                                UI.Field("Item " + idx, itemBinder),
+                                UI.Button("+", () => intArray[idx]++),
+                                UI.Button("-", () => intArray[idx]--)
+                            )
+                        ),
+                        UI.List(
+                            "NonReorderable",
+                            () => intList,
+                            new ListViewOption(reorderable: false, fixedSize: false)),
+                        UI.List(
+                            "FixedSize",
+                            () => classArray,
+                            new ListViewOption(reorderable: true, fixedSize: true)),
+                        UI.Field(
+                            "<b>UI.Field()</b> NonReorderableAttribute member",
+                            () => nonReorderableClass
+                        )
+                    )
                 ),
                 ExampleTemplate.TitlePage("<b>Tips</b>",
-                    UI.List("CustomItemElement",
-                        () => intArray,
-                        (itemBinder, idx) => UI.Row(
-                            UI.Field("Item " + idx, itemBinder),
-                            UI.Button("+", () => intArray[idx]++),
-                            UI.Button("-", () => intArray[idx]--)
-                        )
-                    ),
-                    UI.List(
-                        "NonReorderable",
-                        () => intList,
-                        new ListViewOption(reorderable:false, fixedSize:false)),
-                    UI.List(
-                        "FixedSize",
-                        () => classArray,
-                        new ListViewOption(reorderable: true, fixedSize: true)),
-                    UI.Field(
-                        "<b>UI.Field()</b> NonReorderableAttribute member",
-                        () => nonReorderableClass
-                    )
+                    UI.HelpBox("Right-click on an item to open the menu", HelpBoxType.Info)
                 )
             );
         }

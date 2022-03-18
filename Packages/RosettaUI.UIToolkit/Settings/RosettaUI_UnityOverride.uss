@@ -114,7 +114,7 @@
 
 .unity-foldout__toggle:hover
 {
-    background-color: var(--unity-colors-input_field-border-hover);
+    background-color: var(--rosettaui-color-fold-hover);
 }
 
 .unity-foldout__toggle > .unity-toggle__input,

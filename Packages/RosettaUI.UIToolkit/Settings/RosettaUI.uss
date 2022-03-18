@@ -25,6 +25,7 @@
     --rosettaui-color-input-background: #181818;
     --rosettaui-color-box-background: rgba(100,100,100,0.3);
     --rosettaui-color-list-background: var(--rosettaui-color-box-background);
+    --rosettaui-color-fold-hover: #353535;
     
     font-size: 18px;
     color: var(--unity-colors-default-text);

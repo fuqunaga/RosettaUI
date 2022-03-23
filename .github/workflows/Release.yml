@@ -33,7 +33,7 @@ jobs:
         git checkout upm
         git checkout main README.md || echo README.md not found
         mkdir Documentation~
-        git mv README.md Documentation~/TestNpmjs.md
+        git mv README.md Documentation~/RosettaUI.md
         git checkout main README.md || echo README.md not found
         git checkout main CHANGELOG.md || echo CHANGELOG.md not found
         git checkout main LICENSE || echo LICENSE not found
@@ -47,7 +47,7 @@ jobs:
         fi
         git push -f -u origin upm
       env:
-        PKG_ROOT: Packages/TestNpmjs
+        PKG_ROOT: Packages/RosettaUI
 
     - name: Create upm git tag
       if: steps.semantic.outputs.new_release_published == 'true'

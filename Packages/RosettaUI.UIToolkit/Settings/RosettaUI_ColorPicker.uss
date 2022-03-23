@@ -15,14 +15,16 @@
 .rosettaui-colorpicker__preview-prev
 {
     width: 50%;
-    height: 100%;
+    margin-top: -1px;
+    margin-bottom: -1px;
 
     border-radius: 5px 0 0 5px;
 }
 .rosettaui-colorpicker__preview-curr
 {
     width: 50%;
-    height: 100%;
+    margin-top: -1px;
+    margin-bottom: -1px;
 
     border-radius: 0 5px 5px 0;
 }

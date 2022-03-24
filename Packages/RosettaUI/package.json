@@ -1,8 +1,8 @@
 {
   "name": "ga.fuquna.rosettaui",
-  "version": "1.0.1",
+  "version": "0.0.0",
   "displayName": "RosettaUI",
-  "description": "Code-based multi gui interface",
+  "description": "Code-based multi gui library interface for development menu",
   "unity": "2021.2",
   "author": {
     "name": "fuqunaga",

@@ -1,12 +1,14 @@
-name: Release
+name: Publish
 
 on: workflow_dispatch
     
     
 jobs:
-  release:
-    name: release
+  publish:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        pkg_root: [./Packages/RosettaUI, ./Packages/RosettaUI.UIToolkit]
 
     steps:
     - uses: actions/checkout@v2
@@ -67,6 +69,6 @@ jobs:
       run: |
         npm install
         npm publish
-      working-directory: ./Packages/RosettaUI
+      working-directory: ${{ matrix.pkg_root }}
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -89,7 +89,7 @@ namespace RosettaUI
             DestroyChildren(false);
         }
 
-        protected void NotifyViewValueChanged()
+        public void NotifyViewValueChanged()
         {
             onViewValueChanged?.Invoke();
             Parent?.NotifyViewValueChanged();

@@ -370,7 +370,7 @@ MonoBehaviour:
   stringValue: 
   boolValue: 0
   enumValue: 0
-  colorValue: {r: 0, g: 0.06666667, b: 0.13333334, a: 0.7372549}
+  colorValue: {r: 0, g: 0, b: 0, a: 0}
   vector2Value: {x: 0, y: 0}
   vector3Value: {x: 0, y: 0, z: 0}
   vector4Value: {x: 0, y: 0, z: 0, w: 0}
@@ -948,6 +948,8 @@ MonoBehaviour:
     stringValue: 2
   - floatValue: 0
     stringValue: 3
+  nonReorderableClass:
+    classList: []
 --- !u!1 &1922449323
 GameObject:
   m_ObjectHideFlags: 0

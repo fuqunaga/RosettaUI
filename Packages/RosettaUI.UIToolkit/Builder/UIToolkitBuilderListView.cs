@@ -27,7 +27,7 @@ namespace RosettaUI.UIToolkit.Builder
                 virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
                 unbindItem = UnbindItem
             };
-
+            
             if (option.fixedSize)
             {
                 listView.Q<TextField>().SetEnabled(false);
@@ -43,7 +43,11 @@ namespace RosettaUI.UIToolkit.Builder
             listViewElement.Label.SubscribeValueOnUpdateCallOnce(str => listView.headerTitle = str);
             UIToolkitUtility.SetAcceptClicksIfDisabled(listView.Q<Toggle>());
 
-            listView.itemIndexChanged += OnItemIndexChanged;
+            listView.itemIndexChanged += (int srcIdx, int dstIdx) =>
+            {
+                OnItemIndexChanged(srcIdx, dstIdx);
+                NotifyValueChanged();
+            };
 
             
             // list が Array の場合、参照先が変わる
@@ -52,12 +56,16 @@ namespace RosettaUI.UIToolkit.Builder
             var lastListItemCount = listView.itemsSource.Count;          
             
             // ListView 内での参照先変更を通知
-            listView.itemsSourceChanged += () => listViewElement.SetIList(listView.itemsSource);
+            listView.itemsSourceChanged += NotifyValueChanged;
 
             // ListView 内での要素数変更を通知（ListView 外での変更と区別するための処理）
-            listView.itemsSourceSizeChanged += () => lastListItemCount = listView.itemsSource.Count;
+            listView.itemsSourceSizeChanged += () =>
+            {
+                lastListItemCount = listView.itemsSource.Count;
+                NotifyValueChanged();
+            };
             
-            listViewElement.onUpdate += _=>
+            listViewElement.onUpdate += _ =>
             {
                 var list = listViewElement.GetIList();
                 
@@ -75,6 +83,10 @@ namespace RosettaUI.UIToolkit.Builder
                     listView.OnListSizeChangedExternal();
                 }
             };
+            
+            // Listの値が変更されていたらSetIList()（内部的にBinder.SetObject()）する
+            // UI.List(writeValue, readValue); の readValue を呼んで通知したい
+            listViewElement.onViewValueChanged += () => listViewElement.SetIList(listView.itemsSource);
 
             return listView;
 
@@ -148,6 +160,13 @@ namespace RosettaUI.UIToolkit.Builder
                         action(s, d);
                     }
                 }
+            }
+            
+            // List になにか変更があった場合の通知
+            // 参照先変更、サイズ変更、アイテムの値変更
+            void NotifyValueChanged()
+            {
+                listViewElement.NotifyViewValueChanged();
             }
         }
     }

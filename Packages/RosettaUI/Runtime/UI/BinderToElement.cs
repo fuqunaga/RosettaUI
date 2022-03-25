@@ -273,9 +273,11 @@ namespace RosettaUI
             
         private static Element CreateListViewElementWithoutNullGuard(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
         {
-            createItemElement ??= ((binder, idx) => UI.Field("Item " + idx, binder));
+            createItemElement ??= CreateListViewItemDefaultElement;
             return new ListViewElement(label, listBinder, createItemElement, option);
-        } 
+        }
+
+        public static Element CreateListViewItemDefaultElement(IBinder binder, int idx) => UI.Field("Item " + idx, binder);
         
         #endregion
         

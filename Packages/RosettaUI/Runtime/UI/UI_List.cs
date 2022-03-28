@@ -98,23 +98,7 @@ namespace RosettaUI
                     var isReadOnly = ListBinder.IsReadOnly(listBinder);
                     if (!isReadOnly)
                     {
-                        itemBinderToElement = (binder,idx) => {
-#if false
-                            var element = Popup(
-                                createItemElement(binder, idx),
-                                () => new[]
-                                {
-                                    new MenuItem("Add Element", () => ListBinder.DuplicateItem(listBinder, idx)),
-                                    new MenuItem("Remove Element", () => ListBinder.RemoveItem(listBinder, idx)),
-                                }
-                            );
-
-                            
-                            return element;
-#else
-                            return ListViewElement.AddPopupMenu(createItemElement(binder, idx), binder, idx);
-#endif
-                        };
+                        itemBinderToElement = (binder,idx) => ListViewItemContainerElement.AddPopupMenu(createItemElement(binder, idx), binder, idx);
                     }
 
                     return Column(

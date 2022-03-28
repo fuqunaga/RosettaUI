@@ -273,8 +273,25 @@ namespace RosettaUI
             
         private static Element CreateListViewElementWithoutNullGuard(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
         {
+            option ??= ListViewOption.Default;
+            
             createItemElement ??= CreateListViewItemDefaultElement;
-            return new ListViewElement(label, listBinder, createItemElement, option);
+
+            var isReadOnly = ListBinder.IsReadOnly(listBinder);
+            
+            var countField = UI.Field(null,
+                () => ListBinder.GetCount(listBinder),
+                count => ListBinder.SetCount(listBinder, count)
+            ).SetMinWidth(50f).SetInteractable(!isReadOnly && !option.fixedSize);
+            
+            
+            return UI.Fold(
+                label,countField,
+                new[]{
+                    new ListViewItemContainerElement(listBinder, createItemElement, option)
+                        .SetInteractable(!isReadOnly)
+                }
+            ).Open();
         }
 
         public static Element CreateListViewItemDefaultElement(IBinder binder, int idx) => UI.Field("Item " + idx, binder);

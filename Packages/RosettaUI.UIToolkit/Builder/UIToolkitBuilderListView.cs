@@ -10,51 +10,25 @@ namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        private VisualElement Build_ListView(Element element)
+        private VisualElement Build_ListViewItemContainer(Element element)
         {
-            var listViewElement = (ListViewElement) element;
-            var option = listViewElement.option;
+            var itemContainerElement = (ListViewItemContainerElement) element;
+            var option = itemContainerElement.option;
 
-            var listView = new ListViewCustom(listViewElement.GetIList(),
+            var listView = new ListViewCustom(itemContainerElement.GetIList(),
                 makeItem: () => new VisualElement(),
                 bindItem: BindItem
             )
             {
                 reorderable = option.reorderable,
                 reorderMode = option.reorderable ? ListViewReorderMode.Animated : ListViewReorderMode.Simple,
-                showFoldoutHeader = true,
+                // showFoldoutHeader = true,
                 showAddRemoveFooter = !option.fixedSize,
                 virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
                 unbindItem = UnbindItem
             };
+            
 
-            
-            #region Header
-
-            var fold = listView.Q<Foldout>();
-            SetupOpenCloseBaseElement(fold, listViewElement);
-
-            
-            // arraySizeField
-            var arraySizeField = listView.Q<TextField>();
-            if (option.fixedSize)
-            {
-                arraySizeField.SetEnabled(false);
-            }
-            // move arraySizeField to the most right of the toggle
-            var toggle = listView.Q<Toggle>();
-            toggle.Add(new VisualElement() {style = {flexGrow = 1}});
-            toggle.Add(arraySizeField);
-            
-            listView.ScheduleToUseResolvedLayoutBeforeRendering(() =>
-            {
-                ApplyIndent(fold.contentContainer);
-                listView.Rebuild(); // 起動時にスクロールバーが表示されるのを回避。いまいち原因を追えてない対処療法
-            });
-            
-            #endregion
-            
-            
             #region Callbacks
 
             listView.itemIndexChanged += (int srcIdx, int dstIdx) =>
@@ -79,9 +53,9 @@ namespace RosettaUI.UIToolkit.Builder
                 NotifyValueChanged();
             };
             
-            listViewElement.onUpdate += _ =>
+            itemContainerElement.onUpdate += _ =>
             {
-                var list = listViewElement.GetIList();
+                var list = itemContainerElement.GetIList();
                 
                 // ListView 外での参照先変更を ListView に通知
                 if (listView.itemsSource != list)
@@ -100,7 +74,7 @@ namespace RosettaUI.UIToolkit.Builder
             
             // Listの値が変更されていたらSetIList()（内部的にBinder.SetObject()）する
             // UI.List(writeValue, readValue); の readValue を呼んで通知したい
-            listViewElement.onViewValueChanged += () => listViewElement.SetIList(listView.itemsSource);
+            itemContainerElement.onViewValueChanged += () => itemContainerElement.SetIList(listView.itemsSource);
             
             #endregion
 
@@ -114,7 +88,7 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 ve.Clear();
 
-                var e = listViewElement.GetOrCreateItemElement(idx);
+                var e = itemContainerElement.GetOrCreateItemElement(idx);
                 e.SetEnable(true);
 
                 var itemVe = GetUIObj(e);
@@ -133,7 +107,7 @@ namespace RosettaUI.UIToolkit.Builder
             
             void UnbindItem(VisualElement _, int idx)
             {
-                var e = listViewElement.GetOrCreateItemElement(idx);
+                var e = itemContainerElement.GetOrCreateItemElement(idx);
                 e.SetEnable(false);
             }
 
@@ -142,7 +116,7 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 if (srcIdx == dstIdx) return;
                 
-                var src = GetUIObj(listViewElement.GetContentAt(srcIdx));              
+                var src = GetUIObj(itemContainerElement.GetContentAt(srcIdx));              
                 var srcFolds = src.Query<Foldout>().Build();
                 var srcFoldValues = srcFolds.Select(f => f.value).ToList();
 
@@ -155,7 +129,7 @@ namespace RosettaUI.UIToolkit.Builder
                     for (var i = 0; i < veCount; ++i)
                     {
                         var itemIdx = srcIdx + i * sign;
-                        veArray[i] = GetUIObj(listViewElement.GetContentAt(itemIdx));
+                        veArray[i] = GetUIObj(itemContainerElement.GetContentAt(itemIdx));
                     }
 
                     for (var i = 0; i < veCount - 1; ++i)
@@ -185,7 +159,7 @@ namespace RosettaUI.UIToolkit.Builder
             // 参照先変更、サイズ変更、アイテムの値変更
             void NotifyValueChanged()
             {
-                listViewElement.NotifyViewValueChanged();
+                itemContainerElement.NotifyViewValueChanged();
             }
             
             #endregion

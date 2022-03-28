@@ -1,11 +1,10 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Linq;
-using RosettaUI.Reactive;
 
 namespace RosettaUI
 {
-    public class ListViewElement : OpenCloseBaseElement
+    public class ListViewItemContainerElement : ElementGroup
     {
         private readonly IBinder _binder;
         public readonly ListViewOption option;
@@ -13,16 +12,13 @@ namespace RosettaUI
         private readonly Func<IBinder, int, Element> _createItemElement;
         
         
-        public override ReactiveProperty<bool> IsOpenRx { get; } = new();
-        
-        
-        public ListViewElement(Element header, IBinder listBinder, Func<IBinder, int, Element> createItemElement, ListViewOption option) : base(header, null)
+        public ListViewItemContainerElement(IBinder listBinder, Func<IBinder, int, Element> createItemElement, ListViewOption option) : base(null)
         {
             _binder = listBinder;
             _createItemElement = createItemElement;
-            this.option = option ?? ListViewOption.Default;
+            this.option = option;
 
-            Interactable = !listBinder.IsReadOnly && !GetIList().IsReadOnly;
+            // Interactable = !listBinder.IsReadOnly && !GetIList().IsReadOnly;
         }
 
         public IList GetIList() => ListBinder.GetIList(_binder);
@@ -36,8 +32,7 @@ namespace RosettaUI
             if (element == null)
             {
                 var isReadOnly = ListBinder.IsReadOnly(_binder);
-                
-                for(var i=Contents.Count(); i<=index; i++)
+                for (var i = Contents.Count(); i <= index; i++)
                 {
                     var itemBinder = ListBinder.CreateItemBinderAt(_binder, i);
                     element = _createItemElement(itemBinder, i);

@@ -535,7 +535,8 @@
     /*margin: 2px 4px 4px 0;*/
 }
 
-.unity-list-view__footer > .unity-button
+.unity-list-view__footer > .unity-button,
+.unity-list-view__footer > .unity-button:hover:disabled
 {
     background-color: transparent;
 }

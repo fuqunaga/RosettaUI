@@ -22,13 +22,5 @@ namespace RosettaUI
 
             SetElements(children);
         }
-        
-        public Element GetContentAt(int index)
-        {
-            var children = Children;
-            
-            var idx = index + (HasHeader ? 1 : 0);
-            return (0 <= idx && idx < children.Count) ? children[idx] : null;
-        }
     }
 }

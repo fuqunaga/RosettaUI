@@ -1,29 +1,33 @@
 using System;
 using System.Collections;
 using System.Linq;
+using RosettaUI.Reactive;
 
 namespace RosettaUI
 {
-    public class ListViewElement : ElementGroupWithHeader
+    public class ListViewElement : OpenCloseBaseElement
     {
-        private readonly IBinder binder;
+        private readonly IBinder _binder;
         public readonly ListViewOption option;
         
         private readonly Func<IBinder, int, Element> _createItemElement;
-        public LabelElement Label => (LabelElement)header;
         
-        public ListViewElement(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement, ListViewOption option) : base(label, null)
+        
+        public override ReactiveProperty<bool> IsOpenRx { get; } = new();
+        
+        
+        public ListViewElement(Element header, IBinder listBinder, Func<IBinder, int, Element> createItemElement, ListViewOption option) : base(header, null)
         {
-            binder = listBinder;
+            _binder = listBinder;
             _createItemElement = createItemElement;
             this.option = option ?? ListViewOption.Default;
 
             Interactable = !listBinder.IsReadOnly && !GetIList().IsReadOnly;
         }
 
-        public IList GetIList() => ListBinder.GetIList(binder);
+        public IList GetIList() => ListBinder.GetIList(_binder);
 
-        public void SetIList(IList iList) => binder.SetObject(iList);
+        public void SetIList(IList iList) => _binder.SetObject(iList);
 
         
         public Element GetOrCreateItemElement(int index)
@@ -31,15 +35,15 @@ namespace RosettaUI
             var element = GetContentAt(index);
             if (element == null)
             {
-                var isReadOnly = ListBinder.IsReadOnly(binder);
+                var isReadOnly = ListBinder.IsReadOnly(_binder);
                 
                 for(var i=Contents.Count(); i<=index; i++)
                 {
-                    var itemBinder = ListBinder.CreateItemBinderAt(binder, i);
+                    var itemBinder = ListBinder.CreateItemBinderAt(_binder, i);
                     element = _createItemElement(itemBinder, i);
                     if (!isReadOnly)
                     {
-                        element = AddPopupMenu(element, binder, i);
+                        element = AddPopupMenu(element, _binder, i);
                     }
                     
                     AddChild(element);
@@ -60,6 +64,8 @@ namespace RosettaUI
                 }
             );
         }
+
+        
     }
 
     public class ListViewOption

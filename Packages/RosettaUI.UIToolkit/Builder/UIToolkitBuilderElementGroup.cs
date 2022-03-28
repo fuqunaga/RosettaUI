@@ -56,9 +56,15 @@ namespace RosettaUI.UIToolkit.Builder
 
         private VisualElement Build_Fold(Element element)
         {
-            var foldElement = (FoldElement) element;
             var fold = new Foldout();
-            
+            SetupOpenCloseBaseElement(fold, (FoldElement) element);
+  
+            var ret =  Build_ElementGroupContents(fold, element);
+            return ret;
+        }
+
+        void SetupOpenCloseBaseElement(Foldout fold, OpenCloseBaseElement foldElement)
+        {
             var toggle = fold.Q<Toggle>();
             toggle.Add(Build(foldElement.header));
             
@@ -80,9 +86,6 @@ namespace RosettaUI.UIToolkit.Builder
                     foldElement.IsOpen = evt.newValue;
                 }
             });
-
-            var ret =  Build_ElementGroupContents(fold, foldElement);
-            return ret;
         }
 
 

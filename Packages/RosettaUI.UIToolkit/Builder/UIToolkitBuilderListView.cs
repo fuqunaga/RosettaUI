@@ -27,21 +27,35 @@ namespace RosettaUI.UIToolkit.Builder
                 virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
                 unbindItem = UnbindItem
             };
+
             
+            #region Header
+
+            var fold = listView.Q<Foldout>();
+            SetupOpenCloseBaseElement(fold, listViewElement);
+
+            
+            // arraySizeField
+            var arraySizeField = listView.Q<TextField>();
             if (option.fixedSize)
             {
-                listView.Q<TextField>().SetEnabled(false);
+                arraySizeField.SetEnabled(false);
             }
-
-            ApplyMinusIndentIfPossible(listView, listViewElement);
+            // move arraySizeField to the most right of the toggle
+            var toggle = listView.Q<Toggle>();
+            toggle.Add(new VisualElement() {style = {flexGrow = 1}});
+            toggle.Add(arraySizeField);
+            
             listView.ScheduleToUseResolvedLayoutBeforeRendering(() =>
             {
-                ApplyIndent(listView.Q<Foldout>().contentContainer);
+                ApplyIndent(fold.contentContainer);
                 listView.Rebuild(); // 起動時にスクロールバーが表示されるのを回避。いまいち原因を追えてない対処療法
             });
             
-            listViewElement.Label.SubscribeValueOnUpdateCallOnce(str => listView.headerTitle = str);
-            UIToolkitUtility.SetAcceptClicksIfDisabled(listView.Q<Toggle>());
+            #endregion
+            
+            
+            #region Callbacks
 
             listView.itemIndexChanged += (int srcIdx, int dstIdx) =>
             {
@@ -87,9 +101,14 @@ namespace RosettaUI.UIToolkit.Builder
             // Listの値が変更されていたらSetIList()（内部的にBinder.SetObject()）する
             // UI.List(writeValue, readValue); の readValue を呼んで通知したい
             listViewElement.onViewValueChanged += () => listViewElement.SetIList(listView.itemsSource);
+            
+            #endregion
 
+            
             return listView;
 
+            
+            #region Local functions
             
             void BindItem(VisualElement ve, int idx)
             {
@@ -168,6 +187,8 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 listViewElement.NotifyViewValueChanged();
             }
+            
+            #endregion
         }
     }
 }

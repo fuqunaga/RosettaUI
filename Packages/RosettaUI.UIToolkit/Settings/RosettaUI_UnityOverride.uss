@@ -547,7 +547,13 @@
     background-color: var(--unity-colors-button-background-hover);
 }
 
+.unity-list-view__foldout-header > .unity-foldout__toggle > .unity-toggle__input
+{
+    /*flex-grow: 1;*/
+}
+
 .unity-list-view__size-field
 {
-    top: 5px;
+    /*top: 5px;*/
+    position: initial; /* remove unity default */
 }

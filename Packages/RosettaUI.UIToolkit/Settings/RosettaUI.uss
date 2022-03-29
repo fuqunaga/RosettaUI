@@ -63,6 +63,7 @@
     border-width: var(--rosettaui-window-border-width);
     border-color: var(--rosettaui-window-border-color);
     /*padding-left: 15px;*/
+    padding-bottom: 8px;
 }
 
 .rosettaui-window__titlebar-container {

@@ -8,8 +8,6 @@ namespace RosettaUI
 {
     public static class BinderToElement
     {
-        private static readonly BinderBase<string> NullStrBinder = ConstBinder.Create("null");
-
         private static Element CreateCircularReferenceElement(LabelElement label, Type type)
         {
             return new CompositeFieldElement(label,
@@ -29,7 +27,7 @@ namespace RosettaUI
                 return CreateCircularReferenceElement(label, valueType);
             }
 
-            Func<Element> createElementFunc = binder switch
+            var createElementFunc = binder switch
             {
                 _ when UICustom.GetElementCreationMethod(valueType) is { } creationFunc => () =>
                     creationFunc.func(binder.GetObject()),
@@ -48,40 +46,20 @@ namespace RosettaUI
                 _ => () => CreateMemberFieldElement(label, binder)
             };
 
-            return NullGuardIfNeed(label, binder, createElementFunc);
+            return UI.NullGuardIfNeed(label, binder, createElementFunc);
 
             
             Func<Element> CreateLitView(LabelElement l, IBinder b)
             {
-                ListViewOption option = null;
-                if (b is IPropertyOrFieldBinder pfBinder)
-                {
-                    option = new ListViewOption(
+                var option = (b is IPropertyOrFieldBinder pfBinder)
+                    ? new ListViewOption(
                         TypeUtility.IsReorderable(pfBinder.ParentBinder.ValueType, pfBinder.PropertyOrFieldName),
-                        false
-                        );
-                }
-                
-                return () => CreateListViewElementWithoutNullGuard(l, b, null, option);
+                        false)
+                    : null;
+
+
+                return () => UI.List(l, b, null, option);
             }
-        }
-
-        private static Element NullGuardIfNeed(LabelElement label, IGetter getter, Func<Element> createElement)
-        {
-            Element ret;
-
-            if (getter.IsNullable && getter.ValueType != typeof(string))
-                ret = DynamicElement.Create(
-                    () => getter.IsNull,
-                    isNull => isNull
-                        ? new TextFieldElement(label, NullStrBinder).SetInteractable(false)
-                        : createElement(),
-                    $"NullGuard({nameof(DynamicElement)})"
-                );
-            else
-                ret = createElement();
-
-            return ret;
         }
 
         private static Element CreateEnumElement(LabelElement label, IBinder binder)
@@ -141,7 +119,7 @@ namespace RosettaUI
 
             var elements = fieldNames.Select(createFieldElementFunc);
 
-            return NullGuardIfNeed(label, binder, CreateElementFunc);
+            return UI.NullGuardIfNeed(label, binder, CreateElementFunc);
 
             // NullGuard前にelements.ToList()などで評価していまうとbinder.Get()のオブジェクトがnullであるケースがある
             // 評価を遅延させる
@@ -265,39 +243,6 @@ namespace RosettaUI
         }
 
         #endregion
-        
-        #region ListView
-
-        public static Element CreateListViewElement(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
-            => NullGuardIfNeed(label, listBinder, () => CreateListViewElementWithoutNullGuard(label, listBinder, createItemElement, option));
-            
-        private static Element CreateListViewElementWithoutNullGuard(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
-        {
-            option ??= ListViewOption.Default;
-            
-            createItemElement ??= CreateListViewItemDefaultElement;
-
-            var isReadOnly = ListBinder.IsReadOnly(listBinder);
-            
-            var countField = UI.Field(null,
-                () => ListBinder.GetCount(listBinder),
-                count => ListBinder.SetCount(listBinder, count)
-            ).SetMinWidth(50f).SetInteractable(!isReadOnly && !option.fixedSize);
-            
-            
-            return UI.Fold(
-                label,countField,
-                new[]{
-                    new ListViewItemContainerElement(listBinder, createItemElement, option)
-                        .SetInteractable(!isReadOnly)
-                }
-            ).Open();
-        }
-
-        public static Element CreateListViewItemDefaultElement(IBinder binder, int idx) => UI.Field("Item " + idx, binder);
-        
-        #endregion
-        
 
         class BinderTypeHistory : IDisposable
         {

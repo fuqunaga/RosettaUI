@@ -39,6 +39,9 @@ namespace RosettaUI.Example
                         UI.Slider(() => nullOneLineClass),
                         UI.Slider(() => nullMultiLineClass),
                         UI.Slider(() => nullElementCreator)
+                    ),
+                    ExampleTemplate.UIFunctionColumnBox(nameof(UI.MinMaxSlider),
+                        UI.List(() => nullList)
                     )
                 ),
                 ExampleTemplate.TitleIndent("<b>Circular reference</b>",

@@ -107,7 +107,6 @@ namespace RosettaUI
             var listType = binder.ValueType;
             var itemType = ListUtility.GetItemType(binder.ValueType);
 
-
             list = ListUtility.AddItemAtLast(list, listType, itemType);
             binder.SetObject(list);
         }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace RosettaUI
@@ -51,7 +50,43 @@ namespace RosettaUI
         }
         
         public static Element List(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
-            => BinderToElement.CreateListViewElement(label, listBinder, createItemElement, option);
+        {
+            option ??= ListViewOption.Default;
+
+            var countField = ListCounterField(listBinder, option);
+
+            return Fold(
+                label,countField,
+                new[]{
+                    ListItemContainer(listBinder, createItemElement, option)
+                }
+            ).Open();
+        }
+
+        public static Element ListCounterField(IBinder listBinder, ListViewOption option)
+        {
+            var isReadOnly = ListBinder.IsReadOnly(listBinder);
+            
+            return Field(null,
+                () => ListBinder.GetCount(listBinder),
+                count => ListBinder.SetCount(listBinder, count)
+            ).SetMinWidth(50f).SetInteractable(!isReadOnly && !option.fixedSize);
+        }
+        
+        public static Element ListItemContainer(IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
+        {
+            return NullGuard(null, listBinder,
+                () => new ListViewItemContainerElement(
+                    listBinder,
+                    createItemElement ?? ListItemDefault,
+                    option)
+            );
+        }
+        
+        public static Element ListItemDefault(IBinder binder, int index) => Field($"Item {index}", binder);
+
+
+#if false
 
         public static Element List_(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null)
         {
@@ -106,5 +141,7 @@ namespace RosettaUI
                     ).SetInteractable(!isReadOnly);
                 });
         }
+
+#endif
     }
 }

@@ -18,7 +18,7 @@ namespace RosettaUI
             _createItemElement = createItemElement;
             this.option = option;
 
-            // Interactable = !listBinder.IsReadOnly && !GetIList().IsReadOnly;
+            Interactable = !ListBinder.IsReadOnly(listBinder);
         }
 
         public IList GetIList() => ListBinder.GetIList(_binder);

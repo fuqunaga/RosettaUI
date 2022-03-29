@@ -28,10 +28,7 @@ namespace RosettaUI
         
         public static IList AddItemAtLast(IList list, Type type, Type itemType)
         {
-            if (list == null)
-            {
-                list = (IList)Activator.CreateInstance(type, 0);
-            }
+            list ??= (IList) Activator.CreateInstance(type);
 
             var baseItem = list.Count > 0 ? list[^1] : null;
 

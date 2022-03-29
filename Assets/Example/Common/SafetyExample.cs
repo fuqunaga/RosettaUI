@@ -14,43 +14,29 @@ namespace RosettaUI.Example
         {
             string nullString = null;
             List<float> nullList = null;
-            SimpleClass nullOneLineClass = null;
-            ComplexClass nullMultiLineClass = null;
-            ElementCreator nullElementCreator = null;
+            SimpleClass nullClass = null;
 
             CircularReferenceClass circularReferenceClass = new();
             CircularReferenceClass circularReferenceClassOther = new();
 
             circularReferenceClass.other = circularReferenceClassOther;
             circularReferenceClassOther.other = circularReferenceClass;
-
-
-            return UI.Column(
-                ExampleTemplate.TitleIndent("<b>Null</b>",
-                    ExampleTemplate.UIFunctionColumnBox(nameof(UI.Field),
-                        UI.Field(() => nullString),
-                        UI.Field(() => nullList),
-                        UI.Field(() => nullOneLineClass),
-                        UI.Field(() => nullMultiLineClass),
-                        UI.Field(() => nullElementCreator)
-                    ),
-                    ExampleTemplate.UIFunctionColumnBox(nameof(UI.Slider),
-                        UI.Slider(() => nullList),
-                        UI.Slider(() => nullOneLineClass),
-                        UI.Slider(() => nullMultiLineClass),
-                        UI.Slider(() => nullElementCreator)
-                    ),
-                    ExampleTemplate.UIFunctionColumnBox(nameof(UI.MinMaxSlider),
-                        UI.List(() => nullList)
-                    )
-                ),
-                ExampleTemplate.TitleIndent("<b>Circular reference</b>",
-                    ExampleTemplate.UIFunctionColumn(nameof(UI.Field),
+            
+            return UI.Row(
+                ExampleTemplate.UIFunctionPage(nameof(UI.Field),
+                    UI.Field(() => nullList),
+                    UI.Field(() => nullClass),
+                    UI.Field(() => nullString),
                     UI.Field(() => circularReferenceClass)
-                    ),
-                    ExampleTemplate.UIFunctionColumn(nameof(UI.Slider),
-                        UI.Slider(() => circularReferenceClass)
-                    )
+                ),
+                ExampleTemplate.UIFunctionPage(nameof(UI.Slider),
+                    UI.Slider(() => nullList),
+                    UI.Slider(() => nullClass),
+                    UI.Space().SetHeight(32),
+                    UI.Slider(() => circularReferenceClass)
+                ),
+                ExampleTemplate.UIFunctionPage(nameof(UI.List),
+                    UI.List(() => nullList)
                 )
             );
         }

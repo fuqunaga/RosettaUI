@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
@@ -6,24 +7,32 @@ namespace RosettaUI
 {
     public static partial class UI
     {
-        public static Element List<T>(Expression<Func<IList<T>>> targetExpression, ListViewOption option)
+        public static Element List<TList>(Expression<Func<TList>> targetExpression, ListViewOption option)
+            where TList : IList
             => List(targetExpression, null, option);
-        public static Element List<T>(Expression<Func<IList<T>>> targetExpression, Func<IBinder<T>, int, Element> createItemElement = null, ListViewOption option = null)
+        public static Element List<TList>(Expression<Func<TList>> targetExpression, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
+            where TList : IList
             => List(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, createItemElement, option);
 
-        public static Element List<T>(LabelElement label, Expression<Func<IList<T>>> targetExpression, ListViewOption option)
+        public static Element List<TList>(LabelElement label, Expression<Func<TList>> targetExpression, ListViewOption option)
+            where TList : IList
             => List(label, targetExpression, null, option);
-        public static Element List<T>(LabelElement label, Expression<Func<IList<T>>> targetExpression, Func<IBinder<T>, int, Element> createItemElement = null, ListViewOption option = null) 
+        public static Element List<TList>(LabelElement label, Expression<Func<TList>> targetExpression, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
+            where TList : IList
             => List(label, ExpressionUtility.CreateBinder(targetExpression), createItemElement, option);
 
-        public static Element List<T>(LabelElement label, Func<IList<T>> readValue, Action<IList<T>> writeValue, ListViewOption option)
+        public static Element List<TList>(LabelElement label, Func<TList> readValue, Action<TList> writeValue, ListViewOption option)
+            where TList : IList
             => List(label, readValue, writeValue, null, option);
-        public static Element List<T>(LabelElement label, Func<IList<T>> readValue, Action<IList<T>> writeValue, Func<IBinder<T>, int, Element> createItemElement = null, ListViewOption option = null) 
+        public static Element List<TList>(LabelElement label, Func<TList> readValue, Action<TList> writeValue, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null) 
+            where TList : IList
             => List(label, Binder.Create(readValue, writeValue), createItemElement, option);
 
-        public static Element ListReadOnly<T>(Expression<Func<IList<T>>> targetExpression, ListViewOption option)
+        public static Element ListReadOnly<TList>(Expression<Func<TList>> targetExpression, ListViewOption option)
+            where TList : IList
             => ListReadOnly(targetExpression, null, option);
-        public static Element ListReadOnly<T>(Expression<Func<IList<T>>> targetExpression, Func<IBinder<T>, int, Element> createItemElement = null, ListViewOption option = null)
+        public static Element ListReadOnly<TList>(Expression<Func<TList>> targetExpression, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
+            where TList : IList
         {
             var labelString = ExpressionUtility.CreateLabelString(targetExpression);
             var binder = CreateReadOnlyBinder(targetExpression);
@@ -31,22 +40,14 @@ namespace RosettaUI
         }
 
 
-        public static Element ListReadOnly<T>(LabelElement label, Func<IList<T>> readValue, ListViewOption option)
+        public static Element ListReadOnly<TList>(LabelElement label, Func<TList> readValue, ListViewOption option)
+            where TList : IList
             => ListReadOnly(label, readValue, null, option);
-        public static Element ListReadOnly<T>(LabelElement label, Func<IList<T>> readValue, Func<IBinder<T>, int, Element> createItemElement = null, ListViewOption option = null)
+        public static Element ListReadOnly<TList>(LabelElement label, Func<TList> readValue, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
+            where TList : IList
         {
             var binder = Binder.Create(readValue, null);
             return List(label, binder, createItemElement, option);
-        }
-        
-
-        public static Element List<T>(LabelElement label, IBinder listBinder, Func<IBinder<T>, int, Element> createItemElement = null, ListViewOption option = null)
-        {
-            var createItemElementIBinder = createItemElement == null
-                ? (Func<IBinder, int, Element>)null
-                : (ib, idx) => createItemElement(ib as IBinder<T>, idx);
-
-            return List(label, listBinder, createItemElementIBinder, option);
         }
         
         public static Element List(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
@@ -63,8 +64,9 @@ namespace RosettaUI
             ).Open();
         }
 
-        public static Element ListCounterField(IBinder listBinder, ListViewOption option)
+        public static Element ListCounterField(IBinder listBinder, ListViewOption option = null)
         {
+            option ??= ListViewOption.Default;
             var isReadOnly = ListBinder.IsReadOnly(listBinder);
             
             return Field(null,
@@ -75,6 +77,8 @@ namespace RosettaUI
         
         public static Element ListItemContainer(IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
         {
+            option ??= ListViewOption.Default;
+            
             return NullGuard(null, listBinder,
                 () => new ListViewItemContainerElement(
                     listBinder,

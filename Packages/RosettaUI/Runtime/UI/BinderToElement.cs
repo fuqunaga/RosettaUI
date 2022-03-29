@@ -27,29 +27,27 @@ namespace RosettaUI
                 return CreateCircularReferenceElement(label, valueType);
             }
 
-            var createElementFunc = binder switch
+            return binder switch
             {
-                _ when UICustom.GetElementCreationMethod(valueType) is { } creationFunc => () =>
-                    creationFunc.func(binder.GetObject()),
+                _ when UICustom.GetElementCreationMethod(valueType) is { } creationFunc => WrapNullGuard(() => creationFunc.func(binder.GetObject())),
 
-                IBinder<int> ib => () => new IntFieldElement(label, ib),
-                IBinder<uint> ib => () => new UIntFieldElement(label, ib),
-                IBinder<float> ib => () => new FloatFieldElement(label, ib),
-                IBinder<string> ib => () => new TextFieldElement(label, ib),
-                IBinder<bool> ib => () => new BoolFieldElement(label, ib),
-                IBinder<Color> ib => () => new ColorFieldElement(label, ib),
-                _ when binder.ValueType.IsEnum => () => CreateEnumElement(label, binder),
+                IBinder<int> ib => new IntFieldElement(label, ib),
+                IBinder<uint> ib => new UIntFieldElement(label, ib),
+                IBinder<float> ib => new FloatFieldElement(label, ib),
+                IBinder<string> ib => new TextFieldElement(label, ib),
+                IBinder<bool> ib => new BoolFieldElement(label, ib),
+                IBinder<Color> ib =>  new ColorFieldElement(label, ib),
+                _ when binder.ValueType.IsEnum => CreateEnumElement(label, binder),
 
-                _ when binder.GetObject() is IElementCreator elementCreator => elementCreator.CreateElement,
+                _ when binder.GetObject() is IElementCreator elementCreator => WrapNullGuard(elementCreator.CreateElement),
                 _ when ListBinder.IsListBinder(binder) => CreateLitView(label, binder),
 
-                _ => () => CreateMemberFieldElement(label, binder)
+                _ => WrapNullGuard(() => CreateMemberFieldElement(label, binder))
             };
 
-            return UI.NullGuardIfNeed(label, binder, createElementFunc);
+            Element WrapNullGuard(Func<Element> func) => UI.NullGuardIfNeed(label, binder, func);
 
-            
-            Func<Element> CreateLitView(LabelElement l, IBinder b)
+            Element CreateLitView(LabelElement l, IBinder b)
             {
                 var option = (b is IPropertyOrFieldBinder pfBinder)
                     ? new ListViewOption(
@@ -58,7 +56,7 @@ namespace RosettaUI
                     : null;
 
 
-                return () => UI.List(l, b, null, option);
+                return UI.List(l, b, null, option);
             }
         }
 
@@ -120,6 +118,7 @@ namespace RosettaUI
             var elements = fieldNames.Select(createFieldElementFunc);
 
             return UI.NullGuardIfNeed(label, binder, CreateElementFunc);
+            
 
             // NullGuard前にelements.ToList()などで評価していまうとbinder.Get()のオブジェクトがnullであるケースがある
             // 評価を遅延させる

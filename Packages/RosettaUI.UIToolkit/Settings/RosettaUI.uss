@@ -3,7 +3,7 @@
     --fixed-field-width-s: 80px;
     --slider-min-width: 248px;
     --input-border-width: 2px;
-    --cursor-resize-horizontal: resource("cursor_ew");
+    --cursor-resize-horizontal: resource("cursor_ew") 24 9;
     --close-icon: resource("close");
     
     --rosettaui-gray-button-tint: #A0A0A0;

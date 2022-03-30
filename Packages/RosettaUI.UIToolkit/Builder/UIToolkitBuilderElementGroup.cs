@@ -102,13 +102,10 @@ namespace RosettaUI.UIToolkit.Builder
             toggle.RegisterCallback<PointerUpEvent>(OnPointUpEventFirst);
 
             var labelElement = launcherElement.label;
-            labelElement.SubscribeValueOnUpdateCallOnce(v => toggle.text = v);
+            labelElement?.SubscribeValueOnUpdateCallOnce(v => toggle.text = v);
 
             
-
             return toggle;
-            
-            
 
             // ほかのWindowにかぶらない位置を計算する
             // 一度ドラッグしたWindowはその位置を覚えてこの処理の対象にはならない

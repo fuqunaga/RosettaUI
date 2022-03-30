@@ -2,13 +2,13 @@
 using System.Linq;
 using UnityEditor;
 
-namespace RosettaUI.Editors
+namespace RosettaUI.Editor
 {
     /// <summary>
     /// Display the Element to be updated in the RosettaUIRoot inspector.
     /// </summary>
     [CustomEditor(typeof(RosettaUIRoot), true)]
-    public class RosettaUIRootEditor : Editor
+    public class RosettaUIRootEditor : UnityEditor.Editor
     {
         private bool _isOpen;
 

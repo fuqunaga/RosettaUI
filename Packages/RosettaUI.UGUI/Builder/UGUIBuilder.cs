@@ -49,7 +49,12 @@ namespace RosettaUI.UGUI.Builder
             public GameObject Build(Element element, int layer)
             {
                 this.layer = layer;
-                return Build(element);
+                return BuildInternal(element);
+            }
+            
+            public GameObject Build(Element element)
+            {
+                return BuildInternal(element);
             }
 
             protected void Initialize(GameObject uiObj, Element element)

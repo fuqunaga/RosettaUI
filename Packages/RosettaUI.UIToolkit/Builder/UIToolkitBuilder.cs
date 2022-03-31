@@ -2,17 +2,28 @@ using System;
 using System.Collections.Generic;
 using RosettaUI.Builder;
 using RosettaUI.UIToolkit.UnityInternalAccess;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder : BuilderBase<VisualElement>
     {
+        #region static
+
+        private static readonly UIToolkitBuilder Instance = new();
+
+        public static VisualElement Build(Element element)
+        {
+            return Instance.BuildInternal(element);
+        }
+        
+        
+        #endregion
+        
+        
         private readonly Dictionary<Type, Func<Element, VisualElement>> _buildFuncTable;
 
-
-        public UIToolkitBuilder()
+        protected UIToolkitBuilder()
         {
             _buildFuncTable = new Dictionary<Type, Func<Element, VisualElement>>
             {

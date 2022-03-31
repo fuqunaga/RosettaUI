@@ -14,6 +14,7 @@ namespace RosettaUI
 
         private readonly Queue<Func<Element>> _createElementOnEnableQueue = new();
         
+        
         #region Unity
         
         protected virtual void OnEnable()

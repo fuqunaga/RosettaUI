@@ -9,7 +9,6 @@ namespace RosettaUI.UIToolkit
     public class RosettaUIRootUIToolkit : RosettaUIRoot
     {
         protected UIDocument uiDocument;
-        UIToolkitBuilder _builder;
 
         protected override void OnEnable()
         {
@@ -37,8 +36,7 @@ namespace RosettaUI.UIToolkit
             }
 
             var root = uiDocument.rootVisualElement;
-            _builder ??= new UIToolkitBuilder();
-            var visualElement = _builder.Build(element);
+            var visualElement = UIToolkitBuilder.Build(element);
 
             root.Add(visualElement);
         }

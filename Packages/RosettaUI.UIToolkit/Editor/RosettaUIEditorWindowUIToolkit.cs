@@ -55,19 +55,10 @@ namespace RosettaUI.Editor.UIToolkit
             {
                 name = "ScalingContainer"
             };
-            
-            rootVisualElement.RegisterCallback<GeometryChangedEvent>(_ =>
-            {
-                var rect = rootVisualElement.layout;
-                
-                var width = rect.width / scale;
-                var height = rect.height / scale;
 
-                scalingContainer.style.width = width;
-                scalingContainer.style.height = height;
-              
-                scalingContainer.transform.scale = Vector3.one * scale;
-            });
+            
+            rootVisualElement.RegisterCallback<GeometryChangedEvent>(_ => UpdateScale());
+            scalingContainer.RegisterCallback<AttachToPanelEvent>(_ => UpdateScale()); // EditorWindow を開いたまま Play したとき GeometryChangedEvent が呼ばれないようなので必要
             
             scalingContainer.RegisterCallback<GeometryChangedEvent>(evt =>
             {
@@ -78,8 +69,21 @@ namespace RosettaUI.Editor.UIToolkit
                     rect.height * (scale - 1f) * 0.5f
                 );
             });
-
+      
             return scalingContainer;
+
+            void UpdateScale()
+            {
+                var rect = rootVisualElement.layout;
+                
+                var width = rect.width / scale;
+                var height = rect.height / scale;
+
+                scalingContainer.style.width = width;
+                scalingContainer.style.height = height;
+              
+                scalingContainer.transform.scale = Vector3.one * scale;
+            }
         }
 
         protected virtual void Update()

@@ -55,10 +55,13 @@ namespace RosettaUI.Editor.UIToolkit
             
             var scalingContainer = new VisualElement()
             {
-                name = "ScalingContainer"
+                name = "ScalingContainer",
+                style =
+                {
+                    flexShrink = 0
+                }
             };
 
-            
             rootVisualElement.RegisterCallback<GeometryChangedEvent>(_ => UpdateScale());
             scalingContainer.RegisterCallback<AttachToPanelEvent>(_ => UpdateScale()); // EditorWindow を開いたまま Play したとき GeometryChangedEvent が呼ばれないようなので必要
             

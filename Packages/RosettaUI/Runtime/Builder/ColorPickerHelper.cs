@@ -14,11 +14,13 @@ namespace RosettaUI.Builder
 
         public static string svDiskMaterialPath = "SvDisk";
 
-        public static Texture2D CreateTexture(int width, int height, TextureFormat format = TextureFormat.RGBA32) =>
-            new(width, height, format, false)
+        public static Texture2D CreateTexture(int width, int height, TextureFormat format = TextureFormat.RGBA32)
+        {
+            return new Texture2D(width, height, format, false)
             {
                 wrapMode = TextureWrapMode.Clamp
             };
+        }
 
         public static RenderTexture CreateRenderTexture(int width, int height) => 
             new(width, height, 0)

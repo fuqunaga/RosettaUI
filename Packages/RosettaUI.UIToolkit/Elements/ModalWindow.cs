@@ -14,8 +14,10 @@ namespace RosettaUI.UIToolkit
         readonly VisualElement _eventBlockerElement;
         KeyboardNavigationManipulator _navigationManipulator;
 
-        static readonly string ussClassNameEventBlocker = "rosettaui-modal-window-eventblocker";
-        static readonly string ussClassName = "rosettaui-modal-window";
+        private const string USSClassNameEventBlocker = "rosettaui-modal-window-event-blocker";
+        private const string USSClassName = "rosettaui-modal-window";
+
+        protected override VisualElement SelfRoot => _eventBlockerElement;
 
         public ModalWindow() : base(false)
         {
@@ -24,11 +26,10 @@ namespace RosettaUI.UIToolkit
             CloseButton.visible = false;
 
             _eventBlockerElement = new VisualElement();
-            _eventBlockerElement.AddToClassList(ussClassNameEventBlocker);
+            _eventBlockerElement.AddToClassList(USSClassNameEventBlocker);
             _eventBlockerElement.Add(this);
 
-            AddToClassList(ussClassName);
-
+            AddToClassList(USSClassName);
 
             /*
             m_OuterContainer = new VisualElement();
@@ -258,21 +259,6 @@ namespace RosettaUI.UIToolkit
             Hide();
         }
 #endif
-
-
-        protected override VisualElement SelfRoot => _eventBlockerElement;
-
-        public override void Show(Vector2 position, VisualElement target)
-        {
-            base.Show(position, target);
-
-            var root = target.panel.visualTree;
-
-            _eventBlockerElement.style.left = root.layout.x;
-            _eventBlockerElement.style.top = root.layout.y;
-            _eventBlockerElement.style.width = root.layout.width;
-            _eventBlockerElement.style.height = root.layout.height;
-        }
     }
 
 #if AvoidCompileError

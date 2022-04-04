@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -394,14 +395,9 @@ namespace RosettaUI.UIToolkit
 
         public virtual void Show(Vector2 position, VisualElement target)
         {
-            var root = target.panel.visualTree.Q<TemplateContainer>();
-
-            if (root == null)
-            {
-                Debug.LogError("Could not find rootVisualContainer...");
-                return;
-            }
-
+            var root = target.panel.visualTree.Q<TemplateContainer>()
+                       ?? target.panel.visualTree.Query(null, RosettaUIRootUIToolkit.USSRootClassName).First();
+            
             root.Add(SelfRoot);
 
             var local = root.WorldToLocal(position);

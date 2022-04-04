@@ -8,6 +8,7 @@ namespace RosettaUI.UIToolkit
     [RequireComponent(typeof(UIDocument))]
     public class RosettaUIRootUIToolkit : RosettaUIRoot
     {
+        public const string USSRootClassName = "rosettaui-root";
         protected UIDocument uiDocument;
 
         protected override void OnEnable()
@@ -36,6 +37,7 @@ namespace RosettaUI.UIToolkit
             }
 
             var root = uiDocument.rootVisualElement;
+            root.AddToClassList(USSRootClassName);
             var visualElement = UIToolkitBuilder.Build(element);
 
             root.Add(visualElement);

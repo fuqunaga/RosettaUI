@@ -21,9 +21,16 @@ namespace RosettaUI
             where TList : IList
             => List(label, ExpressionUtility.CreateBinder(targetExpression), createItemElement, option);
 
+        public static Element List<TList>(Expression<Func<TList>> targetExpression, Action<TList> writeValue, ListViewOption option)
+            where TList : IList
+            => List(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue, option);
         public static Element List<TList>(LabelElement label, Func<TList> readValue, Action<TList> writeValue, ListViewOption option)
             where TList : IList
             => List(label, readValue, writeValue, null, option);
+        
+        public static Element List<TList>(Expression<Func<TList>> targetExpression, Action<TList> writeValue, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
+            where TList : IList
+            => List(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue, createItemElement, option);
         public static Element List<TList>(LabelElement label, Func<TList> readValue, Action<TList> writeValue, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null) 
             where TList : IList
             => List(label, Binder.Create(readValue, writeValue), createItemElement, option);

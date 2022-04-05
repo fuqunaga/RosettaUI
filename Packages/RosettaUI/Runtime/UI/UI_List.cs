@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using UnityEngine;
 
 namespace RosettaUI
 {
@@ -17,9 +18,17 @@ namespace RosettaUI
         public static FoldElement List<TList>(LabelElement label, Expression<Func<TList>> targetExpression, ListViewOption option)
             where TList : IList
             => List(label, targetExpression, null, option);
+
         public static FoldElement List<TList>(LabelElement label, Expression<Func<TList>> targetExpression, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
             where TList : IList
-            => List(label, ExpressionUtility.CreateBinder(targetExpression), createItemElement, option);
+        {
+            if (option == null && ExpressionUtility.GetAttribute<TList, NonReorderableAttribute>(targetExpression) != null)
+            {
+                option = new ListViewOption(reorderable: false, ListViewOption.Default.fixedSize);
+            }
+
+            return List(label, ExpressionUtility.CreateBinder(targetExpression), createItemElement, option);
+        }
 
         public static FoldElement List<TList>(Expression<Func<TList>> targetExpression, Action<TList> writeValue, ListViewOption option)
             where TList : IList

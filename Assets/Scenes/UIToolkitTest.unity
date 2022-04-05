@@ -367,8 +367,8 @@ MonoBehaviour:
   listValue: 010000000200000003000000
   arrayValue: 010000000200000003000000
   floatValue: 0
-  intValue: 0
-  boolValue: 0
+  intValue: 4
+  boolValue: 1
   uiCustomClass:
     floatValue: 0
   dynamicElementIf: 0
@@ -510,7 +510,6 @@ MonoBehaviour:
   classList:
   - floatValue: 1
     stringValue: First
-  rangeValue: 0
   attributeTestClass:
     rangeFloat: 0
     multiLineString: 'multi
@@ -964,7 +963,7 @@ MonoBehaviour:
   intValue: 0
   uintValue: 0
   floatValue: 0
-  vector2Value: {x: 0, y: 0}
+  vector2Value: {x: 0.463, y: 0.5}
   vector3Value: {x: 0, y: 0, z: 0}
   vector4Value: {x: 0, y: 0, z: 0, w: 0}
   vector2IntValue: {x: 0, y: 0}
@@ -994,8 +993,8 @@ MonoBehaviour:
   simpleClass:
     floatValue: 0
     stringValue: 
-  stringValue: 
-  rangeValue: 0
+  rangeFloat: 0
+  stringValue: hoghe
 --- !u!1 &1850636927
 GameObject:
   m_ObjectHideFlags: 0
@@ -1056,14 +1055,7 @@ MonoBehaviour:
     stringValue: 2
   - floatValue: 0
     stringValue: 3
-  nonReorderableClass:
-    classList:
-    - floatValue: 0
-      stringValue: 1
-    - floatValue: 0
-      stringValue: 2
-    - floatValue: 0
-      stringValue: 3
+  nonReorderableArray: 010000000200000003000000
 --- !u!1 &1922449323
 GameObject:
   m_ObjectHideFlags: 0
@@ -1118,8 +1110,8 @@ MonoBehaviour:
     min: 0
     max: 0.38863626
   vector2MinMax:
-    min: {x: 0, y: 0}
-    max: {x: 0, y: 0}
+    min: {x: -0.07100046, y: 0}
+    max: {x: 0.22149956, y: 0}
   vector3MinMax:
     min: {x: 0, y: 0, z: 0}
     max: {x: 0, y: 0, z: 0}

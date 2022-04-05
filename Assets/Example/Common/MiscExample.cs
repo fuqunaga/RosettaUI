@@ -51,12 +51,6 @@ namespace RosettaUI.Example
                             UI.TextArea(nameof(UI.TextArea), () => multiLineStringValue),
                             UI.TextAreaReadOnly(nameof(UI.TextAreaReadOnly), () => multiLineStringValue)
                         ),
-                        ExampleTemplate.UIFunctionRow(nameof(UI.Image),
-                            UI.Image(() => texture).SetMaxWidth(200f).SetMaxHeight(200f)
-                        ),
-                        ExampleTemplate.UIFunctionRow(nameof(UI.Button),
-                            UI.Button(nameof(UI.Button), () => print("On button clicked"))
-                        ),
                         ExampleTemplate.UIFunctionColumn(nameof(UI.Dropdown),
                             UI.Dropdown(nameof(UI.Dropdown),
                                 () => dropDownIndex,
@@ -67,17 +61,13 @@ namespace RosettaUI.Example
                                 options: new[] {"One", "Two", "Three"}
                             )
                         ),
-                        ExampleTemplate.UIFunctionRow(nameof(UI.Popup),
-                            UI.Popup(
-                                UI.Box(UI.Label($"{nameof(UI.Popup)}(Right click)")),
-                                () => new[]
-                                {
-                                    new MenuItem("Menu0", () => Debug.Log("Menu0")),
-                                    new MenuItem("Menu1", () => Debug.Log("Menu1")),
-                                    new MenuItem("Menu2", () => Debug.Log("Menu2"))
-                                }
-                            )
+                        ExampleTemplate.UIFunctionRow(nameof(UI.Image),
+                            UI.Image(() => texture).SetMaxWidth(200f).SetMaxHeight(200f)
                         ),
+                        ExampleTemplate.UIFunctionRow(nameof(UI.Button),
+                            UI.Button(nameof(UI.Button), () => print("On button clicked"))
+                        ),
+              
                         ExampleTemplate.UIFunctionRow(nameof(UI.HelpBox),
                             UI.Column(
                                 UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.None)}", HelpBoxType.None),
@@ -89,6 +79,17 @@ namespace RosettaUI.Example
                         ),
                         ExampleTemplate.UIFunctionRow(nameof(UI.Space),
                             UI.Space().SetBackgroundColor(Color.gray)
+                        ),
+                        ExampleTemplate.UIFunctionRow(nameof(UI.Popup),
+                            UI.Popup(
+                                UI.Box(UI.Label($"{nameof(UI.Popup)}(Right click)")),
+                                () => new[]
+                                {
+                                    new MenuItem("Menu0", () => Debug.Log("Menu0")),
+                                    new MenuItem("Menu1", () => Debug.Log("Menu1")),
+                                    new MenuItem("Menu2", () => Debug.Log("Menu2"))
+                                }
+                            )
                         )
                     ),
                     

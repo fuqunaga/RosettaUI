@@ -66,25 +66,33 @@ namespace RosettaUI.Example
                         UI.MinMaxSliderReadOnly(() => boundsIntMinMax)
                     )
                 ),
-                UI.Column(
-                    UI.Label("<b>Tips</b>"),
-                    UI.Indent(
-                        UI.Label("<b>UI.MinMaxSlider(\"CustomLabel\", () => floatMinMax)</b>"),
-                        UI.MinMaxSlider("CustomLabel", () => floatMinMax),
-                        UI.Space().SetHeight(10f),
-                        UI.Label(
-                            "<b>UI.MinMaxSlider(\"Custom min max\", () => floatMinMax, MinMax.Create(-1f, 1f))</b>"),
-                        UI.MinMaxSlider("Custom min max", () => floatMinMax, MinMax.Create(-1f, 1f)),
-                        UI.Label(
-                            "<b>UI.MinMaxSlider(\"Custom min max\", () => vector2MinMax, MinMax.Create(Vector2.one * -1f, Vector2.one))</b>"),
-                        UI.MinMaxSlider("Custom min max", () => vector2MinMax,
-                            MinMax.Create(Vector2.one * -1f, Vector2.one)),
-                        UI.Space().SetHeight(10f),
-                        UI.Label(
-                            $"Supports any type that has a specific member pair [{string.Join(",", TypeUtility.MinMaxMemberNamePairs.Select(pair => $"({pair.Item1}, {pair.Item2})"))}]"),
-                        UI.MinMaxSlider(() => myMinMax),
-                        UI.MinMaxSlider(() => vector2Value)
-                    )
+                ExampleTemplate.CodeElementSets("<b>Argument</b>",
+                    new[]
+                    {
+                        ("UI.MinMaxSlider(() => floatMinMax, MinMax.Create(-1f, 1f));", UI.MinMaxSlider(() => floatMinMax, MinMax.Create(-1f, 1f))),
+                        (@"UI.MinMaxSlider(() => vector2MinMax,
+         MinMax.Create(-Vector2.one, Vector2.one);",
+                            UI.MinMaxSlider(() => vector2MinMax, MinMax.Create(-Vector2.one, Vector2.one))),
+                    }
+                ),
+                ExampleTemplate.CodeElementSets(
+                    $"Supports any type that has a specific member pair [{string.Join(",", TypeUtility.MinMaxMemberNamePairs.Select(pair => $"({pair.Item1}, {pair.Item2})"))}]",
+                    new[]
+                    {
+                        (@"public struct MyMinMax<T>
+{
+    public T Min;
+    public T Max;
+}
+
+public MyMinMax<float> myMinMax;
+
+UI.MinMaxSlider(() => myMinMax);",
+                            UI.MinMaxSlider(() => myMinMax)),
+
+
+                        ("UI.MinMaxSlider(() => vector2Value);", UI.MinMaxSlider(() => vector2Value))
+                    }
                 )
             );
         }

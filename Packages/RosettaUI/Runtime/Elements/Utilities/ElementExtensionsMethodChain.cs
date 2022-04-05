@@ -94,14 +94,17 @@ namespace RosettaUI
         }
         
         
-        public static OpenCloseBaseElement SetOpenFlag(this OpenCloseBaseElement element, bool flag)
+        public static T SetOpenFlag<T>(this T element, bool flag)
+            where T : OpenCloseBaseElement
         {
             element.IsOpen = flag;
             return element;
         }
 
-        public static OpenCloseBaseElement Open(this OpenCloseBaseElement element) => element.SetOpenFlag(true);
+        public static T Open<T>(this T element) where T : OpenCloseBaseElement
+            => element.SetOpenFlag(true);
 
-        public static OpenCloseBaseElement Close(this OpenCloseBaseElement element) => element.SetOpenFlag(false);
+        public static T Close<T>(this T element) where T : OpenCloseBaseElement
+            => element.SetOpenFlag(false);
     }
 }

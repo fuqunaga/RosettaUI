@@ -74,6 +74,10 @@ namespace RosettaUI
             return GetMemberData(type, propertyOrFieldName).isReorderable;
         }
 
+        public static bool IsMultiline(Type type, string propertyOrFieldName)
+        {
+            return GetMemberData(type, propertyOrFieldName).isMultiline;
+        }
         
 
         public static bool HasSerializableField(Type type)
@@ -197,7 +201,8 @@ namespace RosettaUI
                             type = pair.Item2,
                             memberInfo = pair.Item1,
                             range = pair.Item1.GetCustomAttribute<RangeAttribute>(),
-                            isReorderable = pair.Item1.GetCustomAttribute<NonReorderableAttribute>() == null
+                            isReorderable = pair.Item1.GetCustomAttribute<NonReorderableAttribute>() == null,
+                            isMultiline =  pair.Item1.GetCustomAttribute<MultilineAttribute>() != null
                         }
                     );
 
@@ -213,6 +218,7 @@ namespace RosettaUI
                 public MemberInfo memberInfo;
                 public RangeAttribute range;
                 public bool isReorderable;
+                public bool isMultiline;
             }
         }
         

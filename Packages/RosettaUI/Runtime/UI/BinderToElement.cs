@@ -80,15 +80,21 @@ namespace RosettaUI
                 var fieldLabel = UICustom.ModifyPropertyOrFieldLabel(valueType, fieldName);
 
                 var range = TypeUtility.GetRange(valueType, fieldName);
-                if (range == null)
-                {
-                    return UI.Field(fieldLabel, fieldBinder);
-                }
-                else
+                if (range != null)
                 {
                     var (minGetter, maxGetter) = RangeUtility.CreateGetterMinMax(range, fieldBinder.ValueType);
                     return UI.Slider(fieldLabel, fieldBinder, minGetter, maxGetter);
                 }
+               
+                var field = UI.Field(fieldLabel, fieldBinder);
+                
+                
+                if (TypeUtility.IsMultiline(valueType, fieldName) && field is TextFieldElement textField)
+                {
+                    textField.IsMultiLine = true;
+                }
+
+                return field;
             });
 
 

@@ -29,7 +29,7 @@ namespace RosettaUI
         static TextFieldElement _TextArea(Element element)
         {
             var textFieldElement = (TextFieldElement) element;
-            textFieldElement.MultiLine = true;
+            textFieldElement.IsMultiLine = true;
             return textFieldElement;
         }
     }

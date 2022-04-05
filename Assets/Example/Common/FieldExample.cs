@@ -1,11 +1,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace RosettaUI.Example
 {
     public class FieldExample : MonoBehaviour, IElementCreator
     {
+        [System.Serializable]
+        public class AttributeTestClass
+        {
+            [Range(0f,100f)]
+            public float rangeFloat;
+
+            [Multiline]
+            public string multiLineString;
+
+            [NonReorderable]
+            public List<int> nonReorderableList;
+        }
+        
         public int intValue;
         public uint uintValue;
         public float floatValue;
@@ -39,7 +53,8 @@ namespace RosettaUI.Example
 
         //public ComplexClass complexClass;
 
-
+        [FormerlySerializedAs("attributeTextClass")] public AttributeTestClass attributeTestClass;
+        
         public Element CreateElement()
         {
             return UI.Column(
@@ -91,11 +106,40 @@ namespace RosettaUI.Example
                         UI.FieldReadOnly(() => classList)
                     )
                 ),
-                UI.Column(
+                ExampleTemplate.TitleIndent("<b>Attribute</b>",
+                    ExampleTemplate.CodeElementSets(new[]
+                        {
+                            (@"public class AttributeTextClass
+{
+    [Range(0f,100f)]
+    public float rangeFloat;
+
+    [Multiline]
+    public float multiLineString;
+
+    [NonReorderable]
+    public List<int> nonReorderableList;
+}
+
+UI.Field(() => attributeTestClass);
+",
+                                UI.Field(() => attributeTestClass)
+                                )
+                        }
+                    ),
+                    
+                    
                     UI.Label("<b>Tips</b>"),
                     UI.Indent(
-                        UI.Label("<b>UI.Field(\"CustomLabel\", () => floatValue)</b>"),
-                        UI.Field("CustomLabel", () => floatValue),
+                        UI.Row(
+                            UI.Label("Custom Label"),
+                        UI.Box(
+                        UI.Label("UI.Field(\"CustomLabel\", () => floatValue)")
+                        ).SetBackgroundColor(Color.black),
+                        UI.Box(
+                        UI.Field("CustomLabel", () => floatValue)
+                        )
+                        ),
                         ExampleTemplate.BlankLine(),
                         
                         UI.Label("<b>UI.Field(() => vector2Value.x)</b>"),

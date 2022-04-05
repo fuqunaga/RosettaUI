@@ -511,6 +511,14 @@ MonoBehaviour:
   - floatValue: 1
     stringValue: First
   rangeValue: 0
+  attributeTestClass:
+    rangeFloat: 0
+    multiLineString: 'multi
+
+      line
+
+      string'
+    nonReorderableList: 010000000200000003000000
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0

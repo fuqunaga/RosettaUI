@@ -43,52 +43,59 @@ namespace RosettaUI.Example
 
         public int dropDownIndex;
         public string[] dropDownOptions = new[] {"One", "Two", "Three"};
-        
+
 
         public Element CreateElement()
         {
             return UI.Column(
-                ExampleTemplate.TitleIndent("<b>Custom Label</b>",
-                    ExampleTemplate.CodeElementSets(new[]
-                        {
-                            ("UI.Field(\"CustomLabel\", () => floatValue);", UI.Field("CustomLabel", () => floatValue)),
-                            ("UI.Slider(\"CustomLabel\", () => floatValue);", UI.Slider("CustomLabel", () => floatValue)),
-                            ("UI.MinMaxSlider(\"CustomLabel\", () => vector2Value);", UI.MinMaxSlider("CustomLabel", () => vector2Value)),
-                            ("UI.Dropdown(\"CustomLabel\", () => dropDownIndex, dropDownOptions);", UI.Dropdown("CustomLabel", () => dropDownIndex, dropDownOptions)),
-                            ("UI.TextArea(\"CustomLabel\", () => stringValue);", UI.TextArea("CustomLabel", () => stringValue)),
-                            ("UI.List(\"CustomLabel\", () => intList);", UI.List("CustomLabel", () => intList)),
-                        }
-                    )
+                ExampleTemplate.CodeElementSets("<b>Custom Label</b>",
+                    new[]
+                    {
+                        ("UI.Field(\"CustomLabel\", () => floatValue);", UI.Field("CustomLabel", () => floatValue)),
+                        ("UI.Slider(\"CustomLabel\", () => floatValue);", UI.Slider("CustomLabel", () => floatValue)),
+                        ("UI.MinMaxSlider(\"CustomLabel\", () => vector2Value);",
+                            UI.MinMaxSlider("CustomLabel", () => vector2Value)),
+                        ("UI.Dropdown(\"CustomLabel\", () => dropDownIndex, dropDownOptions);",
+                            UI.Dropdown("CustomLabel", () => dropDownIndex, dropDownOptions)),
+                        ("UI.TextArea(\"CustomLabel\", () => stringValue);",
+                            UI.TextArea("CustomLabel", () => stringValue)),
+                        ("UI.List(\"CustomLabel\", () => intList);", UI.List("CustomLabel", () => intList)),
+                    }
                 ),
-                ExampleTemplate.TitleIndent("<b>No Label</b>",
-                    ExampleTemplate.CodeElementSets(new[]
-                        {
-                            ("UI.Field(null, () => floatValue);", UI.Field(null, () => floatValue)),
-                            ("UI.Slider(null, () => floatValue);", UI.Slider(null, () => floatValue)),
-                            ("UI.MinMaxSlider(null, () => vector2Value);", UI.MinMaxSlider(null, () => vector2Value)),
-                            ("UI.Dropdown(null, () => dropDownIndex, dropDownOptions);", UI.Dropdown(null, () => dropDownIndex, dropDownOptions)),
-                            ("UI.TextArea(null, () => stringValue);", UI.TextArea(null, () => stringValue)),
-                            ("UI.List(null, () => intList);", UI.List(null, () => intList)),
-                        }
-                    )
+                ExampleTemplate.CodeElementSets("<b>No Label</b>",
+                    new[]
+                    {
+                        ("UI.Field(null, () => floatValue);", UI.Field(null, () => floatValue)),
+                        ("UI.Slider(null, () => floatValue);", UI.Slider(null, () => floatValue)),
+                        ("UI.MinMaxSlider(null, () => vector2Value);", UI.MinMaxSlider(null, () => vector2Value)),
+                        ("UI.Dropdown(null, () => dropDownIndex, dropDownOptions);",
+                            UI.Dropdown(null, () => dropDownIndex, dropDownOptions)),
+                        ("UI.TextArea(null, () => stringValue);", UI.TextArea(null, () => stringValue)),
+                        ("UI.List(null, () => intList);", UI.List(null, () => intList)),
+                    }
                 ),
-                ExampleTemplate.TitleIndent("<b>Expression</b>",
-                    ExampleTemplate.CodeElementSets(new[]
-                        {
-                            ("UI.Field(() => floatValue / 2f);",  UI.Field(() => floatValue / 2f)),
-                            ("UI.Field(() => floatValue / 2f, f => floatValue = f * 2f);", UI.Field(() => floatValue / 2f, f => floatValue = f * 2f)),
-                            ("UI.Slider(() => floatValue / 2f);",  UI.Slider(() => floatValue / 2f)),
-                            ("UI.Slider(() => floatValue / 2f, f => floatValue = f * 2f);", UI.Slider(() => floatValue / 2f, f => floatValue = f * 2f)),
-                            ("UI.MinMaxSlider(() => vector2Value / 2f);",  UI.MinMaxSlider(() => vector2Value / 2f)),
-                            ("UI.MinMaxSlider(() => vector2Value / 2f, f => vector2Value = f * 2f);", UI.MinMaxSlider(() => vector2Value / 2f, f => vector2Value = f * 2f)),
-                            ("UI.Dropdown(() => GetDropdownIndex(), dropDownOptions);", UI.Dropdown(() => GetDropdownIndex(), dropDownOptions)),
-                            ("UI.Dropdown(() => GetDropdownIndex(), SetDropdownIndex,  dropDownOptions);", UI.Dropdown(() => GetDropdownIndex(), SetDropdownIndex,  dropDownOptions)),
-                            ("UI.TextArea(() => stringValue.ToUpper());", UI.TextArea(() => stringValue.ToUpper())),
-                            ("UI.TextArea(() => stringValue.ToUpper(), s => stringValue = s.ToLower());", UI.TextArea(() => stringValue.ToUpper(), s => stringValue = s.ToLower())),
-                            ("UI.List(() => GetIntList());", UI.List(() => GetIntList())),
-                            ("UI.List(() => GetIntList(), SetIntList);", UI.List(() => GetIntList(), SetIntList)),
-                        }
-                    )
+                ExampleTemplate.CodeElementSets("<b>Expression</b>",
+                    new[]
+                    {
+                        ("UI.Field(() => floatValue / 2f);", UI.Field(() => floatValue / 2f)),
+                        ("UI.Field(() => floatValue / 2f, f => floatValue = f * 2f);",
+                            UI.Field(() => floatValue / 2f, f => floatValue = f * 2f)),
+                        ("UI.Slider(() => floatValue / 2f);", UI.Slider(() => floatValue / 2f)),
+                        ("UI.Slider(() => floatValue / 2f, f => floatValue = f * 2f);",
+                            UI.Slider(() => floatValue / 2f, f => floatValue = f * 2f)),
+                        ("UI.MinMaxSlider(() => vector2Value / 2f);", UI.MinMaxSlider(() => vector2Value / 2f)),
+                        ("UI.MinMaxSlider(() => vector2Value / 2f, f => vector2Value = f * 2f);",
+                            UI.MinMaxSlider(() => vector2Value / 2f, f => vector2Value = f * 2f)),
+                        ("UI.Dropdown(() => GetDropdownIndex(), dropDownOptions);",
+                            UI.Dropdown(() => GetDropdownIndex(), dropDownOptions)),
+                        ("UI.Dropdown(() => GetDropdownIndex(), SetDropdownIndex,  dropDownOptions);",
+                            UI.Dropdown(() => GetDropdownIndex(), SetDropdownIndex, dropDownOptions)),
+                        ("UI.TextArea(() => stringValue.ToUpper());", UI.TextArea(() => stringValue.ToUpper())),
+                        ("UI.TextArea(() => stringValue.ToUpper(), s => stringValue = s.ToLower());",
+                            UI.TextArea(() => stringValue.ToUpper(), s => stringValue = s.ToLower())),
+                        ("UI.List(() => GetIntList());", UI.List(() => GetIntList())),
+                        ("UI.List(() => GetIntList(), SetIntList);", UI.List(() => GetIntList(), SetIntList)),
+                    }
                 )
             );
         }

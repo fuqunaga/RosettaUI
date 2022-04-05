@@ -19,9 +19,11 @@ namespace RosettaUI.Example
         public Bounds boundsValue;
         public BoundsInt boundsIntValue;
         public SimpleClass simpleClass;
-
+        
+        [Range(0f, 100f)] 
+        public float rangeFloat;
+        
         public string stringValue;
-        [Range(-1f, 1f)] public float rangeValue;
 
         public Element CreateElement()
         {
@@ -60,46 +62,36 @@ namespace RosettaUI.Example
                         UI.SliderReadOnly(() => simpleClass)
                     )
                 ),
+                ExampleTemplate.CodeElementSets("<b>Argument</b>",
+                    new[]
+                    {
+                        ("UI.Slider(() => floatValue, max:2f);", UI.Slider(() => floatValue, max: 2f)),
+                        ("UI.Slider(() => floatValue, min:0.5f, max:2f);",
+                            UI.Slider(() => floatValue, min: 0.5f, max: 2f)),
+                        ("UI.Slider(() => vector2Value, max:Vector2.one * 2f);",
+                            UI.Slider(() => vector2Value, max: Vector2.one * 2f)),
+                        ("UI.Slider(() => vector2Value, min:Vector2.one * 0.5f, max:Vector2.one * 2f);",
+                            UI.Slider(() => vector2Value, min: Vector2.one * 0.5f, max: Vector2.one * 2f)),
+                    }
+                ),
+                ExampleTemplate.CodeElementSets("<b>Attribute</b>",
+                    new[]
+                    {
+                        (@"[Range(0f, 100f)] 
+public float rangeFloat;
 
-                UI.Column(
-                    UI.Label("<b>Tips</b>"),
-                    UI.Indent(
-                        UI.Label("<b>UI.Slider(\"CustomLabel\", () => floatValue)</b>"),
-                        UI.Slider("CustomLabel", () => floatValue),
-                        UI.Space().SetHeight(10f),
-                    
-                        UI.Label("<b>UI.Slider(\"Custom min max\", () => floatValue, -1f, 2f)</b>"),
-                        UI.Slider("Custom min max", () => floatValue, -1f, 2f),
-                        UI.Label("<b>UI.Slider(\"Custom min max\", () => vector2Value, Vector2.one * -1, Vector2.one)"),
-                        UI.Slider("Custom min max", () => vector2Value, Vector2.one * -1, Vector2.one),
-                        UI.Space().SetHeight(10f),
-            
-                        UI.Label("<b>UI.Slider(() => vector2Value.x)</b>"),
-                        UI.Label("Supports public field/property"),
-                        UI.Slider(() => vector2Value.x),
-                        UI.Space().SetHeight(10f),
-                        
-                        UI.Label("<b>UI.Slider(() => floatValue + 0.1f),</b>"),
-                        UI.Label("Non-interactable if the expression is not assignable"),
-                        UI.Slider(() => floatValue + 0.1f),
-                        UI.Label("Interactable if set label and writeValue func"),
-                        UI.Slider($"{nameof(floatValue)} + 0.1f",
-                            () => floatValue + 0.1f,
-                            f => floatValue = f - 0.1f
-                        ),
-                        UI.Space().SetHeight(10f),
-
-                        UI.Label("<b>UI.Slider(() => stringValue)</b>"),
-                        UI.Label("Unsupported types will fall back to UI.Field()"),
-                        UI.Slider(() => stringValue),
-                        UI.Space().SetHeight(10f),
-                        
-                        UI.Label("<b>Min and max will be set automatically if there is a range attribute</b>"),
-                        UI.HelpBox("[Range(-1f, 1f)] public float rangeValue;"),
-                        UI.Slider(() => rangeValue)
-                    )
+UI.Slider(() => rangeFloat);
+",
+                            UI.Slider(() => rangeFloat)
+                        )
+                    }
+                ),
+                ExampleTemplate.CodeElementSets("Unsupported types will fall back to UI.Field()",
+                    new[]
+                    {
+                        ("UI.Slider(() => stringValue)", UI.Slider(() => stringValue))
+                    }
                 )
-
             );
         }
     }

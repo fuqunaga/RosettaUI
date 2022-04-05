@@ -41,24 +41,26 @@ namespace RosettaUI.Example
             UIFunctionColumn(functionName, UI.Box(elements));
 
 
-        public static Element CodeElementSets((string, Element)[] pairs)
+        public static Element CodeElementSets(string title, (string, Element)[] pairs)
         {
             var texts = pairs.Select(pair => pair.Item1);
             var elements = pairs.Select(pair => pair.Item2);
 
             var code = string.Join("\n", texts);
-            
-            return UI.Row(
+
+            return TitleIndent(title,
+                UI.Row(
                     UI.TextArea(null, () => code)
-                // UI.Column(
-                //     texts.Select(t => UI.Field(null, () => t).SetHeight(32f))
-                // )
-                    //.SetBackgroundColor(new Color(0.1f, 0.1f, 0.1f))
-                    .SetWidth(700f),
-                UI.Space().SetWidth(30f),
-                UI.Box(
-                    UI.Page(
-                        elements
+                        // UI.Column(
+                        //     texts.Select(t => UI.Field(null, () => t).SetHeight(32f))
+                        // )
+                        //.SetBackgroundColor(new Color(0.1f, 0.1f, 0.1f))
+                        .SetWidth(700f),
+                    UI.Space().SetWidth(30f),
+                    UI.Box(
+                        UI.Page(
+                            elements
+                        )
                     )
                 )
             );

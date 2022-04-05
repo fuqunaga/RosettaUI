@@ -26,13 +26,18 @@ namespace RosettaUI
         public IBinder ParentBinder => parentBinder;
         public string PropertyOrFieldName { get; protected set; }
 
-        public PropertyOrFieldBinder(IBinder<TParent> parentBinder, string propertyOrFieldName)
-            : base(parentBinder,
-                PropertyOrFieldGetterSetter<TParent, TValue>.GetGetterSetter(propertyOrFieldName).Item1,
-                PropertyOrFieldGetterSetter<TParent, TValue>.GetGetterSetter(propertyOrFieldName).Item2
-            )
+        private readonly Func<TParent, TValue> _getFromParentFunc;
+        private readonly Func<TParent, TValue, TParent> _setToParentFunc;
+
+        public PropertyOrFieldBinder(IBinder<TParent> parentBinder, string propertyOrFieldName) : base(parentBinder)
         {
             PropertyOrFieldName = propertyOrFieldName;
+
+            (_getFromParentFunc, _setToParentFunc) =
+                PropertyOrFieldGetterSetter<TParent, TValue>.GetGetterSetter(propertyOrFieldName);
         }
+
+        protected override TValue GetFromParent(TParent parent) => _getFromParentFunc(parent);
+        protected override TParent SetToParent(TParent parent, TValue value) => _setToParentFunc(parent, value);
     }
 }

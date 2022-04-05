@@ -124,15 +124,19 @@ namespace RosettaUI
 
     public class ListItemBinder<T> : ChildBinder<IList<T>, T>
     {
+        private readonly int _idx;
+        
         public ListItemBinder(IGetter<IList<T>> listGetter, int idx) : 
-            base(new Binder<IList<T>>(listGetter, null),
-                (list) => (0<=idx && idx<list.Count) ? list[idx] :default,
-                (list, v) => {
-                    if ( idx < list.Count ) list[idx] = v;
-                    return list; 
-                }
-                )
+            base(new Binder<IList<T>>(listGetter, null))
         {
+            _idx = idx;
+        }
+
+        protected override T GetFromParent(IList<T> list) => (0 <= _idx && _idx < list.Count) ? list[_idx] : default;
+        protected override IList<T> SetToParent(IList<T> list, T value)
+        {
+            if ( _idx < list.Count ) list[_idx] = value;
+            return list; 
         }
     }
 }

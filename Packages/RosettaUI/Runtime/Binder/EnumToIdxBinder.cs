@@ -5,8 +5,16 @@ using UnityEngine.Assertions;
 
 namespace RosettaUI
 {
-    public class EnumToIdxBinder<TFrom> : ChildBinder<TFrom, int>
+    public class EnumToIdxBinder<TFrom> : ConvertBinder<TFrom, int>
     {
+        public EnumToIdxBinder(IBinder<TFrom> parentBinder) : base(parentBinder)
+        {
+        }
+
+        protected override int GetFromParent(TFrom parent) => ToIdxFunc(parent);
+        protected override TFrom SetToParent(TFrom parent, int value) => ToEnumFunc(parent, value);
+
+
         #region static
 
         static readonly Func<TFrom, int> ToIdxFunc;
@@ -41,11 +49,5 @@ namespace RosettaUI
         #endregion
 
 
-        public EnumToIdxBinder(IBinder<TFrom> parentBinder) : base(parentBinder, ToIdxFunc, ToEnumFunc)
-        {
-        }
-
-
-        public override bool IsConst => parentBinder.IsConst;
     }
 }

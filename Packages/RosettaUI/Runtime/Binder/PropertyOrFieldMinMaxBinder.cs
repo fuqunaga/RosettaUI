@@ -14,7 +14,7 @@ namespace RosettaUI
         }
     }
 
-    public class PropertyOrFieldMinMaxBinder<TParent, TValue> : ChildBinderBase<MinMax<TParent>, MinMax<TValue>>
+    public class PropertyOrFieldMinMaxBinder<TParent, TValue> : ChildBinder<MinMax<TParent>, MinMax<TValue>>
     {
         private readonly Func<TParent, TValue> _childGetter;
         private readonly Func<TParent, TValue, TParent> _childSetter;
@@ -26,7 +26,7 @@ namespace RosettaUI
                 PropertyOrFieldGetterSetter<TParent, TValue>.GetGetterSetter(propertyOrFieldName);
         }
 
-        protected override MinMax<TValue> GetFromChild(MinMax<TParent> parent)
+        protected override MinMax<TValue> GetFromParent(MinMax<TParent> parent)
         {
             var (min, max) = parent;
             return MinMax.Create(_childGetter(min), _childGetter(max));

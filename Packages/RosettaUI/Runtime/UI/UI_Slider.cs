@@ -9,8 +9,7 @@ namespace RosettaUI
             => Slider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression);
 
         public static Element Slider<T>(Expression<Func<T>> targetExpression, T max)
-            => Slider(targetExpression, default, max);
-
+            => Slider(targetExpression, default(T), max);
 
         public static Element Slider<T>(Expression<Func<T>> targetExpression, T min, T max)
             => Slider(ExpressionUtility.CreateLabelString(targetExpression),
@@ -39,13 +38,23 @@ namespace RosettaUI
                 ConstGetter.Create(max)
                 );
         }
-        
+
+
+        public static Element Slider<T>(Expression<Func<T>> targetExpression, Action<T> writeValue)
+            => Slider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue);
+
+        public static Element Slider<T>(Expression<Func<T>> targetExpression, Action<T> writeValue, T max)
+            => Slider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue, max);
+
+        public static Element Slider<T>(Expression<Func<T>> targetExpression, Action<T> writeValue, T min, T max)
+            => Slider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue, min, max);
+
         
         public static Element Slider<T>(LabelElement label, Func<T> readValue, Action<T> writeValue) 
             => Slider(label, Binder.Create(readValue, writeValue), null, null);
 
         public static Element Slider<T>(LabelElement label, Func<T> readValue, Action<T> writeValue, T max) 
-            => Slider(label, readValue, writeValue, max, default);
+            => Slider(label, readValue, writeValue, default, max);
 
         public static Element Slider<T>(LabelElement label, Func<T> readValue, Action<T> writeValue, T min, T max)
         {

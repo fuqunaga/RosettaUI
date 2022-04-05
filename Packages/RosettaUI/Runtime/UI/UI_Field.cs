@@ -16,6 +16,9 @@ namespace RosettaUI
             return Field(label, binder);
         }
 
+        public static Element Field<T>(Expression<Func<T>> targetExpression, Action<T> writeValue)
+            => Field(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue);
+        
         public static Element Field<T>(LabelElement label, Func<T> readValue, Action<T> writeValue)
             => Field(label, Binder.Create(readValue, writeValue));
 

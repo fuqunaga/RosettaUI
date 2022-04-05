@@ -42,7 +42,6 @@ namespace RosettaUI.Example
         //public ComplexClass complexClass;
 
         public int dropDownIndex;
-        public string dropDownString = "One";
         public string[] dropDownOptions = new[] {"One", "Two", "Three"};
         
 
@@ -82,8 +81,8 @@ namespace RosettaUI.Example
                             ("UI.Slider(() => floatValue / 2f, f => floatValue = f * 2f);", UI.Slider(() => floatValue / 2f, f => floatValue = f * 2f)),
                             ("UI.MinMaxSlider(() => vector2Value / 2f);",  UI.MinMaxSlider(() => vector2Value / 2f)),
                             ("UI.MinMaxSlider(() => vector2Value / 2f, f => vector2Value = f * 2f);", UI.MinMaxSlider(() => vector2Value / 2f, f => vector2Value = f * 2f)),
-                            ("UI.Dropdown(() => Mathf.FloorToInt(floatValue), dropDownOptions);", UI.Dropdown(() => Mathf.FloorToInt(floatValue), dropDownOptions)),
-                            ("UI.Dropdown(() => Mathf.FloorToInt(floatValue), i => floatValue = i, dropDownOptions);", UI.Dropdown(() => Mathf.FloorToInt(floatValue), i => floatValue = i,  dropDownOptions)),
+                            ("UI.Dropdown(() => GetDropdownIndex(), dropDownOptions);", UI.Dropdown(() => GetDropdownIndex(), dropDownOptions)),
+                            ("UI.Dropdown(() => GetDropdownIndex(), SetDropdownIndex,  dropDownOptions);", UI.Dropdown(() => GetDropdownIndex(), SetDropdownIndex,  dropDownOptions)),
                             ("UI.TextArea(() => stringValue.ToUpper());", UI.TextArea(() => stringValue.ToUpper())),
                             ("UI.TextArea(() => stringValue.ToUpper(), s => stringValue = s.ToLower());", UI.TextArea(() => stringValue.ToUpper(), s => stringValue = s.ToLower())),
                             ("UI.List(() => GetIntList());", UI.List(() => GetIntList())),
@@ -93,7 +92,9 @@ namespace RosettaUI.Example
                 )
             );
         }
-        
+
+        int GetDropdownIndex() => dropDownIndex;
+        void SetDropdownIndex(int idx) => dropDownIndex = idx;
         
         List<int> GetIntList() => intList;
         void SetIntList(List<int> list) => intList = list;

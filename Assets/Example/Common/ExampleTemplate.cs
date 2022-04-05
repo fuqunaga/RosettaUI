@@ -54,7 +54,7 @@ namespace RosettaUI.Example
                 //     texts.Select(t => UI.Field(null, () => t).SetHeight(32f))
                 // )
                     //.SetBackgroundColor(new Color(0.1f, 0.1f, 0.1f))
-                    .SetWidth(800f),
+                    .SetWidth(700f),
                 UI.Space().SetWidth(30f),
                 UI.Box(
                     UI.Page(

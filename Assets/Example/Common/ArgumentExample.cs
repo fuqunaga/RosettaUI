@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -41,6 +42,7 @@ namespace RosettaUI.Example
         //public ComplexClass complexClass;
 
         public int dropDownIndex;
+        public string dropDownString = "One";
         public string[] dropDownOptions = new[] {"One", "Two", "Three"};
         
 
@@ -53,9 +55,9 @@ namespace RosettaUI.Example
                             ("UI.Field(\"CustomLabel\", () => floatValue);", UI.Field("CustomLabel", () => floatValue)),
                             ("UI.Slider(\"CustomLabel\", () => floatValue);", UI.Slider("CustomLabel", () => floatValue)),
                             ("UI.MinMaxSlider(\"CustomLabel\", () => vector2Value);", UI.MinMaxSlider("CustomLabel", () => vector2Value)),
-                            ("UI.List(\"CustomLabel\", () => intList);", UI.List("CustomLabel", () => intList)),
+                            ("UI.Dropdown(\"CustomLabel\", () => dropDownIndex, dropDownOptions);", UI.Dropdown("CustomLabel", () => dropDownIndex, dropDownOptions)),
                             ("UI.TextArea(\"CustomLabel\", () => stringValue);", UI.TextArea("CustomLabel", () => stringValue)),
-                            ("UI.Dropdown(\"CustomLabel\", () => dropDownIndex, dropDownOptions);", UI.Dropdown("CustomLabel", () => dropDownIndex, dropDownOptions))
+                            ("UI.List(\"CustomLabel\", () => intList);", UI.List("CustomLabel", () => intList)),
                         }
                     )
                 ),
@@ -65,17 +67,9 @@ namespace RosettaUI.Example
                             ("UI.Field(null, () => floatValue);", UI.Field(null, () => floatValue)),
                             ("UI.Slider(null, () => floatValue);", UI.Slider(null, () => floatValue)),
                             ("UI.MinMaxSlider(null, () => vector2Value);", UI.MinMaxSlider(null, () => vector2Value)),
-                            ("UI.List(null, () => intList);", UI.List(null, () => intList)),
+                            ("UI.Dropdown(null, () => dropDownIndex, dropDownOptions);", UI.Dropdown(null, () => dropDownIndex, dropDownOptions)),
                             ("UI.TextArea(null, () => stringValue);", UI.TextArea(null, () => stringValue)),
-                            ("UI.Dropdown(null, () => dropDownIndex, dropDownOptions);", UI.Dropdown(null, () => dropDownIndex, dropDownOptions))
-                        }
-                    )
-                ),
-                ExampleTemplate.TitleIndent("<b>Public field/property</b>",
-                    ExampleTemplate.CodeElementSets(new[]
-                        {
-                            ("UI.Field(() => vector2Value.x);", UI.Field(() => vector2Value.x)),
-                            ("UI.Slider(() => vector2Value.x);", UI.Slider(() => vector2Value.x)),
+                            ("UI.List(null, () => intList);", UI.List(null, () => intList)),
                         }
                     )
                 ),
@@ -88,10 +82,20 @@ namespace RosettaUI.Example
                             ("UI.Slider(() => floatValue / 2f, f => floatValue = f * 2f);", UI.Slider(() => floatValue / 2f, f => floatValue = f * 2f)),
                             ("UI.MinMaxSlider(() => vector2Value / 2f);",  UI.MinMaxSlider(() => vector2Value / 2f)),
                             ("UI.MinMaxSlider(() => vector2Value / 2f, f => vector2Value = f * 2f);", UI.MinMaxSlider(() => vector2Value / 2f, f => vector2Value = f * 2f)),
+                            ("UI.Dropdown(() => Mathf.FloorToInt(floatValue), dropDownOptions);", UI.Dropdown(() => Mathf.FloorToInt(floatValue), dropDownOptions)),
+                            ("UI.Dropdown(() => Mathf.FloorToInt(floatValue), i => floatValue = i, dropDownOptions);", UI.Dropdown(() => Mathf.FloorToInt(floatValue), i => floatValue = i,  dropDownOptions)),
+                            ("UI.TextArea(() => stringValue.ToUpper());", UI.TextArea(() => stringValue.ToUpper())),
+                            ("UI.TextArea(() => stringValue.ToUpper(), s => stringValue = s.ToLower());", UI.TextArea(() => stringValue.ToUpper(), s => stringValue = s.ToLower())),
+                            ("UI.List(() => GetIntList());", UI.List(() => GetIntList())),
+                            ("UI.List(() => GetIntList(), SetIntList);", UI.List(() => GetIntList(), SetIntList)),
                         }
                     )
                 )
             );
         }
+        
+        
+        List<int> GetIntList() => intList;
+        void SetIntList(List<int> list) => intList = list;
     }
 }

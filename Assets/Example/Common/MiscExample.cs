@@ -153,10 +153,6 @@ namespace RosettaUI.Example
                     )
                 )
                 */
-       
-                UI.Fold(UI.Field("CustomBar", () => boolValue), null),
-                UI.Fold(UI.Button("LeftBar"), UI.Button("RightBar"), null),
-                
                 UI.Fold("ChildValueChangedCallback",
                     UI.Field(() => intValue),
                     UI.Field(() => floatValue)

@@ -15,6 +15,7 @@ namespace RosettaUI.Example
             typeof(ListExample),
             typeof(ArgumentExample),
             typeof(LayoutExample),
+            typeof(WindowAndDynamicExample),
             typeof(MiscExample),
             typeof(SafetyExample)
         };

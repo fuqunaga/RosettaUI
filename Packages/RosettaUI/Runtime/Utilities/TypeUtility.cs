@@ -28,7 +28,9 @@ namespace RosettaUI
             RegisterUITargetPropertyOrFields(typeof(Bounds),     "center", "extents");
             RegisterUITargetPropertyOrFields(typeof(BoundsInt),  "position", "size");
         }
-        
+
+        public static bool IsNullable(Type type) => Nullable.GetUnderlyingType(type) != null;
+
         private static ReflectionCache GetReflectionCache(Type type)
         {
             if (!ReflectionCacheTable.TryGetValue(type, out var cache))
@@ -223,7 +225,5 @@ namespace RosettaUI
         }
         
         #endregion
-
-
     }
 }

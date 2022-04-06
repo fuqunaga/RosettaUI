@@ -103,9 +103,7 @@ namespace RosettaUI.Example
                     )
                 ),
                 ExampleTemplate.CodeElementSets("<b>Attribute</b>",
-                    new[]
-                    {
-                        (@"public class AttributeTextClass
+                    (@"public class AttributeTextClass
 {
     [Range(0f,100f)]
     public float rangeFloat;
@@ -119,9 +117,8 @@ namespace RosettaUI.Example
 
 UI.Field(() => attributeTestClass);
 ",
-                            UI.Field(() => attributeTestClass)
-                        )
-                    }
+                        UI.Field(() => attributeTestClass)
+                    )
                 ),
                 UI.Label("<b>If the target is IElementCreator, use CreateElement()</b>"),
                 UI.Field(() => elementCreator)

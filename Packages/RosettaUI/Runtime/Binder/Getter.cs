@@ -31,7 +31,7 @@ namespace RosettaUI
 
         public override bool IsNull => Get() == null;
 
-        public override bool IsNullable => !typeof(T).IsValueType;
+        public override bool IsNullable => !typeof(T).IsValueType || Nullable.GetUnderlyingType(typeof(T)) != null;
         
         public override bool IsConst => false;
         

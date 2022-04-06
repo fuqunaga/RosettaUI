@@ -9,6 +9,8 @@ namespace RosettaUI.Example
         
         public static string UIFunctionStr(string functionName) => $"<b>{nameof(UI)}.{functionName}()</b>";
 
+        public static string ElementFunctionStr(string functionName) => $"<b>{nameof(Element)}.{functionName}()</b>";
+        
         public static Element TitleIndent(string title, params Element[] elements) =>
             UI.Column(
                 UI.Label(title),

@@ -152,7 +152,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 544456411}
+  m_Father: {fileID: 1954015388}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &194475843
@@ -196,7 +196,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 544456411}
+  m_Father: {fileID: 1954015388}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &256655866
@@ -294,10 +294,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 256655865}
-  - {fileID: 194475842}
-  - {fileID: 878366089}
+  m_Children: []
   m_Father: {fileID: 852668086}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -323,7 +320,7 @@ MonoBehaviour:
   listValue: 010000000200000003000000
   arrayValue: 010000000200000003000000
   floatValue: 0
-  intValue: 4
+  intValue: 6
   boolValue: 1
   uiCustomClass:
     floatValue: 0
@@ -598,7 +595,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 852668086}
-  m_RootOrder: 9
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &741235377
 MonoBehaviour:
@@ -680,6 +677,7 @@ Transform:
   - {fileID: 554616669}
   - {fileID: 1954015388}
   - {fileID: 544456411}
+  - {fileID: 1912287497}
   - {fileID: 1357753546}
   - {fileID: 741235376}
   m_Father: {fileID: 0}
@@ -730,7 +728,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 544456411}
+  m_Father: {fileID: 1954015388}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &878366090
@@ -859,7 +857,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 852668086}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1357753547
 MonoBehaviour:
@@ -1013,6 +1011,65 @@ MonoBehaviour:
   - floatValue: 0
     stringValue: 3
   nonReorderableArray: 010000000200000003000000
+--- !u!1 &1912287496
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1912287497}
+  - component: {fileID: 1912287498}
+  m_Layer: 0
+  m_Name: MethodExample
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1912287497
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1912287496}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 852668086}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1912287498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1912287496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4da7c61ed1163043af0fd43a30be7d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  multiLineStringValue: 'this is
+
+    multiline
+
+    string'
+  texture: {fileID: 0}
+  dropDownIndex: 0
+  listValue: 010000000200000003000000
+  arrayValue: 010000000200000003000000
+  floatValue: 0
+  intValue: 0
+  boolValue: 0
+  uiCustomClass:
+    floatValue: 0
+  dynamicElementIf: 0
 --- !u!1 &1922449323
 GameObject:
   m_ObjectHideFlags: 0
@@ -1162,7 +1219,10 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 256655865}
+  - {fileID: 194475842}
+  - {fileID: 878366089}
   m_Father: {fileID: 852668086}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1178,18 +1238,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11d77e325ca686141a8d183787b4b253, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  multiLineStringValue: 'this is
-
-    multiline
-
-    string'
-  texture: {fileID: 0}
-  dropDownIndex: 0
-  listValue: 010000000200000003000000
-  arrayValue: 010000000200000003000000
-  floatValue: 0
   intValue: 0
-  boolValue: 0
-  uiCustomClass:
-    floatValue: 0
   dynamicElementIf: 0

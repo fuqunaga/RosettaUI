@@ -7,16 +7,16 @@ namespace RosettaUI.Example
     [RequireComponent(typeof(RosettaUIRoot))]
     public class RosettaUIExample : MonoBehaviour
     {
-        public static readonly Type[] ExampleTypes = new[]
-        {
+        public static readonly Type[] ExampleTypes = {
             typeof(FieldExample),
             typeof(SliderExample),
             typeof(MinMaxSliderExample),
             typeof(ListExample),
-            typeof(ArgumentExample),
             typeof(LayoutExample),
             typeof(WindowAndDynamicExample),
             typeof(MiscExample),
+            typeof(ArgumentExample),
+            typeof(MethodExample),
             typeof(SafetyExample)
         };
         

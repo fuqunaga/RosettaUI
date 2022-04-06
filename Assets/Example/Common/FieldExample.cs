@@ -124,35 +124,8 @@ UI.Field(() => attributeTestClass);
                     }
                 ),
                 UI.Label("<b>If the target is IElementCreator, use CreateElement()</b>"),
-                UI.Field(() => elementCreator),
-                ExampleTemplate.BlankLine(),
-                UI.Label(
-                    "<b>ExpressionTree limitation</b>\n" +
-                    "UI.Field()'s targetExpressions cannot use ?.(null-conditional operator), {}(blocks) or local functions.\n" +
-                    "but UI.FieldReadOnly(label, readValue) and UI.Field(label, readValue, writeValue) can."
-                ),
-                UI.HelpBox(
-                    "// UI.Field(() => stringValue?.Length), // compile error\n" +
-                    "// UI.Field(() => { LocalFunction(); return intValue;}) // compile error"
-                ),
-                UI.FieldReadOnly("UI.FieldReadOnly(label, readValue)", () =>
-                {
-                    LocalFunction();
-                    return intValue;
-                }),
-                UI.Field("UI.Field(label, readValue, writeValue)",
-                    () =>
-                    {
-                        LocalFunction();
-                        return intValue;
-                    },
-                    i => intValue = i)
+                UI.Field(() => elementCreator)
             );
-            
-
-            static void LocalFunction()
-            {
-            }
         }
     }
 }

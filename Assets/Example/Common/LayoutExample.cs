@@ -27,20 +27,19 @@ namespace RosettaUI.Example
         public Element CreateElement()
         {
             var scrollViewItemCount = 50;
-            
+
             return UI.Column(
                 UI.Row(
                     UI.Column(
-                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.Box), UI.Label("box style frame")),
-                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.Row),
-                            UI.Row(
+                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.Column),
+                            UI.Column(
                                 UI.Label("Element0"),
                                 UI.Label("Element1"),
                                 UI.Label("Element2")
                             )
                         ),
-                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.Column),
-                            UI.Column(
+                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.Row),
+                            UI.Row(
                                 UI.Label("Element0"),
                                 UI.Label("Element1"),
                                 UI.Label("Element2")
@@ -63,6 +62,9 @@ namespace RosettaUI.Example
                                     UI.Label("Indent2")
                                 )
                             )
+                        ),
+                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.Box),
+                            UI.Label("box style frame")
                         ),
                         ExampleTemplate.UIFunctionColumn(nameof(UI.Page),
                             UI.Label("Adjust the width of the prefix labels."),
@@ -137,7 +139,7 @@ namespace RosettaUI.Example
                                 )
                             )
                         ),
-                        
+
                         ExampleTemplate.TitleIndent("VerticalAndHorizontal",
                             UI.Box(
                                 UI.ScrollViewVerticalAndHorizontal(700f, 300f,
@@ -176,10 +178,40 @@ namespace RosettaUI.Example
                     )
                 ),
                 ExampleTemplate.BlankLine(),
-                
-                UI.Label("<b>Tips</b>"),
-                UI.Page(
-                    UI.Label("Fold ignores one level of indentation for label alignment"),
+
+                ExampleTemplate.CodeElementSets("<b>Fold argument</b>",
+                    (@"UI.Fold(
+    UI.Field(""CustomBar"", () => intValue), 
+    new[]
+    {
+        UI.Label(""Element"")
+    }
+);",
+                        UI.Fold(
+                            UI.Field("CustomBar", () => intValue),
+                            new[]
+                            {
+                                UI.Label("Element")
+                            }
+                        )
+                    ),
+                    (@"UI.Fold(
+    UI.Label(""Left""), UI.Label(""Right""), 
+    new[]
+    {
+        UI.Label(""Element"")
+    }
+);",
+                        UI.Fold(
+                            UI.Label("Left"), UI.Label("Right"),
+                            new[]
+                            {
+                                UI.Label("Element")
+                            }
+                        )
+                    )
+                ),
+                ExampleTemplate.TitleIndent("Fold ignores one level of indentation for label alignment",
                     UI.Box(
                         UI.Label("No indent"),
                         UI.Fold("Fold0"),

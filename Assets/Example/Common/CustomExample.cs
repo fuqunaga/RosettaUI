@@ -25,21 +25,21 @@ namespace RosettaUI.Example
         [Serializable]
         public class MyClass
         {
-            public float publicValue;
             private float _privateValue;
-            [NonSerialized] public float publicValueNonSerialized;
+            [NonSerialized]
+            public float publicValueNonSerialized;
             public float PropertyValue { get; set; }
         }
 
-        
         public MyFloat myFloatValue;
         public MyInt myInt;
         public MyClass myClass;
-
+        public Vector2 vector2Value;
         
+
         public Element CreateElement()
         {
-            UICustom.RegisterElementCreationFunc<MyInt>(instance =>
+            using var ecfScope = new UICustom.ElementCreationFuncScope<MyInt>(instance =>
             {
                 return UI.Row(
                     UI.Field(nameof(MyInt), () => instance.value),
@@ -48,17 +48,16 @@ namespace RosettaUI.Example
                 );
             });
             
-            UICustom.RegisterPropertyOrFields<MyClass>(
+            using var pofScope = new UICustom.PropertyOrFieldsScope<MyClass>(
                 "_privateValue", 
                 "publicValueNonSerialized",
                 "PropertyValue"
             );
 
-            UICustom.UnregisterPropertyOrFields<MyClass>(
-                "publicValue"
+            using var labelModScope = new UICustom.PropertyOrFieldLabelModifierScope<Vector2>(
+                ("x", "horizontal"),
+                ("y", "vertical")
             );
-
-
 
             return UI.Column(
                 ExampleTemplate.TitleIndent("<b>Custom default UI</b>",
@@ -87,40 +86,50 @@ UI.Field(() => myFloatValue));",
 
 public MyInt myInt;
 
-UICustom.RegisterElementCreationFunc<MyInt>(instance =>
-{
-    return UI.Row(
-        UI.Field(nameof(MyInt), () => instance.value),
-        UI.Button(""+"", () => instance.value++),
-        UI.Button(""-"", () => instance.value--)
-    );
-});",
+using var ecfScope = 
+    new UICustom.ElementCreationFuncScope<MyInt>(instance =>
+    {
+        return UI.Row(
+            UI.Field(nameof(MyInt), () => instance.value),
+            UI.Button(""+"", () => instance.value++),
+            UI.Button(""-"", () => instance.value--)
+        );
+    });
+
+UI.Field(() => myInt);",
                             UI.Field(() => myInt))
                     ),
                     ExampleTemplate.CodeElementSets("<b>Property/Field</b>",
                         "RosettaUI is intended for members serialized in Unity. Otherwise, it can be explicitly specified.",
                         (@"public class MyClass
 {
-    public float publicValue;
     private float privateValue;
-    [NonSerialized] public float publicValueNonSerialized;
+    [NonSerialized] 
+    public float publicValueNonSerialized;
     public float PropertyValue { get; set; }
 }
 
 public MyClass myClass;
 
-UICustom.RegisterPropertyOrFields<MyClass>(
+using var pofScope = new UICustom.PropertyOrFieldsScope<MyClass>(
     ""privateValue"", 
     ""publicValueNonSerialized"",
     ""PropertyValue""
 );
 
-UICustom.UnregisterPropertyOrFields<MyClass>(
-    ""publicValue""
-);
-
 UI.Field(() => myClass);",
-                            UI.Field(() => myClass)))
+                            UI.Field(() => myClass))
+                    ),
+                    ExampleTemplate.CodeElementSets("<b>Property/Field Label</b>",
+                        (@"using var labelModScope =
+    new UICustom.PropertyOrFieldLabelModifierScope<Vector2>(
+        (""x"", ""horizontal""),
+        (""y"", ""vertical"")
+    );
+
+UI.Field(() => vector2Value);",
+                            UI.Field(() => vector2Value))
+                    )
                 )
             );
         }

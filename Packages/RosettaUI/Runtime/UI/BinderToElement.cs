@@ -44,7 +44,7 @@ namespace RosettaUI
 
         private static Element InvokeCreationFunc(LabelElement label, IBinder binder, UICustom.CreationFunc creationFunc)
         {
-            return UI.NullGuardIfNeed(label, binder, () => creationFunc.func(binder.GetObject()));
+            return UI.NullGuardIfNeed(label, binder, () => creationFunc.func(binder));
         }
 
         private static Element CreateEnumElement(LabelElement label, IBinder binder)

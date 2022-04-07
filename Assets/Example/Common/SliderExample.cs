@@ -65,10 +65,10 @@ namespace RosettaUI.Example
                 ExampleTemplate.CodeElementSets("<b>Argument</b>",
                     new[]
                     {
-                        ("UI.Slider(() => floatValue, max:2f);", UI.Slider(() => floatValue, max: 2f)),
-                        ("UI.Slider(() => floatValue, min:0.5f, max:2f);", UI.Slider(() => floatValue, min: 0.5f, max: 2f)),
-                        ("UI.Slider(() => vector2Value, max:Vector2.one * 2f);", UI.Slider(() => vector2Value, max: Vector2.one * 2f)),
-                        ("UI.Slider(() => vector2Value, min:Vector2.one * 0.5f, max:Vector2.one * 2f);", UI.Slider(() => vector2Value, min: Vector2.one * 0.5f, max: Vector2.one * 2f)),
+                        ("UI.Slider(() => floatValue, max: 2f);", UI.Slider(() => floatValue, max: 2f)),
+                        ("UI.Slider(() => floatValue, min: 0.5f, max: 2f);", UI.Slider(() => floatValue, min: 0.5f, max: 2f)),
+                        ("UI.Slider(() => vector2Value, max: Vector2.one * 2f);", UI.Slider(() => vector2Value, max: Vector2.one * 2f)),
+                        ("UI.Slider(() => vector2Value, min: Vector2.one * 0.5f, max: Vector2.one * 2f);", UI.Slider(() => vector2Value, min: Vector2.one * 0.5f, max: Vector2.one * 2f)),
                     }
                 ),
                 ExampleTemplate.CodeElementSets("<b>Attribute</b>",

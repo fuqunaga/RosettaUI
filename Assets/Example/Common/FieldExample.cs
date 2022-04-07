@@ -1,13 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace RosettaUI.Example
 {
     public class FieldExample : MonoBehaviour, IElementCreator
     {
-        [System.Serializable]
+        [Serializable]
         public class AttributeTestClass
         {
             [Range(0f,100f)]
@@ -40,8 +40,6 @@ namespace RosettaUI.Example
         public List<int> intList = new(new[] {1, 2, 3});
         public float[] floatArray = {1f, 2f, 3f};
         public SimpleClass simpleClass;
-
-        public ElementCreator elementCreator;
 
         public List<SimpleClass> classList = new[]
         {
@@ -119,9 +117,7 @@ UI.Field(() => attributeTestClass);
 ",
                         UI.Field(() => attributeTestClass)
                     )
-                ),
-                UI.Label("<b>If the target is IElementCreator, use CreateElement()</b>"),
-                UI.Field(() => elementCreator)
+                )
             );
         }
     }

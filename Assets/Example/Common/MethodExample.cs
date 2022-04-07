@@ -1,52 +1,16 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace RosettaUI.Example
 {
     public class MethodExample : MonoBehaviour, IElementCreator
     {
-        public struct FindObjectOption
-        {
-            public bool supportMultiple;
-            public bool includeInactive;
-        }
-        
-        
-        [Multiline] public string multiLineStringValue = "this is\nmultiline\nstring";
-        public Texture texture;
-        public int dropDownIndex;
-        public FindObjectOption windowLauncherOptions;
-        public FindObjectOption fieldIfObjectFoundOptions;
-
-        
-        
-        public List<int> listValue = new[] {1, 2, 3}.ToList();
-        public int[] arrayValue = new[] {1, 2, 3};
-
         public float floatValue;
         public int intValue;
-        public bool boolValue;
         public List<int> intList = new(new[] {1, 2, 3});
-        
-        public UICustomClass uiCustomClass;
-
-        public bool dynamicElementIf;
-
-        
-        
         
         public Element CreateElement()
         {
-            UICustom.RegisterElementCreationFunc<UICustomClass>((uiCustomClass) =>
-            {
-                return UI.Column(
-                    UI.Label("UICustomized!"),
-                    UI.Slider(() => uiCustomClass.floatValue)
-                );
-            });
-
-
             return UI.Column(
                 ExampleTemplate.CodeElementSets("<b>Styles</b>",
                     ("UI.Field(() => intValue).SetEnable(false); // disappear",

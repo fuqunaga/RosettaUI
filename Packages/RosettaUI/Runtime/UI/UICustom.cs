@@ -69,9 +69,9 @@ namespace RosettaUI
             TypeUtility.RegisterUITargetPropertyOrFields(typeof(T), names);
         }
 
-        public static void UnregisterPropertyOrField<T>(string name)
+        public static void UnregisterPropertyOrFields<T>(params string[] names)
         {
-            TypeUtility.UnregisterUITargetPropertyOrField(typeof(T), name);
+            TypeUtility.UnregisterUITargetPropertyOrFields(typeof(T), names);
         }
         
         /// <returns>removed field name</returns>

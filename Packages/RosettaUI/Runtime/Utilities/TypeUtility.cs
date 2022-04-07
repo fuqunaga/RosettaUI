@@ -109,9 +109,13 @@ namespace RosettaUI
             }
         }
 
-        public static void UnregisterUITargetPropertyOrField(Type type, string name)
+        public static void UnregisterUITargetPropertyOrFields(Type type, params string[] names)
         {
-            GetReflectionCache(type).uiTargetPropertyOrFieldsNameTypeDic.Remove(name);
+            var dic = GetReflectionCache(type).uiTargetPropertyOrFieldsNameTypeDic;
+            foreach (var name in names)
+            {
+                dic.Remove(name);
+            }
         }
 
         public static IEnumerable<string> UnregisterUITargetPropertyOrFieldAll(Type type)
@@ -210,7 +214,8 @@ namespace RosettaUI
 
 
                 uiTargetPropertyOrFieldsNameTypeDic = fis
-                    .Where(fi => fi.IsPublic || fi.GetCustomAttribute<SerializeField>() != null)
+                    .Where(fi => (fi.IsPublic && fi.GetCustomAttribute<NonSerializedAttribute>() == null)
+                                 || fi.GetCustomAttribute<SerializeField>() != null)
                     .ToDictionary(fi => fi.Name, fi => fi.FieldType);
             }
 

@@ -5,6 +5,16 @@ using UnityEngine.Assertions;
 
 namespace RosettaUI
 {
+    public static class EnumToIdxBinder
+    {
+        public static IBinder<int> Create(IBinder binder)
+        {
+            var valueType = binder.ValueType;
+            var binderType = typeof(EnumToIdxBinder<>).MakeGenericType(valueType);
+            return Activator.CreateInstance(binderType, binder) as IBinder<int>;
+        }
+    }
+    
     public class EnumToIdxBinder<TFrom> : ConvertBinder<TFrom, int>
     {
         public EnumToIdxBinder(IBinder<TFrom> parentBinder) : base(parentBinder)

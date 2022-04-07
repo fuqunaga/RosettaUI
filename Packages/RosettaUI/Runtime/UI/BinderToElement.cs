@@ -22,7 +22,7 @@ namespace RosettaUI
 
             return binder switch
             {
-                _ when UICustom.GetElementCreationMethod(valueType) is { } creationFunc => WrapNullGuard(() => creationFunc.func(binder.GetObject())),
+                _ when UICustom.GetElementCreationMethod(valueType) is { } creationFunc => InvokeCreationFunc(label, binder, creationFunc),
 
                 IBinder<int> ib => new IntFieldElement(label, ib),
                 IBinder<uint> ib => new UIntFieldElement(label, ib),
@@ -40,25 +40,17 @@ namespace RosettaUI
             };
 
             Element WrapNullGuard(Func<Element> func) => UI.NullGuardIfNeed(label, binder, func);
+        }
 
-            Element CreateLitView(LabelElement l, IBinder b)
-            {
-                var option = (b is IPropertyOrFieldBinder pfBinder)
-                    ? new ListViewOption(
-                        TypeUtility.IsReorderable(pfBinder.ParentBinder.ValueType, pfBinder.PropertyOrFieldName),
-                        false)
-                    : null;
-
-
-                return UI.List(l, b, null, option);
-            }
+        private static Element InvokeCreationFunc(LabelElement label, IBinder binder, UICustom.CreationFunc creationFunc)
+        {
+            return UI.NullGuardIfNeed(label, binder, () => creationFunc.func(binder.GetObject()));
         }
 
         private static Element CreateEnumElement(LabelElement label, IBinder binder)
         {
             var valueType = binder.ValueType;
-            var binderType = typeof(EnumToIdxBinder<>).MakeGenericType(valueType);
-            var enumToIdxBinder = Activator.CreateInstance(binderType, binder) as BinderBase<int>;
+            var enumToIdxBinder = EnumToIdxBinder.Create(binder);
 
             return new DropdownElement(label, enumToIdxBinder, Enum.GetNames(valueType));
         }
@@ -68,7 +60,18 @@ namespace RosettaUI
             var valueBinder = NullableToValueBinder.Create(binder);
             return UI.NullGuard(label, binder, () => CreateFieldElement(label, valueBinder));
         }
+        
+        private static Element CreateLitView(LabelElement label, IBinder binder)
+        {
+            var option = (binder is IPropertyOrFieldBinder pfBinder)
+                ? new ListViewOption(
+                    TypeUtility.IsReorderable(pfBinder.ParentBinder.ValueType, pfBinder.PropertyOrFieldName),
+                    false)
+                : null;
 
+
+            return UI.List(label, binder, null, option);
+        }
 
         private static Element CreateMemberFieldElement(LabelElement label, IBinder binder)
         {

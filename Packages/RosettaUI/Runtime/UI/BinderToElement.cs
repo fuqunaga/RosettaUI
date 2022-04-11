@@ -8,15 +8,8 @@ namespace RosettaUI
 {
     public static class BinderToElement
     {
-        private static Element CreateCircularReferenceElement(LabelElement label, Type type)
-        {
-            return new CompositeFieldElement(label,
-                new[]
-                {
-                    new HelpBoxElement($"[{type}] Circular reference detected.", HelpBoxType.Error)
-                }).SetInteractable(false);
-        }
-
+        #region Field
+        
         public static Element CreateFieldElement(LabelElement label, IBinder binder)
         {
             var valueType = binder.ValueType;
@@ -29,7 +22,7 @@ namespace RosettaUI
 
             return binder switch
             {
-                _ when UICustom.GetElementCreationMethod(valueType) is { } creationFunc => WrapNullGuard(() => creationFunc.func(binder.GetObject())),
+                _ when UICustom.GetElementCreationMethod(valueType) is { } creationFunc => InvokeCreationFunc(label, binder, creationFunc),
 
                 IBinder<int> ib => new IntFieldElement(label, ib),
                 IBinder<uint> ib => new UIntFieldElement(label, ib),
@@ -37,7 +30,8 @@ namespace RosettaUI
                 IBinder<string> ib => new TextFieldElement(label, ib),
                 IBinder<bool> ib => new BoolFieldElement(label, ib),
                 IBinder<Color> ib =>  new ColorFieldElement(label, ib),
-                _ when binder.ValueType.IsEnum => CreateEnumElement(label, binder),
+                _ when valueType.IsEnum => CreateEnumElement(label, binder),
+                _ when TypeUtility.IsNullable(valueType) => CreateNullableFieldElement(label, binder),
 
                 _ when binder.GetObject() is IElementCreator elementCreator => WrapNullGuard(elementCreator.CreateElement),
                 _ when ListBinder.IsListBinder(binder) => CreateLitView(label, binder),
@@ -46,29 +40,38 @@ namespace RosettaUI
             };
 
             Element WrapNullGuard(Func<Element> func) => UI.NullGuardIfNeed(label, binder, func);
+        }
 
-            Element CreateLitView(LabelElement l, IBinder b)
-            {
-                var option = (b is IPropertyOrFieldBinder pfBinder)
-                    ? new ListViewOption(
-                        TypeUtility.IsReorderable(pfBinder.ParentBinder.ValueType, pfBinder.PropertyOrFieldName),
-                        false)
-                    : null;
-
-
-                return UI.List(l, b, null, option);
-            }
+        private static Element InvokeCreationFunc(LabelElement label, IBinder binder, UICustom.CreationFunc creationFunc)
+        {
+            return UI.NullGuardIfNeed(label, binder, () => creationFunc.func(binder));
         }
 
         private static Element CreateEnumElement(LabelElement label, IBinder binder)
         {
             var valueType = binder.ValueType;
-            var binderType = typeof(EnumToIdxBinder<>).MakeGenericType(valueType);
-            var enumToIdxBinder = Activator.CreateInstance(binderType, binder) as BinderBase<int>;
+            var enumToIdxBinder = EnumToIdxBinder.Create(binder);
 
             return new DropdownElement(label, enumToIdxBinder, Enum.GetNames(valueType));
         }
+        
+        private static Element CreateNullableFieldElement(LabelElement label, IBinder binder)
+        {
+            var valueBinder = NullableToValueBinder.Create(binder);
+            return UI.NullGuard(label, binder, () => CreateFieldElement(label, valueBinder));
+        }
+        
+        private static Element CreateLitView(LabelElement label, IBinder binder)
+        {
+            var option = (binder is IPropertyOrFieldBinder pfBinder)
+                ? new ListViewOption(
+                    TypeUtility.IsReorderable(pfBinder.ParentBinder.ValueType, pfBinder.PropertyOrFieldName),
+                    false)
+                : null;
 
+
+            return UI.List(label, binder, null, option);
+        }
 
         private static Element CreateMemberFieldElement(LabelElement label, IBinder binder)
         {
@@ -80,15 +83,21 @@ namespace RosettaUI
                 var fieldLabel = UICustom.ModifyPropertyOrFieldLabel(valueType, fieldName);
 
                 var range = TypeUtility.GetRange(valueType, fieldName);
-                if (range == null)
-                {
-                    return UI.Field(fieldLabel, fieldBinder);
-                }
-                else
+                if (range != null)
                 {
                     var (minGetter, maxGetter) = RangeUtility.CreateGetterMinMax(range, fieldBinder.ValueType);
                     return UI.Slider(fieldLabel, fieldBinder, minGetter, maxGetter);
                 }
+               
+                var field = UI.Field(fieldLabel, fieldBinder);
+                
+                
+                if (TypeUtility.IsMultiline(valueType, fieldName) && field is TextFieldElement textField)
+                {
+                    textField.IsMultiLine = true;
+                }
+
+                return field;
             });
 
 
@@ -103,6 +112,71 @@ namespace RosettaUI
             return ret;
         }
 
+        #endregion
+        
+
+        #region Slider
+
+        public static Element CreateSliderElement(LabelElement label, IBinder binder, SliderOption option)
+        {
+            return binder switch
+            {
+                IBinder<int> bb => new IntSliderElement(label, bb, option.Cast<int>()),
+                IBinder<uint> bb => new IntSliderElement(label,
+                    new CastBinder<uint, int>(bb),
+                    CreateOptionUintToInt(option)
+                ),
+                IBinder<float> bb => new FloatSliderElement(label, bb, option.Cast<float>()
+                ),
+                
+                _ when TypeUtility.IsNullable(binder.ValueType) => CreateNullableSliderElement(label, binder, option),
+                
+                _ => CreateCompositeSliderElement(label, binder, option)
+                     ?? CreateFieldElement(label, binder)
+            };
+
+            static SliderOption<int> CreateOptionUintToInt(SliderOption option)
+            {
+                return new SliderOption<int>()
+                {
+                    minGetter = CastGetter.Create<uint, int>((IGetter<uint>) option.minGetter),
+                    maxGetter = CastGetter.Create<uint, int>((IGetter<uint>) option.maxGetter),
+                    showInputField = option.showInputField
+                };
+            }
+        }
+
+        private static Element CreateNullableSliderElement(LabelElement label, IBinder binder, SliderOption option)
+        {
+            var valueBinder = NullableToValueBinder.Create(binder);
+            return UI.NullGuard(label, binder, () => CreateSliderElement(label, valueBinder, option));
+        }
+
+
+        private static Element CreateCompositeSliderElement(LabelElement label, IBinder binder, SliderOption option)
+        {
+            return _CreateCompositeSliderElementBase(
+                label,
+                binder,
+                binder.ValueType,
+                fieldName =>
+                {
+                    var fieldLabel = UICustom.ModifyPropertyOrFieldLabel(binder.ValueType, fieldName);
+                    var fieldBinder = PropertyOrFieldBinder.Create(binder, fieldName);
+                    
+                    var fieldOption = new SliderOption(option)
+                    {
+                        minGetter = PropertyOrFieldGetter.Create(option.minGetter, fieldName),
+                        maxGetter = PropertyOrFieldGetter.Create(option.maxGetter, fieldName),
+                    };
+
+
+                    return UI.Slider(fieldLabel, fieldBinder, fieldOption);
+                }
+            );
+        }
+        
+        
         private static Element _CreateCompositeSliderElementBase(LabelElement label, IBinder binder, Type valueType,
             Func<string, Element> createFieldElementFunc)
         {
@@ -146,62 +220,9 @@ namespace RosettaUI
             }
         }
 
-
-        #region Slider
-
-        public static Element CreateSliderElement(LabelElement label, IBinder binder, SliderOption option)
-        {
-            return binder switch
-            {
-                IBinder<int> bb => new IntSliderElement(label, bb, option.Cast<int>()),
-                IBinder<uint> bb => new IntSliderElement(label,
-                    new CastBinder<uint, int>(bb),
-                    CreateOptionUintToInt(option)
-                ),
-                IBinder<float> bb => new FloatSliderElement(label, bb, option.Cast<float>()
-                ),
-                _ => CreateCompositeSliderElement(label, binder, option)
-                     ?? CreateFieldElement(label, binder)
-            };
-
-            static SliderOption<int> CreateOptionUintToInt(SliderOption option)
-            {
-                return new SliderOption<int>()
-                {
-                    minGetter = CastGetter.Create<uint, int>((IGetter<uint>) option.minGetter),
-                    maxGetter = CastGetter.Create<uint, int>((IGetter<uint>) option.maxGetter),
-                    showInputField = option.showInputField
-                };
-            }
-        }
-
-
-        private static Element CreateCompositeSliderElement(LabelElement label, IBinder binder, SliderOption option)
-        {
-            return _CreateCompositeSliderElementBase(
-                label,
-                binder,
-                binder.ValueType,
-                fieldName =>
-                {
-                    var fieldLabel = UICustom.ModifyPropertyOrFieldLabel(binder.ValueType, fieldName);
-                    var fieldBinder = PropertyOrFieldBinder.Create(binder, fieldName);
-                    
-                    var fieldOption = new SliderOption(option)
-                    {
-                        minGetter = PropertyOrFieldGetter.Create(option.minGetter, fieldName),
-                        maxGetter = PropertyOrFieldGetter.Create(option.maxGetter, fieldName),
-                    };
-
-
-                    return UI.Slider(fieldLabel, fieldBinder, fieldOption);
-                }
-            );
-        }
-
         #endregion
 
-
+        
         #region MinMax Slider
 
         public static Element CreateMinMaxSliderElement(LabelElement label, IBinder binder, SliderOption option)
@@ -243,6 +264,17 @@ namespace RosettaUI
 
         #endregion
 
+        
+        private static Element CreateCircularReferenceElement(LabelElement label, Type type)
+        {
+            return new CompositeFieldElement(label,
+                new[]
+                {
+                    new HelpBoxElement($"[{type}] Circular reference detected.", HelpBoxType.Error)
+                }).SetInteractable(false);
+        }
+
+        
         class BinderTypeHistory : IDisposable
         {
             private static readonly HashSet<Type> History = new();

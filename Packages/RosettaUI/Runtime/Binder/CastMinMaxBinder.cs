@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Linq.Expressions;
 
 namespace RosettaUI
 {
-    public class CastMinMaxBinder<TFrom, TTo> : ChildBinder<MinMax<TFrom>, MinMax<TTo>>
+    public class CastMinMaxBinder<TFrom, TTo> : ConvertBinder<MinMax<TFrom>, MinMax<TTo>>
     {
-        public CastMinMaxBinder(IBinder<MinMax<TFrom>> binder) : base(binder, CastFunc, CastToParentFunc)
+        public CastMinMaxBinder(IBinder<MinMax<TFrom>> binder) : base(binder)
         {
         }
 
+        protected override MinMax<TTo> GetFromParent(MinMax<TFrom> parent) => CastFunc(parent);
+        protected override MinMax<TFrom> SetToParent(MinMax<TFrom> parent, MinMax<TTo> value) => CastToParentFunc(parent, value);
 
-        public override bool IsConst => parentBinder.IsConst;
 
         #region static
 

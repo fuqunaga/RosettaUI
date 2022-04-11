@@ -4,15 +4,16 @@ using UnityEngine.Assertions;
 
 namespace RosettaUI
 {
-    public class ConvertToMinMaxBinder<TMinMax, TValue> : ChildBinder<TMinMax, MinMax<TValue>>
+    public class ConvertToMinMaxBinder<TMinMax, TValue> : ConvertBinder<TMinMax, MinMax<TValue>>
     {
-        public ConvertToMinMaxBinder(IBinder<TMinMax> binder) : base(binder, ToMinMaxFunc, ToTMinMaxFunc)
+        public ConvertToMinMaxBinder(IBinder<TMinMax> binder) : base(binder)
         {
         }
 
-        public override bool IsConst => parentBinder.IsConst;
+        protected override MinMax<TValue> GetFromParent(TMinMax parent) => ToMinMaxFunc(parent);
+        protected override TMinMax SetToParent(TMinMax parent, MinMax<TValue> value) => ToTMinMaxFunc(parent, value);
 
-        
+
         #region static
 
         private static readonly Func<TMinMax, MinMax<TValue>> ToMinMaxFunc;

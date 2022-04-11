@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using UnityEngine;
 
 namespace RosettaUI.Example
 {
@@ -8,6 +9,8 @@ namespace RosettaUI.Example
         
         public static string UIFunctionStr(string functionName) => $"<b>{nameof(UI)}.{functionName}()</b>";
 
+        public static string ElementFunctionStr(string functionName) => $"<b>{nameof(Element)}.{functionName}()</b>";
+        
         public static Element TitleIndent(string title, params Element[] elements) =>
             UI.Column(
                 UI.Label(title),
@@ -38,5 +41,35 @@ namespace RosettaUI.Example
 
         public static Element UIFunctionColumnBox(string functionName, params Element[] elements) =>
             UIFunctionColumn(functionName, UI.Box(elements));
+
+
+        public static Element CodeElementSets(string title, params (string, Element)[] pairs)
+            => CodeElementSets(title, null, pairs);
+        
+        public static Element CodeElementSets(string title, string discription, params (string, Element)[] pairs)
+        {
+            var texts = pairs.Select(pair => pair.Item1);
+            var elements = pairs.Select(pair => pair.Item2);
+
+            var code = string.Join("\n", texts);
+
+            return TitleIndent(title,
+                string.IsNullOrEmpty(discription) ? null : UI.Label(discription),
+                UI.Row(
+                    UI.TextArea(null, () => code)
+                        // UI.Column(
+                        //     texts.Select(t => UI.Field(null, () => t).SetHeight(32f))
+                        // )
+                        //.SetBackgroundColor(new Color(0.1f, 0.1f, 0.1f))
+                        .SetWidth(700f),
+                    UI.Space().SetWidth(30f),
+                    UI.Box(
+                        UI.Page(
+                            elements
+                        )
+                    )
+                )
+            );
+        }
     }
 }

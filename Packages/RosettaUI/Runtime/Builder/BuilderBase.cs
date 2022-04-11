@@ -22,7 +22,7 @@ namespace RosettaUI.Builder
         protected void UnregisterUIObj(Element element) => _elementToUIObj.Remove(element);
 
 
-        public TUIObj Build(Element element)
+        protected TUIObj BuildInternal(Element element)
         {
             TUIObj uiObj = default;
             if (element != null)
@@ -79,7 +79,7 @@ namespace RosettaUI.Builder
 
         protected IEnumerable<TUIObj> Build_ElementGroupContents(ElementGroup elementGroup)
         {
-            return elementGroup.Contents.Select(Build).Where(ve => ve != null);
+            return elementGroup.Contents.Select(BuildInternal).Where(ve => ve != null);
         }
     }
 }

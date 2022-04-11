@@ -14,6 +14,10 @@ namespace RosettaUI
         public static DropdownElement Dropdown(LabelElement label, Expression<Func<int>> targetExpression, IEnumerable<string> options) 
             => Dropdown(label, CreateBinder(targetExpression), options);
         
+        
+        public static DropdownElement Dropdown(Expression<Func<int>> targetExpression, Action<int> writeValue, IEnumerable<string> options) 
+            => Dropdown(ExpressionUtility.CreateLabelString(targetExpression) , targetExpression.Compile(), writeValue, options);
+
         public static DropdownElement Dropdown(LabelElement label, Func<int> readValue, Action<int> writeValue, IEnumerable<string> options) 
             => Dropdown(label, Binder.Create(readValue, writeValue), options);
 

@@ -1,6 +1,7 @@
 ﻿//#define ENABLE_IL2CPP
 
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using UnityEngine;
@@ -12,7 +13,7 @@ namespace RosettaUI
     public static class ExpressionUtility
     {
         public static Func<T> CreateReadFunc<T>(Expression<Func<T>> expression) => expression.Compile();
-        
+
         public static IBinder<T> CreateBinder<T>(Expression<Func<T>> expression)
         {
 #if ENABLE_IL2CPP
@@ -29,22 +30,22 @@ namespace RosettaUI
 
             Action<T> setFunc = null;
             var p = Expression.Parameter(type);
-            
+
             // for UI.List()
             // 
             //   var array = new int[];
             //   UI.List(() => array);
-            
+
             // T is IList<int>
             // bodyType is System.Int32[]
             // 
             // so without casting, the setter will be null.
             var bodyType = expression.Body.Type;
             var rightHand = (type == bodyType)
-                ? (Expression)p
+                ? (Expression) p
                 : Expression.Convert(p, bodyType);
-            
-            
+
+
             // check writable
             // hint code https://stackoverflow.com/questions/42773488/how-can-i-find-out-if-an-expression-is-writeable
             try
@@ -65,20 +66,26 @@ namespace RosettaUI
         #region CreateLabelString
 
         const string MethodCallDummyInstanceName = "MethodCallDummy...";
-        static readonly SimplifyVisitor ReadableExpressionVisitor = new SimplifyVisitor();
+        static SimplifyVisitor _readableExpressionVisitor;
 
         public static string CreateLabelString<T>(Expression<Func<T>> expression)
         {
-#if false
             // ReadableExpressions を使いたいが依存するのはちょっと悩ましい
             // https://github.com/AgileObjects/ReadableExpressions
-            return lambda.Body.ToReadableString();
-#else
+            // return lambda.Body.ToReadableString();
 
-            //return lambda.Body.ToString();
-            var changedExpr = ReadableExpressionVisitor.Visit(expression.Body);
-            return changedExpr?.ToString().Replace(MethodCallDummyInstanceName + ".", "");
-#endif
+            _readableExpressionVisitor ??= new();
+            var changedExpr = _readableExpressionVisitor.Visit(expression.Body);
+            Assert.IsNotNull(changedExpr);
+
+            var str = changedExpr.ToString();
+            str = str.Replace(MethodCallDummyInstanceName + ".", "");
+            if (str[0] == '(' && str.IndexOf(')') == str.Length - 1)
+            {
+                str = str[1..^1];
+            }
+
+            return str;
         }
 
 
@@ -114,13 +121,13 @@ namespace RosettaUI
 
 
             /// <summary>
-            /// Remove complex "this" string
+            /// 1. Remove complex "this" string
             /// 
             /// Warning: Constant is not only "this"
             /// This will make that 1.ToString() > ToString()
+            ///
+            /// 2. Add static class name
             /// </summary>
-            /// <param name="node"></param>
-            /// <returns></returns>
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
                 var obj = node.Object;

@@ -79,16 +79,13 @@ namespace RosettaUI.UIToolkit.Builder
                     var menuItems = contextMenuElement.CreateMenuItems?.Invoke();
                     if (menuItems != null)
                     {
-                        var menu = new GenericDropdownMenu();
-                        menu.AddBoxShadow();
 
-                        foreach (var item in menuItems)
+                        var menu = DropDownMenuGenerator.Generate(menuItems, new Rect() {position = evt.position}, ve);
+                        if (menu is GenericDropdownMenu gdm)
                         {
-                            if (item.isEnable) menu.AddItem(item.name, item.isChecked, item.action);
-                            else menu.AddDisabledItem(item.name, item.isChecked);
+                            gdm.AddBoxShadow();
                         }
 
-                        menu.DropDown(new Rect(){position = evt.position}, ve);
                         evt.StopPropagation();
                         evt.PreventDefault();
                     }

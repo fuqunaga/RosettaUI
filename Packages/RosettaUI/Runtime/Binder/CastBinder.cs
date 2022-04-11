@@ -3,15 +3,16 @@ using System.Linq.Expressions;
 
 namespace RosettaUI
 {
-    public class CastBinder<TFrom, TTo> : ChildBinder<TFrom, TTo>
+    public class CastBinder<TFrom, TTo> : ConvertBinder<TFrom, TTo>
     {
-        public CastBinder(IBinder<TFrom> binder) : base(binder, CastFunc, CastToParentFunc)
+        public CastBinder(IBinder<TFrom> binder) : base(binder)
         {
         }
 
+        protected override TTo GetFromParent(TFrom parent) => CastFunc(parent);
+        protected override TFrom SetToParent(TFrom parent, TTo value) => CastToParentFunc(parent, value);
 
-        public override bool IsConst => parentBinder.IsConst;
-
+        
         #region static
 
         public static readonly Func<TFrom, TTo> CastFunc;

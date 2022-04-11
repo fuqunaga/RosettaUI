@@ -2,36 +2,52 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using UnityEngine;
 
 namespace RosettaUI
 {
     public static partial class UI
     {
-        public static Element List<TList>(Expression<Func<TList>> targetExpression, ListViewOption option)
+        public static FoldElement List<TList>(Expression<Func<TList>> targetExpression, ListViewOption option)
             where TList : IList
             => List(targetExpression, null, option);
-        public static Element List<TList>(Expression<Func<TList>> targetExpression, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
+        public static FoldElement List<TList>(Expression<Func<TList>> targetExpression, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
             where TList : IList
             => List(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, createItemElement, option);
 
-        public static Element List<TList>(LabelElement label, Expression<Func<TList>> targetExpression, ListViewOption option)
+        public static FoldElement List<TList>(LabelElement label, Expression<Func<TList>> targetExpression, ListViewOption option)
             where TList : IList
             => List(label, targetExpression, null, option);
-        public static Element List<TList>(LabelElement label, Expression<Func<TList>> targetExpression, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
-            where TList : IList
-            => List(label, ExpressionUtility.CreateBinder(targetExpression), createItemElement, option);
 
-        public static Element List<TList>(LabelElement label, Func<TList> readValue, Action<TList> writeValue, ListViewOption option)
+        public static FoldElement List<TList>(LabelElement label, Expression<Func<TList>> targetExpression, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
+            where TList : IList
+        {
+            if (option == null && ExpressionUtility.GetAttribute<TList, NonReorderableAttribute>(targetExpression) != null)
+            {
+                option = new ListViewOption(reorderable: false, ListViewOption.Default.fixedSize);
+            }
+
+            return List(label, ExpressionUtility.CreateBinder(targetExpression), createItemElement, option);
+        }
+
+        public static FoldElement List<TList>(Expression<Func<TList>> targetExpression, Action<TList> writeValue, ListViewOption option)
+            where TList : IList
+            => List(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue, option);
+        public static FoldElement List<TList>(LabelElement label, Func<TList> readValue, Action<TList> writeValue, ListViewOption option)
             where TList : IList
             => List(label, readValue, writeValue, null, option);
-        public static Element List<TList>(LabelElement label, Func<TList> readValue, Action<TList> writeValue, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null) 
+        
+        public static FoldElement List<TList>(Expression<Func<TList>> targetExpression, Action<TList> writeValue, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
+            where TList : IList
+            => List(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue, createItemElement, option);
+        public static FoldElement List<TList>(LabelElement label, Func<TList> readValue, Action<TList> writeValue, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null) 
             where TList : IList
             => List(label, Binder.Create(readValue, writeValue), createItemElement, option);
 
-        public static Element ListReadOnly<TList>(Expression<Func<TList>> targetExpression, ListViewOption option)
+        public static FoldElement ListReadOnly<TList>(Expression<Func<TList>> targetExpression, ListViewOption option)
             where TList : IList
             => ListReadOnly(targetExpression, null, option);
-        public static Element ListReadOnly<TList>(Expression<Func<TList>> targetExpression, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
+        public static FoldElement ListReadOnly<TList>(Expression<Func<TList>> targetExpression, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
             where TList : IList
         {
             var labelString = ExpressionUtility.CreateLabelString(targetExpression);
@@ -40,28 +56,32 @@ namespace RosettaUI
         }
 
 
-        public static Element ListReadOnly<TList>(LabelElement label, Func<TList> readValue, ListViewOption option)
+        public static FoldElement ListReadOnly<TList>(LabelElement label, Func<TList> readValue, ListViewOption option)
             where TList : IList
             => ListReadOnly(label, readValue, null, option);
-        public static Element ListReadOnly<TList>(LabelElement label, Func<TList> readValue, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
+        public static FoldElement ListReadOnly<TList>(LabelElement label, Func<TList> readValue, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
             where TList : IList
         {
             var binder = Binder.Create(readValue, null);
             return List(label, binder, createItemElement, option);
         }
         
-        public static Element List(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
+        public static FoldElement List(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
         {
             option ??= ListViewOption.Default;
 
             var countField = ListCounterField(listBinder, option);
 
-            return Fold(
+            var fold = Fold(
                 label,countField,
                 new[]{
                     ListItemContainer(listBinder, createItemElement, option)
                 }
             ).Open();
+            
+            SetInteractableWithBinder(fold, listBinder);
+
+            return fold;
         }
 
         public static Element ListCounterField(IBinder listBinder, ListViewOption option = null)

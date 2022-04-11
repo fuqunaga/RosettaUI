@@ -28,7 +28,9 @@ namespace RosettaUI
             RegisterUITargetPropertyOrFields(typeof(Bounds),     "center", "extents");
             RegisterUITargetPropertyOrFields(typeof(BoundsInt),  "position", "size");
         }
-        
+
+        public static bool IsNullable(Type type) => Nullable.GetUnderlyingType(type) != null;
+
         private static ReflectionCache GetReflectionCache(Type type)
         {
             if (!ReflectionCacheTable.TryGetValue(type, out var cache))
@@ -74,6 +76,10 @@ namespace RosettaUI
             return GetMemberData(type, propertyOrFieldName).isReorderable;
         }
 
+        public static bool IsMultiline(Type type, string propertyOrFieldName)
+        {
+            return GetMemberData(type, propertyOrFieldName).isMultiline;
+        }
         
 
         public static bool HasSerializableField(Type type)
@@ -103,9 +109,13 @@ namespace RosettaUI
             }
         }
 
-        public static void UnregisterUITargetPropertyOrField(Type type, string name)
+        public static void UnregisterUITargetPropertyOrFields(Type type, params string[] names)
         {
-            GetReflectionCache(type).uiTargetPropertyOrFieldsNameTypeDic.Remove(name);
+            var dic = GetReflectionCache(type).uiTargetPropertyOrFieldsNameTypeDic;
+            foreach (var name in names)
+            {
+                dic.Remove(name);
+            }
         }
 
         public static IEnumerable<string> UnregisterUITargetPropertyOrFieldAll(Type type)
@@ -197,13 +207,15 @@ namespace RosettaUI
                             type = pair.Item2,
                             memberInfo = pair.Item1,
                             range = pair.Item1.GetCustomAttribute<RangeAttribute>(),
-                            isReorderable = pair.Item1.GetCustomAttribute<NonReorderableAttribute>() == null
+                            isReorderable = pair.Item1.GetCustomAttribute<NonReorderableAttribute>() == null,
+                            isMultiline =  pair.Item1.GetCustomAttribute<MultilineAttribute>() != null
                         }
                     );
 
 
                 uiTargetPropertyOrFieldsNameTypeDic = fis
-                    .Where(fi => fi.IsPublic || fi.GetCustomAttribute<SerializeField>() != null)
+                    .Where(fi => (fi.IsPublic && fi.GetCustomAttribute<NonSerializedAttribute>() == null)
+                                 || fi.GetCustomAttribute<SerializeField>() != null)
                     .ToDictionary(fi => fi.Name, fi => fi.FieldType);
             }
 
@@ -213,11 +225,10 @@ namespace RosettaUI
                 public MemberInfo memberInfo;
                 public RangeAttribute range;
                 public bool isReorderable;
+                public bool isMultiline;
             }
         }
         
         #endregion
-
-
     }
 }

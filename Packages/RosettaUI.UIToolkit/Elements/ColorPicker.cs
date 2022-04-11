@@ -161,7 +161,7 @@ namespace RosettaUI.UIToolkit
             PointerDrag.RegisterCallback(_svHandler, OnPointerMoveOnPanel_SV, CheckPointerIsValid_SV, true);
 
             
-            schedule.Execute(() =>
+            this.ScheduleToUseResolvedLayoutBeforeRendering(() =>
             {
                 // Hue Circle
                 var hueCircleSize = _hueHandler.resolvedStyle.width;
@@ -444,7 +444,7 @@ namespace RosettaUI.UIToolkit
                 _slider2 = InitSlider("slider2", 2, true);
                 _slider3 = InitSlider("slider3", 3, false);
 
-                _colorPicker.schedule.Execute(() =>
+                _colorPicker.ScheduleToUseResolvedLayoutBeforeRendering(() =>
                 {
                     _sliderTexture0 = InitSliderTexture(_slider0);
                     _sliderTexture1 = InitSliderTexture(_slider1);

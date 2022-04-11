@@ -12,7 +12,7 @@ namespace RosettaUI.Example
 
         public Element CreateElement()
         {
-            string nullString = null;
+            int? nullableInt = null;
             List<float> nullList = null;
             SimpleClass nullClass = null;
 
@@ -22,17 +22,17 @@ namespace RosettaUI.Example
             circularReferenceClass.other = circularReferenceClassOther;
             circularReferenceClassOther.other = circularReferenceClass;
             
-            return UI.Row(
+            return UI.Column(
                 ExampleTemplate.UIFunctionPage(nameof(UI.Field),
+                    UI.Field(() => nullableInt),
+                   UI.Field(() => nullClass),
                     UI.Field(() => nullList),
-                    UI.Field(() => nullClass),
-                    UI.Field(() => nullString),
                     UI.Field(() => circularReferenceClass)
                 ),
                 ExampleTemplate.UIFunctionPage(nameof(UI.Slider),
-                    UI.Slider(() => nullList),
+                    UI.Slider(() => nullableInt),
                     UI.Slider(() => nullClass),
-                    UI.Space().SetHeight(32),
+                    UI.Slider(() => nullList),
                     UI.Slider(() => circularReferenceClass)
                 ),
                 ExampleTemplate.UIFunctionPage(nameof(UI.List),

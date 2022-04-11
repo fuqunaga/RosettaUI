@@ -19,6 +19,13 @@ namespace RosettaUI
         public static Element MinMaxSlider<TMinMax>(LabelElement label, Expression<Func<TMinMax>> targetExpression, TMinMax range) 
             => MinMaxSlider(label, targetExpression, ConstGetter.Create(range));
 
+
+        public static Element MinMaxSlider<TMinMax>(Expression<Func<TMinMax>> targetExpression, Action<TMinMax> writeValue)
+            => MinMaxSlider(ExpressionUtility.CreateLabelString(targetExpression),targetExpression.Compile(), writeValue);
+
+        public static Element MinMaxSlider<TMinMax>(Expression<Func<TMinMax>> targetExpression, Action<TMinMax> writeValue, TMinMax range)
+            => MinMaxSlider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue, range);
+        
         public static Element MinMaxSlider<TMinMax>(LabelElement label, Func<TMinMax> readValue, Action<TMinMax> writeValue) 
             => MinMaxSlider(label, Binder.Create(readValue, writeValue), null);
         

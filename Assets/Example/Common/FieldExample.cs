@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,6 +7,19 @@ namespace RosettaUI.Example
 {
     public class FieldExample : MonoBehaviour, IElementCreator
     {
+        [Serializable]
+        public class AttributeTestClass
+        {
+            [Range(0f,100f)]
+            public float rangeFloat;
+
+            [Multiline]
+            public string multiLineString;
+
+            [NonReorderable]
+            public List<int> nonReorderableList;
+        }
+
         public int intValue;
         public uint uintValue;
         public float floatValue;
@@ -27,19 +41,14 @@ namespace RosettaUI.Example
         public float[] floatArray = {1f, 2f, 3f};
         public SimpleClass simpleClass;
 
-        public ElementCreator elementCreator;
-
         public List<SimpleClass> classList = new[]
         {
             new SimpleClass {floatValue = 1f, stringValue = "First"}
         }.ToList();
         
-        [Range(-100f, 100f)]
-        public float rangeValue;
-
-        //public ComplexClass complexClass;
-
-
+        public AttributeTestClass attributeTestClass;
+        
+        
         public Element CreateElement()
         {
             return UI.Column(
@@ -91,69 +100,25 @@ namespace RosettaUI.Example
                         UI.FieldReadOnly(() => classList)
                     )
                 ),
-                UI.Column(
-                    UI.Label("<b>Tips</b>"),
-                    UI.Indent(
-                        UI.Label("<b>UI.Field(\"CustomLabel\", () => floatValue)</b>"),
-                        UI.Field("CustomLabel", () => floatValue),
-                        ExampleTemplate.BlankLine(),
-                        
-                        UI.Label("<b>UI.Field(() => vector2Value.x)</b>"),
-                        UI.Label("Supports public field/property"),
-                        UI.Field(() => vector2Value.x),
-                        ExampleTemplate.BlankLine(),
+                ExampleTemplate.CodeElementSets("<b>Attribute</b>",
+                    (@"public class AttributeTextClass
+{
+    [Range(0f,100f)]
+    public float rangeFloat;
 
-                        UI.Label("<b>Element.RegisterValueChangeCallback()</b>"),
-                        UI.Field("ValueChangedCallback", () => floatValue)
-                            .RegisterValueChangeCallback(() => print($"{nameof(floatValue)} changed.")),
-                        ExampleTemplate.BlankLine(),
+    [Multiline]
+    public float multiLineString;
 
-                        UI.Label("<b>UI.Field(() => floatValue + 1f),</b>"),
-                        UI.Label("Non-interactable if the expression is not assignable"),
-                        UI.Field(() => floatValue + 1f),
-                        UI.Label("Interactable if set label and writeValue func"),
-                        UI.Field($"({nameof(floatValue)}  + 1f)",
-                            () => floatValue + 1f,
-                            f => floatValue = f - 1f
-                        ),
-                        ExampleTemplate.BlankLine(),
+    [NonReorderable]
+    public List<int> nonReorderableList;
+}
 
-                        // TODO
-                        // Field with range attribute will become Slider
-                        //, UI.Field(() => rangeValue)
-
-                        UI.Label("<b>If the target is IElementCreator, use CreateElement()</b>"),
-                        UI.Field(() => elementCreator),
-                        ExampleTemplate.BlankLine(),
-                        
-                        UI.Label(
-                            "<b>ExpressionTree limitation</b>\n" +
-                            "UI.Field()'s targetExpressions cannot use ?.(null-conditional operator), {}(blocks) or local functions.\n" +
-                            "but UI.FieldReadOnly(label, readValue) and UI.Field(label, readValue, writeValue) can."
-                            ),
-                        UI.HelpBox(
-                            "// UI.Field(() => stringValue?.Length), // compile error\n" +
-                            "// UI.Field(() => { LocalFunction(); return intValue;}) // compile error"
-                        ),
-                        UI.FieldReadOnly("UI.FieldReadOnly(label, readValue)", () =>
-                        {
-                            LocalFunction();
-                            return intValue;
-                        }),
-                        UI.Field("UI.Field(label, readValue, writeValue)",
-                            () =>
-                            {
-                                LocalFunction();
-                                return intValue;
-                            },
-                            i => intValue = i)
+UI.Field(() => attributeTestClass);
+",
+                        UI.Field(() => attributeTestClass)
                     )
                 )
             );
-
-            static void LocalFunction()
-            {
-            }
         }
     }
 }

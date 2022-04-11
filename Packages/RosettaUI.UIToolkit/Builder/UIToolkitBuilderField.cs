@@ -10,7 +10,7 @@ namespace RosettaUI.UIToolkit.Builder
             var textFieldElement = (TextFieldElement) element;
 
             var textField = Build_Field<string, TextField>(element);
-            if (textFieldElement.MultiLine)
+            if (textFieldElement.IsMultiLine)
             {
                 textField.multiline = true;
             }

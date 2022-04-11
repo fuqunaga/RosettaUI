@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -37,16 +38,14 @@ namespace RosettaUI.UIToolkit
         static readonly string UssClassNameTitleBarContainerRight = UssClassNameTitleBarContainer + "__right";
         static readonly string UssClassNameContentContainer = UssClassName + "__content-container";
        
+        protected VisualElement dragRoot;
+
         readonly VisualElement _titleBarContainer = new();
         readonly VisualElement _contentContainer = new();
-        
 
         Button _closeButton;
-
         DragMode _dragMode;
-
         Vector2 _draggingLocalPosition;
-
         ResizeEdge _resizeEdge;
         
         public bool IsMoved { get; protected set; }
@@ -73,6 +72,8 @@ namespace RosettaUI.UIToolkit
                 }
             }
         }
+        
+        protected virtual VisualElement SelfRoot => this;
 
         public override VisualElement contentContainer => _contentContainer;
 
@@ -215,10 +216,16 @@ namespace RosettaUI.UIToolkit
             _beforeDrag = true;
         }
 
-
-        void UpdateDragWindow(Vector2 position)
+        Vector2 WorldToDragRootLocal(Vector2 worldPosition)
         {
-            var pos = position - _draggingLocalPosition;
+            return dragRoot?.WorldToLocal(worldPosition) ?? worldPosition;
+        }
+
+
+        void UpdateDragWindow(Vector2 worldPosition)
+        {
+            var localPosition = WorldToDragRootLocal(worldPosition);
+            var pos = localPosition - _draggingLocalPosition;
             
             // ListView の reorderable でアイテムをドラッグするときに Window が少し動いてしまう問題対策
             // ListView は一定距離 PointerMove で移動しないとドラッグ判定にはならないためその間 Window のドラッグが成立してしまう
@@ -258,6 +265,7 @@ namespace RosettaUI.UIToolkit
         }
 
         #endregion
+        
 
         #region Resize Window
 
@@ -387,26 +395,17 @@ namespace RosettaUI.UIToolkit
         {
             style.display = DisplayStyle.None;
         }
-        
-
-        protected virtual VisualElement SelfRoot => this;
-
 
         public virtual void Show(Vector2 position, VisualElement target)
         {
-            var root = target.panel.visualTree.Q<TemplateContainer>();
+            dragRoot = target.panel.visualTree.Q<TemplateContainer>()
+                       ?? target.panel.visualTree.Query(null, RosettaUIRootUIToolkit.USSRootClassName).First();
+            
+            dragRoot.Add(SelfRoot);
 
-            if (root == null)
-            {
-                Debug.LogError("Could not find rootVisualContainer...");
-                return;
-            }
-
-            root.Add(SelfRoot);
-
-            var local = root.WorldToLocal(position);
-            style.left = local.x - root.layout.x;
-            style.top = local.y - root.layout.y;
+            var local = dragRoot.WorldToLocal(position);
+            style.left = local.x - dragRoot.layout.x;
+            style.top = local.y - dragRoot.layout.y;
 
             //schedule.Execute(EnsureVisibilityInParent);
 

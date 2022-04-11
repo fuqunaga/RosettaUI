@@ -17,7 +17,6 @@ namespace RosettaUI.UIToolkit.Builder
             return Instance.BuildInternal(element);
         }
         
-        
         #endregion
         
         
@@ -74,7 +73,7 @@ namespace RosettaUI.UIToolkit.Builder
                 if (evt.oldRect == evt.newRect) return;
 
                 var marginLeft = ve.worldBound.xMin;
-
+                
                 for (var element = label.Parent;
                      element != null;
                      element = element.Parent)
@@ -85,6 +84,8 @@ namespace RosettaUI.UIToolkit.Builder
                         break;
                     }
                 }
+
+                marginLeft /= ve.worldTransform.lossyScale.x; // ignore rotation
 
                 ve.style.minWidth = LayoutSettings.LabelWidth - marginLeft;
             });

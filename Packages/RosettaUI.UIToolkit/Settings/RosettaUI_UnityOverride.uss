@@ -523,6 +523,7 @@
 .unity-list-view__reorderable-handle-bar
 {
     opacity: 0.4;
+    height: 2px;
 }
 
 /*.unity-list-view__scroll-view--with-footer,*/

@@ -86,8 +86,8 @@ namespace RosettaUI.Editor.UIToolkit
 
                 scalingContainer.style.width = width;
                 scalingContainer.style.height = height;
-              
-                scalingContainer.transform.scale = Vector3.one * scale;
+
+                scalingContainer.transform.scale = new Vector3(scale, scale, 1f);
             }
         }
 

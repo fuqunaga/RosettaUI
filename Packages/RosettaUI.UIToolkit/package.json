@@ -1,15 +1,22 @@
 {
   "name": "ga.fuquna.rosettaui.uitoolkit",
-  "version": "0.0.0",
-  "displayName": "RosettaUI.UIToolkit",
+  "version": "0.0.2",
+  "displayName": "RosettaUI - UI Toolkit",
   "description": "RosettaUI UI Toolkit bridge",
   "unity": "2021.2",
   "dependencies": {
     "ga.fuquna.rosettaui": "0.0.0"
   },
+  "keywords": [ 
+    "unity",
+     "ui",
+     "uitoolkit"
+  ],
   "author": {
     "name": "fuqunaga",
     "email": "fukhid@gmail.com",
     "url": "https://fuquna.ga"
-  }
+  },
+  "repository": "github:fuqunaga/RosettaUI",
+  "license": "(MIT OR Apache-2.0)"
 }

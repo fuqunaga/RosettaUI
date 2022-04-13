@@ -35,9 +35,6 @@ namespace RosettaUI.Example
         {
             _rootElement = UI.Window(
                 ExampleTypes.Select(type => UI.WindowLauncher(type))
-#if false
-                , UI.WindowLauncher<UICustomExample>()
-#endif
             );
 
             return _rootElement;

@@ -23,17 +23,25 @@ namespace RosettaUI.Example
         
         public KeyCode toggleUIKey = KeyCode.U;
         private RosettaUIRoot _root;
-
+        
         private void Start()
         {
             _root = GetComponent<RosettaUIRoot>();
             _root.Build(CreateElement());
         }
 
+        public static class Hoge
+        {
+            public static int piyo;
+            public static int GetPiyo() => piyo;
+        }
+        
         private Element CreateElement()
         {
             return UI.Window(
+                new []{UI.Field(() => Hoge.GetPiyo())}.Concat(
                 ExampleTypes.Select(type => UI.WindowLauncher(type))
+                )
             );
         }
 

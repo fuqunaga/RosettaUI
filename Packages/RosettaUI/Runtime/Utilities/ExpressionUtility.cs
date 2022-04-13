@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -31,11 +32,12 @@ namespace RosettaUI
             Action<T> setFunc = null;
             var p = Expression.Parameter(type);
 
-            // for UI.List()
+            
+            // expression が実態よりアップキャストしているとき対策
             // 
-            //   var array = new int[];
-            //   UI.List(() => array);
-
+            //  var array = (IList<int>)new int[];
+            //  UI.List(() => array);
+            // 
             // T is IList<int>
             // bodyType is System.Int32[]
             // 
@@ -65,21 +67,28 @@ namespace RosettaUI
 
         #region CreateLabelString
 
-        const string MethodCallDummyInstanceName = "MethodCallDummy...";
-        static SimplifyVisitor _readableExpressionVisitor;
+        const string MethodCallDummyInstanceName = "RosettaUI_MethodCallDummy...";
+        const string StaticMethodCallDummyClassName = "RosettaUI_StaticMethodCallDummy";
+        private static ToLabelStringVisitor _readableExpressionVisitor;
+        private static Regex _staticMethodDummyRegex;
 
         public static string CreateLabelString<T>(Expression<Func<T>> expression)
         {
             // ReadableExpressions を使いたいが依存するのはちょっと悩ましい
             // https://github.com/AgileObjects/ReadableExpressions
             // return lambda.Body.ToReadableString();
-
+            
             _readableExpressionVisitor ??= new();
             var changedExpr = _readableExpressionVisitor.Visit(expression.Body);
             Assert.IsNotNull(changedExpr);
 
             var str = changedExpr.ToString();
+            
             str = str.Replace(MethodCallDummyInstanceName + ".", "");
+
+            _staticMethodDummyRegex ??= new Regex(@"\(" + StaticMethodCallDummyClassName + @"(\w+) = (\w+.*)\)");
+            str = _staticMethodDummyRegex.Replace(str, "$1.$2");
+            
             if (str[0] == '(' && str.IndexOf(')') == str.Length - 1)
             {
                 str = str[1..^1];
@@ -89,7 +98,7 @@ namespace RosettaUI
         }
 
 
-        private class SimplifyVisitor : ExpressionVisitor
+        private class ToLabelStringVisitor : ExpressionVisitor
         {
             protected override Expression VisitMember(MemberExpression node)
             {
@@ -124,7 +133,6 @@ namespace RosettaUI
             /// 1. Remove complex "this" string
             /// 
             /// Warning: Constant is not only "this"
-            /// This will make that 1.ToString() > ToString()
             ///
             /// 2. Add static class name
             /// </summary>
@@ -132,6 +140,15 @@ namespace RosettaUI
             {
                 var obj = node.Object;
 
+                // add static class name
+                if ( node.Method.IsStatic )
+                {
+                    var type = node.Method.ReturnType;
+                    var param = Expression.Parameter(type, StaticMethodCallDummyClassName + node.Method.DeclaringType.Name);
+                    return Expression.Assign(param, node);
+                }
+                
+                // remove "this"
                 if (obj is ConstantExpression)
                 {
                     var param = Expression.Parameter(obj.Type, MethodCallDummyInstanceName);
@@ -141,6 +158,7 @@ namespace RosettaUI
                 return base.VisitMethodCall(node);
             }
         }
+
 
         #endregion
 

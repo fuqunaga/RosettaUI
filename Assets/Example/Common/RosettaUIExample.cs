@@ -21,9 +21,8 @@ namespace RosettaUI.Example
             typeof(SafetyExample)
         };
         
-        public KeyCode toggleRootElementKey = KeyCode.U;
+        public KeyCode toggleUIKey = KeyCode.U;
         private RosettaUIRoot _root;
-        Element _rootElement;
 
         private void Start()
         {
@@ -33,16 +32,14 @@ namespace RosettaUI.Example
 
         private Element CreateElement()
         {
-            _rootElement = UI.Window(
+            return UI.Window(
                 ExampleTypes.Select(type => UI.WindowLauncher(type))
             );
-
-            return _rootElement;
         }
 
         void Update()
         {
-            if (!RosettaUIRoot.WillUseKeyInputAny() && Input.GetKeyDown(toggleRootElementKey))
+            if (Input.GetKeyDown(toggleUIKey))
             {
                 _root.enabled = !_root.enabled;
             }

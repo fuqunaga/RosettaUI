@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace RosettaUI
@@ -13,10 +14,10 @@ namespace RosettaUI
         public IReadOnlyList<Element> Elements => _elements;
 
         private readonly Queue<Func<Element>> _createElementOnEnableQueue = new();
-        
-        
+
+
         #region Unity
-        
+
         protected virtual void OnEnable()
         {
             while (_createElementOnEnableQueue.Count > 0)
@@ -24,7 +25,7 @@ namespace RosettaUI
                 var func = _createElementOnEnableQueue.Dequeue();
                 Build(func());
             }
-            
+
             Register(this);
 
             foreach (var element in _elements)
@@ -45,29 +46,48 @@ namespace RosettaUI
 
         protected void OnDestroy()
         {
-            foreach(var e in _elements) e.Destroy();
+            foreach (var e in _elements) e.Destroy();
+        }
+
+
+        // suppress Input trick
+        protected virtual void OnGUI()
+        {
+            SuppressInputKey();
         }
 
         #endregion
 
-        
-        protected abstract void BuildInternal(Element element);
-
-        public abstract bool WillUseKeyInput();
-
         public void Build(Element element)
         {
             BuildInternal(element);
-            
+
             updater.Register(element);
             updater.RegisterWindowRecursive(element);
-            
+
             _elements.Add(element);
         }
 
         public void BuildOnEnable(Func<Element> createElement)
         {
             _createElementOnEnableQueue.Enqueue(createElement);
+        }
+
+        public abstract bool WillUseKeyInput();
+
+        protected abstract void BuildInternal(Element element);
+
+
+        private static PropertyInfo _textFieldInputPropertyInfo;
+        
+        protected void SuppressInputKey()
+        {
+            _textFieldInputPropertyInfo ??= typeof(GUIUtility).GetProperty("textFieldInput", BindingFlags.NonPublic | BindingFlags.Static);
+
+            if (WillUseKeyInput())
+            {
+                _textFieldInputPropertyInfo.SetValue(null, true);
+            }
         }
 
         

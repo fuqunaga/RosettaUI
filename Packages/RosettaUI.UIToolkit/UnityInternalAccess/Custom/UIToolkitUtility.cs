@@ -6,7 +6,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
     {
         public static bool WillUseKeyInput(IPanel panel)
         {
-            // refs: TextInputBase.hasForus
+            // refs: TextInputBase.hasFocus
             var element = panel?.focusController?.GetLeafFocusedElement();
             return element is ITextInputField {hasFocus: true};
         }

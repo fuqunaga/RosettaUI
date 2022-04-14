@@ -60,8 +60,6 @@ dependencies.
 [scoped registry]: https://docs.unity3d.com/Manual/upm-scoped.html
 
 
-### Setting Scoped Registry
-
 **Edit > ProjectSettings... > Package Manager > Scoped Registries**
 
 Enter the following and click the Save button.
@@ -73,8 +71,6 @@ Enter the following and click the Save button.
 ```
 ![](Documentation~/2022-04-12-17-29-38.png)
 
-
-### Install via Package Manager
 
 **Window > Package Manager**
 
@@ -88,11 +84,11 @@ Select `RosettaUI - UI ToolKit` and click the Install button
 
 ## How to use
 
-1. Put the `Packages/RosettaUI - UIToolkit/RosettaUIRootUIToolkit.prefab` in the Hierarychy
+1. Put `Packages/RosettaUI - UIToolkit/RosettaUIRootUIToolkit.prefab` in the Hierarychy
 1. Write code to generate `Element` instance
-1. Call RosettaUIRoot.Build(Element) to generate the actual UI ( [Example] )
+1. Call `RosettaUIRoot.Build(Element)` to generate the actual UI ( [Example] )
 
-[Example]: https://github.com/fuqunaga/RosettaUI/blob/9fbdb5af94ed09d0e6f46253e9350a8672bafd15/Assets/Example/Common/RosettaUIExample.cs#L31
+[Example]: Assets/Example/ExampleSimple.cs
 
 Examples are available in this repository.
 I recommend downloading and checking it out.
@@ -115,4 +111,4 @@ I recommend downloading and checking it out.
 ![](Documentation~/2022-04-12-18-55-52.png)
 
 ### And more
-Please check the [Examples]("/Assets/Example/Common")
+Please check the [Examples](Assets/Example/Common)

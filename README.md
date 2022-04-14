@@ -4,6 +4,54 @@ Code-based GUI library for development menus for Unity
 
 ![](Documentation~/2022-04-12-17-18-14.png)
 
+
+
+<table>
+<td width=450>
+
+```csharp
+public class ExampleSimple : MonoBehaviour
+{
+    public string stringValue;
+    public float floatValue;
+    public int intValue;
+    public Color colorValue;
+
+    
+    void Start()
+    {
+        var root = GetComponent<RosettaUIRoot>();
+        root.Build(CreateElement());
+    }
+
+    Element CreateElement()
+    {
+        return UI.Window(nameof(ExampleSimple),
+            UI.Page(
+                UI.Field(() => stringValue),
+                UI.Slider(() => floatValue),
+                UI.Row(
+                    UI.Field(() => intValue),
+                    UI.Button("+", () => intValue++),
+                    UI.Button("-", () => intValue--)
+                ),
+                UI.Field(() => colorValue)
+            )
+        );
+    }
+}
+```
+
+</td>
+<td>
+
+![](Documentation~/simple.gif)
+
+</td>
+</tr>
+</table>
+
+
 ## Installation
 
 This package uses the [scoped registry] feature to resolve package
@@ -53,29 +101,18 @@ I recommend downloading and checking it out.
 ## Functions
 
 ### UI.Field()
-```csharp
-UI.Field(() => value)
-```
 ![](Documentation~/field.gif)
 
 
 ### UI.Slider()
-```csharp
-UI.Slider(() => value)
-```
 ![](Documentation~/2022-04-12-18-46-17.png)
 
 ### UI.MinMaxSlider()
-```csharp
-UI.MinMaxSlider(() => value)
-```
-
 ![](Documentation~/2022-04-12-18-49-48.png)
 
 
 ### Layout elements
 ![](Documentation~/2022-04-12-18-55-52.png)
-
 
 ### And more
 Please check the [Examples]("/Assets/Example/Common")

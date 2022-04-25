@@ -9,7 +9,6 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         public ClampFreeSlider()
         {
             clamped = false;
-            SliderPatchUtility.CreateTextInputFieldAndBlockSliderKeyDownEvent(this);
             
             
             // Label の width が変わってスライダーの長さが変わってもdraggerの位置が再計算されないケース対策
@@ -30,6 +29,16 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
 
         internal override float SliderNormalizeValue(float currentValue, float lowerValue, float higherValue)
             => Mathf.Clamp01(base.SliderNormalizeValue(currentValue, lowerValue, higherValue));
+
+        public override bool showInputField
+        {
+            get => base.showInputField;
+            set
+            {
+                base.showInputField = value;
+                SliderPatchUtility.BlockTextFieldKeyDownEvent(this);
+            }
+        }
     }
 
 
@@ -39,11 +48,11 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         /// BaseSlider.OnKeyDown()で左右キーなどの入力でスライダーが反応してしまう
         /// テキスト入力時はスライダーの反応を止めたいのでStopPropagation()するイベントをinputTextFieldに仕込んでおく
         /// </summary>
-        public static void CreateTextInputFieldAndBlockSliderKeyDownEvent<T>(BaseSlider<T> slider) where T : IComparable<T>
+        public static void BlockTextFieldKeyDownEvent<T>(BaseSlider<T> slider)
+            where T : IComparable<T>
         {
-            slider.showInputField = true;
             var textField = slider.inputTextField;
-            textField.RegisterCallback<KeyDownEvent>(e => e.StopPropagation());
+            textField?.RegisterCallback<KeyDownEvent>(e => e.StopPropagation());
         }
     }
 }

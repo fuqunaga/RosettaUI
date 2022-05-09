@@ -4,9 +4,9 @@
   "displayName": "RosettaUI",
   "description": "Code-based GUI library for development menus for Unity",
   "unity": "2021.2",
-  "keywords": [ 
+  "keywords": [
     "unity",
-     "ui"
+    "ui"
   ],
   "author": {
     "name": "fuqunaga",

@@ -5,12 +5,12 @@
   "description": "RosettaUI UI Toolkit bridge",
   "unity": "2021.2",
   "dependencies": {
-    "ga.fuquna.rosettaui": "0.0.0"
+    "ga.fuquna.rosettaui": "0.0.2"
   },
-  "keywords": [ 
+  "keywords": [
     "unity",
-     "ui",
-     "uitoolkit"
+    "ui",
+    "uitoolkit"
   ],
   "author": {
     "name": "fuqunaga",

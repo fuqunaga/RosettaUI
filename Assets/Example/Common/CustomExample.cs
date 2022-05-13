@@ -39,10 +39,10 @@ namespace RosettaUI.Example
 
         public Element CreateElement(LabelElement _)
         {
-            using var ecfScope = new UICustom.ElementCreationFuncScope<MyInt>(instance =>
+            using var ecfScope = new UICustom.ElementCreationFuncScope<MyInt>((label, instance) =>
             {
                 return UI.Row(
-                    UI.Field(nameof(MyInt), () => instance.value),
+                    UI.Field(label, () => instance.value),
                     UI.Button("+", () => instance.value++),
                     UI.Button("-", () => instance.value--)
                 );
@@ -87,10 +87,10 @@ UI.Field(() => myFloatValue));",
 public MyInt myInt;
 
 using var ecfScope = 
-    new UICustom.ElementCreationFuncScope<MyInt>(instance =>
+    new UICustom.ElementCreationFuncScope<MyInt>((label, instance) =>
     {
         return UI.Row(
-            UI.Field(nameof(MyInt), () => instance.value),
+            UI.Field(label, () => instance.value),
             UI.Button(""+"", () => instance.value++),
             UI.Button(""-"", () => instance.value--)
         );
@@ -103,7 +103,7 @@ UI.Field(() => myInt);",
                         "RosettaUI is intended for members serialized in Unity. Otherwise, it can be explicitly specified.",
                         (@"public class MyClass
 {
-    private float privateValue;
+    private float _privateValue;
     [NonSerialized] 
     public float publicValueNonSerialized;
     public float PropertyValue { get; set; }

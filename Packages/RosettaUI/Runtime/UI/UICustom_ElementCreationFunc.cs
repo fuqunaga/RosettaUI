@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace RosettaUI
 {
@@ -8,14 +7,13 @@ namespace RosettaUI
     {
         public class CreationFunc
         {
-            public Func<IBinder, Element> func;
-            public bool isOneLiner;
+            public Func<LabelElement, IBinder, Element> func;
         }
         
         private static readonly Dictionary<Type, CreationFunc> CreationFuncTable = new();
 
-        // struct は creationFunc 渡してもコピーになってしまうので非対応
-        public static void RegisterElementCreationFunc<T>(Func<T, Element> creationFunc, bool isOneLiner = false)
+        // struct は creationFunc 渡してもコピーになってしまうので class のみ対応
+        public static void RegisterElementCreationFunc<T>(Func<LabelElement, T, Element> creationFunc)
             where T : class
         {
             var cf = new CreationFunc
@@ -24,11 +22,10 @@ namespace RosettaUI
                 // 下手すると毎フレーム変わるので重いかもしれない
                 // 本当は binder から Element を生成するべきだが複雑な UI を作ろうとするとかなり大変
                 // とりあえず「重いけど安全に動く」動作を選択
-                func = binder => UI.DynamicElementOnStatusChanged(
+                func = (label,binder) => UI.DynamicElementOnStatusChanged(
                     binder.GetObject,
-                    obj => creationFunc((T) obj).RegisterValueChangeCallback(() => binder.SetObject(obj))
+                    obj => creationFunc(label, (T)obj).RegisterValueChangeCallback(() => binder.SetObject(obj))
                 ),
-                isOneLiner = isOneLiner
             };
 
             RegisterElementCreationFunc(typeof(T), cf);
@@ -39,9 +36,9 @@ namespace RosettaUI
             CreationFuncTable[type] = creationFunc;
         }
 
-        public static bool UnregisterElementCreationFunc<T>()
+        public static bool UnregisterElementCreationFunc(Type type)
         {
-            return CreationFuncTable.Remove(typeof(T));
+            return CreationFuncTable.Remove(type);
         }
 
         public static CreationFunc GetElementCreationMethod(Type type)
@@ -66,10 +63,10 @@ namespace RosettaUI
         {
             private readonly CreationFunc _creationFuncCache;
 
-            public ElementCreationFuncScope(Func<T, Element> creationFunc, bool isOneLiner = false)
+            public ElementCreationFuncScope(Func<LabelElement, T, Element> creationFunc)
             {
                 _creationFuncCache = GetElementCreationMethod(typeof(T));
-                RegisterElementCreationFunc(creationFunc, isOneLiner);
+                RegisterElementCreationFunc(creationFunc);
             }
 
             public void Dispose()

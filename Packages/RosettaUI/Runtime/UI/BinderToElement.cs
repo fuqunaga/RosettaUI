@@ -33,7 +33,7 @@ namespace RosettaUI
                 _ when valueType.IsEnum => CreateEnumElement(label, binder),
                 _ when TypeUtility.IsNullable(valueType) => CreateNullableFieldElement(label, binder),
 
-                _ when binder.GetObject() is IElementCreator elementCreator => WrapNullGuard(elementCreator.CreateElement),
+                _ when binder.GetObject() is IElementCreator elementCreator => WrapNullGuard(() => elementCreator.CreateElement(label)),
                 _ when ListBinder.IsListBinder(binder) => CreateLitView(label, binder),
 
                 _ => WrapNullGuard(() => CreateMemberFieldElement(label, binder))
@@ -44,7 +44,7 @@ namespace RosettaUI
 
         private static Element InvokeCreationFunc(LabelElement label, IBinder binder, UICustom.CreationFunc creationFunc)
         {
-            return UI.NullGuardIfNeed(label, binder, () => creationFunc.func(binder));
+            return UI.NullGuardIfNeed(label, binder, () => creationFunc.func(label, binder));
         }
 
         private static Element CreateEnumElement(LabelElement label, IBinder binder)
@@ -101,8 +101,8 @@ namespace RosettaUI
             });
 
 
-            Element ret = null;
-            if (TypeUtility.IsSingleLine(binder.ValueType))
+            Element ret;
+            if (TypeUtility.IsSingleLine(valueType))
                 ret = new CompositeFieldElement(label, elements);
             else if (label != null)
                 ret = UI.Fold(label, elements);
@@ -203,6 +203,7 @@ namespace RosettaUI
                     var titleField = CreateMemberFieldElement(new LabelElement(label), binder);
                     var bar = UI.Row(label, titleField);
 
+                    // ReSharper disable once PossibleMultipleEnumeration
                     var fold = UI.Fold(bar, elements);
                     
                     fold.IsOpenRx.SubscribeAndCallOnce(isOpen =>
@@ -215,6 +216,7 @@ namespace RosettaUI
                 }
                 else
                 {
+                    // ReSharper disable once PossibleMultipleEnumeration
                     return UI.Fold(label, elements);
                 }
             }

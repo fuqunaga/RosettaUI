@@ -154,8 +154,6 @@ namespace RosettaUI
                 return t.IsPrimitive || t == typeof(string) || t.IsEnum;
             }
 
-            if (UICustom.GetElementCreationMethod(valueType) is { } creationFunc) return creationFunc.isOneLiner;
-
             if (!SingleLineDic.TryGetValue(valueType, out var ret))
             {
                 if (typeof(IElementCreator).IsAssignableFrom(valueType) || typeof(IList).IsAssignableFrom(valueType))

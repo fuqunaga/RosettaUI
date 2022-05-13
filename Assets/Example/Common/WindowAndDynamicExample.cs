@@ -9,7 +9,7 @@ namespace RosettaUI.Example
         public bool dynamicElementIf;
 
         
-        public Element CreateElement()
+        public Element CreateElement(LabelElement _)
         {
             return UI.Column(
                 ExampleTemplate.CodeElementSets(ExampleTemplate.UIFunctionStr(nameof(UI.WindowLauncher)),

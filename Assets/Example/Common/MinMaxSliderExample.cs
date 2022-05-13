@@ -31,7 +31,7 @@ namespace RosettaUI.Example
 
         public Vector2 vector2Value;
         
-        public Element CreateElement()
+        public Element CreateElement(LabelElement _)
         {
             return UI.Column(
                 UI.Row(

@@ -49,7 +49,7 @@ namespace RosettaUI.Example
         public AttributeTestClass attributeTestClass;
         
         
-        public Element CreateElement()
+        public Element CreateElement(LabelElement _)
         {
             return UI.Column(
                 UI.Row(

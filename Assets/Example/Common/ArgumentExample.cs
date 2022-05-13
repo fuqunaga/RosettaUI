@@ -14,7 +14,7 @@ namespace RosettaUI.Example
         public string[] dropDownOptions = new[] {"One", "Two", "Three"};
 
 
-        public Element CreateElement()
+        public Element CreateElement(LabelElement _)
         {
             return UI.Column(
                 ExampleTemplate.CodeElementSets("<b>Custom Label</b>",

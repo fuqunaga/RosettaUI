@@ -9,7 +9,7 @@ namespace RosettaUI.Example
         public int intValue;
         public List<int> intList = new(new[] {1, 2, 3});
         
-        public Element CreateElement()
+        public Element CreateElement(LabelElement _)
         {
             return UI.Column(
                 ExampleTemplate.CodeElementSets("<b>Styles</b>",

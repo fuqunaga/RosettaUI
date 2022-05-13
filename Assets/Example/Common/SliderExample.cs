@@ -25,7 +25,7 @@ namespace RosettaUI.Example
         
         public string stringValue;
 
-        public Element CreateElement()
+        public Element CreateElement(LabelElement _)
         {
             return UI.Column(
                 UI.Row(

@@ -10,7 +10,7 @@ namespace RosettaUI.Example
             public CircularReferenceClass other;
         }
 
-        public Element CreateElement()
+        public Element CreateElement(LabelElement _)
         {
             int? nullableInt = null;
             List<float> nullList = null;

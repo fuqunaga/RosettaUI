@@ -2,6 +2,6 @@
 {
     public interface IElementCreator
     {
-        Element CreateElement();
+        Element CreateElement(LabelElement label);
     }
 }

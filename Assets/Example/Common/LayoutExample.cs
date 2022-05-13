@@ -24,7 +24,7 @@ namespace RosettaUI.Example
         }
         
 
-        public Element CreateElement()
+        public Element CreateElement(LabelElement _)
         {
             var scrollViewItemCount = 50;
 

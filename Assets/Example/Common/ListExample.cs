@@ -15,7 +15,7 @@ namespace RosettaUI.Example
         [NonReorderable]
         public int[] nonReorderableArray = {1,2,3};
         
-        public Element CreateElement()
+        public Element CreateElement(LabelElement _)
         {
             return UI.Column(
                 UI.HelpBox("Right-click on an item to open the menu", HelpBoxType.Info),

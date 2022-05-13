@@ -10,9 +10,9 @@ namespace RosettaUI.Example
         {
             public float value;
 
-            public Element CreateElement()
+            public Element CreateElement(LabelElement label)
             {
-                return UI.Slider(nameof(MyFloat), () => value);
+                return UI.Slider(label, () => value);
             }
         }
 
@@ -37,7 +37,7 @@ namespace RosettaUI.Example
         public Vector2 vector2Value;
         
 
-        public Element CreateElement()
+        public Element CreateElement(LabelElement _)
         {
             using var ecfScope = new UICustom.ElementCreationFuncScope<MyInt>(instance =>
             {
@@ -66,9 +66,9 @@ namespace RosettaUI.Example
 {
     public float value;
 
-    public Element CreateElement()
+    public Element CreateElement(LabelElement label)
     {
-        return UI.Slider(nameof(MyFloat), () => value);
+        return UI.Slider(label, () => value);
     }
 }
 

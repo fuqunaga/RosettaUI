@@ -10,9 +10,9 @@ namespace RosettaUI.Builder
     public abstract class BuilderBase<TUIObj>
     {
         protected abstract IReadOnlyDictionary<Type, Func<Element, TUIObj>> BuildFuncTable { get; }
-        readonly Dictionary<Element, TUIObj> _elementToUIObj = new Dictionary<Element, TUIObj>();
+        readonly Dictionary<Element, TUIObj> _elementToUIObj = new();
 
-        protected TUIObj GetUIObj(Element element)
+        public TUIObj GetUIObj(Element element)
         {
             _elementToUIObj.TryGetValue(element, out var uiObj);
             return uiObj;

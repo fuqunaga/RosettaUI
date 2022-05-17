@@ -19,51 +19,51 @@ namespace RosettaUI
             return e;
         }
 
-        public static T SetWidth<T>(this T element, float width)
+        public static T SetWidth<T>(this T element, float? width)
             where T : Element
         {
             element.Style.Width = width;
             return element;
         }
 
-        public static T SetHeight<T>(this T element, float height)
+        public static T SetHeight<T>(this T element, float? height)
             where T : Element
         {
             element.Style.Height = height;
             return element;
         }
 
-        public static Element SetMinWidth(this Element element, float minWidth)
+        public static Element SetMinWidth(this Element element, float? minWidth)
         {
             element.Style.MinWidth = minWidth;
             return element;
         }
 
-        public static Element SetMinHeight(this Element element, float minHeight)
+        public static Element SetMinHeight(this Element element, float? minHeight)
         {
             element.Style.MinHeight = minHeight;
             return element;
         }
         
-        public static Element SetMaxWidth(this Element element, float maxWidth)
+        public static Element SetMaxWidth(this Element element, float? maxWidth)
         {
             element.Style.MaxWidth = maxWidth;
             return element;
         }
 
-        public static Element SetMaxHeight(this Element element, float maxHeight)
+        public static Element SetMaxHeight(this Element element, float? maxHeight)
         {
             element.Style.MaxHeight = maxHeight;
             return element;
         }
 
-        public static Element SetColor(this Element element, Color color)
+        public static Element SetColor(this Element element, Color? color)
         {
             element.Style.Color = color;
             return element;
         }
         
-        public static Element SetBackgroundColor(this Element element, Color color)
+        public static Element SetBackgroundColor(this Element element, Color? color)
         {
             element.Style.BackgroundColor = color;
             return element;

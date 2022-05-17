@@ -2,15 +2,16 @@ using System;
 using System.Collections.Generic;
 using RosettaUI.Builder;
 using RosettaUI.UIToolkit.UnityInternalAccess;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder : BuilderBase<VisualElement>
     {
-        #region static
+        #region Static
 
-        private static readonly UIToolkitBuilder Instance = new();
+        public static readonly UIToolkitBuilder Instance = new();
 
         public static VisualElement Build(Element element)
         {
@@ -108,32 +109,39 @@ namespace RosettaUI.UIToolkit.Builder
 
         protected override void OnElementStyleChanged(Element element, VisualElement ve, Style style)
         {
-            var isFixedSize = false;
+            var veStyle = ve.style;
 
-            if (style.Width is { } width)
-            {
-                ve.style.width = width;
-                isFixedSize = true;
-            }
-
-            if (style.Height is { } height)
-            {
-                ve.style.height = height;
-                isFixedSize = true;
-            }
-            if (style.MinWidth is { } minWidth) ve.style.minWidth = minWidth;
-            if (style.MinHeight is { } minHeight) ve.style.minHeight = minHeight;
-            if (style.MaxWidth is { } maxWidth) ve.style.maxWidth = maxWidth;
-            if (style.MaxHeight is { } maxHeight) ve.style.maxHeight = maxHeight;
-            if (style.Color is { } color) ve.style.color = color;
-            if (style.BackgroundColor is { } backgroundColor) ve.style.backgroundColor = backgroundColor;
+            veStyle.width = ToStyleLength(style.Width);
+            veStyle.height = ToStyleLength(style.Height);
+            veStyle.minWidth = ToStyleLength(style.MinWidth);
+            veStyle.minHeight = ToStyleLength(style.MinHeight);
+            veStyle.maxWidth = ToStyleLength(style.MaxWidth);
+            veStyle.maxHeight = ToStyleLength(style.MaxHeight);
+            veStyle.color = ToStyleColor(style.Color);
+            veStyle.backgroundColor = ToStyleColor(style.BackgroundColor);
    
+            // width or height has value
+            var isFixedSize = (veStyle.width.keyword == StyleKeyword.Undefined ||
+                               veStyle.height.keyword == StyleKeyword.Undefined);
             if (isFixedSize)
             {
-                ve.style.flexGrow = 0;
-                ve.style.flexShrink = 1;
+                 veStyle.flexGrow = 0;
+                 veStyle.flexShrink = 1;
             }
+            else
+            {
+                veStyle.flexGrow = StyleKeyword.Null;
+                veStyle.flexShrink = StyleKeyword.Null;
+            }
+            
+            static StyleLength ToStyleLength(float? nullable)
+                => (nullable is { } value) ? value : StyleKeyword.Null;
+            
+            static StyleColor ToStyleColor(Color? nullable)
+                => (nullable is { } value) ? value : StyleKeyword.Null;
         }
+
+
 
         protected override void OnRebuildElementGroupChildren(ElementGroup elementGroup)
         {

@@ -1,7 +1,6 @@
 .unity-label{
     margin: 1px;
     padding: 2px;
-    color: var(--unity-colors-label-text);
 }
 
 .unity-base-field:focus > .unity-base-field__label {

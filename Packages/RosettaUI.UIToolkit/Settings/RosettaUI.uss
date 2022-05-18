@@ -205,11 +205,9 @@
     height: 100%;
 }
 
-/*
 .rosettaui-color-field__overlap-text--light {
-    color:white;
+    color:#F0F0F0;
 }
-*/
 
 .rosettaui-color-field__overlap-text--dark {
     color: #101010;

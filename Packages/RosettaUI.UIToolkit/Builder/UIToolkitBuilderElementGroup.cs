@@ -187,6 +187,8 @@ namespace RosettaUI.UIToolkit.Builder
                     openedWindows.Add(windowElement);
                 }
 
+                if (pos.x < 0f) pos.x = 0f;
+                if (pos.y < 0f) pos.y = 0f;
 
                 window.Show(pos, toggle);
             }

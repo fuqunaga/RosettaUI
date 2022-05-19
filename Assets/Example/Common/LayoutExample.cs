@@ -211,16 +211,19 @@ namespace RosettaUI.Example
                         )
                     )
                 ),
-                ExampleTemplate.TitleIndent("Fold ignores one level of indentation for label alignment",
+                ExampleTemplate.TitleIndent("Fold/WindowLauncher ignores one level of indentation for label alignment",
                     UI.Box(
                         UI.Label("No indent"),
-                        UI.Fold("Fold0"),
+                        UI.Fold(nameof(UI.Fold) + 0),
+                        UI.WindowLauncher(nameof(UI.WindowLauncher) + 0, UI.Window(nameof(UI.Window))),
                         UI.Indent(
                             UI.Label("Indent1"),
-                            UI.Fold("Fold1"),
+                            UI.Fold(nameof(UI.Fold) + 1),
+                            UI.WindowLauncher(nameof(UI.WindowLauncher) + 1, UI.Window(nameof(UI.Window))),
                             UI.Indent(
                                 UI.Label("Indent2"),
-                                UI.Fold("Fold1")
+                                UI.Fold(nameof(UI.Fold) + 2),
+                                UI.WindowLauncher(nameof(UI.WindowLauncher) + 2, UI.Window(nameof(UI.Window)))
                             ).SetBackgroundColor(new Color(0.5f, 0.5f, 1f, 0.2f))
                         ).SetBackgroundColor(new Color(0.5f, 0.5f, 1f, 0.2f))
                     )

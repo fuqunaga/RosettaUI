@@ -38,6 +38,14 @@ namespace RosettaUI.UIToolkit.Builder
                     window.Hide();
                 }
             });
+
+            windowElement.positionRx.SubscribeAndCallOnce(posNullable =>
+            {
+                if (posNullable is { } pos)
+                {
+                    window.Position = pos;
+                }
+            });
             
             
             // Focusable.ExecuteDefaultEvent() 内の this.focusController?.SwitchFocusOnEvent(evt) で
@@ -48,7 +56,6 @@ namespace RosettaUI.UIToolkit.Builder
 
             Build_ElementGroupContents(window.contentContainer, element);
 
-            // add box shadow
             window.AddBoxShadow();
             
             return window;
@@ -104,6 +111,8 @@ namespace RosettaUI.UIToolkit.Builder
             var labelElement = launcherElement.label;
             labelElement?.SubscribeValueOnUpdateCallOnce(v => toggle.text = v);
 
+            ApplyMinusIndentIfPossible(toggle, element);
+            
             
             return toggle;
 
@@ -114,10 +123,17 @@ namespace RosettaUI.UIToolkit.Builder
                 // Toggleの値が変わるのはこのイベントの後
                 if (windowElement.Enable) return;
                 
+                // positionが指定されていたらそちらを優先
+                if (windowElement.positionRx.Value.HasValue)
+                {
+                    window.Show(toggle);
+                    return;
+                }
+                
+                // Auto layout
                 var pos = evt.originalMousePosition;
                 var parentWindowElement = launcherElement.Parents().OfType<WindowElement>().FirstOrDefault();
-
-                // Auto layout
+                
                 if (parentWindowElement != null && GetUIObj(parentWindowElement) is Window parentWindow)
                 {
                     const float delta = 5f;

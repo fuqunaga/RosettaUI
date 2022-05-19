@@ -77,6 +77,25 @@ namespace RosettaUI.UIToolkit
 
         public override VisualElement contentContainer => _contentContainer;
 
+        public Vector2 Position
+        {
+            get
+            {
+                var rs = resolvedStyle;
+                return new Vector2(rs.left, rs.top);
+            }
+            set
+            {
+                if (Position != value)
+                {
+                    style.left = value.x;
+                    style.top = value.y;
+                    IsMoved = true;
+                }
+            }
+        }
+        
+
         public Window(bool resizable = true)
         {
             this.resizable = resizable;
@@ -240,10 +259,7 @@ namespace RosettaUI.UIToolkit
                 _beforeDrag = false;
             }
 
-            style.left = pos.x;
-            style.top = pos.y;
-
-            IsMoved = true;
+            Position = pos;
         }
 
 
@@ -396,26 +412,35 @@ namespace RosettaUI.UIToolkit
             style.display = DisplayStyle.None;
         }
 
+        public virtual void Show(VisualElement target)
+        {
+            SearchDragRootAndAdd(target);
+            Show();
+        }
+
         public virtual void Show(Vector2 position, VisualElement target)
+        {
+            SearchDragRootAndAdd(target);
+
+            var local = dragRoot.WorldToLocal(position);
+            Position = local - dragRoot.layout.position;
+            IsMoved = false;
+
+            //schedule.Execute(EnsureVisibilityInParent);
+
+            Show();
+        }
+
+        void SearchDragRootAndAdd(VisualElement target)
         {
             dragRoot = target.panel.visualTree.Q<TemplateContainer>()
                        ?? target.panel.visualTree.Query(null, RosettaUIRootUIToolkit.USSRootClassName).First();
             
             dragRoot.Add(SelfRoot);
-
-            var local = dragRoot.WorldToLocal(position);
-            style.left = local.x - dragRoot.layout.x;
-            style.top = local.y - dragRoot.layout.y;
-
-            //schedule.Execute(EnsureVisibilityInParent);
-
-            /*
-            if (targetElement != null)
-                targetElement.pseudoStates |= PseudoStates.Active;
-            */
-            Show();
         }
 
+
+#if false
         public void EnsureVisibilityInParent()
         {
             var root = panel?.visualTree;
@@ -442,5 +467,6 @@ namespace RosettaUI.UIToolkit
                 */
             }
         }
+#endif
     }
 }

@@ -59,8 +59,38 @@ namespace RosettaUI.Example
                         UI.Fold("Open", UI.Label("Element")).Open()
                     ),
                     ("UI.List(() => intList).Close();", UI.List(() => intList).Close())
+                ),
+                
+                ExampleTemplate.CodeElementSets("<b>WindowPosition</b>",
+                    (@"var window = UI.Window(""Window"");
+var position = Vector2.zero;
+
+UI.Column(
+    UI.WindowLauncher(""Window"", window),
+    UI.Slider(
+        () => position,
+        max: new Vector2(Screen.width, Screen.height)
+    ).RegisterUpdateCallback(_ => window.Position = position)
+);
+",
+                        WindowPosition()
+                    )
                 )
             );
+
+            Element WindowPosition()
+            {
+                var window = UI.Window("Window");
+                var position = Vector2.zero;
+
+                return UI.Column(
+                    UI.WindowLauncher("Window", window),
+                    UI.Slider(
+                        () => position,
+                        max: new Vector2(Screen.width, Screen.height)
+                    ).RegisterUpdateCallback(_ => window.Position = position)
+                );
+            }
         }
     }
 }

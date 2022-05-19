@@ -106,5 +106,11 @@ namespace RosettaUI
 
         public static T Close<T>(this T element) where T : OpenCloseBaseElement
             => element.SetOpenFlag(false);
+
+        public static WindowElement SetPosition(this WindowElement windowElement, Vector2? position)
+        {
+            windowElement.Position = position;
+            return windowElement;
+        }
     }
 }

@@ -46,7 +46,7 @@ namespace RosettaUI.Example
         public static Element CodeElementSets(string title, params (string, Element)[] pairs)
             => CodeElementSets(title, null, pairs);
         
-        public static Element CodeElementSets(string title, string discription, params (string, Element)[] pairs)
+        public static Element CodeElementSets(string title, string description, params (string, Element)[] pairs)
         {
             var texts = pairs.Select(pair => pair.Item1);
             var elements = pairs.Select(pair => pair.Item2);
@@ -54,7 +54,7 @@ namespace RosettaUI.Example
             var code = string.Join("\n", texts);
 
             return TitleIndent(title,
-                string.IsNullOrEmpty(discription) ? null : UI.Label(discription),
+                string.IsNullOrEmpty(description) ? null : UI.Label(description),
                 UI.Row(
                     UI.TextArea(null, () => code)
                         // UI.Column(

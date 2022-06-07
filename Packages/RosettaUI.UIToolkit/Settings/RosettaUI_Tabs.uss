@@ -1,0 +1,36 @@
+/********************************************************************************
+* Tabs
+********************************************************************************/
+.rosettaui-tabs__title-container
+{
+    flex-direction: row;
+    align-items: flex-start;
+    background-color: rgba(0,0,0,0.2);
+}
+
+.rosettaui-tabs__title
+{
+    padding: 2px 4px;
+    border-radius: 3px 3px 0 0;
+}
+
+.rosettaui-tabs__title--inactive
+{
+    background-color: transparent;
+}
+
+.rosettaui-tabs__title--inactive:hover
+{
+    background-color: var(--rosettaui-highlight-dark-gray);
+}
+
+.rosettaui-tabs__title--active
+{
+    background-color: var(--rosettaui-color-tabs-background);
+}
+
+
+/*.rosettaui-tabs__content-container*/
+/*{*/
+/*    background-color: var(--rosettaui-color-tabs-background);*/
+/*}*/

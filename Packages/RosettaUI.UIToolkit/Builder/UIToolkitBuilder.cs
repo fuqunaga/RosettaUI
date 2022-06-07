@@ -19,26 +19,28 @@ namespace RosettaUI.UIToolkit.Builder
         }
         
         #endregion
-        
-        
+
+
         private readonly Dictionary<Type, Func<Element, VisualElement>> _buildFuncTable;
 
         protected UIToolkitBuilder()
         {
             _buildFuncTable = new Dictionary<Type, Func<Element, VisualElement>>
             {
-                [typeof(WindowElement)] = Build_Window,
-                [typeof(WindowLauncherElement)] = Build_WindowLauncher,
+                [typeof(CompositeFieldElement)] = Build_CompositeField,
+                [typeof(DynamicElement)] = Build_DynamicElement,
+                [typeof(FoldElement)] = Build_Fold,
+                [typeof(HelpBoxElement)] = Build_HelpBox,
+                [typeof(IndentElement)] = Build_Indent,
                 [typeof(RowElement)] = Build_Row,
                 [typeof(ColumnElement)] = Build_Column,
-                [typeof(BoxElement)] = Build_Box,
-                [typeof(HelpBoxElement)] = Build_HelpBox,
-                [typeof(ScrollViewElement)] = Build_ScrollView,
-                [typeof(IndentElement)] = Build_Indent,
                 [typeof(PageElement)] = Build_Column,
-                [typeof(ListViewItemContainerElement)] = Build_ListViewItemContainer,
-                
-                [typeof(CompositeFieldElement)] = Build_CompositeField,
+                [typeof(BoxElement)] = Build_Box,
+                [typeof(ScrollViewElement)] = Build_ScrollView,
+                [typeof(TabsElement)] = Build_Tabs,
+                [typeof(WindowElement)] = Build_Window,
+                [typeof(WindowLauncherElement)] = Build_WindowLauncher,
+
                 [typeof(LabelElement)] = Build_Label,
                 [typeof(IntFieldElement)] = Build_Field<int, IntegerField>,
                 [typeof(UIntFieldElement)] = Build_Field<uint, UIntField>,
@@ -46,19 +48,18 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(TextFieldElement)] = Build_TextField,
                 [typeof(BoolFieldElement)] = Build_Field<bool, Toggle>,
                 [typeof(ColorFieldElement)] = Build_ColorField,
-
-                [typeof(DropdownElement)] = Build_Dropdown,
+                
                 [typeof(IntSliderElement)] = Build_Slider<int, ClampFreeSliderInt>,
                 [typeof(FloatSliderElement)] = Build_Slider<float, ClampFreeSlider>,
-
                 [typeof(IntMinMaxSliderElement)] = Build_MinMaxSlider_Int,
                 [typeof(FloatMinMaxSliderElement)] = Build_MinMaxSlider_Float,
+                
+                [typeof(DropdownElement)] = Build_Dropdown,
                 [typeof(SpaceElement)] = Build_Space,
                 [typeof(ImageElement)] = Build_Image,
                 [typeof(ButtonElement)] = Build_Button,
-                [typeof(FoldElement)] = Build_Fold,
-                [typeof(DynamicElement)] = Build_DynamicElement,
-                [typeof(PopupMenuElement)] = Build_PopupElement
+                [typeof(PopupMenuElement)] = Build_PopupElement,
+                [typeof(ListViewItemContainerElement)] = Build_ListViewItemContainer
             };
         }
 

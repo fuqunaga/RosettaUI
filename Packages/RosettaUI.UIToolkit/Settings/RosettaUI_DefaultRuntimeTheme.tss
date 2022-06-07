@@ -4,6 +4,8 @@
 @import url("RosettaUI_UnityOverride.uss");
 @import url("RosettaUI.uss");
 @import url("RosettaUI_ColorPicker.uss");
+@import url("RosettaUI_Tabs.uss");
+
 
 
 VisualElement {}

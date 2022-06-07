@@ -18,7 +18,7 @@ namespace RosettaUI
 
         protected ElementGroup() { }
 
-        public ElementGroup(IEnumerable<Element> elements)
+        protected ElementGroup(IEnumerable<Element> elements)
         {
             SetElements(elements);
         }

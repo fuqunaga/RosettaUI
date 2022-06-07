@@ -8,7 +8,7 @@
     
     --rosettaui-gray-button-tint: #A0A0A0;
     --rosettaui-highlight-gray: #808080;
-    --rosettaui-highlight-dark-gray: #606060;
+    --rosettaui-highlight-dark-gray: #404040;
     --rosettaui-highlight-blue: rgb(0, 150, 230);
     --rosettaui-highlight-dark-blue: var(--unity-colors-highlight-background);
 
@@ -25,7 +25,7 @@
     --rosettaui-color-input-background: #181818;
     --rosettaui-color-box-background: rgba(100,100,100,0.3);
     --rosettaui-color-list-background: var(--rosettaui-color-box-background);
-    --rosettaui-color-fold-hover: #404040;
+    --rosettaui-color-tabs-background: var(--rosettaui-color-box-background);
     
     font-size: 18px;
     color: var(--unity-colors-default-text);

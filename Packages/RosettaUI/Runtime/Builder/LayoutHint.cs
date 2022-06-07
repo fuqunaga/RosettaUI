@@ -14,7 +14,7 @@ namespace RosettaUI.Builder
         /// マイナスインデントは親の左側をはみ出るので Box や Fold では絵的にまずい
         /// </summary>
         public static bool IsIndentWall(Element element)
-            => element is BoxElement or FoldElement || IsIndentOrigin(element);
+            => element is BoxElement or FoldElement or TabsElement || IsIndentOrigin(element);
         
         public static bool CanMinusIndent(this Element element)
         {

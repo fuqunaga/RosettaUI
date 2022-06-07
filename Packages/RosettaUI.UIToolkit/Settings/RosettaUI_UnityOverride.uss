@@ -113,7 +113,7 @@
 
 .unity-foldout__toggle:hover
 {
-    background-color: var(--rosettaui-color-fold-hover);
+    background-color: var(--rosettaui-highlight-dark-gray);
 }
 
 .unity-foldout__toggle > .unity-toggle__input,
@@ -437,7 +437,7 @@
     background-color: initial;
     border-width: 0;
     border-radius: 0;
-    -unity-background-image-tint-color: var(--rosettaui-highlight-dark-gray);
+    -unity-background-image-tint-color: var(--rosettaui-highlight-gray);
 }
 
 .unity-scroller .unity-scroller__slider:hover .unity-base-slider__dragger

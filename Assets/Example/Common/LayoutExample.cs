@@ -193,8 +193,8 @@ namespace RosettaUI.Example
             return ExampleTemplate.UIFunctionColumn(nameof(UI.Tabs),
                 UI.Box(
                     UI.Tabs(
-                        ("Tab0", UI.Label("This is\n\nTab0\n\ncontents")),
-                        ("Tab1", UI.Row(UI.Space(), UI.Label("This is\n\nTab1\n\ncontents")))
+                        ("Tab0", () => UI.Label("This is\n\n<size=50><color=#d04040ff>Tab0</color></size>\n\ncontents")),
+                        ("Tab1", () => UI.Label("This is\n\n<size=50><color=#a0a0f0ff>Tab1</color></size>\n\ncontents"))
                     )
                 )
             );

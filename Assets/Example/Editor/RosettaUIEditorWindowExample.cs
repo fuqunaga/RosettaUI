@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using RosettaUI;
 using RosettaUI.Editor.UIToolkit;
@@ -16,19 +17,19 @@ public class RosettaUIEditorWindowExample : RosettaUIEditorWindowUIToolkit
     
     protected override Element CreateElement()
     {
-        var idx = 0;
         var types = RosettaUIExample.ExampleTypes;
+        
+        return UI.Tabs(
+            types.Select(type =>
+            {
+                var tabName = type.ToString().Split('.').Last();
 
-        return UI.Column(
-            UI.Dropdown(null, () => idx, types.Select(t => t.ToString())),
-            UI.DynamicElementOnStatusChanged(
-                () => idx,
-                _ =>
+                return Tab.Create(tabName, () =>
                 {
-                    var obj = FindObjectOfType(types[idx], true);
+                    var obj = FindObjectOfType(type, true);
                     return UI.Field(() => obj);
-                }
-            )
+                });
+            })
         );
     }
 }

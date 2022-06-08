@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Reactive;
 
@@ -6,12 +7,6 @@ namespace RosettaUI
 {
     public class TabsElement : ElementGroup
     {
-        public class Tab
-        {
-            public Element header;
-            public Element content;
-        }
-        
         public readonly ReactiveProperty<int> currentTabIndex = new();
         private readonly List<Tab> _tabs;
         
@@ -26,6 +21,29 @@ namespace RosettaUI
         {
             _tabs = tabs?.ToList() ?? new();
             SetElements(_tabs.SelectMany(t => new[] {t.header, t.content}));
+
+            currentTabIndex.SubscribeAndCallOnce(newIndex =>
+            {
+                for (var i = 0; i < _tabs.Count; ++i)
+                {
+                    var tab = _tabs[i];
+                    tab.content.Enable = (i == newIndex);
+                }
+            });
         }
+    }
+    
+    public class Tab
+    {
+        public Element header;
+        public Element content;
+
+        public static Tab Create(string name, Element content) => new()
+        {
+            header = UI.Label(name),
+            content = content
+        };
+
+        public static Tab Create(string name, Func<Element> build) => Create(name, UI.Lazy(build));
     }
 }

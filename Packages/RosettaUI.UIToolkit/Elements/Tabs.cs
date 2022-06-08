@@ -8,6 +8,7 @@ namespace RosettaUI.UIToolkit
     {
         private static readonly string UssClassName = "rosettaui-tabs";
         private static readonly string UssClassNameTitle = UssClassName + "__title";
+        private static readonly string UssClassNameTitleSpacer = UssClassName + "__title-spacer";
         private static readonly string UssClassNameTitleActive = UssClassNameTitle + "--active";
         private static readonly string UssClassNameTitleInactive = UssClassNameTitle + "--inactive";
         private static readonly string UssClassNameTitleContainer = UssClassName + "__title-container";
@@ -40,7 +41,16 @@ namespace RosettaUI.UIToolkit
         {
             AddToClassList(UssClassName);
 
+            // アクティブなtitleとcontentContainerは親のbackgroundカラーにしたい
+            // titleContainerは親のbackgroundカラーより暗くしたい
+            // titleContainerでbackgroundカラーを指定するとアクティブなtitleを親のbackgroundカラーにできない
+            // したがって、titleContainer内の右端にtitleSpacerを入れておき、
+            // 非アクティブなtitleとtitleSpacerを暗くして、擬似的にtitleContainerが暗くなっているように見せる
+            var titleSpacer = new VisualElement();
+            titleSpacer.AddToClassList(UssClassNameTitleSpacer);
+            
             TitleContainer.AddToClassList(UssClassNameTitleContainer);
+            TitleContainer.Add(titleSpacer);
             hierarchy.Add(TitleContainer);
 
             _contentContainer.AddToClassList(UssClassNameContentContainer);
@@ -55,7 +65,7 @@ namespace RosettaUI.UIToolkit
             titleVe.AddToClassList(UssClassNameTitle);
             titleVe.Add(title);
             
-            TitleContainer.Add(titleVe);
+            TitleContainer.Insert(index, titleVe);
             contentContainer.Add(content);
 
             _tabs.Add((titleVe, content));

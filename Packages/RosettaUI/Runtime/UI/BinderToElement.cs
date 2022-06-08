@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Reactive;
 using UnityEngine;
@@ -13,12 +12,13 @@ namespace RosettaUI
         public static Element CreateFieldElement(LabelElement label, IBinder binder)
         {
             var valueType = binder.ValueType;
-            using var typeHistory = BinderTypeHistory.Get(valueType);
             
-            if ( typeHistory == null)
+            if (BinderTypeHistory.IsExistingType(valueType))
             {
                 return CreateCircularReferenceElement(label, valueType);
             }
+
+            using var typeHistory = BinderTypeHistory.GetScope(valueType);
 
             return binder switch
             {
@@ -183,11 +183,11 @@ namespace RosettaUI
             var fieldNames = TypeUtility.GetUITargetFieldNames(valueType).ToList();
             if (!fieldNames.Any()) return null;
 
-            using var typeHistory = BinderTypeHistory.Get(valueType);
-            if (typeHistory == null)
+            if (BinderTypeHistory.IsExistingType(valueType))
             {
                 return CreateCircularReferenceElement(label, valueType);
             }
+            using var typeHistory = BinderTypeHistory.GetScope(valueType);
 
             var elements = fieldNames.Select(createFieldElementFunc);
 
@@ -274,23 +274,6 @@ namespace RosettaUI
                 {
                     new HelpBoxElement($"[{type}] Circular reference detected.", HelpBoxType.Error)
                 }).SetInteractable(false);
-        }
-
-        
-        class BinderTypeHistory : IDisposable
-        {
-            private static readonly HashSet<Type> History = new();
-            public static BinderTypeHistory Get(Type type) => History.Add(type) ? new BinderTypeHistory(type) : null;
-
-            
-            private readonly Type _type;
-
-            private BinderTypeHistory(Type type) => _type = type;
-
-            public void Dispose()
-            {
-                History.Remove(_type);
-            }
         }
     }
 }

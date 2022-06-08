@@ -8,8 +8,8 @@ namespace RosettaUI.UIToolkit.Builder
         {
             var ve = new VisualElement();
             ve.AddToClassList(UssClassName.DynamicElement);
-            
-            return Build_ElementGroupContents(ve, element);
+
+            return ve;
         }
     }
 }

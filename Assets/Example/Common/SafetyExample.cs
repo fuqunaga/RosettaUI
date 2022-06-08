@@ -21,11 +21,11 @@ namespace RosettaUI.Example
 
             circularReferenceClass.other = circularReferenceClassOther;
             circularReferenceClassOther.other = circularReferenceClass;
-            
+
             return UI.Column(
                 ExampleTemplate.UIFunctionPage(nameof(UI.Field),
                     UI.Field(() => nullableInt),
-                   UI.Field(() => nullClass),
+                    UI.Field(() => nullClass),
                     UI.Field(() => nullList),
                     UI.Field(() => circularReferenceClass)
                 ),

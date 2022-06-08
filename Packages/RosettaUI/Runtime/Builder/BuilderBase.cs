@@ -66,7 +66,7 @@ namespace RosettaUI.Builder
 
             if (element is DynamicElement dynamicElement)
             {
-                dynamicElement.onRebuildChildren += OnRebuildElementGroupChildren;
+                dynamicElement.RegisterBuildUI(OnRebuildElementGroupChildren);
             }
         }
 

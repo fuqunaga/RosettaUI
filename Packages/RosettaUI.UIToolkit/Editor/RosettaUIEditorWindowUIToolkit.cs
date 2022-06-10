@@ -1,6 +1,5 @@
 using RosettaUI.UIToolkit.Builder;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -30,7 +29,7 @@ namespace RosettaUI.UIToolkit.Editor
             var ve = UIToolkitBuilder.Build(element);
             if (ve == null) return;
             
-            // rootVisualElement.styleSheets.Clear();
+            rootVisualElement.styleSheets.Clear();
             rootVisualElement.styleSheets.Add(StyleSheet);
 
             var scalingContainer = CreateScalingContainer();

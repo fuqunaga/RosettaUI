@@ -24,7 +24,8 @@
     min-width: initial;
 }
 
-.unity-base-text-field__input{
+.unity-base-text-field__input
+{
     padding-left: 4px;
     padding-right: 4px;
 }

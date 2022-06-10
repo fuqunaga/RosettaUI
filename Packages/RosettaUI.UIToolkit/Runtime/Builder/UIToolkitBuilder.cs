@@ -63,6 +63,9 @@ namespace RosettaUI.UIToolkit.Builder
             };
         }
 
+        public void RegisterBuildFunc(Type type, Func<Element, VisualElement> func) => _buildFuncTable[type] = func;
+        public void UnregisterBuildFunc(Type type) => _buildFuncTable.Remove(type);
+        
 
         protected override IReadOnlyDictionary<Type, Func<Element, VisualElement>> BuildFuncTable => _buildFuncTable;
 

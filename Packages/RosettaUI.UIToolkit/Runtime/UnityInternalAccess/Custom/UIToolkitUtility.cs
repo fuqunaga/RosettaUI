@@ -15,5 +15,11 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         {
             baseBoolField.m_Clickable.acceptClicksIfDisabled = flag;
         }
+
+        public static void RegisterCallbackIncludeDisabled<TEventType>(VisualElement ve, EventCallback<TEventType> callback)
+            where TEventType : EventBase<TEventType>, new()
+        {
+            ve.RegisterCallback(callback, InvokePolicy.IncludeDisabled);
+        }
     }
 }

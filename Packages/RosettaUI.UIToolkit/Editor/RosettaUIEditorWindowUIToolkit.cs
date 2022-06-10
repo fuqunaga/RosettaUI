@@ -1,10 +1,10 @@
-using RosettaUI.UIToolkit;
 using RosettaUI.UIToolkit.Builder;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace RosettaUI.Editor.UIToolkit
+namespace RosettaUI.UIToolkit.Editor
 {
     public abstract class RosettaUIEditorWindowUIToolkit : EditorWindow
     {
@@ -30,7 +30,7 @@ namespace RosettaUI.Editor.UIToolkit
             var ve = UIToolkitBuilder.Build(element);
             if (ve == null) return;
             
-            rootVisualElement.styleSheets.Clear();
+            // rootVisualElement.styleSheets.Clear();
             rootVisualElement.styleSheets.Add(StyleSheet);
 
             var scalingContainer = CreateScalingContainer();

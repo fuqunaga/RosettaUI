@@ -30,7 +30,7 @@ namespace RosettaUI.UIToolkit.Builder
             return colorField;
         }
 
-        private TField Build_Field<T, TField>(Element element)
+        public TField Build_Field<T, TField>(Element element)
             where TField : BaseField<T>, new()
         {
             return Build_Field<T, TField>(element, true);

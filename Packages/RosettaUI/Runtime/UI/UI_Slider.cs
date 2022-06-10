@@ -21,8 +21,8 @@ namespace RosettaUI
 
         public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression)
         {
-            var (rangeMinGetter, rangeMaxGetter) = CreateMinMaxGetterFromRangeAttribute(targetExpression);
-            return Slider(label, CreateBinder(targetExpression), rangeMinGetter, rangeMaxGetter);
+            var (rangeMinGetter, rangeMaxGetter) = UIInternalUtility.CreateMinMaxGetterFromRangeAttribute(targetExpression);
+            return Slider(label, UIInternalUtility.CreateBinder(targetExpression), rangeMinGetter, rangeMaxGetter);
         }
         
         public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T max)
@@ -33,7 +33,7 @@ namespace RosettaUI
         public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T min, T max)
         {
             return Slider(label,
-                CreateBinder(targetExpression),
+                UIInternalUtility.CreateBinder(targetExpression),
                 ConstGetter.Create(min),
                 ConstGetter.Create(max)
                 );
@@ -68,9 +68,9 @@ namespace RosettaUI
 
         public static Element SliderReadOnly<T>(Expression<Func<T>> targetExpression)
         {
-            var (rangeMinGetter, rangeMaxGetter) = CreateMinMaxGetterFromRangeAttribute(targetExpression);
+            var (rangeMinGetter, rangeMaxGetter) = UIInternalUtility.CreateMinMaxGetterFromRangeAttribute(targetExpression);
             return Slider(ExpressionUtility.CreateLabelString(targetExpression),
-                CreateReadOnlyBinder(targetExpression),
+                UIInternalUtility.CreateReadOnlyBinder(targetExpression),
                 rangeMinGetter,
                 rangeMaxGetter
             );
@@ -82,7 +82,7 @@ namespace RosettaUI
         public static Element SliderReadOnly<T>(Expression<Func<T>> targetExpression, T min, T max)
         {
             return Slider(ExpressionUtility.CreateLabelString(targetExpression),
-                CreateReadOnlyBinder(targetExpression),
+                UIInternalUtility.CreateReadOnlyBinder(targetExpression),
                 ConstGetter.Create(min),
                 ConstGetter.Create(max)
             );
@@ -108,7 +108,7 @@ namespace RosettaUI
             var contents = BinderToElement.CreateSliderElement(label, binder, option);
             if (contents == null) return null;
 
-            SetInteractableWithBinder(contents, binder);
+            UIInternalUtility.SetInteractableWithBinder(contents, binder);
 
             return contents;
         }

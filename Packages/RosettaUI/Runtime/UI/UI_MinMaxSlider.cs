@@ -57,7 +57,7 @@ namespace RosettaUI
             IGetter<TMinMax> rangeGetter
             )
         {
-            var binder = CreateBinder(targetExpression);
+            var binder = UIInternalUtility.CreateBinder(targetExpression);
 
             return MinMaxSlider(label, binder, rangeGetter);
         }
@@ -95,7 +95,7 @@ namespace RosettaUI
             var contents = BinderToElement.CreateMinMaxSliderElement(label, binder, option ?? SliderOptionEmpty);
             if (contents == null) return null;
 
-            SetInteractableWithBinder(contents, binder);
+            UIInternalUtility.SetInteractableWithBinder(contents, binder);
 
             return contents;
         }

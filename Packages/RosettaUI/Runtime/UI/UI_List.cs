@@ -51,7 +51,7 @@ namespace RosettaUI
             where TList : IList
         {
             var labelString = ExpressionUtility.CreateLabelString(targetExpression);
-            var binder = CreateReadOnlyBinder(targetExpression);
+            var binder = UIInternalUtility.CreateReadOnlyBinder(targetExpression);
             return List(labelString, binder, createItemElement, option);
         }
 
@@ -79,7 +79,7 @@ namespace RosettaUI
                 }
             ).Open();
             
-            SetInteractableWithBinder(fold, listBinder);
+            UIInternalUtility.SetInteractableWithBinder(fold, listBinder);
 
             return fold;
         }

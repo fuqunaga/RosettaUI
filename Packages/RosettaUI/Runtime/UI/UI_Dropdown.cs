@@ -12,7 +12,7 @@ namespace RosettaUI
             => Dropdown(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, options);
 
         public static DropdownElement Dropdown(LabelElement label, Expression<Func<int>> targetExpression, IEnumerable<string> options) 
-            => Dropdown(label, CreateBinder(targetExpression), options);
+            => Dropdown(label, UIInternalUtility.CreateBinder(targetExpression), options);
         
         
         public static DropdownElement Dropdown(Expression<Func<int>> targetExpression, Action<int> writeValue, IEnumerable<string> options) 
@@ -23,7 +23,7 @@ namespace RosettaUI
 
         
         public static DropdownElement DropdownReadOnly(Expression<Func<int>> targetExpression, IEnumerable<string> options)
-            => Dropdown(ExpressionUtility.CreateLabelString(targetExpression), CreateReadOnlyBinder(targetExpression),
+            => Dropdown(ExpressionUtility.CreateLabelString(targetExpression), UIInternalUtility.CreateReadOnlyBinder(targetExpression),
                 options);
 
         public static DropdownElement DropdownReadOnly(LabelElement label, Func<int> readValue, IEnumerable<string> options) 
@@ -33,7 +33,7 @@ namespace RosettaUI
         public static DropdownElement Dropdown(LabelElement label, IBinder<int> binder, IEnumerable<string> options)
         {
             var element = new DropdownElement(label, binder, options);
-            SetInteractableWithBinder(element, binder);
+            UIInternalUtility.SetInteractableWithBinder(element, binder);
             return element;
         }
    }

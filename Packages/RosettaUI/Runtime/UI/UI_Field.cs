@@ -12,7 +12,7 @@ namespace RosettaUI
 
         public static Element Field<T>(LabelElement label, Expression<Func<T>> targetExpression)
         {
-            var binder = CreateBinder(targetExpression);
+            var binder = UIInternalUtility.CreateBinder(targetExpression);
             return Field(label, binder);
         }
 
@@ -25,7 +25,7 @@ namespace RosettaUI
         public static Element Field(LabelElement label, IBinder binder)
         {
             var element = BinderToElement.CreateFieldElement(label, binder);
-            if (element != null) SetInteractableWithBinder(element, binder);
+            if (element != null) UIInternalUtility.SetInteractableWithBinder(element, binder);
 
             return element;
         }

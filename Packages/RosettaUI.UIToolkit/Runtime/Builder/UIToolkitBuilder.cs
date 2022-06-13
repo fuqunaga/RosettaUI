@@ -131,6 +131,10 @@ namespace RosettaUI.UIToolkit.Builder
             {
                  veStyle.flexGrow = 0;
                  veStyle.flexShrink = 1;
+                 veStyle.minWidth = StyleKeyword.Auto;
+                 veStyle.maxWidth = StyleKeyword.Auto;
+                 veStyle.minHeight = StyleKeyword.Auto;
+                 veStyle.maxHeight = StyleKeyword.Auto;
             }
             else
             {

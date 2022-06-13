@@ -33,61 +33,72 @@ namespace RosettaUI
             return element;
         }
 
-        public static Element SetMinWidth(this Element element, float? minWidth)
+        public static T SetMinWidth<T>(this T element, float? minWidth)
+            where T : Element
         {
             element.Style.MinWidth = minWidth;
             return element;
         }
 
-        public static Element SetMinHeight(this Element element, float? minHeight)
+        public static T SetMinHeight<T>(this T element, float? minHeight)
+            where T : Element
         {
             element.Style.MinHeight = minHeight;
             return element;
         }
         
-        public static Element SetMaxWidth(this Element element, float? maxWidth)
+        public static T SetMaxWidth<T>(this T element, float? maxWidth)
+            where T : Element
         {
             element.Style.MaxWidth = maxWidth;
             return element;
         }
 
-        public static Element SetMaxHeight(this Element element, float? maxHeight)
+        public static T SetMaxHeight<T>(this T element, float? maxHeight)
+            where T : Element
         {
             element.Style.MaxHeight = maxHeight;
             return element;
         }
 
-        public static Element SetColor(this Element element, Color? color)
+        public static T SetColor<T>(this T element, Color? color)
+            where T : Element
         {
             element.Style.Color = color;
             return element;
         }
-        
-        public static Element SetBackgroundColor(this Element element, Color? color)
+
+        public static T SetBackgroundColor<T>(this T element, Color? color)
+            where T : Element
         {
             element.Style.BackgroundColor = color;
             return element;
         }
         
-        public static Element RegisterValueChangeCallback(this Element element, Action onValueChanged)
+        public static T RegisterValueChangeCallback<T>(this T element, Action onValueChanged)
+            where T : Element
         {
             element.onViewValueChanged += onValueChanged;
             return element; 
         }
-        public static Element UnregisterValueChangeCallback(this Element element, Action onValueChanged)
+        
+        public static T UnregisterValueChangeCallback<T>(this T element, Action onValueChanged)
+            where T : Element
         {
             element.onViewValueChanged -= onValueChanged;
             return element;
         }
 
 
-        public static Element RegisterUpdateCallback(this Element element, Action<Element> onUpdate)
+        public static T RegisterUpdateCallback<T>(this T element, Action<Element> onUpdate)
+            where T : Element
         {
             element.onUpdate += onUpdate;
             return element;
         }
 
-        public static Element UnregisterUpdateCallback(this Element element, Action<Element> onUpdate)
+        public static T UnregisterUpdateCallback<T>(this T element, Action<Element> onUpdate)
+            where T : Element
         {
             element.onUpdate -= onUpdate;
             return element;

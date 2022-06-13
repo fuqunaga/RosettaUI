@@ -2,6 +2,10 @@
 * ObjectField 
 *  DefaultCommonDark_inter.uss clone
 ********************************************************************************/
+.unity-object-field
+{
+    align-items: flex-start;
+}
 .unity-object-field__input
 {
     flex-direction: row;

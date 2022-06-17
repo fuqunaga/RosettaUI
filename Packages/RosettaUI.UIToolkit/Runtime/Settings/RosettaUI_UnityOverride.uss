@@ -217,7 +217,8 @@
 /********************************************************************************
 * button
 ********************************************************************************/
-.unity-button {
+.unity-button
+{
     border-radius: 3px;
     border-width: 2px;
     padding: 2px 4px;
@@ -225,13 +226,20 @@
     min-width: 30px;
     
     border-color: var(--unity-colors-button-border);
-    background-color: var(--unity-colors-button-background);
 }
+
 .unity-button:focus {
     background-color: var(--unity-colors-button-background-focus);
 }
+
 .unity-button:hover {
     background-color: var(--unity-colors-button-background-hover);
+}
+
+.unity-button,
+.unity-button:disabled 
+{
+    background-color: var(--unity-colors-button-background);
 }
 
     /*--unity-colors-button-background-focus: #6e6e6e;*/
@@ -549,10 +557,12 @@
     background-color: var(--unity-colors-button-background-hover);
 }
 
+/*
 .unity-list-view__foldout-header > .unity-foldout__toggle > .unity-toggle__input
 {
-    /*flex-grow: 1;*/
+    flex-grow: 1;
 }
+*/
 
 .unity-list-view__size-field
 {

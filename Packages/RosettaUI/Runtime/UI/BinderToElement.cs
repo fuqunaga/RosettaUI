@@ -34,7 +34,7 @@ namespace RosettaUI
                 _ when TypeUtility.IsNullable(valueType) => CreateNullableFieldElement(label, binder),
 
                 _ when binder.GetObject() is IElementCreator elementCreator => WrapNullGuard(() => elementCreator.CreateElement(label)),
-                _ when ListBinder.IsListBinder(binder) => CreateLitView(label, binder),
+                _ when ListBinder.IsListBinder(binder) => CreateListView(label, binder),
 
                 _ => WrapNullGuard(() => CreateMemberFieldElement(label, binder))
             };
@@ -61,7 +61,7 @@ namespace RosettaUI
             return UI.NullGuard(label, binder, () => CreateFieldElement(label, valueBinder));
         }
         
-        private static Element CreateLitView(LabelElement label, IBinder binder)
+        private static Element CreateListView(LabelElement label, IBinder binder)
         {
             var option = (binder is IPropertyOrFieldBinder pfBinder)
                 ? new ListViewOption(

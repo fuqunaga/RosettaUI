@@ -38,6 +38,5 @@ namespace RosettaUI
 
         public static Element FieldReadOnly<T>(LabelElement label, Func<T> readValue)
             => Field(label, readValue, null);
-
     }
 }

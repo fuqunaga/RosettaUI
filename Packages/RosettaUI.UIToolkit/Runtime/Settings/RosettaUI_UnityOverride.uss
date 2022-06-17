@@ -73,6 +73,16 @@
 /********************************************************************************
 * toggle
 ********************************************************************************/
+.unity-toggle
+{
+    max-height: 28px;
+}
+
+.unity-toggle.unity-base-field--no-label
+{
+    flex-grow: 0;
+}
+
 .unity-toggle:hover > .unity-toggle__input {
     border-color: var(--unity-colors-input_field-border-hover);
 }

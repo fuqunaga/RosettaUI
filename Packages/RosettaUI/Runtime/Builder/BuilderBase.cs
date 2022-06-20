@@ -47,7 +47,7 @@ namespace RosettaUI.Builder
 
             SetDefaultCallbacks(element, uiObj);
 
-            if (element is LabelElement {labelType: LabelType.Prefix} label && label.IsLeftMost())
+            if (element is LabelElement {labelType: LabelType.Prefix} label && label.IsMostLeftLabel())
             {
                 CalcPrefixLabelWidthWithIndent(label, uiObj);
             }

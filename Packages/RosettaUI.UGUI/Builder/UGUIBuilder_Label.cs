@@ -29,11 +29,10 @@ namespace RosettaUI.UGUI.Builder
 
             if ( !isFixedSize)
             {
-                var hierarchyElement = containerElement ?? label;
                 //if (hierarchyElement.IsCompositeFieldLabel())
-                if ( hierarchyElement.IsLeftMost())
+                if ( label.IsMostLeftLabel() )
                 {
-                    layoutElement.preferredWidth -= hierarchyElement.GetIndent() * settings.paddingIndent;
+                    layoutElement.preferredWidth -= label.GetIndent() * settings.paddingIndent;
                     go.name = $"{label.GetIndent()}";
                 }
                 else
@@ -63,7 +62,6 @@ namespace RosettaUI.UGUI.Builder
                 var alpha = interactable ? theme.labelColor.a : theme.textAlphaOnDisable;
                 textUI.CrossFadeAlpha(alpha, 0f, true);
             });
-
         }
     }
 }

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace RosettaUI.Builder
@@ -8,73 +6,58 @@ namespace RosettaUI.Builder
     {
         public static bool IsIndentOrigin(Element element) => element is PageElement or WindowElement;
 
-
         /// <summary>
         /// 子のマイナスインデントを許容しないElement
         /// マイナスインデントは親の左側をはみ出るので Box や Fold では絵的にまずい
         /// </summary>
         public static bool IsIndentWall(Element element)
-            => element is BoxElement or FoldElement or TabsElement or ScrollViewElement|| IsIndentOrigin(element);
-        
+            => element is BoxElement or FoldElement or TabsElement or ScrollViewElement || IsIndentOrigin(element);
+
+        /// <summary>
+        /// Foldなど、ラベルの左側にあるElementは1つ目のインデントを無視することで通常のラベルと並びが揃う
+        /// この1つ目のインデントがあるかどうかの判定
+        /// </summary>
         public static bool CanMinusIndent(this Element element)
         {
-            for (var e = element.Parent;
-                 e != null && !IsIndentWall(e);
+            for (var e = element;
+                 e.Parent != null && !IsIndentWall(e.Parent);
                  e = e.Parent)
             {
-                if (e is IndentElement) return true;
+                switch (e.Parent)
+                {
+                    // Row内なら一番左のみ有効
+                    case RowElement row when row.Children.FirstOrDefault() != e:
+                        return false;
+                    case IndentElement:
+                        return true;
+                }
             }
 
             return false;
         }
-        
 
-        public static bool IsLeftMost(this Element element)
+        public static bool IsMostLeftLabel(this LabelElement element)
         {
-            foreach (var current in element.AsIndentEnumerable())
+            for (Element e = element;
+                 e.Parent != null && !IsIndentWall(e.Parent);
+                 e = e.Parent)
             {
-                switch (current.Parent)
+                switch (e.Parent)
                 {
-                    case RowElement row when row.Children.FirstOrDefault() != current:
-                        return false;
+                    case RowElement row:
+                        return row.FirstLabel() == e;
 
                     case CompositeFieldElement c:
-                        return c.Children.FirstOrDefault() == current;
+                        if (c.header != e)
+                        {
+                            return false;
+                        }
+
+                        break;
                 }
             }
 
             return true;
-        }
-    }
-
-
-    public static class ElementIndentEnumerableExtension
-    {
-        public static IEnumerable<Element> AsIndentEnumerable(this Element element) =>
-            new ElementIndentParentEnumerable(element);
-
-
-        readonly struct ElementIndentParentEnumerable : IEnumerable<Element>
-        {
-            private readonly Element _element;
-
-            public ElementIndentParentEnumerable(Element element) => _element = element;
-
-            public IEnumerator<Element> GetEnumerator()
-            {
-                
-                for (var element = _element;
-                     element != null && !LayoutHint.IsIndentOrigin(element);
-                     element = element.Parent)
-                {
-                    yield return element;
-                }
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
         }
     }
 }

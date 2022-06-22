@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -24,10 +25,14 @@ namespace RosettaUI.UIToolkit.Builder
             labelElement.SubscribeValueOnUpdateCallOnce(str => field.label = str);
         }
 
-        public static void Bind<T>(this INotifyValueChanged<T> field, FieldBaseElement<T> element)
+        public static void Bind<T>(this  BaseField<T> field, FieldBaseElement<T> element)
         {
             field.ListenValue(element);
             field.RegisterValueChangedCallback(evt => element.OnViewValueChanged(evt.newValue));
+
+            // ラベルのChangeEventを潰しておく
+            // fieldが BaseField<string> だとラベルのChangeEventを受け取ってしまうのでそれを止める
+            field.labelElement.RegisterValueChangedCallback(evt => evt.StopPropagation());
         }
 
         public static void Bind<TFieldValue, TElementValue>(

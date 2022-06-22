@@ -8,7 +8,7 @@
     {
         public readonly LabelElement label;
 
-        public ReadOnlyFieldElement(LabelElement label, IGetter<T> getter) : base(getter)
+        protected ReadOnlyFieldElement(LabelElement label, IGetter<T> getter) : base(getter)
         {
             if (label != null)
             {

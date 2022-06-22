@@ -104,8 +104,11 @@ namespace RosettaUI
             {
                 var container = node.Expression;
                 var member = node.Member;
-
-                if (container is ConstantExpression)
+                
+                // "this.member" > "member"
+                // "StaticClass.member" > "member"
+                if (container is ConstantExpression 
+                    || member is FieldInfo { IsStatic: true})
                 {
                     Type type;
                     switch (member)

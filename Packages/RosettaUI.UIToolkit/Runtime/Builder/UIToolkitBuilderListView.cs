@@ -25,9 +25,7 @@ namespace RosettaUI.UIToolkit.Builder
                 // showFoldoutHeader = true,
                 showAddRemoveFooter = !option.fixedSize,
                 virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
-                // unbindItem = UnbindItem
             };
-
             
 
             #region Callbacks
@@ -122,12 +120,6 @@ namespace RosettaUI.UIToolkit.Builder
                 }
             }
             
-            void UnbindItem(VisualElement _, int idx)
-            {
-                var e = itemContainerElement.GetOrCreateItemElement(idx);
-                e.SetEnable(false);
-            }
-
             // Item が移動したときに Fold の開閉情報を引き継ぐ
             void OnItemIndexChanged(int srcIdx, int dstIdx)
             {

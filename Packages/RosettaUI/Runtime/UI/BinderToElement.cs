@@ -155,7 +155,7 @@ namespace RosettaUI
 
         private static Element CreateCompositeSliderElement(LabelElement label, IBinder binder, SliderOption option)
         {
-            return _CreateCompositeSliderElementBase(
+            return CreateCompositeSliderElementBase(
                 label,
                 binder,
                 binder.ValueType,
@@ -177,7 +177,7 @@ namespace RosettaUI
         }
         
         
-        private static Element _CreateCompositeSliderElementBase(LabelElement label, IBinder binder, Type valueType,
+        private static Element CreateCompositeSliderElementBase(LabelElement label, IBinder binder, Type valueType,
             Func<string, Element> createFieldElementFunc)
         {
             var fieldNames = TypeUtility.GetUITargetFieldNames(valueType).ToList();
@@ -201,7 +201,11 @@ namespace RosettaUI
                 if (TypeUtility.IsSingleLine(binder.ValueType))
                 {
                     var titleField = CreateMemberFieldElement(new LabelElement(label), binder);
-                    var bar = UI.Row(label, titleField);
+                    
+                    // Foldが閉じてるときは titleField を、開いているときは label を表示
+                    // UI.Row(label, titleField) だと titleField のラベルがPrefixLabel判定されないので
+                    // 下記の順番である必要がある
+                    var bar = UI.Row(titleField, label);
 
                     // ReSharper disable once PossibleMultipleEnumeration
                     var fold = UI.Fold(bar, elements);
@@ -247,7 +251,7 @@ namespace RosettaUI
 
         private static Element CreateCompositeMinMaxSliderElement(LabelElement label, IBinder binder, SliderOption option)
         {
-            return _CreateCompositeSliderElementBase(
+            return CreateCompositeSliderElementBase(
                 label, 
                 binder,
                 binder.GetMinMaxValueType(),

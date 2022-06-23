@@ -12,10 +12,7 @@
         {
             if (label != null)
             {
-                if (label.labelType == LabelType.Auto)
-                {
-                    label.labelType = LabelType.Prefix;
-                }
+                label.SetLabelTypeToPrefixIfAuto();
                 
                 this.label = label;
                 

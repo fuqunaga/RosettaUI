@@ -44,16 +44,13 @@ namespace RosettaUI.Builder
             {
                 switch (e.Parent)
                 {
-                    case RowElement row:
-                        return row.FirstLabel() == e;
-
-                    case CompositeFieldElement c:
-                        if (c.header != e)
-                        {
-                            return false;
-                        }
-
-                        break;
+                    case RowElement row when 
+                        row.Children.FirstOrDefault() != e 
+                        && row.FirstLabel() != e:
+                        return false;
+                    
+                    case CompositeFieldElement c when c.header != e:
+                        return false;
                 }
             }
 

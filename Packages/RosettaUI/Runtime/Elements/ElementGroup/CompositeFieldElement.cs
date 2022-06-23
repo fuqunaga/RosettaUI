@@ -9,10 +9,7 @@ namespace RosettaUI
     {
         public CompositeFieldElement(LabelElement label, IEnumerable<Element> contents) : base(label, contents)
         {
-            if (label is {labelType: LabelType.Auto})
-            {
-                label.labelType = LabelType.Prefix;
-            }
+            label.SetLabelTypeToPrefixIfAuto();
         }
     }
 }

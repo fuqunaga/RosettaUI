@@ -72,13 +72,27 @@ namespace RosettaUI.UIToolkit.Builder
 
         protected override void CalcPrefixLabelWidthWithIndent(LabelElement label, VisualElement ve)
         {
-            // ve.ScheduleToUseResolvedLayoutBeforeRendering(() => // こちらだとFold内のListで１つめの要素のインデントが崩れるのでGeometryChangedEventで常に呼んでおく
-            ve.RegisterCallback<GeometryChangedEvent>(evt =>
+            // 表示前にラベルの幅を計算する
+            // ve.schedule.Execute()は表示後に呼ばれるらしく、サイズが変更されるのが見えてしまう
+            ve.ScheduleToUseResolvedLayoutBeforeRendering(() =>
             {
-                if (evt.oldRect == evt.newRect) return;
-
                 var marginLeft = ve.worldBound.xMin;
-                
+                UpdateLabelWidth(marginLeft);
+
+                // 初回生成時にve.worldBound.xMinがおかしい値の事があるのであとでもう一度チェックする
+                // 特にEditorWindowでWindow内におさまっていないエレメントが怪しい
+                ve.schedule.Execute(() =>
+                {
+                    var marginLeftAfter = ve.worldBound.xMin;
+                    if (Math.Abs(marginLeft - marginLeftAfter) > 1f)
+                    {
+                        UpdateLabelWidth(marginLeftAfter);
+                    }
+                });
+            });
+
+            void UpdateLabelWidth(float marginLeft)
+            {
                 for (var element = label.Parent;
                      element != null;
                      element = element.Parent)
@@ -90,10 +104,11 @@ namespace RosettaUI.UIToolkit.Builder
                     }
                 }
 
+
                 marginLeft /= ve.worldTransform.lossyScale.x; // ignore rotation
 
                 ve.style.minWidth = LayoutSettings.LabelWidth - marginLeft;
-            });
+            }
         }
 
         protected override void OnElementEnableChanged(Element _, VisualElement ve, bool enable)

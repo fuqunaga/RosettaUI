@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UIElements;
@@ -8,18 +9,17 @@ using UnityEngine.UIElements;
 namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
     /// <summary>
-    /// Add item
-    /// - avoid error when IList item is ValueType
-    /// - duplicate a previous item
-    /// Support for external List changes
+    /// ListView with Additional function
+    /// 
+    ///  Add item
+    ///  - avoid error when IList item is ValueType
+    ///  - duplicate a previous item
+    /// 
+    ///  Support for external List changes
     /// </summary>
     public class ListViewCustom : ListView
     {
         public event Action itemsSourceSizeChanged;
-        
-        public ListViewCustom() : base()
-        {
-        }
 
         public ListViewCustom(
             IList itemsSource,
@@ -36,6 +36,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         }
 
         /// <summary>
+        /// 外部でListのサイズが変更されたことを通知する
         /// refs:
         /// BaseListView.OnItemsSourceSizeChanged()
         /// https://github.com/Unity-Technologies/UnityCsReference/blob/d0fe81a19ce788fd1d94f826cf797aafc37db8ea/ModuleOverrides/com.unity.ui/Core/Controls/BaseListView.cs#L420-L426
@@ -52,7 +53,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         
         /// <summary>
         /// 1. ListViewDragger/ListViewDraggerAnimated はアイテムをドラッグした状態で GameView 外で PointerUpしても認識できず中途半端な状態でDragを継続しようとしてしまう
-        /// 2. ListViewDraggerAnimated は高さの異なる Item が２つある状態で移動すると ScrollView 全体の高さがどちらかの2倍？になることがある（すばやく Drag&Drop すると発生しやすい）
+        /// 2. ListViewDraggerAnimated は高さの異なる Item が２つある状態で移動すると ScrollView 全体の高さがどちらかの2倍？になることがある（すばやく DragAndDrop すると発生しやすい）
         ///
         /// 対策
         /// 1. Drag 中の PointerMove イベントでボタンを押していなければ Drag 中断する対策を行う

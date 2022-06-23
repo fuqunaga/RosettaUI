@@ -25,11 +25,14 @@ namespace RosettaUI.UIToolkit.Builder
                 // showFoldoutHeader = true,
                 showAddRemoveFooter = !option.fixedSize,
                 virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
-                unbindItem = UnbindItem
+                // unbindItem = UnbindItem
             };
+
             
 
             #region Callbacks
+
+            listView.itemsRemoved += OnItemsRemoved;
 
             listView.itemIndexChanged += (int srcIdx, int dstIdx) =>
             {
@@ -37,7 +40,6 @@ namespace RosettaUI.UIToolkit.Builder
                 NotifyValueChanged();
             };
 
-            
             // list が Array の場合、参照先が変わる
             // ListView 内で変更される場合も Inspector などで ListView 外で変わる場合もある
             // また ListView 外で List の要素数が変わった場合は、ListView に知らせる必要がある
@@ -67,6 +69,12 @@ namespace RosettaUI.UIToolkit.Builder
                 var listItemCount = listView.itemsSource.Count;
                 if ( lastListItemCount != listItemCount)
                 {
+                    var removeItemCount = lastListItemCount - listItemCount;
+                    if (removeItemCount > 0)
+                    {
+                        OnItemsRemoved(Enumerable.Range(listItemCount, removeItemCount));
+                    }
+
                     lastListItemCount = listItemCount;
                     listView.OnListSizeChangedExternal();
                 }
@@ -103,6 +111,15 @@ namespace RosettaUI.UIToolkit.Builder
                 }
 
                 ve.Add(itemVe);
+            }
+
+            void OnItemsRemoved(IEnumerable<int> idxes)
+            {
+                foreach (var idx in idxes)
+                {
+                    var e = itemContainerElement.GetOrCreateItemElement(idx);
+                    e.SetEnable(false);
+                }
             }
             
             void UnbindItem(VisualElement _, int idx)

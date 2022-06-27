@@ -193,17 +193,13 @@ namespace RosettaUI.UIToolkit.Builder
             
             public static readonly string CompositeField = RosettaUI + "-composite-field";
             public static readonly string CompositeFieldContents = CompositeField + "__contents";
-            
             public static readonly string Column = RosettaUI + "-column";
             public static readonly string Row = RosettaUI + "-row";
-
             public static readonly string WindowLauncher = RosettaUI + "-window-launcher";
-
             public static readonly string MinMaxSlider = RosettaUI + "-min-max-slider";
-           
             public static readonly string Space = RosettaUI + "-space";
-            
             public static readonly string DynamicElement = RosettaUI + "-dynamic-element";
+            public static readonly string IndentElement = RosettaUI + "-indent";
         }
     }
 }

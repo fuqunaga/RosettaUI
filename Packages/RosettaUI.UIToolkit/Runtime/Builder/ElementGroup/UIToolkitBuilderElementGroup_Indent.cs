@@ -9,6 +9,7 @@ namespace RosettaUI.UIToolkit.Builder
             var indentElement = (IndentElement) element;
 
             var ve = new VisualElement();
+            ve.AddToClassList(UssClassName.IndentElement);
             ApplyIndent(ve, indentElement.level);
 
             return Build_ElementGroupContents(ve, element);

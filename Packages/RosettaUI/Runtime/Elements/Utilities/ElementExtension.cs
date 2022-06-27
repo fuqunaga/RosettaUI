@@ -82,7 +82,7 @@ namespace RosettaUI
         
         #region LabelElement
 
-        public static LabelElement Clone(this LabelElement me) => new LabelElement(me);
+        public static LabelElement Clone(this LabelElement me) => new(me);
 
         #endregion
     }

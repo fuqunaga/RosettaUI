@@ -46,7 +46,7 @@ namespace RosettaUI.Builder
                 {
                     case RowElement row when 
                         row.Children.FirstOrDefault() != e 
-                        && row.FirstLabel() != e:
+                        && row.FirstLabel() != element:
                         return false;
                     
                     case CompositeFieldElement c when c.header != e:

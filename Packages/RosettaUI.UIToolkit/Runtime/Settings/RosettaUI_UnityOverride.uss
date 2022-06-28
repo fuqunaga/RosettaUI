@@ -75,7 +75,7 @@
 ********************************************************************************/
 .unity-toggle
 {
-    max-height: 28px;
+    /*max-height: 28px;*/
     margin: 1px 0 3px 0;
 }
 
@@ -120,12 +120,6 @@
     min-width: initial; /* remove unity value */
 }
 
-.unity-foldout__toggle
-{
-    margin: 1px 0;
-    min-height: 32px;
-}
-
 .unity-foldout__toggle:hover
 {
     background-color: var(--rosettaui-highlight-dark-gray);
@@ -143,15 +137,6 @@
     margin: 0 2px;
     -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
 }
-
-/*
-.unity-foldout__toggle > .unity-toggle__input,
-.unity-foldout__toggle .unity-base-field
-{
-    flex-grow: 0;
-}
-*/
- 
 
 .unity-foldout__toggle > .rosettaui-row
 {

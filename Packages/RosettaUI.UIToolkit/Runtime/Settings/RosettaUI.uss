@@ -220,8 +220,8 @@
 ********************************************************************************/
 .rosettaui-window-launcher 
 {
-    /*margin: 0 0 0 -15px;*/
-    padding: 2px 3px 2px 0;
+    margin: 2px 0 4px 0;
+    padding-right: 3px;
 }
 
 .rosettaui-window-launcher:hover

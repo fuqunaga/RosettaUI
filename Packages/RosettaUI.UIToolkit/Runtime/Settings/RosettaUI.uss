@@ -122,7 +122,19 @@
 
 .rosettaui-row {
     flex-direction: row;
-    /*flex: 1 0 auto;*/
+    align-items: flex-start;
+}
+
+/* 
+ .rosettaui-row{ align-items: flex-start }
+ にすると、
+ Row(IntegerField, Button) などのケースでButtonが範囲外に出てしまう
+ IntegerFieldが親（flex: 1 0)、子(flex-grow: 1)の作りになっているのが問題あるみたい
+ （VisualElementで同様のスタイルで再現する） 
+ */
+.rosettaui-row > .unity-base-field
+{
+    flex-shrink: 1;
 }
 
 .rosettaui-row > * {

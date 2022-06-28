@@ -73,8 +73,7 @@
 /********************************************************************************
 * toggle
 ********************************************************************************/
-.unity-toggle
-{
+.unity-toggle {
     /*max-height: 28px;*/
     margin: 1px 0 3px 0;
 }
@@ -244,6 +243,11 @@
 .unity-button:disabled 
 {
     background-color: var(--unity-colors-button-background);
+}
+
+/* 縦方向には伸びる */
+.rosettaui-row >.unity-button{
+    align-self: stretch;
 }
 
 /********************************************************************************

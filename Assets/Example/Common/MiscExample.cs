@@ -8,6 +8,7 @@ namespace RosettaUI.Example
         public string multiLineStringValue = "this is\nmultiline\nstring";
         public Texture texture;
         public int dropDownIndex;
+        public bool boolValue;
 
         public Element CreateElement(LabelElement _)
         {
@@ -27,6 +28,10 @@ namespace RosettaUI.Example
                                 () => dropDownIndex,
                                 options: new[] {"One", "Two", "Three"}
                             )
+                        ),
+                        ExampleTemplate.UIFunctionColumn(nameof(UI.Toggle),
+                            UI.Toggle(nameof(UI.Toggle), () => boolValue),
+                            UI.ToggleReadOnly(nameof(UI.ToggleReadOnly), () => boolValue)
                         ),
                         ExampleTemplate.UIFunctionRow(nameof(UI.Image),
                             UI.Image(() => texture).SetMaxWidth(200f).SetMaxHeight(200f)

@@ -76,19 +76,12 @@
 .unity-toggle
 {
     max-height: 28px;
+    margin: 1px 0 3px 0;
 }
 
 .unity-toggle.unity-base-field--no-label
 {
     flex-grow: 0;
-}
-
-.unity-toggle:hover > .unity-toggle__input {
-    border-color: var(--unity-colors-input_field-border-hover);
-}
-
-.unity-toggle:focus > .unity-toggle__input {
-    border-color: var(--unity-colors-input_field-border-focus);
 }
 
 .unity-toggle__input,
@@ -97,16 +90,27 @@
     flex-grow: 0;
     padding: initial;
     min-width: auto;
-    border-color: var(--unity-colors-input_field-border);
-    background-color: var(--rosettaui-color-input-background);
+    border-width: 0;
+}
+
+.unity-toggle > .unity-toggle__input:hover > .unity-toggle__checkmark{
+    border-color: var(--unity-colors-input_field-border-hover);
+}
+
+.unity-toggle > .unity-toggle__input:focus > .unity-toggle__checkmark{
+    border-color: var(--unity-colors-input_field-border-focus);
 }
 
 .unity-toggle__checkmark,
 .unity-toggle > .unity-toggle__input:disabled > .unity-toggle__checkmark{
     -unity-background-image-tint-color: var(--unity-colors-default-text);
-    background-color: transparent;
-    /*border-color: var(--unity-colors-input_field-border);*/
-    border-width: 0;
+    border-width: 2px;
+    border-color: var(--unity-colors-input_field-border);
+    background-color: var(--rosettaui-color-input-background);
+}
+
+.unity-toggle__text{
+    margin: 0;
 }
 
 /********************************************************************************

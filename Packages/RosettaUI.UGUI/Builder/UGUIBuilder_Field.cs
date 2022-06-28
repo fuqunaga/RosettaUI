@@ -26,7 +26,7 @@ namespace RosettaUI.UGUI.Builder
         {
             var go = Instantiate(element, resource.toggle);
 
-            var boolField = element as BoolFieldElement;
+            var boolField = element as ToggleElement;
 
             var toggle = go.GetComponentInChildren<Toggle>();
             toggle.colors = settings.theme.fieldColors;

@@ -52,7 +52,7 @@ public class ExampleSimple : MonoBehaviour
 </table>
 
 
-## Installation
+# Installation
 
 This package uses the [scoped registry] feature to resolve package
 dependencies. 
@@ -82,7 +82,7 @@ Select `RosettaUI - UI ToolKit` and click the Install button
 ![](Documentation~/2022-04-12-18-04-29.png)
 
 
-## How to use
+# How to use
 
 1. Put `Packages/RosettaUI - UIToolkit/RosettaUIRootUIToolkit.prefab` in the Hierarychy
 1. Write code to generate `Element` instance
@@ -94,7 +94,7 @@ Examples are available in this repository.
 I recommend downloading and checking it out.
 
 
-## Functions
+# Functions
 
 ### UI.Field()
 ![](Documentation~/field.gif)
@@ -112,3 +112,23 @@ I recommend downloading and checking it out.
 
 ### And more
 Please check the [Examples](Assets/Example/Common)
+
+# Enviroment
+
+| Platform | Status            |
+| -------- | ----------------- |
+| Windows  | ✔                 |
+| Mac      | Maybe(not tested) |
+| Linux    | Maybe(not tested) |
+| IL2CPP   | Suspended         |
+
+| UI Library | Status      |
+| ---------- | ----------- |
+| UI Toolkit | ✔           |
+| UGUI       | Suspended   |
+| IMGUI      | Not planned |
+
+
+# See also
+
+[PrefsGUI](https://github.com/fuqunaga/PrefsGUI) - Accessors and GUIs for persistent preference values using a JSON file

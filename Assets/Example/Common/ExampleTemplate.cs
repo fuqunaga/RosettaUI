@@ -7,7 +7,8 @@ namespace RosettaUI.Example
     {
         public static SpaceElement BlankLine() => UI.Space().SetHeight(10f);
         
-        public static string UIFunctionStr(string functionName) => $"<b>{nameof(UI)}.{functionName}()</b>";
+        public static string FunctionStr(string className, string functionName) => $"<b>{className}.{functionName}()</b>";
+        public static string UIFunctionStr(string functionName) => FunctionStr(nameof(UI), functionName);
 
         public static string ElementFunctionStr(string functionName) => $"<b>{nameof(Element)}.{functionName}()</b>";
         
@@ -25,6 +26,9 @@ namespace RosettaUI.Example
                 BlankLine()
             );
 
+        public static Element FunctionColumn(string className, string functionName, params Element[] elements) =>
+            TitleIndent(FunctionStr(className, functionName), elements);
+        
         public static Element UIFunctionColumn(string functionName, params Element[] elements) =>
             TitleIndent(UIFunctionStr(functionName), elements);
         

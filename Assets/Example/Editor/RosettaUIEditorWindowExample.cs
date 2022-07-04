@@ -39,10 +39,10 @@ public class RosettaUIEditorWindowExample : RosettaUIEditorWindowUIToolkit
         return Tab.Create(
             nameof(UIEditor),
             () => UI.Column(
-                ExampleTemplate.UIFunctionColumn(nameof(UIEditor.ObjectField),
+                ExampleTemplate.FunctionColumn(nameof(UIEditor), nameof(UIEditor.ObjectField),
                     UIEditor.ObjectField(() => gameObject)
                 ),
-                ExampleTemplate.UIFunctionColumn(nameof(UIEditor.ObjectFieldReadOnly),
+                ExampleTemplate.FunctionColumn(nameof(UIEditor), nameof(UIEditor.ObjectFieldReadOnly),
                     UIEditor.ObjectFieldReadOnly(() => gameObject)
                 )
             )

@@ -1,5 +1,17 @@
 # RosettaUI
 
+## [0.4.0] - 2022-07-04
+### Added
+- UI.Toggle()
+- UI.Tabs()
+- UI.Lazy()
+- UIEditor.ObjectField()
+
+### Changed
+- Class names are no longer displayed on static member label. 
+e.g.  `UI.Field(() => staticMember)` label: `Class.staticMember` > `staticMember`
+
+
 ## [0.3.2] - 2022-06-03
 ### Added
 - WindowElement.SetPosition()

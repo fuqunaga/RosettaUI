@@ -27,7 +27,7 @@
     --rosettaui-color-window-background: rgba(45, 45, 45, 0.9);
     --rosettaui-color-box-background: rgba(100,100,100,0.3);
     --rosettaui-color-list-background: var(--rosettaui-color-box-background);
-    --rosettaui-color-tabs-title-inactive-background: rgba(0,0,0,0.2);
+    --rosettaui-color-tabs-title-inactive-background: rgba(0,0,0,0.4);
     
     font-size: 18px;
     color: var(--unity-colors-default-text);

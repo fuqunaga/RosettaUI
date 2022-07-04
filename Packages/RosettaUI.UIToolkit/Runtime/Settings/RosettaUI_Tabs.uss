@@ -4,7 +4,6 @@
 .rosettaui-tabs__title-container
 {
     flex-direction: row;
-    align-items: flex-start;
 }
 
 .rosettaui-tabs__title-spacer

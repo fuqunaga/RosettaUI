@@ -106,11 +106,28 @@ namespace RosettaUI.Example
         
         Element CreateElement_Tabs()
         {
+            var tab0Str = @"UI.Tabs(
+    (""Title0"", Element), 
+    (""Title1"", Element)
+);";
+            var tab1Str = @"UI.Tabs(
+    (""Title0"", Func<Element>), 
+    (""Title1"", Func<Element>)
+);";
+
             return ExampleTemplate.UIFunctionColumn(nameof(UI.Tabs),
                 UI.Box(
                     UI.Tabs(
-                        ("Tab0", UI.Label("<size=100><color=#d04040ff>Tab0</color></size>")),
-                        ("Tab1", UI.Label("<size=100><color=#a0a0f0ff>Tab1</color></size>"))
+                        ("Tab0", UI.Column(
+                                UI.TextArea(null, () => tab0Str)
+                            )
+                        ),
+                        ("Tab1", UI.Column(
+                                UI.TextArea(null, () => tab1Str),
+                                UI.HelpBox("Passing Func<Element> will delay the build of the UI until it is displayed",
+                                    HelpBoxType.Info)
+                            )
+                        )
                     )
                 )
             );
@@ -120,7 +137,7 @@ namespace RosettaUI.Example
         {
             // ReSharper disable once ConvertToConstant.Local
             var scrollViewItemCount = 50;
-            const float width = 500f;
+            const float width = 700f;
             const float height = 300f;
 
             return ExampleTemplate.UIFunctionColumn(nameof(UI.ScrollView),
@@ -144,7 +161,7 @@ namespace RosettaUI.Example
                             )
                         ),
                         ("Horizontal",
-                            () => UI.ScrollViewHorizontal(width,
+                            () => UI.ScrollViewHorizontal(null,
                                 UI.DynamicElementOnStatusChanged(
                                     () => scrollViewItemCount,
                                     count => UI.Row(
@@ -162,7 +179,7 @@ namespace RosettaUI.Example
                             )
                         ),
                         ("VerticalAndHorizontal",
-                            () => UI.ScrollViewVerticalAndHorizontal(width, height,
+                            () => UI.ScrollViewVerticalAndHorizontal(null, height,
                                 UI.DynamicElementOnStatusChanged(
                                     () => scrollViewItemCount,
                                     count =>
@@ -195,7 +212,7 @@ namespace RosettaUI.Example
                             )
                         )
                     )
-                )
+                ).SetWidth(width)
             );
         }
         

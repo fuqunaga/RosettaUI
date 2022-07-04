@@ -93,7 +93,7 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {
-        "ga.fuquna.rosettaui": "0.3.2"
+        "ga.fuquna.rosettaui": "0.4.0"
       }
     },
     "com.unity.modules.ai": {

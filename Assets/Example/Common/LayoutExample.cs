@@ -16,11 +16,13 @@ namespace RosettaUI.Example
         {
             return UI.Column(
                 UI.Row(
-                    CreateElementTopLeft(),
+                    CreateElementTopLeft().SetWidth(730f),
                     UI.Column(
+                        CreateElement_Tabs(),
                         CreateElement_ScrollView(),
-                        CreateElement_Tabs()
+                        UI.Space()
                     )
+                    
                 ),
                 ExampleTemplate.BlankLine(),
                 
@@ -101,105 +103,118 @@ namespace RosettaUI.Example
                 )
             );
         }
+        
+        Element CreateElement_Tabs()
+        {
+            var tab0Str = @"UI.Tabs(
+    (""Title0"", Element), 
+    (""Title1"", Element)
+);";
+            var tab1Str = @"UI.Tabs(
+    (""Title0"", Func<Element>), 
+    (""Title1"", Func<Element>)
+);";
+
+            return ExampleTemplate.UIFunctionColumn(nameof(UI.Tabs),
+                UI.Box(
+                    UI.Tabs(
+                        ("Tab0", UI.Column(
+                                UI.TextArea(null, () => tab0Str)
+                            )
+                        ),
+                        ("Tab1", UI.Column(
+                                UI.TextArea(null, () => tab1Str),
+                                UI.HelpBox("Passing Func<Element> will delay the build of the UI until it is displayed",
+                                    HelpBoxType.Info)
+                            )
+                        )
+                    )
+                )
+            );
+        }
 
         Element CreateElement_ScrollView()
         {
             // ReSharper disable once ConvertToConstant.Local
             var scrollViewItemCount = 50;
-            const float width = 500f;
+            const float width = 700f;
             const float height = 300f;
 
             return ExampleTemplate.UIFunctionColumn(nameof(UI.ScrollView),
                 UI.Slider(() => scrollViewItemCount),
                 ExampleTemplate.BlankLine(),
-                UI.Fold("Vertical",
-                    UI.Box(
-                        UI.ScrollViewVertical(height,
-                            UI.DynamicElementOnStatusChanged(
-                                () => scrollViewItemCount,
-                                count => UI.Column(
-                                    Enumerable.Range(0, count)
-                                        .Select(i =>
-                                        {
-                                            var str = i.ToString();
-                                            return UI.Field("Item" + str, () => str);
-                                        })
-                                )
-                            )
-                        )
-                    )
-                ),
-                UI.Fold("Horizontal",
-                    UI.Box(
-                        UI.ScrollViewHorizontal(width,
-                            UI.DynamicElementOnStatusChanged(
-                                () => scrollViewItemCount,
-                                count => UI.Row(
-                                    Enumerable.Range(0, count).Select(i =>
-                                        {
-                                            var str = i.ToString();
-                                            return UI.Column(
-                                                UI.Label("Item" + str),
-                                                UI.Field(null, () => str)
-                                            );
-                                        }
+                UI.Box(
+                    UI.Tabs(
+                        ("Vertical",
+                            () => UI.ScrollViewVertical(height,
+                                UI.DynamicElementOnStatusChanged(
+                                    () => scrollViewItemCount,
+                                    count => UI.Column(
+                                        Enumerable.Range(0, count)
+                                            .Select(i =>
+                                            {
+                                                var str = i.ToString();
+                                                return UI.Field("Item" + str, () => str);
+                                            })
                                     )
                                 )
                             )
-                        )
-                    ).SetWidth(width)
-                ),
-
-                UI.Fold("VerticalAndHorizontal",
-                    UI.Box(
-                        UI.ScrollViewVerticalAndHorizontal(width, height,
-                            UI.DynamicElementOnStatusChanged(
-                                () => scrollViewItemCount,
-                                count =>
-                                {
-                                    using (CollectionPool<List<Element>, Element>.Get(out var rows))
+                        ),
+                        ("Horizontal",
+                            () => UI.ScrollViewHorizontal(null,
+                                UI.DynamicElementOnStatusChanged(
+                                    () => scrollViewItemCount,
+                                    count => UI.Row(
+                                        Enumerable.Range(0, count).Select(i =>
+                                            {
+                                                var str = i.ToString();
+                                                return UI.Column(
+                                                    UI.Label("Item" + str),
+                                                    UI.Field(null, () => str)
+                                                );
+                                            }
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        ("VerticalAndHorizontal",
+                            () => UI.ScrollViewVerticalAndHorizontal(null, height,
+                                UI.DynamicElementOnStatusChanged(
+                                    () => scrollViewItemCount,
+                                    count =>
                                     {
-                                        const int chunkSize = 5;
-                                        var i = 0;
-                                        for (var remain = count; remain > 0; remain -= chunkSize)
+                                        using (CollectionPool<List<Element>, Element>.Get(out var rows))
                                         {
-                                            var size = Mathf.Min(chunkSize, remain);
-                                            rows.Add(
-                                                UI.Row(
-                                                    Enumerable.Range(0, size).Select(_ =>
-                                                    {
-                                                        var idx = i++;
-                                                        var str = idx.ToString();
-                                                        return UI.Field(
-                                                            UI.Label("Item" + idx, LabelType.Standard),
-                                                            () => str);
-                                                    })
-                                                )
-                                            );
-                                        }
+                                            const int chunkSize = 5;
+                                            var i = 0;
+                                            for (var remain = count; remain > 0; remain -= chunkSize)
+                                            {
+                                                var size = Mathf.Min(chunkSize, remain);
+                                                rows.Add(
+                                                    UI.Row(
+                                                        Enumerable.Range(0, size).Select(_ =>
+                                                        {
+                                                            var idx = i++;
+                                                            var str = idx.ToString();
+                                                            return UI.Field(
+                                                                UI.Label("Item" + idx, LabelType.Standard),
+                                                                () => str);
+                                                        })
+                                                    )
+                                                );
+                                            }
 
-                                        return UI.Column(rows);
+                                            return UI.Column(rows);
+                                        }
                                     }
-                                }
+                                )
                             )
                         )
-                    ).SetWidth(width)
-                )
-            );
-        }
-
-        Element CreateElement_Tabs()
-        {
-            return ExampleTemplate.UIFunctionColumn(nameof(UI.Tabs),
-                UI.Box(
-                    UI.Tabs(
-                        ("Tab0", () => UI.Label("This is\n\n<size=50><color=#d04040ff>Tab0</color></size>\n\ncontents")),
-                        ("Tab1", () => UI.Label("This is\n\n<size=50><color=#a0a0f0ff>Tab1</color></size>\n\ncontents"))
                     )
-                )
+                ).SetWidth(width)
             );
         }
-        
         
         Element CreateElement_FoldArgument()
         {

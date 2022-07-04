@@ -73,22 +73,14 @@
 /********************************************************************************
 * toggle
 ********************************************************************************/
-.unity-toggle
-{
-    max-height: 28px;
+.unity-toggle {
+    min-height: 28px;
+    margin: 1px 0 3px 0;
 }
 
 .unity-toggle.unity-base-field--no-label
 {
     flex-grow: 0;
-}
-
-.unity-toggle:hover > .unity-toggle__input {
-    border-color: var(--unity-colors-input_field-border-hover);
-}
-
-.unity-toggle:focus > .unity-toggle__input {
-    border-color: var(--unity-colors-input_field-border-focus);
 }
 
 .unity-toggle__input,
@@ -97,16 +89,32 @@
     flex-grow: 0;
     padding: initial;
     min-width: auto;
+    border-width: 0;
+}
+
+.unity-toggle > .unity-toggle__input:hover > .unity-toggle__checkmark{
+    border-color: var(--unity-colors-input_field-border-hover);
+}
+
+.unity-toggle > .unity-toggle__input:focus > .unity-toggle__checkmark{
+    border-color: var(--unity-colors-input_field-border-focus);
+}
+
+.unity-toggle__checkmark{
+    border-width: 2px;
+    -unity-background-image-tint-color: var(--unity-colors-default-text);
+}
+
+.unity-toggle__checkmark,
+.unity-toggle > .unity-toggle__input:disabled > .unity-toggle__checkmark,
+.unity-toggle > .unity-toggle__input:checked > .unity-toggle__checkmark
+{
     border-color: var(--unity-colors-input_field-border);
     background-color: var(--rosettaui-color-input-background);
 }
 
-.unity-toggle__checkmark,
-.unity-toggle > .unity-toggle__input:disabled > .unity-toggle__checkmark{
-    -unity-background-image-tint-color: var(--unity-colors-default-text);
-    background-color: transparent;
-    /*border-color: var(--unity-colors-input_field-border);*/
-    border-width: 0;
+.unity-toggle__text{
+    margin: 0;
 }
 
 /********************************************************************************
@@ -114,12 +122,6 @@
 ********************************************************************************/
 .unity-foldout .unity-base-field__label{
     min-width: initial; /* remove unity value */
-}
-
-.unity-foldout__toggle
-{
-    margin: 1px 0;
-    min-height: 32px;
 }
 
 .unity-foldout__toggle:hover
@@ -136,18 +138,10 @@
 }
 .unity-foldout__toggle > .unity-toggle__input > .unity-toggle__checkmark
 {
+    border-width: 0;
     margin: 0 2px;
     -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
 }
-
-/*
-.unity-foldout__toggle > .unity-toggle__input,
-.unity-foldout__toggle .unity-base-field
-{
-    flex-grow: 0;
-}
-*/
- 
 
 .unity-foldout__toggle > .rosettaui-row
 {
@@ -159,7 +153,9 @@
 }
 
 /* remove .unity-toggle > .unity-toggle__input:disabled > .unity-toggle__checkmark */
-.unity-foldout__toggle > .unity-toggle__input:disabled > .unity-toggle__checkmark{
+.unity-foldout__toggle > .unity-toggle__input:disabled > .unity-toggle__checkmark,
+.unity-foldout__toggle > .unity-toggle__input:checked > .unity-toggle__checkmark
+{
     background-color: initial;
 }
 
@@ -252,14 +248,10 @@
     background-color: var(--unity-colors-button-background);
 }
 
-    /*--unity-colors-button-background-focus: #6e6e6e;*/
-    /*--unity-colors-button-background-hover: #676767;*/
-    /*--unity-colors-button-background-pressed: #353535;*/
-    /*--unity-colors-button-border: #303030;*/
-    /*--unity-colors-button-border_accent: #242424;*/
-    /*--unity-colors-button-border-pressed: #0d0d0d;*/
-    /*--unity-colors-button-text: #eeeeee;*/
-
+/* 縦方向には伸びる */
+.rosettaui-row >.unity-button{
+    align-self: stretch;
+}
 
 /********************************************************************************
 * slider

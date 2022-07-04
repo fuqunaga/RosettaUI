@@ -28,7 +28,7 @@ namespace RosettaUI
                 IBinder<uint> ib => new UIntFieldElement(label, ib),
                 IBinder<float> ib => new FloatFieldElement(label, ib),
                 IBinder<string> ib => new TextFieldElement(label, ib),
-                IBinder<bool> ib => new BoolFieldElement(label, ib),
+                IBinder<bool> ib => new ToggleElement(label, ib),
                 IBinder<Color> ib =>  new ColorFieldElement(label, ib),
                 _ when valueType.IsEnum => CreateEnumElement(label, binder),
                 _ when TypeUtility.IsNullable(valueType) => CreateNullableFieldElement(label, binder),

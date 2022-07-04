@@ -56,12 +56,7 @@ namespace RosettaUI.Example
             return TitleIndent(title,
                 string.IsNullOrEmpty(description) ? null : UI.Label(description),
                 UI.Row(
-                    UI.TextArea(null, () => code)
-                        // UI.Column(
-                        //     texts.Select(t => UI.Field(null, () => t).SetHeight(32f))
-                        // )
-                        //.SetBackgroundColor(new Color(0.1f, 0.1f, 0.1f))
-                        .SetWidth(700f),
+                    UI.TextArea(null, () => code).SetWidth(700f),
                     UI.Space().SetWidth(30f),
                     UI.Box(
                         UI.Page(

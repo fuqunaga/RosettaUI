@@ -1,6 +1,6 @@
 ﻿namespace RosettaUI
 {
-    public class WindowLauncherElement : BoolFieldElement
+    public class WindowLauncherElement : ToggleElement
     {
         public readonly WindowElement window;
         

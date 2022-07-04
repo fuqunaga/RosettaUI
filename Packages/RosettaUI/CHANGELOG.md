@@ -8,7 +8,7 @@
 - UIEditor.ObjectField()
 
 ### Changed
-- Class names are no longer displayed on static member label. 
+- Class names are no longer displayed on static member label.  
 e.g.  `UI.Field(() => staticMember)` label: `Class.staticMember` > `staticMember`
 
 

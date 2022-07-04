@@ -74,7 +74,7 @@
 * toggle
 ********************************************************************************/
 .unity-toggle {
-    /*max-height: 28px;*/
+    min-height: 28px;
     margin: 1px 0 3px 0;
 }
 
@@ -102,12 +102,13 @@
 
 .unity-toggle__checkmark{
     border-width: 2px;
+    -unity-background-image-tint-color: var(--unity-colors-default-text);
 }
 
 .unity-toggle__checkmark,
-.unity-toggle > .unity-toggle__input:disabled > .unity-toggle__checkmark{
-    -unity-background-image-tint-color: var(--unity-colors-default-text);
-    
+.unity-toggle > .unity-toggle__input:disabled > .unity-toggle__checkmark,
+.unity-toggle > .unity-toggle__input:checked > .unity-toggle__checkmark
+{
     border-color: var(--unity-colors-input_field-border);
     background-color: var(--rosettaui-color-input-background);
 }
@@ -152,7 +153,9 @@
 }
 
 /* remove .unity-toggle > .unity-toggle__input:disabled > .unity-toggle__checkmark */
-.unity-foldout__toggle > .unity-toggle__input:disabled > .unity-toggle__checkmark{
+.unity-foldout__toggle > .unity-toggle__input:disabled > .unity-toggle__checkmark,
+.unity-foldout__toggle > .unity-toggle__input:checked > .unity-toggle__checkmark
+{
     background-color: initial;
 }
 

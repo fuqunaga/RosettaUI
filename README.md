@@ -84,7 +84,7 @@ Select `RosettaUI - UI ToolKit` and click the Install button
 
 ## How to use
 
-1. Put `Packages/RosettaUI - UIToolkit/RosettaUIRootUIToolkit.prefab` in the Hierarychy
+1. Put `Packages/RosettaUI - UIToolkit/RosettaUIRootUIToolkit.prefab` in the Hierarchy
 1. Write code to generate `Element` instance
 1. Call `RosettaUIRoot.Build(Element)` to generate the actual UI ( [Example] )
 
@@ -106,9 +106,9 @@ I recommend downloading and checking it out.
 ### UI.MinMaxSlider()
 ![](Documentation~/2022-04-12-18-49-48.png)
 
-
 ### Layout elements
-![](Documentation~/2022-04-12-18-55-52.png)
+![](Documentation~/2022-07-04-15-38-26.png)
+
 
 ### And more
 Please check the [Examples](Assets/Example/Common)

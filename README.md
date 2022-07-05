@@ -115,14 +115,14 @@ Please check the [Examples](Assets/Example/Common)
 
 # Enviroment
 
-| Platform | Status            |
+| Platform | Support           |
 | -------- | ----------------- |
 | Windows  | ✔                 |
 | Mac      | Maybe(not tested) |
 | Linux    | Maybe(not tested) |
 | IL2CPP   | Suspended         |
 
-| UI Library | Status      |
+| UI Library | Support      |
 | ---------- | ----------- |
 | UI Toolkit | ✔           |
 | UGUI       | Suspended   |

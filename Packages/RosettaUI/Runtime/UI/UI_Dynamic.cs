@@ -60,7 +60,7 @@ namespace RosettaUI
             Assert.IsTrue(typeof(Object).IsAssignableFrom(type));
             if (build == null) return null;
 
-            List<Object> targets = null;
+            var targets = new List<Object>();
             var lastCheckTime = 0f;
             // 起動時などに多くのFindObject()を呼ぶタイミングがかぶって重いのでランダムで散らす
             var intervalMinMax = UISettings.dynamicElementIfObjectFoundInterval;
@@ -73,21 +73,25 @@ namespace RosettaUI
             return DynamicElementOnStatusChanged(
                 readStatus: () =>
                 {
-                    targets?.RemoveAll(t => t == null || (!includeInactive && t is Behaviour {isActiveAndEnabled: false}));
-                    
                     var time = Time.realtimeSinceStartup;
                     if (time - lastCheckTime > interval)
                     {
                         lastCheckTime = time;
-                        if (targets == null || !targets.Any() || supportMultiple)
+                        if (!targets.Any() || supportMultiple)
                         {
-                            targets = Object.FindObjectsOfType(type, includeInactive)
-                                .OrderBy(o => o.name)
-                                .ToList();
+                            targets.Clear();
+                            targets.AddRange(
+                                // includeInactive==false でも Behaviour.enabled==falseなものは含まれるので注意
+                                Object.FindObjectsOfType(type, includeInactive)
+                                    .OrderBy(o => o.name)
+                            );
+
                         }
                     }
-
-                    var hash =  targets?.Aggregate(0, (hash, t) => hash ^ t.GetHashCode());
+                    
+                    targets.RemoveAll(t => t == null || (!includeInactive && t is Behaviour {isActiveAndEnabled: false}));
+                    
+                    var hash =  targets.Aggregate(0, (hash, t) => hash ^ t.GetHashCode());
                     return hash;
                 },
                 build: _ => buildFunc()
@@ -97,13 +101,13 @@ namespace RosettaUI
             
             Element BuildFirstTarget()
             {
-                var target = targets?.FirstOrDefault();
+                var target = targets.FirstOrDefault();
                 return target != null ? build(target) : null;
             }
             
             Element BuildMultipleTarget()
             {
-                if (targets == null || !targets.Any()) return null;
+                if (!targets.Any()) return null;
 
                 var options = targets.Select(obj => obj.name).ToList();
                 var contents = targets.Select(build).ToList();
@@ -111,7 +115,8 @@ namespace RosettaUI
                 var currentIdx = 0;
                 if (currentObjectHash != 0)
                 {
-                    var idx = targets.FindIndex(t => t.GetHashCode() == currentObjectHash);
+                    var hash = currentObjectHash;
+                    var idx = targets.FindIndex(t => t.GetHashCode() == hash);
                     if (idx >= 0)
                     {
                         currentIdx = idx;

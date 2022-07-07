@@ -1,27 +1,38 @@
 using NUnit.Framework;
 using RosettaUI.Builder;
 using UnityEngine;
+using UnityEngine.TestTools.Utils;
 
 namespace RosettaUI.Test
 {
     public class ColorPickerHelperTest
     {
-        [Test]
-        public void Test_CircleToSquare()
+        [TestCaseSource(nameof(CircleToSquareSource))]
+        public void CircleToSquare(float circleX, float circleY, float squareX, float squareY)
+        {
+            var comparer = new Vector2EqualityComparer(10e-4f);
+            Assert.That(
+                ColorPickerHelper.CircleToSquare(new Vector2(circleX, circleY)),
+                Is.EqualTo(new Vector2(squareX, squareY)).Using(comparer)
+            );
+        }
+
+        static object[] CircleToSquareSource()
         {
             var invSqrt2 = 1f / Mathf.Sqrt(2f);
-            //var rad30 = 30.0 * Math.PI / 180.0;
-
-            Assert.AreEqual(Vector2.zero, ColorPickerHelper.CircleToSquare(Vector2.zero));
             
-            Assert.AreEqual(new Vector2(1f, 0f), ColorPickerHelper.CircleToSquare(new Vector2(1f, 0f)));
-            Assert.AreEqual(Vector2.one, ColorPickerHelper.CircleToSquare(new Vector2(invSqrt2, invSqrt2)));
-            Assert.AreEqual(new Vector2(0f, 1f), ColorPickerHelper.CircleToSquare(new Vector2(0f, 1f)));
-            Assert.AreEqual(new Vector2(-1f, 1f), ColorPickerHelper.CircleToSquare(new Vector2(-invSqrt2, invSqrt2)));
-            Assert.AreEqual(new Vector2(-1f, 0f), ColorPickerHelper.CircleToSquare(new Vector2(-1f, 0f)));
-            Assert.AreEqual(new Vector2(-1f, -1f), ColorPickerHelper.CircleToSquare(new Vector2(-invSqrt2, -invSqrt2)));
-            Assert.AreEqual(new Vector2(0f, -1f), ColorPickerHelper.CircleToSquare(new Vector2(0f, -1f)));
-            Assert.AreEqual(new Vector2(1f, -1f), ColorPickerHelper.CircleToSquare(new Vector2(invSqrt2, -invSqrt2)));
+            return new object[]
+            {
+                new []{0f, 0f, 0f, 0f},
+                new []{1f, 0f, 1f, 0f},
+                new []{invSqrt2, invSqrt2, 1f, 1f},
+                new []{0f, 1f, 0f, 1f},
+                new []{-invSqrt2, invSqrt2, -1f, 1f},
+                new []{-1f, 0f, -1f, 0f},
+                new []{-invSqrt2, -invSqrt2, -1f, -1f},
+                new []{0f, -1f, 0f, -1f},
+                new []{invSqrt2, -invSqrt2, 1f, -1f},
+            };
         }
     }
 }

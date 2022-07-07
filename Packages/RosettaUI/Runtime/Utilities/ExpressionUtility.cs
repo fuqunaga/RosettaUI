@@ -108,7 +108,8 @@ namespace RosettaUI
                 // "this.member" > "member"
                 // "StaticClass.member" > "member"
                 if (container is ConstantExpression 
-                    || member is FieldInfo { IsStatic: true})
+                    || member is FieldInfo { IsStatic: true} or PropertyInfo {GetMethod: {IsStatic: true}}
+                   )
                 {
                     Type type;
                     switch (member)

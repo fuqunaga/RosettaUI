@@ -1,5 +1,14 @@
 # RosettaUI
 
+## [0.4.1] - 2022-07-11
+### Changed
+- ExpressionUtility.CreateLabelString() doesn't shows static property's class name
+
+### Fixed
+- UI.FieldIfObjectFound(), UI.DynamicElementIfObjectFound() Element is created and immediately destroyed repeatedly
+- Indexer will be readonly and strange label. e.g. UI.Field(() => list[0])
+
+
 ## [0.4.0] - 2022-07-04
 ### Added
 - UI.Toggle()
@@ -19,13 +28,16 @@ e.g.  `UI.Field(() => staticMember)` label: `Class.staticMember` > `staticMember
 ### Changed
 - WindowLauncher ignores the first indent to align the label(same as Fold)
 
+
 ## [0.2.2] - 2022-05-13
 ### Changed
 - Element.Set* method for style supports null to set default value now.
 
+
 ## [0.1.2] - 2022-05-13
 ### Changed
 - IElementCreater and UICustom.CreationFunc are now received a LabelElement.
+
 
 ## [0.0.0] - 2022-04-12
 - 🎉 first release!

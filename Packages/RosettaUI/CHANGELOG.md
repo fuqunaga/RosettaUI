@@ -1,5 +1,10 @@
 # RosettaUI
 
+## [0.4.2] - 2022-09-21
+### Fixed
+- No label composite field error.  
+ex. `UI.Field(null, () => vector2);`
+
 ## [0.4.1] - 2022-07-11
 ### Changed
 - ExpressionUtility.CreateLabelString() doesn't shows static property's class name

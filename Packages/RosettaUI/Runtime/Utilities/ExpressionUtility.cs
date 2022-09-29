@@ -16,7 +16,7 @@ namespace RosettaUI
         public static IBinder<T> CreateBinder<T>(Expression<Func<T>> expression)
         {
 #if ENABLE_IL2CPP
-            return IL2CPP.ExpressionUtility_IL2CPP.CreateBinder(lambda);
+            return IL2CPP.ExpressionUtility_IL2CPP.CreateBinder(expression);
 #else
             return _CreateBinder(expression);
 #endif

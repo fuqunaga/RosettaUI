@@ -38,8 +38,9 @@ namespace RosettaUI.IL2CPP
             {
                 return (parent, value) =>
                 {
-                    fi.SetValue(parent, value);
-                    return parent;
+                    var boxed = (object)parent;
+                    fi.SetValue(boxed, value);
+                    return (TParent)boxed;
                 };
             }
 
@@ -48,8 +49,9 @@ namespace RosettaUI.IL2CPP
             {
                 return (parent, value) =>
                 {
-                    pi.SetValue(parent, value);
-                    return parent;
+                    var boxed = (object)parent;
+                    pi.SetValue(boxed, value);
+                    return (TParent)boxed;
                 };
             }
 

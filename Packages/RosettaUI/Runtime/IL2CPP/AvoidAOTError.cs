@@ -43,6 +43,10 @@ namespace RosettaUI.IL2CPP
             DefineTypes_PropertyOrFieldBinder<T>();
         }
 
+        public static void DefineBinder<TParent, TValue>()
+        {
+            new PropertyOrFieldBinder<TParent, TValue>(null, null);
+        }
 
         //　組み合わせ爆発するのでなんとかしたい
         static void DefineTypes_PropertyOrFieldBinder<T>()

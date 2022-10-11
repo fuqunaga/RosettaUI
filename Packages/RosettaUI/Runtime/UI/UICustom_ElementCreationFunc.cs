@@ -12,20 +12,23 @@ namespace RosettaUI
         
         private static readonly Dictionary<Type, CreationFunc> CreationFuncTable = new();
 
-        // struct は creationFunc 渡してもコピーになってしまうので class のみ対応
-        public static void RegisterElementCreationFunc<T>(Func<LabelElement, T, Element> creationFunc)
-            where T : class
+        
+        public static void RegisterElementCreationFunc<T>(Func<LabelElement, Func<T>, Element> creationFunc)
+            where T : class // GetObject() as T を呼ぶためにとりあえずwhere T : class
         {
             var cf = new CreationFunc
             {
-                // binder.GetObject() が変わったら UI を作り直す
-                // 下手すると毎フレーム変わるので重いかもしれない
-                // 本当は binder から Element を生成するべきだが複雑な UI を作ろうとするとかなり大変
-                // とりあえず「重いけど安全に動く」動作を選択
-                func = (label,binder) => UI.DynamicElementOnStatusChanged(
-                    binder.GetObject,
-                    obj => creationFunc(label, (T)obj).RegisterValueChangeCallback(() => binder.SetObject(obj))
-                ),
+                // binder から Element を生成するべきだが複雑な UI を作ろうとするとかなり大変なので
+                // binderのかわりにFunc<T>から生成してもらう
+                //
+                // UI.Field(() => GetObj(), obj => SetObj(obj)); などのケースで
+                // binder.GetObject()で返ってきたobjを編集するだけではだめでSetObject()で通知する必要がある
+               func = (label,binder) =>
+                   {
+                       object obj = null;
+                       return creationFunc(label, () => (obj = binder.GetObject()) as T)
+                           .RegisterValueChangeCallback(() => binder.SetObject(obj));
+                   }
             };
 
             RegisterElementCreationFunc(typeof(T), cf);
@@ -63,7 +66,7 @@ namespace RosettaUI
         {
             private readonly CreationFunc _creationFuncCache;
 
-            public ElementCreationFuncScope(Func<LabelElement, T, Element> creationFunc)
+            public ElementCreationFuncScope(Func<LabelElement, Func<T>, Element> creationFunc)
             {
                 _creationFuncCache = GetElementCreationMethod(typeof(T));
                 RegisterElementCreationFunc(creationFunc);

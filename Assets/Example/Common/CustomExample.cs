@@ -39,12 +39,12 @@ namespace RosettaUI.Example
 
         public Element CreateElement(LabelElement _)
         {
-            using var ecfScope = new UICustom.ElementCreationFuncScope<MyInt>((label, instance) =>
+            using var ecfScope = new UICustom.ElementCreationFuncScope<MyInt>((label, getInstance) =>
             {
                 return UI.Row(
-                    UI.Field(label, () => instance.value),
-                    UI.Button("+", () => instance.value++),
-                    UI.Button("-", () => instance.value--)
+                    UI.Field(label, () => getInstance().value),
+                    UI.Button("+", () => getInstance().value++),
+                    UI.Button("-", () => getInstance().value--)
                 );
             });
             
@@ -87,12 +87,12 @@ UI.Field(() => myFloatValue));",
 public MyInt myInt;
 
 using var ecfScope = 
-    new UICustom.ElementCreationFuncScope<MyInt>((label, instance) =>
+    new UICustom.ElementCreationFuncScope<MyInt>((label, getInstance) =>
     {
         return UI.Row(
-            UI.Field(label, () => instance.value),
-            UI.Button(""+"", () => instance.value++),
-            UI.Button(""-"", () => instance.value--)
+            UI.Field(label, () => getInstance().value),
+            UI.Button(""+"", () => getInstance().value++),
+            UI.Button(""-"", () => getInstance().value--)
         );
     });
 

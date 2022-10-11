@@ -1,5 +1,10 @@
 # RosettaUI
 
+## [0.4.3] - 2022-10-11
+### Changed
+- The signature of UICustom.RegisterElementCreationFunc() / ElementCreationFuncScope() has changed  
+Fix that ElementCreationFunc cannot follow when instance changes
+
 ## [0.4.2] - 2022-09-21
 ### Fixed
 - No label composite field error.  

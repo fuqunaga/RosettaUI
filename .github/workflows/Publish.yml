@@ -19,7 +19,7 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: SEmantic Release
+    - name: Semantic Release
       uses: cycjimmy/semantic-release-action@v3
       with:
         semantic_version: 19
@@ -29,7 +29,7 @@ jobs:
             @semantic-release/changelog@6
             @semantic-release/git
         extends: |
-            @pmowrer/semantic-release-monorepo
+            semantic-release-monorepo
         dry_run: true
       env:
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

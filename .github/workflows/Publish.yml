@@ -23,7 +23,7 @@ jobs:
       uses: cycjimmy/semantic-release-action@v3
       with:
         semantic_version: 19
-        branch: semantic-release-monorepo
+        branch: main
         working_directory: ${{ matrix.pkg_root }}  
         extra_plugins: |
             @semantic-release/changelog@6

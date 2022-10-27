@@ -14,15 +14,20 @@ jobs:
         pkg_root: [./Packages/RosettaUI, ./Packages/RosettaUI.UIToolkit]
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
-    - uses: actions/setup-node@v3
+    - name: SEmantic Release
+      uses: cycjimmy/semantic-release-action@v3
       with:
-        registry-url: 'https://registry.npmjs.org'
-
-    - run: npm publish
-      working-directory: ${{ matrix.pkg_root }}
+        semantic_version: 19
+        branch: semantic-release-monorepo
+        working_directory: ${{ matrix.pkg_root }}  
+        extra_plugins: |
+            @semantic-release/changelog@6
+            @semantic-release/git
+        dry_run: true
       env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

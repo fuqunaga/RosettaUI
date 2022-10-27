@@ -28,6 +28,8 @@ jobs:
         extra_plugins: |
             @semantic-release/changelog@6
             @semantic-release/git
+        extends: |
+            @pmowrer/semantic-release-monorepo
         dry_run: true
       env:
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

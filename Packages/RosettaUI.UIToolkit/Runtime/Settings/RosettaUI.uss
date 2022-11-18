@@ -96,7 +96,7 @@
 }
 
 .rosettaui-window__content-container{
-    flex-grow: 1;
+    overflow: hidden;
 }
 
 /********************************************************************************

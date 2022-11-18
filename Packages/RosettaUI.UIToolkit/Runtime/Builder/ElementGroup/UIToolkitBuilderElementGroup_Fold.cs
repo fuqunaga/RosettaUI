@@ -6,9 +6,9 @@ namespace RosettaUI.UIToolkit.Builder
     {
         private VisualElement Build_Fold(Element element)
         {
-            var fold = new Foldout();
+            var fold = new FoldoutCustom();
             SetupOpenCloseBaseElement(fold, (FoldElement) element);
-  
+   
             var ret =  Build_ElementGroupContents(fold, element);
             return ret;
         }

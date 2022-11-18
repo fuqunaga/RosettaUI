@@ -120,6 +120,29 @@ namespace RosettaUI.UIToolkit
             RegisterCallback<PointerDownEvent>(OnPointerDown);
             RegisterCallback<MouseMoveEvent>(OnMouseMove);
             RegisterCallback<MouseOutEvent>(OnMouseOut);
+            
+            RegisterCallback<ChangeVisibleEvent>(_ =>
+            {
+                style.width = StyleKeyword.Null;
+                ResetFixedSize();
+            });
+
+            ResetFixedSize();
+        }
+
+        // 幅固定
+        // ほぼルートのWindowエレメントのサイズが不定だとレイアウトの計算がめちゃくちゃ重い
+        // 特にHorizontal方向はほとんどのエレメントが固定サイズを持っていないので再計算が走りまくるようで重い
+        // これを回避するためWindowは内容物のレイアウトが落ち着いたら幅を固定しておく
+        // 同一フレームだとGeometryChangedEventなどでサイズが変わるやつがいるので１フレーム待つ
+        void ResetFixedSize()
+        {
+            var startFrameCount = Time.frameCount;
+            schedule.Execute(() =>
+            {
+                if (Time.frameCount <= startFrameCount) return;
+                style.width = layout.width;
+            }).Until(() => Time.frameCount > startFrameCount); 
         }
 
 

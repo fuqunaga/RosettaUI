@@ -1,3 +1,11 @@
+# [ga.fuquna.rosettaui-v1.0.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.0.0...ga.fuquna.rosettaui-v1.0.1) (2022-11-22)
+
+
+### Bug Fixes
+
+* circular reference checks from type-based to reference-based [#11](https://github.com/fuqunaga/RosettaUI/issues/11) ([479bd7e](https://github.com/fuqunaga/RosettaUI/commit/479bd7e91a4239c867ea4c11b4d7fa31e5082169))
+* List always pass through circular reference detection [#12](https://github.com/fuqunaga/RosettaUI/issues/12) ([991c90a](https://github.com/fuqunaga/RosettaUI/commit/991c90ae4b2aaf363f47e15f3c0cb3cc355251b6))
+
 # RosettaUI
 
 ## [0.4.3] - 2022-10-11

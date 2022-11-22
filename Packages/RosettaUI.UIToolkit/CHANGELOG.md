@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.0.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.0.1...ga.fuquna.rosettaui.uitoolkit-v1.0.2) (2022-11-22)
+
+
+### Bug Fixes
+
+* follow Rosettaui 1.0.2 ([d92f6a3](https://github.com/fuqunaga/RosettaUI/commit/d92f6a33b7137f51e3abe43b3b2fed3380d664fd))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.0.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.0.0...ga.fuquna.rosettaui.uitoolkit-v1.0.1) (2022-11-22)
 
 

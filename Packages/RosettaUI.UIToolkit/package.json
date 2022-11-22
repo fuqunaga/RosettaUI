@@ -1,6 +1,6 @@
 {
   "name": "ga.fuquna.rosettaui.uitoolkit",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "displayName": "RosettaUI - UI Toolkit",
   "description": "RosettaUI UI Toolkit bridge",
   "unity": "2021.2",

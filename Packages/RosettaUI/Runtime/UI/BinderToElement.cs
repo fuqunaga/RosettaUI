@@ -12,34 +12,38 @@ namespace RosettaUI
         public static Element CreateFieldElement(LabelElement label, IBinder binder)
         {
             var valueType = binder.ValueType;
-            
-            if (BinderTypeHistory.IsExistingType(valueType))
+
+
+            if (BinderHistory.IsCircularReference(binder))
             {
                 return CreateCircularReferenceElement(label, valueType);
             }
 
-            using var typeHistory = BinderTypeHistory.GetScope(valueType);
+            using var binderHistory = BinderHistory.GetScope(binder);
 
             return binder switch
             {
-                _ when UICustom.GetElementCreationMethod(valueType) is { } creationFunc => InvokeCreationFunc(label, binder, creationFunc),
+                _ when UICustom.GetElementCreationMethod(valueType) is { } creationFunc => InvokeCreationFunc(label,
+                    binder, creationFunc),
 
                 IBinder<int> ib => new IntFieldElement(label, ib),
                 IBinder<uint> ib => new UIntFieldElement(label, ib),
                 IBinder<float> ib => new FloatFieldElement(label, ib),
                 IBinder<string> ib => new TextFieldElement(label, ib),
                 IBinder<bool> ib => new ToggleElement(label, ib),
-                IBinder<Color> ib =>  new ColorFieldElement(label, ib),
+                IBinder<Color> ib => new ColorFieldElement(label, ib),
                 _ when valueType.IsEnum => CreateEnumElement(label, binder),
                 _ when TypeUtility.IsNullable(valueType) => CreateNullableFieldElement(label, binder),
 
-                _ when binder.GetObject() is IElementCreator elementCreator => WrapNullGuard(() => elementCreator.CreateElement(label)),
+                _ when binder.GetObject() is IElementCreator elementCreator => WrapNullGuard(() =>
+                    elementCreator.CreateElement(label)),
                 _ when ListBinder.IsListBinder(binder) => CreateListView(label, binder),
 
                 _ => WrapNullGuard(() => CreateMemberFieldElement(label, binder))
             };
 
             Element WrapNullGuard(Func<Element> func) => UI.NullGuardIfNeed(label, binder, func);
+            
         }
 
         private static Element InvokeCreationFunc(LabelElement label, IBinder binder, UICustom.CreationFunc creationFunc)
@@ -183,11 +187,11 @@ namespace RosettaUI
             var fieldNames = TypeUtility.GetUITargetFieldNames(valueType).ToList();
             if (!fieldNames.Any()) return null;
 
-            if (BinderTypeHistory.IsExistingType(valueType))
+            if (BinderHistory.IsCircularReference(binder))
             {
                 return CreateCircularReferenceElement(label, valueType);
             }
-            using var typeHistory = BinderTypeHistory.GetScope(valueType);
+            using var binderHistory = BinderHistory.GetScope(binder);
 
             var elements = fieldNames.Select(createFieldElementFunc);
 

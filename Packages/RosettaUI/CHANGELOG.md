@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.0.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.0.1...ga.fuquna.rosettaui-v1.0.2) (2022-11-22)
+
+
+### Bug Fixes
+
+* version up manually to try to avoid npm publish error ([835205a](https://github.com/fuqunaga/RosettaUI/commit/835205acc2bbddcd7d57fd4979a46206093edf39))
+
 # [ga.fuquna.rosettaui-v1.0.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.0.0...ga.fuquna.rosettaui-v1.0.1) (2022-11-22)
 
 

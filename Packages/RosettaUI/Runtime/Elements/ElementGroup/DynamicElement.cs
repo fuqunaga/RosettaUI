@@ -43,7 +43,7 @@ namespace RosettaUI
         private readonly Func<Element> _build;
         private readonly string _displayName;
         private readonly Func<DynamicElement, bool> _rebuildIf;
-        private readonly BinderTypeHistory.Snapshot _binderTypeHistorySnapshot;
+        private readonly BinderHistory.Snapshot _binderTypeHistorySnapshot;
         private bool _needBuildChildren = true;
         
         public override IEnumerable<Element> Contents
@@ -66,7 +66,7 @@ namespace RosettaUI
             _rebuildIf = rebuildIf;
             _displayName = displayName;
             
-            _binderTypeHistorySnapshot = BinderTypeHistory.Snapshot.Create();
+            _binderTypeHistorySnapshot = BinderHistory.Snapshot.Create();
 
             enableRx.Subscribe(enable =>
             {

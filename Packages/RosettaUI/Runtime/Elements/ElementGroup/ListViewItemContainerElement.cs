@@ -10,6 +10,7 @@ namespace RosettaUI
         public readonly ListViewOption option;
         
         private readonly Func<IBinder, int, Element> _createItemElement;
+        private readonly BinderHistory.Snapshot _binderTypeHistorySnapshot;
         
         
         public ListViewItemContainerElement(IBinder listBinder, Func<IBinder, int, Element> createItemElement, ListViewOption option) : base(null)
@@ -19,6 +20,8 @@ namespace RosettaUI
             this.option = option;
 
             Interactable = !ListBinder.IsReadOnly(listBinder);
+            
+            _binderTypeHistorySnapshot = BinderHistory.Snapshot.Create();
         }
 
         public IList GetIList() => ListBinder.GetIList(_binder);
@@ -31,6 +34,8 @@ namespace RosettaUI
             var element = GetContentAt(index);
             if (element == null)
             {
+                using var applyScope = _binderTypeHistorySnapshot.GetApplyScope();
+                
                 var isReadOnly = ListBinder.IsReadOnly(_binder);
                 for (var i = Contents.Count(); i <= index; i++)
                 {

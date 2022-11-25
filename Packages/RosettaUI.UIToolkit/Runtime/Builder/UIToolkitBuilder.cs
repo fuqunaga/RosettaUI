@@ -5,6 +5,12 @@ using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+#if UNITY_2022_1_OR_NEWER
+using IntegerField = UnityEngine.UIElements.IntegerField;
+using FloatField = UnityEngine.UIElements.FloatField;
+#endif
+
+
 namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder : BuilderBase<VisualElement>

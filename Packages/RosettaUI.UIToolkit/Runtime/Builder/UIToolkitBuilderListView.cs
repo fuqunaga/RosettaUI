@@ -14,8 +14,11 @@ namespace RosettaUI.UIToolkit.Builder
         {
             var itemContainerElement = (ListViewItemContainerElement) element;
             var option = itemContainerElement.option;
-
+#if UNITY_2022_1_OR_NEWER
+            var listView = new ListView(itemContainerElement.GetIList(),
+#else
             var listView = new ListViewCustom(itemContainerElement.GetIList(),
+#endif
                 makeItem: () => new VisualElement(),
                 bindItem: BindItem
             )
@@ -46,12 +49,15 @@ namespace RosettaUI.UIToolkit.Builder
             // ListView 内での参照先変更を通知
             listView.itemsSourceChanged += NotifyValueChanged;
 
+#if !UNITY_2022_1_OR_NEWER
+// TODO: support unity20222
             // ListView 内での要素数変更を通知（ListView 外での変更と区別するための処理）
             listView.itemsSourceSizeChanged += () =>
             {
                 lastListItemCount = listView.itemsSource.Count;
                 NotifyValueChanged();
             };
+#endif
             
             itemContainerElement.onUpdate += _ =>
             {
@@ -74,7 +80,10 @@ namespace RosettaUI.UIToolkit.Builder
                     }
 
                     lastListItemCount = listItemCount;
+#if !UNITY_2022_1_OR_NEWER
+// TODO: support unity20222
                     listView.OnListSizeChangedExternal();
+#endif
                 }
             };
             

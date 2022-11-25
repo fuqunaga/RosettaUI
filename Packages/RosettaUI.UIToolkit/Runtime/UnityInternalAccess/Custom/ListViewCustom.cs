@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
+#if !UNITY_2022_1_OR_NEWER
     /// <summary>
     /// ListView with Additional function
     /// 
@@ -145,4 +145,5 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         
         #endregion
     }
+#endif
 }

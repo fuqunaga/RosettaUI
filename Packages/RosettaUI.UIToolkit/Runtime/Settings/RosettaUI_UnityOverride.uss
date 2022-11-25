@@ -524,10 +524,10 @@
 
 .unity-list-view__reorderable-handle
 {
-    margin-top: 15px;
     min-width: 26px;
-    justify-content: flex-start;
+    padding-top: 13px;
     align-items: center;
+    justify-content: flex-start; /* for Unity2021. Default in Unity2022 */
 }
 
 .unity-list-view__reorderable-handle-bar

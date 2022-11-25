@@ -14,21 +14,27 @@ namespace RosettaUI.UIToolkit.Builder
         {
             var itemContainerElement = (ListViewItemContainerElement) element;
             var option = itemContainerElement.option;
+            
 #if UNITY_2022_1_OR_NEWER
-            var listView = new ListView(itemContainerElement.GetIList(),
+            var listView = new ListView()
 #else
-            var listView = new ListViewCustom(itemContainerElement.GetIList(),
+            var listView = new ListViewCustom()
 #endif
-                makeItem: () => new VisualElement(),
-                bindItem: BindItem
-            )
             {
+                makeItem =() => new VisualElement(),
+                bindItem = BindItem,
                 reorderable = option.reorderable,
                 reorderMode = option.reorderable ? ListViewReorderMode.Animated : ListViewReorderMode.Simple,
                 // showFoldoutHeader = true,
                 showAddRemoveFooter = !option.fixedSize,
                 virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
             };
+
+#if UNITY_2022_1_OR_NEWER
+            listView.SetViewController(new ListViewControllerCustom());
+#endif
+
+            listView.itemsSource = itemContainerElement.GetIList();
             
 
             #region Callbacks
@@ -49,21 +55,25 @@ namespace RosettaUI.UIToolkit.Builder
             // ListView 内での参照先変更を通知
             listView.itemsSourceChanged += NotifyValueChanged;
 
-#if !UNITY_2022_1_OR_NEWER
-// TODO: support unity20222
+
             // ListView 内での要素数変更を通知（ListView 外での変更と区別するための処理）
+#if UNITY_2022_1_OR_NEWER
+            listView.viewController.itemsSourceSizeChanged += () =>
+#else
             listView.itemsSourceSizeChanged += () =>
+#endif
             {
                 lastListItemCount = listView.itemsSource.Count;
                 NotifyValueChanged();
             };
-#endif
+
             
             itemContainerElement.onUpdate += _ =>
             {
                 var list = itemContainerElement.GetIList();
                 
                 // ListView 外での参照先変更を ListView に通知
+                // ReSharper disable once PossibleUnintendedReferenceComparison
                 if (listView.itemsSource != list)
                 {
                     listView.itemsSource = list;
@@ -80,10 +90,7 @@ namespace RosettaUI.UIToolkit.Builder
                     }
 
                     lastListItemCount = listItemCount;
-#if !UNITY_2022_1_OR_NEWER
-// TODO: support unity20222
-                    listView.OnListSizeChangedExternal();
-#endif
+                    listView.RefreshItems();
                 }
             };
             

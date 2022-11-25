@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿#if !UNITY_2022_1_OR_NEWER
+
+using System;
 using UnityEngine;
-using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
-#if !UNITY_2022_1_OR_NEWER
     /// <summary>
     /// ListView with Additional function
     /// 
@@ -21,33 +19,15 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
     {
         public event Action itemsSourceSizeChanged;
 
-        public ListViewCustom(
-            IList itemsSource,
-            float itemHeight = ItemHeightUnset,
-            Func<VisualElement> makeItem = null,
-            Action<VisualElement, int> bindItem = null)
-            : base(itemsSource, itemHeight, makeItem, bindItem)
+        public ListViewCustom()
         {
-            viewController.itemsSourceSizeChanged += () => itemsSourceSizeChanged?.Invoke();
+            ((ListViewController)GetOrCreateViewController()).itemsSourceSizeChanged += () => itemsSourceSizeChanged?.Invoke();
             
             // disable scroll view
             scrollView.verticalScrollerVisibility = ScrollerVisibility.Hidden;
             scrollView.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
         }
 
-        /// <summary>
-        /// 外部でListのサイズが変更されたことを通知する
-        /// refs:
-        /// BaseListView.OnItemsSourceSizeChanged()
-        /// https://github.com/Unity-Technologies/UnityCsReference/blob/d0fe81a19ce788fd1d94f826cf797aafc37db8ea/ModuleOverrides/com.unity.ui/Core/Controls/BaseListView.cs#L420-L426
-        /// </summary>
-        public void OnListSizeChangedExternal()
-        {
-            if (itemsSource.IsFixedSize)
-                Rebuild();
-            else
-                RefreshItems();
-        }
 
         #region 画面外 Drag 対策 / サイズの異なるアイテムの移動でScrolViewの高さがおかしくなる対策
         
@@ -97,53 +77,13 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
 
         #endregion
 
-
-
+        
         #region Avoid error when IList item is ValueType
         
         private protected override void CreateViewController() => SetViewController(new ListViewControllerCustom());
 
-        class ListViewControllerCustom : ListViewController
-        {
-            private void EnsureItemSourceCanBeResized()
-            {
-                if (this.itemsSource.IsFixedSize && !this.itemsSource.GetType().IsArray)
-                    throw new InvalidOperationException("Cannot add or remove items from source, because its size is fixed.");
-            }
-
-            public override void AddItems(int itemCount)
-            {
-                this.EnsureItemSourceCanBeResized();
-                var count = this.itemsSource.Count;
-                var intList = CollectionPool<List<int>, int>.Get();
-                try
-                {
-                    var type = itemsSource.GetType();
-                    var itemType = ListUtility.GetItemType(type);
-                    for (var i = 0; i < itemCount; ++i)
-                    {
-                        itemsSource = ListUtility.AddItemAtLast(itemsSource, type, itemType);
-                        intList.Add(count + i);
-                    }
-
-
-                    this.RaiseItemsAdded((IEnumerable<int>) intList);
-                }
-                finally
-                {
-                    CollectionPool<List<int>, int>.Release(intList);
-                }
-                this.RaiseOnSizeChanged();
-                
-                // これがあるとアイテムをAddしたときにちらつく
-                // if (!this.itemsSource.IsFixedSize)
-                //     return;
-                
-                this.view.Rebuild();
-            }
-        }
-        
         #endregion
     }
-#endif
 }
+
+#endif

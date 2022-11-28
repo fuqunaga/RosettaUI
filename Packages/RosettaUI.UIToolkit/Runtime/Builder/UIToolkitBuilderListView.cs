@@ -15,27 +15,17 @@ namespace RosettaUI.UIToolkit.Builder
             var itemContainerElement = (ListViewItemContainerElement) element;
             var option = itemContainerElement.option;
             
-#if UNITY_2022_1_OR_NEWER
-            var listView = new ListView()
-#else
             var listView = new ListViewCustom()
-#endif
             {
-                makeItem =() => new VisualElement(),
-                bindItem = BindItem,
                 reorderable = option.reorderable,
                 reorderMode = option.reorderable ? ListViewReorderMode.Animated : ListViewReorderMode.Simple,
+                virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+                itemsSource = itemContainerElement.GetIList(),
                 // showFoldoutHeader = true,
                 showAddRemoveFooter = !option.fixedSize,
-                virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+                makeItem =() => new VisualElement(),
+                bindItem = BindItem,
             };
-
-#if UNITY_2022_1_OR_NEWER
-            listView.SetViewController(new ListViewControllerCustom());
-#endif
-
-            listView.itemsSource = itemContainerElement.GetIList();
-            
 
             #region Callbacks
 
@@ -171,7 +161,7 @@ namespace RosettaUI.UIToolkit.Builder
                 ArrayPool<VisualElement>.Shared.Return(veArray);
                 
 
-                void ExecByPair<T, U>(IEnumerable<T> source, IEnumerable<U> destination, Action<T, U> action)
+                void ExecByPair<T0, T1>(IEnumerable<T0> source, IEnumerable<T1> destination, Action<T0, T1> action)
                 {
                     foreach (var (s, d) in source.Zip(destination, (s, d) => (s, d)))
                     {

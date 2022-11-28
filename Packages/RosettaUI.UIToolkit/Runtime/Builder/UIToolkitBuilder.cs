@@ -79,26 +79,20 @@ namespace RosettaUI.UIToolkit.Builder
         protected override void CalcPrefixLabelWidthWithIndent(LabelElement label, VisualElement ve)
         {
             // 表示前にラベルの幅を計算する
-            // ve.schedule.Execute()は表示後に呼ばれるらしく、サイズが変更されるのが見えてしまう
-            ve.ScheduleToUseResolvedLayoutBeforeRendering(() =>
-            {
-                var marginLeft = ve.worldBound.xMin;
-                UpdateLabelWidth(marginLeft);
+            ve.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
 
-                // 初回生成時にve.worldBound.xMinがおかしい値の事があるのであとでもう一度チェックする
-                // 特にEditorWindowでWindow内におさまっていないエレメントが怪しい
-                ve.schedule.Execute(() =>
+            void OnGeometryChanged(GeometryChangedEvent evt)
+            {
+                // 移動してなければ落ち着いたと見てコールバック解除
+                // UpdateLabelWidth()でスタイルを変えているので少なくとも一度は再度呼ばれる
+                if (Mathf.Approximately(evt.oldRect.xMin, evt.newRect.xMin))
                 {
-                    var marginLeftAfter = ve.worldBound.xMin;
-                    if (Math.Abs(marginLeft - marginLeftAfter) > 1f)
-                    {
-                        UpdateLabelWidth(marginLeftAfter);
-                    }
-                });
-            });
+                    ve.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+                    return;
+                }
 
-            void UpdateLabelWidth(float marginLeft)
-            {
+                var marginLeft = ve.worldBound.xMin;
+          
                 for (var element = label.Parent;
                      element != null;
                      element = element.Parent)
@@ -110,9 +104,7 @@ namespace RosettaUI.UIToolkit.Builder
                     }
                 }
 
-
                 marginLeft /= ve.worldTransform.lossyScale.x; // ignore rotation
-
                 ve.style.minWidth = LayoutSettings.LabelWidth - marginLeft;
             }
         }

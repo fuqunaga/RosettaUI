@@ -143,7 +143,7 @@ namespace RosettaUI.UIToolkit.Builder
             if (isFixedSize)
             {
                  veStyle.flexGrow = 0;
-                 veStyle.flexShrink = 1;
+                 veStyle.flexShrink = 0;
                  veStyle.minWidth = StyleKeyword.Auto;
                  veStyle.maxWidth = StyleKeyword.Auto;
                  veStyle.minHeight = StyleKeyword.Auto;
@@ -156,10 +156,10 @@ namespace RosettaUI.UIToolkit.Builder
             }
             
             static StyleLength ToStyleLength(float? nullable)
-                => (nullable is { } value) ? value : StyleKeyword.Null;
+                => nullable ?? (StyleLength)StyleKeyword.Null;
             
             static StyleColor ToStyleColor(Color? nullable)
-                => (nullable is { } value) ? value : StyleKeyword.Null;
+                => nullable ?? (StyleColor)StyleKeyword.Null;
         }
 
 

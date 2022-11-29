@@ -56,20 +56,36 @@ namespace RosettaUI.UIToolkit
             _contentContainer.AddToClassList(UssClassNameContentContainer);
             hierarchy.Add(_contentContainer);
         }
+        
+        public void AddTabs(IEnumerable<(VisualElement header, VisualElement content)> tabs)
+        {
+            foreach (var (header, content) in tabs)
+            {
+                DoAddTab(header, content);
+            }
 
-        public void AddTab(VisualElement title, VisualElement content)
+            UpdateTabActive();
+        }
+
+        public void AddTab(VisualElement header, VisualElement content)
+        {
+            DoAddTab(header, content);
+            UpdateTabActive();
+        }
+
+        private void DoAddTab(VisualElement header, VisualElement content)
         {
             var index = _tabs.Count;
             var titleVe = new Button(() => CurrentTabIndex = index);
             titleVe.ClearClassList();
             titleVe.AddToClassList(UssClassNameTitle);
-            titleVe.Add(title);
+            titleVe.Add(header);
             
             TitleContainer.Insert(index, titleVe);
             contentContainer.Add(content);
 
             _tabs.Add((titleVe, content));
-            UpdateTabActive();
+            
         }
         
         private void UpdateTabActive()
@@ -82,14 +98,21 @@ namespace RosettaUI.UIToolkit
                 {
                     title.RemoveFromClassList(UssClassNameTitleInactive);
                     title.AddToClassList(UssClassNameTitleActive);
-                    content.style.display = DisplayStyle.Flex;
+
+                    if (content != null)
+                    {
+                        content.style.display = DisplayStyle.Flex;
+                    }
                 }
                 else
                 {
                     title.RemoveFromClassList(UssClassNameTitleActive);
                     title.AddToClassList(UssClassNameTitleInactive);
 
-                    content.style.display = DisplayStyle.None;
+                    if (content != null)
+                    {
+                        content.style.display = DisplayStyle.None;
+                    }
                 }
             }
         }

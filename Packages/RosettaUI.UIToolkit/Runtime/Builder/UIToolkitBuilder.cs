@@ -5,6 +5,12 @@ using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+#if UNITY_2022_1_OR_NEWER
+using IntegerField = UnityEngine.UIElements.IntegerField;
+using FloatField = UnityEngine.UIElements.FloatField;
+#endif
+
+
 namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder : BuilderBase<VisualElement>
@@ -73,26 +79,20 @@ namespace RosettaUI.UIToolkit.Builder
         protected override void CalcPrefixLabelWidthWithIndent(LabelElement label, VisualElement ve)
         {
             // 表示前にラベルの幅を計算する
-            // ve.schedule.Execute()は表示後に呼ばれるらしく、サイズが変更されるのが見えてしまう
-            ve.ScheduleToUseResolvedLayoutBeforeRendering(() =>
-            {
-                var marginLeft = ve.worldBound.xMin;
-                UpdateLabelWidth(marginLeft);
+            ve.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
 
-                // 初回生成時にve.worldBound.xMinがおかしい値の事があるのであとでもう一度チェックする
-                // 特にEditorWindowでWindow内におさまっていないエレメントが怪しい
-                ve.schedule.Execute(() =>
+            void OnGeometryChanged(GeometryChangedEvent evt)
+            {
+                // 移動してなければ落ち着いたと見てコールバック解除
+                // UpdateLabelWidth()でスタイルを変えているので少なくとも一度は再度呼ばれる
+                if (Mathf.Approximately(evt.oldRect.xMin, evt.newRect.xMin))
                 {
-                    var marginLeftAfter = ve.worldBound.xMin;
-                    if (Math.Abs(marginLeft - marginLeftAfter) > 1f)
-                    {
-                        UpdateLabelWidth(marginLeftAfter);
-                    }
-                });
-            });
+                    ve.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+                    return;
+                }
 
-            void UpdateLabelWidth(float marginLeft)
-            {
+                var marginLeft = ve.worldBound.xMin;
+          
                 for (var element = label.Parent;
                      element != null;
                      element = element.Parent)
@@ -104,9 +104,7 @@ namespace RosettaUI.UIToolkit.Builder
                     }
                 }
 
-
                 marginLeft /= ve.worldTransform.lossyScale.x; // ignore rotation
-
                 ve.style.minWidth = LayoutSettings.LabelWidth - marginLeft;
             }
         }
@@ -145,7 +143,7 @@ namespace RosettaUI.UIToolkit.Builder
             if (isFixedSize)
             {
                  veStyle.flexGrow = 0;
-                 veStyle.flexShrink = 1;
+                 veStyle.flexShrink = 0;
                  veStyle.minWidth = StyleKeyword.Auto;
                  veStyle.maxWidth = StyleKeyword.Auto;
                  veStyle.minHeight = StyleKeyword.Auto;
@@ -158,10 +156,10 @@ namespace RosettaUI.UIToolkit.Builder
             }
             
             static StyleLength ToStyleLength(float? nullable)
-                => (nullable is { } value) ? value : StyleKeyword.Null;
+                => nullable ?? (StyleLength)StyleKeyword.Null;
             
             static StyleColor ToStyleColor(Color? nullable)
-                => (nullable is { } value) ? value : StyleKeyword.Null;
+                => nullable ?? (StyleColor)StyleKeyword.Null;
         }
 
 

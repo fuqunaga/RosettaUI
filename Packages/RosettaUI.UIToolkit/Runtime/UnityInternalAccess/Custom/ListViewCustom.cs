@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+using System.Reflection;
 using UnityEngine;
-using UnityEngine.Pool;
+using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.UnityInternalAccess
@@ -19,35 +17,51 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
     /// </summary>
     public class ListViewCustom : ListView
     {
+#if UNITY_2022_1_OR_NEWER
+        private static FieldInfo _fieldInfo;
+
+        // Avoid error when IList item is ValueType
+        protected override CollectionViewController CreateViewController() => new ListViewControllerCustom();
+
+        private protected override void CreateVirtualizationController()
+        {
+            _fieldInfo ??= typeof(BaseVerticalCollectionView).GetField("m_VirtualizationController",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            
+            Assert.IsNotNull(_fieldInfo);
+            _fieldInfo.SetValue(this, new DynamicHeightVirtualizationControllerCustom(this));
+        }
+
+        private class DynamicHeightVirtualizationControllerCustom : DynamicHeightVirtualizationController<ReusableListViewItem>
+        {
+            public DynamicHeightVirtualizationControllerCustom(BaseVerticalCollectionView collectionView) : base(collectionView)
+            {
+            }
+
+            // 最後のアイテムをドラッグすると
+            // - ドラッグ中のアイテムは非表示扱い
+            // - 総アイテム数より表示アイテムが少ない
+            // →表示アイテムを追加
+            // となって無限にアイテムを追加してしまうのでドラッグ中のアイテムを非表示扱いにしない
+            // https://github.com/Unity-Technologies/UnityCsReference/blob/a6cadb936f3855ab7e5bd8e19d85af403d6802c6/ModuleOverrides/com.unity.ui/Core/Collections/Virtualization/VerticalVirtualizationController.cs#L35-L36
+            // https://github.com/Unity-Technologies/UnityCsReference/blob/67987ef0401fa681258a34e708085ec209c95373/ModuleOverrides/com.unity.ui/Core/Collections/Virtualization/DynamicHeightVirtualizationController.cs#L355-L360
+            protected override bool VisibleItemPredicate(ReusableListViewItem i)
+            {
+                return i.rootElement.style.display == DisplayStyle.Flex;
+            }
+        }
+#else
         public event Action itemsSourceSizeChanged;
 
-        public ListViewCustom(
-            IList itemsSource,
-            float itemHeight = ItemHeightUnset,
-            Func<VisualElement> makeItem = null,
-            Action<VisualElement, int> bindItem = null)
-            : base(itemsSource, itemHeight, makeItem, bindItem)
+        public ListViewCustom()
         {
-            viewController.itemsSourceSizeChanged += () => itemsSourceSizeChanged?.Invoke();
+            ((ListViewController)GetOrCreateViewController()).itemsSourceSizeChanged += () => itemsSourceSizeChanged?.Invoke();
             
             // disable scroll view
             scrollView.verticalScrollerVisibility = ScrollerVisibility.Hidden;
             scrollView.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
         }
 
-        /// <summary>
-        /// 外部でListのサイズが変更されたことを通知する
-        /// refs:
-        /// BaseListView.OnItemsSourceSizeChanged()
-        /// https://github.com/Unity-Technologies/UnityCsReference/blob/d0fe81a19ce788fd1d94f826cf797aafc37db8ea/ModuleOverrides/com.unity.ui/Core/Controls/BaseListView.cs#L420-L426
-        /// </summary>
-        public void OnListSizeChangedExternal()
-        {
-            if (itemsSource.IsFixedSize)
-                Rebuild();
-            else
-                RefreshItems();
-        }
 
         #region 画面外 Drag 対策 / サイズの異なるアイテムの移動でScrolViewの高さがおかしくなる対策
         
@@ -97,52 +111,12 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
 
         #endregion
 
-
-
+        
         #region Avoid error when IList item is ValueType
         
         private protected override void CreateViewController() => SetViewController(new ListViewControllerCustom());
 
-        class ListViewControllerCustom : ListViewController
-        {
-            private void EnsureItemSourceCanBeResized()
-            {
-                if (this.itemsSource.IsFixedSize && !this.itemsSource.GetType().IsArray)
-                    throw new InvalidOperationException("Cannot add or remove items from source, because its size is fixed.");
-            }
-
-            public override void AddItems(int itemCount)
-            {
-                this.EnsureItemSourceCanBeResized();
-                var count = this.itemsSource.Count;
-                var intList = CollectionPool<List<int>, int>.Get();
-                try
-                {
-                    var type = itemsSource.GetType();
-                    var itemType = ListUtility.GetItemType(type);
-                    for (var i = 0; i < itemCount; ++i)
-                    {
-                        itemsSource = ListUtility.AddItemAtLast(itemsSource, type, itemType);
-                        intList.Add(count + i);
-                    }
-
-
-                    this.RaiseItemsAdded((IEnumerable<int>) intList);
-                }
-                finally
-                {
-                    CollectionPool<List<int>, int>.Release(intList);
-                }
-                this.RaiseOnSizeChanged();
-                
-                // これがあるとアイテムをAddしたときにちらつく
-                // if (!this.itemsSource.IsFixedSize)
-                //     return;
-                
-                this.view.Rebuild();
-            }
-        }
-        
         #endregion
+#endif
     }
 }

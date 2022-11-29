@@ -14,19 +14,18 @@ namespace RosettaUI.UIToolkit.Builder
         {
             var itemContainerElement = (ListViewItemContainerElement) element;
             var option = itemContainerElement.option;
-
-            var listView = new ListViewCustom(itemContainerElement.GetIList(),
-                makeItem: () => new VisualElement(),
-                bindItem: BindItem
-            )
+            
+            var listView = new ListViewCustom()
             {
                 reorderable = option.reorderable,
                 reorderMode = option.reorderable ? ListViewReorderMode.Animated : ListViewReorderMode.Simple,
+                virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+                itemsSource = itemContainerElement.GetIList(),
                 // showFoldoutHeader = true,
                 showAddRemoveFooter = !option.fixedSize,
-                virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+                makeItem =() => new VisualElement(),
+                bindItem = BindItem,
             };
-            
 
             #region Callbacks
 
@@ -46,18 +45,25 @@ namespace RosettaUI.UIToolkit.Builder
             // ListView 内での参照先変更を通知
             listView.itemsSourceChanged += NotifyValueChanged;
 
+
             // ListView 内での要素数変更を通知（ListView 外での変更と区別するための処理）
+#if UNITY_2022_1_OR_NEWER
+            listView.viewController.itemsSourceSizeChanged += () =>
+#else
             listView.itemsSourceSizeChanged += () =>
+#endif
             {
                 lastListItemCount = listView.itemsSource.Count;
                 NotifyValueChanged();
             };
+
             
             itemContainerElement.onUpdate += _ =>
             {
                 var list = itemContainerElement.GetIList();
                 
                 // ListView 外での参照先変更を ListView に通知
+                // ReSharper disable once PossibleUnintendedReferenceComparison
                 if (listView.itemsSource != list)
                 {
                     listView.itemsSource = list;
@@ -74,7 +80,7 @@ namespace RosettaUI.UIToolkit.Builder
                     }
 
                     lastListItemCount = listItemCount;
-                    listView.OnListSizeChangedExternal();
+                    listView.RefreshItems();
                 }
             };
             
@@ -155,7 +161,7 @@ namespace RosettaUI.UIToolkit.Builder
                 ArrayPool<VisualElement>.Shared.Return(veArray);
                 
 
-                void ExecByPair<T, U>(IEnumerable<T> source, IEnumerable<U> destination, Action<T, U> action)
+                void ExecByPair<T0, T1>(IEnumerable<T0> source, IEnumerable<T1> destination, Action<T0, T1> action)
                 {
                     foreach (var (s, d) in source.Zip(destination, (s, d) => (s, d)))
                     {

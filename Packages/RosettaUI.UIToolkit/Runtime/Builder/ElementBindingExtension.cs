@@ -15,19 +15,19 @@ namespace RosettaUI.UIToolkit.Builder
             }
         }
 
-        public static void ListenValue<T>(this INotifyValueChanged<T> field, ReadOnlyValueElement<T> element)
+        public static void SubscribeValueOnUpdateCallOnce<T>(this in ReadOnlyValueElement<T>.ViewBridge viewBridge,  INotifyValueChanged<T> field)
         {
-            element.SubscribeValueOnUpdateCallOnce(field.SetValueWithoutNotifyIfNotEqual);
+            viewBridge.SubscribeValueOnUpdateCallOnce(field.SetValueWithoutNotifyIfNotEqual);
         }
 
         public static void ListenLabel<T>(this BaseField<T> field, LabelElement labelElement)
         {
-            labelElement.SubscribeValueOnUpdateCallOnce(str => field.label = str);
+            labelElement.GetViewBridge().SubscribeValueOnUpdateCallOnce(str => field.label = str);
         }
 
         public static void Bind<T>(this  BaseField<T> field, FieldBaseElement<T> element)
         {
-            field.ListenValue(element);
+            element.GetViewBridge().SubscribeValueOnUpdateCallOnce(field);
             field.RegisterValueChangedCallback(evt => element.OnViewValueChanged(evt.newValue));
 
             // ラベルのChangeEventを潰しておく
@@ -42,7 +42,7 @@ namespace RosettaUI.UIToolkit.Builder
             Func<TFieldValue, TElementValue> fieldValueToElementValue
         )
         {
-            element.SubscribeValueOnUpdateCallOnce(v => field.SetValueWithoutNotifyIfNotEqual(elementValueToFieldValue(v)));
+            element.GetViewBridge().SubscribeValueOnUpdateCallOnce(v => field.SetValueWithoutNotifyIfNotEqual(elementValueToFieldValue(v)));
             field.RegisterValueChangedCallback(evt => element.OnViewValueChanged(fieldValueToElementValue(evt.newValue)));
         }
     }

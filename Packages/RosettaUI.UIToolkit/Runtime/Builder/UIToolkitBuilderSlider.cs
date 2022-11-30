@@ -56,7 +56,7 @@ namespace RosettaUI.UIToolkit.Builder
             }
             
 
-            sliderElement.SubscribeValueOnUpdateCallOnce(minMax =>
+            sliderElement.GetViewBridge().SubscribeValueOnUpdateCallOnce(minMax =>
                 {
                     var min = toFloat(minMax.min);
                     var max = toFloat(minMax.max);

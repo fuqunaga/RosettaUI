@@ -10,7 +10,7 @@ namespace RosettaUI.UIToolkit.Builder
             var helpBoxElement = (HelpBoxElement) element;
         
             var helpBox = new HelpBox(null, GetHelpBoxMessageType(helpBoxElement.helpBoxType));
-            helpBoxElement.label.SubscribeValueOnUpdateCallOnce(str => helpBox.text = str);
+            helpBoxElement.label.GetViewBridge().SubscribeValueOnUpdateCallOnce(str => helpBox.text = str);
 
             return helpBox;
 

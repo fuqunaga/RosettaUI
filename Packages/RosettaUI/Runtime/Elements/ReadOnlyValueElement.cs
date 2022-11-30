@@ -28,24 +28,32 @@ namespace RosettaUI
                 listenValue?.Invoke(getter.Get());
             }
         }
-    }
-    
-    
 
-    public static class ReadOnlyValueElementSubscribe
-    {
-        public static void SubscribeValueOnUpdateCallOnce<T>(this ReadOnlyValueElement<T> me, Action<T> action)
+        private void ClearListenValue() => listenValue = null;
+
+        public ViewBridge GetViewBridge() => new(this);
+
+        public readonly struct ViewBridge
         {
-            action?.Invoke(me.Value);
-            me.SubscribeValueOnUpdate(action);
-        }
-        
-        public static void SubscribeValueOnUpdate<T>(this ReadOnlyValueElement<T>me, Action<T> action)
-        {
-            if (!me.IsConst)
+            private readonly ReadOnlyValueElement<T> _element;
+            public ViewBridge(ReadOnlyValueElement<T> element) => _element = element;
+
+            public void SubscribeValueOnUpdateCallOnce(Action<T> action)
             {
-                me.listenValue += action;
+                if (action == null) return;
+                action.Invoke(_element.Value);
+                SubscribeValueOnUpdate(action);
             }
+
+            public void SubscribeValueOnUpdate(Action<T> action)
+            {
+                if (action != null && !_element.IsConst)
+                {
+                    _element.listenValue += action;
+                }
+            }
+
+            public void UnsubscribeAll() => _element.ClearListenValue();
         }
     }
 }

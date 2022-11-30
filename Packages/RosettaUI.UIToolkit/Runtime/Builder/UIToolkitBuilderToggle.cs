@@ -10,7 +10,7 @@ namespace RosettaUI.UIToolkit.Builder
             var toggle = Build_Field<bool, Toggle>(element, !toggleElement.isLabelRight);
             if (toggleElement.isLabelRight)
             {
-                toggleElement.label?.SubscribeValueOnUpdateCallOnce(text => toggle.text = text);
+                toggleElement.label?.GetViewBridge().SubscribeValueOnUpdateCallOnce(text => toggle.text = text);
             }
 
             return toggle;

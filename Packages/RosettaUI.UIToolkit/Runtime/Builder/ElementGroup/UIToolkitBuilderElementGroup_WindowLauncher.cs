@@ -20,7 +20,7 @@ namespace RosettaUI.UIToolkit.Builder
             toggle.RegisterCallback<PointerUpEvent>(OnPointUpEventFirst);
 
             var labelElement = launcherElement.label;
-            labelElement?.SubscribeValueOnUpdateCallOnce(v => toggle.text = v);
+            labelElement?.GetViewBridge().SubscribeValueOnUpdateCallOnce(v => toggle.text = v);
 
             ApplyMinusIndentIfPossible(toggle, element);
             

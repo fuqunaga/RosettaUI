@@ -26,7 +26,7 @@ namespace RosettaUI.UIToolkit.Builder
                 }
             };
 
-            imageElement.SubscribeValueOnUpdateCallOnce(tex => ve.image = tex);
+            imageElement.GetViewBridge().SubscribeValueOnUpdateCallOnce(tex => ve.image = tex);
             
             return ve;
         }
@@ -38,7 +38,7 @@ namespace RosettaUI.UIToolkit.Builder
 
             var button = new Button(buttonElement.OnClick);
 
-            button.ListenValue(buttonElement);
+            buttonElement.GetViewBridge().SubscribeValueOnUpdateCallOnce(button);
             // buttonElement.SubscribeValueOnUpdate(str => button.text = str);
 
             return button;

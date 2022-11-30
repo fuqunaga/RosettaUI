@@ -35,7 +35,7 @@ namespace RosettaUI.UGUI.Builder
             
             if (!dropdownElement.IsConst)
             {
-                dropdownElement.SubscribeValueOnUpdate(v => dropdown.value = v);
+                dropdownElement.GetViewBridge().SubscribeValueOnUpdate(v => dropdown.value = v);
             }
             
             SubscribeInteractable(element, dropdown, dropdown.captionText);

@@ -9,6 +9,8 @@ namespace RosettaUI
     {
         public readonly IGetter<T> getter;
         internal event Action<T> listenValue;
+
+        private ReadOnlyValueViewBridgeBase _viewBridgeBase;
         
         public T Value => getter.Get();
         
@@ -31,29 +33,42 @@ namespace RosettaUI
 
         private void ClearListenValue() => listenValue = null;
 
-        public ViewBridge GetViewBridge() => new(this);
+        protected override ElementViewBridge CreateViewBridge() => new ReadOnlyValueViewBridgeBase(this);
 
-        public readonly struct ViewBridge
+        public class ReadOnlyValueViewBridgeBase : ElementViewBridge
         {
-            private readonly ReadOnlyValueElement<T> _element;
-            public ViewBridge(ReadOnlyValueElement<T> element) => _element = element;
+            private ReadOnlyValueElement<T> Element => (ReadOnlyValueElement<T>)element;
+            
+            public ReadOnlyValueViewBridgeBase(ReadOnlyValueElement<T> element) : base(element)
+            {
+            }
 
             public void SubscribeValueOnUpdateCallOnce(Action<T> action)
             {
                 if (action == null) return;
-                action.Invoke(_element.Value);
+                action.Invoke(Element.Value);
                 SubscribeValueOnUpdate(action);
             }
 
             public void SubscribeValueOnUpdate(Action<T> action)
             {
-                if (action != null && !_element.IsConst)
+                if (action != null && !Element.IsConst)
                 {
-                    _element.listenValue += action;
+                    Element.listenValue += action;
                 }
             }
 
-            public void UnsubscribeAll() => _element.ClearListenValue();
+            public override void UnsubscribeAll()
+            {
+                base.UnsubscribeAll();
+                Element.ClearListenValue();
+            } 
         }
+    }
+    
+        
+    public static partial class ElementViewBridgeExtensions
+    {
+        public static ReadOnlyValueElement<T>.ReadOnlyValueViewBridgeBase GetViewBridge<T>(this ReadOnlyValueElement<T> element) => (ReadOnlyValueElement<T>.ReadOnlyValueViewBridgeBase)element.ViewBridge;
     }
 }

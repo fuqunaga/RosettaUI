@@ -15,24 +15,31 @@ namespace RosettaUI.UIToolkit.Builder
             }
         }
 
-        public static void SubscribeValueOnUpdateCallOnce<T>(this in ReadOnlyValueElement<T>.ViewBridge viewBridge,  INotifyValueChanged<T> field)
+        // Subscribe element -> field
+        public static void SubscribeValueOnUpdateCallOnce<T>(this ReadOnlyValueElement<T> element, INotifyValueChanged<T> field)
         {
-            viewBridge.SubscribeValueOnUpdateCallOnce(field.SetValueWithoutNotifyIfNotEqual);
+            element.GetViewBridge().SubscribeValueOnUpdateCallOnce(field.SetValueWithoutNotifyIfNotEqual);
+        }
+        
+        // Subscribe field -> element
+        private static void Subscribe<TValue>(this BaseField<TValue> field, FieldBaseElement<TValue> element)
+        {
+            var viewBridge = element.GetViewBridge();
+            
+            field.RegisterValueChangedCallback(OnValueChanged);
+            viewBridge.onUnsubscribe += () => field?.UnregisterValueChangedCallback(OnValueChanged);
+
+            void OnValueChanged(ChangeEvent<TValue> evt)
+            {
+                viewBridge.SetValueFromView(evt.newValue);
+            }
         }
 
-        public static void ListenLabel<T>(this BaseField<T> field, LabelElement labelElement)
+        // Subscribe element <-> field
+        public static void Bind<T>(this FieldBaseElement<T> element, BaseField<T> field)
         {
-            labelElement.GetViewBridge().SubscribeValueOnUpdateCallOnce(str => field.label = str);
-        }
-
-        public static void Bind<T>(this  BaseField<T> field, FieldBaseElement<T> element)
-        {
-            element.GetViewBridge().SubscribeValueOnUpdateCallOnce(field);
-            field.RegisterValueChangedCallback(evt => element.OnViewValueChanged(evt.newValue));
-
-            // ラベルのChangeEventを潰しておく
-            // fieldが BaseField<string> だとラベルのChangeEventを受け取ってしまうのでそれを止める
-            field.labelElement.RegisterValueChangedCallback(evt => evt.StopPropagation());
+            element.SubscribeValueOnUpdateCallOnce(field);
+            field.Subscribe(element);
         }
 
         public static void Bind<TFieldValue, TElementValue>(
@@ -42,8 +49,10 @@ namespace RosettaUI.UIToolkit.Builder
             Func<TFieldValue, TElementValue> fieldValueToElementValue
         )
         {
-            element.GetViewBridge().SubscribeValueOnUpdateCallOnce(v => field.SetValueWithoutNotifyIfNotEqual(elementValueToFieldValue(v)));
-            field.RegisterValueChangedCallback(evt => element.OnViewValueChanged(fieldValueToElementValue(evt.newValue)));
+            var viewBridge = element.GetViewBridge();
+            
+            viewBridge.SubscribeValueOnUpdateCallOnce(v => field.SetValueWithoutNotifyIfNotEqual(elementValueToFieldValue(v)));
+            field.RegisterValueChangedCallback(evt => viewBridge.SetValueFromView(fieldValueToElementValue(evt.newValue)));
         }
     }
 }

@@ -72,7 +72,7 @@ namespace RosettaUI.UIToolkit.Builder
                 var min = toValue(vec2.x);
                 var max = toValue(vec2.y);
                 
-                sliderElement.OnViewValueChanged(MinMax.Create(min, max));
+                sliderElement.GetViewBridge().SetValueFromView(MinMax.Create(min, max));
                 UpdateMinMaxTextField(min, max);
             });
 

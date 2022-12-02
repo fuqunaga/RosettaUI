@@ -36,6 +36,11 @@ namespace RosettaUI.Builder
             return false;
         }
 
+        public static bool IsPrefix(this LabelElement label)
+        {
+            return label.labelType == LabelType.Prefix && label.IsMostLeftLabel();
+        }
+
         public static bool IsMostLeftLabel(this LabelElement element)
         {
             for (Element e = element;

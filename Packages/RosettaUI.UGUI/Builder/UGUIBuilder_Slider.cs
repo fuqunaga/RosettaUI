@@ -1,5 +1,6 @@
 ﻿using RosettaUI.Reactive;
 using System;
+using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,8 +24,8 @@ namespace RosettaUI.UGUI.Builder
 
             slider.onValueChanged.AddListener((f) =>
             {
-                inputFieldUI.SetTextWithoutNotify(f.ToString());
-                sliderElement.OnViewValueChanged(Mathf.RoundToInt(f));
+                inputFieldUI.SetTextWithoutNotify(f.ToString(CultureInfo.InvariantCulture));
+                sliderElement.GetViewBridge().SetValueFromView(Mathf.RoundToInt(f));
             });
 
             if (!sliderElement.IsMinConst)
@@ -81,8 +82,8 @@ namespace RosettaUI.UGUI.Builder
             slider.onValueChanged.AddListener((sliderValue) =>
             {
                 var f = sliderToField(sliderValue);
-                inputFieldUI.SetTextWithoutNotify(f.ToString());
-                sliderElement.OnViewValueChanged(f);
+                inputFieldUI.SetTextWithoutNotify(f.ToString(CultureInfo.InvariantCulture));
+                sliderElement.GetViewBridge().SetValueFromView(f);
             });
 
             if (!sliderElement.IsMinConst)

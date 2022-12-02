@@ -19,7 +19,7 @@ namespace RosettaUI.UIToolkit.Builder
             toggle.AddToClassList(UssClassName.WindowLauncher);
             toggle.RegisterCallback<PointerUpEvent>(OnPointUpEventFirst);
 
-            var labelElement = launcherElement.label;
+            var labelElement = launcherElement.Label;
             labelElement?.GetViewBridge().SubscribeValueOnUpdateCallOnce(v => toggle.text = v);
 
             ApplyMinusIndentIfPossible(toggle, element);

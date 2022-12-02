@@ -10,17 +10,37 @@ namespace RosettaUI.Builder
     public abstract class BuilderBase<TUIObj>
     {
         protected abstract IReadOnlyDictionary<Type, Func<Element, TUIObj>> BuildFuncTable { get; }
-        readonly Dictionary<Element, TUIObj> _elementToUIObj = new();
-
+        private readonly Dictionary<Element, TUIObj> _elementToUIObj = new();
+        private readonly Dictionary<TUIObj, Element> _uiObjToElement = new();
+        
         public TUIObj GetUIObj(Element element)
         {
             _elementToUIObj.TryGetValue(element, out var uiObj);
             return uiObj;
         }
 
-        protected void RegisterUIObj(Element element, TUIObj uiObj) => _elementToUIObj[element] = uiObj;
-        protected void UnregisterUIObj(Element element) => _elementToUIObj.Remove(element);
+        public Element GetElement(TUIObj uiObj)
+        {
+            _uiObjToElement.TryGetValue(uiObj, out var element);
+            return element;
+        }
 
+        protected void RegisterUIObj(Element element, TUIObj uiObj)
+        {
+            _elementToUIObj[element] = uiObj;
+            _uiObjToElement[uiObj] = element;
+        }
+
+        protected void UnregisterUIObj(Element element)
+        {
+            _elementToUIObj.Remove(element);
+
+            var uiObj = GetUIObj(element);
+            if (uiObj != null)
+            {
+                _uiObjToElement.Remove(uiObj);
+            }
+        }
 
         protected TUIObj BuildInternal(Element element)
         {
@@ -31,6 +51,7 @@ namespace RosettaUI.Builder
                 {
                     uiObj = func(element);
                     SetupUIObj(element, uiObj);
+                    SetPersistantCallback(element);
                 }
                 else
                 {
@@ -44,32 +65,50 @@ namespace RosettaUI.Builder
         protected virtual void SetupUIObj(Element element, TUIObj uiObj)
         {
             RegisterUIObj(element, uiObj);
-
             SetDefaultCallbacks(element, uiObj);
-            
-            if (element is LabelElement {labelType: LabelType.Prefix} label && label.IsMostLeftLabel())
-            {
-                CalcPrefixLabelWidthWithIndent(label, uiObj);
-            }
+        }
+
+        protected virtual void TeardownUIObj(Element element)
+        {
+            UnregisterUIObj(element);
+            element.GetViewBridge().UnsubscribeAll();
         }
 
 
         protected abstract void CalcPrefixLabelWidthWithIndent(LabelElement label, TUIObj uiObj);
-        
-        protected virtual void SetDefaultCallbacks(Element element, TUIObj uiObj)
+
+
+        protected virtual void SetPersistantCallback(Element element)
         {
-            element.enableRx.SubscribeAndCallOnce((enable) => OnElementEnableChanged(element, uiObj, enable));
-            element.interactableRx.SubscribeAndCallOnce((interactable) =>
-                OnElementInteractableChanged(element, uiObj, interactable));
-            element.Style.SubscribeAndCallOnce((style) => OnElementStyleChanged(element, uiObj, style));
             element.onDestroy += OnDestroyElement;
 
             if (element is DynamicElement dynamicElement)
             {
                 dynamicElement.RegisterBuildUI(OnRebuildElementGroupChildren);
+            } 
+        }
+        
+        protected virtual void SetDefaultCallbacks(Element element, TUIObj uiObj)
+        {
+            var enableUnsubscribe = element.enableRx.SubscribeAndCallOnce((enable) => OnElementEnableChanged(element, uiObj, enable));
+            var interactableUnsubscribe = element.interactableRx.SubscribeAndCallOnce((interactable) => OnElementInteractableChanged(element, uiObj, interactable));
+            var styleUnsubscribe =  element.Style.SubscribeAndCallOnce((style) => OnElementStyleChanged(element, uiObj, style));
+
+            var viewBridge = element.GetViewBridge();
+            viewBridge.onUnsubscribe += () =>
+            {
+                enableUnsubscribe.Dispose();
+                interactableUnsubscribe.Dispose();
+                styleUnsubscribe.Dispose();
+            };
+            
+                        
+            if (element is LabelElement label && label.IsPrefix())
+            {
+                CalcPrefixLabelWidthWithIndent(label, uiObj);
             }
         }
-
+        
         protected abstract void OnElementEnableChanged(Element element, TUIObj uiObj, bool enable);
         protected abstract void OnElementInteractableChanged(Element element, TUIObj uiObj, bool interactable);
         protected abstract void OnElementStyleChanged(Element element, TUIObj uiObj, Style style);

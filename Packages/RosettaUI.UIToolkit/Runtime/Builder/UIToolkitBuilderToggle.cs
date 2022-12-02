@@ -4,16 +4,20 @@ namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        private VisualElement Build_Toggle(Element element)
+        private bool Bind_Toggle(Element element, VisualElement visualElement)
         {
-            var toggleElement = (ToggleElement) element;
-            var toggle = Build_Field<bool, Toggle>(element, !toggleElement.isLabelRight);
-            if (toggleElement.isLabelRight)
-            {
-                toggleElement.label?.GetViewBridge().SubscribeValueOnUpdateCallOnce(text => toggle.text = text);
-            }
+            if (element is not ToggleElement toggleElement || visualElement is not Toggle toggle) return false;
 
-            return toggle;
+            Bind_Field(toggleElement, toggle, !toggleElement.isLabelRight);
+
+            // SetupFieldLabel()のtoggle.text版
+            // toggle.labelはチェックボックスの左、toggle.textは右
+            if (toggleElement.isLabelRight&& toggleElement.Label is {} label)
+            {
+                label.GetViewBridge().SubscribeValueOnUpdateCallOnce(text => toggle.text = text);
+            }
+            
+            return true;
         }
     }
 }

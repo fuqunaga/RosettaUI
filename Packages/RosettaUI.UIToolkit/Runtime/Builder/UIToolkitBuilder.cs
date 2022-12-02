@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using RosettaUI.Builder;
 using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 
 #if UNITY_2022_1_OR_NEWER
@@ -23,7 +24,7 @@ namespace RosettaUI.UIToolkit.Builder
         {
             return Instance.BuildInternal(element);
         }
-        
+
         #endregion
 
 
@@ -47,13 +48,14 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(WindowElement)] = Build_Window,
                 [typeof(WindowLauncherElement)] = Build_WindowLauncher,
 
-                [typeof(LabelElement)] = Build_Label,
                 [typeof(IntFieldElement)] = Build_Field<int, IntegerField>,
                 [typeof(UIntFieldElement)] = Build_Field<uint, UIntField>,
                 [typeof(FloatFieldElement)] = Build_Field<float, FloatField>,
-                [typeof(TextFieldElement)] = Build_TextField,
-                [typeof(ToggleElement)] = Build_Toggle,
-                [typeof(ColorFieldElement)] = Build_ColorField,
+                [typeof(TextFieldElement)] = (e) => Build_Field<string, TextField>(e, Bind_TextField),
+                [typeof(ColorFieldElement)] = (e) => Build_Field<Color, ColorField>(e, Bind_ColorField),
+
+                [typeof(LabelElement)] = Build_Label,
+                [typeof(ToggleElement)] = (e) => Build_Field<bool, Toggle>(e, Bind_Toggle),
                 
                 [typeof(IntSliderElement)] = Build_Slider<int, ClampFreeSliderInt>,
                 [typeof(FloatSliderElement)] = Build_Slider<float, ClampFreeSlider>,
@@ -67,6 +69,19 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(PopupMenuElement)] = Build_PopupElement,
                 [typeof(ListViewItemContainerElement)] = Build_ListViewItemContainer
             };
+            
+            
+            BindFuncTable = new()
+            {
+                [typeof(IntFieldElement)] = Bind_Field<int, IntegerField>,
+                [typeof(UIntFieldElement)] = Bind_Field<uint, UIntField>,
+                [typeof(FloatFieldElement)] = Bind_Field<float, FloatField>,
+                [typeof(TextFieldElement)] =  Bind_TextField,
+                [typeof(ColorFieldElement)] = Bind_ColorField,
+                
+                [typeof(LabelElement)] = Bind_Label,
+                [typeof(ToggleElement)] = Bind_Toggle,
+            };
         }
 
         public void RegisterBuildFunc(Type type, Func<Element, VisualElement> func) => _buildFuncTable[type] = func;
@@ -75,12 +90,70 @@ namespace RosettaUI.UIToolkit.Builder
 
         protected override IReadOnlyDictionary<Type, Func<Element, VisualElement>> BuildFuncTable => _buildFuncTable;
 
+        private Dictionary<Type, Func<Element, VisualElement, bool>> BindFuncTable { get; }
 
+        /// <summary>
+        /// 既存のVisualElementを新たなElementと紐づける
+        /// VisualElementの構成が一致していなければ return false
+        /// </summary>
+        /// <returns>success flag</returns>
+        public bool Bind(Element element, VisualElement ve)
+        {
+            if (element == null) return false;
+            
+            // 親なしはとりあえず禁止
+            // 新Elementを旧Elementのヒエラルキー上に入れ忘れ防止
+            // PrefixLabelの幅計算で正しい親が必要
+            Assert.IsNotNull(element.Parent);
+                
+            Unbind(element);
+            var prevElement = GetElement(ve);
+            if (prevElement != null)
+            {
+                Unbind(prevElement);
+            }
+
+            if (!BindFuncTable.TryGetValue(element.GetType(), out var func))
+            {
+                Debug.LogError($"{GetType()}: Unknown Type[{element.GetType()}].");
+                return false;
+            }
+
+            if (!func.Invoke(element, ve)) return false;
+
+            SetupUIObj(element, ve);
+            
+            return true;
+        }
+
+        public void Unbind(Element element)
+        {
+            foreach (var child in element.Children)
+            {
+                Unbind(child);
+            }
+            TeardownUIObj(element);
+        }
+
+
+        // プレフィックスラベルの幅を計算する
         protected override void CalcPrefixLabelWidthWithIndent(LabelElement label, VisualElement ve)
         {
-            // 表示前にラベルの幅を計算する
-            ve.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            // すでにパネルにアタッチされている＝Build時ではなくBind時
+            // レイアウト計算が終わってるはずなので即計算する
+            if (ve.panel != null)
+            {
+                CalcMinWidth();
+                Debug.Log("OnBind");
+            }
+            // Build時はまだレイアウト計算が終わっていないのでGeometryChangedを待つ
+            else
+            {
+                ve.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+                Debug.Log("OnBuild");
+            }
 
+            // リストの要素など１回目のあとにレイアウト変更がされるので落ち着くまで複数回呼ばれるようにする
             void OnGeometryChanged(GeometryChangedEvent evt)
             {
                 // 移動してなければ落ち着いたと見てコールバック解除
@@ -89,6 +162,16 @@ namespace RosettaUI.UIToolkit.Builder
                 {
                     ve.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
                     return;
+                }
+
+                CalcMinWidth();
+            }
+
+            void CalcMinWidth()
+            {
+                if (label.Parent == null)
+                {
+                    Debug.LogWarning($"Label parent is null. [{label.Value}]");
                 }
 
                 var marginLeft = ve.worldBound.xMin;

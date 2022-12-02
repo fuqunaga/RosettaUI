@@ -38,7 +38,7 @@ namespace RosettaUI.UIToolkit.Builder
 
             var button = new Button(buttonElement.OnClick);
 
-            buttonElement.GetViewBridge().SubscribeValueOnUpdateCallOnce(button);
+            buttonElement.SubscribeValueOnUpdateCallOnce(button);
             // buttonElement.SubscribeValueOnUpdate(str => button.text = str);
 
             return button;

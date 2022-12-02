@@ -26,6 +26,7 @@ namespace RosettaUI
         public event Action onViewValueChanged;
         public event Action<Element, bool> onDestroy;
 
+        private ElementViewBridge _viewBridge;
 
         public bool Enable
         {
@@ -43,7 +44,7 @@ namespace RosettaUI
         
         public Element Parent { get; private set; }
 
-        public void SetParent(Element element)
+        private void SetParent(Element element)
         {
             this.ValidateSingleParent();
             Parent = element;
@@ -51,7 +52,7 @@ namespace RosettaUI
 
         protected void AddChild(Element element)
         {
-            _children.Add(element);
+            _children.AddLast(element);
             element.SetParent(this);
         }
 
@@ -101,5 +102,31 @@ namespace RosettaUI
             onViewValueChanged?.Invoke();
             Parent?.NotifyViewValueChanged();
         }
+        
+        
+        /// <summary>
+        /// Interface for UI library
+        /// </summary>
+        internal ElementViewBridge ViewBridge => _viewBridge ??= CreateViewBridge();
+
+        protected virtual ElementViewBridge CreateViewBridge() => new(this);
+
+        public class ElementViewBridge
+        {
+            public event Action onUnsubscribe;
+            protected readonly Element element;
+
+            public ElementViewBridge(Element element) => this.element = element;
+
+            public virtual void UnsubscribeAll()
+            {
+                onUnsubscribe?.Invoke();
+            } 
+        }
+    }
+    
+    public static partial class ElementViewBridgeExtensions
+    {
+        public static Element.ElementViewBridge GetViewBridge(this Element element) => element.ViewBridge;
     }
 }

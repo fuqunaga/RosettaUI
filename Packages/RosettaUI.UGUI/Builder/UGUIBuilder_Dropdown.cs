@@ -31,7 +31,7 @@ namespace RosettaUI.UGUI.Builder
 
             dropdown.options = dropdownElement.options?.Select(str => new TMP_Dropdown.OptionData(str)).ToList();
 
-            dropdown.onValueChanged.AddListener(dropdownElement.OnViewValueChanged);
+            dropdown.onValueChanged.AddListener(dropdownElement.GetViewBridge().SetValueFromView);
             
             if (!dropdownElement.IsConst)
             {

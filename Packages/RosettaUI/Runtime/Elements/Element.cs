@@ -1,6 +1,7 @@
 ﻿using RosettaUI.Reactive;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RosettaUI
 {
@@ -12,8 +13,8 @@ namespace RosettaUI
     /// </summary>
     public abstract class Element
     {
-        private readonly List<Element> _children = new();
-        public IReadOnlyList<Element> Children => _children;
+        private readonly LinkedList<Element> _children = new();
+        public IEnumerable<Element> Children => _children;
 
 
         public readonly ReactiveProperty<bool> enableRx = new(true);
@@ -70,23 +71,29 @@ namespace RosettaUI
             onUpdate?.Invoke(this);
             foreach(var e in _children) e.Update();
         }
-
-        protected void DestroyChildren(bool isDestroyRoot)
-        {
-            foreach (var child in _children)
-            {
-                child.Parent = null;
-                child.Destroy(isDestroyRoot);
-            }
-            _children.Clear();
-        }
         
-        public virtual void Destroy(bool isDestroyRoot = true)
+        public void Destroy(bool isDestroyRoot = true)
         {
             onDestroy?.Invoke(this, isDestroyRoot);
-            Parent?.RemoveChild(this);
-            
             DestroyChildren(false);
+
+            // Element.Childrenは追加削除できない親と一体化した要素も含む
+            // 追加削除できるものはElementGroupのContentsなので削除
+            if (Parent is ElementGroup)
+            {
+                Parent.RemoveChild(this);
+            }
+        }
+
+        public void DestroyChildren(bool isDestroyRoot = true)
+        {
+            var node = _children.First;
+            while(node != null)
+            {
+                var next = node.Next;
+                node.Value.Destroy(isDestroyRoot);
+                node = next;
+            }
         }
 
         public void NotifyViewValueChanged()

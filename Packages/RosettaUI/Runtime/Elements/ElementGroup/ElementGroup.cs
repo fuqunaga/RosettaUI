@@ -4,7 +4,7 @@ using System.Linq;
 namespace RosettaUI
 {
     /// <summary>
-    /// 子供として任意の Element を持てる Element
+    /// 任意のElementを子供に持てるElement
     /// </summary>
     public abstract class ElementGroup : Element
     {

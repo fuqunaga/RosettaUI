@@ -31,15 +31,17 @@ namespace RosettaUI.Builder
             _uiObjToElement[uiObj] = element;
         }
 
-        protected void UnregisterUIObj(Element element)
+        protected TUIObj UnregisterUIObj(Element element)
         {
-            _elementToUIObj.Remove(element);
-
             var uiObj = GetUIObj(element);
             if (uiObj != null)
             {
                 _uiObjToElement.Remove(uiObj);
             }
+            
+            _elementToUIObj.Remove(element);
+
+            return uiObj;
         }
 
         protected TUIObj BuildInternal(Element element)
@@ -68,10 +70,10 @@ namespace RosettaUI.Builder
             SetDefaultCallbacks(element, uiObj);
         }
 
-        protected virtual void TeardownUIObj(Element element)
+        protected virtual TUIObj TeardownUIObj(Element element)
         {
-            UnregisterUIObj(element);
             element.GetViewBridge().UnsubscribeAll();
+            return UnregisterUIObj(element);
         }
 
 

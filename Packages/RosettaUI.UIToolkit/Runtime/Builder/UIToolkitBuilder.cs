@@ -38,11 +38,12 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(DynamicElement)] = Build_DynamicElement,
                 [typeof(FoldElement)] = Build_Fold,
                 [typeof(HelpBoxElement)] = Build_HelpBox,
-                [typeof(IndentElement)] = Build_Indent,
-                [typeof(RowElement)] = Build_Row,
-                [typeof(ColumnElement)] = Build_Column,
-                [typeof(PageElement)] = Build_Column,
-                [typeof(BoxElement)] = Build_Box,
+                [typeof(RowElement)] = Build_ElementGroup<RowElement, Row>,
+                [typeof(ColumnElement)] = Build_ElementGroup<ColumnElement, Column>,
+                [typeof(BoxElement)] = Build_ElementGroup<BoxElement, Box>,
+                [typeof(IndentElement)] = Build_ElementGroup<IndentElement, Indent>,
+                [typeof(PageElement)] = Build_ElementGroup<PageElement, Column>,
+                
                 [typeof(ScrollViewElement)] = Build_ScrollView,
                 [typeof(TabsElement)] = Build_Tabs,
                 [typeof(WindowElement)] = Build_Window,
@@ -73,7 +74,11 @@ namespace RosettaUI.UIToolkit.Builder
             
             BindFuncTable = new()
             {
-                [typeof(RowElement)] = Bind_Row,
+                [typeof(RowElement)] = Bind_ElementGroup<RowElement, Row>,
+                [typeof(ColumnElement)] = Bind_ElementGroup<ColumnElement, Column>,
+                [typeof(BoxElement)] = Bind_ElementGroup<BoxElement, Box>,
+                [typeof(IndentElement)] = Bind_ElementGroup<IndentElement, Indent>,
+                [typeof(PageElement)] = Bind_ElementGroup<PageElement, Column>,
                 
                 [typeof(IntFieldElement)] = Bind_Field<int, IntegerField>,
                 [typeof(UIntFieldElement)] = Bind_Field<uint, UIntField>,
@@ -115,26 +120,35 @@ namespace RosettaUI.UIToolkit.Builder
                 Unbind(prevElement);
             }
 
+            // BindFunc内でGetUIObj()をしたいので先に登録しておく
+            // プレフィックスラベルの幅を求める計算がBuild時はコールバックで呼ばれるのでBuild後で済むが、
+            // Bind時は異なる幅でレイアウト処理まで行くと重たいのですぐに幅を計算して元通りにしておきたい
+            // したがってBindFunc内でGetUIObj()できるように先にSetupUIObj()を呼んでおく
+            SetupUIObj(element, ve);
+            
             if (!BindFuncTable.TryGetValue(element.GetType(), out var func))
             {
                 Debug.LogError($"{GetType()}: Unknown Type[{element.GetType()}].");
                 return false;
             }
 
-            if (!func.Invoke(element, ve)) return false;
+            if (!func.Invoke(element, ve))
+            {
+                TeardownUIObj(element);
+                return false;
+            }
 
-            SetupUIObj(element, ve);
             
             return true;
         }
 
-        public void Unbind(Element element)
+        public VisualElement Unbind(Element element)
         {
             foreach (var child in element.Children)
             {
                 Unbind(child);
             }
-            TeardownUIObj(element);
+            return TeardownUIObj(element);
         }
 
 
@@ -256,25 +270,22 @@ namespace RosettaUI.UIToolkit.Builder
         protected override void OnDestroyViewElement(Element element, bool isDestroyRoot)
         {
             var ve = GetUIObj(element);
+            Unbind(element);   
             
             if (isDestroyRoot)
             {
                 ve?.RemoveFromHierarchy();
             }
-
-            Unbind(element);   
         }
 
         private static class UssClassName
         {
             private static readonly string RosettaUI = "rosettaui";
             
-            public static readonly string Column = RosettaUI + "-column";
             public static readonly string WindowLauncher = RosettaUI + "-window-launcher";
             public static readonly string MinMaxSlider = RosettaUI + "-min-max-slider";
             public static readonly string Space = RosettaUI + "-space";
             public static readonly string DynamicElement = RosettaUI + "-dynamic-element";
-            public static readonly string IndentElement = RosettaUI + "-indent";
         }
     }
 }

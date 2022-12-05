@@ -4,15 +4,13 @@ namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        VisualElement Build_Indent(Element element)
+        private bool Bind_Indent(Element element, VisualElement visualElement)
         {
-            var indentElement = (IndentElement) element;
+            if (element is not IndentElement indentElement || visualElement is not Indent indent) return false;
+            
+            ApplyIndent(indent, indentElement.level);
 
-            var ve = new VisualElement();
-            ve.AddToClassList(UssClassName.IndentElement);
-            ApplyIndent(ve, indentElement.level);
-
-            return Build_ElementGroupContents(ve, element);
+            return Bind_ElementGroupContents(indentElement, indent);
         }
     }
 }

@@ -68,11 +68,11 @@ namespace RosettaUI.UIToolkit.Builder
             return container;
         }
 
-        private bool Bind_ElementGroupContents(Element element, VisualElement visualElement,
+        // ElementGroupのBind
+        // visualElementの子供にBindできない場合はBuildで生成する
+        private bool Bind_ElementGroupContents(ElementGroup elementGroup, VisualElement visualElement,
             Action<Element, VisualElement, int> bindChild = null)
         {
-            if (element is not ElementGroup elementGroup) return false;
-
             var contentCount = elementGroup.Contents.Count();
             var visualElementCount = visualElement.childCount;
 

@@ -1,6 +1,6 @@
 ﻿using UnityEngine.UIElements;
 
-namespace RosettaUI.UIToolkit.Builder
+namespace RosettaUI.UIToolkit
 {
     /// <summary>
     /// 複数のField要素からなる複合Field

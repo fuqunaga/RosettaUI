@@ -73,6 +73,8 @@ namespace RosettaUI.UIToolkit.Builder
             
             BindFuncTable = new()
             {
+                [typeof(RowElement)] = Bind_Row,
+                
                 [typeof(IntFieldElement)] = Bind_Field<int, IntegerField>,
                 [typeof(UIntFieldElement)] = Bind_Field<uint, UIntField>,
                 [typeof(FloatFieldElement)] = Bind_Field<float, FloatField>,
@@ -251,7 +253,7 @@ namespace RosettaUI.UIToolkit.Builder
             Build_ElementGroupContents(groupVe, elementGroup);
         }
 
-        protected override void OnDestroyElement(Element element, bool isDestroyRoot)
+        protected override void OnDestroyViewElement(Element element, bool isDestroyRoot)
         {
             var ve = GetUIObj(element);
             
@@ -260,7 +262,7 @@ namespace RosettaUI.UIToolkit.Builder
                 ve?.RemoveFromHierarchy();
             }
 
-            UnregisterUIObj(element);
+            Unbind(element);   
         }
 
         private static class UssClassName
@@ -268,7 +270,6 @@ namespace RosettaUI.UIToolkit.Builder
             private static readonly string RosettaUI = "rosettaui";
             
             public static readonly string Column = RosettaUI + "-column";
-            public static readonly string Row = RosettaUI + "-row";
             public static readonly string WindowLauncher = RosettaUI + "-window-launcher";
             public static readonly string MinMaxSlider = RosettaUI + "-min-max-slider";
             public static readonly string Space = RosettaUI + "-space";

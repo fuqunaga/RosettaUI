@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq;
 using RosettaUI.Builder;
 using RosettaUI.Reactive;
 using RosettaUI.UIToolkit.UnityInternalAccess;
+using UnityEngine.Assertions;
+using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -63,6 +66,42 @@ namespace RosettaUI.UIToolkit.Builder
             }
 
             return container;
+        }
+
+        private bool Bind_ElementGroupContents(Element element, VisualElement visualElement,
+            Action<Element, VisualElement, int> bindChild = null)
+        {
+            if (element is not ElementGroup elementGroup) return false;
+
+            var contentCount = elementGroup.Contents.Count();
+            var visualElementCount = visualElement.childCount;
+
+            for (var i = contentCount; i < visualElementCount; ++i)
+            {
+                visualElement.RemoveAt(i);
+            }
+
+            using var pool = ListPool<VisualElement>.Get(out var veList);
+            veList.AddRange(visualElement.Children());
+
+            foreach (var (e,idx) in elementGroup.Contents.Select((e,idx) => (e,idx)))
+            {
+                if (idx < veList.Count)
+                {
+                    var ve = veList[idx];
+                    var success = Bind(e, ve);
+                    if (success) continue;
+
+                    visualElement.RemoveAt(idx);
+                }
+
+                var newVe = Build(e);
+                Assert.IsNotNull(newVe);
+                
+                visualElement.Insert(idx, newVe);
+            }
+
+            return true;
         }
     }
 }

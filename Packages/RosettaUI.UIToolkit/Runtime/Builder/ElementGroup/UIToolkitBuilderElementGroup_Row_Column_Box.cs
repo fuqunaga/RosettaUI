@@ -6,16 +6,16 @@ namespace RosettaUI.UIToolkit.Builder
     {
         private VisualElement Build_Row(Element element)
         {
-            var row = CreateRowVisualElement();
-
-            return Build_ElementGroupContents(row, element);
+            var row = new Row();
+            Bind_Row(element, row);
+            return row;
         }
 
-        private static VisualElement CreateRowVisualElement()
+        private bool Bind_Row(Element element, VisualElement visualElement)
         {
-            var row = new VisualElement();
-            row.AddToClassList(UssClassName.Row);
-            return row;
+            if (element is not RowElement rowElement || visualElement is not Row row) return false;
+
+            return Bind_ElementGroupContents(element, visualElement);
         }
 
         private VisualElement Build_Column(Element element)

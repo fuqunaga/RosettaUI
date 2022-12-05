@@ -81,7 +81,7 @@ namespace RosettaUI.UIToolkit.Builder
                 (max) => slider.highLimit = toFloat(max)
             );
 
-            var row = CreateRowVisualElement();
+            var row = new Row();
             row.AddToClassList(UssClassName.MinMaxSlider);
             row.Add(slider);
             row.Add(minTextField);

@@ -97,7 +97,7 @@ namespace RosettaUI
         {
             if (_rebuildIf?.Invoke(this) ?? false)
             {
-                DestroyChildren();
+                DestroyViewChildren();
                 
                 _needBuildChildren = true;
                 BuildUI();

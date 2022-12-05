@@ -74,7 +74,7 @@ namespace RosettaUI
                 var e = _registerQueue.Dequeue();
                 if (_elements.Add(e))
                 {
-                    e.onDestroy += (element,_) => Unregister(element);
+                    e.onDestroyView += (element,_) => Unregister(element);
                 }
             }
 

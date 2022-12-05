@@ -80,7 +80,7 @@ namespace RosettaUI.Builder
 
         protected virtual void SetPersistantCallback(Element element)
         {
-            element.onDestroy += OnDestroyElement;
+            element.onDestroyView += OnDestroyViewElement;
 
             if (element is DynamicElement dynamicElement)
             {
@@ -113,7 +113,7 @@ namespace RosettaUI.Builder
         protected abstract void OnElementInteractableChanged(Element element, TUIObj uiObj, bool interactable);
         protected abstract void OnElementStyleChanged(Element element, TUIObj uiObj, Style style);
         protected abstract void OnRebuildElementGroupChildren(ElementGroup elementGroup);
-        protected abstract void OnDestroyElement(Element element, bool isDestroyRoot);
+        protected abstract void OnDestroyViewElement(Element element, bool isDestroyRoot);
 
 
         protected IEnumerable<TUIObj> Build_ElementGroupContents(ElementGroup elementGroup)

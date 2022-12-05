@@ -1,7 +1,7 @@
-﻿using RosettaUI.Reactive;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using RosettaUI.Reactive;
+using UnityEngine.Assertions;
 
 namespace RosettaUI
 {
@@ -21,10 +21,12 @@ namespace RosettaUI
         public readonly ReactiveProperty<bool> interactableRx = new(true);
 
         public bool UpdateWhileDisabled { get; set; }
+
+        public bool HasBuilt => ViewBridge.HasBuilt;
         
         public event Action<Element> onUpdate;
         public event Action onViewValueChanged;
-        public event Action<Element, bool> onDestroy;
+        public event Action<Element, bool> onDestroyView;
 
         private ElementViewBridge _viewBridge;
 
@@ -50,6 +52,15 @@ namespace RosettaUI
             Parent = element;
         }
 
+        public bool DetachParent()
+        {
+            Assert.IsFalse(HasBuilt, $"{GetType()} has already built. Call DestroyView() to reuse this element");
+            if (Parent == null) return false;
+            Parent.RemoveChild(this);
+
+            return true;
+        }
+
         protected void AddChild(Element element)
         {
             _children.AddLast(element);
@@ -73,26 +84,24 @@ namespace RosettaUI
             foreach(var e in _children) e.Update();
         }
         
-        public void Destroy(bool isDestroyRoot = true)
+        public void DestroyView(bool isDestroyRoot = true)
         {
-            onDestroy?.Invoke(this, isDestroyRoot);
-            DestroyChildren(false);
+            onDestroyView?.Invoke(this, isDestroyRoot);
+            DestroyViewChildren(false);
 
-            // Element.Childrenは追加削除できない親と一体化した要素も含む
-            // 追加削除できるものはElementGroupのContentsなので削除
-            if (Parent is ElementGroup)
+            if (isDestroyRoot)
             {
-                Parent.RemoveChild(this);
+                DetachParent();
             }
         }
 
-        public void DestroyChildren(bool isDestroyRoot = true)
+        public void DestroyViewChildren(bool isDestroyRoot = true)
         {
             var node = _children.First;
             while(node != null)
             {
                 var next = node.Next;
-                node.Value.Destroy(isDestroyRoot);
+                node.Value.DestroyView(isDestroyRoot);
                 node = next;
             }
         }
@@ -116,11 +125,14 @@ namespace RosettaUI
             public event Action onUnsubscribe;
             protected readonly Element element;
 
+            public bool HasBuilt => onUnsubscribe != null;
+
             public ElementViewBridge(Element element) => this.element = element;
 
             public virtual void UnsubscribeAll()
             {
                 onUnsubscribe?.Invoke();
+                onUnsubscribe = null;
             } 
         }
     }

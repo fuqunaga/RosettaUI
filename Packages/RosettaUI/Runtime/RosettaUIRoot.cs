@@ -46,7 +46,7 @@ namespace RosettaUI
 
         protected void OnDestroy()
         {
-            foreach (var e in _elements) e.Destroy();
+            foreach (var e in _elements) e.DestroyView();
         }
 
 

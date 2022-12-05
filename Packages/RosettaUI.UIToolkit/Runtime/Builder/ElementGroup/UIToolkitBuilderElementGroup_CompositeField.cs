@@ -1,4 +1,5 @@
-﻿using UnityEngine.UIElements;
+﻿using RosettaUI.UIToolkit.UnityInternalAccess;
+using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
 {
@@ -6,26 +7,23 @@ namespace RosettaUI.UIToolkit.Builder
     {
         private VisualElement Build_CompositeField(Element element)
         {
-            var compositeFieldElement = (CompositeFieldElement) element;
+            var compositeField = new CompositeField();
 
-            var field = new VisualElement();
-            field.AddToClassList(UssClassName.UnityBaseField);
-            field.AddToClassList(UssClassName.CompositeField);
+            Bind_CompositeField(element, compositeField);
 
-            var labelElement = compositeFieldElement.header;
-            if (labelElement != null)
-            {
-                var label = Build(labelElement);
-                label.AddToClassList(UssClassName.UnityBaseFieldLabel);
-                field.Add(label);
-            }
+            // TODO: Bindに移す
+            Build_ElementGroupContents(compositeField, element);
 
-            var contentContainer = new VisualElement();
-            contentContainer.AddToClassList(UssClassName.CompositeFieldContents);
-            field.Add(contentContainer);
-            Build_ElementGroupContents(contentContainer, element);
+            return compositeField;
+        }
 
-            return field;
+        private bool Bind_CompositeField(Element element, VisualElement visualElement)
+        {
+            if (element is not CompositeFieldElement compositeFieldElement || visualElement is not CompositeField compositeField) return false;
+            
+            Bind_ExistingLabel(compositeFieldElement.Label, compositeField.labelElement, str => compositeField.label = str);
+
+            return true;
         }
     }
 }

@@ -144,13 +144,11 @@ namespace RosettaUI.UIToolkit.Builder
             if (ve.panel != null)
             {
                 CalcMinWidth();
-                Debug.Log("OnBind");
             }
             // Build時はまだレイアウト計算が終わっていないのでGeometryChangedを待つ
             else
             {
                 ve.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
-                Debug.Log("OnBuild");
             }
 
             // リストの要素など１回目のあとにレイアウト変更がされるので落ち着くまで複数回呼ばれるようにする
@@ -267,13 +265,8 @@ namespace RosettaUI.UIToolkit.Builder
 
         private static class UssClassName
         {
-            public static readonly string UnityBaseField = "unity-base-field";
-            public static readonly string UnityBaseFieldLabel = UnityBaseField + "__label";
-
             private static readonly string RosettaUI = "rosettaui";
             
-            public static readonly string CompositeField = RosettaUI + "-composite-field";
-            public static readonly string CompositeFieldContents = CompositeField + "__contents";
             public static readonly string Column = RosettaUI + "-column";
             public static readonly string Row = RosettaUI + "-row";
             public static readonly string WindowLauncher = RosettaUI + "-window-launcher";

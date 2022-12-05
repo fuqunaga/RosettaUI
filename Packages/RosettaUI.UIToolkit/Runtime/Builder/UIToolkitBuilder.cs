@@ -75,6 +75,10 @@ namespace RosettaUI.UIToolkit.Builder
             BindFuncTable = new()
             {
                 [typeof(CompositeFieldElement)] = Bind_CompositeField,
+                // [typeof(DynamicElement)] = Build_DynamicElement,
+                // [typeof(FoldElement)] = Build_Fold,
+                [typeof(HelpBoxElement)] = Bind_HelpBox,
+
                 
                 [typeof(RowElement)] = Bind_ElementGroup<RowElement, Row>,
                 [typeof(ColumnElement)] = Bind_ElementGroup<ColumnElement, Column>,

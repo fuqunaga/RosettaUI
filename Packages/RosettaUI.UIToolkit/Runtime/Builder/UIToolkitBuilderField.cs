@@ -97,7 +97,12 @@ namespace RosettaUI.UIToolkit.Builder
             
             if (labelEnable)
             {
-                SetupFieldLabel(field, element);
+                Bind_ExistingLabel(element.Label, field.labelElement, str => field.label = str);
+            }
+            else
+            {
+                //　Bind時以前のVisualElementのラベルを消しとく
+                field.label = null;
             }
         }
     }

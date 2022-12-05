@@ -12,7 +12,7 @@ namespace RosettaUI.UIToolkit.Builder
 
             // SetupFieldLabel()のtoggle.text版
             // toggle.labelはチェックボックスの左、toggle.textは右
-            if (toggleElement.isLabelRight&& toggleElement.Label is {} label)
+            if (toggleElement.isLabelRight && toggleElement.Label is {} label)
             {
                 label.GetViewBridge().SubscribeValueOnUpdateCallOnce(text => toggle.text = text);
             }

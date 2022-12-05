@@ -11,7 +11,7 @@ namespace RosettaUI
 
         public static WindowLauncherElement WindowLauncher(LabelElement title, WindowElement window)
         {
-            var label = title ?? window.header?.FirstLabel()?.Clone();
+            var label = title ?? window.Header?.FirstLabel()?.Clone();
             return new WindowLauncherElement(label, window);
         }
 

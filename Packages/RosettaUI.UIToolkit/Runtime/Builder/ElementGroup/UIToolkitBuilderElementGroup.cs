@@ -25,7 +25,7 @@ namespace RosettaUI.UIToolkit.Builder
         private static void SetupOpenCloseBaseElement(Foldout fold, OpenCloseBaseElement foldElement)
         {
             var toggle = fold.Q<Toggle>();
-            toggle.Add(Build(foldElement.header));
+            toggle.Add(Build(foldElement.Header));
 
             // disable 中でもクリック可能
             UIToolkitUtility.SetAcceptClicksIfDisabled(toggle);

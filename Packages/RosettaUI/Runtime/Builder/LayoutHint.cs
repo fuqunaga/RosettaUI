@@ -54,7 +54,7 @@ namespace RosettaUI.Builder
                         && row.FirstLabel() != element:
                         return false;
                     
-                    case CompositeFieldElement c when c.header != e:
+                    case CompositeFieldElement c when c.Label != e:
                         return false;
                 }
             }

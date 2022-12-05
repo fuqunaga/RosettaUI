@@ -1,4 +1,5 @@
-﻿using UnityEngine.UIElements;
+﻿using System;
+using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
 {
@@ -10,15 +11,6 @@ namespace RosettaUI.UIToolkit.Builder
             Bind_Label(element, ve);
             return ve;
         }
-        
-        private void SetupFieldLabel<T, TElementValue>(BaseField<T> field, ReadOnlyFieldElement<TElementValue> fieldBaseElement)
-        {
-            var labelElement = fieldBaseElement.Label;
-            if (labelElement == null) return;
-
-            labelElement.GetViewBridge().SubscribeValueOnUpdateCallOnce(str => field.label = str);
-            SetupUIObj(labelElement, field.labelElement);
-        }
 
         private bool Bind_Label(Element element, VisualElement visualElement)
         {
@@ -26,6 +18,32 @@ namespace RosettaUI.UIToolkit.Builder
             labelElement.SubscribeValueOnUpdateCallOnce(label);
             
             return true;
+        }
+        
+                
+        private void SetupFieldLabel<T, TElementValue>(BaseField<T> field, ReadOnlyFieldElement<TElementValue> fieldBaseElement)
+        {
+            Bind_ExistingLabel(fieldBaseElement.Label, field.labelElement, (str) => field.label = str);
+        }
+        
+        /// <summary>
+        /// 一部のVisualElementがもともと内包しているLabelとLabelElementをBindする
+        /// LabelはアクセスできないがBaseBoolField.textなどのように値を渡せる場合もある
+        /// </summary>
+        private void Bind_ExistingLabel(LabelElement labelElement, Label label, Action<string> setValueToView)
+        {
+            if (labelElement == null)
+            {
+                setValueToView = null;
+            }
+            else
+            {
+                labelElement.GetViewBridge().SubscribeValueOnUpdateCallOnce(setValueToView);
+                if (label != null)
+                {
+                    SetupUIObj(labelElement, label);
+                }
+            }
         }
     }
 }

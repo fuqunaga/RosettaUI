@@ -32,17 +32,12 @@ namespace RosettaUI.UIToolkit.Builder
         /// </summary>
         private void Bind_ExistingLabel(LabelElement labelElement, Label label, Action<string> setValueToView)
         {
-            if (labelElement == null)
+            if (labelElement == null) return;
+            
+            labelElement.GetViewBridge().SubscribeValueOnUpdateCallOnce(setValueToView);
+            if (label != null)
             {
-                setValueToView = null;
-            }
-            else
-            {
-                labelElement.GetViewBridge().SubscribeValueOnUpdateCallOnce(setValueToView);
-                if (label != null)
-                {
-                    SetupUIObj(labelElement, label);
-                }
+                SetupUIObj(labelElement, label);
             }
         }
     }

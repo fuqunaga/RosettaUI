@@ -1,5 +1,4 @@
-﻿using RosettaUI.UIToolkit.UnityInternalAccess;
-using UnityEngine.UIElements;
+﻿using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
 {
@@ -8,12 +7,7 @@ namespace RosettaUI.UIToolkit.Builder
         private VisualElement Build_CompositeField(Element element)
         {
             var compositeField = new CompositeField();
-
             Bind_CompositeField(element, compositeField);
-
-            // TODO: Bindに移す
-            Build_ElementGroupContents(compositeField, element);
-
             return compositeField;
         }
 
@@ -23,7 +17,7 @@ namespace RosettaUI.UIToolkit.Builder
             
             Bind_ExistingLabel(compositeFieldElement.Label, compositeField.labelElement, str => compositeField.label = str);
 
-            return true;
+            return Bind_ElementGroupContents(compositeFieldElement, compositeField);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using UnityEngine.UIElements;
+﻿using RosettaUI.Reactive;
+using RosettaUI.UIToolkit.UnityInternalAccess;
+using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
 {
@@ -7,11 +9,59 @@ namespace RosettaUI.UIToolkit.Builder
         private VisualElement Build_Fold(Element element)
         {
             var fold = new FoldoutCustom();
-            SetupOpenCloseBaseElement(fold, (FoldElement) element);
-   
-            var ret =  Build_ElementGroupContents(fold, element);
-            return ret;
+            var toggle = fold.Toggle;
+
+            // disable 中でもクリック可能
+            UIToolkitUtility.SetAcceptClicksIfDisabled(toggle);
+            
+            // Foldout 直下の Toggle は marginLeft が default.uss で書き換わるので上書きしておく
+            // セレクタ例： .unity-foldout--depth-1 > .unity-fold__toggle
+            toggle.style.marginLeft = 0;
+
+            Bind_Fold(element, fold);
+            return fold;
         }
 
+
+        private bool Bind_Fold(Element element, VisualElement visualElement)
+        {
+            if (element is not FoldElement foldElement || visualElement is not FoldoutCustom fold) return false;
+
+            var headerElement = foldElement.Header;
+            if (headerElement == null)
+            {
+                fold.HeaderContent = null;
+            }
+            else
+            {
+                var success = Bind(headerElement, fold.HeaderContent);
+                if (!success)
+                {
+                    fold.HeaderContent = Build(headerElement);
+                }
+            }
+
+            // Indentがあるなら１レベルキャンセル
+            ApplyMinusIndentIfPossible(fold, foldElement);
+
+            var openDisposable = foldElement.IsOpenRx.SubscribeAndCallOnce(isOpen => fold.value = isOpen);
+            fold.RegisterValueChangedCallback(OnFoldValueChanged);
+            
+            foldElement.GetViewBridge().onUnsubscribe += () =>
+            {
+                openDisposable.Dispose();
+                fold.UnregisterValueChangedCallback(OnFoldValueChanged);
+            };
+
+            return Bind_ElementGroupContents(foldElement, fold);
+            
+            void OnFoldValueChanged(ChangeEvent<bool> evt)
+            {
+                if (evt.target == fold)
+                {
+                    foldElement.IsOpen = evt.newValue;
+                }
+            }
+        }
     }
 }

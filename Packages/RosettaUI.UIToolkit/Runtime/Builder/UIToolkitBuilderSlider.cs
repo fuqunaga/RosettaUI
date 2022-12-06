@@ -11,111 +11,87 @@ namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        private VisualElement Build_Slider<T, TSlider>(Element element)
-            where T : IComparable<T>
-            where TSlider : BaseSlider<T>, new()
+        private bool Bind_Slider<TValue, TSlider>(Element element, VisualElement visualElement)
+            where TValue : IComparable<TValue>
+            where TSlider : BaseSlider<TValue>, new()
         {
-            var sliderElement = (SliderElement<T>) element;
-            var slider = Build_Field<T, TSlider>(sliderElement);
+            if (element is not SliderElement<TValue> sliderElement || visualElement is not TSlider slider) return false;
 
-            InitRangeFieldElement(sliderElement,
+            slider.showInputField = sliderElement.showInputField;
+            
+            BindRangeFieldElement(sliderElement,
                 (min) => slider.lowValue = min,
                 (max) => slider.highValue = max
             );
-
-            slider.showInputField = sliderElement.showInputField;
-            return slider;
+            
+            return Bind_Field<TValue, TSlider>(element, visualElement);
         }
 
-        VisualElement Build_MinMaxSlider_Int(Element element) =>
-            Build_MinMaxSlider<int, IntegerField>(element, (i) => i, (f) => (int) f);
-
-        VisualElement Build_MinMaxSlider_Float(Element element) =>
-            Build_MinMaxSlider<float, FloatField>(element, (f) => f, (f) => f);
-
-        private VisualElement Build_MinMaxSlider<T, TTextField>(Element element, Func<T, float> toFloat, Func<float, T> toValue)
-            where TTextField : TextInputBaseField<T>, new()
+        private bool Bind_MinMaxSlider<TValue, TTextField>(Element element, VisualElement visualElement)
+            where TTextField : TextValueField<TValue>, new()
         {
-            if (toValue == null) throw new ArgumentNullException(nameof(toValue));
+            if (element is not MinMaxSliderElement<TValue> sliderElement 
+                || visualElement is not MinMaxSliderWithField<TValue, TTextField> slider) return false;
             
-            var sliderElement = (MinMaxSliderElement<T>) element;
+            Bind_ExistingLabel(sliderElement.Label,  slider.labelElement, str => slider.label = str);
             
-            var slider = new MinMaxSlider();
-            SetupFieldLabel(slider, sliderElement);
-
-
-            TTextField minTextField = null;
-            TTextField maxTextField = null;
-            if (sliderElement.showInputField)
-            {
-                minTextField = new TTextField();
-                maxTextField = new TTextField();
-
-                minTextField.RegisterValueChangedCallback((evt) => slider.minValue = toFloat(evt.newValue));
-                maxTextField.RegisterValueChangedCallback((evt) => slider.maxValue = toFloat(evt.newValue));
-            }
+            slider.ShowInputField = sliderElement.showInputField;
             
-
-            sliderElement.GetViewBridge().SubscribeValueOnUpdateCallOnce(minMax =>
-                {
-                    var min = toFloat(minMax.min);
-                    var max = toFloat(minMax.max);
-
-                    slider.SetValueWithoutNotifyIfNotEqual(new Vector2(min, max));
-                    UpdateMinMaxTextField(minMax.min, minMax.max);
-                }
+            
+            var viewBridge = sliderElement.GetViewBridge();
+            viewBridge.SubscribeValueOnUpdateCallOnce(minMax => slider.value = new Vector2(ToFloat(minMax.min), ToFloat(minMax.max)));
+            slider.RegisterValueChangedCallback(OnValueChanged);
+            viewBridge.onUnsubscribe +=  () => slider?.UnregisterValueChangedCallback(OnValueChanged);
+            
+            BindRangeFieldElement(sliderElement,
+                (min) => slider.lowLimit = ToFloat(min),
+                (max) => slider.highLimit = ToFloat(max)
             );
+            
 
-            slider.RegisterValueChangedCallback(evt =>
+            return true;
+
+
+            void OnValueChanged(ChangeEvent<Vector2> evt)
             {
-                var vec2 = evt.newValue;
-                var min = toValue(vec2.x);
-                var max = toValue(vec2.y);
+                var minMax = MinMax.Create(
+                    ToTValue(evt.newValue.x),
+                    ToTValue(evt.newValue.y)
+                    );
                 
-                sliderElement.GetViewBridge().SetValueFromView(MinMax.Create(min, max));
-                UpdateMinMaxTextField(min, max);
-            });
-
-            InitRangeFieldElement(sliderElement,
-                (min) => slider.lowLimit = toFloat(min),
-                (max) => slider.highLimit = toFloat(max)
-            );
-
-            var row = new Row();
-            row.AddToClassList(UssClassName.MinMaxSlider);
-            row.Add(slider);
-            row.Add(minTextField);
-            row.Add(maxTextField);
-
-            return row;
-
-            
-            void UpdateMinMaxTextField(T min, T max)
-            {
-                if (sliderElement.showInputField)
-                {
-                    minTextField.SetValueWithoutNotifyIfNotEqual(min);
-                    maxTextField.SetValueWithoutNotifyIfNotEqual(max);
-                }
+                viewBridge.SetValueFromView(minMax);
             }
+            
+            float ToFloat(TValue value) => MinMaxSliderWithField<TValue, TTextField>.ToFloat(value);
+            TValue ToTValue(float floatValue) => MinMaxSliderWithField<TValue, TTextField>.ToTValue(floatValue);
         }
 
 
-        static void InitRangeFieldElement<T, TRange>(
+        private static void BindRangeFieldElement<T, TRange>(
             RangeFieldElement<T, TRange> rangeFieldElement,
             Action<TRange> updateMin,
             Action<TRange> updateMax
         )
         {
             if (rangeFieldElement.IsMinConst)
+            {
                 updateMin(rangeFieldElement.Min);
+            }
             else
-                rangeFieldElement.minRx.SubscribeAndCallOnce(updateMin);
+            {
+                var disposable = rangeFieldElement.minRx.SubscribeAndCallOnce(updateMin);
+                rangeFieldElement.GetViewBridge().onUnsubscribe += disposable.Dispose;
+            }
 
             if (rangeFieldElement.IsMaxConst)
+            {
                 updateMax(rangeFieldElement.Max);
+            }
             else
-                rangeFieldElement.maxRx.SubscribeAndCallOnce(updateMax);
+            {
+                var disposable = rangeFieldElement.maxRx.SubscribeAndCallOnce(updateMax);
+                rangeFieldElement.GetViewBridge().onUnsubscribe += disposable.Dispose;
+            }
         }
 
     }

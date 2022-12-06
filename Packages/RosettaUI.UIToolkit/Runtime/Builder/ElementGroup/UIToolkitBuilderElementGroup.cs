@@ -11,7 +11,7 @@ namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        static void ApplyMinusIndentIfPossible(VisualElement ve, Element element)
+        private static void ApplyMinusIndentIfPossible(VisualElement ve, Element element)
         {
             // Indentがあるなら１レベルキャンセル
             if (element.CanMinusIndent())
@@ -20,34 +20,9 @@ namespace RosettaUI.UIToolkit.Builder
             }
         }
 
-        static void ApplyIndent(VisualElement ve, int indentLevel = 1)
+        private static void ApplyIndent(VisualElement ve, int indentLevel = 1)
         {
             ve.style.marginLeft = LayoutSettings.IndentSize * indentLevel;
-        }
-
-        private static void SetupOpenCloseBaseElement(Foldout fold, OpenCloseBaseElement foldElement)
-        {
-            var toggle = fold.Q<Toggle>();
-            toggle.Add(Build(foldElement.Header));
-
-            // disable 中でもクリック可能
-            UIToolkitUtility.SetAcceptClicksIfDisabled(toggle);
-
-            // Foldout 直下の Toggle は marginLeft が default.uss で書き換わるので上書きしておく
-            // セレクタ例： .unity-foldout--depth-1 > .unity-fold__toggle
-            toggle.style.marginLeft = 0;
-
-            // Indentがあるなら１レベルキャンセル
-            ApplyMinusIndentIfPossible(fold, foldElement);
-
-            foldElement.IsOpenRx.SubscribeAndCallOnce(isOpen => fold.value = isOpen);
-            fold.RegisterValueChangedCallback(evt =>
-            {
-                if (evt.target == fold)
-                {
-                    foldElement.IsOpen = evt.newValue;
-                }
-            });
         }
 
         private VisualElement Build_ElementGroupContents(VisualElement container, Element element,
@@ -66,6 +41,16 @@ namespace RosettaUI.UIToolkit.Builder
             }
 
             return container;
+        }
+        
+        // ElementGroupのBind
+        // 型チェックあり
+        private bool Bind_ElementGroup<TElementGroup, TVisualElement>(Element element, VisualElement visualElement)
+            where TElementGroup : ElementGroup
+            where TVisualElement : VisualElement
+        {
+            if (element is not TElementGroup elementGroup || visualElement is not TVisualElement) return false;
+            return Bind_ElementGroupContents(elementGroup, visualElement);
         }
 
         // ElementGroupのBind

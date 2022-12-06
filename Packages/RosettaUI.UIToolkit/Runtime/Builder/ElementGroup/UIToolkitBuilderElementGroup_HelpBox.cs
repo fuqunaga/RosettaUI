@@ -6,13 +6,6 @@ namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        private VisualElement Build_HelpBox(Element element)
-        {
-            var helpBox = new HelpBox();
-            Bind_HelpBox(element, helpBox);
-            return helpBox;
-        }
-
         private bool Bind_HelpBox(Element element, VisualElement visualElement)
         {
             if (element is not HelpBoxElement helpBoxElement || visualElement is not HelpBox helpBox) return false;

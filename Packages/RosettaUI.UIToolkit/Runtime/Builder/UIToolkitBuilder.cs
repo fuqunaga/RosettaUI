@@ -34,15 +34,15 @@ namespace RosettaUI.UIToolkit.Builder
         {
             _buildFuncTable = new Dictionary<Type, Func<Element, VisualElement>>
             {
-                [typeof(CompositeFieldElement)] = Build_CompositeField,
+                [typeof(CompositeFieldElement)] = BuildSimple<CompositeField>,
                 [typeof(DynamicElement)] = Build_DynamicElement,
                 [typeof(FoldElement)] = Build_Fold,
-                [typeof(HelpBoxElement)] = Build_HelpBox,
-                [typeof(RowElement)] = Build_ElementGroup<RowElement, Row>,
-                [typeof(ColumnElement)] = Build_ElementGroup<ColumnElement, Column>,
-                [typeof(BoxElement)] = Build_ElementGroup<BoxElement, Box>,
-                [typeof(IndentElement)] = Build_ElementGroup<IndentElement, Indent>,
-                [typeof(PageElement)] = Build_ElementGroup<PageElement, Column>,
+                [typeof(HelpBoxElement)] = BuildSimple<HelpBox>,
+                [typeof(RowElement)] = BuildSimple<Row>,
+                [typeof(ColumnElement)] = BuildSimple<Column>,
+                [typeof(BoxElement)] = BuildSimple<Box>,
+                [typeof(IndentElement)] = BuildSimple<Indent>,
+                [typeof(PageElement)] = BuildSimple<Column>,
                 
                 [typeof(ScrollViewElement)] = Build_ScrollView,
                 [typeof(TabsElement)] = Build_Tabs,
@@ -58,10 +58,10 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(LabelElement)] = Build_Label,
                 [typeof(ToggleElement)] = (e) => Build_Field<bool, Toggle>(e, Bind_Toggle),
                 
-                [typeof(IntSliderElement)] = Build_Slider<int, ClampFreeSliderInt>,
-                [typeof(FloatSliderElement)] = Build_Slider<float, ClampFreeSlider>,
-                [typeof(IntMinMaxSliderElement)] = Build_MinMaxSlider_Int,
-                [typeof(FloatMinMaxSliderElement)] = Build_MinMaxSlider_Float,
+                [typeof(IntSliderElement)] = BuildSimple<ClampFreeSliderInt>,
+                [typeof(FloatSliderElement)] = BuildSimple<ClampFreeSlider>,
+                [typeof(IntMinMaxSliderElement)] = BuildSimple<MinMaxSliderWithField<int, IntegerField>>,
+                [typeof(FloatMinMaxSliderElement)] = BuildSimple<MinMaxSliderWithField<float, FloatField>>,
                 
                 [typeof(DropdownElement)] = Build_Dropdown,
                 [typeof(SpaceElement)] = Build_Space,
@@ -76,15 +76,18 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 [typeof(CompositeFieldElement)] = Bind_CompositeField,
                 // [typeof(DynamicElement)] = Build_DynamicElement,
-                // [typeof(FoldElement)] = Build_Fold,
+                [typeof(FoldElement)] = Bind_Fold,
                 [typeof(HelpBoxElement)] = Bind_HelpBox,
-
-                
                 [typeof(RowElement)] = Bind_ElementGroup<RowElement, Row>,
                 [typeof(ColumnElement)] = Bind_ElementGroup<ColumnElement, Column>,
                 [typeof(BoxElement)] = Bind_ElementGroup<BoxElement, Box>,
-                [typeof(IndentElement)] = Bind_ElementGroup<IndentElement, Indent>,
+                [typeof(IndentElement)] = Bind_Indent,
                 [typeof(PageElement)] = Bind_ElementGroup<PageElement, Column>,
+                
+                // [typeof(ScrollViewElement)] = Build_ScrollView,
+                // [typeof(TabsElement)] = Build_Tabs,
+                // [typeof(WindowElement)] = Build_Window,
+                // [typeof(WindowLauncherElement)] = Build_WindowLauncher,
                 
                 [typeof(IntFieldElement)] = Bind_Field<int, IntegerField>,
                 [typeof(UIntFieldElement)] = Bind_Field<uint, UIntField>,
@@ -94,6 +97,18 @@ namespace RosettaUI.UIToolkit.Builder
                 
                 [typeof(LabelElement)] = Bind_Label,
                 [typeof(ToggleElement)] = Bind_Toggle,
+                
+                [typeof(IntSliderElement)] = Bind_Slider<int, ClampFreeSliderInt>,
+                [typeof(FloatSliderElement)] = Bind_Slider<float, ClampFreeSlider>,
+                [typeof(IntMinMaxSliderElement)] = Bind_MinMaxSlider<int, IntegerField>,
+                [typeof(FloatMinMaxSliderElement)] = Bind_MinMaxSlider<float, FloatField>,
+                //
+                // [typeof(DropdownElement)] = Build_Dropdown,
+                // [typeof(SpaceElement)] = Build_Space,
+                // [typeof(ImageElement)] = Build_Image,
+                // [typeof(ButtonElement)] = Build_Button,
+                // [typeof(PopupMenuElement)] = Build_PopupElement,
+                // [typeof(ListViewItemContainerElement)] = Build_ListViewItemContainer
             };
         }
 
@@ -106,13 +121,25 @@ namespace RosettaUI.UIToolkit.Builder
         private Dictionary<Type, Func<Element, VisualElement, bool>> BindFuncTable { get; }
 
         /// <summary>
+        /// Build時の特殊処理がないBindするだけのBuild
+        /// </summary>
+        private VisualElement BuildSimple<TVisualElement>(Element element)
+            where TVisualElement : VisualElement, new()
+        {
+            var ve = new TVisualElement();
+            var success = Bind(element, ve);
+            Assert.IsTrue(success);
+            return ve;
+        }
+
+        /// <summary>
         /// 既存のVisualElementを新たなElementと紐づける
         /// VisualElementの構成が一致していなければ return false
         /// </summary>
         /// <returns>success flag</returns>
         public bool Bind(Element element, VisualElement ve)
         {
-            if (element == null) return false;
+            if (element == null || ve == null) return false;
             
             // 親なしはとりあえず禁止
             // 新Elementを旧Elementのヒエラルキー上に入れ忘れ防止

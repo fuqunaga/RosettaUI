@@ -1,20 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
 {
     public static class ElementBindingExtension
     {
-        public static void SetValueWithoutNotifyIfNotEqual<T>(this INotifyValueChanged<T> field, T value)
-        {
-            if (!EqualityComparer<T>.Default.Equals(field.value, value))
-            {
-                field.SetValueWithoutNotify(value);
-            }
-        }
-
         // Subscribe element -> field
         public static void SubscribeValueOnUpdateCallOnce<T>(this ReadOnlyValueElement<T> element, INotifyValueChanged<T> field)
         {
@@ -22,7 +12,7 @@ namespace RosettaUI.UIToolkit.Builder
         }
         
         // Subscribe field -> element
-        private static void Subscribe<TValue>(this BaseField<TValue> field, FieldBaseElement<TValue> element)
+        public static void Subscribe<TValue>(this INotifyValueChanged<TValue> field, FieldBaseElement<TValue> element)
         {
             var viewBridge = element.GetViewBridge();
             
@@ -36,7 +26,7 @@ namespace RosettaUI.UIToolkit.Builder
         }
 
         // Subscribe element <-> field
-        public static void Bind<T>(this FieldBaseElement<T> element, BaseField<T> field)
+        public static void Bind<T>(this FieldBaseElement<T> element, INotifyValueChanged<T> field)
         {
             element.SubscribeValueOnUpdateCallOnce(field);
             field.Subscribe(element);

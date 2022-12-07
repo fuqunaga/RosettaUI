@@ -1,6 +1,6 @@
 ﻿using UnityEngine.UIElements;
 
-namespace RosettaUI.UIToolkit.Builder
+namespace RosettaUI.UIToolkit
 {
     public static class BoxShadowExtension
     {
@@ -11,15 +11,15 @@ namespace RosettaUI.UIToolkit.Builder
             ve.RegisterCallback<GeometryChangedEvent>(evt =>
             {
                 var style = boxShadow.style;
-                var resolveStyle = boxShadow.resolvedStyle;
+                var resolvedStyle = boxShadow.resolvedStyle;
                 
-                style.width = evt.newRect.width + resolveStyle.borderLeftWidth + resolveStyle.borderRightWidth - 2f;
-                style.height = evt.newRect.height + resolveStyle.borderTopWidth + resolveStyle.borderBottomWidth- 2f;
+                style.width = evt.newRect.width + resolvedStyle.borderLeftWidth + resolvedStyle.borderRightWidth - 2f;
+                style.height = evt.newRect.height + resolvedStyle.borderTopWidth + resolvedStyle.borderBottomWidth- 2f;
                 
                 var windowStyle = ve.resolvedStyle;
 
-                style.marginLeft = -(resolveStyle.borderLeftWidth + windowStyle.borderLeftWidth) + 0.5f;
-                style.marginTop = -(resolveStyle.borderTopWidth + windowStyle.borderTopWidth) + 0.5f;
+                style.marginLeft = -(resolvedStyle.borderLeftWidth + windowStyle.borderLeftWidth) + 0.5f;
+                style.marginTop = -(resolvedStyle.borderTopWidth + windowStyle.borderTopWidth) + 0.5f;
             });
         }
         

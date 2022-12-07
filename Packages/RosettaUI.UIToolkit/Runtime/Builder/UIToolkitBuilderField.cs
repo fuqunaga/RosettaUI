@@ -97,7 +97,7 @@ namespace RosettaUI.UIToolkit.Builder
             
             if (labelEnable)
             {
-                Bind_ExistingLabel(element.Label, field.labelElement, str => field.label = str);
+                Bind_FieldLabel(element, field);
             }
             else
             {

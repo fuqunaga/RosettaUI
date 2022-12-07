@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
-namespace RosettaUI.UIToolkit.Builder
+namespace RosettaUI.UIToolkit
 {
     public static class VisualElementExtension
     {

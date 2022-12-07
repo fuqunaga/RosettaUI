@@ -20,8 +20,10 @@ namespace RosettaUI.UIToolkit.Builder
             return true;
         }
         
-                
-        private void SetupFieldLabel<T, TElementValue>(BaseField<T> field, ReadOnlyFieldElement<TElementValue> fieldBaseElement)
+        /// <summary>
+        /// Fieldがもともと内包しているLabelとLabelElementをBindする
+        /// </summary>
+        private void Bind_FieldLabel<T, TElementValue>(ReadOnlyFieldElement<TElementValue> fieldBaseElement, BaseField<T> field)
         {
             Bind_ExistingLabel(fieldBaseElement.Label, field.labelElement, (str) => field.label = str);
         }

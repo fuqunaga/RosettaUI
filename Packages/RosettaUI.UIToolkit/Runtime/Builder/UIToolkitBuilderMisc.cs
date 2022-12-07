@@ -44,27 +44,6 @@ namespace RosettaUI.UIToolkit.Builder
             return button;
         }
 
-        private VisualElement Build_Dropdown(Element element)
-        {
-            var dropdownElement = (DropdownElement) element;
-            var options = dropdownElement.options.ToList();
-
-            var field = new PopupFieldCustomMenu<string>(
-                options,
-                dropdownElement.Value
-            );
-            field.onMenuCreated += menu => menu.AddBoxShadow(); 
-      
-            SetupFieldLabel(field, dropdownElement);
-
-            field.Bind(dropdownElement,
-                elementValueToFieldValue: i => (0 <= i && i < options.Count) ? options[i] : default,
-                fieldValueToElementValue: str => options.IndexOf(str)
-            );
-
-            return field;
-        }
-        
         private VisualElement Build_PopupElement(Element element)
         {
             var contextMenuElement = (PopupMenuElement) element;

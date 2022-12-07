@@ -33,10 +33,15 @@ namespace RosettaUI.UIToolkit.Builder
             if (element is not MinMaxSliderElement<TValue> sliderElement 
                 || visualElement is not MinMaxSliderWithField<TValue, TTextField> slider) return false;
             
-            Bind_ExistingLabel(sliderElement.Label,  slider.labelElement, str => slider.label = str);
+            Bind_FieldLabel(sliderElement,  slider);
             
             slider.ShowInputField = sliderElement.showInputField;
             
+            
+            sliderElement.Bind(slider,
+                elementValueToFieldValue: minMax => new Vector2(ToFloat(minMax.min), ToFloat(minMax.max)),
+                fieldValueToElementValue: vec2 => MinMax.Create(ToTValue(vec2.x), ToTValue(vec2.y))
+                );
             
             var viewBridge = sliderElement.GetViewBridge();
             viewBridge.SubscribeValueOnUpdateCallOnce(minMax => slider.value = new Vector2(ToFloat(minMax.min), ToFloat(minMax.max)));

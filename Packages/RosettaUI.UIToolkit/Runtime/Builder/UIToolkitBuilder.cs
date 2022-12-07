@@ -49,21 +49,21 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(WindowElement)] = Build_Window,
                 [typeof(WindowLauncherElement)] = Build_WindowLauncher,
 
-                [typeof(IntFieldElement)] = Build_Field<int, IntegerField>,
-                [typeof(UIntFieldElement)] = Build_Field<uint, UIntField>,
-                [typeof(FloatFieldElement)] = Build_Field<float, FloatField>,
-                [typeof(TextFieldElement)] = (e) => Build_Field<string, TextField>(e, Bind_TextField),
-                [typeof(ColorFieldElement)] = (e) => Build_Field<Color, ColorField>(e, Bind_ColorField),
+                [typeof(IntFieldElement)] = BuildSimple<IntegerField>,
+                [typeof(UIntFieldElement)] = BuildSimple<UIntField>,
+                [typeof(FloatFieldElement)] = BuildSimple<FloatField>,
+                [typeof(TextFieldElement)] = BuildSimple<TextField>,
+                [typeof(ColorFieldElement)] = BuildSimple<ColorField>,
 
-                [typeof(LabelElement)] = Build_Label,
-                [typeof(ToggleElement)] = (e) => Build_Field<bool, Toggle>(e, Bind_Toggle),
+                [typeof(LabelElement)] = BuildSimple<Label>,
+                [typeof(ToggleElement)] = BuildSimple<Toggle>,
                 
                 [typeof(IntSliderElement)] = BuildSimple<ClampFreeSliderInt>,
                 [typeof(FloatSliderElement)] = BuildSimple<ClampFreeSlider>,
                 [typeof(IntMinMaxSliderElement)] = BuildSimple<MinMaxSliderWithField<int, IntegerField>>,
                 [typeof(FloatMinMaxSliderElement)] = BuildSimple<MinMaxSliderWithField<float, FloatField>>,
                 
-                [typeof(DropdownElement)] = Build_Dropdown,
+                [typeof(DropdownElement)] = BuildSimple<PopupFieldCustomMenu<string>>,
                 [typeof(SpaceElement)] = Build_Space,
                 [typeof(ImageElement)] = Build_Image,
                 [typeof(ButtonElement)] = Build_Button,
@@ -102,8 +102,8 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(FloatSliderElement)] = Bind_Slider<float, ClampFreeSlider>,
                 [typeof(IntMinMaxSliderElement)] = Bind_MinMaxSlider<int, IntegerField>,
                 [typeof(FloatMinMaxSliderElement)] = Bind_MinMaxSlider<float, FloatField>,
-                //
-                // [typeof(DropdownElement)] = Build_Dropdown,
+                
+                [typeof(DropdownElement)] = Bind_Dropdown,
                 // [typeof(SpaceElement)] = Build_Space,
                 // [typeof(ImageElement)] = Build_Image,
                 // [typeof(ButtonElement)] = Build_Button,

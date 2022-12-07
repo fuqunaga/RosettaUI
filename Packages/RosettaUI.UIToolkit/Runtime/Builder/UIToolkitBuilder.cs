@@ -65,7 +65,7 @@ namespace RosettaUI.UIToolkit.Builder
                 
                 [typeof(DropdownElement)] = BuildSimple<PopupFieldCustomMenu<string>>,
                 [typeof(SpaceElement)] = BuildSimple<Space>,
-                [typeof(ImageElement)] = Build_Image,
+                [typeof(ImageElement)] = BuildSimple<Image>,
                 [typeof(ButtonElement)] = Build_Button,
                 [typeof(PopupMenuElement)] = Build_PopupElement,
                 [typeof(ListViewItemContainerElement)] = Build_ListViewItemContainer
@@ -105,7 +105,7 @@ namespace RosettaUI.UIToolkit.Builder
                 
                 [typeof(DropdownElement)] = Bind_Dropdown,
                 [typeof(SpaceElement)] = BindSimple<Space>,
-                // [typeof(ImageElement)] = Build_Image,
+                [typeof(ImageElement)] = Bind_Image,
                 // [typeof(ButtonElement)] = Build_Button,
                 // [typeof(PopupMenuElement)] = Build_PopupElement,
                 // [typeof(ListViewItemContainerElement)] = Build_ListViewItemContainer

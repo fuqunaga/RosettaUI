@@ -67,7 +67,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(SpaceElement)] = BuildSimple<Space>,
                 [typeof(ImageElement)] = BuildSimple<Image>,
                 [typeof(ButtonElement)] = BuildSimple<Button>,
-                [typeof(PopupMenuElement)] = Build_PopupElement,
+                [typeof(PopupMenuElement)] = BuildSimple<PopupMenu>,
                 [typeof(ListViewItemContainerElement)] = Build_ListViewItemContainer
             };
             
@@ -107,7 +107,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(SpaceElement)] = BindSimple<Space>,
                 [typeof(ImageElement)] = Bind_Image,
                 [typeof(ButtonElement)] = Bind_Button,
-                // [typeof(PopupMenuElement)] = Build_PopupElement,
+                [typeof(PopupMenuElement)] = Bind_PopupMenu,
                 // [typeof(ListViewItemContainerElement)] = Build_ListViewItemContainer
             };
         }

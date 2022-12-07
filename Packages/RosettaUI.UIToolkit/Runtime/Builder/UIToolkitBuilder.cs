@@ -64,7 +64,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(FloatMinMaxSliderElement)] = BuildSimple<MinMaxSliderWithField<float, FloatField>>,
                 
                 [typeof(DropdownElement)] = BuildSimple<PopupFieldCustomMenu<string>>,
-                [typeof(SpaceElement)] = Build_Space,
+                [typeof(SpaceElement)] = BuildSimple<Space>,
                 [typeof(ImageElement)] = Build_Image,
                 [typeof(ButtonElement)] = Build_Button,
                 [typeof(PopupMenuElement)] = Build_PopupElement,
@@ -104,7 +104,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(FloatMinMaxSliderElement)] = Bind_MinMaxSlider<float, FloatField>,
                 
                 [typeof(DropdownElement)] = Bind_Dropdown,
-                // [typeof(SpaceElement)] = Build_Space,
+                [typeof(SpaceElement)] = BindSimple<Space>,
                 // [typeof(ImageElement)] = Build_Image,
                 // [typeof(ButtonElement)] = Build_Button,
                 // [typeof(PopupMenuElement)] = Build_PopupElement,
@@ -130,6 +130,12 @@ namespace RosettaUI.UIToolkit.Builder
             var success = Bind(element, ve);
             Assert.IsTrue(success);
             return ve;
+        }
+
+        private bool BindSimple<TVisualElement>(Element element, VisualElement visualElement)
+            where TVisualElement : VisualElement
+        {
+            return visualElement is TVisualElement;
         }
 
         /// <summary>

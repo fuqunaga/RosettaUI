@@ -112,7 +112,8 @@ namespace RosettaUI.Example
                 UI.Fold($"Fold[{id}]",
                     UI.Field($"{nameof(intValue)}[{id}]", () => intValue)
                     ),
-                UI.Dropdown($"{nameof(intValue)}[{id}]", () => dropDownIdx, new[]{"one","two","three"}),
+                UI.Dropdown($"Dropdown[{id}]", () => dropDownIdx, new[]{"one","two","three"}),
+                UI.Button($"Button[{id}]", () => Debug.Log($"On button clicked at id[{id}]")),
                 
                 UI.Label("Image"),
                 UI.Image(() => textures[id % textures.Count]),

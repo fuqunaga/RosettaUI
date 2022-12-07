@@ -7,18 +7,6 @@ namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        private static Button Build_Button(Element element)
-        {
-            var buttonElement = (ButtonElement) element;
-
-            var button = new Button(buttonElement.OnClick);
-
-            buttonElement.SubscribeValueOnUpdateCallOnce(button);
-            // buttonElement.SubscribeValueOnUpdate(str => button.text = str);
-
-            return button;
-        }
-
         private VisualElement Build_PopupElement(Element element)
         {
             var contextMenuElement = (PopupMenuElement) element;

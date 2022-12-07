@@ -61,7 +61,7 @@ namespace RosettaUI.UIToolkit.Builder
             var contentCount = elementGroup.Contents.Count();
             var visualElementCount = visualElement.childCount;
 
-            for (var i = contentCount; i < visualElementCount; ++i)
+            for (var i = visualElementCount - 1; i >= contentCount; --i)
             {
                 visualElement.RemoveAt(i);
             }

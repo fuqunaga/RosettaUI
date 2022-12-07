@@ -5,15 +5,15 @@ namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        VisualElement Build_ScrollView(Element element)
+        private bool Bind_ScrollView(Element element, VisualElement visualElement)
         {
-            var scrollViewElement = (ScrollViewElement) element;
-            var scrollViewMode = GetScrollViewMode(scrollViewElement.type);
+            if (element is not ScrollViewElement scrollViewElement ||
+                visualElement is not ScrollView scrollView) return false;
+            
+            scrollView.mode = GetScrollViewMode(scrollViewElement.type);
 
-            var scrollView = new ScrollView(scrollViewMode);
-            return Build_ElementGroupContents(scrollView, element);
-
-
+            return Bind_ElementGroupContents(scrollViewElement, scrollView);
+            
             static ScrollViewMode GetScrollViewMode(ScrollViewType type)
             {
                 return type switch

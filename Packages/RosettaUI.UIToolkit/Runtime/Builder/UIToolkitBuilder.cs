@@ -44,7 +44,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(IndentElement)] = BuildSimple<Indent>,
                 [typeof(PageElement)] = BuildSimple<Column>,
                 
-                [typeof(ScrollViewElement)] = Build_ScrollView,
+                [typeof(ScrollViewElement)] = BuildSimple<ScrollView>,
                 [typeof(TabsElement)] = Build_Tabs,
                 [typeof(WindowElement)] = Build_Window,
                 [typeof(WindowLauncherElement)] = Build_WindowLauncher,
@@ -84,7 +84,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(IndentElement)] = Bind_Indent,
                 [typeof(PageElement)] = Bind_ElementGroup<PageElement, Column>,
                 
-                // [typeof(ScrollViewElement)] = Build_ScrollView,
+                [typeof(ScrollViewElement)] = Bind_ScrollView,
                 // [typeof(TabsElement)] = Build_Tabs,
                 // [typeof(WindowElement)] = Build_Window,
                 // [typeof(WindowLauncherElement)] = Build_WindowLauncher,

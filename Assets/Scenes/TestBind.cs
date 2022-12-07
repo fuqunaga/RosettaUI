@@ -31,15 +31,15 @@ namespace RosettaUI.Example
             bool build =true;
             var bindCount = 0;
 
-            return UI.ScrollViewVerticalAndHorizontal(1000f, 1200f,
+            return //UI.ScrollViewVerticalAndHorizontal(1000f, 1200f,
                 UI.DynamicElementOnTrigger(
                     _ => build,
                     () =>
                     {
                         build = false;
                         bindCount = 0;
-                        
-                        for(var i=0; i<setsCount; ++i)
+
+                        for (var i = 0; i < setsCount; ++i)
                         {
                             var enable = i == 0;
                             foreach (var e in _elementSets[i])
@@ -48,7 +48,7 @@ namespace RosettaUI.Example
                                 e.Enable = enable;
                             }
                         }
-                        
+
                         return UI.Column(
                             new[]
                                 {
@@ -58,8 +58,8 @@ namespace RosettaUI.Example
                                 .Concat(_elementSets.SelectMany(set => set))
                         );
                     }
-                )
-            );
+                );
+            // );
         }
         
         IEnumerable<Element> CreateElements(int id)
@@ -83,9 +83,12 @@ namespace RosettaUI.Example
             float floatMin = -(id + 1) * 0.1f;
             float floatMax = (id + 1) * 0.1f;
 
+            var popupMenuItems = new[] { "one", "two", "three" }.Select(str =>
+                new MenuItem(str, () => Debug.Log($"PopupMenuItem[{str}] clicked at id[{id}]")));
+
             // return new[]
             // {
-            //     UI.Dropdown($"{nameof(intValue)}[{id}]", () => dropDownIdx, new[] { "one", "two", "three" }),
+            //     UI.ScrollViewVertical(200f, Enumerable.Range(0,(id+1)*10).Select(i => UI.Field($"Item[{i}]_id[{id}]", () => i))),
             // };
             
             return new[]
@@ -115,6 +118,8 @@ namespace RosettaUI.Example
                 UI.Dropdown($"Dropdown[{id}]", () => dropDownIdx, new[]{"one","two","three"}),
                 UI.Button($"Button[{id}]", () => Debug.Log($"On button clicked at id[{id}]")),
                 
+                UI.Popup(UI.Label($"Popup[{id}]"), () => popupMenuItems),
+                
                 UI.Label("Image"),
                 UI.Image(() => textures[id % textures.Count]),
                 
@@ -135,7 +140,9 @@ namespace RosettaUI.Example
 
                 UI.Label("Page"),
                 UI.Page(CreateGroupContents(id)),
-
+                
+                UI.Label("ScrollView"),
+                UI.ScrollViewVertical(200f, Enumerable.Range(0,(id+1)*10).Select(i => UI.Field($"Item[{i}]_id[{id}]", () => i))),
             };
 
             IEnumerable<Element> CreateGroupContents(int id)

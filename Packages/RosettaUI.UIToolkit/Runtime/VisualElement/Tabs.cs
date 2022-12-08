@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
@@ -14,10 +16,12 @@ namespace RosettaUI.UIToolkit
         private static readonly string UssClassNameTitleContainer = UssClassName + "__title-container";
         private static readonly string UssClassNameContentContainer = UssClassName + "__content-container";
 
-        private readonly List<(VisualElement, VisualElement)> _tabs = new();
+        private readonly List<(VisualElement headerButton, VisualElement content)> _tabs = new();
         private int _currentTabIndex;
         private readonly VisualElement _contentContainer = new();
 
+        public IEnumerable<(VisualElement header, VisualElement content)> TabPairs =>
+            _tabs.Select(pair => (pair.headerButton.Children().First(), pair.content));
         public VisualElement TitleContainer { get; } = new();
         public override VisualElement contentContainer => _contentContainer;
 
@@ -28,12 +32,11 @@ namespace RosettaUI.UIToolkit
             get => _currentTabIndex;
             set
             {
-                if (_currentTabIndex != value)
-                {
-                    _currentTabIndex = value;
-                    UpdateTabActive();
-                    onCurrentTabIndexChanged?.Invoke(_currentTabIndex);
-                }
+                if (_currentTabIndex == value) return;
+
+                _currentTabIndex = Mathf.Min(Mathf.Max(value, 0), _tabs.Count - 1);
+                UpdateTabActive();
+                onCurrentTabIndexChanged?.Invoke(_currentTabIndex);
             }
         }
 
@@ -72,7 +75,7 @@ namespace RosettaUI.UIToolkit
             DoAddTab(header, content);
             UpdateTabActive();
         }
-
+        
         private void DoAddTab(VisualElement header, VisualElement content)
         {
             var index = _tabs.Count;
@@ -85,7 +88,6 @@ namespace RosettaUI.UIToolkit
             contentContainer.Add(content);
 
             _tabs.Add((titleVe, content));
-            
         }
         
         private void UpdateTabActive()
@@ -115,6 +117,55 @@ namespace RosettaUI.UIToolkit
                     }
                 }
             }
+        }
+
+        public void ReplaceTabs(List<(VisualElement header, VisualElement content)> nextTabs)
+        {
+            var nextCount = nextTabs.Count;
+            
+            // 削除するタブ
+            for (var i = _tabs.Count - 1; i >= nextCount; --i)
+            {
+                var tab = _tabs[i];
+                tab.headerButton.RemoveFromHierarchy();
+                tab.content.RemoveFromHierarchy();
+                
+                _tabs.RemoveAt(i);
+            }
+            
+            var currentCount = _tabs.Count;
+            
+            // currentにもnextに存在するタブ
+            for (var i = 0; i < currentCount; ++i)
+            {
+                var (headerButton, content) = _tabs[i];
+                var header = headerButton.Children().First();
+
+                var (headerNext, contentNext) = nextTabs[i];
+
+                if (headerNext != null && header != headerNext)
+                {
+                    header.RemoveFromHierarchy();
+                    headerButton.Add(headerNext);
+                }
+
+                if (contentNext != null && content != contentNext)
+                {
+                    var index = IndexOf(content);
+                    content.RemoveFromHierarchy();
+                    Insert(index, contentNext);
+                    _tabs[i] = (headerButton, content);
+                }
+            }
+
+            // 追加するタブ
+            for (var i = currentCount; i < nextCount; ++i)
+            {
+                var (headerNext, contentNext) = nextTabs[i];
+                DoAddTab(headerNext, contentNext);
+            }
+            
+            UpdateTabActive();
         }
     }
 }

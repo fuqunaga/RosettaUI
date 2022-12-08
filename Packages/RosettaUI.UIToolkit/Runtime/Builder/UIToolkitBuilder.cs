@@ -45,7 +45,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(PageElement)] = BuildSimple<Column>,
                 
                 [typeof(ScrollViewElement)] = BuildSimple<ScrollView>,
-                [typeof(TabsElement)] = Build_Tabs,
+                [typeof(TabsElement)] = BuildSimple<Tabs>,
                 [typeof(WindowElement)] = Build_Window,
                 [typeof(WindowLauncherElement)] = Build_WindowLauncher,
 
@@ -85,7 +85,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(PageElement)] = Bind_ElementGroup<PageElement, Column>,
                 
                 [typeof(ScrollViewElement)] = Bind_ScrollView,
-                // [typeof(TabsElement)] = Build_Tabs,
+                [typeof(TabsElement)] = Bind_Tabs,
                 // [typeof(WindowElement)] = Build_Window,
                 // [typeof(WindowLauncherElement)] = Build_WindowLauncher,
                 

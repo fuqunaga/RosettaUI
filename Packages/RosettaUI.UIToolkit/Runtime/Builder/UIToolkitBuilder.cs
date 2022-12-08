@@ -46,7 +46,7 @@ namespace RosettaUI.UIToolkit.Builder
                 
                 [typeof(ScrollViewElement)] = BuildSimple<ScrollView>,
                 [typeof(TabsElement)] = BuildSimple<Tabs>,
-                [typeof(WindowElement)] = Build_Window,
+                [typeof(WindowElement)] = BuildSimple<Window>,
                 [typeof(WindowLauncherElement)] = Build_WindowLauncher,
 
                 [typeof(IntFieldElement)] = BuildSimple<IntegerField>,
@@ -86,7 +86,7 @@ namespace RosettaUI.UIToolkit.Builder
                 
                 [typeof(ScrollViewElement)] = Bind_ScrollView,
                 [typeof(TabsElement)] = Bind_Tabs,
-                // [typeof(WindowElement)] = Build_Window,
+                [typeof(WindowElement)] = Bind_Window,
                 // [typeof(WindowLauncherElement)] = Build_WindowLauncher,
                 
                 [typeof(IntFieldElement)] = Bind_Field<int, IntegerField>,
@@ -150,8 +150,12 @@ namespace RosettaUI.UIToolkit.Builder
             // 親なしはとりあえず禁止
             // 新Elementを旧Elementのヒエラルキー上に入れ忘れ防止
             // PrefixLabelの幅計算で正しい親が必要
-            Assert.IsNotNull(element.Parent);
-                
+            // TODO: あとで削除する。Windowなしで各Elementがヒエラルキー上のルートになることはありえる
+            if (element is not WindowElement)
+            {
+                Assert.IsNotNull(element.Parent, $"{element.GetType()} FirstLabel[{element.FirstLabel()?.Value}]");
+            }
+
             Unbind(element);
             var prevElement = GetElement(ve);
             if (prevElement != null)

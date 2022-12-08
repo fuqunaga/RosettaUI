@@ -1,18 +1,25 @@
-﻿using RosettaUI.Reactive;
+﻿using System.Linq;
+using RosettaUI.Reactive;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        private VisualElement Build_Window(Element element)
+        private bool Bind_Window(Element element, VisualElement visualElement)
         {
-            var windowElement = (WindowElement) element;
-            var window = new Window();
-            window.TitleBarContainerLeft.Add(Build(windowElement.Header));
-            window.CloseButton.clicked += () => windowElement.Enable = !windowElement.Enable;
+            if (element is not WindowElement windowElement || visualElement is not Window window) return false;
 
-            windowElement.IsOpenRx.SubscribeAndCallOnce(isOpen =>
+            var titleBarLeft = window.TitleBarContainerLeft.Children().FirstOrDefault();
+            var bound = titleBarLeft != null && Bind(windowElement.Header, titleBarLeft);
+            if (!bound)
+            {
+                window.TitleBarContainerLeft.Add(Build(windowElement.Header));
+            }
+
+            window.CloseButton.clicked += OnCloseButtonClicked;
+            
+            var openDisposable = windowElement.IsOpenRx.SubscribeAndCallOnce(isOpen =>
             {
                 if (isOpen)
                 {
@@ -25,7 +32,7 @@ namespace RosettaUI.UIToolkit.Builder
                 }
             });
 
-            windowElement.positionRx.SubscribeAndCallOnce(posNullable =>
+            var positionDisposable = windowElement.positionRx.SubscribeAndCallOnce(posNullable =>
             {
                 if (posNullable is { } pos)
                 {
@@ -33,18 +40,16 @@ namespace RosettaUI.UIToolkit.Builder
                 }
             });
 
+            windowElement.GetViewBridge().onUnsubscribe += () =>
+            {
+                window.CloseButton.clicked -= OnCloseButtonClicked;
+                openDisposable.Dispose();
+                positionDisposable.Dispose();
+            };
+            
+            return Bind_ElementGroupContents(windowElement, window);
 
-            // Focusable.ExecuteDefaultEvent() 内の this.focusController?.SwitchFocusOnEvent(evt) で
-            // NavigationMoveEvent 方向にフォーカスを移動しようとする
-            // キー入力をしている場合などにフォーカスが移ってしまうのは避けたいのでWindow単位で抑制しておく
-            // UnityデフォルトでもTextFieldは抑制できているが、IntegerField.inputFieldでは出来ていないなど挙動に一貫性がない
-            window.RegisterCallback<NavigationMoveEvent>(evt => evt.PreventDefault());
-
-            Build_ElementGroupContents(window.contentContainer, element);
-
-            window.AddBoxShadow();
-
-            return window;
+            void OnCloseButtonClicked() =>  windowElement.Enable = !windowElement.Enable;
         }
     }
 }

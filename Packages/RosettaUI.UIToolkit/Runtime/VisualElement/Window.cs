@@ -94,9 +94,12 @@ namespace RosettaUI.UIToolkit
                 }
             }
         }
-        
 
-        public Window(bool resizable = true)
+        public Window() : this(true)
+        {
+        }
+
+        public Window(bool resizable)
         {
             this.resizable = resizable;
 
@@ -126,7 +129,15 @@ namespace RosettaUI.UIToolkit
                 style.width = StyleKeyword.Null;
                 ResetFixedSize();
             });
+            
+            // Focusable.ExecuteDefaultEvent() 内の this.focusController?.SwitchFocusOnEvent(evt) で
+            // NavigationMoveEvent 方向にフォーカスを移動しようとする
+            // キー入力をしている場合などにフォーカスが移ってしまうのは避けたいのでWindow単位で抑制しておく
+            // UnityデフォルトでもTextFieldは抑制できているが、IntegerField.inputFieldでは出来ていないなど挙動に一貫性がない
+            RegisterCallback<NavigationMoveEvent>(evt => evt.PreventDefault());
 
+            this.AddBoxShadow();
+            
             ResetFixedSize();
         }
 

@@ -28,7 +28,7 @@ namespace RosettaUI.Example
                 _elementSets.Add(CreateElements(i).ToList());
             }
 
-            bool build =true;
+            var build =true;
             var bindCount = 0;
 
             return //UI.ScrollViewVerticalAndHorizontal(1000f, 1200f,
@@ -55,17 +55,16 @@ namespace RosettaUI.Example
                                     UI.Button("Build", () => build = true),
                                     UI.Button("Bind", () => Bind(++bindCount))
                                 }
-                                .Concat(_elementSets.SelectMany(set => set))
+                                .Concat(_elementSets.SelectMany(sets => sets)) // 今回非表示のElementもBindするとき親が指定されててほしいので非表示状態だけど登録しておく
                         );
                     }
                 );
-            // );
         }
-        
+
         IEnumerable<Element> CreateElements(int id)
         {
             // return Enumerable.Range(0, 1000).Select(i => UI.Field(() => intValue));
-            
+
             int intValue = id;
             uint uintValue = (uint)id;
             float floatValue = id * 0.1f;
@@ -73,7 +72,7 @@ namespace RosettaUI.Example
             Color colorValue = Color.HSVToRGB(id / 6f, 1f, 1f);
             bool boolValue = id % 2 == 1;
             Vector2 vector2Field = Vector2.one * id * 0.1f;
-            Vector2Int vector2IntField = Vector2Int.one *id;
+            Vector2Int vector2IntField = Vector2Int.one * id;
             int dropDownIdx = 0;
 
             int intMin = -id;
@@ -88,61 +87,66 @@ namespace RosettaUI.Example
 
             // return new[]
             // {
-            //     UI.ScrollViewVertical(200f, Enumerable.Range(0,(id+1)*10).Select(i => UI.Field($"Item[{i}]_id[{id}]", () => i))),
+            //     UI.Window($"Window[{id}]", CreateGroupContents(id))
             // };
-            
+
             return new[]
             {
-                UI.Label($"Label[{id}]"),
-                UI.Field($"{nameof(intValue)}[{id}]", () => intValue),
-                UI.Field($"{nameof(uintValue)}[{id}]", () => uintValue),
-                UI.Field($"{nameof(floatValue)}[{id}]", () => floatValue),
-                UI.Field($"{nameof(stringValue)}[{id}]", () => stringValue),
-                UI.Field($"{nameof(colorValue)}[{id}]", () => colorValue),
-                UI.Field($"{nameof(boolValue)}[{id}]", () => boolValue),
-                UI.Field($"{nameof(vector2Field)}[{id}]", () => vector2Field),
-                UI.Field($"{nameof(vector2IntField)}[{id}]", () => vector2IntField),
-                
-                UI.Slider($"{nameof(intValue)}[{id}]", () => intValue, intMin, intMax),
-                UI.Slider($"{nameof(uintValue)}[{id}]", () => uintValue, uintMin, uintMax),
-                UI.Slider($"{nameof(floatValue)}[{id}]", () => floatValue, floatMin, floatMax),
-                
-                UI.MinMaxSlider($"{nameof(vector2Field)}[{id}]", () => vector2Field, new Vector2(floatMin, floatMax)),
-                UI.MinMaxSlider($"{nameof(vector2IntField)}[{id}]", () => vector2IntField, new Vector2Int(intMin, intMax)),
-                
-                UI.Toggle($"Toggle[{id}]", () => boolValue),
-                UI.HelpBox($"HelpBox[{id}]", (HelpBoxType)(id%4)),
-                UI.Fold($"Fold[{id}]",
-                    UI.Field($"{nameof(intValue)}[{id}]", () => intValue)
+                UI.Fold("Elements",
+                    UI.Label($"Label[{id}]"),
+                    UI.Field($"{nameof(intValue)}[{id}]", () => intValue),
+                    UI.Field($"{nameof(uintValue)}[{id}]", () => uintValue),
+                    UI.Field($"{nameof(floatValue)}[{id}]", () => floatValue),
+                    UI.Field($"{nameof(stringValue)}[{id}]", () => stringValue),
+                    UI.Field($"{nameof(colorValue)}[{id}]", () => colorValue),
+                    UI.Field($"{nameof(boolValue)}[{id}]", () => boolValue),
+                    UI.Field($"{nameof(vector2Field)}[{id}]", () => vector2Field),
+                    UI.Field($"{nameof(vector2IntField)}[{id}]", () => vector2IntField),
+                    UI.Slider($"{nameof(intValue)}[{id}]", () => intValue, intMin, intMax),
+                    UI.Slider($"{nameof(uintValue)}[{id}]", () => uintValue, uintMin, uintMax),
+                    UI.Slider($"{nameof(floatValue)}[{id}]", () => floatValue, floatMin, floatMax),
+                    UI.MinMaxSlider($"{nameof(vector2Field)}[{id}]", () => vector2Field,
+                        new Vector2(floatMin, floatMax)),
+                    UI.MinMaxSlider($"{nameof(vector2IntField)}[{id}]", () => vector2IntField,
+                        new Vector2Int(intMin, intMax)),
+                    UI.Toggle($"Toggle[{id}]", () => boolValue),
+                    UI.HelpBox($"HelpBox[{id}]", (HelpBoxType)(id % 4)),
+                    UI.Fold($"Fold[{id}]",
+                        UI.Field($"{nameof(intValue)}[{id}]", () => intValue)
                     ),
-                UI.Dropdown($"Dropdown[{id}]", () => dropDownIdx, new[]{"one","two","three"}),
-                UI.Button($"Button[{id}]", () => Debug.Log($"On button clicked at id[{id}]")),
-                
-                UI.Popup(UI.Label($"Popup[{id}]"), () => popupMenuItems),
-                
-                UI.Label("Image"),
-                UI.Image(() => textures[id % textures.Count]),
-                
-                UI.Label("Space"),
-                UI.Space().SetWidth((id+1) * 100f).SetHeight(30f).SetBackgroundColor(Color.gray),
+                    UI.Dropdown($"Dropdown[{id}]", () => dropDownIdx, new[] { "one", "two", "three" }),
+                    UI.Button($"Button[{id}]", () => Debug.Log($"On button clicked at id[{id}]")),
+                    UI.Popup(UI.Label($"Popup[{id}]"), () => popupMenuItems),
+                    UI.Label("Image"),
+                    UI.Image(() => textures[id % textures.Count]),
+                    UI.Label("Space"),
+                    UI.Space().SetWidth((id + 1) * 100f).SetHeight(30f).SetBackgroundColor(Color.gray)
+                ).Open(),
 
-                UI.Label("Row"),
-                UI.Row(CreateGroupContents(id)),
-                
-                UI.Label("Column"),
-                UI.Column(CreateGroupContents(id)),
-                
-                UI.Label("Box"),
-                UI.Box(CreateGroupContents(id)),
-                
-                UI.Label("Indent"),
-                UI.Indent(CreateGroupContents(id)),
+                UI.Fold("ElementGroups",
+                    UI.Label("Row"),
+                    UI.Row(CreateGroupContents(id)),
 
-                UI.Label("Page"),
-                UI.Page(CreateGroupContents(id)),
-                
-                UI.Label("ScrollView"),
-                UI.ScrollViewVertical(200f, Enumerable.Range(0,(id+1)*10).Select(i => UI.Field($"Item[{i}]_id[{id}]", () => i))),
+                    UI.Label("Column"),
+                    UI.Column(CreateGroupContents(id)),
+
+                    UI.Label("Box"),
+                    UI.Box(CreateGroupContents(id)),
+
+                    UI.Label("Indent"),
+                    UI.Indent(CreateGroupContents(id)),
+
+                    UI.Label("Page"),
+                    UI.Page(CreateGroupContents(id)),
+
+                    UI.Label("ScrollView"),
+                    UI.ScrollViewVertical(200f,
+                        Enumerable.Range(0, (id + 1) * 10).Select(i => UI.Field($"Item[{i}]_id[{id}]", () => i))),
+                    
+                    UI.Tabs(CreateTabContents(id))
+                    
+                    // UI.Window($"Window[{id}]", CreateGroupContents(id))
+                ).Open()
             };
 
             IEnumerable<Element> CreateGroupContents(int id)
@@ -177,6 +181,13 @@ namespace RosettaUI.Example
 
                     _ => throw new ArgumentOutOfRangeException()
                 };
+            }
+            
+            
+            IEnumerable<(string, Element)> CreateTabContents(int id)
+            {
+                return Enumerable.Range(0, (id+2))
+                    .Select(idx => ($"Tab[{id}-{idx}]", (Element)UI.Column(CreateGroupContents(idx))));
             }
         }
 

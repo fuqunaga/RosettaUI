@@ -36,7 +36,7 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 [typeof(CompositeFieldElement)] = BuildSimple<CompositeField>,
                 [typeof(DynamicElement)] = Build_DynamicElement,
-                [typeof(FoldElement)] = Build_Fold,
+                [typeof(FoldElement)] = BuildSimple<FoldoutCustom>,
                 [typeof(HelpBoxElement)] = BuildSimple<HelpBox>,
                 [typeof(RowElement)] = BuildSimple<Row>,
                 [typeof(ColumnElement)] = BuildSimple<Column>,

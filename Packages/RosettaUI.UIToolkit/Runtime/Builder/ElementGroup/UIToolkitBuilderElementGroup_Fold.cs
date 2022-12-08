@@ -6,23 +6,6 @@ namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        private VisualElement Build_Fold(Element element)
-        {
-            var fold = new FoldoutCustom();
-            var toggle = fold.Toggle;
-
-            // disable 中でもクリック可能
-            UIToolkitUtility.SetAcceptClicksIfDisabled(toggle);
-            
-            // Foldout 直下の Toggle は marginLeft が default.uss で書き換わるので上書きしておく
-            // セレクタ例： .unity-foldout--depth-1 > .unity-fold__toggle
-            toggle.style.marginLeft = 0;
-
-            Bind_Fold(element, fold);
-            return fold;
-        }
-
-
         private bool Bind_Fold(Element element, VisualElement visualElement)
         {
             if (element is not FoldElement foldElement || visualElement is not FoldoutCustom fold) return false;

@@ -47,7 +47,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(ScrollViewElement)] = BuildSimple<ScrollView>,
                 [typeof(TabsElement)] = BuildSimple<Tabs>,
                 [typeof(WindowElement)] = BuildSimple<Window>,
-                [typeof(WindowLauncherElement)] = Build_WindowLauncher,
+                [typeof(WindowLauncherElement)] = BuildSimple<WindowLauncher>,
 
                 [typeof(IntFieldElement)] = BuildSimple<IntegerField>,
                 [typeof(UIntFieldElement)] = BuildSimple<UIntField>,
@@ -87,7 +87,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(ScrollViewElement)] = Bind_ScrollView,
                 [typeof(TabsElement)] = Bind_Tabs,
                 [typeof(WindowElement)] = Bind_Window,
-                // [typeof(WindowLauncherElement)] = Build_WindowLauncher,
+                [typeof(WindowLauncherElement)] = Bind_WindowLauncher,
                 
                 [typeof(IntFieldElement)] = Bind_Field<int, IntegerField>,
                 [typeof(UIntFieldElement)] = Bind_Field<uint, UIntField>,

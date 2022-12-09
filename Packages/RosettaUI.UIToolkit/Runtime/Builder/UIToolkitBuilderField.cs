@@ -46,15 +46,6 @@ namespace RosettaUI.UIToolkit.Builder
             return Build_Field<TValue, TField>(element, Bind_Field<TValue, TField>);
         }
 
-        private TField Build_Field<TValue, TField>(Element element, bool labelEnable)
-            where TField : BaseField<TValue>, new()
-        {
-            var field = CreateField<TValue, TField>();
-            Bind_Field((FieldBaseElement<TValue>) element, field, labelEnable);
-
-            return field;
-        }
-
         private static TField Build_Field<TValue, TField>(Element element, Func<Element, VisualElement, bool> bindMethod)
             where TField : BaseField<TValue>, new()
         {

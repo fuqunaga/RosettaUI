@@ -120,7 +120,8 @@ namespace RosettaUI.Example
                     UI.Label("Image"),
                     UI.Image(() => textures[id % textures.Count]),
                     UI.Label("Space"),
-                    UI.Space().SetWidth((id + 1) * 100f).SetHeight(30f).SetBackgroundColor(Color.gray)
+                    UI.Space().SetWidth((id + 1) * 100f).SetHeight(30f).SetBackgroundColor(Color.gray),
+                    UI.WindowLauncher($"Launcher[{id}]", UI.Window($"Window[{id}]", CreateGroupContents(id)))
                 ).Open(),
 
                 UI.Fold("ElementGroups",

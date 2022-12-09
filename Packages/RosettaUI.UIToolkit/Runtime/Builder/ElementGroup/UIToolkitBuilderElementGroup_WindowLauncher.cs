@@ -1,107 +1,61 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using System.Linq;
+using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        private static readonly Dictionary<WindowElement, List<WindowElement>> WindowLauncherOpenedWindowTable = new();
-
-        private VisualElement Build_WindowLauncher(Element element)
+        private bool Bind_WindowLauncher(Element element, VisualElement visualElement)
         {
-            var launcherElement = (WindowLauncherElement) element;
-            var windowElement = launcherElement.window;
-            var window = (Window) Build(windowElement);
+            if (element is not WindowLauncherElement windowLauncherElement 
+                || visualElement is not WindowLauncher windowLauncher) return false;
 
-            var toggle = Build_Field<bool, Toggle>(launcherElement, false);
-            toggle.AddToClassList(UssClassName.WindowLauncher);
-            toggle.RegisterCallback<PointerUpEvent>(OnPointUpEventFirst);
-
-            var labelElement = launcherElement.Label;
-            labelElement?.GetViewBridge().SubscribeValueOnUpdateCallOnce(v => toggle.text = v);
-
-            ApplyMinusIndentIfPossible(toggle, element);
+            Bind_Field(windowLauncherElement, windowLauncher, false);
+            Bind_ExistingLabel(windowLauncherElement.Label, null, str => windowLauncher.text = str);
+            ApplyMinusIndentIfPossible(windowLauncher, element);
             
+            var windowElement = windowLauncherElement.window;
+            var window = (Window)(GetUIObj(windowElement) ?? Build(windowElement));
             
-            return toggle;
-
+            windowLauncher.RegisterCallback<PointerUpEvent>(OnPointUpEvent);
+            windowLauncherElement.GetViewBridge().onUnsubscribe += () =>
+            {
+                windowLauncher.UnregisterCallback<PointerUpEvent>(OnPointUpEvent);
+            };
+            
+            return true;
+            
             // ほかのWindowにかぶらない位置を計算する
             // 一度ドラッグしたWindowはその位置を覚えてこの処理の対象にはならない
-            void OnPointUpEventFirst(PointerUpEvent evt)
+            void OnPointUpEvent(PointerUpEvent evt)
             {
                 // Toggleの値が変わるのはこのイベントの後
+                // これから閉じるならリターン
                 if (windowElement.Enable) return;
                 
                 // positionが指定されていたらそちらを優先
                 if (windowElement.positionRx.Value.HasValue)
                 {
-                    window.Show(toggle);
+                    window.Show(windowLauncher);
                     return;
                 }
                 
-                // Auto layout
-                var pos = evt.originalMousePosition;
-                var parentWindowElement = launcherElement.Parents().OfType<WindowElement>().FirstOrDefault();
+                var screenRect = GetUIObj(windowLauncherElement)?.panel.visualTree.layout;
+                Assert.IsTrue(screenRect.HasValue);
                 
-                if (parentWindowElement != null && GetUIObj(parentWindowElement) is Window parentWindow)
-                {
-                    const float delta = 5f;
-                    var area = parentWindow.panel.visualTree.layout;
-                    
-                    var rect = parentWindow.layout;
-                    var x = rect.xMax + delta;
-                    if (x < area.xMax)
-                    {
-                        pos = new Vector2(x, rect.yMin);
-                    }
+                var parentWindowElement = windowLauncherElement.Parents().OfType<WindowElement>().FirstOrDefault();
+                
+                var pos = WindowLayout.CalcOpenWindowPosition(
+                    evt.originalMousePosition,
+                    screenRect.Value,
+                    windowElement,
+                    parentWindowElement,
+                    getWindowRect: we => GetUIObj(we).layout,
+                    isWindowMoved: we => GetUIObj(we) is Window { IsMoved: true }
+                );
 
-                    if (!WindowLauncherOpenedWindowTable.TryGetValue(parentWindowElement, out var openedWindows))
-                    {
-                        openedWindows = WindowLauncherOpenedWindowTable[parentWindowElement] = new List<WindowElement>();
-                    }
-
-                    var lastIndex = openedWindows.FindLastIndex(w => w is {IsOpen: true} && GetUIObj(w) is Window {IsMoved: false});
-                    if (lastIndex >= 0)
-                    {
-                        var removeIndex = lastIndex + 1;
-                        openedWindows.RemoveRange(removeIndex, openedWindows.Count - removeIndex);
-                    }
-
-                    var lastOpenedWindowElement = openedWindows.LastOrDefault();
-                    if (lastOpenedWindowElement != null &&  GetUIObj(lastOpenedWindowElement) is Window targetWindow)
-                    {
-                        var targetWindowRect = targetWindow.layout;
-
-                        if ( Vector2.Distance(pos,targetWindowRect.position) < delta)
-                        {
-                            
-                            var areaYHalf = area.center.y;
-
-                            var yMax = targetWindowRect.yMax;
-                            if (yMax < areaYHalf)
-                            {
-                                pos.y = yMax + delta;
-                            }
-                            else
-                            {
-                                var newX = targetWindowRect.xMax + delta; 
-                                if (newX < area.xMax)
-                                {
-                                    pos.x = newX;
-                                }
-                            }
-                        }
-                    }
-                    
-                    openedWindows.Add(windowElement);
-                }
-
-                if (pos.x < 0f) pos.x = 0f;
-                if (pos.y < 0f) pos.y = 0f;
-
-                window.Show(pos, toggle);
+                window.Show(pos, windowLauncher);
             }
         }
     }

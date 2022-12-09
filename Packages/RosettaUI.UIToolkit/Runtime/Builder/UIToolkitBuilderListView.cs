@@ -15,16 +15,19 @@ namespace RosettaUI.UIToolkit.Builder
             var itemContainerElement = (ListViewItemContainerElement) element;
             var option = itemContainerElement.option;
             
+            var veToTypeIdxTable = new Dictionary<VisualElement, Dictionary<Type, int>>();
+
             var listView = new ListViewCustom()
             {
                 reorderable = option.reorderable,
                 reorderMode = option.reorderable ? ListViewReorderMode.Animated : ListViewReorderMode.Simple,
-                virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+                // virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
                 itemsSource = itemContainerElement.GetIList(),
                 // showFoldoutHeader = true,
                 showAddRemoveFooter = !option.fixedSize,
-                makeItem =() => new VisualElement(),
+                makeItem = MakeItem,
                 bindItem = BindItem,
+                unbindItem = UnbindItem
             };
 
             #region Callbacks
@@ -63,7 +66,6 @@ namespace RosettaUI.UIToolkit.Builder
                 var list = itemContainerElement.GetIList();
                 
                 // ListView 外での参照先変更を ListView に通知
-                // ReSharper disable once PossibleUnintendedReferenceComparison
                 if (listView.itemsSource != list)
                 {
                     listView.itemsSource = list;
@@ -91,30 +93,73 @@ namespace RosettaUI.UIToolkit.Builder
             #endregion
 
             
-            return listView;
-
             
             #region Local functions
+
+            
+            // 各要素ごとに空のVisualElementを作り、
+            // その子供にElementの型に応じたVisualElementを生成する
+            // Bind対象のElementが変わったら型ごとのVisualElementは非表示にして再利用を待つ
+
+            VisualElement MakeItem()
+            {
+                var itemVe = new VisualElement();
+                ApplyIndent(itemVe); // リストの要素は見栄えを気にしてとりあえず強制インデント
+
+                return itemVe;
+            }
             
             void BindItem(VisualElement ve, int idx)
             {
-                ve.Clear();
-
+                if (!veToTypeIdxTable.TryGetValue(ve, out var typeToIdx))
+                {
+                    veToTypeIdxTable[ve] = typeToIdx = new();
+                }
+                
                 var e = itemContainerElement.GetOrCreateItemElement(idx);
                 e.SetEnable(true);
+                var elementType = e.GetType();
 
-                var itemVe = GetUIObj(e);
-                if (itemVe == null)
+                var needBuild = true;
+                if (typeToIdx.TryGetValue(elementType, out var veIdx))
                 {
-                    itemVe = Build(e);
-                    ApplyIndent(itemVe);
+                    var itemVe = ve.ElementAt(veIdx);
+                    if (itemVe != null)
+                    {
+                        var success = Bind(e, itemVe);
+                        needBuild = !success;
+                    }
                 }
-                else
+                
+                if ( needBuild )
                 {
-                    e.Update();　// 表示前に最新の値をUIに通知
+                    var itemVe = Build(e);
+                    ApplyIndent(itemVe); 
+                    ve.Add(itemVe);
+
+                    typeToIdx[elementType] = veIdx = ve.childCount - 1;
                 }
 
-                ve.Add(itemVe);
+                // var itemVe = GetUIObj(e);
+                // if (itemVe == null)
+                // {
+                //     itemVe = Build(e);
+                //     ApplyIndent(itemVe);
+                // }
+                // else
+                // {
+                //     e.Update();　// 表示前に最新の値をUIに通知
+                // }
+                //
+                // ve.Add(itemVe);
+            }
+
+            void UnbindItem(VisualElement _, int idx)
+            {
+                var e = itemContainerElement.GetOrCreateItemElement(idx);
+                e.SetEnable(false); //　itemVeを非表示
+                
+                Unbind(e);
             }
 
             void OnItemsRemoved(IEnumerable<int> idxes)
@@ -178,6 +223,9 @@ namespace RosettaUI.UIToolkit.Builder
             }
             
             #endregion
+            
+            
+            return listView;
         }
     }
 }

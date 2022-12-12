@@ -97,7 +97,7 @@ namespace RosettaUI.UIToolkit.Editor
 
         protected virtual void OnDestroy()
         {
-            element.DestroyView();
+            element.DetachView();
         }
     }
 }

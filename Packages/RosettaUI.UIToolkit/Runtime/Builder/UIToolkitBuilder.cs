@@ -35,7 +35,7 @@ namespace RosettaUI.UIToolkit.Builder
             _buildFuncTable = new Dictionary<Type, Func<Element, VisualElement>>
             {
                 [typeof(CompositeFieldElement)] = BuildSimple<CompositeField>,
-                [typeof(DynamicElement)] = Build_DynamicElement,
+                [typeof(DynamicElement)] = BuildSimple<VisualElement>,
                 [typeof(FoldElement)] = BuildSimple<FoldoutCustom>,
                 [typeof(HelpBoxElement)] = BuildSimple<HelpBox>,
                 [typeof(RowElement)] = BuildSimple<Row>,
@@ -75,7 +75,7 @@ namespace RosettaUI.UIToolkit.Builder
             BindFuncTable = new()
             {
                 [typeof(CompositeFieldElement)] = Bind_CompositeField,
-                // [typeof(DynamicElement)] = Build_DynamicElement,
+                [typeof(DynamicElement)] = Bind_DynamicElement,
                 [typeof(FoldElement)] = Bind_Fold,
                 [typeof(HelpBoxElement)] = Bind_HelpBox,
                 [typeof(RowElement)] = Bind_ElementGroup<RowElement, Row>,
@@ -165,7 +165,8 @@ namespace RosettaUI.UIToolkit.Builder
 
             // BindFunc内でGetUIObj()をしたいので先に登録しておく
             // プレフィックスラベルの幅を求める計算がBuild時はコールバックで呼ばれるのでBuild後で済むが、
-            // Bind時は異なる幅でレイアウト処理まで行くと重たいのですぐに幅を計算して元通りにしておきたい
+            // Bind時はデフォルトの幅になったままレイアウト処理が行われるとレイアウトが変更され重たいので、
+            // すぐにBind前の幅に戻してしておきたい
             // したがってBindFunc内でGetUIObj()できるように先にSetupUIObj()を呼んでおく
             SetupUIObj(element, ve);
             
@@ -302,33 +303,15 @@ namespace RosettaUI.UIToolkit.Builder
                 => nullable ?? (StyleColor)StyleKeyword.Null;
         }
 
-
-
-        protected override void OnRebuildElementGroupChildren(ElementGroup elementGroup)
-        {
-            var groupVe = GetUIObj(elementGroup);
-            Build_ElementGroupContents(groupVe, elementGroup);
-        }
-
-        protected override void OnDestroyViewElement(Element element, bool isDestroyRoot)
+        protected override void OnDetachView(Element element, bool destroyView)
         {
             var ve = GetUIObj(element);
             Unbind(element);   
             
-            if (isDestroyRoot)
+            if (destroyView)
             {
                 ve?.RemoveFromHierarchy();
             }
-        }
-
-        private static class UssClassName
-        {
-            private static readonly string RosettaUI = "rosettaui";
-            
-            public static readonly string WindowLauncher = RosettaUI + "-window-launcher";
-            public static readonly string MinMaxSlider = RosettaUI + "-min-max-slider";
-            public static readonly string Space = RosettaUI + "-space";
-            public static readonly string DynamicElement = RosettaUI + "-dynamic-element";
         }
     }
 }

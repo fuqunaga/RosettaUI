@@ -71,17 +71,16 @@ namespace RosettaUI
         /// Update()内のループ中のElement.Update()内でRegister()/Unregister()されることがあるので
         /// 次のUpdate()までキューに貯める
         /// </summary>
-        void ProcessQueue()
+        private void ProcessQueue()
         {
             while (_registerQueue.Any())
             {
                 var e = _registerQueue.Dequeue();
                 if (_elements.Add(e))
                 {
-                    e.onDestroyView += (element,_) => Unregister(element);
+                    e.onDetachView += (element,_) => Unregister(element);
                 }
             }
-
 
             while (_unregisterQueue.Any())
             {

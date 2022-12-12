@@ -60,7 +60,7 @@ namespace RosettaUI
                     window.Close();
                 }
             };
-            launcher.onDestroyView += (_,_) => window.DestroyView();
+            launcher.onDetachView += (_,_) => window.DetachView();
 
             return launcher;
         }

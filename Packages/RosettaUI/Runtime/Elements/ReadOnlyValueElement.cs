@@ -65,7 +65,6 @@ namespace RosettaUI
             } 
         }
     }
-    
         
     public static partial class ElementViewBridgeExtensions
     {

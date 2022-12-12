@@ -58,6 +58,8 @@ namespace RosettaUI.UIToolkit.Builder
         private bool Bind_ElementGroupContents(ElementGroup elementGroup, VisualElement visualElement,
             Action<Element, VisualElement, int> bindChild = null)
         {
+            visualElement.name = elementGroup.DisplayName;
+            
             var contentCount = elementGroup.Contents.Count();
             var visualElementCount = visualElement.childCount;
 

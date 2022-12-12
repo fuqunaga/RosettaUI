@@ -9,56 +9,56 @@ namespace RosettaUI.Example
 {
     public class TestBind : MonoBehaviour
     {
-        private List<List<Element>> _elementSets = new();
+        private readonly List<List<Element>> _elementSets = new();
         public List<Texture> textures;
+        private RosettaUIRoot _root;
+        private Element _rootElement;
         
         private void Start()
         {
-            var root = GetComponent<RosettaUIRoot>();
+            _root = GetComponent<RosettaUIRoot>();
+            Build();
+        }
 
-            var window = UI.Window(CreateElement());
-            root.Build(window);
+        private void Build()
+        {
+            _rootElement?.DetachView();
+            
+            _rootElement = UI.Window(CreateElement());
+            _root.Build(_rootElement);
         }
 
         private Element CreateElement()
         {
             const int setsCount = 10;
-            for (var i = 0; i < setsCount; ++i)
+            if (!_elementSets.Any())
             {
-                _elementSets.Add(CreateElements(i).ToList());
+                for (var i = 0; i < setsCount; ++i)
+                {
+                    _elementSets.Add(CreateElements(i).ToList());
+                }
             }
 
-            var build =true;
+            for (var i = 0; i < setsCount; ++i)
+            {
+                var enable = i == 0;
+                foreach (var e in _elementSets[i])
+                {
+                    e.DetachParent();
+                    e.Enable = enable;
+                }
+            }
+
             var bindCount = 0;
 
-            return //UI.ScrollViewVerticalAndHorizontal(1000f, 1200f,
-                UI.DynamicElementOnTrigger(
-                    _ => build,
-                    () =>
+            return UI.Column(
+                new[]
                     {
-                        build = false;
-                        bindCount = 0;
-
-                        for (var i = 0; i < setsCount; ++i)
-                        {
-                            var enable = i == 0;
-                            foreach (var e in _elementSets[i])
-                            {
-                                e.DetachParent();
-                                e.Enable = enable;
-                            }
-                        }
-
-                        return UI.Column(
-                            new[]
-                                {
-                                    UI.Button("Build", () => build = true),
-                                    UI.Button("Bind", () => Bind(++bindCount))
-                                }
-                                .Concat(_elementSets.SelectMany(sets => sets)) // 今回非表示のElementもBindするとき親が指定されててほしいので非表示状態だけど登録しておく
-                        );
+                        UI.Button("Build", Build),
+                        UI.Button("Bind", () => Bind(++bindCount))
                     }
-                );
+                    .Concat(_elementSets.SelectMany(sets => sets)) // 今回非表示のElementもBindするとき親が指定されててほしいので非表示状態だけど登録しておく
+            );
         }
 
         IEnumerable<Element> CreateElements(int id)
@@ -87,7 +87,13 @@ namespace RosettaUI.Example
 
             // return new[]
             // {
-            //     UI.Window($"Window[{id}]", CreateGroupContents(id))
+            //     UI.Slider(() => intValue, 1),
+            //     UI.DynamicElementOnStatusChanged(
+            //         () => intValue,
+            //         i => UI.Row(
+            //             Enumerable.Range(0, i + 1).Select(idx => UI.Button(idx.ToString()))
+            //         )
+            //     )
             // };
 
             return new[]
@@ -122,8 +128,8 @@ namespace RosettaUI.Example
                     UI.Label("Space"),
                     UI.Space().SetWidth((id + 1) * 100f).SetHeight(30f).SetBackgroundColor(Color.gray),
                     UI.WindowLauncher($"Launcher[{id}]", UI.Window($"Window[{id}]", CreateGroupContents(id)))
-                ).Open(),
-
+                ).Open()
+                ,
                 UI.Fold("ElementGroups",
                     UI.Label("Row"),
                     UI.Row(CreateGroupContents(id)),
@@ -144,9 +150,12 @@ namespace RosettaUI.Example
                     UI.ScrollViewVertical(200f,
                         Enumerable.Range(0, (id + 1) * 10).Select(i => UI.Field($"Item[{i}]_id[{id}]", () => i))),
                     
-                    UI.Tabs(CreateTabContents(id))
+                    UI.Tabs(CreateTabContents(id)),
                     
-                    // UI.Window($"Window[{id}]", CreateGroupContents(id))
+                    UI.Label("DynamicElement"),
+                    UI.Slider(() => intValue),
+                    UI.DynamicElementOnStatusChanged(() => intValue,
+                        i => UI.Row(Enumerable.Range(0,i+1).Select(idx => UI.Button(idx.ToString()))))
                 ).Open()
             };
 

@@ -53,7 +53,6 @@ namespace RosettaUI.Builder
                 {
                     uiObj = func(element);
                     SetupUIObj(element, uiObj);
-                    SetPersistantCallback(element);
                 }
                 else
                 {
@@ -79,22 +78,14 @@ namespace RosettaUI.Builder
 
         protected abstract void CalcPrefixLabelWidthWithIndent(LabelElement label, TUIObj uiObj);
 
-
-        protected virtual void SetPersistantCallback(Element element)
-        {
-            element.onDestroyView += OnDestroyViewElement;
-
-            if (element is DynamicElement dynamicElement)
-            {
-                dynamicElement.RegisterBuildUI(OnRebuildElementGroupChildren);
-            } 
-        }
-        
+       
         protected virtual void SetDefaultCallbacks(Element element, TUIObj uiObj)
         {
             var enableUnsubscribe = element.enableRx.SubscribeAndCallOnce((enable) => OnElementEnableChanged(element, uiObj, enable));
             var interactableUnsubscribe = element.interactableRx.SubscribeAndCallOnce((interactable) => OnElementInteractableChanged(element, uiObj, interactable));
             var styleUnsubscribe =  element.Style.SubscribeAndCallOnce((style) => OnElementStyleChanged(element, uiObj, style));
+            
+            element.onDetachView += OnDetachView;
 
             var viewBridge = element.GetViewBridge();
             viewBridge.onUnsubscribe += () =>
@@ -102,6 +93,7 @@ namespace RosettaUI.Builder
                 enableUnsubscribe.Dispose();
                 interactableUnsubscribe.Dispose();
                 styleUnsubscribe.Dispose();
+                element.onDetachView -= OnDetachView; 
             };
             
                         
@@ -114,9 +106,7 @@ namespace RosettaUI.Builder
         protected abstract void OnElementEnableChanged(Element element, TUIObj uiObj, bool enable);
         protected abstract void OnElementInteractableChanged(Element element, TUIObj uiObj, bool interactable);
         protected abstract void OnElementStyleChanged(Element element, TUIObj uiObj, Style style);
-        protected abstract void OnRebuildElementGroupChildren(ElementGroup elementGroup);
-        protected abstract void OnDestroyViewElement(Element element, bool isDestroyRoot);
-
+        protected abstract void OnDetachView(Element element, bool destroyView);
 
         protected IEnumerable<TUIObj> Build_ElementGroupContents(ElementGroup elementGroup)
         {

@@ -26,7 +26,7 @@ namespace RosettaUI
         
         public event Action<Element> onUpdate;
         public event Action onViewValueChanged;
-        public event Action<Element, bool> onDestroyView;
+        public event Action<Element, bool> onDetachView;
 
         private ElementViewBridge _viewBridge;
 
@@ -84,24 +84,24 @@ namespace RosettaUI
             foreach(var e in _children) e.Update();
         }
         
-        public void DestroyView(bool isDestroyRoot = true)
+        public void DetachView(bool destroyView = true)
         {
-            onDestroyView?.Invoke(this, isDestroyRoot);
-            DestroyViewChildren(false);
+            onDetachView?.Invoke(this, destroyView);
+            DetachViewChildren();
 
-            if (isDestroyRoot)
+            if (destroyView)
             {
                 DetachParent();
             }
         }
 
-        public void DestroyViewChildren(bool isDestroyRoot = true)
+        private void DetachViewChildren()
         {
             var node = _children.First;
             while(node != null)
             {
                 var next = node.Next;
-                node.Value.DestroyView(isDestroyRoot);
+                node.Value.DetachView(false);
                 node = next;
             }
         }

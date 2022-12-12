@@ -59,7 +59,7 @@ namespace RosettaUI.UGUI.Builder
 
             protected void Initialize(GameObject uiObj, Element element)
             {
-                base.SetDefaultCallbacks(element, uiObj);
+                // base.SetDefaultCallbacks(element, uiObj);
 
                 SetLayerRecursive(uiObj.transform, layer);
 
@@ -128,25 +128,11 @@ namespace RosettaUI.UGUI.Builder
 #endif
             }
 
-            protected override void OnRebuildElementGroupChildren(ElementGroup elementGroup)
-            {
-                var parentGo = GetUIObj(elementGroup);
-                var trans = parentGo.transform;
-
-                foreach(var e in elementGroup.Children)
-                {
-                    var go = impl.Build(e);
-                    go.transform.SetParent(trans);
-                }
-
-            }
-
-
-            protected override void OnDestroyViewElement(Element element, bool isDestroyRoot)
+            protected override void OnDetachView(Element element, bool destroyView)
             {
                 var go = GetUIObj(element);
 
-                if (isDestroyRoot)
+                if (destroyView)
                 {
                     Object.Destroy(go);
                 }

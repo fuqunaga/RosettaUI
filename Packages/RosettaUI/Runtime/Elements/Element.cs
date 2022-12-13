@@ -128,7 +128,7 @@ namespace RosettaUI
             public bool HasBuilt => onUnsubscribe != null;
 
             public ElementViewBridge(Element element) => this.element = element;
-
+            
             public virtual void UnsubscribeAll()
             {
                 onUnsubscribe?.Invoke();

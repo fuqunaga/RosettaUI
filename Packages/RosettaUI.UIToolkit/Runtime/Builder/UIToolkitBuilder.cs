@@ -68,7 +68,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(ImageElement)] = BuildSimple<Image>,
                 [typeof(ButtonElement)] = BuildSimple<Button>,
                 [typeof(PopupMenuElement)] = BuildSimple<PopupMenu>,
-                [typeof(ListViewItemContainerElement)] = Build_ListViewItemContainer
+                [typeof(ListViewItemContainerElement)] = BuildSimple<ListViewCustom>,
             };
             
             
@@ -108,7 +108,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(ImageElement)] = Bind_Image,
                 [typeof(ButtonElement)] = Bind_Button,
                 [typeof(PopupMenuElement)] = Bind_PopupMenu,
-                // [typeof(ListViewItemContainerElement)] = Build_ListViewItemContainer
+                [typeof(ListViewItemContainerElement)] = Bind_ListViewItemContainer
             };
         }
 

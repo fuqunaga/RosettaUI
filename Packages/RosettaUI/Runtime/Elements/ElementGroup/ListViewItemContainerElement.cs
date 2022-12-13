@@ -4,6 +4,22 @@ using System.Linq;
 
 namespace RosettaUI
 {
+    public class ListViewOption
+    {
+        private static ListViewOption _default;
+        public static ListViewOption Default => _default ?? new (true, false);
+        
+        public readonly bool reorderable;
+        public readonly bool fixedSize;
+
+        public ListViewOption(bool reorderable, bool fixedSize)
+        {
+            this.reorderable = reorderable;
+            this.fixedSize = fixedSize;
+        }
+    }
+    
+    
     public class ListViewItemContainerElement : ElementGroup
     {
         private readonly IBinder _binder;
@@ -23,37 +39,31 @@ namespace RosettaUI
             
             _binderTypeHistorySnapshot = BinderHistory.Snapshot.Create();
         }
-
-        public IList GetIList() => ListBinder.GetIList(_binder);
-
-        public void SetIList(IList iList) => _binder.SetObject(iList);
-
         
-        public Element GetOrCreateItemElement(int index)
+        private Element GetOrCreateItemElement(int index)
         {
             var element = GetContentAt(index);
-            if (element == null)
-            {
-                using var applyScope = _binderTypeHistorySnapshot.GetApplyScope();
+            if (element != null) return element;
+            
+            using var applyScope = _binderTypeHistorySnapshot.GetApplyScope();
                 
-                var isReadOnly = ListBinder.IsReadOnly(_binder);
-                for (var i = Contents.Count(); i <= index; i++)
+            var isReadOnly = ListBinder.IsReadOnly(_binder);
+            for (var i = Contents.Count(); i <= index; i++)
+            {
+                var itemBinder = ListBinder.CreateItemBinderAt(_binder, i);
+                element = _createItemElement(itemBinder, i);
+                if (!isReadOnly)
                 {
-                    var itemBinder = ListBinder.CreateItemBinderAt(_binder, i);
-                    element = _createItemElement(itemBinder, i);
-                    if (!isReadOnly)
-                    {
-                        element = AddPopupMenu(element, _binder, i);
-                    }
-                    
-                    AddChild(element);
+                    element = AddPopupMenu(element, _binder, i);
                 }
+                    
+                AddChild(element);
             }
 
             return element;
         }
-
-        public static Element AddPopupMenu(Element element, IBinder binder, int idx)
+        
+        private static Element AddPopupMenu(Element element, IBinder binder, int idx)
         {
             return new PopupMenuElement(
                 element,
@@ -65,21 +75,28 @@ namespace RosettaUI
             );
         }
 
-        
+        protected override ElementViewBridge CreateViewBridge() => new ListViewItemContainerViewBridge(this);
+
+        public class ListViewItemContainerViewBridge : ElementViewBridge
+        {
+            private ListViewItemContainerElement Element => (ListViewItemContainerElement)element;
+            private IBinder Binder => Element._binder;
+            
+            public ListViewItemContainerViewBridge(ListViewItemContainerElement element) : base(element)
+            {
+            }
+            
+            public IList GetIList() => ListBinder.GetIList(Binder);
+
+            public void SetIList(IList iList) => Binder.SetObject(iList);
+
+            public Element GetOrCreateItemElement(int index) => Element.GetOrCreateItemElement(index);
+
+        }
     }
 
-    public class ListViewOption
+    public static partial class ElementViewBridgeExtensions
     {
-        private static ListViewOption _default;
-        public static ListViewOption Default => _default ?? new (true, false);
-        
-        public readonly bool reorderable;
-        public readonly bool fixedSize;
-
-        public ListViewOption(bool reorderable, bool fixedSize)
-        {
-            this.reorderable = reorderable;
-            this.fixedSize = fixedSize;
-        }
+        public static ListViewItemContainerElement.ListViewItemContainerViewBridge GetViewBridge(this ListViewItemContainerElement element) => (ListViewItemContainerElement.ListViewItemContainerViewBridge)element.ViewBridge;
     }
 }

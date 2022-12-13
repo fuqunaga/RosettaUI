@@ -41,14 +41,9 @@ namespace RosettaUI
         
         public Element GetContentAt(int index)
         {
-            var i = 0;
-            foreach (var c in Contents)
-            {
-                if (i == index) return c;
-                i++;
-            }
-
-            return null;
+            return (0 <= index && index < Contents.Count())
+                ? Contents.ElementAt(index)
+                : null;
         }
     }
 }

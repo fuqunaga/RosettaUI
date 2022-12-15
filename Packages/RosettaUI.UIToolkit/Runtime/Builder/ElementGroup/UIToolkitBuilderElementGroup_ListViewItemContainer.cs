@@ -21,8 +21,8 @@ namespace RosettaUI.UIToolkit.Builder
             var itemsSource = viewBridge.GetIList();
 
             listView.virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight; //　これだけ定数
-            // listView.reorderable = option.reorderable;
-            // listView.reorderMode = option.reorderable ? ListViewReorderMode.Animated : ListViewReorderMode.Simple;
+            listView.reorderable = option.reorderable;
+            listView.reorderMode = option.reorderable ? ListViewReorderMode.Animated : ListViewReorderMode.Simple;
             listView.showAddRemoveFooter = !option.fixedSize;
             listView.makeItem = MakeItem;
             listView.bindItem = BindItem;
@@ -105,13 +105,12 @@ namespace RosettaUI.UIToolkit.Builder
                 if (success) return;
                 
                 var itemVe = Build(e);
-                ApplyIndent(itemVe); 
                 ve.Add(itemVe);
             }
 
             void UnbindItem(VisualElement _, int idx)
             {
-                var e = itemContainerElement.GetContentAt(idx);
+                var e = itemContainerElement.GetItemElementAt(idx);
                 
                 // Debug.Log($"Unbind Idx[{idx}] Value[{e?.Query<ReadOnlyValueElement<int>>().First().Value}] Open[{e?.Query<FoldElement>().First().IsOpen}]");
                 
@@ -125,21 +124,16 @@ namespace RosettaUI.UIToolkit.Builder
 
             void OnItemsRemoved(IEnumerable<int> idxes)
             {
-                foreach (var idx in idxes)
-                {
-                    var e = itemContainerElement.GetContentAt(idx);
-                    if (e == null) continue;
-                    
-                    Unbind(e);
-                    e.DetachParent();
-                }
+                var min = idxes.Min();
+                viewBridge.RemoveItemElementAfter(min);
             }
             
             void OnItemIndexChanged(int srcIdx, int dstIdx)
             {
                 // Debug.Log($"ItemIndexChanged src[{srcIdx}] dst[{dstIdx}]");
                 
-                CopyFoldOpenClose(srcIdx, dstIdx);
+                // CopyFoldOpenClose(srcIdx, dstIdx);
+                viewBridge.RemoveItemElementAfter(Mathf.Min(srcIdx, dstIdx));
                 OnViewListChanged();
             }
             
@@ -226,29 +220,25 @@ namespace RosettaUI.UIToolkit.Builder
 
             void OnElementUpdate(Element _)
             {
-                if (float.IsNaN(listView.layout.height)) return;
-                
                 var list = viewBridge.GetIList();
-                
+                var listItemCount = list.Count;
+
                 // ListView 外での参照先変更を ListView に通知
                 if (!ReferenceEquals(listView.itemsSource, list))
                 {
+                    viewBridge.RemoveItemElementAfter(0);
+                    lastListItemCount = listItemCount;
                     listView.itemsSource = list;
+                    
                 }
-                
                 // ListView 外での要素数が変更された
                 // 要素のElementを消してlistViewをリフレッシュ
-                var listItemCount = listView.itemsSource.Count;
-                if (lastListItemCount == listItemCount) return;
-                
-                var removeItemCount = lastListItemCount - listItemCount;
-                if (removeItemCount > 0)
+                else if (lastListItemCount != listItemCount)
                 {
-                    OnItemsRemoved(Enumerable.Range(listItemCount, removeItemCount));
+                    viewBridge.RemoveItemElementAfter(0);
+                    lastListItemCount = listItemCount;
+                    listView.RefreshItems(); 
                 }
-
-                lastListItemCount = listItemCount;
-                listView.RefreshItems();
             }
             
             // List になにか変更があった場合の通知

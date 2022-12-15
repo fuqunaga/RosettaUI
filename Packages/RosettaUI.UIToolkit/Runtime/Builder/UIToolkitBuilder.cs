@@ -146,6 +146,7 @@ namespace RosettaUI.UIToolkit.Builder
         public bool Bind(Element element, VisualElement ve)
         {
             if (element == null || ve == null) return false;
+            if (GetUIObj(element) == ve) return true;
             
             // 親なしはとりあえず禁止
             // 新Elementを旧Elementのヒエラルキー上に入れ忘れ防止

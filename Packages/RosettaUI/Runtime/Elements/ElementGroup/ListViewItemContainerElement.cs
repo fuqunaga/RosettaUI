@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Pool;
 
 namespace RosettaUI
 {
@@ -28,6 +30,7 @@ namespace RosettaUI
         private readonly Func<IBinder, int, Element> _createItemElement;
         private readonly BinderHistory.Snapshot _binderTypeHistorySnapshot;
         
+        private readonly Dictionary<int, Element> _itemIndexToElement = new();
         
         public ListViewItemContainerElement(IBinder listBinder, Func<IBinder, int, Element> createItemElement, ListViewOption option) : base(null)
         {
@@ -39,15 +42,32 @@ namespace RosettaUI
             
             _binderTypeHistorySnapshot = BinderHistory.Snapshot.Create();
         }
-        
+
+        public Element GetItemElementAt(int index)
+        {
+            _itemIndexToElement.TryGetValue(index, out var element);
+            return element;
+        }
+
         private Element GetOrCreateItemElement(int index)
         {
-            var element = GetContentAt(index);
+            var element = GetItemElementAt(index);
             if (element != null) return element;
             
             using var applyScope = _binderTypeHistorySnapshot.GetApplyScope();
-                
             var isReadOnly = ListBinder.IsReadOnly(_binder);
+            var itemBinder = ListBinder.CreateItemBinderAt(_binder, index);
+            
+            element = _createItemElement(itemBinder, index);
+            if (!isReadOnly)
+            {
+                element = AddPopupMenu(element, _binder, index);
+            }
+            
+            AddChild(element);
+            _itemIndexToElement[index] = element;
+
+            /*
             for (var i = Contents.Count(); i <= index; i++)
             {
                 var itemBinder = ListBinder.CreateItemBinderAt(_binder, i);
@@ -59,8 +79,25 @@ namespace RosettaUI
                     
                 AddChild(element);
             }
+            */
 
             return element;
+        }
+        
+        private void RemoveItemElementAfter(int startIndex)
+        {
+            using var pool = ListPool<int>.Get(out var keys);
+            keys.AddRange(
+                _itemIndexToElement.Keys.Where(key => key >= startIndex)
+            );
+
+            foreach (var key in keys)
+            {
+                if (!_itemIndexToElement.Remove(key, out var element)) continue;
+                
+                element.DetachView(false);
+                element.DetachParent();
+            }
         }
         
         private static Element AddPopupMenu(Element element, IBinder binder, int idx)
@@ -92,6 +129,7 @@ namespace RosettaUI
 
             public Element GetOrCreateItemElement(int index) => Element.GetOrCreateItemElement(index);
 
+            public void RemoveItemElementAfter(int startIndex) => Element.RemoveItemElementAfter(startIndex);
         }
     }
 

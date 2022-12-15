@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -17,50 +18,72 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
     /// </summary>
     public class ListViewCustom : ListView
     {
-#if UNITY_2022_1_OR_NEWER
-        private static FieldInfo _fieldInfo;
-
-        // Avoid error when IList item is ValueType
-        protected override CollectionViewController CreateViewController() => new ListViewControllerCustom();
-
-        private protected override void CreateVirtualizationController()
-        {
-            _fieldInfo ??= typeof(BaseVerticalCollectionView).GetField("m_VirtualizationController",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-            
-            Assert.IsNotNull(_fieldInfo);
-            _fieldInfo.SetValue(this, new DynamicHeightVirtualizationControllerCustom(this));
-        }
-
-        private class DynamicHeightVirtualizationControllerCustom : DynamicHeightVirtualizationController<ReusableListViewItem>
-        {
-            public DynamicHeightVirtualizationControllerCustom(BaseVerticalCollectionView collectionView) : base(collectionView)
-            {
-            }
-
-            // 最後のアイテムをドラッグすると
-            // - ドラッグ中のアイテムは非表示扱い
-            // - 総アイテム数より表示アイテムが少ない
-            // →表示アイテムを追加
-            // となって無限にアイテムを追加してしまうのでドラッグ中のアイテムを非表示扱いにしない
-            // https://github.com/Unity-Technologies/UnityCsReference/blob/a6cadb936f3855ab7e5bd8e19d85af403d6802c6/ModuleOverrides/com.unity.ui/Core/Collections/Virtualization/VerticalVirtualizationController.cs#L35-L36
-            // https://github.com/Unity-Technologies/UnityCsReference/blob/67987ef0401fa681258a34e708085ec209c95373/ModuleOverrides/com.unity.ui/Core/Collections/Virtualization/DynamicHeightVirtualizationController.cs#L355-L360
-            protected override bool VisibleItemPredicate(ReusableListViewItem i)
-            {
-                return i.rootElement.style.display == DisplayStyle.Flex;
-            }
-        }
-#else
+#if !UNITY_2022_1_OR_NEWER
         public event Action itemsSourceSizeChanged;
 
         public ListViewCustom()
         {
             ((ListViewController)GetOrCreateViewController()).itemsSourceSizeChanged += () => itemsSourceSizeChanged?.Invoke();
+            
+            // RegisterCallback<GeometryChangedEvent>(OnFirstLayoutFinished);
         }
 
-
-        #region 画面外 Drag 対策 / サイズの異なるアイテムの移動でScrolViewの高さがおかしくなる対策
+        // 初回だけ全要素のVisualElementが作成されてしまう問題対策
+        //
+        // 初回はScrollViewのHeightが確定していない関係で全要素のVisualElementを作成してしまっている
+        // 要素の作成をあと回しにするとwidthの初期値がゼロで小さくなってしまうので避けたい
+        // FixedHeightVirtualizationControllerは初回でも固定数しか作成されない模様
+        // 
+        // 初期化時だけFixedHeightVirtualizationControllerにしてレイアウト計算が終わったら
+        // DynamicHeightVirtualizationControllerにする作戦
+        // 
+        // 現状常にDynamicHeight想定
+        // void OnFirstLayoutFinished(GeometryChangedEvent _)
+        // {
+        //     UnregisterCallback<GeometryChangedEvent>(OnFirstLayoutFinished);
+        //     schedule.Execute(() => virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight);
+        // }
+#endif
         
+        
+        
+        #region Avoid error when IList item is ValueType
+        
+#if UNITY_2022_1_OR_NEWER
+        
+        protected override CollectionViewController CreateViewController() => new ListViewControllerCustom();
+#else
+        private protected override void CreateViewController() => SetViewController(new ListViewControllerCustom());
+#endif
+
+        #endregion
+        
+
+        #region DynamicHeightVirtualizationController
+        
+        private static FieldInfo _fieldInfo;
+        private protected override void CreateVirtualizationController()
+        {
+            if (virtualizationMethod != CollectionVirtualizationMethod.DynamicHeight)
+            {
+                base.CreateVirtualizationController();
+                return;
+            }
+
+            _fieldInfo ??= typeof(BaseVerticalCollectionView).GetField("m_VirtualizationController", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(_fieldInfo);
+            _fieldInfo.SetValue(this, new DynamicHeightVirtualizationControllerCustom(this));
+            // _fieldInfo.SetValue(this, new DynamicHeightVirtualizationControllerForDebug<ReusableListViewItem>(this));
+        }
+
+        #endregion
+
+
+
+        //　これいまいらないかも
+        #region 画面外 Drag 対策 / サイズの異なるアイテムの移動でScrolViewの高さがおかしくなる対策
+
+#if !UNITY_2022_1_OR_NEWER
         /// <summary>
         /// 1. ListViewDragger/ListViewDraggerAnimated はアイテムをドラッグした状態で GameView 外で PointerUpしても認識できず中途半端な状態でDragを継続しようとしてしまう
         /// 2. ListViewDraggerAnimated は高さの異なる Item が２つある状態で移動すると ScrollView 全体の高さがどちらかの2倍？になることがある（すばやく DragAndDrop すると発生しやすい）
@@ -70,7 +93,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         /// 2. OnDrop() で Rebuild() する（要素を一度消してサイズを再計算させる）
         /// </summary>
         
-        internal override ListViewDragger CreateDragger() => reorderMode == ListViewReorderMode.Simple ? new ListViewDragger(this) : new ListViewDraggerAnimatedCustom(this);
+        // internal override ListViewDragger CreateDragger() => reorderMode == ListViewReorderMode.Simple ? new ListViewDragger(this) : new ListViewDraggerAnimatedCustom(this);
 
         private class ListViewDraggerAnimatedCustom : ListViewDraggerAnimated
         {
@@ -104,15 +127,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
                 targetListView.virtualizationController.Resize(size, 0);
             }
         }
-
-        #endregion
-
-        
-        #region Avoid error when IList item is ValueType
-        
-        private protected override void CreateViewController() => SetViewController(new ListViewControllerCustom());
-
-        #endregion
 #endif
+        #endregion
     }
 }

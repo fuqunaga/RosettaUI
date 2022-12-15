@@ -1,81 +1,88 @@
 ﻿using System;
-using System.Buffers;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        private bool Bind_ListViewItemContainer(Element element, VisualElement ve)
+        private bool Bind_ListViewItemContainer(Element element, VisualElement visualElement)
         {
             if (element is not ListViewItemContainerElement itemContainerElement ||
-                ve is not ListViewCustom listView) return false;
+                visualElement is not ListViewCustom listView) return false;
             
             var option = itemContainerElement.option;           
             var viewBridge = itemContainerElement.GetViewBridge();
+            var itemsSource = viewBridge.GetIList();
 
             listView.virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight; //　これだけ定数
-            listView.reorderable = option.reorderable;
-            listView.reorderMode = option.reorderable ? ListViewReorderMode.Animated : ListViewReorderMode.Simple;
-            listView.itemsSource = viewBridge.GetIList();
+            // listView.reorderable = option.reorderable;
+            // listView.reorderMode = option.reorderable ? ListViewReorderMode.Animated : ListViewReorderMode.Simple;
             listView.showAddRemoveFooter = !option.fixedSize;
             listView.makeItem = MakeItem;
             listView.bindItem = BindItem;
             listView.unbindItem = UnbindItem;
 
+
+            
             // list が Array の場合、参照先が変わる
             // ListView 内で変更される場合も Inspector などで ListView 外で変わる場合もある
             // また ListView 外で List の要素数が変わった場合は、ListView に知らせる必要がある
-            var lastListItemCount = listView.itemsSource.Count;          
-
-
-            #region Callbacks
+            // 外部での要素数の変更を検知するために要素数を保存しといてチェックする
+            var lastListItemCount = itemsSource.Count;
             
-            listView.itemsRemoved += OnItemsRemoved;
-            listView.itemIndexChanged += OnItemIndexChanged;
+            SetCallbacks();
 
-            // ListView 内での参照先変更を通知
-            listView.itemsSourceChanged += OnItemsSourceChanged;
-
-            // ListView 内での要素数変更を通知（ListView 外での変更と区別するための処理）
-#if UNITY_2022_1_OR_NEWER
-            listView.viewController.itemsSourceSizeChanged += OnItemsSourceSizeChanged;
-#else
-            listView.itemsSourceSizeChanged += OnItemsSourceSizeChanged;
-#endif
+            listView.itemsSource = itemsSource;
             
-            itemContainerElement.onUpdate += OnElementUpdate; 
-                
-            
-            viewBridge.onUnsubscribe += () =>
-            {
-                listView.itemsRemoved -= OnItemsRemoved;
-                listView.itemIndexChanged -= OnItemIndexChanged;
-                listView.itemsSourceChanged -= OnItemsSourceChanged;
-#if UNITY_2022_1_OR_NEWER
-                listView.viewController.itemsSourceSizeChanged -= OnItemsSourceSizeChanged;
-#else
-                listView.itemsSourceSizeChanged -= OnItemsSourceSizeChanged;
-#endif
-                
-                itemContainerElement.onUpdate -= OnElementUpdate;
-            };
-            
-            #endregion
-
-            
+            return true;
             
             #region Local functions
 
+            void SetCallbacks()
+            {
+                listView.itemsRemoved += OnItemsRemoved;
+                listView.itemIndexChanged += OnItemIndexChanged;
+
+                // ListView 内での参照先変更を通知
+                listView.itemsSourceChanged += OnItemsSourceChanged;
+
+                // ListView 内での要素数変更を通知（ListView 外での変更と区別するための処理）
+#if UNITY_2022_1_OR_NEWER
+                listView.viewController.itemsSourceSizeChanged += OnItemsSourceSizeChanged;
+#else
+                listView.itemsSourceSizeChanged += OnItemsSourceSizeChanged;
+#endif
+
+                itemContainerElement.onUpdate += OnElementUpdate;
+
+
+                viewBridge.onUnsubscribe += () =>
+                {
+                    listView.itemsRemoved -= OnItemsRemoved;
+                    listView.itemIndexChanged -= OnItemIndexChanged;
+                    listView.itemsSourceChanged -= OnItemsSourceChanged;
+#if UNITY_2022_1_OR_NEWER
+                    listView.viewController.itemsSourceSizeChanged -= OnItemsSourceSizeChanged;
+#else
+                    listView.itemsSourceSizeChanged -= OnItemsSourceSizeChanged;
+#endif
+
+                    itemContainerElement.onUpdate -= OnElementUpdate;
+
+                    listView.itemsSource = Array.Empty<int>(); // null だとエラーになるので空配列で
+
+                };
+            }
             
             // 各要素ごとに空のVisualElementを作り、
             // その子供にElementの型に応じたVisualElementを生成する
             // Bind対象のElementが変わったら型ごとのVisualElementは非表示にして再利用を待つ
-
             VisualElement MakeItem()
             {
                 var itemVe = new VisualElement();
@@ -87,6 +94,9 @@ namespace RosettaUI.UIToolkit.Builder
             void BindItem(VisualElement ve, int idx)
             {
                 var e = viewBridge.GetOrCreateItemElement(idx);
+                
+                // Debug.Log($"Bind Idx[{idx}] Value[{e.Query<ReadOnlyValueElement<int>>().First().Value}] Open[{e.Query<FoldElement>().First().IsOpen}]");
+                
                 e.SetEnable(true);
                 e.Update();　// 表示前に最新の値をUIに通知
 
@@ -102,9 +112,14 @@ namespace RosettaUI.UIToolkit.Builder
             void UnbindItem(VisualElement _, int idx)
             {
                 var e = itemContainerElement.GetContentAt(idx);
+                
+                // Debug.Log($"Unbind Idx[{idx}] Value[{e?.Query<ReadOnlyValueElement<int>>().First().Value}] Open[{e?.Query<FoldElement>().First().IsOpen}]");
+                
                 if (e == null) return;
                 
-                e.SetEnable(false); //　itemVeを非表示
+                // UnbindItemでVisualElementに影響を与えてはダメそう
+                // 最後尾にスクロールしたときに隙間ができる（本来表示されるVisualElementが内容がない→height==0→非表示になっている
+                // e.SetEnable(false);
                 Unbind(e);
             }
 
@@ -113,6 +128,8 @@ namespace RosettaUI.UIToolkit.Builder
                 foreach (var idx in idxes)
                 {
                     var e = itemContainerElement.GetContentAt(idx);
+                    if (e == null) continue;
+                    
                     Unbind(e);
                     e.DetachParent();
                 }
@@ -120,7 +137,9 @@ namespace RosettaUI.UIToolkit.Builder
             
             void OnItemIndexChanged(int srcIdx, int dstIdx)
             {
-                // CopyFoldOpenClose(srcIdx, dstIdx);
+                // Debug.Log($"ItemIndexChanged src[{srcIdx}] dst[{dstIdx}]");
+                
+                CopyFoldOpenClose(srcIdx, dstIdx);
                 OnViewListChanged();
             }
             
@@ -128,7 +147,35 @@ namespace RosettaUI.UIToolkit.Builder
             void CopyFoldOpenClose(int srcIdx, int dstIdx)
             {
                 if (srcIdx == dstIdx) return;
+
+#if true
+                var toElement = itemContainerElement.GetContentAt(srcIdx);
                 
+                using var pool = ListPool<bool>.Get(out var srcOpenList);
+                srcOpenList.AddRange(toElement.Query<FoldElement>().Select(fold => fold.IsOpen));
+                
+                var sign = (dstIdx < srcIdx) ? -1 : 1;
+                var endIdx = dstIdx + sign;
+                for (var i = srcIdx + sign; i != endIdx; i += sign)
+                {
+                    var fromElement = itemContainerElement.GetContentAt(i);
+                    Debug.Log($"from[{i}] to[{i-sign}] {fromElement.Query<FoldElement>().First().IsOpen}");
+                    
+                    foreach(var (from, to) in fromElement.Query<FoldElement>().Zip(toElement.Query<FoldElement>(), (from, to) => (from, to)))
+                    {
+                        if (from == null || to == null) break;
+                        to.SetOpenFlag(from.IsOpen);
+                    }
+
+                    toElement = fromElement;
+                }
+
+                foreach (var (to, isOpen) in itemContainerElement.GetContentAt(dstIdx).Query<FoldElement>()
+                             .Zip(srcOpenList, (to, isOpen) => (to, isOpen)))
+                {
+                    to.SetOpenFlag(isOpen);
+                }
+#else
                 var src = GetUIObj(itemContainerElement.GetContentAt(srcIdx));              
                 var srcFolds = src.Query<Foldout>().Build();
                 var srcFoldValues = srcFolds.Select(f => f.value).ToList();
@@ -166,6 +213,7 @@ namespace RosettaUI.UIToolkit.Builder
                         action(s, d);
                     }
                 }
+#endif
             }
 
             void OnItemsSourceChanged() => OnViewListChanged();
@@ -178,10 +226,12 @@ namespace RosettaUI.UIToolkit.Builder
 
             void OnElementUpdate(Element _)
             {
+                if (float.IsNaN(listView.layout.height)) return;
+                
                 var list = viewBridge.GetIList();
                 
                 // ListView 外での参照先変更を ListView に通知
-                if (listView.itemsSource != list)
+                if (!ReferenceEquals(listView.itemsSource, list))
                 {
                     listView.itemsSource = list;
                 }
@@ -212,9 +262,6 @@ namespace RosettaUI.UIToolkit.Builder
             }
             
             #endregion
-            
-            
-            return true;
         }
     }
 }

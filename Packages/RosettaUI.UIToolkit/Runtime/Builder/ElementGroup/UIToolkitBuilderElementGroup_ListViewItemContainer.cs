@@ -46,6 +46,7 @@ namespace RosettaUI.UIToolkit.Builder
 
             void SetCallbacks()
             {
+                listView.itemsAdded += OnItemsAdded;
                 listView.itemsRemoved += OnItemsRemoved;
                 listView.itemIndexChanged += OnItemIndexChanged;
 
@@ -64,6 +65,7 @@ namespace RosettaUI.UIToolkit.Builder
 
                 viewBridge.onUnsubscribe += () =>
                 {
+                    listView.itemsRemoved -= OnItemsAdded;
                     listView.itemsRemoved -= OnItemsRemoved;
                     listView.itemIndexChanged -= OnItemIndexChanged;
                     listView.itemsSourceChanged -= OnItemsSourceChanged;
@@ -95,7 +97,7 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 var e = viewBridge.GetOrCreateItemElement(idx);
                 
-                // Debug.Log($"Bind Idx[{idx}] Value[{e.Query<ReadOnlyValueElement<int>>().First().Value}] Open[{e.Query<FoldElement>().First().IsOpen}]");
+                Debug.Log($"Bind Idx[{idx}] FirstLabel[{e.FirstLabel()?.Value}]");
                 
                 e.SetEnable(true);
                 e.Update();　// 表示前に最新の値をUIに通知
@@ -112,7 +114,7 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 var e = itemContainerElement.GetItemElementAt(idx);
                 
-                // Debug.Log($"Unbind Idx[{idx}] Value[{e?.Query<ReadOnlyValueElement<int>>().First().Value}] Open[{e?.Query<FoldElement>().First().IsOpen}]");
+                Debug.Log($"Unbind Idx[{idx}] FirstLabel[{e?.FirstLabel()?.Value}]");
                 
                 if (e == null) return;
                 
@@ -122,92 +124,24 @@ namespace RosettaUI.UIToolkit.Builder
                 Unbind(e);
             }
 
+            // リストの最後への追加しかこないはず
+            void OnItemsAdded(IEnumerable<int> idxes)
+            {
+                viewBridge.OnItemsAdded(idxes);
+                OnViewListChanged();
+            }
+            
+            // 複数選択できないので１つか、最後の要素の複数削除しかこないはず
             void OnItemsRemoved(IEnumerable<int> idxes)
             {
-                var min = idxes.Min();
-                viewBridge.RemoveItemElementAfter(min);
+                viewBridge.OnItemsRemoved(idxes);
+                OnViewListChanged();
             }
             
             void OnItemIndexChanged(int srcIdx, int dstIdx)
             {
-                // Debug.Log($"ItemIndexChanged src[{srcIdx}] dst[{dstIdx}]");
-                
-                // CopyFoldOpenClose(srcIdx, dstIdx);
-                viewBridge.RemoveItemElementAfter(Mathf.Min(srcIdx, dstIdx));
+                viewBridge.OnItemIndexChanged(srcIdx, dstIdx);
                 OnViewListChanged();
-            }
-            
-            // Item が移動したときに Fold の開閉情報を引き継ぐ
-            void CopyFoldOpenClose(int srcIdx, int dstIdx)
-            {
-                if (srcIdx == dstIdx) return;
-
-#if true
-                var toElement = itemContainerElement.GetContentAt(srcIdx);
-                
-                using var pool = ListPool<bool>.Get(out var srcOpenList);
-                srcOpenList.AddRange(toElement.Query<FoldElement>().Select(fold => fold.IsOpen));
-                
-                var sign = (dstIdx < srcIdx) ? -1 : 1;
-                var endIdx = dstIdx + sign;
-                for (var i = srcIdx + sign; i != endIdx; i += sign)
-                {
-                    var fromElement = itemContainerElement.GetContentAt(i);
-                    Debug.Log($"from[{i}] to[{i-sign}] {fromElement.Query<FoldElement>().First().IsOpen}");
-                    
-                    foreach(var (from, to) in fromElement.Query<FoldElement>().Zip(toElement.Query<FoldElement>(), (from, to) => (from, to)))
-                    {
-                        if (from == null || to == null) break;
-                        to.SetOpenFlag(from.IsOpen);
-                    }
-
-                    toElement = fromElement;
-                }
-
-                foreach (var (to, isOpen) in itemContainerElement.GetContentAt(dstIdx).Query<FoldElement>()
-                             .Zip(srcOpenList, (to, isOpen) => (to, isOpen)))
-                {
-                    to.SetOpenFlag(isOpen);
-                }
-#else
-                var src = GetUIObj(itemContainerElement.GetContentAt(srcIdx));              
-                var srcFolds = src.Query<Foldout>().Build();
-                var srcFoldValues = srcFolds.Select(f => f.value).ToList();
-
-                var veCount = Mathf.Abs(srcIdx - dstIdx) + 1;
-                var veArray = ArrayPool<VisualElement>.Shared.Rent(veCount);
-                {
-                    var isInsert = (dstIdx < srcIdx);
-                    var sign = isInsert ? -1 : 1;
-
-                    for (var i = 0; i < veCount; ++i)
-                    {
-                        var itemIdx = srcIdx + i * sign;
-                        veArray[i] = GetUIObj(itemContainerElement.GetContentAt(itemIdx));
-                    }
-
-                    for (var i = 0; i < veCount - 1; ++i)
-                    {
-                        var curr = veArray[i];
-                        var prev = veArray[i + 1];
-                        
-                        var prevFolds = prev.Query<Foldout>().Build();
-                        ExecByPair(prevFolds, prevFolds.RebuildOn(curr), (p, c) => c.value = p.value);
-                    }
-
-                    ExecByPair(srcFoldValues, srcFolds.RebuildOn(veArray[veCount - 1]), (s, d) => d.value = s);
-                }
-                ArrayPool<VisualElement>.Shared.Return(veArray);
-                
-
-                void ExecByPair<T0, T1>(IEnumerable<T0> source, IEnumerable<T1> destination, Action<T0, T1> action)
-                {
-                    foreach (var (s, d) in source.Zip(destination, (s, d) => (s, d)))
-                    {
-                        action(s, d);
-                    }
-                }
-#endif
             }
 
             void OnItemsSourceChanged() => OnViewListChanged();
@@ -235,9 +169,10 @@ namespace RosettaUI.UIToolkit.Builder
                 // 要素のElementを消してlistViewをリフレッシュ
                 else if (lastListItemCount != listItemCount)
                 {
-                    viewBridge.RemoveItemElementAfter(0);
+                    // viewBridge.RemoveItemElementAfter(0);
                     lastListItemCount = listItemCount;
                     listView.RefreshItems(); 
+                    Debug.Log($"ListView Count changed externally");
                 }
             }
             

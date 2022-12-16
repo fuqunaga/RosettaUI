@@ -26,7 +26,7 @@ namespace RosettaUI
             return typeof(ListItemBinder<>).MakeGenericType(itemType);
         }
         
-        public static IEnumerable<IBinder> CreateItemBinders(IBinder listBinder)
+        public static IEnumerable<IListItemBinder> CreateItemBinders(IBinder listBinder)
         {
             var itemBinderType = GetItemBinderType(listBinder.ValueType);
             var itemCount = GetCount(listBinder);
@@ -36,14 +36,14 @@ namespace RosettaUI
                 .Select(i => CreateItemBinderAt(listBinder, i, itemBinderType));
         }
 
-        public static IBinder CreateItemBinderAt(IBinder listBinder, int index)
+        public static IListItemBinder CreateItemBinderAt(IBinder listBinder, int index)
         {
             var itemBinderType = GetItemBinderType(listBinder.ValueType);
             return CreateItemBinderAt(listBinder, index, itemBinderType);
         }
 
-        private static IBinder CreateItemBinderAt(IBinder listBinder, int index, Type itemBinderType)
-            => Activator.CreateInstance(itemBinderType, listBinder, index) as IBinder;
+        private static IListItemBinder CreateItemBinderAt(IBinder listBinder, int index, Type itemBinderType)
+            => Activator.CreateInstance(itemBinderType, listBinder, index) as IListItemBinder;
 
         public static IList GetIList(IBinder binder) => binder.GetObject() as IList;
         
@@ -120,22 +120,26 @@ namespace RosettaUI
             binder.SetObject(list);
         }
     }
-    
 
-    public class ListItemBinder<T> : ChildBinder<IList<T>, T>
+    public interface IListItemBinder : IBinder
     {
-        private readonly int _idx;
+        int Index { get; set; }
+    }
+
+    public class ListItemBinder<T> : ChildBinder<IList<T>, T>, IListItemBinder
+    {
+        public int Index { get; set; }
         
-        public ListItemBinder(IGetter<IList<T>> listGetter, int idx) : 
+        public ListItemBinder(IGetter<IList<T>> listGetter, int index) : 
             base(new Binder<IList<T>>(listGetter, null))
         {
-            _idx = idx;
+            Index = index;
         }
 
-        protected override T GetFromParent(IList<T> list) => (0 <= _idx && _idx < list.Count) ? list[_idx] : default;
+        protected override T GetFromParent(IList<T> list) => (0 <= Index && Index < list.Count) ? list[Index] : default;
         protected override IList<T> SetToParent(IList<T> list, T value)
         {
-            if ( _idx < list.Count ) list[_idx] = value;
+            if ( Index < list.Count ) list[Index] = value;
             return list; 
         }
     }

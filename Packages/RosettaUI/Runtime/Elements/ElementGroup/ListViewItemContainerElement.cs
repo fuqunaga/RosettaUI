@@ -229,17 +229,6 @@ namespace RosettaUI
             RemoveItemElementCacheAll();
         }
 
-        public override void Update()
-        {
-            base.Update();
-
-            Debug.Log(
-                string.Join(", ",
-                    _itemIndexToElementAndBinder.Select(pair => $"{pair.Key}:({pair.Value.element?.FirstLabel()?.Value}, {pair.Value.itemBinder.Index})")
-                )
-            );
-        }
-
         protected override ElementViewBridge CreateViewBridge() => new ListViewItemContainerViewBridge(this);
 
         public class ListViewItemContainerViewBridge : ElementViewBridge

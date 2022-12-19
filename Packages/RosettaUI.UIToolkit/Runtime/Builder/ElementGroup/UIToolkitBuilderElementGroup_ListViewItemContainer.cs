@@ -142,6 +142,12 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 viewBridge.OnItemIndexChanged(srcIdx, dstIdx);
                 OnViewListChanged();
+                
+                // ドラッグ中アニメーションでアイテムが移動中にドロップすると
+                // コンテナのサイズがおかしくなる
+                // 原因不明だがとりあえずリビルドで治るので対処療法
+                // 副作用として（おそらく）１フレームのちらつきがある
+                listView.Rebuild();
             }
 
             void OnItemsSourceChanged() => OnViewListChanged();

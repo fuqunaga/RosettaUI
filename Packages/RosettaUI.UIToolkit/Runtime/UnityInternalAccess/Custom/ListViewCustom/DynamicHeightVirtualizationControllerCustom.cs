@@ -60,7 +60,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
                 }
                 else
                 {
-                    for (var i = 0; i < 5; ++i)
+                    for (var i = 0; i < FirstFillItemCount; ++i)
                     {
                         var orMakeItem = this.GetOrMakeItem();
                         this.m_ActiveItems.Add(orMakeItem);

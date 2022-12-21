@@ -69,6 +69,7 @@ public class ManyElement : MonoBehaviour
     public class DiverseClass : IElementCreator
     {
         public int id;
+        [Range(0,50)]
         public int value;
         public float height;
 

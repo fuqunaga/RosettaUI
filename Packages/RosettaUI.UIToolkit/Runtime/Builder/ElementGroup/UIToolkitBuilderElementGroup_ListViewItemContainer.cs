@@ -27,14 +27,6 @@ namespace RosettaUI.UIToolkit.Builder
             listView.makeItem = MakeItem;
             listView.bindItem = BindItem;
             listView.unbindItem = UnbindItem;
-
-
-            
-            // list が Array の場合、参照先が変わる
-            // ListView 内で変更される場合も Inspector などで ListView 外で変わる場合もある
-            // また ListView 外で List の要素数が変わった場合は、ListView に知らせる必要がある
-            // 外部での要素数の変更を検知するために要素数を保存しといてチェックする
-            var lastListItemCount = itemsSource.Count;
             
             SetCallbacks();
 
@@ -46,6 +38,13 @@ namespace RosettaUI.UIToolkit.Builder
 
             void SetCallbacks()
             {
+                // 参照か要素数がUIの外で変化した
+                viewBridge.SubscribeListChanged(list =>
+                {
+                    listView.itemsSource = list;
+                    listView.Rebuild();
+                });
+                
                 listView.itemsAdded += OnItemsAdded;
                 listView.itemsRemoved += OnItemsRemoved;
                 listView.itemIndexChanged += OnItemIndexChanged;
@@ -60,9 +59,6 @@ namespace RosettaUI.UIToolkit.Builder
                 listView.itemsSourceSizeChanged += OnItemsSourceSizeChanged;
 #endif
 
-                itemContainerElement.onUpdate += OnElementUpdate;
-
-
                 viewBridge.onUnsubscribe += () =>
                 {
                     listView.itemsRemoved -= OnItemsAdded;
@@ -74,11 +70,7 @@ namespace RosettaUI.UIToolkit.Builder
 #else
                     listView.itemsSourceSizeChanged -= OnItemsSourceSizeChanged;
 #endif
-
-                    itemContainerElement.onUpdate -= OnElementUpdate;
-
                     listView.itemsSource = Array.Empty<int>(); // null だとエラーになるので空配列で
-
                 };
             }
             
@@ -97,7 +89,7 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 var e = viewBridge.GetOrCreateItemElement(idx);
                 
-                Debug.Log($"Bind Idx[{idx}] FirstLabel[{e.FirstLabel()?.Value}]");
+                // Debug.Log($"Bind Idx[{idx}] FirstLabel[{e.FirstLabel()?.Value}]");
                 
                 e.SetEnable(true);
                 e.Update();　// 表示前に最新の値をUIに通知
@@ -114,7 +106,7 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 var e = itemContainerElement.GetItemElementAt(idx);
                 
-                Debug.Log($"Unbind Idx[{idx}] FirstLabel[{e?.FirstLabel()?.Value}]");
+                // Debug.Log($"Unbind Idx[{idx}] FirstLabel[{e?.FirstLabel()?.Value}]");
                 
                 if (e == null) return;
                 
@@ -151,46 +143,11 @@ namespace RosettaUI.UIToolkit.Builder
             }
 
             void OnItemsSourceChanged() => OnViewListChanged();
-
-            void OnItemsSourceSizeChanged()
-            {
-                lastListItemCount = listView.itemsSource.Count;
-                OnViewListChanged();
-            }
-
-            void OnElementUpdate(Element _)
-            {
-                var list = viewBridge.GetIList();
-                var listItemCount = list.Count;
-
-                // ListView 外での参照先変更を ListView に通知
-                if (!ReferenceEquals(listView.itemsSource, list))
-                {
-                    viewBridge.RemoveItemElementAfter(0);
-                    lastListItemCount = listItemCount;
-                    listView.itemsSource = list;
-                    
-                }
-                // ListView 外での要素数が変更された
-                // 要素のElementを消してlistViewをリフレッシュ
-                else if (lastListItemCount != listItemCount)
-                {
-                    // viewBridge.RemoveItemElementAfter(0);
-                    lastListItemCount = listItemCount;
-                    listView.RefreshItems(); 
-                    Debug.Log($"ListView Count changed externally");
-                }
-            }
+            void OnItemsSourceSizeChanged() => OnViewListChanged();
             
             // List になにか変更があった場合の通知
             // 参照先変更、サイズ変更、アイテムの値変更
-            void OnViewListChanged()
-            {
-                // Listの値が変更されていたらSetIList()（内部的にBinder.SetObject()）する
-                // itemsSourceは自動的に変更されているが、UI.List(writeValue, readValue); の readValue を呼んで通知したいので手動で呼ぶ
-                viewBridge.SetIList(listView.itemsSource);
-                itemContainerElement.NotifyViewValueChanged();
-            }
+            void OnViewListChanged() => viewBridge.OnViewListChanged(listView.itemsSource);
             
             #endregion
         }

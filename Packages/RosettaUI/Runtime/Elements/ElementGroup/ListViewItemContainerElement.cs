@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Pool;
 
@@ -24,6 +23,25 @@ namespace RosettaUI
     }
     
     
+    /// <summary>
+    /// ListViewの要素を表示するエレメント
+    /// Foldや要素数フィールドのようなヘッダー要素はほかのElementと組み合わせて実現する
+    /// UIToolKitのListViewを想定しており表示領域外のElementはできるだけ生成しない
+    /// 
+    /// リストに変更があった場合の対応がとてもややこしい
+    /// 
+    /// アプリケーション側で変更があった場合、追加削除された要素、リスト自体の参照先が変わったケースなど
+    /// どういった変更があったのかわからない
+    /// したがってリストの要素数と参照をチェックしておき変化があったらUIを作り直すという挙動になっている
+    /// この場合要素ElementのFoldElementのOpen/Closeなどの情報は引き継げない
+    /// 逆にUI側での変更はわかるのでできるだけ引き継ぐ
+    /// 
+    /// Reorderableで要素が移動した場合、Binderレベルでは元のリストのインデックスからとれる値が変わるので何もする必要がないが、
+    /// 前述のFoldElementのOpen/CloseのようなUIの状態を引き継げない
+    /// これに対応するため各IndexのElementとBinderを保持しておき、Binderの参照Indexを新しいIndexに書き換え、
+    /// ElementとBinderを新たなIndexのものとして扱うことでUIの状態を引き継げるようにしている
+    /// 移動した要素の移動前移動後のIndexだけでなくその間の要素のIndexもすべてずれるのでそれらすべでで上述のIndex替え操作を行う
+    /// </summary>
     public class ListViewItemContainerElement : ElementGroup
     {
         private readonly IBinder _binder;
@@ -35,6 +53,10 @@ namespace RosettaUI
         private readonly Dictionary<int, (Element element, IListItemBinder itemBinder)> _itemIndexToElementAndBinder = new();
 
         protected int ListItemCount => ListBinder.GetCount(_binder);
+
+        private int _lastListItemCount;
+
+        private event Action<IList> _onListChanged;
         
         public ListViewItemContainerElement(IBinder listBinder, Func<IBinder, int, Element> createItemElement, ListViewOption option) : base(null)
         {
@@ -45,6 +67,22 @@ namespace RosettaUI
             Interactable = !ListBinder.IsReadOnly(listBinder);
             
             _binderTypeHistorySnapshot = BinderHistory.Snapshot.Create();
+
+            _lastListItemCount = ListItemCount;
+        }
+
+        protected override void UpdateInternal()
+        {
+            var listItemCount = ListItemCount;
+            if (_lastListItemCount != listItemCount)
+            {
+                _lastListItemCount = listItemCount;
+                RemoveItemElementCacheAll();
+                
+                _onListChanged?.Invoke(ListBinder.GetIList(_binder));
+            }
+            
+            base.UpdateInternal();
         }
 
         public Element GetItemElementAt(int index)
@@ -175,6 +213,8 @@ namespace RosettaUI
 
         private void OnItemsAdded(IEnumerable<int> indices)
         {
+            _lastListItemCount = ListItemCount;
+
             using var pool = ListPool<int>.Get(out var indexList);
             indexList.AddRange(indices.Distinct());
 
@@ -200,6 +240,8 @@ namespace RosettaUI
         
         private void OnItemsRemoved(IEnumerable<int> indices)
         {
+            _lastListItemCount = ListItemCount;
+            
             using var pool = ListPool<int>.Get(out var indexList);
             indexList.AddRange(indices.Distinct());
 
@@ -229,6 +271,18 @@ namespace RosettaUI
             RemoveItemElementCacheAll();
         }
 
+        
+        // List になにか変更があった場合の通知
+        // 参照先変更、サイズ変更、アイテムの値変更
+        // Listの値が変更されていたらSetIList()（内部的にBinder.SetObject()）する
+        // itemsSourceは自動的に変更されているが、UI.List(writeValue, readValue); の readValue を呼んで通知したいので手動で呼ぶ
+        void OnViewListChanged(IList list)
+        {
+            _binder.SetObject(list);
+            _lastListItemCount = list.Count;
+            NotifyViewValueChanged();
+        }
+        
         protected override ElementViewBridge CreateViewBridge() => new ListViewItemContainerViewBridge(this);
 
         public class ListViewItemContainerViewBridge : ElementViewBridge
@@ -241,17 +295,25 @@ namespace RosettaUI
             }
             
             public IList GetIList() => ListBinder.GetIList(Binder);
-
-            public void SetIList(IList iList) => Binder.SetObject(iList);
-
+            
             public Element GetOrCreateItemElement(int index) => Element.GetOrCreateItemElement(index);
-
-            public void RemoveItemElementAfter(int startIndex) => throw new NotImplementedException();
 
             public void OnItemIndexChanged(int fromIndex, int toIndex) => Element.OnMoveItemIndex(fromIndex, toIndex);
 
             public void OnItemsAdded(IEnumerable<int> indices) => Element.OnItemsAdded(indices);
             public void OnItemsRemoved(IEnumerable<int> indices) => Element.OnItemsRemoved(indices);
+
+            // UIでのリストの変更を通知
+            // 参照or要素数
+            public void OnViewListChanged(IList list) => Element.OnViewListChanged(list);
+
+            // UIではない外部でのリストの変更を通知
+            // 参照or要素数
+            public void SubscribeListChanged(Action<IList> action)
+            {
+                Element._onListChanged += action;
+                onUnsubscribe += () => Element._onListChanged -= action;
+            }
         }
     }
 

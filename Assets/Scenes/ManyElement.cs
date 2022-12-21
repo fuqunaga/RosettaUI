@@ -12,6 +12,7 @@ public class ManyElement : MonoBehaviour
     public bool rebuild;
     
     public List<DiverseClass> _diverseClassList;
+    public DiverseClass[] _diverseClassArray;
 
     private RosettaUIRoot _root;
 
@@ -39,11 +40,15 @@ public class ManyElement : MonoBehaviour
         Element CreateHeavyElement()
         {
             _diverseClassList = Enumerable.Range(0, elementCount)
-                // .Select(i => i.ToString())
                 .Select(i => new DiverseClass {id = i})
                 .ToList();
-
+            
+            _diverseClassArray = Enumerable.Range(0, elementCount)
+                .Select(i => new DiverseClass {id = i})
+                .ToArray();
+            
             return UI.List(() => _diverseClassList
+            // return UI.List(() => _diverseClassArray
                 // ,createItemElement: (binder, idx) => UI.Label(((IBinder<string>)binder).Get())
                 // ,createItemElement: (binder, idx) => UI.Fold($"Item{idx}", UI.Field(null, binder))
                 , createItemElement: (binder, _) => UI.Field(null, binder)
@@ -65,16 +70,20 @@ public class ManyElement : MonoBehaviour
     {
         public int id;
         public int value;
-        private float? _height;
-        
+        public float height;
+
         public Element CreateElement(LabelElement _)
         {
             var labelStr = $"Id[{id}]";
-            _height ??= 30f + Random.value * 50f;
+
+            if (height <= 0f)
+                height = (30f + Random.value * 50f);
+            
+            // Debug.Log($"Id[{id}] height[{_height.Value}] hash:[{GetHashCode()}]");
             
             return (id % 4) switch
             {
-                0 => UI.Field(labelStr, () => value).SetHeight(_height),
+                0 => UI.Field(labelStr, () => value).SetHeight(height),
                 1 => UI.Slider(labelStr, () => value),
                 2 => UI.Fold(labelStr, UI.Field("", () => value)),
                 3 => UI.Fold(labelStr, UI.Slider("", () => value)),

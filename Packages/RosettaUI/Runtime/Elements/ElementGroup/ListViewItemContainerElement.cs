@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Pool;
 
@@ -45,23 +44,40 @@ namespace RosettaUI
     /// </summary>
     public class ListViewItemContainerElement : ElementGroup
     {
-        private readonly IBinder _binder;
+        public readonly IBinder binder;
         public readonly ListViewOption option;
         
         private readonly Func<IBinder, int, Element> _createItemElement;
         private readonly BinderHistory.Snapshot _binderTypeHistorySnapshot;
-        
         private readonly Dictionary<int, (Element element, IListItemBinder itemBinder)> _itemIndexToElementAndBinder = new();
-
-        protected int ListItemCount => ListBinder.GetCount(_binder);
-
         private int _lastListItemCount;
-
         private event Action<IList> _onListChanged;
-        
+
+        public int ListItemCount
+        {
+            get => ListBinder.GetCount(binder);
+            set
+            {
+                var prevCount = ListItemCount;
+                if (prevCount == value) return;
+                
+                // remove
+                if (prevCount > value)
+                {
+                    for (var i = value; i < prevCount; ++i)
+                    {
+                        RemoveItemElementCache(i);
+                    }
+                }
+
+                ListBinder.SetCount(binder, value);
+                NotifyListChangedToView();
+            }
+        }
+
         public ListViewItemContainerElement(IBinder listBinder, Func<IBinder, int, Element> createItemElement, ListViewOption option) : base(null)
         {
-            _binder = listBinder;
+            binder = listBinder;
             _createItemElement = createItemElement;
             this.option = option;
 
@@ -87,7 +103,7 @@ namespace RosettaUI
         protected void NotifyListChangedToView()
         {
             _lastListItemCount = ListItemCount;
-            _onListChanged?.Invoke(ListBinder.GetIList(_binder));
+            _onListChanged?.Invoke(ListBinder.GetIList(binder));
         }
 
         public Element GetItemElementAt(int index)
@@ -102,19 +118,50 @@ namespace RosettaUI
             if (element != null) return element;
             
             using var applyScope = _binderTypeHistorySnapshot.GetApplyScope();
-            var isReadOnly = ListBinder.IsReadOnly(_binder);
-            var itemBinder = ListBinder.CreateItemBinderAt(_binder, index);
+            var isReadOnly = ListBinder.IsReadOnly(binder);
+            var itemBinder = ListBinder.CreateItemBinderAt(binder, index);
 
             element = _createItemElement(itemBinder, index);
             if (!isReadOnly)
             {
-                element = AddPopupMenu(element, _binder, itemBinder);
+                element = AddPopupMenu(element, itemBinder);
             }
             
             AddChild(element);
             RegisterItemElementCache((element, itemBinder), index);
 
             return element;
+        }
+        
+        private Element AddPopupMenu(Element element, IListItemBinder itemBinder)
+        {
+            return new PopupMenuElement(
+                element,
+                () => new[]
+                {
+                    new MenuItem("Add Element", DuplicateItem),
+                    new MenuItem("Remove Element", RemoveItem),
+                }
+            );
+
+            void DuplicateItem()
+            {
+                var index = itemBinder.Index;
+                ListBinder.DuplicateItem(binder, index);
+                OnItemIndexShiftPlus(index + 1);
+                
+                NotifyListChangedToView();
+            }
+
+            void RemoveItem()
+            {
+                var index = itemBinder.Index;
+                RemoveItemElementCache(index);
+                OnItemIndexShiftMinus(index);
+                ListBinder.RemoveItem(binder, index);
+                
+                NotifyListChangedToView();
+            }
         }
 
         private void RegisterItemElementCache((Element element, IListItemBinder itemBinder) pair, int index)
@@ -146,42 +193,12 @@ namespace RosettaUI
         }
 
 
-        private Element AddPopupMenu(Element element, IBinder binder, IListItemBinder itemBinder)
-        {
-            return new PopupMenuElement(
-                element,
-                () => new[]
-                {
-                    new MenuItem("Add Element", DuplicateItem),
-                    new MenuItem("Remove Element", RemoveItem),
-                }
-            );
-
-            void DuplicateItem()
-            {
-                var index = itemBinder.Index;
-                ListBinder.DuplicateItem(binder, index);
-                OnItemIndexShiftPlus(index + 1);
-                
-                NotifyListChangedToView();
-            }
-
-            void RemoveItem()
-            {
-                var index = itemBinder.Index;
-                RemoveItemElementCache(index);
-                OnItemIndexShiftMinus(index);
-                ListBinder.RemoveItem(binder, index);
-                
-                NotifyListChangedToView();
-            }
-        }
         
         #region Item Index Changed
 
         private void OnItemIndexShiftPlus(int startIndex, int endIndex = -1)
         {
-            if (endIndex < 0) endIndex = ListBinder.GetCount(_binder) - 1;
+            if (endIndex < 0) endIndex = ListBinder.GetCount(binder) - 1;
 
             for (var i = endIndex; i > startIndex; --i)
             {
@@ -193,7 +210,7 @@ namespace RosettaUI
 
         private void OnItemIndexShiftMinus(int startIndex, int endIndex = -1)
         {
-            if (endIndex < 0) endIndex = ListBinder.GetCount(_binder) - 1;
+            if (endIndex < 0) endIndex = ListBinder.GetCount(binder) - 1;
 
             for (var i = startIndex; i < endIndex; ++i)
             {
@@ -286,9 +303,9 @@ namespace RosettaUI
         // 参照先変更、サイズ変更、アイテムの値変更
         // Listの値が変更されていたらSetIList()（内部的にBinder.SetObject()）する
         // itemsSourceは自動的に変更されているが、UI.List(writeValue, readValue); の readValue を呼んで通知したいので手動で呼ぶ
-        void OnViewListChanged(IList list)
+        private void OnViewListChanged(IList list)
         {
-            _binder.SetObject(list);
+            binder.SetObject(list);
             _lastListItemCount = list.Count;
             NotifyViewValueChanged();
         }
@@ -298,7 +315,7 @@ namespace RosettaUI
         public class ListViewItemContainerViewBridge : ElementViewBridge
         {
             private ListViewItemContainerElement Element => (ListViewItemContainerElement)element;
-            private IBinder Binder => Element._binder;
+            private IBinder Binder => Element.binder;
             
             public ListViewItemContainerViewBridge(ListViewItemContainerElement element) : base(element)
             {

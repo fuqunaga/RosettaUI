@@ -72,6 +72,17 @@ public class ManyElement : MonoBehaviour
         public int value;
         public float height;
 
+        public DiverseClass()
+        {
+        }
+
+        public DiverseClass(DiverseClass other)
+        {
+            id = other.id;
+            value = other.value;
+            height = other.height;
+        }
+
         public Element CreateElement(LabelElement _)
         {
             var labelStr = $"Id[{id}]";

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Pool;
 
@@ -76,13 +77,17 @@ namespace RosettaUI
             var listItemCount = ListItemCount;
             if (_lastListItemCount != listItemCount)
             {
-                _lastListItemCount = listItemCount;
                 RemoveItemElementCacheAll();
-                
-                _onListChanged?.Invoke(ListBinder.GetIList(_binder));
+                NotifyListChangedToView();
             }
             
             base.UpdateInternal();
+        }
+
+        protected void NotifyListChangedToView()
+        {
+            _lastListItemCount = ListItemCount;
+            _onListChanged?.Invoke(ListBinder.GetIList(_binder));
         }
 
         public Element GetItemElementAt(int index)
@@ -103,7 +108,7 @@ namespace RosettaUI
             element = _createItemElement(itemBinder, index);
             if (!isReadOnly)
             {
-                element = AddPopupMenu(element, _binder, index);
+                element = AddPopupMenu(element, _binder, itemBinder);
             }
             
             AddChild(element);
@@ -114,7 +119,7 @@ namespace RosettaUI
 
         private void RegisterItemElementCache((Element element, IListItemBinder itemBinder) pair, int index)
         {
-            Assert.IsFalse(_itemIndexToElementAndBinder.ContainsKey(index));
+            Assert.IsFalse(_itemIndexToElementAndBinder.ContainsKey(index), $"{index}");
             
             pair.itemBinder.Index = index;
             _itemIndexToElementAndBinder[index] = pair;
@@ -141,7 +146,7 @@ namespace RosettaUI
         }
 
 
-        private Element AddPopupMenu(Element element, IBinder binder, int idx)
+        private Element AddPopupMenu(Element element, IBinder binder, IListItemBinder itemBinder)
         {
             return new PopupMenuElement(
                 element,
@@ -154,16 +159,21 @@ namespace RosettaUI
 
             void DuplicateItem()
             {
-                ListBinder.DuplicateItem(binder, idx);
-                // OnItemIndexShiftPlus(idx + 1);
-                throw new NotImplementedException();
+                var index = itemBinder.Index;
+                ListBinder.DuplicateItem(binder, index);
+                OnItemIndexShiftPlus(index + 1);
+                
+                NotifyListChangedToView();
             }
 
             void RemoveItem()
             {
-                ListBinder.RemoveItem(binder, idx);
-                // OnItemIndexShiftMinus(idx);
-                throw new NotImplementedException();
+                var index = itemBinder.Index;
+                RemoveItemElementCache(index);
+                OnItemIndexShiftMinus(index);
+                ListBinder.RemoveItem(binder, index);
+                
+                NotifyListChangedToView();
             }
         }
         

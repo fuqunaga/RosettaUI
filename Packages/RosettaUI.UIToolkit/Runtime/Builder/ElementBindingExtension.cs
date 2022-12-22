@@ -1,49 +1,62 @@
 ﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
 {
     public static class ElementBindingExtension
     {
-        public static void SetValueWithoutNotifyIfNotEqual<T>(this INotifyValueChanged<T> field, T value)
+        // Subscribe element -> field
+        public static void SubscribeValueOnUpdateCallOnce<T>(this ReadOnlyValueElement<T> element, INotifyValueChanged<T> field)
         {
-            if (!EqualityComparer<T>.Default.Equals(field.value, value))
+            element.GetViewBridge().SubscribeValueOnUpdateCallOnce(field.SetValueWithoutNotifyIfNotEqual);
+        }
+        
+        // Subscribe field -> element
+        private static void Subscribe<TValue>(this BaseField<TValue> field, FieldBaseElement<TValue> element)
+        {
+            field.Subscribe(element, v => v);
+        }
+        
+        // Subscribe field -> element
+        private static void Subscribe<TFieldValue, TElementValue>(
+            this BaseField<TFieldValue> field,
+            FieldBaseElement<TElementValue> element,
+            Func<TFieldValue, TElementValue> fieldValueToElementValue)
+        {
+            var viewBridge = element.GetViewBridge();
+            
+            field.RegisterValueChangedCallback(OnValueChanged);
+            viewBridge.onUnsubscribe += () => field?.UnregisterValueChangedCallback(OnValueChanged);
+            
+            // TFieldValueがstringのとき
+            // ラベルの更新とBaseFieldの値の更新の区別がつかないのでラベルのイベントは止めておく
+            field.labelElement.RegisterValueChangedCallback(e => e.StopPropagation());
+
+            void OnValueChanged(ChangeEvent<TFieldValue> evt)
             {
-                field.SetValueWithoutNotify(value);
+                viewBridge.SetValueFromView(fieldValueToElementValue(evt.newValue));
             }
         }
 
-        public static void ListenValue<T>(this INotifyValueChanged<T> field, ReadOnlyValueElement<T> element)
+        // Subscribe element <-> field
+        public static void Bind<T>(this FieldBaseElement<T> element, BaseField<T> field)
         {
-            element.SubscribeValueOnUpdateCallOnce(field.SetValueWithoutNotifyIfNotEqual);
+            element.SubscribeValueOnUpdateCallOnce(field);
+            field.Subscribe(element);
         }
 
-        public static void ListenLabel<T>(this BaseField<T> field, LabelElement labelElement)
-        {
-            labelElement.SubscribeValueOnUpdateCallOnce(str => field.label = str);
-        }
-
-        public static void Bind<T>(this  BaseField<T> field, FieldBaseElement<T> element)
-        {
-            field.ListenValue(element);
-            field.RegisterValueChangedCallback(evt => element.OnViewValueChanged(evt.newValue));
-
-            // ラベルのChangeEventを潰しておく
-            // fieldが BaseField<string> だとラベルのChangeEventを受け取ってしまうのでそれを止める
-            field.labelElement.RegisterValueChangedCallback(evt => evt.StopPropagation());
-        }
-
-        public static void Bind<TFieldValue, TElementValue>(
-            this INotifyValueChanged<TFieldValue> field,
-            FieldBaseElement<TElementValue> element,
+        // Subscribe element <-(change value)-> field
+        public static void Bind<TElementValue, TFieldValue>(
+            this FieldBaseElement<TElementValue> element,
+            BaseField<TFieldValue> field,
             Func<TElementValue, TFieldValue> elementValueToFieldValue,
             Func<TFieldValue, TElementValue> fieldValueToElementValue
         )
         {
-            element.SubscribeValueOnUpdateCallOnce(v => field.SetValueWithoutNotifyIfNotEqual(elementValueToFieldValue(v)));
-            field.RegisterValueChangedCallback(evt => element.OnViewValueChanged(fieldValueToElementValue(evt.newValue)));
+            var viewBridge = element.GetViewBridge();
+            
+            viewBridge.SubscribeValueOnUpdateCallOnce(v => field.SetValueWithoutNotifyIfNotEqual(elementValueToFieldValue(v)));
+            field.Subscribe(element, fieldValueToElementValue);
         }
     }
 }

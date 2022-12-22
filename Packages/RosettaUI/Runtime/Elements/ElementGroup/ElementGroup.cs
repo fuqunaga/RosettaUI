@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace RosettaUI
 {
     /// <summary>
-    /// 子供として任意の Element を持てる Element
+    /// 任意のElementを子供に持てるElement
     /// </summary>
     public abstract class ElementGroup : Element
     {
@@ -24,25 +25,25 @@ namespace RosettaUI
 
         protected void SetElements(IEnumerable<Element> elements)
         {
-            if (elements != null)
+            if (elements == null) return;
+            
+            foreach (var e in elements.Where(e => e != null))
             {
-                foreach (var e in elements.Where(e => e != null))
+                if (e is WindowElement window)
                 {
-                    AddChild(e);
+                    Debug.LogWarning($"WindowElement(FirstLabel[{window.FirstLabel()?.Value}]) cannot be a child of another Element. Please using UI.WindowLauncher() or RosettaUIRoot.Build() directly.");
+                    continue;
                 }
+                
+                AddChild(e);
             }
         }
         
         public Element GetContentAt(int index)
         {
-            var i = 0;
-            foreach (var c in Contents)
-            {
-                if (i == index) return c;
-                i++;
-            }
-
-            return null;
+            return (0 <= index && index < Contents.Count())
+                ? Contents.ElementAt(index)
+                : null;
         }
     }
 }

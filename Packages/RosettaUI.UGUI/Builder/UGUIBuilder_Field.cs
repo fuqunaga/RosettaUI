@@ -31,11 +31,11 @@ namespace RosettaUI.UGUI.Builder
             var toggle = go.GetComponentInChildren<Toggle>();
             toggle.colors = settings.theme.fieldColors;
 
-            toggle.onValueChanged.AddListener(boolField.OnViewValueChanged);
+            toggle.onValueChanged.AddListener(boolField.GetViewBridge().SetValueFromView);
 
             if (!boolField.IsConst)
             {
-                boolField.SubscribeValueOnUpdate((v) => toggle.isOn = v);
+                boolField.GetViewBridge().SubscribeValueOnUpdate((v) => toggle.isOn = v);
             }
 
             element.interactableRx.Subscribe( (interactable) =>
@@ -92,7 +92,7 @@ namespace RosettaUI.UGUI.Builder
                 var (success, v) = tryParse(str);
                 if (success)
                 {
-                    field.OnViewValueChanged(v);
+                    field.GetViewBridge().SetValueFromView(v);
                 }
             }
             );
@@ -101,7 +101,7 @@ namespace RosettaUI.UGUI.Builder
 
             if (!field.IsConst)
             {
-                field.SubscribeValueOnUpdate((v) =>
+                field.GetViewBridge().SubscribeValueOnUpdate((v) =>
                 {
                     var (success, viewValue) = tryParse(capturedInputFieldUI.text);
                     var isDifferent = !success || !(v?.Equals(viewValue) ?? (viewValue == null));
@@ -122,7 +122,7 @@ namespace RosettaUI.UGUI.Builder
 
         static GameObject BuildField_AddLabelIfHas<T>(GameObject go, FieldBaseElement<T> field)
         {
-            var label = field.label;
+            var label = field.Label;
             if (label != null)
             {
                 var parent = Build_RowAt((string)label, field);

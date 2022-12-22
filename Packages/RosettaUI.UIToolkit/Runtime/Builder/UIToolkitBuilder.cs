@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using RosettaUI.Builder;
 using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 
 #if UNITY_2022_1_OR_NEWER
@@ -23,7 +24,7 @@ namespace RosettaUI.UIToolkit.Builder
         {
             return Instance.BuildInternal(element);
         }
-        
+
         #endregion
 
 
@@ -33,39 +34,81 @@ namespace RosettaUI.UIToolkit.Builder
         {
             _buildFuncTable = new Dictionary<Type, Func<Element, VisualElement>>
             {
-                [typeof(CompositeFieldElement)] = Build_CompositeField,
-                [typeof(DynamicElement)] = Build_DynamicElement,
-                [typeof(FoldElement)] = Build_Fold,
-                [typeof(HelpBoxElement)] = Build_HelpBox,
-                [typeof(IndentElement)] = Build_Indent,
-                [typeof(RowElement)] = Build_Row,
-                [typeof(ColumnElement)] = Build_Column,
-                [typeof(PageElement)] = Build_Column,
-                [typeof(BoxElement)] = Build_Box,
-                [typeof(ScrollViewElement)] = Build_ScrollView,
-                [typeof(TabsElement)] = Build_Tabs,
-                [typeof(WindowElement)] = Build_Window,
-                [typeof(WindowLauncherElement)] = Build_WindowLauncher,
+                [typeof(CompositeFieldElement)] = BuildSimple<CompositeField>,
+                [typeof(DynamicElement)] = BuildSimple<VisualElement>,
+                [typeof(FoldElement)] = BuildSimple<FoldoutCustom>,
+                [typeof(HelpBoxElement)] = BuildSimple<HelpBox>,
+                [typeof(RowElement)] = BuildSimple<Row>,
+                [typeof(ColumnElement)] = BuildSimple<Column>,
+                [typeof(BoxElement)] = BuildSimple<Box>,
+                [typeof(IndentElement)] = BuildSimple<Indent>,
+                [typeof(PageElement)] = BuildSimple<Column>,
+                
+                [typeof(ScrollViewElement)] = BuildSimple<ScrollView>,
+                [typeof(TabsElement)] = BuildSimple<Tabs>,
+                [typeof(WindowElement)] = BuildSimple<Window>,
+                [typeof(WindowLauncherElement)] = BuildSimple<WindowLauncher>,
 
-                [typeof(LabelElement)] = Build_Label,
-                [typeof(IntFieldElement)] = Build_Field<int, IntegerField>,
-                [typeof(UIntFieldElement)] = Build_Field<uint, UIntField>,
-                [typeof(FloatFieldElement)] = Build_Field<float, FloatField>,
-                [typeof(TextFieldElement)] = Build_TextField,
-                [typeof(ToggleElement)] = Build_Toggle,
-                [typeof(ColorFieldElement)] = Build_ColorField,
+                [typeof(IntFieldElement)] = BuildSimple<IntegerField>,
+                [typeof(UIntFieldElement)] = BuildSimple<UIntField>,
+                [typeof(FloatFieldElement)] = BuildSimple<FloatField>,
+                [typeof(TextFieldElement)] = BuildSimple<TextField>,
+                [typeof(ColorFieldElement)] = BuildSimple<ColorField>,
+
+                [typeof(LabelElement)] = BuildSimple<Label>,
+                [typeof(ToggleElement)] = BuildSimple<Toggle>,
                 
-                [typeof(IntSliderElement)] = Build_Slider<int, ClampFreeSliderInt>,
-                [typeof(FloatSliderElement)] = Build_Slider<float, ClampFreeSlider>,
-                [typeof(IntMinMaxSliderElement)] = Build_MinMaxSlider_Int,
-                [typeof(FloatMinMaxSliderElement)] = Build_MinMaxSlider_Float,
+                [typeof(IntSliderElement)] = BuildSimple<ClampFreeSliderInt>,
+                [typeof(FloatSliderElement)] = BuildSimple<ClampFreeSlider>,
+                [typeof(IntMinMaxSliderElement)] = BuildSimple<MinMaxSliderWithField<int, IntegerField>>,
+                [typeof(FloatMinMaxSliderElement)] = BuildSimple<MinMaxSliderWithField<float, FloatField>>,
                 
-                [typeof(DropdownElement)] = Build_Dropdown,
-                [typeof(SpaceElement)] = Build_Space,
-                [typeof(ImageElement)] = Build_Image,
-                [typeof(ButtonElement)] = Build_Button,
-                [typeof(PopupMenuElement)] = Build_PopupElement,
-                [typeof(ListViewItemContainerElement)] = Build_ListViewItemContainer
+                [typeof(DropdownElement)] = BuildSimple<PopupFieldCustomMenu<string>>,
+                [typeof(SpaceElement)] = BuildSimple<Space>,
+                [typeof(ImageElement)] = BuildSimple<Image>,
+                [typeof(ButtonElement)] = BuildSimple<Button>,
+                [typeof(PopupMenuElement)] = BuildSimple<PopupMenu>,
+                [typeof(ListViewItemContainerElement)] = BuildSimple<ListViewCustom>,
+            };
+            
+            
+            BindFuncTable = new()
+            {
+                [typeof(CompositeFieldElement)] = Bind_CompositeField,
+                [typeof(DynamicElement)] = Bind_DynamicElement,
+                [typeof(FoldElement)] = Bind_Fold,
+                [typeof(HelpBoxElement)] = Bind_HelpBox,
+                [typeof(RowElement)] = Bind_ElementGroup<RowElement, Row>,
+                [typeof(ColumnElement)] = Bind_ElementGroup<ColumnElement, Column>,
+                [typeof(BoxElement)] = Bind_ElementGroup<BoxElement, Box>,
+                [typeof(IndentElement)] = Bind_Indent,
+                [typeof(PageElement)] = Bind_ElementGroup<PageElement, Column>,
+                
+                [typeof(ScrollViewElement)] = Bind_ScrollView,
+                [typeof(TabsElement)] = Bind_Tabs,
+                [typeof(WindowElement)] = Bind_Window,
+                [typeof(WindowLauncherElement)] = Bind_WindowLauncher,
+                
+                [typeof(IntFieldElement)] = Bind_Field<int, IntegerField>,
+                [typeof(UIntFieldElement)] = Bind_Field<uint, UIntField>,
+                [typeof(FloatFieldElement)] = Bind_Field<float, FloatField>,
+                [typeof(TextFieldElement)] =  Bind_TextField,
+                [typeof(ColorFieldElement)] = Bind_ColorField,
+                
+                [typeof(LabelElement)] = Bind_Label,
+                [typeof(ToggleElement)] = Bind_Toggle,
+                
+                [typeof(IntSliderElement)] = Bind_Slider<int, ClampFreeSliderInt>,
+                [typeof(FloatSliderElement)] = Bind_Slider<float, ClampFreeSlider>,
+                [typeof(IntMinMaxSliderElement)] = Bind_MinMaxSlider<int, IntegerField>,
+                [typeof(FloatMinMaxSliderElement)] = Bind_MinMaxSlider<float, FloatField>,
+                
+                [typeof(DropdownElement)] = Bind_Dropdown,
+                [typeof(SpaceElement)] = BindSimple<Space>,
+                [typeof(ImageElement)] = Bind_Image,
+                [typeof(ButtonElement)] = Bind_Button,
+                [typeof(PopupMenuElement)] = Bind_PopupMenu,
+                [typeof(ListViewItemContainerElement)] = Bind_ListViewItemContainer
             };
         }
 
@@ -75,12 +118,92 @@ namespace RosettaUI.UIToolkit.Builder
 
         protected override IReadOnlyDictionary<Type, Func<Element, VisualElement>> BuildFuncTable => _buildFuncTable;
 
+        private Dictionary<Type, Func<Element, VisualElement, bool>> BindFuncTable { get; }
 
+        /// <summary>
+        /// Build時の特殊処理がないBindするだけのBuild
+        /// </summary>
+        private VisualElement BuildSimple<TVisualElement>(Element element)
+            where TVisualElement : VisualElement, new()
+        {
+            var ve = new TVisualElement();
+            var success = Bind(element, ve);
+            Assert.IsTrue(success);
+            return ve;
+        }
+
+        private bool BindSimple<TVisualElement>(Element element, VisualElement visualElement)
+            where TVisualElement : VisualElement
+        {
+            return visualElement is TVisualElement;
+        }
+
+        /// <summary>
+        /// 既存のVisualElementを新たなElementと紐づける
+        /// VisualElementの構成が一致していなければ return false
+        /// </summary>
+        /// <returns>success flag</returns>
+        public bool Bind(Element element, VisualElement ve)
+        {
+            if (element == null || ve == null) return false;
+            if (GetUIObj(element) == ve) return true;
+            
+            Unbind(element);
+            var prevElement = GetElement(ve);
+            if (prevElement != null)
+            {
+                Unbind(prevElement);
+            }
+
+            // BindFunc内でGetUIObj()をしたいので先に登録しておく
+            // プレフィックスラベルの幅を求める計算がBuild時はコールバックで呼ばれるのでBuild後で済むが、
+            // Bind時はデフォルトの幅になったままレイアウト処理が行われるとレイアウトが変更され重たいので、
+            // すぐにBind前の幅に戻してしておきたい
+            // したがってBindFunc内でGetUIObj()できるように先にSetupUIObj()を呼んでおく
+            SetupUIObj(element, ve);
+            
+            if (!BindFuncTable.TryGetValue(element.GetType(), out var func))
+            {
+                Debug.LogError($"{GetType()}: Unknown Type[{element.GetType()}].");
+                return false;
+            }
+
+            if (!func.Invoke(element, ve))
+            {
+                TeardownUIObj(element);
+                return false;
+            }
+
+            
+            return true;
+        }
+
+        public VisualElement Unbind(Element element)
+        {
+            foreach (var child in element.Children)
+            {
+                Unbind(child);
+            }
+            return TeardownUIObj(element);
+        }
+
+
+        // プレフィックスラベルの幅を計算する
         protected override void CalcPrefixLabelWidthWithIndent(LabelElement label, VisualElement ve)
         {
-            // 表示前にラベルの幅を計算する
-            ve.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            // すでにパネルにアタッチされている＝Build時ではなくBind時
+            // レイアウト計算が終わってるはずなので即計算する
+            if (ve.panel != null)
+            {
+                CalcMinWidth();
+            }
+            // Build時はまだレイアウト計算が終わっていないのでGeometryChangedを待つ
+            else
+            {
+                ve.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            }
 
+            // リストの要素など１回目のあとにレイアウト変更がされるので落ち着くまで複数回呼ばれるようにする
             void OnGeometryChanged(GeometryChangedEvent evt)
             {
                 // 移動してなければ落ち着いたと見てコールバック解除
@@ -89,6 +212,16 @@ namespace RosettaUI.UIToolkit.Builder
                 {
                     ve.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
                     return;
+                }
+
+                CalcMinWidth();
+            }
+
+            void CalcMinWidth()
+            {
+                if (label.Parent == null)
+                {
+                    Debug.LogWarning($"Label parent is null. [{label.Value}]");
                 }
 
                 var marginLeft = ve.worldBound.xMin;
@@ -162,42 +295,15 @@ namespace RosettaUI.UIToolkit.Builder
                 => nullable ?? (StyleColor)StyleKeyword.Null;
         }
 
-
-
-        protected override void OnRebuildElementGroupChildren(ElementGroup elementGroup)
-        {
-            var groupVe = GetUIObj(elementGroup);
-            Build_ElementGroupContents(groupVe, elementGroup);
-        }
-
-        protected override void OnDestroyElement(Element element, bool isDestroyRoot)
+        protected override void OnDetachView(Element element, bool destroyView)
         {
             var ve = GetUIObj(element);
+            Unbind(element);   
             
-            if (isDestroyRoot)
+            if (destroyView)
             {
                 ve?.RemoveFromHierarchy();
             }
-
-            UnregisterUIObj(element);
-        }
-
-        private static class UssClassName
-        {
-            public static readonly string UnityBaseField = "unity-base-field";
-            public static readonly string UnityBaseFieldLabel = UnityBaseField + "__label";
-
-            private static readonly string RosettaUI = "rosettaui";
-            
-            public static readonly string CompositeField = RosettaUI + "-composite-field";
-            public static readonly string CompositeFieldContents = CompositeField + "__contents";
-            public static readonly string Column = RosettaUI + "-column";
-            public static readonly string Row = RosettaUI + "-row";
-            public static readonly string WindowLauncher = RosettaUI + "-window-launcher";
-            public static readonly string MinMaxSlider = RosettaUI + "-min-max-slider";
-            public static readonly string Space = RosettaUI + "-space";
-            public static readonly string DynamicElement = RosettaUI + "-dynamic-element";
-            public static readonly string IndentElement = RosettaUI + "-indent";
         }
     }
 }

@@ -52,7 +52,7 @@ namespace RosettaUI.UGUI.Builder
             textUI.color = settings.theme.labelColor;
             if (!stringElement.IsConst)
             {
-                stringElement.SubscribeValueOnUpdate(s => textUI.text = s);
+                stringElement.GetViewBridge().SubscribeValueOnUpdate(s => textUI.text = s);
             }
 
             stringElement.interactableRx.Subscribe((interactable) =>

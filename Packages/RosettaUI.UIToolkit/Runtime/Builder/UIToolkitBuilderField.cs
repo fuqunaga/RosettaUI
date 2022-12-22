@@ -1,55 +1,100 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        private VisualElement Build_TextField(Element element)
+        private bool Bind_TextField(Element element, VisualElement visualElement)
         {
-            var textFieldElement = (TextFieldElement) element;
+            if (element is not TextFieldElement textFieldElement || visualElement is not TextField textField) return false;
 
-            var textField = Build_Field<string, TextField>(element);
-            if (textFieldElement.IsMultiLine)
+            Bind_Field(textFieldElement, textField, true);
+
+            if (textFieldElement.IsMultiLine != textField.multiline)
             {
-                textField.multiline = true;
+                textField.multiline = textFieldElement.IsMultiLine;
             }
 
-            return textField;
+            return true;
         }
+   
 
-        private VisualElement Build_ColorField(Element element)
+        private bool Bind_ColorField(Element element, VisualElement visualElement)
         {
-            var colorField = Build_Field<Color, ColorField>(element);
+            if (element is not FieldBaseElement<Color> colorElement || visualElement is not ColorField colorField) return false;
 
-            colorField.showColorPickerFunc += (pos, target) =>
+            Bind_Field(colorElement, colorField, true);
+            
+            colorField.showColorPickerFunc += ShowColorPicker;
+            element.GetViewBridge().onUnsubscribe += () => colorField.showColorPickerFunc -= ShowColorPicker;
+
+            return true;
+            
+            
+            void ShowColorPicker(Vector2 pos, UnityInternalAccess.ColorField target)
             {
                 ColorPicker.Show(pos, target, colorField.value, color => colorField.value = color);
-            };
-
-            return colorField;
+            }
         }
 
-        public TField Build_Field<T, TField>(Element element)
-            where TField : BaseField<T>, new()
+        public TField Build_Field<TValue, TField>(Element element)
+            where TField : BaseField<TValue>, new()
         {
-            return Build_Field<T, TField>(element, true);
+            return Build_Field<TValue, TField>(element, Bind_Field<TValue, TField>);
         }
 
-        private TField Build_Field<T, TField>(Element element, bool labelEnable)
-            where TField : BaseField<T>, new()
+        private static TField Build_Field<TValue, TField>(Element element, Func<Element, VisualElement, bool> bindMethod)
+            where TField : BaseField<TValue>, new()
         {
-            var fieldBaseElement = (FieldBaseElement<T>) element;
+            var field = CreateField<TValue, TField>();
+            var success = bindMethod(element, field);
+            Assert.IsTrue(success);
 
+            return field;
+        }
+        
+        private static TField CreateField<TValue, TField>()
+            where TField : BaseField<TValue>, new()
+        {
             var field = new TField();
-            field.Bind(fieldBaseElement);
 
-            if (labelEnable)
+            // ラベルのChangeEventを潰しておく
+            // fieldが BaseField<string> だとラベルのChangeEventを受け取ってしまうのでそれを止める
+            if (typeof(TValue) == typeof(string))
             {
-                SetupFieldLabel(field, fieldBaseElement);
+                field.labelElement.RegisterValueChangedCallback(evt => evt.StopPropagation());
             }
 
             return field;
+        }
+
+        private bool Bind_Field<TValue, TField>(Element element, VisualElement visualElement)
+            where TField : BaseField<TValue>, new()
+        {
+            if (element is not FieldBaseElement<TValue> fieldBaseElement || visualElement is not TField field) return false;
+            
+            Bind_Field(fieldBaseElement, field, true);
+
+            return true;
+        }
+
+        private void Bind_Field<TValue, TField>(FieldBaseElement<TValue> element, TField field, bool labelEnable)
+            where TField : BaseField<TValue>, new()
+        {
+            element.Bind(field);
+            
+            if (labelEnable)
+            {
+                Bind_FieldLabel(element, field);
+            }
+            else
+            {
+                //　Bind時以前のVisualElementのラベルを消しとく
+                field.label = null;
+            }
         }
     }
 }

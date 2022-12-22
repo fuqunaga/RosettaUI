@@ -1,20 +1,21 @@
 ﻿using System;
+using UnityEditor;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        private VisualElement Build_HelpBox(Element element)
+        private bool Bind_HelpBox(Element element, VisualElement visualElement)
         {
-            var helpBoxElement = (HelpBoxElement) element;
-        
-            var helpBox = new HelpBox(null, GetHelpBoxMessageType(helpBoxElement.helpBoxType));
-            helpBoxElement.label.SubscribeValueOnUpdateCallOnce(str => helpBox.text = str);
+            if (element is not HelpBoxElement helpBoxElement || visualElement is not HelpBox helpBox) return false;
 
-            return helpBox;
+            helpBox.messageType = ToHelpBoxMessageType(helpBoxElement.helpBoxType);
+            Bind_ExistingLabel(helpBoxElement.label, null, str => helpBox.text = str);
 
-            static HelpBoxMessageType GetHelpBoxMessageType(HelpBoxType helpBoxType)
+            return true;
+            
+            static HelpBoxMessageType ToHelpBoxMessageType(HelpBoxType helpBoxType)
             {
                 return helpBoxType switch
                 {

@@ -145,16 +145,18 @@
     margin-right: 0;
 }
 
-.rosettaui-composite-field__contents
+.rosettaui-composite-field__content-container 
 {
     flex-direction: row;
 }
 
-.rosettaui-composite-field__contents .unity-base-field__label {
+.rosettaui-composite-field .unity-base-field__label 
+{
     min-width: 15px;
 }
 
-.rosettaui-composite-field__contents  .unity-base-field__input {
+.rosettaui-composite-field .unity-base-field__input 
+{
     min-width: var(--fixed-field-width-m);
 }
 
@@ -253,26 +255,10 @@
 }
 
 /********************************************************************************
-* Indent
-********************************************************************************/
-.rosettaui-indent
-{
-    flex: 1 0 auto;
-}
-
-/********************************************************************************
 * Space
 ********************************************************************************/
 .rosettaui-space
 {
     flex-grow: 100;
-    flex-shrink: 0;
-}
-
-/********************************************************************************
-* Dynamic Element
-********************************************************************************/
-.rosettaui-dynamic-element
-{
     flex-shrink: 0;
 }

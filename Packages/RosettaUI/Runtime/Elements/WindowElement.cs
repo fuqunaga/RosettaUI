@@ -13,10 +13,9 @@ namespace RosettaUI
             set => positionRx.Value = value;
         }
 
-
+        public override ReactiveProperty<bool> IsOpenRx => enableRx;
+        
         public WindowElement(Element header, IEnumerable<Element> contents) : base(header, contents)
         {}
-
-        public override ReactiveProperty<bool> IsOpenRx => enableRx;
     }
 }

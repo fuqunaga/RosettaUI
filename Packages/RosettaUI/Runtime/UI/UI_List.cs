@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using UnityEngine;
 
@@ -70,12 +71,13 @@ namespace RosettaUI
         {
             option ??= ListViewOption.Default;
 
-            var countField = ListCounterField(listBinder, option);
+            var listItemContainer = ListItemContainer(listBinder, createItemElement, option);
+            var countField = ListCounterField(listBinder, listItemContainer, option);
 
             var fold = Fold(
                 label,countField,
                 new[]{
-                    ListItemContainer(listBinder, createItemElement, option)
+                    listItemContainer
                 }
             ).Open();
             
@@ -84,15 +86,27 @@ namespace RosettaUI
             return fold;
         }
 
-        public static Element ListCounterField(IBinder listBinder, ListViewOption option = null)
+        public static Element ListCounterField(IBinder listBinder,　Element itemContainerElement, ListViewOption option = null)
         {
             option ??= ListViewOption.Default;
-            var isReadOnly = ListBinder.IsReadOnly(listBinder);
+            var interactable = !ListBinder.IsReadOnly(listBinder) && !option.fixedSize;
             
             return Field(null,
                 () => ListBinder.GetCount(listBinder),
-                count => ListBinder.SetCount(listBinder, count)
-            ).SetMinWidth(50f).SetInteractable(!isReadOnly && !option.fixedSize);
+                count =>
+                {
+                    // ListViewItemContainerElementが存在していたら新しいcountを通知
+                    // NullGuardで存在してない場合もありそのときはlistBinderに直接セットする
+                    var containerElement = itemContainerElement.Query<ListViewItemContainerElement>().FirstOrDefault();
+                    if (containerElement != null)
+                    {
+                        containerElement.ListItemCount = count;
+                    }
+                    else
+                    {
+                        ListBinder.SetCount(listBinder, count);
+                    }
+                }).SetMinWidth(50f).SetInteractable(interactable);
         }
         
         public static Element ListItemContainer(IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
@@ -108,64 +122,5 @@ namespace RosettaUI
         }
         
         public static Element ListItemDefault(IBinder binder, int index) => Field($"Item {index}", binder);
-
-
-#if false
-
-        public static Element List_(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null)
-        {
-            var isReadOnly = ListBinder.IsReadOnly(listBinder);
-
-            var countFieldWidth = 80f;
-            var field = Field(null,
-                () => ListBinder.GetCount(listBinder),
-                isReadOnly ? (Action<int>) null : (count) => ListBinder.SetCount(listBinder, count)
-            ).SetWidth(countFieldWidth);
-     
-            var buttons = isReadOnly
-                ? null
-                : Row(
-                    Space(),
-                    Button("＋", () => ListBinder.AddItemAtLast(listBinder)),
-                    Button("－", () => ListBinder.RemoveItemAtLast(listBinder))
-                );
-
-            return Fold(
-                barLeft: label,
-                barRight: field,
-                elements: new[]
-                {
-                    Box(Indent(
-                        List(listBinder, createItemElement),
-                        buttons
-                        )
-                    )
-                }
-            );
-        }
-        
-        public static Element List(IBinder listBinder, Func<IBinder, int, Element> createItemElement = null)
-        {
-            return DynamicElementOnStatusChanged(
-                readStatus: () => ListBinder.GetCount(listBinder),
-                build: _ =>
-                {
-                    createItemElement ??= ((binder, idx) => Field("Element " + idx, binder));
-
-                    var itemBinderToElement = createItemElement;
-
-                    var isReadOnly = ListBinder.IsReadOnly(listBinder);
-                    if (!isReadOnly)
-                    {
-                        itemBinderToElement = (binder,idx) => ListViewItemContainerElement.AddPopupMenu(createItemElement(binder, idx), binder, idx);
-                    }
-
-                    return Column(
-                        ListBinder.CreateItemBinders(listBinder).Select(itemBinderToElement)
-                    ).SetInteractable(!isReadOnly);
-                });
-        }
-
-#endif
     }
 }

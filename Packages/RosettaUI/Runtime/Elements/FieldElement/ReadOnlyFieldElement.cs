@@ -1,4 +1,6 @@
-﻿namespace RosettaUI
+﻿using System.Linq;
+
+namespace RosettaUI
 {
     /// <summary>
     /// 値を持ち外部と同期するFieldElement
@@ -6,17 +8,14 @@
     /// </summary>
     public abstract class ReadOnlyFieldElement<T> : ReadOnlyValueElement<T>
     {
-        public readonly LabelElement label;
+        public LabelElement Label => Children.FirstOrDefault() as LabelElement;
 
         protected ReadOnlyFieldElement(LabelElement label, IGetter<T> getter) : base(getter)
         {
             if (label != null)
             {
                 label.SetLabelTypeToPrefixIfAuto();
-                
-                this.label = label;
-                
-                AddChild(this.label);
+                AddChild(label);
             }
         }
     }

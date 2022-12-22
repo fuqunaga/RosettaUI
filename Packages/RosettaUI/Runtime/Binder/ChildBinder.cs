@@ -3,11 +3,11 @@
     /// <summary>
     /// Binder, which targets a portion of the parents
     /// </summary>
-    public abstract class ChildBinder/*Base*/<TParent, TValue> : BinderBase<TValue>
+    public abstract class ChildBinder<TParent, TValue> : BinderBase<TValue>
     {
         protected readonly IBinder<TParent> parentBinder;
 
-        protected ChildBinder/*Base*/(IBinder<TParent> parentBinder)
+        protected ChildBinder(IBinder<TParent> parentBinder)
         {
             this.parentBinder = parentBinder;
             getter = Getter.Create(() => GetFromParent(parentBinder.Get()));

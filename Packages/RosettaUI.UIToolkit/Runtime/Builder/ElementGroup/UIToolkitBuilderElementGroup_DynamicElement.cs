@@ -4,12 +4,13 @@ namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        private VisualElement Build_DynamicElement(Element element)
+        private bool Bind_DynamicElement(Element element, VisualElement visualElement)
         {
-            var ve = new VisualElement();
-            ve.AddToClassList(UssClassName.DynamicElement);
+            if (element is not DynamicElement dynamicElement) return false;
+            
+            dynamicElement.GetViewBridge().RegisterBindView(e => Bind_ElementGroupContents(e, visualElement));
 
-            return ve;
+            return true;
         }
     }
 }

@@ -11,7 +11,7 @@ namespace RosettaUI
 
         public static WindowLauncherElement WindowLauncher(LabelElement title, WindowElement window)
         {
-            var label = title ?? window.header?.FirstLabel()?.Clone();
+            var label = title ?? window.Header?.FirstLabel()?.Clone();
             return new WindowLauncherElement(label, window);
         }
 
@@ -60,7 +60,7 @@ namespace RosettaUI
                     window.Close();
                 }
             };
-            launcher.onDestroy += (_,_) => window.Destroy();
+            launcher.onDetachView += (_,_) => window.DetachView();
 
             return launcher;
         }

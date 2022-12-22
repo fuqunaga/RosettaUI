@@ -4,28 +4,13 @@ namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        private VisualElement Build_CompositeField(Element element)
+        private bool Bind_CompositeField(Element element, VisualElement visualElement)
         {
-            var compositeFieldElement = (CompositeFieldElement) element;
+            if (element is not CompositeFieldElement compositeFieldElement || visualElement is not CompositeField compositeField) return false;
+            
+            Bind_ExistingLabel(compositeFieldElement.Label, compositeField.labelElement, str => compositeField.label = str);
 
-            var field = new VisualElement();
-            field.AddToClassList(UssClassName.UnityBaseField);
-            field.AddToClassList(UssClassName.CompositeField);
-
-            var labelElement = compositeFieldElement.header;
-            if (labelElement != null)
-            {
-                var label = Build(labelElement);
-                label.AddToClassList(UssClassName.UnityBaseFieldLabel);
-                field.Add(label);
-            }
-
-            var contentContainer = new VisualElement();
-            contentContainer.AddToClassList(UssClassName.CompositeFieldContents);
-            field.Add(contentContainer);
-            Build_ElementGroupContents(contentContainer, element);
-
-            return field;
+            return Bind_ElementGroupContents(compositeFieldElement, compositeField);
         }
     }
 }

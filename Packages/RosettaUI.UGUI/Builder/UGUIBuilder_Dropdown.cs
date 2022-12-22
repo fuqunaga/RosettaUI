@@ -31,11 +31,11 @@ namespace RosettaUI.UGUI.Builder
 
             dropdown.options = dropdownElement.options?.Select(str => new TMP_Dropdown.OptionData(str)).ToList();
 
-            dropdown.onValueChanged.AddListener(dropdownElement.OnViewValueChanged);
+            dropdown.onValueChanged.AddListener(dropdownElement.GetViewBridge().SetValueFromView);
             
             if (!dropdownElement.IsConst)
             {
-                dropdownElement.SubscribeValueOnUpdate(v => dropdown.value = v);
+                dropdownElement.GetViewBridge().SubscribeValueOnUpdate(v => dropdown.value = v);
             }
             
             SubscribeInteractable(element, dropdown, dropdown.captionText);

@@ -1,6 +1,7 @@
-﻿using RosettaUI.Reactive;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using RosettaUI.Reactive;
+using UnityEngine.Assertions;
 
 namespace RosettaUI
 {
@@ -12,19 +13,22 @@ namespace RosettaUI
     /// </summary>
     public abstract class Element
     {
-        private readonly List<Element> _children = new();
-        public IReadOnlyList<Element> Children => _children;
+        private readonly LinkedList<Element> _children = new();
+        public IEnumerable<Element> Children => _children;
 
 
         public readonly ReactiveProperty<bool> enableRx = new(true);
         public readonly ReactiveProperty<bool> interactableRx = new(true);
 
         public bool UpdateWhileDisabled { get; set; }
+
+        public bool HasBuilt => ViewBridge.HasBuilt;
         
         public event Action<Element> onUpdate;
         public event Action onViewValueChanged;
-        public event Action<Element, bool> onDestroy;
+        public event Action<Element, bool> onDetachView;
 
+        private ElementViewBridge _viewBridge;
 
         public bool Enable
         {
@@ -42,15 +46,24 @@ namespace RosettaUI
         
         public Element Parent { get; private set; }
 
-        public void SetParent(Element element)
+        private void SetParent(Element element)
         {
             this.ValidateSingleParent();
             Parent = element;
         }
 
+        public bool DetachParent()
+        {
+            Assert.IsFalse(HasBuilt, $"{GetType()} has already built. Call DestroyView() to reuse this element");
+            if (Parent == null) return false;
+            Parent.RemoveChild(this);
+
+            return true;
+        }
+
         protected void AddChild(Element element)
         {
-            _children.Add(element);
+            _children.AddLast(element);
             element.SetParent(this);
         }
 
@@ -70,23 +83,27 @@ namespace RosettaUI
             onUpdate?.Invoke(this);
             foreach(var e in _children) e.Update();
         }
-
-        protected void DestroyChildren(bool isDestroyRoot)
-        {
-            foreach (var child in _children)
-            {
-                child.Parent = null;
-                child.Destroy(isDestroyRoot);
-            }
-            _children.Clear();
-        }
         
-        public virtual void Destroy(bool isDestroyRoot = true)
+        public void DetachView(bool destroyView = true)
         {
-            onDestroy?.Invoke(this, isDestroyRoot);
-            Parent?.RemoveChild(this);
-            
-            DestroyChildren(false);
+            onDetachView?.Invoke(this, destroyView);
+            DetachViewChildren();
+
+            if (destroyView)
+            {
+                DetachParent();
+            }
+        }
+
+        private void DetachViewChildren()
+        {
+            var node = _children.First;
+            while(node != null)
+            {
+                var next = node.Next;
+                node.Value.DetachView(false);
+                node = next;
+            }
         }
 
         public void NotifyViewValueChanged()
@@ -94,5 +111,34 @@ namespace RosettaUI
             onViewValueChanged?.Invoke();
             Parent?.NotifyViewValueChanged();
         }
+        
+        
+        /// <summary>
+        /// Interface for UI library
+        /// </summary>
+        internal ElementViewBridge ViewBridge => _viewBridge ??= CreateViewBridge();
+
+        protected virtual ElementViewBridge CreateViewBridge() => new(this);
+
+        public class ElementViewBridge
+        {
+            public event Action onUnsubscribe;
+            protected readonly Element element;
+
+            public bool HasBuilt => onUnsubscribe != null;
+
+            public ElementViewBridge(Element element) => this.element = element;
+            
+            public virtual void UnsubscribeAll()
+            {
+                onUnsubscribe?.Invoke();
+                onUnsubscribe = null;
+            } 
+        }
+    }
+    
+    public static partial class ElementViewBridgeExtensions
+    {
+        public static Element.ElementViewBridge GetViewBridge(this Element element) => element.ViewBridge;
     }
 }

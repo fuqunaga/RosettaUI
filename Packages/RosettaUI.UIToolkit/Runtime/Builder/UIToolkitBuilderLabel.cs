@@ -1,4 +1,5 @@
-﻿using UnityEngine.UIElements;
+﻿using System;
+using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
 {
@@ -6,21 +7,44 @@ namespace RosettaUI.UIToolkit.Builder
     {
         VisualElement Build_Label(Element element)
         {
-            var labelElement = (LabelElement) element;
-            var label = new Label(labelElement.Value);
-            label.ListenValue(labelElement);
+            var ve = new Label();
+            Bind_Label(element, ve);
+            return ve;
+        }
+
+        private bool Bind_Label(Element element, VisualElement visualElement)
+        {
+            if (visualElement is not Label label || element is not LabelElement labelElement) return false;
+            labelElement.SubscribeValueOnUpdateCallOnce(label);
             
-            return label;
+            return true;
         }
         
-        void SetupFieldLabel<T, TElementValue>(BaseField<T> field, ReadOnlyFieldElement<TElementValue> fieldBaseElement)
+        /// <summary>
+        /// Fieldがもともと内包しているLabelとLabelElementをBindする
+        /// </summary>
+        private void Bind_FieldLabel<T, TElementValue>(ReadOnlyFieldElement<TElementValue> fieldBaseElement, BaseField<T> field)
         {
-            var labelElement = fieldBaseElement.label;
-            if (labelElement != null)
+            Bind_ExistingLabel(fieldBaseElement.Label, field.labelElement, (str) => field.label = str);
+        }
+        
+        /// <summary>
+        /// 一部のVisualElementがもともと内包しているLabelとLabelElementをBindする
+        /// LabelはアクセスできないがBaseBoolField.textなどのように値を渡せる場合もある
+        /// </summary>
+        private void Bind_ExistingLabel(LabelElement labelElement, Label label, Action<string> setValueToView)
+        {
+            if (labelElement == null)
             {
-                field.ListenLabel(labelElement);
-
-                SetupUIObj(labelElement, field.labelElement);
+                setValueToView(null);
+            }
+            else
+            {
+                labelElement.GetViewBridge().SubscribeValueOnUpdateCallOnce(setValueToView);
+                if (label != null)
+                {
+                    SetupUIObj(labelElement, label);
+                }
             }
         }
     }

@@ -8,6 +8,8 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         public ClampFreeSliderInt()
         {
             clamped = false;
+            SliderPatchUtility.FixDraggerInvalidPosition(this);
+
         }
         internal override float SliderNormalizeValue(int currentValue, int lowerValue, int higherValue)
             => Mathf.Clamp01(base.SliderNormalizeValue(currentValue, lowerValue, higherValue));

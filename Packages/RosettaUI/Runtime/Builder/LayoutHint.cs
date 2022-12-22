@@ -36,6 +36,11 @@ namespace RosettaUI.Builder
             return false;
         }
 
+        public static bool IsPrefix(this LabelElement label)
+        {
+            return label.labelType == LabelType.Prefix && label.IsMostLeftLabel();
+        }
+
         public static bool IsMostLeftLabel(this LabelElement element)
         {
             for (Element e = element;
@@ -49,7 +54,7 @@ namespace RosettaUI.Builder
                         && row.FirstLabel() != element:
                         return false;
                     
-                    case CompositeFieldElement c when c.header != e:
+                    case CompositeFieldElement c when c.Label != e:
                         return false;
                 }
             }

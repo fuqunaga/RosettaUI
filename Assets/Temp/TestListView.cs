@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+#if !UNITY_2022_2_OR_NEWER
 using RosettaUI.UIToolkit.UnityInternalAccess;
+#endif
 using UnityEngine;
 using UnityEngine.UIElements;
 

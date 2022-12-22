@@ -1,14 +1,15 @@
-﻿using System;
+﻿#if !UNITY_2022_2_OR_NEWER
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine.Assertions;
+#endif
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
-
 #if UNITY_2022_1_OR_NEWER
-        private class DynamicHeightVirtualizationControllerCustom : DynamicHeightVirtualizationController<ReusableListViewItem>
+        internal class DynamicHeightVirtualizationControllerCustom : DynamicHeightVirtualizationController<ReusableListViewItem>
         {
             public DynamicHeightVirtualizationControllerCustom(BaseVerticalCollectionView collectionView) : base(collectionView)
             {

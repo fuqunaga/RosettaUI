@@ -18,21 +18,9 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
     /// </summary>
     public class ListViewCustom : ListView
     {
-#if !UNITY_2022_1_OR_NEWER
-        public event Action itemsSourceSizeChanged;
-
-        public ListViewCustom()
-        {
-            ((ListViewController)GetOrCreateViewController()).itemsSourceSizeChanged += () => itemsSourceSizeChanged?.Invoke();
-        }
-#endif
-        
-        
-        
         #region Avoid error when IList item is ValueType
         
-#if UNITY_2022_1_OR_NEWER
-        
+#if UNITY_2022_2_OR_NEWER
         protected override CollectionViewController CreateViewController() => new ListViewControllerCustom();
 #else
         private protected override void CreateViewController() => SetViewController(new ListViewControllerCustom());

@@ -7,8 +7,15 @@ using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 
 #if UNITY_2022_1_OR_NEWER
+
 using IntegerField = UnityEngine.UIElements.IntegerField;
 using FloatField = UnityEngine.UIElements.FloatField;
+using PopupFieldString = UnityEngine.UIElements.PopupField<string>;
+
+#else
+
+using PopupFieldString = PopupField<string>;
+ss
 #endif
 
 
@@ -63,7 +70,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(IntMinMaxSliderElement)] = BuildSimple<MinMaxSliderWithField<int, IntegerField>>,
                 [typeof(FloatMinMaxSliderElement)] = BuildSimple<MinMaxSliderWithField<float, FloatField>>,
                 
-                [typeof(DropdownElement)] = BuildSimple<PopupFieldCustomMenu<string>>,
+                [typeof(DropdownElement)] = BuildSimple<PopupFieldString>,
                 [typeof(SpaceElement)] = BuildSimple<Space>,
                 [typeof(ImageElement)] = BuildSimple<Image>,
                 [typeof(ButtonElement)] = BuildSimple<Button>,

@@ -34,6 +34,7 @@ namespace RosettaUI.UIToolkit.Builder
             
             return true;
             
+            
             #region Local functions
 
             void SetCallbacks()
@@ -52,24 +53,13 @@ namespace RosettaUI.UIToolkit.Builder
                 // ListView 内での参照先変更を通知
                 listView.itemsSourceChanged += OnItemsSourceChanged;
 
-                // ListView 内での要素数変更を通知（ListView 外での変更と区別するための処理）
-#if UNITY_2022_1_OR_NEWER
-                listView.viewController.itemsSourceSizeChanged += OnItemsSourceSizeChanged;
-#else
-                listView.itemsSourceSizeChanged += OnItemsSourceSizeChanged;
-#endif
-
                 viewBridge.onUnsubscribe += () =>
                 {
                     listView.itemsRemoved -= OnItemsAdded;
                     listView.itemsRemoved -= OnItemsRemoved;
                     listView.itemIndexChanged -= OnItemIndexChanged;
                     listView.itemsSourceChanged -= OnItemsSourceChanged;
-#if UNITY_2022_1_OR_NEWER
-                    listView.viewController.itemsSourceSizeChanged -= OnItemsSourceSizeChanged;
-#else
-                    listView.itemsSourceSizeChanged -= OnItemsSourceSizeChanged;
-#endif
+                    
                     listView.itemsSource = Array.Empty<int>(); // null だとエラーになるので空配列で
                 };
             }
@@ -143,7 +133,6 @@ namespace RosettaUI.UIToolkit.Builder
             }
 
             void OnItemsSourceChanged() => OnViewListChanged();
-            void OnItemsSourceSizeChanged() => OnViewListChanged();
             
             // List になにか変更があった場合の通知
             // 参照先変更、サイズ変更、アイテムの値変更

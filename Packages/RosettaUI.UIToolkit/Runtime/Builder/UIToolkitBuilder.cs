@@ -14,8 +14,8 @@ using PopupFieldString = UnityEngine.UIElements.PopupField<string>;
 
 #else
 
-using PopupFieldString = PopupField<string>;
-ss
+using PopupFieldString = RosettaUI.UIToolkit.UnityInternalAccess.PopupField<string>;
+
 #endif
 
 

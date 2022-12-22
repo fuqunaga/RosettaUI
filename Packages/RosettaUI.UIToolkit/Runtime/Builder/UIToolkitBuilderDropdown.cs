@@ -1,4 +1,6 @@
-﻿using RosettaUI.UIToolkit.UnityInternalAccess;
+﻿#if !UNITY_2022_2_OR_NEWER
+using RosettaUI.UIToolkit.UnityInternalAccess;
+#endif
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -8,7 +10,7 @@ namespace RosettaUI.UIToolkit.Builder
         private bool Bind_Dropdown(Element element, VisualElement visualElement)
         {
             if (element is not DropdownElement dropdownElement ||
-                visualElement is not PopupFieldCustomMenu<string> popupField) return false;
+                visualElement is not PopupField<string> popupField) return false;
 
             var options = dropdownElement.options;
             popupField.choices = options;

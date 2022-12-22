@@ -148,15 +148,6 @@ namespace RosettaUI.UIToolkit.Builder
             if (element == null || ve == null) return false;
             if (GetUIObj(element) == ve) return true;
             
-            // 親なしはとりあえず禁止
-            // 新Elementを旧Elementのヒエラルキー上に入れ忘れ防止
-            // PrefixLabelの幅計算で正しい親が必要
-            // TODO: あとで削除する。Windowなしで各Elementがヒエラルキー上のルートになることはありえる
-            if (element is not WindowElement)
-            {
-                Assert.IsNotNull(element.Parent, $"{element.GetType()} FirstLabel[{element.FirstLabel()?.Value}]");
-            }
-
             Unbind(element);
             var prevElement = GetElement(ve);
             if (prevElement != null)

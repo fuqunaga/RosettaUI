@@ -9,7 +9,6 @@ namespace RosettaUI.Builder
 {
     public abstract class BuilderBase<TUIObj>
     {
-        protected abstract IReadOnlyDictionary<Type, Func<Element, TUIObj>> BuildFuncTable { get; }
         private readonly Dictionary<Element, TUIObj> _elementToUIObj = new();
         private readonly Dictionary<TUIObj, Element> _uiObjToElement = new();
         
@@ -46,22 +45,22 @@ namespace RosettaUI.Builder
 
         protected TUIObj BuildInternal(Element element)
         {
-            TUIObj uiObj = default;
-            if (element != null)
+            if (element == null) return default;
+
+            TUIObj uiObj = DispatchBuild(element);
+            if (uiObj != null)
             {
-                if (BuildFuncTable.TryGetValue(element.GetType(), out var func))
-                {
-                    uiObj = func(element);
-                    SetupUIObj(element, uiObj);
-                }
-                else
-                {
-                    Debug.LogError($"{GetType()}: Unknown Type[{element.GetType()}].");
-                }
+                SetupUIObj(element, uiObj);
+            }
+            else
+            {
+                Debug.LogError($"{GetType()}: Unknown Type[{element.GetType()}].");
             }
 
             return uiObj;
         }
+
+        protected abstract TUIObj DispatchBuild(Element element);
 
         protected virtual void SetupUIObj(Element element, TUIObj uiObj)
         {

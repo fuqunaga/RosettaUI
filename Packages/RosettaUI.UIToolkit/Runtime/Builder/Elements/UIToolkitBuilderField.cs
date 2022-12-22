@@ -40,38 +40,7 @@ namespace RosettaUI.UIToolkit.Builder
             }
         }
 
-        public TField Build_Field<TValue, TField>(Element element)
-            where TField : BaseField<TValue>, new()
-        {
-            return Build_Field<TValue, TField>(element, Bind_Field<TValue, TField>);
-        }
-
-        private static TField Build_Field<TValue, TField>(Element element, Func<Element, VisualElement, bool> bindMethod)
-            where TField : BaseField<TValue>, new()
-        {
-            var field = CreateField<TValue, TField>();
-            var success = bindMethod(element, field);
-            Assert.IsTrue(success);
-
-            return field;
-        }
-        
-        private static TField CreateField<TValue, TField>()
-            where TField : BaseField<TValue>, new()
-        {
-            var field = new TField();
-
-            // ラベルのChangeEventを潰しておく
-            // fieldが BaseField<string> だとラベルのChangeEventを受け取ってしまうのでそれを止める
-            if (typeof(TValue) == typeof(string))
-            {
-                field.labelElement.RegisterValueChangedCallback(evt => evt.StopPropagation());
-            }
-
-            return field;
-        }
-
-        private bool Bind_Field<TValue, TField>(Element element, VisualElement visualElement)
+        public bool Bind_Field<TValue, TField>(Element element, VisualElement visualElement)
             where TField : BaseField<TValue>, new()
         {
             if (element is not FieldBaseElement<TValue> fieldBaseElement || visualElement is not TField field) return false;

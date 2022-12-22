@@ -34,109 +34,58 @@ namespace RosettaUI.UIToolkit.Builder
 
         #endregion
 
-
-        private readonly Dictionary<Type, Func<Element, VisualElement>> _buildFuncTable;
-
+        
         protected UIToolkitBuilder()
         {
-            _buildFuncTable = new Dictionary<Type, Func<Element, VisualElement>>
+            FuncTable = new()
             {
-                [typeof(CompositeFieldElement)] = BuildSimple<CompositeField>,
-                [typeof(DynamicElement)] = BuildSimple<VisualElement>,
-                [typeof(FoldElement)] = BuildSimple<FoldoutCustom>,
-                [typeof(HelpBoxElement)] = BuildSimple<HelpBox>,
-                [typeof(RowElement)] = BuildSimple<Row>,
-                [typeof(ColumnElement)] = BuildSimple<Column>,
-                [typeof(BoxElement)] = BuildSimple<Box>,
-                [typeof(IndentElement)] = BuildSimple<Indent>,
-                [typeof(PageElement)] = BuildSimple<Column>,
+                [typeof(BoxElement)] = BuildBindFunc<Box>.Create(Bind_ElementGroup<BoxElement, Box>),
+                [typeof(ColumnElement)] = BuildBindFunc<Column>.Create(Bind_ElementGroup<ColumnElement, Column>),
+                [typeof(CompositeFieldElement)] = BuildBindFunc<CompositeField>.Create(Bind_CompositeField),
+                [typeof(DynamicElement)] = BuildBindFunc<VisualElement>.Create(Bind_DynamicElement),
+                [typeof(FoldElement)] = BuildBindFunc<FoldoutCustom>.Create(Bind_Fold),
+                [typeof(HelpBoxElement)] = BuildBindFunc<HelpBox>.Create(Bind_HelpBox),
+                [typeof(IndentElement)] = BuildBindFunc<Indent>.Create(Bind_Indent),
+                [typeof(ListViewItemContainerElement)] = BuildBindFunc<ListViewCustom>.Create(Bind_ListViewItemContainer),
+                [typeof(PageElement)] = BuildBindFunc<Column>.Create(Bind_ElementGroup<PageElement, Column>),
+                [typeof(PopupMenuElement)] = BuildBindFunc<PopupMenu>.Create(Bind_PopupMenu),
+                [typeof(RowElement)] = BuildBindFunc<Row>.Create(Bind_ElementGroup<RowElement, Row>),
+                [typeof(ScrollViewElement)] = BuildBindFunc<ScrollView>.Create(Bind_ScrollView),
+                [typeof(TabsElement)] = BuildBindFunc<Tabs>.Create(Bind_Tabs),
+                [typeof(WindowElement)] = BuildBindFunc<Window>.Create(Bind_Window),
+                [typeof(WindowLauncherElement)] = BuildBindFunc<WindowLauncher>.Create(Bind_WindowLauncher),
                 
-                [typeof(ScrollViewElement)] = BuildSimple<ScrollView>,
-                [typeof(TabsElement)] = BuildSimple<Tabs>,
-                [typeof(WindowElement)] = BuildSimple<Window>,
-                [typeof(WindowLauncherElement)] = BuildSimple<WindowLauncher>,
+                [typeof(ColorFieldElement)] = BuildBindFunc<ColorField>.Create(Bind_ColorField),
+                [typeof(FloatFieldElement)] = BuildBindFunc<FloatField>.Create(Bind_Field<float, FloatField>),
+                [typeof(IntFieldElement)] = BuildBindFunc<IntegerField>.Create(Bind_Field<int, IntegerField>),
+                [typeof(UIntFieldElement)] = BuildBindFunc<UIntField>.Create(Bind_Field<uint, UIntField>),
+                [typeof(TextFieldElement)] =  BuildBindFunc<TextField>.Create(Bind_TextField),
 
-                [typeof(IntFieldElement)] = BuildSimple<IntegerField>,
-                [typeof(UIntFieldElement)] = BuildSimple<UIntField>,
-                [typeof(FloatFieldElement)] = BuildSimple<FloatField>,
-                [typeof(TextFieldElement)] = BuildSimple<TextField>,
-                [typeof(ColorFieldElement)] = BuildSimple<ColorField>,
-
-                [typeof(LabelElement)] = BuildSimple<Label>,
-                [typeof(ToggleElement)] = BuildSimple<Toggle>,
+                [typeof(IntSliderElement)] = BuildBindFunc<ClampFreeSliderInt>.Create(Bind_Slider<int, ClampFreeSliderInt>),
+                [typeof(FloatSliderElement)] = BuildBindFunc<ClampFreeSlider>.Create(Bind_Slider<float, ClampFreeSlider>),
+                [typeof(IntMinMaxSliderElement)] = BuildBindFunc<MinMaxSliderWithField<int, IntegerField>>.Create(Bind_MinMaxSlider<int, IntegerField>),
+                [typeof(FloatMinMaxSliderElement)] = BuildBindFunc<MinMaxSliderWithField<float, FloatField>>.Create(Bind_MinMaxSlider<float, FloatField>),
                 
-                [typeof(IntSliderElement)] = BuildSimple<ClampFreeSliderInt>,
-                [typeof(FloatSliderElement)] = BuildSimple<ClampFreeSlider>,
-                [typeof(IntMinMaxSliderElement)] = BuildSimple<MinMaxSliderWithField<int, IntegerField>>,
-                [typeof(FloatMinMaxSliderElement)] = BuildSimple<MinMaxSliderWithField<float, FloatField>>,
-                
-                [typeof(DropdownElement)] = BuildSimple<PopupFieldString>,
-                [typeof(SpaceElement)] = BuildSimple<Space>,
-                [typeof(ImageElement)] = BuildSimple<Image>,
-                [typeof(ButtonElement)] = BuildSimple<Button>,
-                [typeof(PopupMenuElement)] = BuildSimple<PopupMenu>,
-                [typeof(ListViewItemContainerElement)] = BuildSimple<ListViewCustom>,
-            };
-            
-            
-            BindFuncTable = new()
-            {
-                [typeof(CompositeFieldElement)] = Bind_CompositeField,
-                [typeof(DynamicElement)] = Bind_DynamicElement,
-                [typeof(FoldElement)] = Bind_Fold,
-                [typeof(HelpBoxElement)] = Bind_HelpBox,
-                [typeof(RowElement)] = Bind_ElementGroup<RowElement, Row>,
-                [typeof(ColumnElement)] = Bind_ElementGroup<ColumnElement, Column>,
-                [typeof(BoxElement)] = Bind_ElementGroup<BoxElement, Box>,
-                [typeof(IndentElement)] = Bind_Indent,
-                [typeof(PageElement)] = Bind_ElementGroup<PageElement, Column>,
-                
-                [typeof(ScrollViewElement)] = Bind_ScrollView,
-                [typeof(TabsElement)] = Bind_Tabs,
-                [typeof(WindowElement)] = Bind_Window,
-                [typeof(WindowLauncherElement)] = Bind_WindowLauncher,
-                
-                [typeof(IntFieldElement)] = Bind_Field<int, IntegerField>,
-                [typeof(UIntFieldElement)] = Bind_Field<uint, UIntField>,
-                [typeof(FloatFieldElement)] = Bind_Field<float, FloatField>,
-                [typeof(TextFieldElement)] =  Bind_TextField,
-                [typeof(ColorFieldElement)] = Bind_ColorField,
-                
-                [typeof(LabelElement)] = Bind_Label,
-                [typeof(ToggleElement)] = Bind_Toggle,
-                
-                [typeof(IntSliderElement)] = Bind_Slider<int, ClampFreeSliderInt>,
-                [typeof(FloatSliderElement)] = Bind_Slider<float, ClampFreeSlider>,
-                [typeof(IntMinMaxSliderElement)] = Bind_MinMaxSlider<int, IntegerField>,
-                [typeof(FloatMinMaxSliderElement)] = Bind_MinMaxSlider<float, FloatField>,
-                
-                [typeof(DropdownElement)] = Bind_Dropdown,
-                [typeof(SpaceElement)] = BindSimple<Space>,
-                [typeof(ImageElement)] = Bind_Image,
-                [typeof(ButtonElement)] = Bind_Button,
-                [typeof(PopupMenuElement)] = Bind_PopupMenu,
-                [typeof(ListViewItemContainerElement)] = Bind_ListViewItemContainer
+                [typeof(LabelElement)] = BuildBindFunc<Label>.Create(Bind_Label),
+                [typeof(ButtonElement)] = BuildBindFunc<Button>.Create(Bind_Button),
+                [typeof(ToggleElement)] = BuildBindFunc<Toggle>.Create(Bind_Toggle),
+                [typeof(DropdownElement)] = BuildBindFunc<PopupFieldString>.Create(Bind_Dropdown),
+                [typeof(SpaceElement)] = BuildBindFunc<Space>.Create(BindSimple<Space>),
+                [typeof(ImageElement)] = BuildBindFunc<Image>.Create(Bind_Image),
             };
         }
 
-        public void RegisterBuildFunc(Type type, Func<Element, VisualElement> func) => _buildFuncTable[type] = func;
-        public void UnregisterBuildFunc(Type type) => _buildFuncTable.Remove(type);
-        
+        public void RegisterBuildBindFunc(Type type, IBuildBindFunc buildBindFunc) => FuncTable[type] = buildBindFunc;
+        public void UnregisterBuildFunc(Type type) => FuncTable.Remove(type);
 
-        protected override IReadOnlyDictionary<Type, Func<Element, VisualElement>> BuildFuncTable => _buildFuncTable;
+        private Dictionary<Type, IBuildBindFunc> FuncTable { get; }
 
-        private Dictionary<Type, Func<Element, VisualElement, bool>> BindFuncTable { get; }
-
-        /// <summary>
-        /// Build時の特殊処理がないBindするだけのBuild
-        /// </summary>
-        private VisualElement BuildSimple<TVisualElement>(Element element)
-            where TVisualElement : VisualElement, new()
+        protected override VisualElement DispatchBuild(Element element)
         {
-            var ve = new TVisualElement();
-            var success = Bind(element, ve);
-            Assert.IsTrue(success);
-            return ve;
+            var type = element.GetType();
+            return FuncTable.TryGetValue(type, out var buildBindFunc)
+                ? buildBindFunc.Build(element) 
+                : null;
         }
 
         private bool BindSimple<TVisualElement>(Element element, VisualElement visualElement)
@@ -148,6 +97,7 @@ namespace RosettaUI.UIToolkit.Builder
         /// <summary>
         /// 既存のVisualElementを新たなElementと紐づける
         /// VisualElementの構成が一致していなければ return false
+        /// ElementGroupの場合、子供の構成が違ったらBuildしなおす
         /// </summary>
         /// <returns>success flag</returns>
         public bool Bind(Element element, VisualElement ve)
@@ -169,13 +119,13 @@ namespace RosettaUI.UIToolkit.Builder
             // したがってBindFunc内でGetUIObj()できるように先にSetupUIObj()を呼んでおく
             SetupUIObj(element, ve);
             
-            if (!BindFuncTable.TryGetValue(element.GetType(), out var func))
+            if (!FuncTable.TryGetValue(element.GetType(), out var buildBindFunc))
             {
                 Debug.LogError($"{GetType()}: Unknown Type[{element.GetType()}].");
                 return false;
             }
 
-            if (!func.Invoke(element, ve))
+            if (!buildBindFunc.Bind(element, ve))
             {
                 TeardownUIObj(element);
                 return false;

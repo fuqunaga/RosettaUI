@@ -42,8 +42,7 @@ namespace RosettaUI.UGUI.Builder
                 };
             }
 
-            protected override IReadOnlyDictionary<Type, Func<Element, GameObject>> BuildFuncTable => buildFuncs;
-
+            
             int layer;
 
             public GameObject Build(Element element, int layer)
@@ -55,6 +54,14 @@ namespace RosettaUI.UGUI.Builder
             public GameObject Build(Element element)
             {
                 return BuildInternal(element);
+            }
+
+            protected override GameObject DispatchBuild(Element element)
+            {
+                var type = element.GetType();
+                return buildFuncs.TryGetValue(type, out var func)
+                    ? func(element)
+                    : null;
             }
 
             protected void Initialize(GameObject uiObj, Element element)

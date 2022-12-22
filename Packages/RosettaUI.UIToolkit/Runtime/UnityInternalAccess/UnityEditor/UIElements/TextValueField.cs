@@ -187,7 +187,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
           if (commandName == "Paste" || commandName == "Cut")
             flag = true;
         }
-        if (!(!this.textValueFieldParent.isDelayed & flag))
+        if (!(!(this.textValueFieldParent?.isDelayed ?? false) & flag))
           return;
         this.m_UpdateTextFromValue = false;
         try

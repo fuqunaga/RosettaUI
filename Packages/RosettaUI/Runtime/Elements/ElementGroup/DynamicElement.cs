@@ -46,7 +46,7 @@ namespace RosettaUI
         private readonly BinderHistory.Snapshot _binderTypeHistorySnapshot;
         private bool _needBuildChildren = true;
         
-        public override IEnumerable<Element> Contents
+        public override IEnumerable<Element> Children
         {
             get
             {
@@ -56,7 +56,7 @@ namespace RosettaUI
                     BuildElement();
                 }
 
-                return base.Contents;
+                return base.Children;
             }
         }
 
@@ -97,14 +97,11 @@ namespace RosettaUI
         {
             if (!(_rebuildIf?.Invoke(this) ?? false)) return;
             
-            // ～このへん VisualElementをキープしながらElementを差し替えてBindしなおしたい～ 
             while (Children.Any())
             {
                 var child = Children.Last();
-                child.DetachView(false);
-                child.DetachParent();
+                RemoveChild(child, false);
             }
-
 
             _needBuildChildren = true;
             BindChildrenToView();

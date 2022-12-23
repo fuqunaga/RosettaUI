@@ -14,8 +14,7 @@ namespace RosettaUI
     public abstract class Element
     {
         private readonly LinkedList<Element> _children = new();
-        public IEnumerable<Element> Children => _children;
-
+        public virtual IEnumerable<Element> Children => _children;
 
         public readonly ReactiveProperty<bool> enableRx = new(true);
         public readonly ReactiveProperty<bool> interactableRx = new(true);
@@ -52,13 +51,10 @@ namespace RosettaUI
             Parent = element;
         }
 
-        public bool DetachParent()
+        public void DetachParent()
         {
             Assert.IsFalse(HasBuilt, $"{GetType()} has already built. Call DestroyView() to reuse this element");
-            if (Parent == null) return false;
-            Parent.RemoveChild(this);
-
-            return true;
+            Parent?.RemoveChild(this, false);
         }
 
         protected void AddChild(Element element)
@@ -67,10 +63,13 @@ namespace RosettaUI
             element.SetParent(this);
         }
 
-        protected void RemoveChild(Element element)
+        protected bool RemoveChild(Element element, bool destroyView = true)
         {
+            if (!_children.Remove(element)) return false;
             element.Parent = null;
-            _children.Remove(element);
+            element.DetachView(destroyView);
+
+            return true;
         }
 
         public virtual void Update()

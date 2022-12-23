@@ -50,8 +50,7 @@ public class ManyElement : MonoBehaviour
             return UI.List(() => _diverseClassList
             // return UI.List(() => _diverseClassArray
                 // ,createItemElement: (binder, idx) => UI.Label(((IBinder<string>)binder).Get())
-                // ,createItemElement: (binder, idx) => UI.Fold($"Item{idx}", UI.Field(null, binder))
-                , createItemElement: (binder, _) => UI.Field(null, binder)
+                ,createItemElement: (binder, idx) => UI.Fold($"Item{idx}", UI.Field(null, binder))
             ).SetHeight(500f);
 
 
@@ -96,7 +95,10 @@ public class ManyElement : MonoBehaviour
             return (id % 4) switch
             {
                 0 => UI.Field(labelStr, () => value).SetHeight(height),
-                1 => UI.Slider(labelStr, () => value),
+                1 => UI.Row(
+                    UI.Slider(labelStr, () => value),
+                    UI.Button("hogehoge")
+                ),
                 2 => UI.Fold(labelStr, UI.Field("", () => value)),
                 3 => UI.Fold(labelStr, UI.Slider("", () => value)),
                 _ => throw new ArgumentOutOfRangeException()

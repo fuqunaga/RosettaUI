@@ -64,10 +64,10 @@ namespace RosettaUI
             public static Snapshot Create() => new ();
 
             private readonly HashSet<IBinder> _snapshot;
-        
-            protected Snapshot()
+
+            private Snapshot()
             {
-                _snapshot = new(History);
+                _snapshot = new HashSet<IBinder>(History);
             }
             
             public SnapshotApplyScope GetApplyScope() => new(_snapshot);
@@ -75,17 +75,20 @@ namespace RosettaUI
             
             internal readonly struct SnapshotApplyScope : IDisposable
             {
-                private readonly HashSet<IBinder> _snapshot;
+                private readonly List<IBinder> _snapshot;
                 
                 public SnapshotApplyScope(HashSet<IBinder> snapshot)
                 {
-                    foreach (var binder in snapshot)
+                    // snapshotのApplyが入れ子になっていることがあるので、
+                    // すでにHistoryに登録済みのものは無視する
+                    var newBinders =  snapshot.Except(History).ToList();
+                   
+                    foreach (var binder in newBinders)
                     {
-                        var success = History.Add(binder);
-                        Assert.IsTrue(success, $"[{binder}] has already existed in {nameof(BinderHistory)}");
+                        History.Add(binder);
                     }
 
-                    _snapshot = snapshot;
+                    _snapshot = newBinders;
                 }
             
                 public void Dispose()

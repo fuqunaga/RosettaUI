@@ -8,10 +8,6 @@ namespace RosettaUI
     /// <summary>
     /// 動的に内容が変化するElement
     /// UI実装側はbuildの結果をいれるプレースホルダー的な役割
-    ///
-    /// UIのビルドはできるだけ遅延する
-    /// - DynamicElementViewBridge.RegisterBindView()時にEnableなとき
-    /// - Enable==trueになって_needBuildChildren==true（まだ子供のElementを生成していない）とき
     /// </summary>
     public class DynamicElement : ElementGroup
     {
@@ -44,22 +40,7 @@ namespace RosettaUI
         private readonly string _displayName;
         private readonly Func<DynamicElement, bool> _rebuildIf;
         private readonly BinderHistory.Snapshot _binderTypeHistorySnapshot;
-        private bool _needBuildChildren = true;
         
-        public override IEnumerable<Element> Children
-        {
-            get
-            {
-                if (_needBuildChildren)
-                {
-                    _needBuildChildren = false;
-                    BuildElement();
-                }
-
-                return base.Children;
-            }
-        }
-
         public DynamicElement(Func<Element> build, Func<DynamicElement, bool> rebuildIf, string displayName = null)
         {
             _build = build;
@@ -68,11 +49,11 @@ namespace RosettaUI
             
             _binderTypeHistorySnapshot = BinderHistory.Snapshot.Create();
 
-            enableRx.Subscribe(enable =>
+            enableRx.SubscribeAndCallOnce(enable =>
             {
-                if (enable && _needBuildChildren)
+                if (enable)
                 {
-                    BindChildrenToView();
+                    BuildElement();
                 }
             });
         }
@@ -89,7 +70,8 @@ namespace RosettaUI
         {
             using var applyScope = _binderTypeHistorySnapshot.GetApplyScope();
             SetElements(new[] {_build?.Invoke()});
-            
+
+            bindChildrenToView?.Invoke(this);
             onBuildChildren?.Invoke(this);
         }
 
@@ -102,12 +84,7 @@ namespace RosettaUI
                 var child = Children.Last();
                 RemoveChild(child, false);
             }
-
-            _needBuildChildren = true;
-            BindChildrenToView();
         }
-
-        private void BindChildrenToView() => bindChildrenToView?.Invoke(this);
 
         private void ClearBindView() => bindChildrenToView = null;
         

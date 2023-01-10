@@ -14,7 +14,7 @@ namespace RosettaUI
     public abstract class Element
     {
         private readonly LinkedList<Element> _children = new();
-        public virtual IEnumerable<Element> Children => _children;
+        public IEnumerable<Element> Children => _children;
 
         public readonly ReactiveProperty<bool> enableRx = new(true);
         public readonly ReactiveProperty<bool> interactableRx = new(true);

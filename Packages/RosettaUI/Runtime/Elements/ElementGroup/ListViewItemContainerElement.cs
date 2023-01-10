@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.Pool;
 
 namespace RosettaUI
@@ -397,21 +398,17 @@ namespace RosettaUI
                 };
             }
 
-            public bool Apply(Element element)
+            public void Apply(Element element)
             {
                 using var pool = ListPool<FoldElement>.Get(out var foldList);
                 foldList.AddRange(element.Query<FoldElement>());
-
-                // 階層構造気にせず数だけチェックしている
-                // 厳密に階層の一致も見たほうがいい？
-                if (_openList.Count != foldList.Count) return false;
-
-                for (var i = 0; i < _openList.Count; ++i)
+                
+                // 数が合わなくてもできるだけ引き継ぐ
+                var count = Mathf.Min(foldList.Count, _openList.Count);
+                for (var i = 0; i < count; ++i)
                 {
                     foldList[i].IsOpen = _openList[i];
                 }
-
-                return true;
             }
         }
     }

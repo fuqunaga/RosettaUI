@@ -26,7 +26,15 @@ namespace RosettaUI.UIToolkit.Builder
             // Indentがあるなら１レベルキャンセル
             ApplyMinusIndentIfPossible(fold, foldElement);
 
-            var openDisposable = foldElement.IsOpenRx.SubscribeAndCallOnce(isOpen => fold.value = isOpen);
+            // 初回のElementの値セットではNotifyしない
+            // NotifyするとFoldoutCustomでChangeVisibleEventを飛ばしWindowサイズの再計算を促すが
+            // ListViewItemContainer内でBindされたときに飛ばすと、
+            // ListViewItemContainerスクロール中にWindowサイズが変わってしまい見栄えがよくない
+            // スクロール中はWindowサイズを替えたくない→ChangeVisibleEventは飛ばさない→Notifyしない
+            fold.SetValueWithoutNotify(foldElement.IsOpen);
+            
+            // 通常時の値の相互通知
+            var openDisposable = foldElement.IsOpenRx.Subscribe(isOpen => fold.value = isOpen);
             fold.RegisterValueChangedCallback(OnFoldValueChanged);
             
             foldElement.GetViewBridge().onUnsubscribe += () =>

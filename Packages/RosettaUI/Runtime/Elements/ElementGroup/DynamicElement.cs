@@ -84,6 +84,8 @@ namespace RosettaUI
                 var child = Children.Last();
                 RemoveChild(child, false);
             }
+            
+            BuildElement();
         }
 
         private void ClearBindView() => bindChildrenToView = null;

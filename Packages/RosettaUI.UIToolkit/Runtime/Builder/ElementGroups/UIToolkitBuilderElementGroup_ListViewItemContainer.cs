@@ -26,7 +26,18 @@ namespace RosettaUI.UIToolkit.Builder
             listView.showAddRemoveFooter = !option.fixedSize;
             listView.makeItem = MakeItem;
             listView.bindItem = BindItem;
-            listView.unbindItem = UnbindItem;
+
+            // UnbindItem処理はしない
+            // 
+            // 要素がFoldなどサイズが変わるVisualElementの場合、
+            // DynamicHeightVirtualizationController.OnScroll()で最後の要素が不必要にUnbind()されてしまうことがある@Unity2021.3.16f1
+            // unbindItemされても表示されている状態になる
+            // 
+            // 上記挙動がなければ本来は念のためUnbind(Element)を呼んでおきたいが以下のように呼ばなくても大丈夫そう
+            // ・VisualElementが再利用されている場合はBindItem()内のBind()がよばれる。Bind()は防衛的にUnbind()するので、ここでUnbind(Element)しなくても問題ない
+            // ・VisualElementが再利用されない場合はElementは無効なVisualElementとBind()されたままになる。が表示されていないので問題ない・・・と思う
+            // 
+            // listView.unbindItem = UnbindItem;
             
             SetCallbacks();
 
@@ -92,19 +103,19 @@ namespace RosettaUI.UIToolkit.Builder
                 ve.Add(itemVe);
             }
 
+#if false
             void UnbindItem(VisualElement _, int idx)
             {
                 var e = itemContainerElement.GetItemElementAt(idx);
-                
                 // Debug.Log($"Unbind Idx[{idx}] FirstLabel[{e?.FirstLabel()?.Value}]");
-                
                 if (e == null) return;
                 
                 // UnbindItemでVisualElementに影響を与えてはダメそう
                 // 最後尾にスクロールしたときに隙間ができる（本来表示されるVisualElementが内容がない→height==0→非表示になっている
                 // e.SetEnable(false);
-                Unbind(e);
+                // Unbind(e);
             }
+#endif
 
             // リストの最後への追加しかこないはず
             void OnItemsAdded(IEnumerable<int> idxes)

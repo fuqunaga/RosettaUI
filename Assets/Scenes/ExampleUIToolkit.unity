@@ -317,6 +317,7 @@ MonoBehaviour:
     string'
   texture: {fileID: 2800000, guid: f8fa76ac67c34254da2b9c9b263733c3, type: 3}
   dropDownIndex: 0
+  boolValue: 0
 --- !u!1 &554616668
 GameObject:
   m_ObjectHideFlags: 0
@@ -453,7 +454,7 @@ MonoBehaviour:
   classList:
   - floatValue: 1
     stringValue: First
-  attributeTestClass:
+  attributeExampleClass:
     rangeFloat: 0
     multiLineString: 'multi
 
@@ -1101,10 +1102,10 @@ MonoBehaviour:
     max: 0
   floatMinMax:
     min: 0
-    max: 0.38863626
+    max: 0
   vector2MinMax:
-    min: {x: -0.07100046, y: 0}
-    max: {x: 0.22149956, y: 0}
+    min: {x: 0, y: 0}
+    max: {x: 0, y: 0}
   vector3MinMax:
     min: {x: 0, y: 0, z: 0}
     max: {x: 0, y: 0, z: 0}

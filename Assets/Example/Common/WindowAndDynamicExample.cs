@@ -11,43 +11,60 @@ namespace RosettaUI.Example
         
         public Element CreateElement(LabelElement _)
         {
-            return UI.Column(
-                ExampleTemplate.CodeElementSets(ExampleTemplate.UIFunctionStr(nameof(UI.WindowLauncher)),
-                    (@"UI.WindowLauncher(
+            return UI.Tabs(
+                ExampleTemplate.UIFunctionTab(nameof(UI.WindowLauncher), CreateWindowLauncher()),
+                ExampleTemplate.UIFunctionTab(nameof(UI.FieldIfObjectFound), CreateFieldIfObjectFound()),
+                ExampleTemplate.UIFunctionTab("DynamicElement*", CreateDynamicElement())
+            );
+        }
+
+        private static Element CreateWindowLauncher()
+        {
+            return ExampleTemplate.CodeElementSets(ExampleTemplate.UIFunctionStr(nameof(UI.WindowLauncher)),
+                (@"UI.WindowLauncher(
     UI.Window(
         UI.Label(""Element"")
     )
 );
 ",
-                        UI.WindowLauncher(
-                            UI.Window(
-                                UI.Label("Window")
-                            )
+                    UI.WindowLauncher(
+                        UI.Window(
+                            UI.Label("Window")
                         )
-                    ),
-                    ("UI.WindowLauncher<BehaviourExample>();\n", UI.WindowLauncher<BehaviourExample>()),
-                    (@"UI.WindowLauncher<BehaviourExample>(
+                    )
+                ),
+                ("UI.WindowLauncher<BehaviourExample>();\n", UI.WindowLauncher<BehaviourExample>()),
+                (@"UI.WindowLauncher<BehaviourExample>(
     supportMultiple: true, 
     includeInactive: true
-);", 
-                        UI.WindowLauncher<BehaviourExample>(supportMultiple: true, includeInactive: true))
-                ),
-                ExampleTemplate.CodeElementSets(ExampleTemplate.UIFunctionStr(nameof(UI.FieldIfObjectFound)),
-                    (@"UI.Box(
+);",
+                    UI.WindowLauncher<BehaviourExample>(supportMultiple: true, includeInactive: true))
+            );
+        }
+
+        private static Element CreateFieldIfObjectFound()
+        {
+            return ExampleTemplate.CodeElementSets(ExampleTemplate.UIFunctionStr(nameof(UI.FieldIfObjectFound)),
+                (@"UI.Box(
     UI.FieldIfObjectFound<BehaviourExample>()
 );
 ",
-                        UI.Box(UI.FieldIfObjectFound<BehaviourExample>())
-                    ),
-                    (@"UI.Box(
+                    UI.Box(UI.FieldIfObjectFound<BehaviourExample>())
+                ),
+                (@"UI.Box(
     UI.FieldIfObjectFound<BehaviourExample>(
         supportMultiple: true, 
         includeInactive: true
     )
 );",
-                        UI.Box(UI.FieldIfObjectFound<BehaviourExample>(supportMultiple: true, includeInactive: true))
-                    )
-                ),
+                    UI.Box(UI.FieldIfObjectFound<BehaviourExample>(supportMultiple: true, includeInactive: true))
+                )
+            );
+        }
+
+        private Element CreateDynamicElement()
+        {
+            return UI.Page(
                 ExampleTemplate.CodeElementSets(ExampleTemplate.UIFunctionStr(nameof(UI.DynamicElementIf)),
                     "The element appears when the condition is true.",
                     (@"UI.Field(() => dynamicElementIf);
@@ -65,7 +82,8 @@ UI.DynamicElementIf(
                         )
                     )
                 ),
-                ExampleTemplate.CodeElementSets(ExampleTemplate.UIFunctionStr(nameof(UI.DynamicElementOnStatusChanged)),
+                ExampleTemplate.CodeElementSets(
+                    ExampleTemplate.UIFunctionStr(nameof(UI.DynamicElementOnStatusChanged)),
                     (@"UI.Slider(""Button count"", () => intValue, max: 10);
 
 UI.DynamicElementOnStatusChanged(

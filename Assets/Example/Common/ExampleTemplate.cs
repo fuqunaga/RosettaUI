@@ -7,11 +7,12 @@ namespace RosettaUI.Example
     {
         public static SpaceElement BlankLine() => UI.Space().SetHeight(10f);
         
-        public static string FunctionStr(string className, string functionName) => $"<b>{className}.{functionName}()</b>";
+        public static string FunctionStr(string className, string functionName) => $"{className}.{functionName}()";
         public static string UIFunctionStr(string functionName) => FunctionStr(nameof(UI), functionName);
-
         public static string ElementFunctionStr(string functionName) => $"<b>{nameof(Element)}.{functionName}()</b>";
-        
+
+        public static string TabTitle(string title) => $"● {title} ";
+
         public static Element TitleIndent(string title, params Element[] elements) =>
             UI.Column(
                 UI.Label(title),
@@ -34,6 +35,11 @@ namespace RosettaUI.Example
         
         public static Element UIFunctionPage(string functionName, params Element[] elements) =>
             TitlePage(UIFunctionStr(functionName), elements);
+
+        public static (string, Element) UIFunctionTab(string functionName, params Element[] elements)
+        {
+            return (TabTitle(UIFunctionStr(functionName)), UI.Page(elements));
+        }
         
         public static Element UIFunctionRow(string functionName, params Element[] elements) =>
             UI.Column(
@@ -59,7 +65,7 @@ namespace RosettaUI.Example
 
             return TitleIndent(title,
                 string.IsNullOrEmpty(description) ? null : UI.Label(description),
-                UI.Row(
+                UI.Column(
                     UI.TextArea(null, () => code).SetWidth(700f),
                     UI.Space().SetWidth(30f),
                     UI.Box(

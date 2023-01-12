@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace RosettaUI.Example
 {
@@ -46,62 +47,62 @@ namespace RosettaUI.Example
             new SimpleClass {floatValue = 1f, stringValue = "First"}
         }.ToList();
         
-        public AttributeTestClass attributeTestClass;
-        
-        
+        [FormerlySerializedAs("attributeTestClass")] public AttributeTestClass attributeExampleClass;
+
+
         public Element CreateElement(LabelElement _)
         {
-            return UI.Column(
-                UI.Row(
-                    ExampleTemplate.UIFunctionPage(nameof(UI.Field),
-                        UI.Field(() => intValue),
-                        UI.Field(() => uintValue),
-                        UI.Field(() => floatValue),
-                        UI.Field(() => stringValue),
-                        UI.Field(() => boolValue),
-                        UI.Field(() => enumValue),
-                        UI.Field(() => colorValue),
-                        UI.Field(() => vector2Value),
-                        UI.Field(() => vector3Value),
-                        UI.Field(() => vector4Value),
-                        UI.Field(() => vector2IntValue),
-                        UI.Field(() => vector3IntValue),
-                        UI.Field(() => rectValue),
-                        UI.Field(() => rectIntValue),
-                        UI.Field(() => rectOffsetValue),
-                        UI.Field(() => boundsValue),
-                        UI.Field(() => boundsIntValue),
-                        UI.Field(() => intList),
-                        UI.Field(() => floatArray),
-                        UI.Field(() => simpleClass),
-                        UI.Field(() => classList)
-                    ),
-                    ExampleTemplate.UIFunctionPage(nameof(UI.FieldReadOnly),
-                        UI.FieldReadOnly(() => intValue),
-                        UI.FieldReadOnly(() => uintValue),
-                        UI.FieldReadOnly(() => floatValue),
-                        UI.FieldReadOnly(() => stringValue),
-                        UI.FieldReadOnly(() => boolValue),
-                        UI.FieldReadOnly(() => enumValue),
-                        UI.FieldReadOnly(() => colorValue),
-                        UI.FieldReadOnly(() => vector2Value),
-                        UI.FieldReadOnly(() => vector3Value),
-                        UI.FieldReadOnly(() => vector4Value),
-                        UI.FieldReadOnly(() => vector2IntValue),
-                        UI.FieldReadOnly(() => vector3IntValue),
-                        UI.FieldReadOnly(() => rectValue),
-                        UI.FieldReadOnly(() => rectIntValue),
-                        UI.FieldReadOnly(() => rectOffsetValue),
-                        UI.FieldReadOnly(() => boundsValue),
-                        UI.FieldReadOnly(() => boundsIntValue),
-                        UI.FieldReadOnly(() => intList),
-                        UI.FieldReadOnly(() => floatArray),
-                        UI.FieldReadOnly(() => simpleClass),
-                        UI.FieldReadOnly(() => classList)
-                    )
+            return UI.Tabs(
+                ExampleTemplate.UIFunctionTab(nameof(UI.Field),
+                    UI.Field(() => intValue),
+                    UI.Field(() => uintValue),
+                    UI.Field(() => floatValue),
+                    UI.Field(() => stringValue),
+                    UI.Field(() => boolValue),
+                    UI.Field(() => enumValue),
+                    UI.Field(() => colorValue),
+                    UI.Field(() => vector2Value),
+                    UI.Field(() => vector3Value),
+                    UI.Field(() => vector4Value),
+                    UI.Field(() => vector2IntValue),
+                    UI.Field(() => vector3IntValue),
+                    UI.Field(() => rectValue),
+                    UI.Field(() => rectIntValue),
+                    UI.Field(() => rectOffsetValue),
+                    UI.Field(() => boundsValue),
+                    UI.Field(() => boundsIntValue),
+                    UI.Field(() => intList),
+                    UI.Field(() => floatArray),
+                    UI.Field(() => simpleClass),
+                    UI.Field(() => classList)
                 ),
-                ExampleTemplate.CodeElementSets("<b>Attribute</b>",
-                    (@"public class AttributeTextClass
+                ExampleTemplate.UIFunctionTab(nameof(UI.FieldReadOnly),
+                    UI.FieldReadOnly(() => intValue),
+                    UI.FieldReadOnly(() => uintValue),
+                    UI.FieldReadOnly(() => floatValue),
+                    UI.FieldReadOnly(() => stringValue),
+                    UI.FieldReadOnly(() => boolValue),
+                    UI.FieldReadOnly(() => enumValue),
+                    UI.FieldReadOnly(() => colorValue),
+                    UI.FieldReadOnly(() => vector2Value),
+                    UI.FieldReadOnly(() => vector3Value),
+                    UI.FieldReadOnly(() => vector4Value),
+                    UI.FieldReadOnly(() => vector2IntValue),
+                    UI.FieldReadOnly(() => vector3IntValue),
+                    UI.FieldReadOnly(() => rectValue),
+                    UI.FieldReadOnly(() => rectIntValue),
+                    UI.FieldReadOnly(() => rectOffsetValue),
+                    UI.FieldReadOnly(() => boundsValue),
+                    UI.FieldReadOnly(() => boundsIntValue),
+                    UI.FieldReadOnly(() => intList),
+                    UI.FieldReadOnly(() => floatArray),
+                    UI.FieldReadOnly(() => simpleClass),
+                    UI.FieldReadOnly(() => classList)
+                ),
+                (ExampleTemplate.TabTitle("Codes"),
+                    UI.Page(
+                        ExampleTemplate.CodeElementSets("<b>Attributes</b>",
+                            (@"public class AttributeExampleClass
 {
     [Range(0f,100f)]
     public float rangeFloat;
@@ -113,9 +114,11 @@ namespace RosettaUI.Example
     public List<int> nonReorderableList;
 }
 
-UI.Field(() => attributeTestClass);
+UI.Field(() => attributeExampleClass).Open();
 ",
-                        UI.Field(() => attributeTestClass)
+                                UI.Field(() => attributeExampleClass).Open()
+                            )
+                        )
                     )
                 )
             );

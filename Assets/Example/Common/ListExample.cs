@@ -30,36 +30,34 @@ namespace RosettaUI.Example
                     UI.ListReadOnly(() => classArray),
                     UI.ListReadOnly(() => classList)
                 ),
-                (ExampleTemplate.TabTitle("Codes"),
-                    UI.Page(
-                        ExampleTemplate.CodeElementSets("<b>CustomItemElement</b>",
-                            (@"UI.List(() => intArray,
+                ExampleTemplate.Tab("Codes",
+                    ExampleTemplate.CodeElementSets("CustomItemElement",
+                        (@"UI.List(() => intArray,
     (itemBinder, idx) => UI.Row(
         UI.Field($""Item {idx}"", itemBinder),
         UI.Button(""+"", () => intArray[idx]++),
         UI.Button(""-"", () => intArray[idx]--)
 );",
-                                UI.List(() => intArray,
-                                    (itemBinder, idx) => UI.Row(
-                                        UI.Field($"Item {idx}", itemBinder),
-                                        UI.Button("+", () => intArray[idx]++),
-                                        UI.Button("-", () => intArray[idx]--)
-                                    )
+                            UI.List(() => intArray,
+                                (itemBinder, idx) => UI.Row(
+                                    UI.Field($"Item {idx}", itemBinder),
+                                    UI.Button("+", () => intArray[idx]++),
+                                    UI.Button("-", () => intArray[idx]--)
                                 )
                             )
-                        ),
-                        ExampleTemplate.CodeElementSets("<b>Options</b>", 
-                            ("UI.List(() => intArray, new ListViewOption(reorderable: false, fixedSize: false));",
-                                UI.List(() => intArray, new ListViewOption(reorderable: false, fixedSize: false))), 
-                            ("UI.List(() => intArray, new ListViewOption(reorderable: true,  fixedSize: true));",
-                                UI.List(() => intArray, new ListViewOption(reorderable: true, fixedSize: true)))),
-                        ExampleTemplate.CodeElementSets("<b>Attribute</b>", 
-                            (@"[NonReorderable]
+                        )
+                    ),
+                    ExampleTemplate.CodeElementSets("Options",
+                        ("UI.List(() => intArray, new ListViewOption(reorderable: false, fixedSize: false));",
+                            UI.List(() => intArray, new ListViewOption(reorderable: false, fixedSize: false))),
+                        ("UI.List(() => intArray, new ListViewOption(reorderable: true,  fixedSize: true));",
+                            UI.List(() => intArray, new ListViewOption(reorderable: true, fixedSize: true)))),
+                    ExampleTemplate.CodeElementSets("<b>Attribute</b>",
+                        (@"[NonReorderable]
 public int[] nonReorderableArray;
 
 UI.List(() => nonReorderableArray);",
-                                UI.List(() => nonReorderableArray)))
-                    )
+                            UI.List(() => nonReorderableArray)))
                 )
             );
         }

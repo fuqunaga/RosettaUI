@@ -60,39 +60,46 @@ namespace RosettaUI.Example
                     UI.SliderReadOnly(() => boundsIntValue),
                     UI.SliderReadOnly(() => simpleClass)
                 ),
-                (ExampleTemplate.TabTitle("Codes"),
-                    UI.Page(
-                        ExampleTemplate.CodeElementSets("<b>Argument</b>",
-                            new[]
-                            {
-                                ("UI.Slider(() => floatValue, max: 2f);", UI.Slider(() => floatValue, max: 2f)),
-                                ("UI.Slider(() => floatValue, min: 0.5f, max: 2f);",
-                                    UI.Slider(() => floatValue, min: 0.5f, max: 2f)),
-                                ("UI.Slider(() => vector2Value, max: Vector2.one * 2f);",
-                                    UI.Slider(() => vector2Value, max: Vector2.one * 2f)),
-                                ("UI.Slider(() => vector2Value, min: Vector2.one * 0.5f, max: Vector2.one * 2f);",
-                                    UI.Slider(() => vector2Value, min: Vector2.one * 0.5f, max: Vector2.one * 2f)),
-                            }
+                ExampleTemplate.Tab("Codes",
+                    ExampleTemplate.CodeElementSets("Argument",
+                        ("UI.Slider(() => floatValue, max: 2f);\n",
+                            UI.Slider(() => floatValue, max: 2f)),
+                        ("UI.Slider(() => floatValue, min: 0.5f, max: 2f);\n",
+                            UI.Slider(() => floatValue, min: 0.5f, max: 2f)),
+                        (@"UI.Slider(
+    () => vector2Value,
+    max: Vector2.one * 2f
+).Open();
+",
+                            UI.Slider(
+                                () => vector2Value,
+                                max: Vector2.one * 2f
+                            ).Open()
                         ),
-                        ExampleTemplate.CodeElementSets("<b>Attribute</b>",
-                            new[]
-                            {
-                                (@"[Range(0f, 100f)] 
+                        (@"UI.Slider(
+    () => vector2Value, 
+    min: Vector2.one * 0.5f,
+    max: Vector2.one * 2f
+).Open();
+",
+                            UI.Slider(
+                                () => vector2Value,
+                                min: Vector2.one * 0.5f,
+                                max: Vector2.one * 2f
+                            ).Open()
+                        )
+                    ),
+                    ExampleTemplate.CodeElementSets("Attribute", 
+                        (@"[Range(0f, 100f)] 
 public float rangeFloat;
 
 UI.Slider(() => rangeFloat);
 ",
-                                    UI.Slider(() => rangeFloat)
-                                )
-                            }
-                        ),
-                        ExampleTemplate.CodeElementSets("Unsupported types will fall back to UI.Field()",
-                            new[]
-                            {
-                                ("UI.Slider(() => stringValue)", UI.Slider(() => stringValue))
-                            }
-                        )
-                    )
+                            UI.Slider(() => rangeFloat)
+                        )),
+                    ExampleTemplate.CodeElementSets("Unsupported types",
+                        "Unsupported types will fall back to UI.Field()", 
+                        ("\nUI.Slider(() => stringValue);\n", UI.Slider(() => stringValue)))
                 )
             );
         }

@@ -99,10 +99,8 @@ namespace RosettaUI.Example
                     UI.FieldReadOnly(() => simpleClass),
                     UI.FieldReadOnly(() => classList)
                 ),
-                (ExampleTemplate.TabTitle("Codes"),
-                    UI.Page(
-                        ExampleTemplate.CodeElementSets("<b>Attributes</b>",
-                            (@"public class AttributeExampleClass
+                ExampleTemplate.CodeElementSetsTab("Codes", "Attributes",
+                    (@"public class AttributeExampleClass
 {
     [Range(0f,100f)]
     public float rangeFloat;
@@ -116,9 +114,7 @@ namespace RosettaUI.Example
 
 UI.Field(() => attributeExampleClass).Open();
 ",
-                                UI.Field(() => attributeExampleClass).Open()
-                            )
-                        )
+                        UI.Field(() => attributeExampleClass).Open()
                     )
                 )
             );

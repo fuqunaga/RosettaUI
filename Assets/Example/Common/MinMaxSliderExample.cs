@@ -64,22 +64,16 @@ namespace RosettaUI.Example
                     UI.MinMaxSliderReadOnly(() => boundsMinMax),
                     UI.MinMaxSliderReadOnly(() => boundsIntMinMax)
                 ),
-                (ExampleTemplate.TabTitle("Codes"),
-                    UI.Page(
-                        ExampleTemplate.CodeElementSets("<b>Argument</b>",
-                            new[]
-                            {
-                                ("UI.MinMaxSlider(() => floatMinMax, MinMax.Create(-1f, 1f));",
-                                    UI.MinMaxSlider(() => floatMinMax, MinMax.Create(-1f, 1f))),
-                                (@"UI.MinMaxSlider(() => vector2MinMax, MinMax.Create(-Vector2.one, Vector2.one)).Open();",
-                                    UI.MinMaxSlider(() => vector2MinMax, MinMax.Create(-Vector2.one, Vector2.one)).Open()),
-                            }
-                        ),
-                        ExampleTemplate.CodeElementSets(
-                            $"Supports any type that has a specific member pair [{string.Join(",", TypeUtility.MinMaxMemberNamePairs.Select(pair => $"({pair.Item1}, {pair.Item2})"))}]",
-                            new[]
-                            {
-                                (@"public struct MyMinMax<T>
+                ExampleTemplate.Tab("Codes",
+                    ExampleTemplate.CodeElementSets("Argument",
+                        ("UI.MinMaxSlider(() => floatMinMax, MinMax.Create(-1f, 1f));",
+                            UI.MinMaxSlider(() => floatMinMax, MinMax.Create(-1f, 1f))),
+                        (@"UI.MinMaxSlider(() => vector2MinMax, MinMax.Create(-Vector2.one, Vector2.one)).Open();",
+                            UI.MinMaxSlider(() => vector2MinMax, MinMax.Create(-Vector2.one, Vector2.one)).Open())
+                    ),
+                    ExampleTemplate.CodeElementSets("Supported types",
+                        $"Supports any type that has a specific member pair [{string.Join(",", TypeUtility.MinMaxMemberNamePairs.Select(pair => $"({pair.Item1}, {pair.Item2})"))}]", 
+                        (@"public struct MyMinMax<T>
 {
     public T Min;
     public T Max;
@@ -88,13 +82,7 @@ namespace RosettaUI.Example
 public MyMinMax<float> myMinMax;
 
 UI.MinMaxSlider(() => myMinMax);",
-                                    UI.MinMaxSlider(() => myMinMax)),
-
-
-                                ("UI.MinMaxSlider(() => vector2Value);", UI.MinMaxSlider(() => vector2Value))
-                            }
-                        )
-                    )
+                            UI.MinMaxSlider(() => myMinMax)), ("UI.MinMaxSlider(() => vector2Value);", UI.MinMaxSlider(() => vector2Value)))
                 )
             );
         }

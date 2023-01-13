@@ -12,15 +12,15 @@ namespace RosettaUI.Example
         public Element CreateElement(LabelElement _)
         {
             return UI.Tabs(
-                ExampleTemplate.UIFunctionTab(nameof(UI.WindowLauncher), CreateWindowLauncher()),
-                ExampleTemplate.UIFunctionTab(nameof(UI.FieldIfObjectFound), CreateFieldIfObjectFound()),
-                ExampleTemplate.UIFunctionTab("DynamicElement*", CreateDynamicElement())
+                CreateTabWindowLauncher(),
+                CreateTabFieldIfObjectFound(),
+                CreateTabDynamicElement()
             );
         }
 
-        private static Element CreateWindowLauncher()
+        private static (string, Element) CreateTabWindowLauncher()
         {
-            return ExampleTemplate.CodeElementSets(ExampleTemplate.UIFunctionStr(nameof(UI.WindowLauncher)),
+            return ExampleTemplate.CodeElementSetsTab(ExampleTemplate.UIFunctionStr(nameof(UI.WindowLauncher)),
                 (@"UI.WindowLauncher(
     UI.Window(
         UI.Label(""Element"")
@@ -42,9 +42,9 @@ namespace RosettaUI.Example
             );
         }
 
-        private static Element CreateFieldIfObjectFound()
+        private static (string, Element) CreateTabFieldIfObjectFound()
         {
-            return ExampleTemplate.CodeElementSets(ExampleTemplate.UIFunctionStr(nameof(UI.FieldIfObjectFound)),
+            return ExampleTemplate.CodeElementSetsTab(ExampleTemplate.UIFunctionStr(nameof(UI.FieldIfObjectFound)),
                 (@"UI.Box(
     UI.FieldIfObjectFound<BehaviourExample>()
 );
@@ -62,9 +62,9 @@ namespace RosettaUI.Example
             );
         }
 
-        private Element CreateDynamicElement()
+        private (string, Element) CreateTabDynamicElement()
         {
-            return UI.Page(
+            return ExampleTemplate.UIFunctionTab("DynamicElement*", 
                 ExampleTemplate.CodeElementSets(ExampleTemplate.UIFunctionStr(nameof(UI.DynamicElementIf)),
                     "The element appears when the condition is true.",
                     (@"UI.Field(() => dynamicElementIf);

@@ -109,12 +109,10 @@ namespace RosettaUI.Example
 
         private (string, Element) CreateCodes()
         {
-            return (ExampleTemplate.TabTitle("Codes"),
-                    UI.Page(
-                        CreateElement_FoldArgument(),
-                        CreateElement_IgnoreIndentRule()
-                    )
-                );
+            return ExampleTemplate.Tab("Codes",
+                CreateElement_FoldArgument(),
+                CreateElement_IgnoreIndentRule()
+            );
         }
 
         Element CreateElement_Tabs()
@@ -228,10 +226,10 @@ namespace RosettaUI.Example
                 ).SetWidth(width)
             );
         }
-        
-        Element CreateElement_FoldArgument()
+
+        private Element CreateElement_FoldArgument()
         {
-            return ExampleTemplate.CodeElementSets("<b>Fold argument</b>",
+            return ExampleTemplate.CodeElementSets("Fold argument",
                 (@"UI.Fold(
     UI.Field(""CustomBar"", () => intValue), 
     new[]
@@ -265,7 +263,7 @@ namespace RosettaUI.Example
             );
         }
 
-        Element CreateElement_IgnoreIndentRule()
+        private static Element CreateElement_IgnoreIndentRule()
         {
             return ExampleTemplate.TitleIndent(
                 "Fold/WindowLauncher ignores one level of indentation for label alignment",

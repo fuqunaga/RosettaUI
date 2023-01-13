@@ -15,32 +15,34 @@ namespace RosettaUI
             return new WindowLauncherElement(label, window);
         }
 
-        public static WindowLauncherElement WindowLauncher<T>(bool supportMultiple = false, bool includeInactive = false)
+        public static WindowLauncherElement WindowLauncher<T>(bool supportMultiple = false, bool includeInactive = false, bool pageEnableInWindow = true)
             where T : Object
         {
-            return WindowLauncher<T>(null, supportMultiple, includeInactive);
+            return WindowLauncher<T>(null, supportMultiple, includeInactive, pageEnableInWindow);
         }
         
-        public static WindowLauncherElement WindowLauncher<T>(LabelElement title, bool supportMultiple = false, bool includeInactive = false)
+        public static WindowLauncherElement WindowLauncher<T>(LabelElement title, bool supportMultiple = false, bool includeInactive = false, bool pageEnableInWindow = true)
             where T : Object
         {
-            return WindowLauncher(title, supportMultiple, includeInactive, typeof(T));
+            return WindowLauncher(title, supportMultiple, includeInactive, pageEnableInWindow, typeof(T));
         }
 
         public static WindowLauncherElement WindowLauncher(params Type[] types) => WindowLauncher(null, types);
         public static WindowLauncherElement WindowLauncher(bool supportMultiple, bool includeInactive, params Type[] types) 
-            => WindowLauncher(null, supportMultiple, includeInactive, types);
+            => WindowLauncher(null, supportMultiple, includeInactive, true, types);
 
         public static WindowLauncherElement WindowLauncher(LabelElement title, params Type[] types)
-            => WindowLauncher(title, false, false, types);
+            => WindowLauncher(title, false, false, true, types);
         
-        public static WindowLauncherElement WindowLauncher(LabelElement title, bool supportMultiple, bool includeInactive, params Type[] types)
+        public static WindowLauncherElement WindowLauncher(LabelElement title, bool supportMultiple, bool includeInactive, bool pageEnableInWindow, params Type[] types)
         {
             Assert.IsTrue(types.Any());
 
             var elements = types.Select(t => FieldIfObjectFound(t, supportMultiple, includeInactive)).ToList();
             title ??= types.First().ToString().Split('.').LastOrDefault();
-            var window = Window(title, Page(elements));
+            var window = pageEnableInWindow
+                ? Window(title, Page(elements))
+                : Window(title, elements);
             
             var launcher = WindowLauncher(window);
             launcher.UpdateWhileDisabled = true;

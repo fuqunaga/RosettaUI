@@ -6,7 +6,9 @@ namespace RosettaUI.UIToolkit.Builder
     {
         private bool Bind_DynamicElement(Element element, VisualElement visualElement)
         {
-            if (element is not DynamicElement dynamicElement) return false;
+            // (visualElement is not VisualElement) is not work
+            // visualElementがVisualElementを継承したクラスでもtrueになってしまうのでGetType()で厳密にチェックする
+            if (element is not DynamicElement dynamicElement || visualElement.GetType() != typeof(VisualElement)) return false;
             
             dynamicElement.GetViewBridge().RegisterBindView(e => Bind_ElementGroupContents(e, visualElement));
 

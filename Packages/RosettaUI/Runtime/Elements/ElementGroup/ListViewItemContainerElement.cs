@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.Assertions;
+using UnityEngine;
 using UnityEngine.Pool;
 
 namespace RosettaUI
@@ -30,9 +30,9 @@ namespace RosettaUI
     /// 
     /// リストに変更があった場合の対応がとてもややこしい
     /// 
-    /// アプリケーション側で変更があった場合、追加削除された要素、リスト自体の参照先が変わったケースなど
+    /// アプリケーション側で変更があった場合、要素の追加削除やリスト自体の参照先が変わったケースなど
     /// どういった変更があったのかわからない
-    /// したがってリストの要素数と参照をチェックしておき変化があったらUIを作り直すという挙動になっている
+    /// したがってリストの要素数と参照をチェックしておき変化があったらUIを作り直す
     /// この場合要素ElementのFoldElementのOpen/Closeなどの情報は引き継げない
     /// 逆にUI側での変更はわかるのでできるだけ引き継ぐ
     /// 
@@ -44,18 +44,20 @@ namespace RosettaUI
     /// </summary>
     public class ListViewItemContainerElement : ElementGroup
     {
-        public readonly IBinder binder;
+        private readonly IBinder _binder;
         public readonly ListViewOption option;
         
         private readonly Func<IBinder, int, Element> _createItemElement;
         private readonly BinderHistory.Snapshot _binderTypeHistorySnapshot;
-        private readonly Dictionary<int, (Element element, IListItemBinder itemBinder)> _itemIndexToElementAndBinder = new();
+        private readonly Dictionary<int, IBinder> _itemIndexToBinder = new();
+        private readonly Dictionary<int, Element> _itemIndexToElement = new();
+        private readonly Dictionary<int, ElementState> _itemIndexToElementState = new();
         private int _lastListItemCount;
-        private event Action<IList> _onListChanged;
+        private event Action<IList> onListChanged;
 
         public int ListItemCount
         {
-            get => ListBinder.GetCount(binder);
+            get => ListBinder.GetCount(_binder);
             set
             {
                 var prevCount = ListItemCount;
@@ -66,18 +68,18 @@ namespace RosettaUI
                 {
                     for (var i = value; i < prevCount; ++i)
                     {
-                        RemoveItemElementCache(i);
+                        RemoveItemElement(i);
                     }
                 }
 
-                ListBinder.SetCount(binder, value);
+                ListBinder.SetCount(_binder, value);
                 NotifyListChangedToView();
             }
         }
 
         public ListViewItemContainerElement(IBinder listBinder, Func<IBinder, int, Element> createItemElement, ListViewOption option) : base(null)
         {
-            binder = listBinder;
+            _binder = listBinder;
             _createItemElement = createItemElement;
             this.option = option;
 
@@ -93,7 +95,8 @@ namespace RosettaUI
             var listItemCount = ListItemCount;
             if (_lastListItemCount != listItemCount)
             {
-                RemoveItemElementCacheAll();
+                StoreElementStateAll();
+                RemoveItemElementAll();
                 NotifyListChangedToView();
             }
             
@@ -103,13 +106,13 @@ namespace RosettaUI
         protected void NotifyListChangedToView()
         {
             _lastListItemCount = ListItemCount;
-            _onListChanged?.Invoke(ListBinder.GetIList(binder));
+            onListChanged?.Invoke(ListBinder.GetIList(_binder));
         }
 
         public Element GetItemElementAt(int index)
         {
-            _itemIndexToElementAndBinder.TryGetValue(index, out var pair);
-            return pair.element;
+            _itemIndexToElement.TryGetValue(index, out var element);
+            return element;
         }
 
         private Element GetOrCreateItemElement(int index)
@@ -118,22 +121,30 @@ namespace RosettaUI
             if (element != null) return element;
             
             using var applyScope = _binderTypeHistorySnapshot.GetApplyScope();
-            var isReadOnly = ListBinder.IsReadOnly(binder);
-            var itemBinder = ListBinder.CreateItemBinderAt(binder, index);
+            var isReadOnly = ListBinder.IsReadOnly(_binder);
+
+            if (!_itemIndexToBinder.TryGetValue(index, out var itemBinder))
+            {
+                _itemIndexToBinder[index] = itemBinder = ListBinder.CreateItemBinderAt(_binder, index);
+            }
 
             element = _createItemElement(itemBinder, index);
             if (!isReadOnly)
             {
-                element = AddPopupMenu(element, itemBinder);
+                element = AddPopupMenu(element, index);
+            }
+
+            if (_itemIndexToElementState.TryGetValue(index, out var state))
+            {
+                state.Apply(element);
             }
             
-            AddChild(element);
-            RegisterItemElementCache((element, itemBinder), index);
+            AddItemElement(element, index);
 
             return element;
         }
         
-        private Element AddPopupMenu(Element element, IListItemBinder itemBinder)
+        private Element AddPopupMenu(Element element, int index)
         {
             return new PopupMenuElement(
                 element,
@@ -146,93 +157,124 @@ namespace RosettaUI
 
             void DuplicateItem()
             {
-                var index = itemBinder.Index;
-                ListBinder.DuplicateItem(binder, index);
-                OnItemIndexShiftPlus(index + 1);
+                ListBinder.DuplicateItem(_binder, index);
+                OnItemIndexShiftPlus(index);
                 
                 NotifyListChangedToView();
             }
 
             void RemoveItem()
             {
-                var index = itemBinder.Index;
-                RemoveItemElementCache(index);
+                ListBinder.RemoveItem(_binder, index);
                 OnItemIndexShiftMinus(index);
-                ListBinder.RemoveItem(binder, index);
-                
+
                 NotifyListChangedToView();
             }
         }
-
-        private void RegisterItemElementCache((Element element, IListItemBinder itemBinder) pair, int index)
+        
+        private void AddItemElement(Element element, int index, bool removeState = true)
         {
-            Assert.IsFalse(_itemIndexToElementAndBinder.ContainsKey(index), $"{index}");
-            
-            pair.itemBinder.Index = index;
-            _itemIndexToElementAndBinder[index] = pair;
+            RemoveItemElement(index, removeState);
+            _itemIndexToElement[index] = element;
+            AddChild(element);
         }
 
-        private void RemoveItemElementCache(int index)
+        private void RemoveItemElement(int index, bool removeState = true)
         {
-            if (!_itemIndexToElementAndBinder.Remove(index, out var pair)) return;
+            if ( removeState) _itemIndexToElementState.Remove(index);
+            if (!_itemIndexToElement.Remove(index, out var element)) return;
 
-            var element = pair.element;
-            element.DetachView();
-            element.DetachParent();
+            RemoveChild(element, false);
         }
-
-        private void RemoveItemElementCacheAll()
+        
+        private void RemoveItemElementAll()
         {
-            foreach (var element in _itemIndexToElementAndBinder.Values.Select(pair => pair.element))
+            foreach (var element in _itemIndexToElement.Values)
             {
-                element.DetachView();
-                element.DetachParent();
+                RemoveChild(element, false);
             }
-
-            _itemIndexToElementAndBinder.Clear();
+            
+            _itemIndexToElement.Clear();
         }
 
+        private void StoreElementStateAll()
+        {
+            foreach (var (index, element) in _itemIndexToElement)
+            {
+                if (_itemIndexToElementState.ContainsKey(index)) continue;
+
+                _itemIndexToElementState[index] = ElementState.Create(element);
+            }
+        }
 
         
         #region Item Index Changed
 
         private void OnItemIndexShiftPlus(int startIndex, int endIndex = -1)
         {
-            if (endIndex < 0) endIndex = ListBinder.GetCount(binder) - 1;
+            if (endIndex < 0) endIndex = ListItemCount - 1;
 
             for (var i = endIndex; i > startIndex; --i)
             {
-                var prevIndex = i - 1;
-                if (!_itemIndexToElementAndBinder.Remove(prevIndex, out var pair)) return;
-                RegisterItemElementCache(pair, i);
+                MoveElementState(i - 1, i);
+                RemoveItemElement(i, false);
             }
+            
+            RemoveItemElement(startIndex);
         }
 
         private void OnItemIndexShiftMinus(int startIndex, int endIndex = -1)
         {
-            if (endIndex < 0) endIndex = ListBinder.GetCount(binder) - 1;
+            //すでにListの要素が削除された状態なので、StateとElementはListItemCount+1個の配列に対応している
+            if (endIndex < 0) endIndex = ListItemCount;
 
             for (var i = startIndex; i < endIndex; ++i)
             {
-                var prevIndex = i + 1;
-                if (!_itemIndexToElementAndBinder.Remove(prevIndex, out var pair)) return;
-                RegisterItemElementCache(pair, i);
+                MoveElementState(i + 1, i);
+                RemoveItemElement(i, false);
+            }
+            
+            RemoveItemElement(endIndex);
+        }
+
+        private void MoveElementState(int fromIndex, int toIndex)
+        {
+            if (!_itemIndexToElementState.Remove(fromIndex, out var state))
+            {
+                state = CreateElementState(fromIndex);
+            }
+
+            if (state != null)
+            {
+                _itemIndexToElementState[toIndex] = state;
             }
         }
 
         private void OnMoveItemIndex(int fromIndex, int toIndex)
         {
-            var hasElement = _itemIndexToElementAndBinder.Remove(fromIndex, out var pair);
+            if (!_itemIndexToElementState.Remove(fromIndex, out var state))
+            {
+                state = CreateElementState(fromIndex);
+            }
+            
             if ( toIndex < fromIndex )
                 OnItemIndexShiftPlus(toIndex, fromIndex);
             else
                 OnItemIndexShiftMinus(fromIndex, toIndex);
 
 
-            if (hasElement)
+            if (state != null)
             {
-                RegisterItemElementCache(pair, toIndex);
+                _itemIndexToElementState[toIndex] = state;
             }
+        }
+
+        private ElementState CreateElementState(int index)
+        {
+            var element = GetItemElementAt(index);
+            return element == null 
+                ? null
+                : ElementState.Create(element);
         }
  
         #endregion
@@ -253,6 +295,7 @@ namespace RosettaUI
             }
             
             // 最後尾ではないけどずらす
+            // 現状歯抜け選択には非対応
             if (indexList.Count() == 1)
             {
                 var i = indexList.First();
@@ -262,7 +305,7 @@ namespace RosettaUI
             }
             
             // 最後尾でないかつ複数ならリセット
-            RemoveItemElementCacheAll();
+            RemoveItemElementAll();
         }
         
         private void OnItemsRemoved(IEnumerable<int> indices)
@@ -278,34 +321,31 @@ namespace RosettaUI
             {
                 foreach (var i in indexList)
                 {
-                    RemoveItemElementCache(i);
+                    RemoveItemElement(i);
                 }
 
                 return;
             }
             
             // 最後尾ではないけど１つだけなら消してずらす
+            // 現状歯抜け選択には非対応
             if (indexList.Count() == 1)
             {
                 var i = indexList.First();
-                RemoveItemElementCache(i);
                 OnItemIndexShiftMinus(i);
                 
                 return;
             }
             
             // 最後尾でないかつ複数ならリセット
-            RemoveItemElementCacheAll();
+            RemoveItemElementAll();
         }
-
         
-        // List になにか変更があった場合の通知
-        // 参照先変更、サイズ変更、アイテムの値変更
-        // Listの値が変更されていたらSetIList()（内部的にBinder.SetObject()）する
-        // itemsSourceは自動的に変更されているが、UI.List(writeValue, readValue); の readValue を呼んで通知したいので手動で呼ぶ
+        // UI側でListの参照先が変わった(Arrayの要素数変更などすると変わる）
+        // UI.List(writeValue, readValue); の readValue を呼んで通知したいので手動で呼ぶ
         private void OnViewListChanged(IList list)
         {
-            binder.SetObject(list);
+            _binder.SetObject(list);
             _lastListItemCount = list.Count;
             NotifyViewValueChanged();
         }
@@ -315,7 +355,7 @@ namespace RosettaUI
         public class ListViewItemContainerViewBridge : ElementViewBridge
         {
             private ListViewItemContainerElement Element => (ListViewItemContainerElement)element;
-            private IBinder Binder => Element.binder;
+            private IBinder Binder => Element._binder;
             
             public ListViewItemContainerViewBridge(ListViewItemContainerElement element) : base(element)
             {
@@ -338,8 +378,37 @@ namespace RosettaUI
             // 参照or要素数
             public void SubscribeListChanged(Action<IList> action)
             {
-                Element._onListChanged += action;
-                onUnsubscribe += () => Element._onListChanged -= action;
+                Element.onListChanged += action;
+                onUnsubscribe += () => Element.onListChanged -= action;
+            }
+        }
+
+
+        // 別のElementに引き継ぐElementの状態
+        //　現状FoldのOpen/Close情報のみ
+        private class ElementState
+        {
+            private List<bool> _openList;
+            
+            public static ElementState Create(Element element)
+            {
+                return new ElementState()
+                {
+                    _openList = element.Query<FoldElement>().Select(fold => fold.IsOpen).ToList()
+                };
+            }
+
+            public void Apply(Element element)
+            {
+                using var pool = ListPool<FoldElement>.Get(out var foldList);
+                foldList.AddRange(element.Query<FoldElement>());
+                
+                // 数が合わなくてもできるだけ引き継ぐ
+                var count = Mathf.Min(foldList.Count, _openList.Count);
+                for (var i = 0; i < count; ++i)
+                {
+                    foldList[i].IsOpen = _openList[i];
+                }
             }
         }
     }

@@ -511,6 +511,8 @@ Unity2022.2.0b6
 .unity-collection-view
 {
     max-height: initial; /* remove unity default */
+    margin-top: 1px;
+    margin-bottom: 3px;
 }
 
 .unity-collection-view__scroll-view

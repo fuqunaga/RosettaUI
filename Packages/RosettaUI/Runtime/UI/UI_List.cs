@@ -56,7 +56,6 @@ namespace RosettaUI
             return List(labelString, binder, createItemElement, option);
         }
 
-
         public static FoldElement ListReadOnly<TList>(LabelElement label, Func<TList> readValue, ListViewOption option)
             where TList : IList
             => ListReadOnly(label, readValue, null, option);
@@ -108,19 +107,5 @@ namespace RosettaUI
                     }
                 }).SetMinWidth(50f).SetInteractable(interactable);
         }
-        
-        public static Element ListItemContainer(IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, ListViewOption option = null)
-        {
-            option ??= ListViewOption.Default;
-            
-            return NullGuard(null, listBinder,
-                () => new ListViewItemContainerElement(
-                    listBinder,
-                    createItemElement ?? ListItemDefault,
-                    option)
-            );
-        }
-        
-        public static Element ListItemDefault(IBinder binder, int index) => Field($"Item {index}", binder);
     }
 }

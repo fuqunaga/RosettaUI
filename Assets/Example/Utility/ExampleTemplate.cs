@@ -62,11 +62,15 @@ namespace RosettaUI.Example
             var elements = pairs.Select(pair => pair.Item2);
 
             var code = string.Join("\n", texts);
+            var highlightedCode = SyntaxHighlighter.Highlight(code);
 
             return TitleIndent(Bold(title),
                 string.IsNullOrEmpty(description) ? null : UI.Label(description),
                 UI.Column(
-                    UI.TextArea(null, () => code),
+                    // UI.TextArea(null, () => highlightedCode),
+                    UI.Box(
+                    UI.Label(highlightedCode)
+                    ).SetBackgroundColor(new Color(0f, 0f, 0f, 0.7f)),
                     UI.Space().SetWidth(30f),
                     UI.Box(
                         UI.Page(

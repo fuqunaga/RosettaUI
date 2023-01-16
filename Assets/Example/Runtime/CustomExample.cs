@@ -38,6 +38,10 @@ namespace RosettaUI.Example
 
         public Element CreateElement(LabelElement _)
         {
+            SyntaxHighlighter.AddPattern("type", nameof(MyFloat));
+            SyntaxHighlighter.AddPattern("type", nameof(MyInt));
+            SyntaxHighlighter.AddPattern("type", nameof(MyClass));
+
             return UI.Tabs(
                     CreateTabIElementCreator(),
                     CreateTabCreationFunc(),
@@ -61,7 +65,8 @@ namespace RosettaUI.Example
 
 public MyFloat myFloatValue;
 
-UI.Field(() => myFloatValue));",
+UI.Field(() => myFloatValue));
+",
                     UI.Field(() => myFloatValue)
                 )
             );
@@ -87,17 +92,17 @@ UI.Field(() => myFloatValue));",
 
 public MyInt myInt;
 
-using var creationFuncScope = 
-    new UICustom.ElementCreationFuncScope<MyInt>((label, getInstance) =>
-    {
-        return UI.Row(
-            UI.Field(label, () => getInstance().value),
-            UI.Button(""+"", () => getInstance().value++),
-            UI.Button(""-"", () => getInstance().value--)
-        );
-    });
+using var creationFuncScope =  new UICustom.ElementCreationFuncScope<MyInt>((label, getInstance) =>
+{
+    return UI.Row(
+        UI.Field(label, () => getInstance().value),
+        UI.Button(""+"", () => getInstance().value++),
+        UI.Button(""-"", () => getInstance().value--)
+    );
+});
 
-UI.Field(() => myInt);",
+UI.Field(() => myInt);
+",
                     UI.Field(() => myInt))
             );
         }
@@ -119,7 +124,7 @@ UI.Field(() => myInt);",
 
             return (ExampleTemplate.TabTitle("Property/Field"),
                     UI.Page(
-                        ExampleTemplate.CodeElementSets("<b>Property/Field</b>",
+                        ExampleTemplate.CodeElementSets("Property/Field",
                             "RosettaUI is intended for members serialized in Unity. Otherwise, it can be explicitly specified.",
                             (@"public class MyClass
 {
@@ -137,16 +142,18 @@ using var propertyOrFieldsScope = new UICustom.PropertyOrFieldsScope<MyClass>(
     ""PropertyValue""
 );
 
-UI.Field(() => myClass);",
+UI.Field(() => myClass);
+",
                                 UI.Field(() => myClass))
                         ),
-                        ExampleTemplate.CodeElementSets("<b>Property/Field Label</b>",
+                        ExampleTemplate.CodeElementSets("Property/Field Label",
                             (@"using var labelModifierScope = new UICustom.PropertyOrFieldLabelModifierScope<Vector2>(
-        (""x"", ""horizontal""),
-        (""y"", ""vertical"")
-    );
+    (""x"", ""horizontal""),
+    (""y"", ""vertical"")
+);
 
-UI.Field(() => vector2Value).Open();",
+UI.Field(() => vector2Value).Open();
+",
                                 UI.Field(() => vector2Value).Open()
                                 )
                         )

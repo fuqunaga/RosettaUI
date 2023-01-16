@@ -75,7 +75,7 @@ namespace RosettaUI.Example
 ",
                         UI.Fold("Open", UI.Label("Element")).Open()
                     ),
-                    ("UI.List(() => intList).Close();", UI.List(() => intList).Close())
+                    ("UI.List(() => intList).Close();\n", UI.List(() => intList).Close())
                 );
         }
 
@@ -92,8 +92,7 @@ UI.Column(
         () => position,
         max: new Vector2(Screen.width, Screen.height)
     ).RegisterUpdateCallback(_ => window.Position = position)
-);
-",
+);",
                             WindowPosition()
                         )
                     );

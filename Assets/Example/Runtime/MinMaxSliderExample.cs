@@ -68,10 +68,26 @@ namespace RosettaUI.Example
                 ),
                 ExampleTemplate.Tab("Codes",
                     ExampleTemplate.CodeElementSets("Argument",
-                        ("UI.MinMaxSlider(() => floatMinMax, MinMax.Create(-1f, 1f));",
-                            UI.MinMaxSlider(() => floatMinMax, MinMax.Create(-1f, 1f))),
-                        (@"UI.MinMaxSlider(() => vector2MinMax, MinMax.Create(-Vector2.one, Vector2.one)).Open();",
-                            UI.MinMaxSlider(() => vector2MinMax, MinMax.Create(-Vector2.one, Vector2.one)).Open())
+                        (@"UI.MinMaxSlider(
+    () => floatMinMax,
+    range: MinMax.Create(-1f, 1f)
+);
+",
+                            UI.MinMaxSlider(
+                                () => floatMinMax,
+                                range: MinMax.Create(-1f, 1f)
+                            )
+                        ),
+                        (@"UI.MinMaxSlider(
+    () => vector2MinMax,
+    range: MinMax.Create(-Vector2.one, Vector2.one)
+).Open();
+",
+                            UI.MinMaxSlider(
+                                () => vector2MinMax,
+                                range: MinMax.Create(-Vector2.one, Vector2.one)
+                            ).Open()
+                        )
                     ),
                     ExampleTemplate.CodeElementSets("Supported types",
                         $"Supports any type that has a specific member pair [{string.Join(",", TypeUtility.MinMaxMemberNamePairs.Select(pair => $"({pair.Item1}, {pair.Item2})"))}]", 
@@ -84,7 +100,12 @@ namespace RosettaUI.Example
 public MyMinMax<float> myMinMax;
 
 UI.MinMaxSlider(() => myMinMax);",
-                            UI.MinMaxSlider(() => myMinMax)), ("UI.MinMaxSlider(() => vector2Value);", UI.MinMaxSlider(() => vector2Value)))
+                            UI.MinMaxSlider(() => myMinMax)
+                            ),
+                        ("UI.MinMaxSlider(() => vector2Value);\n",
+                            UI.MinMaxSlider(() => vector2Value)
+                        )
+                    )
                 )
             );
         }

@@ -236,7 +236,8 @@ namespace RosettaUI.Example
     {
         UI.Label(""Element"")
     }
-);",
+);
+",
                     UI.Fold(
                         UI.Field("CustomBar", () => intValue),
                         new[]
@@ -266,7 +267,7 @@ namespace RosettaUI.Example
         private static Element CreateElement_IgnoreIndentRule()
         {
             return ExampleTemplate.TitleIndent(
-                "Fold/WindowLauncher ignores one level of indentation for label alignment",
+                "Fold/WindowLauncher ignores one level of indentation for label alignment.",
                 UI.Box(
                     UI.Label("No indent"),
                     UI.Fold(nameof(UI.Fold) + 0),

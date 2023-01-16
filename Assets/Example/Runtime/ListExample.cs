@@ -56,7 +56,8 @@ namespace RosettaUI.Example
                         (@"[NonReorderable]
 public int[] nonReorderableArray;
 
-UI.List(() => nonReorderableArray);",
+UI.List(() => nonReorderableArray);
+",
                             UI.List(() => nonReorderableArray)))
                 )
             );

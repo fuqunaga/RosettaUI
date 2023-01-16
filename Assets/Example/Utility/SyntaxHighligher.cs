@@ -7,21 +7,31 @@ namespace RosettaUI.Example
 {
     public static class SyntaxHighlighter
     {
-        public static Dictionary<string, List<string>> Patterns = new()
+        private static readonly Dictionary<string, List<string>> Patterns = new()
         {
             ["type"] = new()
             {
                 "Range",
                 "Multiline",
                 "NonReorderable",
+                "NonSerialized",
                 "((?<!\\.)List)",
                 "T",
                 nameof(Enumerable),
                 nameof(Vector2),
                 nameof(Color),
+                nameof(Screen),
+                nameof(Debug),
                 nameof(UI),
+                nameof(UICustom),
+                "ElementCreationFuncScope",
+                "PropertyOrFieldsScope",
+                nameof(UICustom.PropertyOrFieldLabelModifierScope),
                 nameof(MinMax),
                 nameof(ListViewOption),
+                nameof(IElementCreator),
+                nameof(Element),
+                nameof(LabelElement)
             },
             ["method"] = new()
             {
@@ -30,6 +40,7 @@ namespace RosettaUI.Example
                 nameof(string.ToLower),
                 nameof(Enumerable.Range),
                 nameof(Enumerable.Select),
+                nameof(Debug.Log),
                 nameof(UI.Field),
                 nameof(UI.FieldReadOnly),
                 nameof(UI.Slider),
@@ -59,10 +70,13 @@ namespace RosettaUI.Example
                 nameof(ElementExtensionsMethodChain.Close),
                 nameof(ElementExtensionsMethodChain.RegisterUpdateCallback),
                 nameof(ElementExtensionsMethodChain.RegisterValueChangeCallback),
+                nameof(IElementCreator.CreateElement)
             },
             ["keyword"] = new()
             {
                 "public",
+                "protected",
+                "private",
                 "class",
                 "struct",
                 "return",
@@ -74,7 +88,9 @@ namespace RosettaUI.Example
                 "nameof",
                 "true",
                 "false",
-                "null"
+                "null",
+                "var",
+                "using",
             },
             ["symbol"] = new()
             {
@@ -97,7 +113,6 @@ namespace RosettaUI.Example
                 @"/\*[\s\S]*?\*/|//.*"
             }
         };
-        
 
         private static readonly Dictionary<string, string> ColorTable = new()
         {
@@ -123,6 +138,7 @@ namespace RosettaUI.Example
 
             var nameAndFormats = new[]
             {
+                ("comment", format1),
                 ("type", format2),
                 ("method", format2),
                 ("keyword", format2),
@@ -130,7 +146,6 @@ namespace RosettaUI.Example
                 ("digit", format1),
                 ("str", format1),
                 ("parameterName", format1),
-                ("comment", format1),
             };
 
             var patterns = nameAndFormats.Select((pair) =>

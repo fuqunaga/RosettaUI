@@ -52,6 +52,14 @@ namespace RosettaUI.Example
         public static (string, Element) UIFunctionTab(string functionName, params Element[] elements) =>
             Tab(UIFunctionStr(functionName), elements);
 
+
+        public static Element CodeBox(string code)
+        {
+            var highlightedCode = SyntaxHighlighter.Highlight(code);
+            return UI.Box(
+                UI.Label(highlightedCode)
+            ).SetBackgroundColor(new Color(0f, 0f, 0f, 0.7f));
+        }
         
         public static Element CodeElementSets(string title, params (string, Element)[] pairs)
             => CodeElementSets(title, null, pairs);
@@ -62,15 +70,11 @@ namespace RosettaUI.Example
             var elements = pairs.Select(pair => pair.Item2);
 
             var code = string.Join("\n", texts);
-            var highlightedCode = SyntaxHighlighter.Highlight(code);
-
+            
             return TitleIndent(Bold(title),
                 string.IsNullOrEmpty(description) ? null : UI.Label(description),
                 UI.Column(
-                    // UI.TextArea(null, () => highlightedCode),
-                    UI.Box(
-                    UI.Label(highlightedCode)
-                    ).SetBackgroundColor(new Color(0f, 0f, 0f, 0.7f)),
+                    CodeBox(code),
                     UI.Space().SetWidth(30f),
                     UI.Box(
                         UI.Page(

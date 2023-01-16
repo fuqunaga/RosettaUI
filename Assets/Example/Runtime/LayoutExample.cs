@@ -117,24 +117,25 @@ namespace RosettaUI.Example
 
         Element CreateElement_Tabs()
         {
-            var tab0Str = @"UI.Tabs(
+            var tab0Str = @"
+UI.Tabs(
     (""Title0"", Element), 
     (""Title1"", Element)
-);";
-            var tab1Str = @"UI.Tabs(
+);
+";
+            var tab1Str = @"
+UI.Tabs(
     (""Title0"", Func<Element>), 
     (""Title1"", Func<Element>)
-);";
+);
+";
 
             return ExampleTemplate.UIFunctionColumn(nameof(UI.Tabs),
                 UI.Box(
                     UI.Tabs(
-                        ("Tab0", UI.Column(
-                                UI.TextArea(null, () => tab0Str)
-                            )
-                        ),
+                        ("Tab0", ExampleTemplate.CodeBox(tab0Str)),
                         ("Tab1", UI.Column(
-                                UI.TextArea(null, () => tab1Str),
+                                ExampleTemplate.CodeBox(tab1Str),
                                 UI.HelpBox("Passing Func<Element> will delay the build of the UI until it is displayed",
                                     HelpBoxType.Info)
                             )

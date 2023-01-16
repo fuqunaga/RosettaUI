@@ -49,11 +49,12 @@ namespace RosettaUI
             
             _binderTypeHistorySnapshot = BinderHistory.Snapshot.Create();
 
-            enableRx.SubscribeAndCallOnce(enable =>
+            BuildElement();
+            enableRx.Subscribe(enable =>
             {
                 if (enable)
                 {
-                    BuildElement();
+                    CheckAndRebuild();
                 }
             });
         }
@@ -68,6 +69,12 @@ namespace RosettaUI
 
         private void BuildElement()
         {
+            while (Children.Any())
+            {
+                var child = Children.Last();
+                RemoveChild(child, false);
+            }
+
             using var applyScope = _binderTypeHistorySnapshot.GetApplyScope();
             SetElements(new[] {_build?.Invoke()});
 
@@ -78,13 +85,6 @@ namespace RosettaUI
         public void CheckAndRebuild()
         {
             if (!(_rebuildIf?.Invoke(this) ?? false)) return;
-            
-            while (Children.Any())
-            {
-                var child = Children.Last();
-                RemoveChild(child, false);
-            }
-            
             BuildElement();
         }
 
@@ -100,10 +100,10 @@ namespace RosettaUI
             {
             }
             
-            public void RegisterBindView(Action<DynamicElement> action)
+            public void RegisterBindViewAndCallOnce(Action<DynamicElement> action)
             {
                 Element.bindChildrenToView += action;
-                if ( Element.Enable) action?.Invoke(Element);
+                action?.Invoke(Element);
             }
 
             public override void UnsubscribeAll()

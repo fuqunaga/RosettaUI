@@ -22,7 +22,7 @@ namespace RosettaUI.Example
             circularReferenceClass.other = circularReferenceClassOther;
             circularReferenceClassOther.other = circularReferenceClass;
 
-            return UI.Column(
+            return UI.Page(
                 ExampleTemplate.UIFunctionPage(nameof(UI.Field),
                     UI.Field(() => nullableInt),
                     UI.Field(() => nullClass),

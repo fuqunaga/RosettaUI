@@ -37,6 +37,10 @@ namespace RosettaUI.UIToolkit
                 _currentTabIndex = Mathf.Min(Mathf.Max(value, 0), _tabs.Count - 1);
                 UpdateTabActive();
                 onCurrentTabIndexChanged?.Invoke(_currentTabIndex);
+                
+                using var changeVisibleEvent = ChangeVisibleEvent.GetPooled();
+                changeVisibleEvent.target = this;
+                SendEvent(changeVisibleEvent);
             }
         }
 

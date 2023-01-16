@@ -14,96 +14,107 @@ namespace RosettaUI.Example
 
         public Element CreateElement(LabelElement _)
         {
-            return UI.Column(
-                UI.Row(
-                    CreateElementTopLeft().SetWidth(730f),
-                    UI.Column(
-                        CreateElement_Tabs(),
-                        CreateElement_ScrollView(),
-                        UI.Space()
+            return UI.Tabs(
+                CreateMethods0(),
+                CreateMethods1(),
+                CreateCodes()
+            );
+        }
+
+        private (string, Element) CreateMethods0()
+        {
+            return (ExampleTemplate.TabTitle("Methods0"),
+                    UI.Page(
+                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.Column),
+                            UI.Column(
+                                UI.Label("Element0"),
+                                UI.Label("Element1"),
+                                UI.Label("Element2")
+                            )
+                        ),
+                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.Row),
+                            UI.Row(
+                                UI.Label("Element0"),
+                                UI.Label("Element1"),
+                                UI.Label("Element2")
+                            )
+                        ),
+                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.Fold),
+                            UI.Fold("Fold0",
+                                UI.Fold("Fold1",
+                                    UI.Fold("Fold2",
+                                        UI.Label("Element")
+                                    )
+                                )
+                            )
+                        ),
+                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.Indent),
+                            UI.Label("No indent"),
+                            UI.Indent(
+                                UI.Label("Indent1"),
+                                UI.Indent(
+                                    UI.Label("Indent2")
+                                )
+                            )
+                        ),
+                        ExampleTemplate.UIFunctionColumnBox(nameof(UI.Box),
+                            UI.Label("box style frame")
+                        ),
+                        ExampleTemplate.UIFunctionColumn(nameof(UI.Page),
+                            UI.Label("Adjust the width of the prefix labels."),
+                            UI.Column(
+                                UI.Row(
+                                    UI.Label("Page").SetWidth(80f),
+                                    UI.Box(
+                                        UI.Page(
+                                            UI.Field(() => intValue),
+                                            UI.Fold("Fold0",
+                                                UI.Field(() => floatValue),
+                                                UI.Fold("Fold1",
+                                                    UI.Field(() => stringValue)
+                                                ).Open()
+                                            ).Open()
+                                        ))
+                                ),
+                                UI.Row(
+                                    UI.Label("Column").SetWidth(80f),
+                                    UI.Box(
+                                        UI.Column(
+                                            UI.Field(() => intValue),
+                                            UI.Fold("Fold0",
+                                                UI.Field(() => floatValue),
+                                                UI.Fold("Fold",
+                                                    UI.Field(() => stringValue)
+                                                ).Open()
+                                            ).Open()
+                                        )
+                                    )
+                                )
+                            )
+                        )
                     )
-                    
-                ),
-                ExampleTemplate.BlankLine(),
-                
+                );
+        }
+
+
+        private (string, Element) CreateMethods1()
+        {
+            return (ExampleTemplate.TabTitle("Methods1"),
+                    UI.Page(
+                        CreateElement_Tabs(),
+                        CreateElement_ScrollView()
+                    )
+                );
+        }
+
+        private (string, Element) CreateCodes()
+        {
+            return ExampleTemplate.Tab("Codes",
                 CreateElement_FoldArgument(),
                 CreateElement_IgnoreIndentRule()
             );
         }
 
-        Element CreateElementTopLeft()
-        {
-            return UI.Column(
-                ExampleTemplate.UIFunctionColumnBox(nameof(UI.Column),
-                    UI.Column(
-                        UI.Label("Element0"),
-                        UI.Label("Element1"),
-                        UI.Label("Element2")
-                    )
-                ),
-                ExampleTemplate.UIFunctionColumnBox(nameof(UI.Row),
-                    UI.Row(
-                        UI.Label("Element0"),
-                        UI.Label("Element1"),
-                        UI.Label("Element2")
-                    )
-                ),
-                ExampleTemplate.UIFunctionColumnBox(nameof(UI.Fold),
-                    UI.Fold("Fold0",
-                        UI.Fold("Fold1",
-                            UI.Fold("Fold2",
-                                UI.Label("Element")
-                            )
-                        )
-                    )
-                ),
-                ExampleTemplate.UIFunctionColumnBox(nameof(UI.Indent),
-                    UI.Label("No indent"),
-                    UI.Indent(
-                        UI.Label("Indent1"),
-                        UI.Indent(
-                            UI.Label("Indent2")
-                        )
-                    )
-                ),
-                ExampleTemplate.UIFunctionColumnBox(nameof(UI.Box),
-                    UI.Label("box style frame")
-                ),
-                ExampleTemplate.UIFunctionColumn(nameof(UI.Page),
-                    UI.Label("Adjust the width of the prefix labels."),
-                    UI.Column(
-                        UI.Row(
-                            UI.Label("Page").SetWidth(80f),
-                            UI.Box(
-                                UI.Page(
-                                    UI.Field(() => intValue),
-                                    UI.Fold("Fold0",
-                                        UI.Field(() => floatValue),
-                                        UI.Fold("Fold1",
-                                            UI.Field(() => stringValue)
-                                        ).Open()
-                                    ).Open()
-                                ))
-                        ),
-                        UI.Row(
-                            UI.Label("Column").SetWidth(80f),
-                            UI.Box(
-                                UI.Column(
-                                    UI.Field(() => intValue),
-                                    UI.Fold("Fold0",
-                                        UI.Field(() => floatValue),
-                                        UI.Fold("Fold",
-                                            UI.Field(() => stringValue)
-                                        ).Open()
-                                    ).Open()
-                                )
-                            )
-                        )
-                    )
-                )
-            );
-        }
-        
         Element CreateElement_Tabs()
         {
             var tab0Str = @"UI.Tabs(
@@ -215,17 +226,18 @@ namespace RosettaUI.Example
                 ).SetWidth(width)
             );
         }
-        
-        Element CreateElement_FoldArgument()
+
+        private Element CreateElement_FoldArgument()
         {
-            return ExampleTemplate.CodeElementSets("<b>Fold argument</b>",
+            return ExampleTemplate.CodeElementSets("Fold argument",
                 (@"UI.Fold(
     UI.Field(""CustomBar"", () => intValue), 
     new[]
     {
         UI.Label(""Element"")
     }
-);",
+);
+",
                     UI.Fold(
                         UI.Field("CustomBar", () => intValue),
                         new[]
@@ -252,10 +264,10 @@ namespace RosettaUI.Example
             );
         }
 
-        Element CreateElement_IgnoreIndentRule()
+        private static Element CreateElement_IgnoreIndentRule()
         {
             return ExampleTemplate.TitleIndent(
-                "Fold/WindowLauncher ignores one level of indentation for label alignment",
+                "Fold/WindowLauncher ignores one level of indentation for label alignment.",
                 UI.Box(
                     UI.Label("No indent"),
                     UI.Fold(nameof(UI.Fold) + 0),

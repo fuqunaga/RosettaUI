@@ -256,12 +256,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   floatValue: 0
-  stringValue: 'multi line
-
-    string'
-  vector2Value: {x: 0.27055246, y: 0.27055246}
-  intList: 130000000200000003000000
-  dropDownIndex: 1
+  stringValue: this is string.
+  vector2Value: {x: 0, y: 0}
+  intList: 010000000200000003000000
+  dropDownIndex: 0
   dropDownOptions:
   - One
   - Two
@@ -317,6 +315,7 @@ MonoBehaviour:
     string'
   texture: {fileID: 2800000, guid: f8fa76ac67c34254da2b9c9b263733c3, type: 3}
   dropDownIndex: 0
+  boolValue: 0
 --- !u!1 &554616668
 GameObject:
   m_ObjectHideFlags: 0
@@ -448,13 +447,13 @@ MonoBehaviour:
   - 2
   - 3
   simpleClass:
-    floatValue: 0.12
+    floatValue: 0
     stringValue: 
   classList:
   - floatValue: 1
     stringValue: First
-  attributeTestClass:
-    rangeFloat: 0
+  attributeExampleClass:
+    rangeFloat: 50
     multiLineString: 'multi
 
       line
@@ -860,8 +859,8 @@ MonoBehaviour:
   myFloatValue:
     value: 0
   myInt:
-    value: 148
-  vector2Value: {x: -0.25, y: 0.48}
+    value: 0
+  vector2Value: {x: 0, y: 0}
 --- !u!1 &1740173062
 GameObject:
   m_ObjectHideFlags: 0
@@ -908,8 +907,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   intValue: 0
   uintValue: 0
-  floatValue: 0
-  vector2Value: {x: 0.463, y: 0.5}
+  floatValue: 1
+  vector2Value: {x: 1, y: 1}
   vector3Value: {x: 0, y: 0, z: 0}
   vector4Value: {x: 0, y: 0, z: 0, w: 0}
   vector2IntValue: {x: 0, y: 0}
@@ -1101,10 +1100,10 @@ MonoBehaviour:
     max: 0
   floatMinMax:
     min: 0
-    max: 0.38863626
+    max: 0
   vector2MinMax:
-    min: {x: -0.07100046, y: 0}
-    max: {x: 0.22149956, y: 0}
+    min: {x: 0, y: 0}
+    max: {x: 0, y: 0}
   vector3MinMax:
     min: {x: 0, y: 0, z: 0}
     max: {x: 0, y: 0, z: 0}
@@ -1217,5 +1216,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11d77e325ca686141a8d183787b4b253, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  intValue: 0
+  intValue: 5
   dynamicElementIf: 0

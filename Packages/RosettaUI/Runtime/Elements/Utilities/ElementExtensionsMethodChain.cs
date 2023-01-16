@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using UnityEngine;
 
 namespace RosettaUI
@@ -103,19 +104,27 @@ namespace RosettaUI
             element.onUpdate -= onUpdate;
             return element;
         }
-        
-        
-        public static T SetOpenFlag<T>(this T element, bool flag)
-            where T : OpenCloseBaseElement
+
+        public static T SetOpenFlag<T>(this T element, bool flag, bool recursive = false)
+            where T : Element
         {
-            element.IsOpen = flag;
+            var openCloseElements = element.Query<OpenCloseBaseElement>();
+            if (!recursive)
+            {
+                openCloseElements = openCloseElements.Take(1);
+            }
+            
+            foreach(var e in openCloseElements)
+            {
+                e.IsOpen = flag;
+            }
             return element;
         }
 
-        public static T Open<T>(this T element) where T : OpenCloseBaseElement
+        public static T Open<T>(this T element, bool recursive = false) where T : Element
             => element.SetOpenFlag(true);
 
-        public static T Close<T>(this T element) where T : OpenCloseBaseElement
+        public static T Close<T>(this T element, bool recursive = false) where T : Element
             => element.SetOpenFlag(false);
 
         public static WindowElement SetPosition(this WindowElement windowElement, Vector2? position)

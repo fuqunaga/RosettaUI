@@ -33,7 +33,7 @@ namespace RosettaUI.Example
         private Element CreateElement()
         {
             return UI.Window(
-                ExampleTypes.Select(type => UI.WindowLauncher(type))
+                ExampleTypes.Select(type => UI.WindowLauncher(null, false, false, false, type))
             );
         }
 

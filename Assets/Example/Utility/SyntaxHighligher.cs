@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,17 +12,20 @@ namespace RosettaUI.Example
         {
             ["type"] = new()
             {
-                "Range",
+                "(?<!\\.)Range",
+                "(?<!\\.)List",
+                "Func",
+                "T",
+                nameof(Enumerable),
+                
                 "Multiline",
                 "NonReorderable",
                 "NonSerialized",
-                "((?<!\\.)List)",
-                "T",
-                nameof(Enumerable),
                 nameof(Vector2),
                 nameof(Color),
                 nameof(Screen),
                 nameof(Debug),
+                
                 nameof(UI),
                 nameof(UICustom),
                 "ElementCreationFuncScope",
@@ -58,6 +62,7 @@ namespace RosettaUI.Example
                 nameof(UI.DynamicElementOnStatusChanged),
                 nameof(UI.Dropdown),
                 nameof(UI.TextArea),
+                nameof(UI.Tabs),
                 nameof(MinMax.Create),
                 nameof(ElementExtensionsMethodChain.SetEnable),
                 nameof(ElementExtensionsMethodChain.SetInteractable),

@@ -142,9 +142,9 @@ using var propertyOrFieldsScope = new UICustom.PropertyOrFieldsScope<MyClass>(
     ""PropertyValue""
 );
 
-UI.Field(() => myClass);
+UI.Field(() => myClass).Open();
 ",
-                                UI.Field(() => myClass))
+                                UI.Field(() => myClass).Open())
                         ),
                         ExampleTemplate.CodeElementSets("Property/Field Label",
                             (@"using var labelModifierScope = new UICustom.PropertyOrFieldLabelModifierScope<Vector2>(
@@ -152,9 +152,9 @@ UI.Field(() => myClass);
     (""y"", ""vertical"")
 );
 
-UI.Field(() => vector2Value).Open();
+UI.Field(() => vector2Value);
 ",
-                                UI.Field(() => vector2Value).Open()
+                                UI.Field(() => vector2Value)
                                 )
                         )
                     )

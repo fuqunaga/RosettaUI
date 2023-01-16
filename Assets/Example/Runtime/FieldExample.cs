@@ -9,7 +9,7 @@ namespace RosettaUI.Example
     public class FieldExample : MonoBehaviour, IElementCreator
     {
         [Serializable]
-        public class AttributeTestClass
+        public class AttributeExampleClass
         {
             [Range(0f,100f)]
             public float rangeFloat;
@@ -47,11 +47,13 @@ namespace RosettaUI.Example
             new SimpleClass {floatValue = 1f, stringValue = "First"}
         }.ToList();
         
-        [FormerlySerializedAs("attributeTestClass")] public AttributeTestClass attributeExampleClass;
+        [FormerlySerializedAs("attributeTestClass")] public AttributeExampleClass attributeExampleClass;
 
 
         public Element CreateElement(LabelElement _)
         {
+            SyntaxHighlighter.AddPattern("type", nameof(AttributeExampleClass));
+            
             return UI.Tabs(
                 ExampleTemplate.UIFunctionTab(nameof(UI.Field),
                     UI.Field(() => intValue),

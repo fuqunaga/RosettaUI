@@ -16,6 +16,11 @@ namespace RosettaUI.Example
 
         public Element CreateElement(LabelElement _)
         {
+            SyntaxHighlighter.AddPattern("method", nameof(GetDropdownIndex));
+            SyntaxHighlighter.AddPattern("method", nameof(SetDropdownIndex));
+            SyntaxHighlighter.AddPattern("method", nameof(GetIntList));
+            SyntaxHighlighter.AddPattern("method", nameof(SetIntList));
+            
             return UI.Tabs(
                 CreateCustomLabel(),
                 CreateNoLabel(),
@@ -84,6 +89,8 @@ namespace RosettaUI.Example
 
         private (string, Element) CreateExpressionTreeLimitation()
         {
+            SyntaxHighlighter.AddPattern("method", nameof(LocalFunction));
+            
             return ExampleTemplate.CodeElementSetsWithDescriptionTab("ExpressionTree limitation",
                 "targetExpression args cannot use \"?.\"(null-conditional operator), \"{}\"(blocks) or local function because of ExpressionTree limitation.\n" +
                 "but it can be used in styles such as UI.FieldReadOnly(label, readValue) and UI.Field(label, readValue, writeValue).",

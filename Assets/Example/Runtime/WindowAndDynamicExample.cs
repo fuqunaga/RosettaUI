@@ -11,6 +11,8 @@ namespace RosettaUI.Example
         
         public Element CreateElement(LabelElement _)
         {
+            SyntaxHighlighter.AddPattern("type", nameof(BehaviourExample));
+            
             return UI.Tabs(
                 CreateTabWindowLauncher(),
                 CreateTabFieldIfObjectFound(),

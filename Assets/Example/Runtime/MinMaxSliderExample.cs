@@ -33,6 +33,8 @@ namespace RosettaUI.Example
         
         public Element CreateElement(LabelElement _)
         {
+            SyntaxHighlighter.AddPattern("type", "MyMinMax");
+            
             return UI.Tabs(
                 ExampleTemplate.UIFunctionTab(nameof(UI.MinMaxSlider),
                     UI.MinMaxSlider(() => intMinMax),

@@ -101,8 +101,25 @@ namespace RosettaUI.Example
                     UI.FieldReadOnly(() => simpleClass),
                     UI.FieldReadOnly(() => classList)
                 ),
-                ExampleTemplate.CodeElementSetsTab("Codes", "Attributes",
-                    (@"public class AttributeExampleClass
+                ExampleTemplate.Tab("Codes",
+                    ExampleTemplate.CodeElementSets("Argument",
+                        "If FieldOption.delayInput == true, the value isn't updated until Enter is pressed or the focus is lost.",
+                        (@"UI.Field(
+    () => intValue,
+    new FieldOption() { delayInput = true }
+).RegisterValueChangeCallback(
+    () => Debug.Log($""OnValueChanged[{intValue}]"")
+);",
+                            UI.Field(
+                                () => intValue,
+                                new FieldOption() { delayInput = true }
+                            ).RegisterValueChangeCallback(
+                                () => Debug.Log($"OnValueChanged[{intValue}]")
+                            )
+                        )
+                    ),
+                    ExampleTemplate.CodeElementSets("Attribute",
+                        (@"public class AttributeExampleClass
 {
     [Range(0f,100f)]
     public float rangeFloat;
@@ -116,7 +133,8 @@ namespace RosettaUI.Example
 
 UI.Field(() => attributeExampleClass).Open();
 ",
-                        UI.Field(() => attributeExampleClass).Open()
+                            UI.Field(() => attributeExampleClass).Open()
+                        )
                     )
                 )
             );

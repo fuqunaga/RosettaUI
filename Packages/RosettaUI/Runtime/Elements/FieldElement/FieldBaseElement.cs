@@ -5,11 +5,13 @@
     /// </summary>
     public abstract class FieldBaseElement<T> : ReadOnlyFieldElement<T>
     {
+        public FieldOption Option { get; protected set; }
         private readonly IBinder<T> _binder;
-
-        protected FieldBaseElement(LabelElement label, IBinder<T> binder) : base(label, binder)
+        
+        protected FieldBaseElement(LabelElement label, IBinder<T> binder, FieldOption option = null) : base(label, binder)
         {
             _binder = binder;
+            Option = option;
             Interactable = !binder.IsReadOnly;
         }
         

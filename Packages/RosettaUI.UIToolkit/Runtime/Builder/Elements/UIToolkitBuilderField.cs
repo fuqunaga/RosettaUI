@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.Assertions;
+﻿using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -54,6 +52,11 @@ namespace RosettaUI.UIToolkit.Builder
             where TField : BaseField<TValue>, new()
         {
             element.Bind(field);
+
+            if (field is TextInputBaseField<TValue> textInputBaseField)
+            {
+                textInputBaseField.isDelayed = element.Option?.delayInput ?? false;
+            }
             
             if (labelEnable)
             {

@@ -9,7 +9,7 @@ namespace RosettaUI
     {
         #region Field
         
-        public static Element CreateFieldElement(LabelElement label, IBinder binder)
+        public static Element CreateFieldElement(LabelElement label, IBinder binder, FieldOption option = null)
         {
             var valueType = binder.ValueType;
 
@@ -26,20 +26,20 @@ namespace RosettaUI
                 _ when UICustom.GetElementCreationMethod(valueType) is { } creationFunc => InvokeCreationFunc(label,
                     binder, creationFunc),
 
-                IBinder<int> ib => new IntFieldElement(label, ib),
-                IBinder<uint> ib => new UIntFieldElement(label, ib),
-                IBinder<float> ib => new FloatFieldElement(label, ib),
-                IBinder<string> ib => new TextFieldElement(label, ib),
+                IBinder<int> ib => new IntFieldElement(label, ib, option),
+                IBinder<uint> ib => new UIntFieldElement(label, ib, option),
+                IBinder<float> ib => new FloatFieldElement(label, ib, option),
+                IBinder<string> ib => new TextFieldElement(label, ib, option),
                 IBinder<bool> ib => new ToggleElement(label, ib),
                 IBinder<Color> ib => new ColorFieldElement(label, ib),
                 _ when valueType.IsEnum => CreateEnumElement(label, binder),
-                _ when TypeUtility.IsNullable(valueType) => CreateNullableFieldElement(label, binder),
+                _ when TypeUtility.IsNullable(valueType) => CreateNullableFieldElement(label, binder, option),
 
                 _ when binder.GetObject() is IElementCreator elementCreator => WrapNullGuard(() =>
                     elementCreator.CreateElement(label)),
                 _ when ListBinder.IsListBinder(binder) => CreateListView(label, binder),
 
-                _ => WrapNullGuard(() => CreateMemberFieldElement(label, binder))
+                _ => WrapNullGuard(() => CreateMemberFieldElement(label, binder, option))
             };
 
             Element WrapNullGuard(Func<Element> func) => UI.NullGuardIfNeed(label, binder, func);
@@ -59,10 +59,10 @@ namespace RosettaUI
             return new DropdownElement(label, enumToIdxBinder, Enum.GetNames(valueType));
         }
         
-        private static Element CreateNullableFieldElement(LabelElement label, IBinder binder)
+        private static Element CreateNullableFieldElement(LabelElement label, IBinder binder, FieldOption option)
         {
             var valueBinder = NullableToValueBinder.Create(binder);
-            return UI.NullGuard(label, binder, () => CreateFieldElement(label, valueBinder));
+            return UI.NullGuard(label, binder, () => CreateFieldElement(label, valueBinder, option));
         }
         
         private static Element CreateListView(LabelElement label, IBinder binder)
@@ -77,7 +77,7 @@ namespace RosettaUI
             return UI.List(label, binder, null, option);
         }
 
-        private static Element CreateMemberFieldElement(LabelElement label, IBinder binder)
+        private static Element CreateMemberFieldElement(LabelElement label, IBinder binder, FieldOption option)
         {
             var valueType = binder.ValueType;
 
@@ -93,7 +93,7 @@ namespace RosettaUI
                     return UI.Slider(fieldLabel, fieldBinder, minGetter, maxGetter);
                 }
                
-                var field = UI.Field(fieldLabel, fieldBinder);
+                var field = UI.Field(fieldLabel, fieldBinder, option);
                 
                 
                 if (TypeUtility.IsMultiline(valueType, fieldName) && field is TextFieldElement textField)
@@ -204,7 +204,7 @@ namespace RosettaUI
             {
                 if (TypeUtility.IsSingleLine(binder.ValueType))
                 {
-                    var titleField = CreateMemberFieldElement(new LabelElement(label), binder);
+                    var titleField = CreateMemberFieldElement(new LabelElement(label), binder, null);
                     
                     // Foldが閉じてるときは titleField を、開いているときは label を表示
                     // UI.Row(label, titleField) だと titleField のラベルがPrefixLabel判定されないので

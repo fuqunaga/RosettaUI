@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -29,27 +28,27 @@ namespace RosettaUI.UIToolkit
 
         #endregion
 
+        private const string UssClassName = "rosettaui-window";
+        private const string UssClassNameFocused = UssClassName + "--focused";
+        private const string UssClassNameTitleBarContainer = UssClassName + "__titlebar-container";
+        private const string UssClassNameTitleBarContainerLeft = UssClassNameTitleBarContainer + "__left";
+        private const string UssClassNameTitleBarContainerRight = UssClassNameTitleBarContainer + "__right";
+        private const string UssClassNameContentContainer = UssClassName + "__content-container";
 
         public readonly bool resizable;
-
-        static readonly string UssClassName = "rosettaui-window";
-        static readonly string UssClassNameTitleBarContainer = UssClassName + "__titlebar-container";
-        static readonly string UssClassNameTitleBarContainerLeft = UssClassNameTitleBarContainer + "__left";
-        static readonly string UssClassNameTitleBarContainerRight = UssClassNameTitleBarContainer + "__right";
-        static readonly string UssClassNameContentContainer = UssClassName + "__content-container";
-       
         protected VisualElement dragRoot;
 
-        readonly VisualElement _titleBarContainer = new();
-        readonly VisualElement _contentContainer = new();
+        private readonly VisualElement _titleBarContainer = new();
+        private readonly VisualElement _contentContainer = new();
 
-        Button _closeButton;
-        DragMode _dragMode;
-        Vector2 _draggingLocalPosition;
-        ResizeEdge _resizeEdge;
+        private Button _closeButton;
+        private DragMode _dragMode;
+        private Vector2 _draggingLocalPosition;
+        private ResizeEdge _resizeEdge;
+        private bool _focused;
         
         public bool IsMoved { get; protected set; }
-
+        
         public VisualElement TitleBarContainerLeft { get; } = new();
 
         public VisualElement TitleBarContainerRight { get; } = new();
@@ -95,6 +94,19 @@ namespace RosettaUI.UIToolkit
             }
         }
 
+        public bool IsFocused
+        {
+            get => _focused;
+            protected set
+            {
+                if (_focused == value) return;
+                
+                _focused = value;
+                if ( _focused) AddToClassList(UssClassNameFocused);
+                else RemoveFromClassList(UssClassNameFocused);
+            }
+        }
+
         public Window() : this(true)
         {
         }
@@ -102,6 +114,9 @@ namespace RosettaUI.UIToolkit
         public Window(bool resizable)
         {
             this.resizable = resizable;
+
+            focusable = true;
+            pickingMode = PickingMode.Position;
 
             AddToClassList(UssClassName);
 
@@ -123,6 +138,9 @@ namespace RosettaUI.UIToolkit
             RegisterCallback<PointerDownEvent>(OnPointerDown);
             RegisterCallback<MouseMoveEvent>(OnMouseMove);
             RegisterCallback<MouseOutEvent>(OnMouseOut);
+            RegisterCallback<FocusEvent>(OnFocus, TrickleDown.TrickleDown);
+            RegisterCallback<BlurEvent>(OnBlur, TrickleDown.TrickleDown);
+
             
             RegisterCallback<ChangeVisibleEvent>(_ =>
             {
@@ -146,7 +164,7 @@ namespace RosettaUI.UIToolkit
         // 特にHorizontal方向はほとんどのエレメントが固定サイズを持っていないので再計算が走りまくるようで重い
         // これを回避するためWindowは内容物のレイアウトが落ち着いたら幅を固定しておく
         // 同一フレームだとGeometryChangedEventなどでサイズが変わるやつがいるので１フレーム待つ
-        void ResetFixedSize()
+        private void ResetFixedSize()
         {
             var startFrameCount = Time.frameCount;
             schedule.Execute(() =>
@@ -237,11 +255,21 @@ namespace RosettaUI.UIToolkit
                 CursorManager.ResetCursor();
             }
         }
+        
+        private void OnFocus(FocusEvent evt)
+        {
+            IsFocused = true;
+        }
+        
+        private void OnBlur(BlurEvent evt)
+        {
+            IsFocused = false;
+        }
 
         #endregion
 
 
-        void FinishDrag()
+        private void FinishDrag()
         {
             _dragMode = DragMode.None;
             UnregisterPanelCallback();
@@ -249,7 +277,7 @@ namespace RosettaUI.UIToolkit
             ResetCursor();
         }
 
-        void ResetCursor()
+        private void ResetCursor()
         {
             if (_resizeEdge != ResizeEdge.None)
             {
@@ -260,8 +288,8 @@ namespace RosettaUI.UIToolkit
         #region DragWindow
 
         private bool _beforeDrag;
-        
-        void StartDragWindow(Vector2 localPosition)
+
+        private void StartDragWindow(Vector2 localPosition)
         {
             _dragMode = DragMode.DragWindow;
             _draggingLocalPosition = localPosition;
@@ -269,13 +297,13 @@ namespace RosettaUI.UIToolkit
             _beforeDrag = true;
         }
 
-        Vector2 WorldToDragRootLocal(Vector2 worldPosition)
+        private Vector2 WorldToDragRootLocal(Vector2 worldPosition)
         {
             return dragRoot?.WorldToLocal(worldPosition) ?? worldPosition;
         }
 
 
-        void UpdateDragWindow(Vector2 worldPosition)
+        private void UpdateDragWindow(Vector2 worldPosition)
         {
             var localPosition = WorldToDragRootLocal(worldPosition);
             var pos = localPosition - _draggingLocalPosition;
@@ -297,7 +325,7 @@ namespace RosettaUI.UIToolkit
         }
 
 
-        void RegisterPanelCallback()
+        private void RegisterPanelCallback()
         {
             var root = panel.visualTree;
             root.RegisterCallback<PointerMoveEvent>(OnPointerMoveOnRoot);
@@ -319,7 +347,7 @@ namespace RosettaUI.UIToolkit
 
         #region Resize Window
 
-        void StartResizeWindow()
+        private void StartResizeWindow()
         {
             _dragMode = DragMode.ResizeWindow;
         }
@@ -359,7 +387,7 @@ namespace RosettaUI.UIToolkit
         }
 
 
-        ResizeEdge CalcEdge(Vector2 localPosition)
+        private ResizeEdge CalcEdge(Vector2 localPosition)
         {
             const float edgeWidth = 4f;
             var top = localPosition.y <= edgeWidth;
@@ -389,7 +417,7 @@ namespace RosettaUI.UIToolkit
             return edge;
         }
 
-        static CursorType ToCursorType(ResizeEdge edge)
+        private static CursorType ToCursorType(ResizeEdge edge)
         {
             var type = CursorType.Default;
 
@@ -415,13 +443,13 @@ namespace RosettaUI.UIToolkit
         }
 
 
-        void UpdateResizeEdgeAndCursor(Vector2 localPosition)
+        private void UpdateResizeEdgeAndCursor(Vector2 localPosition)
         {
             _resizeEdge = CalcEdge(localPosition);
             SetResizeCursor();
         }
 
-        void SetResizeCursor()
+        private void SetResizeCursor()
         {
             var cursorType = ToCursorType(_resizeEdge);
 
@@ -465,7 +493,7 @@ namespace RosettaUI.UIToolkit
             Show();
         }
 
-        void SearchDragRootAndAdd(VisualElement target)
+        private void SearchDragRootAndAdd(VisualElement target)
         {
             dragRoot = target.panel.visualTree.Q<TemplateContainer>()
                        ?? target.panel.visualTree.Query(null, RosettaUIRootUIToolkit.USSRootClassName).First();

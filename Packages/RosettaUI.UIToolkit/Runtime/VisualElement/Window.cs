@@ -53,6 +53,7 @@ namespace RosettaUI.UIToolkit
         private Vector2 _draggingLocalPosition;
         private ResizeEdge _resizeEdge;
         private bool _focused;
+        private bool _closable;
         
         public bool IsMoved { get; protected set; }
         
@@ -66,16 +67,15 @@ namespace RosettaUI.UIToolkit
             get => _closeButton;
             set
             {
-                if (_closeButton != value)
+                if (_closeButton == value) return;
+                
+                if (_closeButton != null)
                 {
-                    if (_closeButton != null)
-                    {
-                        TitleBarContainerRight.Remove(_closeButton);
-                    }
-
-                    _closeButton = value;
-                    TitleBarContainerRight.Add(_closeButton);
+                    TitleBarContainerRight.Remove(_closeButton);
                 }
+
+                _closeButton = value;
+                TitleBarContainerRight.Add(_closeButton);
             }
         }
         
@@ -114,11 +114,43 @@ namespace RosettaUI.UIToolkit
             }
         }
 
-        public Window() : this(true)
+        public bool Closable
+        {
+            get => _closable;
+            set
+            {
+                if (_closable == value) return;
+                _closable = value;
+
+                if (_closable)
+                {
+                    RegisterCallback<KeyDownEvent>(OnKeyDown);
+                    
+                    if ( CloseButton == null)
+                    { 
+                        CloseButton = new WindowTitleButton();
+                        CloseButton.clicked += Hide;
+                    }
+
+                    CloseButton.visible = true;
+                }
+                else
+                {
+                    UnregisterCallback<KeyDownEvent>(OnKeyDown);
+                    
+                    if (CloseButton != null)
+                    {
+                        CloseButton.visible = false;
+                    }
+                }
+            }
+        }
+
+        public Window() : this(true, true)
         {
         }
 
-        public Window(bool resizable)
+        public Window(bool resizable, bool closable)
         {
             this.resizable = resizable;
 
@@ -135,17 +167,15 @@ namespace RosettaUI.UIToolkit
             _titleBarContainer.Add(TitleBarContainerRight);
             hierarchy.Add(_titleBarContainer);
 
-            CloseButton = new WindowTitleButton();
-            CloseButton.clicked += Hide;
-            
             _contentContainer.AddToClassList(UssClassNameContentContainer);
             hierarchy.Add(_contentContainer);
+
+            Closable = closable;
 
             RegisterCallback<PointerDownEvent>(OnPointerDownTrickleDown, TrickleDown.TrickleDown);
             RegisterCallback<PointerDownEvent>(OnPointerDown);
             RegisterCallback<MouseMoveEvent>(OnMouseMove);
             RegisterCallback<MouseOutEvent>(OnMouseOut);
-            RegisterCallback<KeyDownEvent>(OnKeyDown);
             RegisterCallback<FocusEvent>(OnFocus, TrickleDown.TrickleDown);
             RegisterCallback<BlurEvent>(OnBlur, TrickleDown.TrickleDown);
 
@@ -267,9 +297,9 @@ namespace RosettaUI.UIToolkit
         
         private void OnKeyDown(KeyDownEvent evt)
         {
-            if (!IsFocused || hideKey == KeyCode.None) return;
+            if (!IsFocused || closeKey == KeyCode.None) return;
 
-            if (evt.keyCode == hideKey && evt.modifiers == hideKeyModifiers)
+            if (evt.keyCode == closeKey && evt.modifiers == closeKeyModifiers)
             {
                 Hide();
             }

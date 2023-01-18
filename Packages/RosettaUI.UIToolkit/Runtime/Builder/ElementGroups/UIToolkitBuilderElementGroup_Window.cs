@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using RosettaUI.Reactive;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -17,7 +18,8 @@ namespace RosettaUI.UIToolkit.Builder
                 window.TitleBarContainerLeft.Add(Build(windowElement.Header));
             }
 
-            window.CloseButton.clicked += OnCloseButtonClicked;
+            window.onShow += OnShow;
+            window.onHide += OnHide;
             
             var openDisposable = windowElement.IsOpenRx.SubscribeAndCallOnce(isOpen =>
             {
@@ -42,14 +44,18 @@ namespace RosettaUI.UIToolkit.Builder
 
             windowElement.GetViewBridge().onUnsubscribe += () =>
             {
-                window.CloseButton.clicked -= OnCloseButtonClicked;
+                window.onShow -= OnShow;
+                window.onHide -= OnHide;
+
                 openDisposable.Dispose();
                 positionDisposable.Dispose();
             };
             
             return Bind_ElementGroupContents(windowElement, window);
 
-            void OnCloseButtonClicked() =>  windowElement.Enable = !windowElement.Enable;
+
+            void OnShow() => windowElement.Enable = true;
+            void OnHide() => windowElement.Enable = false;
         }
     }
 }

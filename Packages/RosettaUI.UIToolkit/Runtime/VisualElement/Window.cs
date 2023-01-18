@@ -35,7 +35,14 @@ namespace RosettaUI.UIToolkit
         private const string UssClassNameTitleBarContainerRight = UssClassNameTitleBarContainer + "__right";
         private const string UssClassNameContentContainer = UssClassName + "__content-container";
 
+        public static KeyCode closeKey = KeyCode.Q;
+        public static EventModifiers closeKeyModifiers = EventModifiers.None;
+
         public readonly bool resizable;
+        
+        public event Action onShow;
+        public event Action onHide;
+        
         protected VisualElement dragRoot;
 
         private readonly VisualElement _titleBarContainer = new();
@@ -138,6 +145,7 @@ namespace RosettaUI.UIToolkit
             RegisterCallback<PointerDownEvent>(OnPointerDown);
             RegisterCallback<MouseMoveEvent>(OnMouseMove);
             RegisterCallback<MouseOutEvent>(OnMouseOut);
+            RegisterCallback<KeyDownEvent>(OnKeyDown);
             RegisterCallback<FocusEvent>(OnFocus, TrickleDown.TrickleDown);
             RegisterCallback<BlurEvent>(OnBlur, TrickleDown.TrickleDown);
 
@@ -253,6 +261,17 @@ namespace RosettaUI.UIToolkit
             if (_dragMode != DragMode.ResizeWindow)
             {
                 CursorManager.ResetCursor();
+            }
+        }
+        
+        
+        private void OnKeyDown(KeyDownEvent evt)
+        {
+            if (!IsFocused || hideKey == KeyCode.None) return;
+
+            if (evt.keyCode == hideKey && evt.modifiers == hideKeyModifiers)
+            {
+                Hide();
             }
         }
         
@@ -467,11 +486,14 @@ namespace RosettaUI.UIToolkit
         public virtual void Show()
         {
             style.display = DisplayStyle.Flex;
+            Focus();
+            onShow?.Invoke();
         }
 
         public virtual void Hide()
         {
             style.display = DisplayStyle.None;
+            onHide?.Invoke();
         }
 
         public virtual void Show(VisualElement target)

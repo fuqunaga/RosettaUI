@@ -12,11 +12,13 @@ namespace RosettaUI.UIToolkit.Builder
             if (element is not WindowElement windowElement || visualElement is not Window window) return false;
 
             var titleBarLeft = window.TitleBarContainerLeft.Children().FirstOrDefault();
-            var bound = titleBarLeft != null && Bind(windowElement.Header, titleBarLeft);
-            if (!bound)
+            var successBind = titleBarLeft != null && Bind(windowElement.Header, titleBarLeft);
+            if (!successBind)
             {
                 window.TitleBarContainerLeft.Add(Build(windowElement.Header));
             }
+            
+            window.Closable = windowElement.Closable;
 
             window.onShow += OnShow;
             window.onHide += OnHide;

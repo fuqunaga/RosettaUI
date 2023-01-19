@@ -54,6 +54,7 @@ namespace RosettaUI.UIToolkit
         private ResizeEdge _resizeEdge;
         private bool _focused;
         private bool _closable;
+        private IVisualElementScheduledItem _focusTask;
 
         public bool IsMoved { get; protected set; }
 
@@ -106,6 +107,7 @@ namespace RosettaUI.UIToolkit
             get => _focused;
             protected set
             {
+                _focusTask?.Pause();
                 if (_focused == value) return;
 
                 _focused = value;
@@ -156,6 +158,7 @@ namespace RosettaUI.UIToolkit
 
             focusable = true;
             pickingMode = PickingMode.Position;
+            tabIndex = -1;
 
             AddToClassList(UssClassName);
 
@@ -261,14 +264,19 @@ namespace RosettaUI.UIToolkit
             }
         }
 
+        // Focusは短時間で複数回変わるケースがあるので様子を見る
+        // ・Window内の要素同士でのフォーカスの移動
+        // ・PopupFieldをクリックすると一度WindowがFocusになったあとDropdownMenuにフォーカスが移る
         private void OnFocus(FocusEvent evt)
         {
-            IsFocused = true;
+            _focusTask?.Pause();
+            _focusTask = schedule.Execute(() => IsFocused = true).StartingIn(50);
         }
 
         private void OnBlur(BlurEvent evt)
         {
-            IsFocused = false;
+            _focusTask?.Pause();
+            _focusTask = schedule.Execute(() => IsFocused = false).StartingIn(50);
         }
 
         #endregion

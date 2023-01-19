@@ -60,15 +60,8 @@ namespace RosettaUI.UIToolkit
 
         public override void Hide()
         {
-            UnregisterPanelCallback();
-
+            base.Hide();
             _eventBlockerElement.RemoveFromHierarchy();
-
-            /*
-            if (m_TargetElement != null)
-                m_TargetElement.pseudoStates ^= PseudoStates.Active;
-            m_TargetElement = null;
-            */
         }
 
         private void Apply(KeyboardNavigationOperation op, EventBase sourceEvent)
@@ -168,7 +161,9 @@ namespace RosettaUI.UIToolkit
             }
             */
 
+            if (worldBound.Contains(evt.position)) return;
             Hide();
+            evt.StopPropagation();
         }
 
 #if false

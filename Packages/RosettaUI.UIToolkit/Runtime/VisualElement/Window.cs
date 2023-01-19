@@ -39,10 +39,10 @@ namespace RosettaUI.UIToolkit
         public static EventModifiers closeKeyModifiers = EventModifiers.None;
 
         public readonly bool resizable;
-        
+
         public event Action onShow;
         public event Action onHide;
-        
+
         protected VisualElement dragRoot;
 
         private readonly VisualElement _titleBarContainer = new();
@@ -54,9 +54,9 @@ namespace RosettaUI.UIToolkit
         private ResizeEdge _resizeEdge;
         private bool _focused;
         private bool _closable;
-        
+
         public bool IsMoved { get; protected set; }
-        
+
         public VisualElement TitleBarContainerLeft { get; } = new();
 
         public VisualElement TitleBarContainerRight { get; } = new();
@@ -68,7 +68,7 @@ namespace RosettaUI.UIToolkit
             set
             {
                 if (_closeButton == value) return;
-                
+
                 if (_closeButton != null)
                 {
                     TitleBarContainerRight.Remove(_closeButton);
@@ -78,7 +78,7 @@ namespace RosettaUI.UIToolkit
                 TitleBarContainerRight.Add(_closeButton);
             }
         }
-        
+
         protected virtual VisualElement SelfRoot => this;
 
         public override VisualElement contentContainer => _contentContainer;
@@ -107,9 +107,9 @@ namespace RosettaUI.UIToolkit
             protected set
             {
                 if (_focused == value) return;
-                
+
                 _focused = value;
-                if ( _focused) AddToClassList(UssClassNameFocused);
+                if (_focused) AddToClassList(UssClassNameFocused);
                 else RemoveFromClassList(UssClassNameFocused);
             }
         }
@@ -125,9 +125,9 @@ namespace RosettaUI.UIToolkit
                 if (_closable)
                 {
                     RegisterCallback<KeyDownEvent>(OnKeyDown);
-                    
-                    if ( CloseButton == null)
-                    { 
+
+                    if (CloseButton == null)
+                    {
                         CloseButton = new WindowTitleButton();
                         CloseButton.clicked += Hide;
                     }
@@ -137,7 +137,7 @@ namespace RosettaUI.UIToolkit
                 else
                 {
                     UnregisterCallback<KeyDownEvent>(OnKeyDown);
-                    
+
                     if (CloseButton != null)
                     {
                         CloseButton.visible = false;
@@ -162,7 +162,7 @@ namespace RosettaUI.UIToolkit
             _titleBarContainer.AddToClassList(UssClassNameTitleBarContainer);
             TitleBarContainerLeft.AddToClassList(UssClassNameTitleBarContainerLeft);
             TitleBarContainerRight.AddToClassList(UssClassNameTitleBarContainerRight);
-            
+
             _titleBarContainer.Add(TitleBarContainerLeft);
             _titleBarContainer.Add(TitleBarContainerRight);
             hierarchy.Add(_titleBarContainer);
@@ -172,28 +172,31 @@ namespace RosettaUI.UIToolkit
 
             Closable = closable;
 
+
+            this.AddBoxShadow();
+
+            // ResizeはWindowの少し外側から有効
+            // BoxShadowがWindow外のサイズをもつ子供のエレメントなので
+            // PointerMoveEventを拾うように有効化する
+            if (this.resizable)
+            {
+                var boxShadow = this.Q<BoxShadow>();
+                boxShadow.pickingMode = PickingMode.Position;
+                RegisterCallback<PointerMoveEvent>(OnPointerMove);
+            }
+
             RegisterCallback<PointerDownEvent>(OnPointerDownTrickleDown, TrickleDown.TrickleDown);
             RegisterCallback<PointerDownEvent>(OnPointerDown);
-            RegisterCallback<MouseMoveEvent>(OnMouseMove);
-            RegisterCallback<MouseOutEvent>(OnMouseOut);
             RegisterCallback<FocusEvent>(OnFocus, TrickleDown.TrickleDown);
             RegisterCallback<BlurEvent>(OnBlur, TrickleDown.TrickleDown);
 
-            
             RegisterCallback<ChangeVisibleEvent>(_ =>
             {
                 style.width = StyleKeyword.Null;
                 ResetFixedSize();
             });
-            
-            // Focusable.ExecuteDefaultEvent() 内の this.focusController?.SwitchFocusOnEvent(evt) で
-            // NavigationMoveEvent 方向にフォーカスを移動しようとする
-            // キー入力をしている場合などにフォーカスが移ってしまうのは避けたいのでWindow単位で抑制しておく
-            // UnityデフォルトでもTextFieldは抑制できているが、IntegerField.inputFieldでは出来ていないなど挙動に一貫性がない
-            RegisterCallback<NavigationMoveEvent>(evt => evt.PreventDefault());
 
-            this.AddBoxShadow();
-            
+
             ResetFixedSize();
         }
 
@@ -209,7 +212,7 @@ namespace RosettaUI.UIToolkit
             {
                 if (Time.frameCount <= startFrameCount) return;
                 style.width = layout.width;
-            }).Until(() => Time.frameCount > startFrameCount); 
+            }).Until(() => Time.frameCount > startFrameCount);
         }
 
 
@@ -222,79 +225,27 @@ namespace RosettaUI.UIToolkit
 
         protected virtual void OnPointerDown(PointerDownEvent evt)
         {
-            if (evt.button == 0)
-            {
-                if (_resizeEdge != ResizeEdge.None)
-                {
-                    StartResizeWindow();
-                }
-                else
-                {
-                    StartDragWindow(evt.localPosition);
-                }
+            if (evt.button != 0) return;
 
-                RegisterPanelCallback();
+            if (_resizeEdge != ResizeEdge.None)
+            {
+                StartDrag(DragMode.ResizeWindow);
                 evt.StopPropagation();
             }
-        }
-
-        protected virtual void OnPointerMoveOnRoot(PointerMoveEvent evt)
-        {
-            if (_dragMode != DragMode.None)
+            // BoxShadowがWindowの範囲より広いのでWindow外のポインタイベントも入ってくる
+            else if (layout.Contains(evt.position))
             {
-                // 画面外でボタンをUpされた場合検知できないので、現在押下中かどうかで判定する
-                if ((evt.pressedButtons & 0x1) != 0)
-                {
-                    switch (_dragMode)
-                    {
-                        case DragMode.DragWindow:
-                            UpdateDragWindow(evt.position);
-                            break;
-
-                        case DragMode.ResizeWindow:
-                            UpdateResizeWindow(evt.position);
-                            break;
-                        
-                        case DragMode.None:
-                        default:
-                            break;
-                    }
-                }
-                else
-                {
-                    FinishDrag();
-                }
+                StartDragWindow(evt.localPosition);
             }
         }
 
-
-        protected virtual void OnPointerUpOnRoot(PointerUpEvent evt)
+        protected virtual void OnPointerMove(PointerMoveEvent evt)
         {
-            if (evt.button == 0)
-            {
-                _dragMode = DragMode.None;
-                FinishDrag();
-            }
+            if (_dragMode != DragMode.None) return;
+
+            UpdateResizeEdgeAndCursor(evt.localPosition);
         }
 
-
-        protected virtual void OnMouseMove(MouseMoveEvent evt)
-        {
-            if (resizable && _dragMode == DragMode.None)
-            {
-                UpdateResizeEdgeAndCursor(evt.localMousePosition);
-            }
-        }
-
-        protected virtual void OnMouseOut(MouseOutEvent evt)
-        {
-            if (_dragMode != DragMode.ResizeWindow)
-            {
-                CursorManager.ResetCursor();
-            }
-        }
-        
-        
         private void OnKeyDown(KeyDownEvent evt)
         {
             if (!IsFocused || closeKey == KeyCode.None) return;
@@ -304,12 +255,12 @@ namespace RosettaUI.UIToolkit
                 Hide();
             }
         }
-        
+
         private void OnFocus(FocusEvent evt)
         {
             IsFocused = true;
         }
-        
+
         private void OnBlur(BlurEvent evt)
         {
             IsFocused = false;
@@ -317,22 +268,77 @@ namespace RosettaUI.UIToolkit
 
         #endregion
 
+        
+        #region Drag(DragWindow or Resize)
 
+        private void StartDrag(DragMode dragMode)
+        {
+            _dragMode = dragMode;
+            RegisterPanelCallback();
+        }
+        
         private void FinishDrag()
         {
+            if (_dragMode == DragMode.None) return;
+            
             _dragMode = DragMode.None;
             UnregisterPanelCallback();
 
-            ResetCursor();
+            CursorManager.ResetCursor();
+        }
+        
+        private void RegisterPanelCallback()
+        {
+            var root = panel.visualTree;
+            root.RegisterCallback<PointerMoveEvent>(OnPointerMoveOnPanel);
+            root.RegisterCallback<PointerUpEvent>(OnPointerUpOnPanel);
         }
 
-        private void ResetCursor()
+        private void UnregisterPanelCallback()
         {
-            if (_resizeEdge != ResizeEdge.None)
+            var root = panel?.visualTree;
+            if (root == null) return;
+            root.UnregisterCallback<PointerMoveEvent>(OnPointerMoveOnPanel);
+            root.UnregisterCallback<PointerUpEvent>(OnPointerUpOnPanel);
+        }
+        
+        protected virtual void OnPointerMoveOnPanel(PointerMoveEvent evt)
+        {
+            if (_dragMode == DragMode.None) return;
+            
+            // 画面外でボタンをUpされた場合検知できないので、現在押下中かどうかで判定する
+            if ((evt.pressedButtons & 0x1) != 0)
             {
-                CursorManager.ResetCursor();
+                switch (_dragMode)
+                {
+                    case DragMode.DragWindow:
+                        UpdateDragWindow(evt.position);
+                        break;
+
+                    case DragMode.ResizeWindow:
+                        UpdateResizeWindow(evt.position);
+                        break;
+
+                    case DragMode.None:
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                FinishDrag();
             }
         }
+
+
+        protected virtual void OnPointerUpOnPanel(PointerUpEvent evt)
+        {
+            if (evt.button != 0) return;
+            FinishDrag();
+        }
+        
+        #endregion
+
 
         #region DragWindow
 
@@ -340,9 +346,8 @@ namespace RosettaUI.UIToolkit
 
         private void StartDragWindow(Vector2 localPosition)
         {
-            _dragMode = DragMode.DragWindow;
+            StartDrag(DragMode.DragWindow);
             _draggingLocalPosition = localPosition;
-
             _beforeDrag = true;
         }
 
@@ -356,7 +361,7 @@ namespace RosettaUI.UIToolkit
         {
             var localPosition = WorldToDragRootLocal(worldPosition);
             var pos = localPosition - _draggingLocalPosition;
-            
+
             // ListView の reorderable でアイテムをドラッグするときに Window が少し動いてしまう問題対策
             // ListView は一定距離 PointerMove で移動しないとドラッグ判定にはならないためその間 Window のドラッグが成立してしまう
             // Window も遊びを入れることで対処
@@ -374,37 +379,30 @@ namespace RosettaUI.UIToolkit
         }
 
 
-        private void RegisterPanelCallback()
-        {
-            var root = panel.visualTree;
-            root.RegisterCallback<PointerMoveEvent>(OnPointerMoveOnRoot);
-            root.RegisterCallback<PointerUpEvent>(OnPointerUpOnRoot);
-        }
-
-        protected void UnregisterPanelCallback()
-        {
-            var root = panel?.visualTree;
-            if (root != null)
-            {
-                root.UnregisterCallback<PointerMoveEvent>(OnPointerMoveOnRoot);
-                root.UnregisterCallback<PointerUpEvent>(OnPointerUpOnRoot);
-            }
-        }
-
         #endregion
-        
+
 
         #region Resize Window
 
-        private void StartResizeWindow()
+        private void UpdateResizeEdgeAndCursor(Vector2 localPosition)
         {
-            _dragMode = DragMode.ResizeWindow;
-        }
+            var prevResizeEdge = _resizeEdge;
+            _resizeEdge = CalcEdge(localPosition);
 
+            // _resizeEdgeがNoneではないとき、カーソルを変更
+            // _resizeEdgeがNoneのとき、
+            //  別のエレメントでカーソルが変わっていた場合はSetResizeCursor()したくない
+            //  このWindowがカーソルを変えていた場合は戻したい
+            //  →とりあえずprevResizeEdgeがNoneじゃなければ元に戻す
+            if (_resizeEdge != ResizeEdge.None || prevResizeEdge != ResizeEdge.None)
+            {
+                SetResizeCursor();
+            }
+        }
+        
         private void UpdateResizeWindow(Vector2 position)
         {
             SetResizeCursor();
-
 
             if (_resizeEdge.HasFlag(ResizeEdge.Top))
             {
@@ -438,31 +436,34 @@ namespace RosettaUI.UIToolkit
 
         private ResizeEdge CalcEdge(Vector2 localPosition)
         {
-            const float edgeWidth = 4f;
-            var top = localPosition.y <= edgeWidth;
-            var bottom = localPosition.y >= resolvedStyle.height - edgeWidth;
-            var left = localPosition.x <= edgeWidth;
-            var right = localPosition.x >= resolvedStyle.width - edgeWidth;
+            const float edgeWidthOuter = 4f;
+            const float edgeWidthInner = 2f;
+
+            var rect = new Rect() { size = layout.size };
+            var outerRect = new Rect()
+            {
+                min = -Vector2.one * edgeWidthOuter,
+                max = rect.size + Vector2.one * edgeWidthOuter
+            };
+            var innerRect = new Rect()
+            {
+                min = Vector2.one * edgeWidthInner,
+                max = rect.size - Vector2.one * edgeWidthInner
+            };
+
+            if (!outerRect.Contains(localPosition)) return ResizeEdge.None;
+
+            var top = localPosition.y <= innerRect.yMin;
+            var bottom = localPosition.y >= innerRect.yMax;
+            var left = localPosition.x <= innerRect.xMin;
+            var right = localPosition.x >= innerRect.xMax;
 
             var edge = ResizeEdge.None;
-            if (top)
-            {
-                edge |= ResizeEdge.Top;
-            }
-            else if (bottom)
-            {
-                edge |= ResizeEdge.Bottom;
-            }
-
-            if (left)
-            {
-                edge |= ResizeEdge.Left;
-            }
-            else if (right)
-            {
-                edge |= ResizeEdge.Right;
-            }
-
+            if (top) edge |= ResizeEdge.Top;
+            if (bottom) edge |= ResizeEdge.Bottom;
+            if (left) edge |= ResizeEdge.Left;
+            if (right) edge |= ResizeEdge.Right;
+            
             return edge;
         }
 
@@ -492,27 +493,15 @@ namespace RosettaUI.UIToolkit
         }
 
 
-        private void UpdateResizeEdgeAndCursor(Vector2 localPosition)
-        {
-            _resizeEdge = CalcEdge(localPosition);
-            SetResizeCursor();
-        }
-
         private void SetResizeCursor()
         {
             var cursorType = ToCursorType(_resizeEdge);
-
-            // カーソルを元に戻すのはOnMouseOutイベントで行う
-            // ここので元に戻すと子要素でカーソルを変化させてもここで上書きしてしまう
-            if (cursorType != CursorType.Default)
-            {
-                CursorManager.SetCursor(cursorType);
-            }
+            CursorManager.SetCursor(cursorType);
         }
 
         #endregion
 
-        
+
         public virtual void Show()
         {
             style.display = DisplayStyle.Flex;
@@ -523,6 +512,7 @@ namespace RosettaUI.UIToolkit
         public virtual void Hide()
         {
             style.display = DisplayStyle.None;
+            FinishDrag();
             onHide?.Invoke();
         }
 
@@ -549,7 +539,7 @@ namespace RosettaUI.UIToolkit
         {
             dragRoot = target.panel.visualTree.Q<TemplateContainer>()
                        ?? target.panel.visualTree.Query(null, RosettaUIRootUIToolkit.USSRootClassName).First();
-            
+
             dragRoot.Add(SelfRoot);
         }
 

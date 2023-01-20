@@ -130,7 +130,10 @@ namespace RosettaUI.UIToolkit
 
                     if (CloseButton == null)
                     {
-                        CloseButton = new WindowTitleButton();
+                        CloseButton = new WindowTitleButton()
+                        {
+                            tabIndex = -1
+                        };
                         CloseButton.clicked += Hide;
                     }
 

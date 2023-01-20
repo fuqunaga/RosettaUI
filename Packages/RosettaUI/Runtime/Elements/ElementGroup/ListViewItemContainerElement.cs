@@ -7,22 +7,6 @@ using UnityEngine.Pool;
 
 namespace RosettaUI
 {
-    public class ListViewOption
-    {
-        private static ListViewOption _default;
-        public static ListViewOption Default => _default ?? new (true, false);
-        
-        public readonly bool reorderable;
-        public readonly bool fixedSize;
-
-        public ListViewOption(bool reorderable, bool fixedSize)
-        {
-            this.reorderable = reorderable;
-            this.fixedSize = fixedSize;
-        }
-    }
-    
-    
     /// <summary>
     /// ListViewの要素を表示するエレメント
     /// Foldや要素数フィールドのようなヘッダー要素はほかのElementと組み合わせて実現する

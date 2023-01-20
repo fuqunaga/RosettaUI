@@ -69,9 +69,9 @@ namespace RosettaUI
         {
             var option = (binder is IPropertyOrFieldBinder pfBinder)
                 ? new ListViewOption(
-                    TypeUtility.IsReorderable(pfBinder.ParentBinder.ValueType, pfBinder.PropertyOrFieldName),
-                    false)
-                : null;
+                    reorderable: TypeUtility.IsReorderable(pfBinder.ParentBinder.ValueType, pfBinder.PropertyOrFieldName)
+                )
+                : ListViewOption.Default;
 
 
             return UI.List(label, binder, null, option);

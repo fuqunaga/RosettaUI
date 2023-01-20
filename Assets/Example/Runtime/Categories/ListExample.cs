@@ -16,6 +16,8 @@ namespace RosettaUI.Example
         
         public Element CreateElement(LabelElement _)
         {
+            var listViewOption = ListViewOption.Default;
+            
             return UI.Tabs(
                 ExampleTemplate.UIFunctionTab(nameof(UI.List),
                     UI.List(() => intArray),
@@ -48,10 +50,22 @@ namespace RosettaUI.Example
                         )
                     ),
                     ExampleTemplate.CodeElementSets("Options",
-                        ("UI.List(() => intArray, new ListViewOption(reorderable: false, fixedSize: false));",
-                            UI.List(() => intArray, new ListViewOption(reorderable: false, fixedSize: false))),
-                        ("UI.List(() => intArray, new ListViewOption(reorderable: true,  fixedSize: true));",
-                            UI.List(() => intArray, new ListViewOption(reorderable: true, fixedSize: true)))),
+                        (@"var listViewOption = ListViewOption.Default;
+
+UI.Field(() => listViewOption).Open(),
+UI.DynamicElementOnStatusChanged(
+    () => listViewOption,
+    _ => UI.List(() => intArray, listViewOption)
+)",
+                            UI.Column(
+                                UI.Field(() => listViewOption).Open(),
+                                UI.DynamicElementOnStatusChanged(
+                                    () => listViewOption,
+                                    _ => UI.List(() => intArray, listViewOption)
+                                )
+                            )
+                        )
+                    ),
                     ExampleTemplate.CodeElementSets("<b>Attribute</b>",
                         (@"[NonReorderable]
 public int[] nonReorderableArray;

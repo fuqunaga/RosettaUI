@@ -226,12 +226,12 @@ namespace RosettaUI.UIToolkit
 
         #region Event
 
-        protected virtual void OnPointerDownTrickleDown(PointerDownEvent evt)
+        private void OnPointerDownTrickleDown(PointerDownEvent evt)
         {
             BringToFront();
         }
 
-        protected virtual void OnPointerDown(PointerDownEvent evt)
+        private void OnPointerDown(PointerDownEvent evt)
         {
             if (evt.button != 0) return;
 
@@ -247,7 +247,7 @@ namespace RosettaUI.UIToolkit
             }
         }
 
-        protected virtual void OnPointerMove(PointerMoveEvent evt)
+        private void OnPointerMove(PointerMoveEvent evt)
         {
             if (_dragMode != DragMode.None) return;
 
@@ -269,26 +269,24 @@ namespace RosettaUI.UIToolkit
         // ・PopupFieldをクリックすると一度WindowがFocusになったあとDropdownMenuにフォーカスが移る
         private void OnFocus(FocusEvent evt)
         {
-            Debug.Log(nameof(OnFocus));
             _focusTask?.Pause();
             _focusTask = schedule.Execute(() => IsFocused = true);
         }
 
         private void OnBlur(BlurEvent evt)
         {
-            Debug.Log(nameof(OnBlur));
             var relatedTarget = evt.relatedTarget;
             
             _focusTask?.Pause();
             _focusTask = schedule.Execute(() =>
             {
+                // DropdownMenuはこのWindowの子ではないが見た目上子供のような挙動が自然
+                // 簡易的にWindow内ではないVisualElementはDropdownMenu（などのポップアップ）と判定
+                // DropdownMenu中はIsFocused==falseにせずに見た目をキープし、
+                // DropdownMenuが削除されたらFocus()で正しいフォーカス状態（キー入力を受け付ける）に戻す
                 if (relatedTarget is VisualElement visualElement && !IsInWindow(visualElement))
                 {
-                    visualElement.RegisterCallback<DetachFromPanelEvent>(_ =>
-                    {
-                        Debug.Log(nameof(DetachFromPanelEvent) + "Menu");
-                        Focus();
-                    });
+                    visualElement.RegisterCallback<DetachFromPanelEvent>(_ => Focus());
                 }
                 else
                 {

@@ -1,6 +1,5 @@
 using System;
 using RosettaUI.Builder;
-using RosettaUI.UIToolkit.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -22,20 +21,28 @@ namespace RosettaUI.UIToolkit
                 _window = new ModalWindow();
                 _colorPickerInstance = new ColorPicker();
                 _window.Add(_colorPickerInstance);
+
+                _window.RegisterCallback<NavigationSubmitEvent>(_ => _window.Hide());
+                _window.RegisterCallback<NavigationCancelEvent>(_ =>
+                {
+                    onColorChanged?.Invoke(initialColor);
+                    _window.Hide();
+                });
             }
 
             _window.Show(position, target);
 
-            // Show()前はPanelが設定されていないのでコールバック系はShow()
+            // Show()前はPanelが設定されていないのでコールバック系はShow()後
             _colorPickerInstance.PrevColor = initialColor;
             _colorPickerInstance.onColorChanged += onColorChanged;
             _colorPickerInstance.RegisterCallback<DetachFromPanelEvent>(OnDetach);
-
 
             void OnDetach(DetachFromPanelEvent _)
             {
                 _colorPickerInstance.onColorChanged -= onColorChanged;
                 _colorPickerInstance.UnregisterCallback<DetachFromPanelEvent>(OnDetach);
+                
+                target?.Focus();
             }
         }
 
@@ -137,7 +144,7 @@ namespace RosettaUI.UIToolkit
             _sliderSet = new SliderSet(this);
             InitHex();
         }
-        
+
         private void InitPreview()
         {
             var preview = this.Q("preview");

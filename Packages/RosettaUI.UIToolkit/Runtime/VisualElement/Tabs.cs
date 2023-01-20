@@ -83,7 +83,10 @@ namespace RosettaUI.UIToolkit
         private void DoAddTab(VisualElement header, VisualElement content)
         {
             var index = _tabs.Count;
-            var titleVe = new Button(() => CurrentTabIndex = index);
+            var titleVe = new Button(() => CurrentTabIndex = index)
+            {
+                tabIndex = -1
+            };
             titleVe.ClearClassList();
             titleVe.AddToClassList(UssClassNameTitle);
             titleVe.Add(header);

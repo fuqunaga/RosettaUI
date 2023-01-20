@@ -34,7 +34,7 @@ namespace RosettaUI.Example
         {
             return UI.Window(
                 ExampleTypes.Select(type => UI.WindowLauncher(null, false, false, false, type))
-            );
+            ).SetClosable(false);
         }
 
         void Update()

@@ -24,7 +24,8 @@
     
     
     --rosettaui-color-input-background: #181818;
-    --rosettaui-color-window-background: rgba(45, 45, 45, 0.9);
+    --rosettaui-color-window-background: rgba(45, 45, 45, 0.85);
+    --rosettaui-color-window-background-focused: rgba(45, 45, 45, 0.9);
     --rosettaui-color-box-background: rgba(100,100,100,0.3);
     --rosettaui-color-list-background: var(--rosettaui-color-box-background);
     --rosettaui-color-tabs-title-inactive-background: rgba(0,0,0,0.4);
@@ -50,6 +51,11 @@
     -unity-slice-left: 21;
 }
 
+.rosettaui-window--focused > .rosettaui-box-shadow {
+    -unity-background-image-tint-color: rgba(0,4,16,0.8);
+}
+
+
 
 /********************************************************************************
 * Window
@@ -67,6 +73,10 @@
     padding-bottom: 8px;
 }
 
+.rosettaui-window--focused {
+    background-color: var(--rosettaui-color-window-background-focused);
+}
+
 .rosettaui-window__titlebar-container {
     /*margin: var(--window-border-width-inverse) var(--window-border-width-inverse) 0px var(--window-border-width-inverse);*/
     margin: 2px;
@@ -76,6 +86,9 @@
 .rosettaui-window__titlebar-container__right {
     align-content: flex-end;
     margin-left: auto;
+    margin-top: -2px;
+    margin-bottom: -2px;
+    margin-right: -2px;
 }
 
 .rosettaui-window-title-button {

@@ -202,17 +202,13 @@ namespace RosettaUI.UIToolkit.Builder
         protected override void OnElementEnableChanged(Element _, VisualElement ve, bool enable)
         {
             var display = enable ? DisplayStyle.Flex : DisplayStyle.None;
-            if (ve.resolvedStyle.display != display)
-            {
-                ve.style.display = display;
-            }
+            ve.style.display = display;
         }
 
         protected override void OnElementInteractableChanged(Element _, VisualElement ve, bool interactable)
         {
             ve.SetEnabled(interactable);
         }
-
 
         protected override void OnElementStyleChanged(Element element, VisualElement ve, Style style)
         {

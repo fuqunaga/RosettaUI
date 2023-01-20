@@ -20,8 +20,6 @@ namespace RosettaUI.UIToolkit
             if (_window == null)
             {
                 _window = new ModalWindow();
-                _window.AddBoxShadow();
-                
                 _colorPickerInstance = new ColorPicker();
                 _window.Add(_colorPickerInstance);
             }

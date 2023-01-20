@@ -598,6 +598,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de292b76e20316349842181a7da14d32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  closeWindowKey: 113
+  closeWindowKeyModifiers: 0
 --- !u!4 &852668086
 Transform:
   m_ObjectHideFlags: 0

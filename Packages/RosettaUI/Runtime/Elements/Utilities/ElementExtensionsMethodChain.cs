@@ -127,6 +127,12 @@ namespace RosettaUI
         public static T Close<T>(this T element, bool recursive = false) where T : Element
             => element.SetOpenFlag(false);
 
+        public static WindowElement SetClosable(this WindowElement windowElement, bool closable)
+        {
+            windowElement.Closable = closable;
+            return windowElement;
+        }
+        
         public static WindowElement SetPosition(this WindowElement windowElement, Vector2? position)
         {
             windowElement.Position = position;

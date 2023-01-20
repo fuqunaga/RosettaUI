@@ -11,51 +11,27 @@ namespace RosettaUI.UIToolkit
     /// </summary>
     public class ModalWindow : Window
     {
-        readonly VisualElement _eventBlockerElement;
-        KeyboardNavigationManipulator _navigationManipulator;
-
         private const string USSClassNameEventBlocker = "rosettaui-modal-window-event-blocker";
         private const string USSClassName = "rosettaui-modal-window";
 
+        private readonly VisualElement _eventBlockerElement;
+        private KeyboardNavigationManipulator _navigationManipulator;
+
         protected override VisualElement SelfRoot => _eventBlockerElement;
 
-        public ModalWindow() : base(false)
+        public ModalWindow() : base(false, true)
         {
-            CloseButton = new WindowTitleButton();
-            CloseButton.clicked += Hide;
-            CloseButton.visible = false;
-
             _eventBlockerElement = new VisualElement();
             _eventBlockerElement.AddToClassList(USSClassNameEventBlocker);
             _eventBlockerElement.Add(this);
 
             AddToClassList(USSClassName);
 
-            /*
-            m_OuterContainer = new VisualElement();
-            m_OuterContainer.AddToClassList(containerOuterUssClassName);
-            m_MenuContainer.Add(m_OuterContainer);
-
-            m_ScrollView = new ScrollView();
-            m_ScrollView.AddToClassList(containerInnerUssClassName);
-            m_ScrollView.pickingMode = PickingMode.Position;
-            m_ScrollView.contentContainer.focusable = true;
-            m_ScrollView.touchScrollBehavior = ScrollView.TouchScrollBehavior.Clamped;
-            m_OuterContainer.hierarchy.Add(m_ScrollView);
-
-            */
-
-            /*
-            RegisterCallback<PointerMoveEvent>(OnPointerMove);
-            RegisterCallback<PointerUpEvent>(OnPointerUp);
-            */
-
-
             _eventBlockerElement.RegisterCallback<AttachToPanelEvent>(OnAttachToPanel);
             _eventBlockerElement.RegisterCallback<DetachFromPanelEvent>(OnDetachFromPanel);
         }
 
-        void OnAttachToPanel(AttachToPanelEvent evt)
+        private void OnAttachToPanel(AttachToPanelEvent evt)
         {
             if (evt.destinationPanel == null)
                 return;
@@ -67,7 +43,7 @@ namespace RosettaUI.UIToolkit
             //RegisterCallback<FocusOutEvent>(OnFocusOut);
         }
 
-        void OnDetachFromPanel(DetachFromPanelEvent evt)
+        private void OnDetachFromPanel(DetachFromPanelEvent evt)
         {
             if (evt.originPanel == null)
                 return;
@@ -84,18 +60,11 @@ namespace RosettaUI.UIToolkit
 
         public override void Hide()
         {
-            UnregisterPanelCallback();
-
+            base.Hide();
             _eventBlockerElement.RemoveFromHierarchy();
-
-            /*
-            if (m_TargetElement != null)
-                m_TargetElement.pseudoStates ^= PseudoStates.Active;
-            m_TargetElement = null;
-            */
         }
 
-        void Apply(KeyboardNavigationOperation op, EventBase sourceEvent)
+        private void Apply(KeyboardNavigationOperation op, EventBase sourceEvent)
         {
             if (Apply(op))
             {
@@ -104,7 +73,7 @@ namespace RosettaUI.UIToolkit
             }
         }
 
-        bool Apply(KeyboardNavigationOperation op)
+        private bool Apply(KeyboardNavigationOperation op)
         {
             /*
             var selectedIndex = GetSelectedIndex();
@@ -180,7 +149,7 @@ namespace RosettaUI.UIToolkit
         }
 
 
-        void OnPointerDownOnBlocker(PointerDownEvent evt)
+        private void OnPointerDownOnBlocker(PointerDownEvent evt)
         {
             /*
             m_MousePosition = m_ScrollView.WorldToLocal(evt.position);
@@ -192,7 +161,9 @@ namespace RosettaUI.UIToolkit
             }
             */
 
+            if (worldBound.Contains(evt.position)) return;
             Hide();
+            evt.StopPropagation();
         }
 
 #if false
@@ -326,7 +297,7 @@ namespace RosettaUI.UIToolkit
     /// </summary>
     public class KeyboardNavigationManipulator : Manipulator
     {
-        readonly Action<KeyboardNavigationOperation, EventBase> m_Action;
+        private readonly Action<KeyboardNavigationOperation, EventBase> m_Action;
 
         /// <summary>
         /// Initializes and returns an instance of KeyboardNavigationManipulator, configured to invoke the specified callback.
@@ -366,7 +337,7 @@ namespace RosettaUI.UIToolkit
                 OnRuntimeKeyDown(evt);
         }
 
-        void OnRuntimeKeyDown(KeyDownEvent evt)
+        private void OnRuntimeKeyDown(KeyDownEvent evt)
         {
             // At the moment these actions are not mapped dynamically in the InputSystemEventSystem component.
             // When that becomes the case in the future, remove the following and use corresponding Navigation events.
@@ -388,7 +359,7 @@ namespace RosettaUI.UIToolkit
             Invoke(GetOperation(), evt);
         }
 
-        void OnEditorKeyDown(KeyDownEvent evt)
+        private void OnEditorKeyDown(KeyDownEvent evt)
         {
             KeyboardNavigationOperation GetOperation()
             {
@@ -436,7 +407,7 @@ namespace RosettaUI.UIToolkit
             }
         }
 #endif
-        void Invoke(KeyboardNavigationOperation operation, EventBase evt)
+        private void Invoke(KeyboardNavigationOperation operation, EventBase evt)
         {
             if (operation == KeyboardNavigationOperation.None)
                 return;

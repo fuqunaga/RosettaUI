@@ -269,14 +269,42 @@ namespace RosettaUI.UIToolkit
         // ・PopupFieldをクリックすると一度WindowがFocusになったあとDropdownMenuにフォーカスが移る
         private void OnFocus(FocusEvent evt)
         {
+            Debug.Log(nameof(OnFocus));
             _focusTask?.Pause();
-            _focusTask = schedule.Execute(() => IsFocused = true).StartingIn(50);
+            _focusTask = schedule.Execute(() => IsFocused = true);
         }
 
         private void OnBlur(BlurEvent evt)
         {
+            Debug.Log(nameof(OnBlur));
+            var relatedTarget = evt.relatedTarget;
+            
             _focusTask?.Pause();
-            _focusTask = schedule.Execute(() => IsFocused = false).StartingIn(50);
+            _focusTask = schedule.Execute(() =>
+            {
+                if (relatedTarget is VisualElement visualElement && !IsInWindow(visualElement))
+                {
+                    visualElement.RegisterCallback<DetachFromPanelEvent>(_ =>
+                    {
+                        Debug.Log(nameof(DetachFromPanelEvent) + "Menu");
+                        Focus();
+                    });
+                }
+                else
+                {
+                    IsFocused = false;
+                }
+            });
+
+            static bool IsInWindow(VisualElement visualElement)
+            {
+                return visualElement switch
+                {
+                    null => false,
+                    Window => true,
+                    _ => IsInWindow(visualElement.parent)
+                };
+            }
         }
 
         #endregion

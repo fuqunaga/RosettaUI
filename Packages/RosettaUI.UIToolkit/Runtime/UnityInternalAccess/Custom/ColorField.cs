@@ -25,7 +25,8 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             labelElement.AddToClassList(labelUssClassName);
             
             visualInput.AddToClassList(inputUssClassName);
-            visualInput.RegisterCallback<ClickEvent>(OnClick);
+            visualInput.RegisterCallback<ClickEvent>(OnClickInput);
+            RegisterCallback<NavigationSubmitEvent>(OnNavigationSubmit);
         }
 
         public override void SetValueWithoutNotify(Color color)
@@ -34,10 +35,37 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             colorInput.SetColor(color);
         }
 
-        private void OnClick(ClickEvent evt)
+        private void OnClickInput(ClickEvent evt)
         {
-            showColorPickerFunc?.Invoke(evt.position, this);
+            ShowColorPicker(evt.position);
+            
+            evt.StopPropagation();
         }
+        
+        private void OnNavigationSubmit(NavigationSubmitEvent evt)
+        {
+            var mousePosition = Input.mousePosition;
+            var position = new Vector2(
+                mousePosition.x,
+                Screen.height - mousePosition.y
+            );
+
+            var screenRect = new Rect(0f, 0f, Screen.width, Screen.height);
+            if (!screenRect.Contains(position))
+            {
+                position = worldBound.center;
+            }
+            
+            ShowColorPicker(position);
+            
+            evt.StopPropagation();
+        }
+
+        private void ShowColorPicker(Vector2 position)
+        {
+            showColorPickerFunc?.Invoke(position, this);
+        }
+        
 
         public class ColorInput : VisualElement
         {
@@ -50,6 +78,8 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
 
             public ColorInput()
             {
+                pickingMode = PickingMode.Ignore;
+                
                 rgbField = new VisualElement();
                 rgbField.AddToClassList(ussFieldInputRGB);
                 Add(rgbField);

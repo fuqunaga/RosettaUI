@@ -5,26 +5,26 @@ namespace RosettaUI
 {
     public static partial class UI
     {
-        public static Element Field<T>(Expression<Func<T>> targetExpression, FieldOption option = null)
+        public static Element Field<T>(Expression<Func<T>> targetExpression, in FieldOption? option = null)
         {
             return Field(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, option);
         }
 
-        public static Element Field<T>(LabelElement label, Expression<Func<T>> targetExpression, FieldOption option = null)
+        public static Element Field<T>(LabelElement label, Expression<Func<T>> targetExpression, in FieldOption? option = null)
         {
             var binder = UIInternalUtility.CreateBinder(targetExpression);
             return Field(label, binder, option);
         }
 
-        public static Element Field<T>(Expression<Func<T>> targetExpression, Action<T> writeValue, FieldOption option = null)
+        public static Element Field<T>(Expression<Func<T>> targetExpression, Action<T> writeValue, in FieldOption? option = null)
             => Field(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue, option);
         
-        public static Element Field<T>(LabelElement label, Func<T> readValue, Action<T> writeValue, FieldOption option = null)
+        public static Element Field<T>(LabelElement label, Func<T> readValue, Action<T> writeValue, in FieldOption? option = null)
             => Field(label, Binder.Create(readValue, writeValue), option);
 
-        public static Element Field(LabelElement label, IBinder binder, FieldOption option = null)
+        public static Element Field(LabelElement label, IBinder binder, in FieldOption? option = null)
         {
-            var element = BinderToElement.CreateFieldElement(label, binder, option);
+            var element = BinderToElement.CreateFieldElement(label, binder, option ?? FieldOption.Default);
             if (element != null) UIInternalUtility.SetInteractableWithBinder(element, binder);
 
             return element;

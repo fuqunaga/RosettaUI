@@ -1,7 +1,8 @@
 ﻿namespace RosettaUI
 {
-    public class FieldOption
+    public struct FieldOption
     {
-        public bool delayInput = false;
+        public static FieldOption Default = new();
+        public bool delayInput;
     }
 }

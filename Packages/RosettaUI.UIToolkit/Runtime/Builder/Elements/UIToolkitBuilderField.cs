@@ -55,7 +55,7 @@ namespace RosettaUI.UIToolkit.Builder
 
             if (field is TextInputBaseField<TValue> textInputBaseField)
             {
-                textInputBaseField.isDelayed = element.Option?.delayInput ?? false;
+                textInputBaseField.isDelayed = element.Option.delayInput;
             }
             
             if (labelEnable)

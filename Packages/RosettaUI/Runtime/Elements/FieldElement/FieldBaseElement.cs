@@ -8,7 +8,7 @@
         public FieldOption Option { get; protected set; }
         private readonly IBinder<T> _binder;
         
-        protected FieldBaseElement(LabelElement label, IBinder<T> binder, FieldOption option = null) : base(label, binder)
+        protected FieldBaseElement(LabelElement label, IBinder<T> binder, in FieldOption option = default) : base(label, binder)
         {
             _binder = binder;
             Option = option;

@@ -35,7 +35,7 @@ namespace RosettaUI.UIToolkit
         private const string UssClassNameTitleBarContainerRight = UssClassNameTitleBarContainer + "__right";
         private const string UssClassNameContentContainer = UssClassName + "__content-container";
 
-        public static KeyCode closeKey = KeyCode.Q;
+        public static KeyCode closeKey = KeyCode.Escape;
         public static EventModifiers closeKeyModifiers = EventModifiers.None;
 
         public readonly bool resizable;

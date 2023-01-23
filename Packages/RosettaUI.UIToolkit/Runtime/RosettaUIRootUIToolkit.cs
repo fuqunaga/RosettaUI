@@ -1,4 +1,3 @@
-using System;
 using RosettaUI.UIToolkit.Builder;
 using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine;
@@ -11,7 +10,7 @@ namespace RosettaUI.UIToolkit
     {
         public const string USSRootClassName = "rosettaui-root";
 
-        public KeyCode closeWindowKey = KeyCode.Q;
+        public KeyCode closeWindowKey = KeyCode.Escape;
         public EventModifiers closeWindowKeyModifiers;
         
         protected UIDocument uiDocument;

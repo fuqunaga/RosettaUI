@@ -143,6 +143,11 @@ Unity2022.2.0b6
     background-color: var(--rosettaui-highlight-dark-gray);
 }
 
+.unity-foldout__toggle:focus
+{
+    background-color: var(--rosettaui-highlight-dark-blue);
+}
+
 .unity-foldout__toggle > .unity-toggle__input,
 .unity-foldout__toggle:disabled > .unity-toggle__input /* remove  .unity-toggle:disabled > .unity-toggle__input*/
 {
@@ -433,7 +438,7 @@ Unity2022.2.0b6
     height: var(--rosettaui-scroller-size);
     background-color: initial;
     border-width: 0;
-    -unity-background-image-tint-color: var(--rosettaui-highlight-gray);
+    -unity-background-image-tint-color: var(--rosettaui-scroller-tint-color);
 }
 
 .unity-scroller--vertical > .unity-scroller__low-button:hover,
@@ -473,12 +478,12 @@ Unity2022.2.0b6
     background-color: initial;
     border-width: 0;
     border-radius: 0;
-    -unity-background-image-tint-color: var(--rosettaui-highlight-gray);
+    -unity-background-image-tint-color: var(--rosettaui-scroller-tint-color);
 }
 
 .unity-scroller .unity-scroller__slider:hover .unity-base-slider__dragger
 {
-    -unity-background-image-tint-color: var(--rosettaui-highlight-gray);
+    -unity-background-image-tint-color: var(--rosettaui-scroller-tint-color);
 }
 .unity-scroller .unity-scroller__slider:focus .unity-base-slider__dragger
 {

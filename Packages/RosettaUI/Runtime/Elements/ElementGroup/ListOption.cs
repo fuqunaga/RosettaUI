@@ -1,14 +1,14 @@
 ﻿namespace RosettaUI
 {
-    public struct ListViewOption
+    public struct ListOption
     {
-        public static ListViewOption Default =>  new (true);
+        public static ListOption Default =>  new (true);
         
         public bool reorderable;
         public bool fixedSize;
         public bool header;
 
-        public ListViewOption(bool reorderable, bool fixedSize = false, bool header = true)
+        public ListOption(bool reorderable, bool fixedSize = false, bool header = true)
         {
             this.reorderable = reorderable;
             this.fixedSize = fixedSize;

@@ -194,6 +194,7 @@
 {
     padding: 0;
     border-color: var(--unity-colors-input_field-border);
+    width: 185px;
 }
 
 .rosettaui-color-field__input-rgb {

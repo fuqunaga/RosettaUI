@@ -211,7 +211,7 @@ UI.Tabs(
                                                             var str = idx.ToString();
                                                             return UI.Field(
                                                                 UI.Label("Item" + idx, LabelType.Standard),
-                                                                () => str);
+                                                                () => str).SetWidth(200f);
                                                         })
                                                     )
                                                 );

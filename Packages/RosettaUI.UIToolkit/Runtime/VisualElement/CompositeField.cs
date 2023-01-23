@@ -55,7 +55,7 @@ namespace RosettaUI.UIToolkit
 
         private void InitLabelElement()
         {
-            labelElement = new Label() { focusable = true, tabIndex = -1 };
+            labelElement = new Label(); // { focusable = true, tabIndex = -1 };
             labelElement.AddToClassList(UssClassName.UnityBaseFieldLabel);
         }
         

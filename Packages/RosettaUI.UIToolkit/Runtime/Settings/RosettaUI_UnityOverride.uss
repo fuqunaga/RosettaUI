@@ -138,6 +138,12 @@ Unity2022.2.0b6
     min-width: initial; /* remove unity value */
 }
 
+.unity-foldout__toggle
+{
+    height: 32px;
+    margin: 0;
+}
+
 .unity-foldout__toggle:hover
 {
     background-color: var(--rosettaui-highlight-dark-gray);

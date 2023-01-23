@@ -61,7 +61,7 @@ namespace RosettaUI
             }
         }
 
-        public ListViewItemContainerElement(IBinder listBinder, Func<IBinder, int, Element> createItemElement, ListViewOption option) : base(null)
+        public ListViewItemContainerElement(IBinder listBinder, Func<IBinder, int, Element> createItemElement, in ListViewOption option) : base(null)
         {
             _binder = listBinder;
             _createItemElement = createItemElement;

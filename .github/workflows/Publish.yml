@@ -5,6 +5,10 @@ on:
     branches:
       - main
   workflow_dispatch:      
+    inputs:
+      dry_run:
+        required: true
+        type: boolean        
     
 jobs:
   publish:
@@ -30,7 +34,7 @@ jobs:
             @semantic-release/git
         extends: |
             semantic-release-monorepo
-        dry_run: false
+        dry_run: ${{ inputs && inputs.dry_run }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

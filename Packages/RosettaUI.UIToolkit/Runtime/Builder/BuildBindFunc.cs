@@ -30,7 +30,7 @@ namespace RosettaUI.UIToolkit.Builder
         {
             var ve = new TVisualElement();
             var success = Bind(element, ve);
-            Assert.IsTrue(success);
+            Assert.IsTrue(success, $"Bind failed. VisualElement type[{typeof(TVisualElement)} Element type [{element.GetType()}]");
             return ve;
         }
     }

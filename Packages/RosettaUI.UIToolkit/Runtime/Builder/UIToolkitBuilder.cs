@@ -10,11 +10,6 @@ using UnityEngine.UIElements;
 
 using IntegerField = UnityEngine.UIElements.IntegerField;
 using FloatField = UnityEngine.UIElements.FloatField;
-using PopupFieldString = UnityEngine.UIElements.PopupField<string>;
-
-#else
-
-using PopupFieldString = RosettaUI.UIToolkit.UnityInternalAccess.PopupField<string>;
 
 #endif
 
@@ -69,7 +64,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(LabelElement)] = BuildBindFunc<Label>.Create(Bind_Label),
                 [typeof(ButtonElement)] = BuildBindFunc<Button>.Create(Bind_Button),
                 [typeof(ToggleElement)] = BuildBindFunc<Toggle>.Create(Bind_Toggle),
-                [typeof(DropdownElement)] = BuildBindFunc<PopupFieldString>.Create(Bind_Dropdown),
+                [typeof(DropdownElement)] = BuildBindFunc<PopupFieldCustom<string>>.Create(Bind_Dropdown),
                 [typeof(SpaceElement)] = BuildBindFunc<Space>.Create(BindSimple<Space>),
                 [typeof(ImageElement)] = BuildBindFunc<Image>.Create(Bind_Image),
             };

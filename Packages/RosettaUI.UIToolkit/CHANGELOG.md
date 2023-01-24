@@ -1,3 +1,17 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.1.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.0.2...ga.fuquna.rosettaui.uitoolkit-v1.1.0) (2023-01-24)
+
+
+### Bug Fixes
+
+* Image is now aligned in the upper left corner. ([e2c8aa5](https://github.com/fuqunaga/RosettaUI/commit/e2c8aa5a249a50569bcaf448d83b57e51ba3bee6))
+* ListView reorderable handle uss ([fc8d095](https://github.com/fuqunaga/RosettaUI/commit/fc8d0958ecc3140d4e8567494a91db071f84671e))
+
+
+### Features
+
+* [#6](https://github.com/fuqunaga/RosettaUI/issues/6) FieldOption.delayInput. This can delay updating the value in UI.Field(). ([508862f](https://github.com/fuqunaga/RosettaUI/commit/508862f5f3446b11e7f33de1d15f860b743b1ac2))
+* WindowElement.SetClosable() ([82971ec](https://github.com/fuqunaga/RosettaUI/commit/82971ecf70246cdae12c7016d02d329acd236e85))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.0.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.0.1...ga.fuquna.rosettaui.uitoolkit-v1.0.2) (2022-11-22)
 
 

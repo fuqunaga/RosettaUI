@@ -5,22 +5,15 @@ namespace RosettaUI
 {
     public abstract class ElementGroupWithHeader : ElementGroup
     {
-        public readonly Element header;
-        public bool HasHeader => header != null;
+        public Element Header => _hasHeader ? Children.FirstOrDefault() : null;
+        private readonly bool _hasHeader;
         
-        public override IEnumerable<Element> Contents => HasHeader ? Children.Skip(1) : Children;
+        public override IEnumerable<Element> Contents => _hasHeader ? Children.Skip(1) : Children;
 
         protected ElementGroupWithHeader(Element header, IEnumerable<Element> contents)
         {
-            this.header = header;
-            
-            var children = new[] {header}.AsEnumerable();
-            if (contents != null)
-            {
-                children = children.Concat(contents);
-            }
-
-            SetElements(children);
+            _hasHeader = header != null;
+            SetElements(contents?.Prepend(header));
         }
     }
 }

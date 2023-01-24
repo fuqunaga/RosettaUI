@@ -71,6 +71,20 @@
 }
 
 /********************************************************************************
+* text field multiline
+********************************************************************************/
+/* 
+特定のTextField(Rowの子供、ラベルあり、multiline)
+align-self: flex-start
+だとなぜか横幅が伸びてしまう対策
+Unity2022.2.0b6
+ */
+.unity-base-text-field__input--multiline {
+    align-self: auto;
+}
+
+
+/********************************************************************************
 * toggle
 ********************************************************************************/
 .unity-toggle {
@@ -124,9 +138,20 @@
     min-width: initial; /* remove unity value */
 }
 
+.unity-foldout__toggle
+{
+    height: 32px;
+    margin: 0;
+}
+
 .unity-foldout__toggle:hover
 {
     background-color: var(--rosettaui-highlight-dark-gray);
+}
+
+.unity-foldout__toggle:focus
+{
+    background-color: var(--rosettaui-highlight-dark-blue);
 }
 
 .unity-foldout__toggle > .unity-toggle__input,
@@ -251,6 +276,17 @@
 /* 縦方向には伸びる */
 .rosettaui-row >.unity-button{
     align-self: stretch;
+}
+
+/********************************************************************************
+* image
+********************************************************************************/
+.unity-image{
+    align-self: flex-start;
+}
+
+.rosettaui-row > .unity-image {
+    flex-grow: 0; /* rosettaui-row > * を打消し */
 }
 
 /********************************************************************************
@@ -408,7 +444,7 @@
     height: var(--rosettaui-scroller-size);
     background-color: initial;
     border-width: 0;
-    -unity-background-image-tint-color: var(--rosettaui-highlight-gray);
+    -unity-background-image-tint-color: var(--rosettaui-scroller-tint-color);
 }
 
 .unity-scroller--vertical > .unity-scroller__low-button:hover,
@@ -448,12 +484,12 @@
     background-color: initial;
     border-width: 0;
     border-radius: 0;
-    -unity-background-image-tint-color: var(--rosettaui-highlight-gray);
+    -unity-background-image-tint-color: var(--rosettaui-scroller-tint-color);
 }
 
 .unity-scroller .unity-scroller__slider:hover .unity-base-slider__dragger
 {
-    -unity-background-image-tint-color: var(--rosettaui-highlight-gray);
+    -unity-background-image-tint-color: var(--rosettaui-scroller-tint-color);
 }
 .unity-scroller .unity-scroller__slider:focus .unity-base-slider__dragger
 {
@@ -486,6 +522,8 @@
 .unity-collection-view
 {
     max-height: initial; /* remove unity default */
+    margin-top: 1px;
+    margin-bottom: 3px;
 }
 
 .unity-collection-view__scroll-view
@@ -524,10 +562,10 @@
 
 .unity-list-view__reorderable-handle
 {
-    margin-top: 15px;
     min-width: 26px;
-    justify-content: flex-start;
+    padding-top: 13px;
     align-items: center;
+    justify-content: flex-start; /* for Unity2021. Default in Unity2022 */
 }
 
 .unity-list-view__reorderable-handle-bar

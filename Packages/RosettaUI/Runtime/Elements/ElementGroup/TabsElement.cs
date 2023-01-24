@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Reactive;
+using UnityEngine.Pool;
 
 namespace RosettaUI
 {
@@ -19,9 +20,20 @@ namespace RosettaUI
 
         public TabsElement(IEnumerable<Tab> tabs)
         {
-            _tabs = tabs?.ToList() ?? new();
-            SetElements(_tabs.SelectMany(t => new[] {t.header, t.content}));
+            _tabs = tabs?.Where(t => t != null).ToList() ?? new();
 
+            using var pool = ListPool<Element>.Get(out var list);
+            foreach (var tab in _tabs)
+            {
+                list.Add(tab.header);
+                list.Add(tab.content);
+            }
+            
+            SetElements(list);
+            
+            // RosettaUI.UIToolkit.Tabsでもコンテンツの表示/非表示の切り替えは行われるが
+            // RosettaUIのElementには伝わらないため表示されてもElement.Update()が呼ばれない
+            // Elementにも伝えるため同期されるcurrentTabIndexで監視しておく
             currentTabIndex.SubscribeAndCallOnce(newIndex =>
             {
                 for (var i = 0; i < _tabs.Count; ++i)

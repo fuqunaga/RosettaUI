@@ -5,7 +5,7 @@ MonoImporter:
   serializedVersion: 2
   defaultReferences:
   - m_ViewDataDictionary: {instanceID: 0}
-  - prefab: {fileID: 7781135667513472537, guid: 523daa3d756bed649861167eb2a9339c, type: 3}
+  - gameObject: {fileID: 7781135667513472537, guid: 523daa3d756bed649861167eb2a9339c, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

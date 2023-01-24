@@ -9,22 +9,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         public ClampFreeSlider()
         {
             clamped = false;
-            
-            
-            // Label の width が変わってスライダーの長さが変わってもdraggerの位置が再計算されないケース対策
-            //
-            //  // これで dragger がはみ出る
-            //  var root = GetComponent<RosettaUIRoot>();
-            //  root.Build(UI.Slider(() => 1);
-            // 
-            // BaseSlider では dragElement にしか UpdateDragElementPosition() がコールバック登録されていないので
-            // dragContainer にも登録したい・・・が、private で呼べないので SetValueWithoutNotify() で間接的に呼ぶ
-            
-            dragContainer.RegisterCallback<GeometryChangedEvent>(evt =>
-            {
-                if (evt.oldRect == evt.newRect) return;
-                SetValueWithoutNotify(value);
-            });
+            SliderPatchUtility.FixDraggerInvalidPosition(this);
         }
 
         internal override float SliderNormalizeValue(float currentValue, float lowerValue, float higherValue)
@@ -44,6 +29,28 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
 
     public static class SliderPatchUtility
     {
+        /// <summary>
+        /// Fix dragger invalid position
+        ///
+        /// Label の width が変わってスライダーの長さが変わってもdraggerの位置が再計算されないケース対策
+        ///
+        ///  // これで dragger がはみ出る
+        ///  var root = GetComponent<RosettaUIRoot>();
+        ///  root.Build(UI.Slider(() => 1);
+        /// 
+        /// BaseSlider では dragElement にしか UpdateDragElementPosition() がコールバック登録されていないので
+        /// dragContainer にも登録したい・・・が、private で呼べないので SetValueWithoutNotify() で間接的に呼ぶ
+        /// </summary>
+        public static void FixDraggerInvalidPosition<T>(BaseSlider<T> slider)
+            where T : IComparable<T>
+        {
+            slider.dragContainer.RegisterCallback<GeometryChangedEvent>(evt =>
+            {
+                if (evt.oldRect == evt.newRect) return;
+                slider.SetValueWithoutNotify(slider.value);
+            });
+        }
+
         /// <summary>
         /// BaseSlider.OnKeyDown()で左右キーなどの入力でスライダーが反応してしまう
         /// テキスト入力時はスライダーの反応を止めたいのでStopPropagation()するイベントをinputTextFieldに仕込んでおく

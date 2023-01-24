@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using RosettaUI.Reactive;
 
 namespace RosettaUI
@@ -7,10 +8,6 @@ namespace RosettaUI
     /// <summary>
     /// 動的に内容が変化するElement
     /// UI実装側はbuildの結果をいれるプレースホルダー的な役割
-    ///
-    /// UIのビルドはできるだけ遅延する
-    /// - RegisterBuildUI()時にEnableなとき
-    /// - Enable==trueになって_needBuildChildren==true（まだ子供のElementを生成していない）とき
     /// </summary>
     public class DynamicElement : ElementGroup
     {
@@ -37,29 +34,13 @@ namespace RosettaUI
         #endregion
 
         public event Action<DynamicElement> onBuildChildren;
-        private event Action<DynamicElement> buildUI;
-        
+        private event Action<DynamicElement> bindChildrenToView;
         
         private readonly Func<Element> _build;
         private readonly string _displayName;
         private readonly Func<DynamicElement, bool> _rebuildIf;
         private readonly BinderHistory.Snapshot _binderTypeHistorySnapshot;
-        private bool _needBuildChildren = true;
         
-        public override IEnumerable<Element> Contents
-        {
-            get
-            {
-                if (_needBuildChildren)
-                {
-                    _needBuildChildren = false;
-                    BuildElement();
-                }
-
-                return base.Contents;
-            }
-        }
-
         public DynamicElement(Func<Element> build, Func<DynamicElement, bool> rebuildIf, string displayName = null)
         {
             _build = build;
@@ -68,11 +49,12 @@ namespace RosettaUI
             
             _binderTypeHistorySnapshot = BinderHistory.Snapshot.Create();
 
+            BuildElement();
             enableRx.Subscribe(enable =>
             {
-                if (enable && _needBuildChildren)
+                if (enable)
                 {
-                    BuildUI();
+                    CheckAndRebuild();
                 }
             });
         }
@@ -87,29 +69,54 @@ namespace RosettaUI
 
         private void BuildElement()
         {
+            while (Children.Any())
+            {
+                var child = Children.Last();
+                RemoveChild(child, false);
+            }
+
             using var applyScope = _binderTypeHistorySnapshot.GetApplyScope();
             SetElements(new[] {_build?.Invoke()});
-            
+
+            bindChildrenToView?.Invoke(this);
             onBuildChildren?.Invoke(this);
         }
 
         public void CheckAndRebuild()
         {
-            if (_rebuildIf?.Invoke(this) ?? false)
+            if (!(_rebuildIf?.Invoke(this) ?? false)) return;
+            BuildElement();
+        }
+
+        private void ClearBindView() => bindChildrenToView = null;
+        
+        protected override ElementViewBridge CreateViewBridge() => new DynamicElementViewBridge(this);
+        
+        public class DynamicElementViewBridge : ElementViewBridge
+        {
+            private DynamicElement Element => (DynamicElement)element;
+            
+            public DynamicElementViewBridge(DynamicElement element) : base(element)
             {
-                DestroyChildren(true);
-                _needBuildChildren = true;
-                BuildUI();
+            }
+            
+            public void RegisterBindViewAndCallOnce(Action<DynamicElement> action)
+            {
+                Element.bindChildrenToView += action;
+                action?.Invoke(Element);
+            }
+
+            public override void UnsubscribeAll()
+            {
+                base.UnsubscribeAll();
+                Element.ClearBindView();
             }
         }
-
-        private void BuildUI() => buildUI?.Invoke(this);
-
-        public void RegisterBuildUI(Action<DynamicElement> action)
-        {
-            buildUI += action;
-            
-            if ( Enable) action?.Invoke(this);
-        }
+    }
+    
+           
+    public static partial class ElementViewBridgeExtensions
+    {
+        public static DynamicElement.DynamicElementViewBridge GetViewBridge(this DynamicElement element) => (DynamicElement.DynamicElementViewBridge)element.ViewBridge;
     }
 }

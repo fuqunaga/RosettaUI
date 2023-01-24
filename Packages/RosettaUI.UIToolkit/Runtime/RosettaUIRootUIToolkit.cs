@@ -9,6 +9,10 @@ namespace RosettaUI.UIToolkit
     public class RosettaUIRootUIToolkit : RosettaUIRoot
     {
         public const string USSRootClassName = "rosettaui-root";
+
+        public KeyCode closeWindowKey = KeyCode.Escape;
+        public EventModifiers closeWindowKeyModifiers;
+        
         protected UIDocument uiDocument;
 
         protected override void OnEnable()
@@ -18,6 +22,8 @@ namespace RosettaUI.UIToolkit
             {
                 ve.visible = true;
             }
+            
+            ApplyCloseWindowKey();
         }
 
         protected override void OnDisable()
@@ -27,6 +33,12 @@ namespace RosettaUI.UIToolkit
             {
                 ve.visible = false;
             }
+        }
+
+        private void OnValidate()
+        {
+            if (!Application.isPlaying) return;
+            ApplyCloseWindowKey();
         }
 
         protected override void BuildInternal(Element element)
@@ -46,6 +58,12 @@ namespace RosettaUI.UIToolkit
         public override bool WillUseKeyInput()
         {
             return uiDocument != null && UIToolkitUtility.WillUseKeyInput(uiDocument.rootVisualElement?.panel);
-        } 
+        }
+
+        protected void ApplyCloseWindowKey()
+        {
+            Window.closeKey = closeWindowKey;
+            Window.closeKeyModifiers = closeWindowKeyModifiers;
+        }
     }
 }

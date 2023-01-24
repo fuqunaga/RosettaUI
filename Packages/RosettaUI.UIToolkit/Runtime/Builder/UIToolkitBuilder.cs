@@ -3,7 +3,16 @@ using System.Collections.Generic;
 using RosettaUI.Builder;
 using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UIElements;
+
+#if UNITY_2022_1_OR_NEWER
+
+using IntegerField = UnityEngine.UIElements.IntegerField;
+using FloatField = UnityEngine.UIElements.FloatField;
+
+#endif
+
 
 namespace RosettaUI.UIToolkit.Builder
 {
@@ -17,82 +26,158 @@ namespace RosettaUI.UIToolkit.Builder
         {
             return Instance.BuildInternal(element);
         }
-        
+
         #endregion
 
-
-        private readonly Dictionary<Type, Func<Element, VisualElement>> _buildFuncTable;
-
+        
         protected UIToolkitBuilder()
         {
-            _buildFuncTable = new Dictionary<Type, Func<Element, VisualElement>>
+            FuncTable = new()
             {
-                [typeof(CompositeFieldElement)] = Build_CompositeField,
-                [typeof(DynamicElement)] = Build_DynamicElement,
-                [typeof(FoldElement)] = Build_Fold,
-                [typeof(HelpBoxElement)] = Build_HelpBox,
-                [typeof(IndentElement)] = Build_Indent,
-                [typeof(RowElement)] = Build_Row,
-                [typeof(ColumnElement)] = Build_Column,
-                [typeof(PageElement)] = Build_Column,
-                [typeof(BoxElement)] = Build_Box,
-                [typeof(ScrollViewElement)] = Build_ScrollView,
-                [typeof(TabsElement)] = Build_Tabs,
-                [typeof(WindowElement)] = Build_Window,
-                [typeof(WindowLauncherElement)] = Build_WindowLauncher,
+                [typeof(BoxElement)] = BuildBindFunc<Box>.Create(Bind_ElementGroup<BoxElement, Box>),
+                [typeof(ColumnElement)] = BuildBindFunc<Column>.Create(Bind_ElementGroup<ColumnElement, Column>),
+                [typeof(CompositeFieldElement)] = BuildBindFunc<CompositeField>.Create(Bind_CompositeField),
+                [typeof(DynamicElement)] = BuildBindFunc<VisualElement>.Create(Bind_DynamicElement),
+                [typeof(FoldElement)] = BuildBindFunc<FoldoutCustom>.Create(Bind_Fold),
+                [typeof(HelpBoxElement)] = BuildBindFunc<HelpBox>.Create(Bind_HelpBox),
+                [typeof(IndentElement)] = BuildBindFunc<Indent>.Create(Bind_Indent),
+                [typeof(ListViewItemContainerElement)] = BuildBindFunc<ListViewCustom>.Create(Bind_ListViewItemContainer),
+                [typeof(PageElement)] = BuildBindFunc<Column>.Create(Bind_ElementGroup<PageElement, Column>),
+                [typeof(PopupMenuElement)] = BuildBindFunc<PopupMenu>.Create(Bind_PopupMenu),
+                [typeof(RowElement)] = BuildBindFunc<Row>.Create(Bind_ElementGroup<RowElement, Row>),
+                [typeof(ScrollViewElement)] = BuildBindFunc<ScrollView>.Create(Bind_ScrollView),
+                [typeof(TabsElement)] = BuildBindFunc<Tabs>.Create(Bind_Tabs),
+                [typeof(WindowElement)] = BuildBindFunc<Window>.Create(Bind_Window),
+                [typeof(WindowLauncherElement)] = BuildBindFunc<WindowLauncher>.Create(Bind_WindowLauncher),
+                
+                [typeof(ColorFieldElement)] = BuildBindFunc<ColorField>.Create(Bind_ColorField),
+                [typeof(FloatFieldElement)] = BuildBindFunc<FloatField>.Create(Bind_Field<float, FloatField>),
+                [typeof(IntFieldElement)] = BuildBindFunc<IntegerField>.Create(Bind_Field<int, IntegerField>),
+                [typeof(UIntFieldElement)] = BuildBindFunc<UIntField>.Create(Bind_Field<uint, UIntField>),
+                [typeof(TextFieldElement)] =  BuildBindFunc<TextField>.Create(Bind_TextField),
 
-                [typeof(LabelElement)] = Build_Label,
-                [typeof(IntFieldElement)] = Build_Field<int, IntegerField>,
-                [typeof(UIntFieldElement)] = Build_Field<uint, UIntField>,
-                [typeof(FloatFieldElement)] = Build_Field<float, FloatField>,
-                [typeof(TextFieldElement)] = Build_TextField,
-                [typeof(ToggleElement)] = Build_Toggle,
-                [typeof(ColorFieldElement)] = Build_ColorField,
+                [typeof(IntSliderElement)] = BuildBindFunc<ClampFreeSliderInt>.Create(Bind_Slider<int, ClampFreeSliderInt>),
+                [typeof(FloatSliderElement)] = BuildBindFunc<ClampFreeSlider>.Create(Bind_Slider<float, ClampFreeSlider>),
+                [typeof(IntMinMaxSliderElement)] = BuildBindFunc<MinMaxSliderWithField<int, IntegerField>>.Create(Bind_MinMaxSlider<int, IntegerField>),
+                [typeof(FloatMinMaxSliderElement)] = BuildBindFunc<MinMaxSliderWithField<float, FloatField>>.Create(Bind_MinMaxSlider<float, FloatField>),
                 
-                [typeof(IntSliderElement)] = Build_Slider<int, ClampFreeSliderInt>,
-                [typeof(FloatSliderElement)] = Build_Slider<float, ClampFreeSlider>,
-                [typeof(IntMinMaxSliderElement)] = Build_MinMaxSlider_Int,
-                [typeof(FloatMinMaxSliderElement)] = Build_MinMaxSlider_Float,
-                
-                [typeof(DropdownElement)] = Build_Dropdown,
-                [typeof(SpaceElement)] = Build_Space,
-                [typeof(ImageElement)] = Build_Image,
-                [typeof(ButtonElement)] = Build_Button,
-                [typeof(PopupMenuElement)] = Build_PopupElement,
-                [typeof(ListViewItemContainerElement)] = Build_ListViewItemContainer
+                [typeof(LabelElement)] = BuildBindFunc<Label>.Create(Bind_Label),
+                [typeof(ButtonElement)] = BuildBindFunc<Button>.Create(Bind_Button),
+                [typeof(ToggleElement)] = BuildBindFunc<Toggle>.Create(Bind_Toggle),
+                [typeof(DropdownElement)] = BuildBindFunc<PopupFieldCustom<string>>.Create(Bind_Dropdown),
+                [typeof(SpaceElement)] = BuildBindFunc<Space>.Create(BindSimple<Space>),
+                [typeof(ImageElement)] = BuildBindFunc<Image>.Create(Bind_Image),
             };
         }
 
-        public void RegisterBuildFunc(Type type, Func<Element, VisualElement> func) => _buildFuncTable[type] = func;
-        public void UnregisterBuildFunc(Type type) => _buildFuncTable.Remove(type);
-        
+        public void RegisterBuildBindFunc(Type type, IBuildBindFunc buildBindFunc) => FuncTable[type] = buildBindFunc;
+        public void UnregisterBuildFunc(Type type) => FuncTable.Remove(type);
 
-        protected override IReadOnlyDictionary<Type, Func<Element, VisualElement>> BuildFuncTable => _buildFuncTable;
+        private Dictionary<Type, IBuildBindFunc> FuncTable { get; }
+
+        protected override VisualElement DispatchBuild(Element element)
+        {
+            var type = element.GetType();
+            return FuncTable.TryGetValue(type, out var buildBindFunc)
+                ? buildBindFunc.Build(element) 
+                : null;
+        }
+
+        private bool BindSimple<TVisualElement>(Element element, VisualElement visualElement)
+            where TVisualElement : VisualElement
+        {
+            return visualElement is TVisualElement;
+        }
+
+        /// <summary>
+        /// 既存のVisualElementを新たなElementと紐づける
+        /// VisualElementの構成が一致していなければ return false
+        /// ElementGroupの場合、子供の構成が違ったらBuildしなおす
+        /// </summary>
+        /// <returns>success flag</returns>
+        public bool Bind(Element element, VisualElement ve)
+        {
+            if (element == null || ve == null) return false;
+            if (GetUIObj(element) == ve) return true;
+            
+            Unbind(element);
+            var prevElement = GetElement(ve);
+            if (prevElement != null)
+            {
+                Unbind(prevElement);
+            }
+
+            // BindFunc内でGetUIObj()をしたいので先に登録しておく
+            // プレフィックスラベルの幅を求める計算がBuild時はコールバックで呼ばれるのでBuild後で済むが、
+            // Bind時はデフォルトの幅になったままレイアウト処理が行われるとレイアウトが変更され重たいので、
+            // すぐにBind前の幅に戻してしておきたい
+            // したがってBindFunc内でGetUIObj()できるように先にSetupUIObj()を呼んでおく
+            SetupUIObj(element, ve);
+            
+            if (!FuncTable.TryGetValue(element.GetType(), out var buildBindFunc))
+            {
+                Debug.LogError($"{GetType()}: Unknown Type[{element.GetType()}].");
+                return false;
+            }
+
+            if (!buildBindFunc.Bind(element, ve))
+            {
+                TeardownUIObj(element);
+                return false;
+            }
+
+            
+            return true;
+        }
+
+        public VisualElement Unbind(Element element)
+        {
+            foreach (var child in element.Children)
+            {
+                Unbind(child);
+            }
+            return TeardownUIObj(element);
+        }
 
 
+        // プレフィックスラベルの幅を計算する
         protected override void CalcPrefixLabelWidthWithIndent(LabelElement label, VisualElement ve)
         {
-            // 表示前にラベルの幅を計算する
-            // ve.schedule.Execute()は表示後に呼ばれるらしく、サイズが変更されるのが見えてしまう
-            ve.ScheduleToUseResolvedLayoutBeforeRendering(() =>
+            // すでにパネルにアタッチされている＝Build時ではなくBind時
+            // レイアウト計算が終わってるはずなので即計算する
+            if (ve.panel != null)
             {
-                var marginLeft = ve.worldBound.xMin;
-                UpdateLabelWidth(marginLeft);
+                CalcMinWidth();
+            }
+            // Build時はまだレイアウト計算が終わっていないのでGeometryChangedを待つ
+            else
+            {
+                ve.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            }
 
-                // 初回生成時にve.worldBound.xMinがおかしい値の事があるのであとでもう一度チェックする
-                // 特にEditorWindowでWindow内におさまっていないエレメントが怪しい
-                ve.schedule.Execute(() =>
+            // リストの要素など１回目のあとにレイアウト変更がされるので落ち着くまで複数回呼ばれるようにする
+            void OnGeometryChanged(GeometryChangedEvent evt)
+            {
+                // 移動してなければ落ち着いたと見てコールバック解除
+                // UpdateLabelWidth()でスタイルを変えているので少なくとも一度は再度呼ばれる
+                if (Mathf.Approximately(evt.oldRect.xMin, evt.newRect.xMin))
                 {
-                    var marginLeftAfter = ve.worldBound.xMin;
-                    if (Math.Abs(marginLeft - marginLeftAfter) > 1f)
-                    {
-                        UpdateLabelWidth(marginLeftAfter);
-                    }
-                });
-            });
+                    ve.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+                    return;
+                }
 
-            void UpdateLabelWidth(float marginLeft)
+                CalcMinWidth();
+            }
+
+            void CalcMinWidth()
             {
+                if (label.Parent == null)
+                {
+                    Debug.LogWarning($"Label parent is null. [{label.Value}]");
+                }
+
+                var marginLeft = ve.worldBound.xMin;
+          
                 for (var element = label.Parent;
                      element != null;
                      element = element.Parent)
@@ -104,9 +189,7 @@ namespace RosettaUI.UIToolkit.Builder
                     }
                 }
 
-
                 marginLeft /= ve.worldTransform.lossyScale.x; // ignore rotation
-
                 ve.style.minWidth = LayoutSettings.LabelWidth - marginLeft;
             }
         }
@@ -114,17 +197,13 @@ namespace RosettaUI.UIToolkit.Builder
         protected override void OnElementEnableChanged(Element _, VisualElement ve, bool enable)
         {
             var display = enable ? DisplayStyle.Flex : DisplayStyle.None;
-            if (ve.resolvedStyle.display != display)
-            {
-                ve.style.display = display;
-            }
+            ve.style.display = display;
         }
 
         protected override void OnElementInteractableChanged(Element _, VisualElement ve, bool interactable)
         {
             ve.SetEnabled(interactable);
         }
-
 
         protected override void OnElementStyleChanged(Element element, VisualElement ve, Style style)
         {
@@ -145,7 +224,7 @@ namespace RosettaUI.UIToolkit.Builder
             if (isFixedSize)
             {
                  veStyle.flexGrow = 0;
-                 veStyle.flexShrink = 1;
+                 veStyle.flexShrink = 0;
                  veStyle.minWidth = StyleKeyword.Auto;
                  veStyle.maxWidth = StyleKeyword.Auto;
                  veStyle.minHeight = StyleKeyword.Auto;
@@ -158,48 +237,21 @@ namespace RosettaUI.UIToolkit.Builder
             }
             
             static StyleLength ToStyleLength(float? nullable)
-                => (nullable is { } value) ? value : StyleKeyword.Null;
+                => nullable ?? (StyleLength)StyleKeyword.Null;
             
             static StyleColor ToStyleColor(Color? nullable)
-                => (nullable is { } value) ? value : StyleKeyword.Null;
+                => nullable ?? (StyleColor)StyleKeyword.Null;
         }
 
-
-
-        protected override void OnRebuildElementGroupChildren(ElementGroup elementGroup)
-        {
-            var groupVe = GetUIObj(elementGroup);
-            Build_ElementGroupContents(groupVe, elementGroup);
-        }
-
-        protected override void OnDestroyElement(Element element, bool isDestroyRoot)
+        protected override void OnDetachView(Element element, bool destroyView)
         {
             var ve = GetUIObj(element);
+            Unbind(element);   
             
-            if (isDestroyRoot)
+            if (destroyView)
             {
                 ve?.RemoveFromHierarchy();
             }
-
-            UnregisterUIObj(element);
-        }
-
-        private static class UssClassName
-        {
-            public static readonly string UnityBaseField = "unity-base-field";
-            public static readonly string UnityBaseFieldLabel = UnityBaseField + "__label";
-
-            private static readonly string RosettaUI = "rosettaui";
-            
-            public static readonly string CompositeField = RosettaUI + "-composite-field";
-            public static readonly string CompositeFieldContents = CompositeField + "__contents";
-            public static readonly string Column = RosettaUI + "-column";
-            public static readonly string Row = RosettaUI + "-row";
-            public static readonly string WindowLauncher = RosettaUI + "-window-launcher";
-            public static readonly string MinMaxSlider = RosettaUI + "-min-max-slider";
-            public static readonly string Space = RosettaUI + "-space";
-            public static readonly string DynamicElement = RosettaUI + "-dynamic-element";
-            public static readonly string IndentElement = RosettaUI + "-indent";
         }
     }
 }

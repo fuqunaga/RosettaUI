@@ -2,7 +2,7 @@
 {
     public class UIntFieldElement : FieldBaseElement<uint>
     {
-        public UIntFieldElement(LabelElement label, IBinder<uint> binder) : base(label, binder)
+        public UIntFieldElement(LabelElement label, IBinder<uint> binder, FieldOption option) : base(label, binder, option)
         {}
     }
 }

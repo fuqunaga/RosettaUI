@@ -9,6 +9,8 @@ namespace RosettaUI
     {
         public readonly IGetter<T> getter;
         internal event Action<T> listenValue;
+
+        private ReadOnlyValueViewBridgeBase _viewBridgeBase;
         
         public T Value => getter.Get();
         
@@ -28,24 +30,44 @@ namespace RosettaUI
                 listenValue?.Invoke(getter.Get());
             }
         }
-    }
-    
-    
 
-    public static class ReadOnlyValueElementSubscribe
-    {
-        public static void SubscribeValueOnUpdateCallOnce<T>(this ReadOnlyValueElement<T> me, Action<T> action)
+        private void ClearListenValue() => listenValue = null;
+
+        protected override ElementViewBridge CreateViewBridge() => new ReadOnlyValueViewBridgeBase(this);
+
+        public class ReadOnlyValueViewBridgeBase : ElementViewBridge
         {
-            action?.Invoke(me.Value);
-            me.SubscribeValueOnUpdate(action);
-        }
-        
-        public static void SubscribeValueOnUpdate<T>(this ReadOnlyValueElement<T>me, Action<T> action)
-        {
-            if (!me.IsConst)
+            private ReadOnlyValueElement<T> Element => (ReadOnlyValueElement<T>)element;
+            
+            public ReadOnlyValueViewBridgeBase(ReadOnlyValueElement<T> element) : base(element)
             {
-                me.listenValue += action;
             }
+
+            public void SubscribeValueOnUpdateCallOnce(Action<T> action)
+            {
+                if (action == null) return;
+                action.Invoke(Element.Value);
+                SubscribeValueOnUpdate(action);
+            }
+
+            public void SubscribeValueOnUpdate(Action<T> action)
+            {
+                if (action != null && !Element.IsConst)
+                {
+                    Element.listenValue += action;
+                }
+            }
+
+            public override void UnsubscribeAll()
+            {
+                base.UnsubscribeAll();
+                Element.ClearListenValue();
+            } 
         }
+    }
+        
+    public static partial class ElementViewBridgeExtensions
+    {
+        public static ReadOnlyValueElement<T>.ReadOnlyValueViewBridgeBase GetViewBridge<T>(this ReadOnlyValueElement<T> element) => (ReadOnlyValueElement<T>.ReadOnlyValueViewBridgeBase)element.ViewBridge;
     }
 }

@@ -3,9 +3,9 @@
   "version": "1.0.2",
   "displayName": "RosettaUI - UI Toolkit",
   "description": "RosettaUI UI Toolkit bridge",
-  "unity": "2021.2",
+  "unity": "2021.3",
   "dependencies": {
-    "ga.fuquna.rosettaui": "1.0.2"
+    "ga.fuquna.rosettaui": "1.1.0"
   },
   "keywords": [
     "unity",

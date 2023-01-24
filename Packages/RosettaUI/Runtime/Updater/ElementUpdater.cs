@@ -13,26 +13,30 @@ namespace RosettaUI
 
         public void RegisterWindowRecursive(Element element)
         {
-            if (element is WindowElement)
+            switch (element)
             {
-                Register(element);
-            }
-            else if (element is WindowLauncherElement windowLauncherElement)
-            {
-                RegisterWindowRecursive(windowLauncherElement.window);
-            }
-            
-            if (element is ElementGroup elementGroup)
-            {
-                foreach (var e in elementGroup.Children)
+                case WindowLauncherElement windowLauncherElement:
                 {
-                    RegisterWindowRecursive(e);
+                    var window = windowLauncherElement.window;
+                    Register(window);
+                    RegisterWindowRecursive(window);
+                    break;
                 }
-
-                if (element is DynamicElement dynamicElement)
+                
+                case ElementGroup elementGroup:
                 {
-                    dynamicElement.onBuildChildren -= RegisterWindowRecursive;
-                    dynamicElement.onBuildChildren += RegisterWindowRecursive;
+                    foreach (var e in elementGroup.Children)
+                    {
+                        RegisterWindowRecursive(e);
+                    }
+
+                    if (element is DynamicElement dynamicElement)
+                    {
+                        dynamicElement.onBuildChildren -= RegisterWindowRecursive;
+                        dynamicElement.onBuildChildren += RegisterWindowRecursive;
+                    }
+
+                    break;
                 }
             }
         }
@@ -67,17 +71,16 @@ namespace RosettaUI
         /// Update()内のループ中のElement.Update()内でRegister()/Unregister()されることがあるので
         /// 次のUpdate()までキューに貯める
         /// </summary>
-        void ProcessQueue()
+        private void ProcessQueue()
         {
             while (_registerQueue.Any())
             {
                 var e = _registerQueue.Dequeue();
                 if (_elements.Add(e))
                 {
-                    e.onDestroy += (element,_) => Unregister(element);
+                    e.onDetachView += (element,_) => Unregister(element);
                 }
             }
-
 
             while (_unregisterQueue.Any())
             {

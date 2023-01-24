@@ -9,7 +9,7 @@ namespace RosettaUI
     {
         #region Field
         
-        public static Element CreateFieldElement(LabelElement label, IBinder binder)
+        public static Element CreateFieldElement(LabelElement label, IBinder binder, in FieldOption option)
         {
             var valueType = binder.ValueType;
 
@@ -20,30 +20,30 @@ namespace RosettaUI
             }
 
             using var binderHistory = BinderHistory.GetScope(binder);
+            var optionCaptured = option;
 
             return binder switch
             {
                 _ when UICustom.GetElementCreationMethod(valueType) is { } creationFunc => InvokeCreationFunc(label,
                     binder, creationFunc),
 
-                IBinder<int> ib => new IntFieldElement(label, ib),
-                IBinder<uint> ib => new UIntFieldElement(label, ib),
-                IBinder<float> ib => new FloatFieldElement(label, ib),
-                IBinder<string> ib => new TextFieldElement(label, ib),
+                IBinder<int> ib => new IntFieldElement(label, ib, option),
+                IBinder<uint> ib => new UIntFieldElement(label, ib, option),
+                IBinder<float> ib => new FloatFieldElement(label, ib, option),
+                IBinder<string> ib => new TextFieldElement(label, ib, option),
                 IBinder<bool> ib => new ToggleElement(label, ib),
                 IBinder<Color> ib => new ColorFieldElement(label, ib),
                 _ when valueType.IsEnum => CreateEnumElement(label, binder),
-                _ when TypeUtility.IsNullable(valueType) => CreateNullableFieldElement(label, binder),
+                _ when TypeUtility.IsNullable(valueType) => CreateNullableFieldElement(label, binder, option),
 
                 _ when binder.GetObject() is IElementCreator elementCreator => WrapNullGuard(() =>
                     elementCreator.CreateElement(label)),
                 _ when ListBinder.IsListBinder(binder) => CreateListView(label, binder),
 
-                _ => WrapNullGuard(() => CreateMemberFieldElement(label, binder))
+                _ => WrapNullGuard(() => CreateMemberFieldElement(label, binder, optionCaptured))
             };
 
             Element WrapNullGuard(Func<Element> func) => UI.NullGuardIfNeed(label, binder, func);
-            
         }
 
         private static Element InvokeCreationFunc(LabelElement label, IBinder binder, UICustom.CreationFunc creationFunc)
@@ -59,27 +59,28 @@ namespace RosettaUI
             return new DropdownElement(label, enumToIdxBinder, Enum.GetNames(valueType));
         }
         
-        private static Element CreateNullableFieldElement(LabelElement label, IBinder binder)
+        private static Element CreateNullableFieldElement(LabelElement label, IBinder binder, FieldOption option)
         {
             var valueBinder = NullableToValueBinder.Create(binder);
-            return UI.NullGuard(label, binder, () => CreateFieldElement(label, valueBinder));
+            return UI.NullGuard(label, binder, () => CreateFieldElement(label, valueBinder, option));
         }
         
         private static Element CreateListView(LabelElement label, IBinder binder)
         {
             var option = (binder is IPropertyOrFieldBinder pfBinder)
                 ? new ListViewOption(
-                    TypeUtility.IsReorderable(pfBinder.ParentBinder.ValueType, pfBinder.PropertyOrFieldName),
-                    false)
-                : null;
+                    reorderable: TypeUtility.IsReorderable(pfBinder.ParentBinder.ValueType, pfBinder.PropertyOrFieldName)
+                )
+                : ListViewOption.Default;
 
 
             return UI.List(label, binder, null, option);
         }
 
-        private static Element CreateMemberFieldElement(LabelElement label, IBinder binder)
+        private static Element CreateMemberFieldElement(LabelElement label, IBinder binder, in FieldOption option)
         {
             var valueType = binder.ValueType;
+            var optionCaptured = option;
 
             var elements = TypeUtility.GetUITargetFieldNames(valueType).Select(fieldName =>
             {
@@ -93,7 +94,7 @@ namespace RosettaUI
                     return UI.Slider(fieldLabel, fieldBinder, minGetter, maxGetter);
                 }
                
-                var field = UI.Field(fieldLabel, fieldBinder);
+                var field = UI.Field(fieldLabel, fieldBinder, optionCaptured);
                 
                 
                 if (TypeUtility.IsMultiline(valueType, fieldName) && field is TextFieldElement textField)
@@ -136,7 +137,7 @@ namespace RosettaUI
                 _ when TypeUtility.IsNullable(binder.ValueType) => CreateNullableSliderElement(label, binder, option),
                 
                 _ => CreateCompositeSliderElement(label, binder, option)
-                     ?? CreateFieldElement(label, binder)
+                     ?? CreateFieldElement(label, binder, FieldOption.Default)
             };
 
             static SliderOption<int> CreateOptionUintToInt(SliderOption option)
@@ -204,7 +205,7 @@ namespace RosettaUI
             {
                 if (TypeUtility.IsSingleLine(binder.ValueType))
                 {
-                    var titleField = CreateMemberFieldElement(new LabelElement(label), binder);
+                    var titleField = CreateMemberFieldElement(new LabelElement(label), binder, FieldOption.Default);
                     
                     // Foldが閉じてるときは titleField を、開いているときは label を表示
                     // UI.Row(label, titleField) だと titleField のラベルがPrefixLabel判定されないので

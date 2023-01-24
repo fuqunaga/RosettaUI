@@ -24,7 +24,7 @@ namespace RosettaUI
 
     public class PopupMenuElement : ElementGroup
     {
-        public Func<IEnumerable<MenuItem>> CreateMenuItems { get; protected set; }
+        public Func<IEnumerable<MenuItem>> CreateMenuItems { get; }
 
         public PopupMenuElement(Element element, Func<IEnumerable<MenuItem>> createMenuItems) : base(new[] {element})
         {

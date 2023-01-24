@@ -1,3 +1,12 @@
+# [ga.fuquna.rosettaui-v1.1.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.0.2...ga.fuquna.rosettaui-v1.1.0) (2023-01-24)
+
+
+### Features
+
+* [#6](https://github.com/fuqunaga/RosettaUI/issues/6) FieldOption.delayInput. This can delay updating the value in UI.Field(). ([508862f](https://github.com/fuqunaga/RosettaUI/commit/508862f5f3446b11e7f33de1d15f860b743b1ac2))
+* Open/Close/SetOpenFlag methods can now be called on Elements, not just OpenClsoeBaseElement. ([cf9eabd](https://github.com/fuqunaga/RosettaUI/commit/cf9eabd2b9cf915082817868a551f5a428aca96d))
+* WindowElement.SetClosable() ([82971ec](https://github.com/fuqunaga/RosettaUI/commit/82971ecf70246cdae12c7016d02d329acd236e85))
+
 # [ga.fuquna.rosettaui-v1.0.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.0.1...ga.fuquna.rosettaui-v1.0.2) (2022-11-22)
 
 

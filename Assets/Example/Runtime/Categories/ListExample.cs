@@ -16,7 +16,7 @@ namespace RosettaUI.Example
         
         public Element CreateElement(LabelElement _)
         {
-            var listViewOption = ListOption.Default;
+            var listViewOption = ListViewOption.Default;
             
             return UI.Tabs(
                 ExampleTemplate.UIFunctionTab(nameof(UI.List),

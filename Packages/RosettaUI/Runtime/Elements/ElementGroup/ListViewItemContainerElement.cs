@@ -29,7 +29,7 @@ namespace RosettaUI
     public class ListViewItemContainerElement : ElementGroup
     {
         private readonly IBinder _binder;
-        public readonly ListOption option;
+        public readonly ListViewOption option;
         
         private readonly Func<IBinder, int, Element> _createItemElement;
         private readonly BinderHistory.Snapshot _binderTypeHistorySnapshot;
@@ -61,7 +61,7 @@ namespace RosettaUI
             }
         }
 
-        public ListViewItemContainerElement(IBinder listBinder, Func<IBinder, int, Element> createItemElement, in ListOption option) : base(null)
+        public ListViewItemContainerElement(IBinder listBinder, Func<IBinder, int, Element> createItemElement, in ListViewOption option) : base(null)
         {
             _binder = listBinder;
             _createItemElement = createItemElement;

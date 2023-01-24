@@ -68,10 +68,10 @@ namespace RosettaUI
         private static Element CreateListView(LabelElement label, IBinder binder)
         {
             var option = (binder is IPropertyOrFieldBinder pfBinder)
-                ? new ListOption(
+                ? new ListViewOption(
                     reorderable: TypeUtility.IsReorderable(pfBinder.ParentBinder.ValueType, pfBinder.PropertyOrFieldName)
                 )
-                : ListOption.Default;
+                : ListViewOption.Default;
 
 
             return UI.List(label, binder, null, option);

@@ -32,7 +32,7 @@ namespace RosettaUI.Example
                 "PropertyOrFieldsScope",
                 nameof(UICustom.PropertyOrFieldLabelModifierScope),
                 nameof(MinMax),
-                nameof(ListOption),
+                nameof(ListViewOption),
                 nameof(IElementCreator),
                 nameof(Element),
                 nameof(LabelElement)

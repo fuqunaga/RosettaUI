@@ -18,9 +18,12 @@ namespace RosettaUI.UIToolkit.Builder
             }
         }
 
-        private static void ApplyIndent(VisualElement ve, int indentLevel = 1)
+        private static void ApplyIndent(VisualElement ve, int indentLevel = 1, bool padding = false)
         {
-            ve.style.marginLeft = LayoutSettings.IndentSize * indentLevel;
+            if ( padding)
+                ve.style.paddingLeft = LayoutSettings.IndentSize * indentLevel;
+            else
+                ve.style.marginLeft = LayoutSettings.IndentSize * indentLevel;
         }
 
         private VisualElement Build_ElementGroupContents(VisualElement container, Element element,

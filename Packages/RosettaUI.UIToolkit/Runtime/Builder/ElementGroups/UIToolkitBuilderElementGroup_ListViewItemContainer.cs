@@ -81,7 +81,11 @@ namespace RosettaUI.UIToolkit.Builder
             VisualElement MakeItem()
             {
                 var itemVe = new VisualElement();
-                ApplyIndent(itemVe); // リストの要素は見栄えを気にしてとりあえず強制インデント
+                
+                // リストの要素は見栄えを気にしてとりあえず強制インデント
+                // marginでのインデントだとreorderable==falseのとき
+                // 選択時の青色がmarginのスペースには反映されないのでpadding
+                ApplyIndent(itemVe, padding: true);
 
                 return itemVe;
             }

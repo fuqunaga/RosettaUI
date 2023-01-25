@@ -5,8 +5,7 @@ Code-based UI library for development menu for Unity
 ![](Documentation~/2023-01-25-15-48-22.png)
 
 
-<div style="display: flex; align-items: start">
-<div style="min-width: 450px">
+<img src=Documentation~/simple.gif width=50% align="right" />
 
 ```csharp
 public class ExampleSimple : MonoBehaviour
@@ -40,10 +39,6 @@ public class ExampleSimple : MonoBehaviour
     }
 }
 ```
-
-</div>
-<img src=Documentation~/simple.gif width=400px/>
-</div>
 
 
 # Installation
@@ -92,40 +87,39 @@ I recommend downloading and checking it out.
 
 ## UI.Field()
 
-<div style="display: flex; align-items: start; max-width: 1000px">
-<img src="Documentation~/field.gif" width=45%/>
-<img src="Documentation~/2023-01-25-16-36-00.png" width=55% />
-</div>
-
+<p float="left>
+<img src="Documentation~/field.gif" width=40% align=top />
+<img src="Documentation~/2023-01-25-16-36-00.png" width=45% align=top />
+</p>
 
 ## UI.Slider()
 
-<div style="display: flex; align-items: start; max-width: 1000px">
-<img src="Documentation~/2023-01-25-16-41-59.png" width=50%/>
-<img src="Documentation~/2023-01-25-16-56-56.png" width=50%/>
-</div>
+<p float="left">
+<img src="Documentation~/2023-01-25-16-41-59.png" width=45% align=top />
+<img src="Documentation~/2023-01-25-16-56-56.png" width=45% align=top />
+</p>
 
 ## UI.MinMaxSlider()
 
-<div style="display: flex; align-items: start; max-width: 1000px">
-<img src="Documentation~/2023-01-25-17-05-28.png" width=50% />
-<img src="Documentation~/2023-01-25-17-07-45.png" width=55% />
-</div>
+<p float="left">
+<img src="Documentation~/2023-01-25-17-05-28.png" width=45% align=top />
+<img src="Documentation~/2023-01-25-17-07-45.png" width=45% align=top />
+</p>
 
 
 ## UI.List()
 
-<div style="display: flex; align-items: start; max-width: 1000px">
-<img src="Documentation~/2023-01-25-17-11-06.png" width=30% />
-<img src="Documentation~/2023-01-25-17-25-46.png" width=38% />
-</div>
+<p float="left">
+<img src="Documentation~/2023-01-25-17-11-06.png" width=30% align=top />
+<img src="Documentation~/2023-01-25-17-25-46.png" width=38% align=top />
+</p>
 
 ## Layout elements
 
-<div style="display: flex; align-items: start; max-width: 1000px">
-<img src="Documentation~/2023-01-25-17-26-32.png" width=35% />
-<img src="Documentation~/2023-01-25-17-27-30.png" width=50% />
-</div>
+<p float="left">
+<img src="Documentation~/2023-01-25-17-26-32.png" width=35% align=top />
+<img src="Documentation~/2023-01-25-17-27-30.png" width=50% align=top />
+</p>
 
 ## And more...
 Please check the [Examples](Assets/Scenes)

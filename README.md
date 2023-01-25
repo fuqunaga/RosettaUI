@@ -87,10 +87,12 @@ I recommend downloading and checking it out.
 
 ## UI.Field()
 
-<p float="left>
-<img src="Documentation~/field.gif" width=40% align=top />
+
+<p float="left">
+<img src="Documentation~/field.gif" width=40% align=top  />
 <img src="Documentation~/2023-01-25-16-36-00.png" width=45% align=top />
 </p>
+
 
 ## UI.Slider()
 
@@ -110,15 +112,15 @@ I recommend downloading and checking it out.
 ## UI.List()
 
 <p float="left">
-<img src="Documentation~/2023-01-25-17-11-06.png" width=30% align=top />
-<img src="Documentation~/2023-01-25-17-25-46.png" width=38% align=top />
+<img src="Documentation~/2023-01-25-17-11-06.png" width=25% align=top />
+<img src="Documentation~/2023-01-25-17-25-46.png" width=30% align=top />
 </p>
 
 ## Layout elements
 
 <p float="left">
-<img src="Documentation~/2023-01-25-17-26-32.png" width=35% align=top />
-<img src="Documentation~/2023-01-25-17-27-30.png" width=50% align=top />
+<img src="Documentation~/2023-01-25-17-26-32.png" width=32% align=top />
+<img src="Documentation~/2023-01-25-17-27-30.png" width=45% align=top />
 </p>
 
 ## And more...

@@ -1,13 +1,12 @@
 # RosettaUI
 
-Code-based GUI library for development menus for Unity
+Code-based UI library for development menu for Unity
 
-![](Documentation~/2022-04-12-17-18-14.png)
+![](Documentation~/2023-01-25-15-48-22.png)
 
 
-
-<table>
-<td width=450>
+<div style="display: flex; align-items: start">
+<div style="min-width: 450px">
 
 ```csharp
 public class ExampleSimple : MonoBehaviour
@@ -42,14 +41,9 @@ public class ExampleSimple : MonoBehaviour
 }
 ```
 
-</td>
-<td>
-
-![](Documentation~/simple.gif)
-
-</td>
-</tr>
-</table>
+</div>
+<img src=Documentation~/simple.gif width=400px/>
+</div>
 
 
 # Installation
@@ -76,7 +70,7 @@ Enter the following and click the Save button.
 
 Select `MyRegistries` in `Packages:`
 
-![](Documentation~/2022-04-12-17-40-26.png)
+<img src="Documentation~/2022-04-12-17-40-26.png" width=35%>
 
 Select `RosettaUI - UI ToolKit` and click the Install button
 ![](Documentation~/2022-04-12-18-04-29.png)
@@ -96,22 +90,45 @@ I recommend downloading and checking it out.
 
 # Functions
 
-### UI.Field()
-![](Documentation~/field.gif)
+## UI.Field()
+
+<div style="display: flex; align-items: start; max-width: 1000px">
+<img src="Documentation~/field.gif" width=45%/>
+<img src="Documentation~/2023-01-25-16-36-00.png" width=55% />
+</div>
 
 
-### UI.Slider()
-![](Documentation~/2022-04-12-18-46-17.png)
+## UI.Slider()
 
-### UI.MinMaxSlider()
-![](Documentation~/2022-04-12-18-49-48.png)
+<div style="display: flex; align-items: start; max-width: 1000px">
+<img src="Documentation~/2023-01-25-16-41-59.png" width=50%/>
+<img src="Documentation~/2023-01-25-16-56-56.png" width=50%/>
+</div>
 
-### Layout elements
-![](Documentation~/2022-07-04-15-38-26.png)
+## UI.MinMaxSlider()
+
+<div style="display: flex; align-items: start; max-width: 1000px">
+<img src="Documentation~/2023-01-25-17-05-28.png" width=50% />
+<img src="Documentation~/2023-01-25-17-07-45.png" width=55% />
+</div>
 
 
-### And more
-Please check the [Examples](Assets/Example/Common)
+## UI.List()
+
+<div style="display: flex; align-items: start; max-width: 1000px">
+<img src="Documentation~/2023-01-25-17-11-06.png" width=30% />
+<img src="Documentation~/2023-01-25-17-25-46.png" width=38% />
+</div>
+
+## Layout elements
+
+<div style="display: flex; align-items: start; max-width: 1000px">
+<img src="Documentation~/2023-01-25-17-26-32.png" width=35% />
+<img src="Documentation~/2023-01-25-17-27-30.png" width=50% />
+</div>
+
+## And more...
+Please check the [Examples](Assets/Scenes)
 
 # Enviroment
 

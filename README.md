@@ -123,7 +123,7 @@ I recommend downloading and checking it out.
 <img src="Documentation~/2023-01-25-17-27-30.png" width=45% align=top />
 </p>
 
-## And more...
+## And more
 Please check the [Examples](Assets/Scenes)
 
 # Enviroment

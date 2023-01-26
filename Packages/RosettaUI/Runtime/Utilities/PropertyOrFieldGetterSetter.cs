@@ -77,7 +77,7 @@ namespace RosettaUI
             }
             catch (Exception e)
             {
-                Debug.Log(e);
+                Debug.LogError($"{typeof(PropertyOrFieldGetterSetter<TParent, TValue>)}.{nameof(CreateSetter)} propertyOrFieldName[{propertyOrFieldName}]\n{e}");
             }
 
             return Expression.Lambda<Func<TParent, TValue, TParent>>(block, objParam, setterValueParam).Compile();

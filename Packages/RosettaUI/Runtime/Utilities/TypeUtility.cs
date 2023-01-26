@@ -212,8 +212,11 @@ namespace RosettaUI
 
 
                 uiTargetPropertyOrFieldsNameTypeDic = fis
-                    .Where(fi => (fi.IsPublic && fi.GetCustomAttribute<NonSerializedAttribute>() == null)
-                                 || fi.GetCustomAttribute<SerializeField>() != null)
+                    .Where(fi => !fi.IsInitOnly)
+                    .Where(fi =>
+                        (fi.IsPublic && fi.GetCustomAttribute<NonSerializedAttribute>() == null)
+                        || fi.GetCustomAttribute<SerializeField>() != null
+                    )
                     .ToDictionary(fi => fi.Name, fi => fi.FieldType);
             }
 

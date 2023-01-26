@@ -17,12 +17,6 @@ namespace RosettaUI.Example
         }
 
         [Serializable]
-        public class MyInt
-        {
-            public int value;
-        }
-
-        [Serializable]
         public class MyClass
         {
             private float _privateValue;
@@ -31,7 +25,7 @@ namespace RosettaUI.Example
         }
 
         public MyFloat myFloatValue;
-        public MyInt myInt;
+        public int intValue;
         public MyClass myClass;
         public Vector2 vector2Value;
 
@@ -39,7 +33,6 @@ namespace RosettaUI.Example
         public Element CreateElement(LabelElement _)
         {
             SyntaxHighlighter.AddPattern("type", nameof(MyFloat));
-            SyntaxHighlighter.AddPattern("type", nameof(MyInt));
             SyntaxHighlighter.AddPattern("type", nameof(MyClass));
 
             return UI.Tabs(
@@ -74,36 +67,30 @@ UI.Field(() => myFloatValue));
 
         private (string, Element) CreateTabCreationFunc()
         {
-            using var creationFuncScope = new UICustom.ElementCreationFuncScope<MyInt>((label, getInstance) =>
+            using var scope = UICustom.ElementCreationFuncScope.Create<int>((label, readValue, writeValue) =>
             {
                 return UI.Row(
-                    UI.Field(label, () => getInstance().value),
-                    UI.Button("+", () => getInstance().value++),
-                    UI.Button("-", () => getInstance().value--)
+                    UI.Field(label, readValue, writeValue), // UI.Field() in CreationFunc calls default UI.Field()
+                    UI.Button("+", () => writeValue(readValue()+1)),
+                    UI.Button("-", () => writeValue(readValue()-1))
                 );
             });
 
-            return ExampleTemplate.CodeElementSetsWithDescriptionTab("CreationFunc",
+            return ExampleTemplate.CodeElementSetsWithDescriptionTab("ElementCreationFunc",
                 "Default UI can be defined with UICustom.",
-                (@"public class MyInt
-{
-    public int value;
-}
-
-public MyInt myInt;
-
-using var creationFuncScope =  new UICustom.ElementCreationFuncScope<MyInt>((label, getInstance) =>
+                (@"using var scope = UICustom.ElementCreationFuncScope.Create<int>((label, readValue, writeValue) =>
 {
     return UI.Row(
-        UI.Field(label, () => getInstance().value),
-        UI.Button(""+"", () => getInstance().value++),
-        UI.Button(""-"", () => getInstance().value--)
+        UI.Field(label, readValue, writeValue), // UI.Field() in CreationFunc calls default UI.Field()
+        UI.Button(""+"", () => writeValue(readValue()+1)),
+        UI.Button(""-"", () => writeValue(readValue()-1))
     );
 });
 
-UI.Field(() => myInt);
+UI.Field(() => intValue);
 ",
-                    UI.Field(() => myInt))
+                    UI.Field(() => intValue)
+                )
             );
         }
 

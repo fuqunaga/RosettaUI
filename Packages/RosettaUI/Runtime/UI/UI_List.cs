@@ -8,64 +8,146 @@ namespace RosettaUI
 {
     public static partial class UI
     {
-        public static Element List<TList>(Expression<Func<TList>> targetExpression, in ListViewOption option)
+        #region targetExpression
+
+        public static Element List<TList> (
+            Expression<Func<TList>> targetExpression,
+            in ListViewOption option
+        )
             where TList : IList
-            => List(targetExpression, createItemElement: null, option);
-        public static Element List<TList>(Expression<Func<TList>> targetExpression, Func<IBinder, int, Element> createItemElement = null, in ListViewOption? option = null)
+            => List(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, null, option);
+
+        public static Element List<TList>(
+            Expression<Func<TList>> targetExpression,
+            Func<IBinder, int, Element> createItemElement = null,
+            in ListViewOption? option = null
+        )
             where TList : IList
             => List(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, createItemElement, option);
 
-        public static Element List<TList>(LabelElement label, Expression<Func<TList>> targetExpression, in ListViewOption option)
+        public static Element List<TList>(
+            LabelElement label,
+            Expression<Func<TList>> targetExpression,
+            in ListViewOption option
+        )
             where TList : IList
             => List(label, targetExpression, null, option);
 
-        public static Element List<TList>(LabelElement label, Expression<Func<TList>> targetExpression, Func<IBinder, int, Element> createItemElement = null, in ListViewOption? option = null)
+        public static Element List<TList>(
+            LabelElement label,
+            Expression<Func<TList>> targetExpression,
+            Func<IBinder, int, Element> createItemElement = null,
+            in ListViewOption? option = null
+        )
             where TList : IList
         {
-            ListViewOption? newOption = null;
-            if (option == null && ExpressionUtility.GetAttribute<TList, NonReorderableAttribute>(targetExpression) != null)
-            {
-                newOption = new ListViewOption(reorderable: false, ListViewOption.Default.fixedSize);
-            }
-
-            return List(label, ExpressionUtility.CreateBinder(targetExpression), createItemElement, newOption ?? option);
+            return List(
+                label,
+                ExpressionUtility.CreateBinder(targetExpression),
+                createItemElement,
+                option ?? CalcDefaultOptionOf(targetExpression)
+            );
         }
 
-        public static Element List<TList>(Expression<Func<TList>> targetExpression, Action<TList> writeValue, in ListViewOption option)
+        #endregion
+
+
+        #region readValue/writeValue
+        
+        public static Element List<TList>(
+            Expression<Func<TList>> targetExpression,
+            Action<TList> writeValue,
+            in ListViewOption option
+        )
             where TList : IList
-            => List(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue, option);
-        public static Element List<TList>(LabelElement label, Func<TList> readValue, Action<TList> writeValue, in ListViewOption option)
+            => List(targetExpression, writeValue, null, option);
+        
+        public static Element List<TList>(
+            LabelElement label,
+            Func<TList> readValue,
+            Action<TList> writeValue,
+            in ListViewOption option
+        )
             where TList : IList
             => List(label, readValue, writeValue, null, option);
-        
-        public static Element List<TList>(Expression<Func<TList>> targetExpression, Action<TList> writeValue, Func<IBinder, int, Element> createItemElement = null, in ListViewOption? option = null)
+
+        public static Element List<TList>(
+            Expression<Func<TList>> targetExpression,
+            Action<TList> writeValue,
+            Func<IBinder, int, Element> createItemElement = null,
+            in ListViewOption? option = null
+        )
             where TList : IList
-            => List(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue, createItemElement, option);
-        public static Element List<TList>(LabelElement label, Func<TList> readValue, Action<TList> writeValue, Func<IBinder, int, Element> createItemElement = null, in ListViewOption? option = null) 
+        {
+            return List(
+                ExpressionUtility.CreateLabelString(targetExpression),
+                targetExpression.Compile(), 
+                writeValue,
+                createItemElement, 
+                option ?? CalcDefaultOptionOf(targetExpression));
+        }
+
+        public static Element List<TList>(
+            LabelElement label,
+            Func<TList> readValue,
+            Action<TList> writeValue,
+            Func<IBinder, int, Element> createItemElement = null,
+            in ListViewOption? option = null
+        )
             where TList : IList
             => List(label, Binder.Create(readValue, writeValue), createItemElement, option);
 
-        public static Element ListReadOnly<TList>(Expression<Func<TList>> targetExpression, in ListViewOption option)
+        #endregion
+
+
+        #region ReadOnly
+        
+        public static Element ListReadOnly<TList>(
+            Expression<Func<TList>> targetExpression,
+            in ListViewOption option
+        )
             where TList : IList
             => ListReadOnly(targetExpression, null, option);
-        public static Element ListReadOnly<TList>(Expression<Func<TList>> targetExpression, Func<IBinder, int, Element> createItemElement = null, in ListViewOption? option = null)
+
+        public static Element ListReadOnly<TList>(
+            Expression<Func<TList>> targetExpression,
+            Func<IBinder, int, Element> createItemElement = null,
+            in ListViewOption? option = null
+        )
             where TList : IList
         {
-            var labelString = ExpressionUtility.CreateLabelString(targetExpression);
-            var binder = UIInternalUtility.CreateReadOnlyBinder(targetExpression);
-            return List(labelString, binder, createItemElement, option);
+            return List(
+                ExpressionUtility.CreateLabelString(targetExpression),
+                UIInternalUtility.CreateReadOnlyBinder(targetExpression),
+                createItemElement, 
+                option ?? CalcDefaultOptionOf(targetExpression));
         }
 
-        public static Element ListReadOnly<TList>(LabelElement label, Func<TList> readValue, in ListViewOption option)
+        public static Element ListReadOnly<TList>(
+            LabelElement label,
+            Func<TList> readValue,
+            in ListViewOption option
+        )
             where TList : IList
             => ListReadOnly(label, readValue, null, option);
-        public static Element ListReadOnly<TList>(LabelElement label, Func<TList> readValue, Func<IBinder, int, Element> createItemElement = null, in ListViewOption? option = null)
+        
+        public static Element ListReadOnly<TList>(
+            LabelElement label, 
+            Func<TList> readValue, 
+            Func<IBinder, int, Element> createItemElement = null,
+            in ListViewOption? option = null
+        )
             where TList : IList
         {
             var binder = Binder.Create(readValue, null);
             return List(label, binder, createItemElement, option);
         }
         
+        #endregion
+
+
+        #region Core
+
         public static Element List(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, in ListViewOption? optionNullable = null)
         {
             var option = optionNullable ?? ListViewOption.Default;
@@ -125,5 +207,13 @@ namespace RosettaUI
         }
         
         public static Element ListItemDefault(IBinder binder, int index) => Field($"Item {index}", binder);
+
+        private static ListViewOption? CalcDefaultOptionOf(LambdaExpression expression)
+            => ExpressionUtility.GetAttribute<NonReorderableAttribute>(expression) != null
+                    ? new ListViewOption(reorderable: false)
+                    : null;
+
+
+        #endregion
     }
 }

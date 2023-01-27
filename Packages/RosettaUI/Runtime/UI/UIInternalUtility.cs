@@ -23,7 +23,7 @@ namespace RosettaUI
         public static (IGetter<T>, IGetter<T>) CreateMinMaxGetterFromRangeAttribute<T>(Expression<Func<T>> targetExpression)
         {
             var rangeAttribute = typeof(IConvertible).IsAssignableFrom(typeof(T))
-                ? ExpressionUtility.GetAttribute<T, RangeAttribute>(targetExpression)
+                ? ExpressionUtility.GetAttribute<RangeAttribute>(targetExpression)
                 : null;
 
             return RangeUtility.CreateGetterMinMax<T>(rangeAttribute);

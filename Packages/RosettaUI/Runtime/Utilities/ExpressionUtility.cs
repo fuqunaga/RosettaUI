@@ -215,7 +215,7 @@ namespace RosettaUI
 
         #region GetAttribute
 
-        public static TAttribute GetAttribute<T, TAttribute>(Expression<Func<T>> lambda)
+        public static TAttribute GetAttribute<TAttribute>(LambdaExpression lambda)
             where TAttribute : Attribute
         {
             if (lambda.Body is MemberExpression memberExpression)

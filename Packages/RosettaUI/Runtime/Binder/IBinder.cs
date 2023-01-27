@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RosettaUI
+﻿namespace RosettaUI
 {
     public interface IBinder : IGetter
     {
@@ -14,6 +12,4 @@ namespace RosettaUI
     {
         void Set(T v);
     }
-
-
 }

@@ -28,7 +28,7 @@ namespace RosettaUI.Builder
                     // Row内なら一番左のみ有効
                     case RowElement row when row.Children.FirstOrDefault() != e:
                         return false;
-                    case IndentElement:
+                    case IndentElement or ListViewItemContainerElement:
                         return true;
                 }
             }

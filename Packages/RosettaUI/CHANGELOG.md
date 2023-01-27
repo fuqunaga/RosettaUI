@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.1.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.1.1...ga.fuquna.rosettaui-v1.1.2) (2023-01-27)
+
+
+### Bug Fixes
+
+* Fold and normal items did not align in a UI.List() without a header. ([63ba1c8](https://github.com/fuqunaga/RosettaUI/commit/63ba1c820978bf68d8187dc7f8315b9d22b83747))
+
 # [ga.fuquna.rosettaui-v1.1.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.1.0...ga.fuquna.rosettaui-v1.1.1) (2023-01-27)
 
 

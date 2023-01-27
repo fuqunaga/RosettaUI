@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.1.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.1.0...ga.fuquna.rosettaui-v1.1.1) (2023-01-27)
+
+
+### Bug Fixes
+
+* error passing class with public readonly field to UI.FIeld() ([6b4b3fe](https://github.com/fuqunaga/RosettaUI/commit/6b4b3fec02d8be777e5ef870876a1399476a5ba8))
+
 # [ga.fuquna.rosettaui-v1.1.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.0.2...ga.fuquna.rosettaui-v1.1.0) (2023-01-24)
 
 

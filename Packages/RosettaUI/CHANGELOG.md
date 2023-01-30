@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.1.3](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.1.2...ga.fuquna.rosettaui-v1.1.3) (2023-01-30)
+
+
+### Bug Fixes
+
+* Invalid cast exception when calling UI.Field() with a class that inherits T registered with UICustom.RegisterElementCreationFunc<T>(). ([431cceb](https://github.com/fuqunaga/RosettaUI/commit/431cceb9f956bde87b10033443c14fd19951576d))
+
 # [ga.fuquna.rosettaui-v1.1.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.1.1...ga.fuquna.rosettaui-v1.1.2) (2023-01-27)
 
 

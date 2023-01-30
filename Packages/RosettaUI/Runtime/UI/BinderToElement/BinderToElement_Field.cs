@@ -4,8 +4,6 @@ using UnityEngine;
 
 namespace RosettaUI
 {
-    using CreationFunc = Func<LabelElement, IBinder, Element>;
-    
     public  static partial class BinderToElement
     {
         public static Element CreateFieldElement(LabelElement label, IBinder binder, in FieldOption option)
@@ -20,7 +18,7 @@ namespace RosettaUI
             using var binderHistory = BinderHistory.GetScope(binder);
             var optionCaptured = option;
             
-            if (!UICustomCreationScope.IsIn(valueType) && UICustom.GetElementCreationMethod(valueType) is { } creationFunc)
+            if (!UICustomCreationScope.IsIn(valueType) && UICustom.GetElementCreationFunc(valueType) is { } creationFunc)
             {
                 using var scope = new UICustomCreationScope(valueType);
                 return InvokeCreationFunc(creationFunc);
@@ -45,7 +43,7 @@ namespace RosettaUI
             };
 
             
-            Element InvokeCreationFunc(CreationFunc createFunc)
+            Element InvokeCreationFunc(Func<LabelElement, IBinder, Element>  createFunc)
             {
                 return WrapNullGuard(() => createFunc(label, binder));
             }

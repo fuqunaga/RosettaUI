@@ -3,23 +3,34 @@ using System.Collections.Generic;
 
 namespace RosettaUI
 {
-    using CreationFunc = Func<LabelElement, IBinder, Element>;
-    
+    /// <summary>
+    /// 特定の型に標準のUI(UI.Field()で生成される）を指定できる
+    /// </summary>
     public static partial class UICustom
     {
-        private static readonly Dictionary<Type, CreationFunc> CreationFuncTable = new();
-
-        public static void RegisterElementCreationFunc<T>(Func<LabelElement, Func<T>, Action<T>, Element> creationFunc)
+        private class CreationFunc
         {
-            RegisterElementCreationFunc(typeof(T), CreationFunc);
-            
-            Element CreationFunc(LabelElement label, IBinder binder)
-            {
-                var typedBinder = (IBinder<T>)binder;
-                return creationFunc(label, typedBinder.Get, typedBinder.Set);
-            }
+            public readonly Func<LabelElement, IBinder, Element> func;
+            public readonly bool includeParentTypes;
+
+            public CreationFunc(Func<LabelElement, IBinder, Element> func, bool includeParentTypes = false) =>
+                (this.func, this.includeParentTypes) = (func, includeParentTypes);
         }
         
+        
+        private static readonly Dictionary<Type, CreationFunc> CreationFuncTable = new();
+
+        // exclude parent type
+        public static void RegisterElementCreationFunc<T>(Func<LabelElement, Func<T>, Action<T>, Element> creationFunc)
+        {
+            RegisterElementCreationFunc(typeof(T), new CreationFunc((label, binder) =>
+                {
+                    var typedBinder = (IBinder<T>)binder;
+                    return creationFunc(label, typedBinder.Get, typedBinder.Set);
+                }
+            ));
+        }
+
         [Obsolete("Use other signature of RegisterElementCreationFunc().")]
         public static void RegisterElementCreationFunc<T>(Func<LabelElement, Func<T>, Element> creationFunc)
             where T : class // GetObject() as T を呼ぶためにとりあえずwhere T : class
@@ -29,27 +40,29 @@ namespace RosettaUI
             //
             // UI.Field(() => GetObj(), obj => SetObj(obj)); などのケースで
             // binder.GetObject()で返ってきたobjを編集するだけではだめでSetObject()で通知する必要がある
-            Element CreationFunc(LabelElement label, IBinder binder)
-            {
-                object obj = null;
-                return creationFunc(label, () => (obj = binder.GetObject()) as T)
-                    .RegisterValueChangeCallback(() => binder.SetObject(obj));
-            }
-
-            RegisterElementCreationFunc(typeof(T), CreationFunc);
+            RegisterElementCreationFunc(typeof(T), new CreationFunc((label, binder) =>
+                {
+                    object obj = null;
+                    return creationFunc(label, () => (obj = binder.GetObject()) as T)
+                        .RegisterValueChangeCallback(() => binder.SetObject(obj));
+                }
+            ));
         }
 
+        // exclude parent type
         public static void RegisterElementCreationFunc<T>(Func<LabelElement, IBinder<T>, Element> creationFunc)
         {
-            RegisterElementCreationFunc(typeof(T), CreationFunc);
-            
-            Element CreationFunc(LabelElement label, IBinder binder)
-            {
-                return creationFunc(label, (IBinder<T>)binder);
-            }
+            RegisterElementCreationFunc(typeof(T),
+                new CreationFunc((label, binder) => creationFunc(label, (IBinder<T>)binder)));
+        }
+
+        // include parent type
+        public static void RegisterElementCreationFunc(Type type, Func<LabelElement, IBinder, Element> creationFunc)
+        {
+            RegisterElementCreationFunc(type, new CreationFunc(creationFunc, true));
         }
         
-        public static void RegisterElementCreationFunc(Type type, CreationFunc creationFunc)
+        private static void RegisterElementCreationFunc(Type type, CreationFunc creationFunc)
         {
             CreationFuncTable[type] = creationFunc;
         }
@@ -59,20 +72,33 @@ namespace RosettaUI
             return CreationFuncTable.Remove(type);
         }
 
-        public static CreationFunc GetElementCreationMethod(Type type)
+        
+        public static Func<LabelElement, IBinder, Element> GetElementCreationFunc(Type type)
         {
-            if (type == null) return null;
-
-            return CreationFuncTable.TryGetValue(type, out var func)
-                ? func
-                : CreationFuncTable[type] = GetElementCreationMethod(type.BaseType);
+            return GetElementCreationFuncData(type)?.func;
         }
-        
-        
+
+        private static CreationFunc GetElementCreationFuncData(Type type, bool isTarget = true)
+        {
+            while (true)
+            {
+                if (type == null) return null;
+
+                if (CreationFuncTable.TryGetValue(type, out var creationFunc) && (isTarget || creationFunc.includeParentTypes))
+                {
+                    return creationFunc;
+                }
+
+                type = type.BaseType;
+                isTarget = false;
+            }
+        }
+
         #region Scope
 
         public readonly ref struct ElementCreationFuncScope
         {
+            // exclude parent type
             public static ElementCreationFuncScope Create<T>(Func<LabelElement, Func<T>, Action<T>, Element> creationFunc)
             {
                 var ret = new ElementCreationFuncScope(typeof(T));
@@ -80,6 +106,7 @@ namespace RosettaUI
                 return ret;
             }
 
+            // exclude parent type
             public static ElementCreationFuncScope Create<T>(Func<LabelElement, IBinder<T>, Element> creationFunc)
             {
                 var ret = new ElementCreationFuncScope(typeof(T));
@@ -87,6 +114,7 @@ namespace RosettaUI
                 return ret;
             }
             
+            // include parent type
             public static ElementCreationFuncScope Create(Type type, Func<LabelElement, IBinder, Element> creationFunc)
             {
                 var ret = new ElementCreationFuncScope(type);
@@ -100,7 +128,7 @@ namespace RosettaUI
             private ElementCreationFuncScope(Type type)
             {
                 _type = type;
-                _creationFuncCache = GetElementCreationMethod(type);
+                _creationFuncCache = GetElementCreationFuncData(type);
             }
             
             public void Dispose()
@@ -117,7 +145,7 @@ namespace RosettaUI
             [Obsolete("Use ElementCreationFuncScope.Create() instead.")]
             public ElementCreationFuncScope(Func<LabelElement, Func<T>, Element> creationFunc)
             {
-                _creationFuncCache = GetElementCreationMethod(typeof(T));
+                _creationFuncCache = GetElementCreationFuncData(typeof(T));
                 RegisterElementCreationFunc(creationFunc);
             }
 

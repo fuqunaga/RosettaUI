@@ -21,8 +21,8 @@ namespace RosettaUI.UIToolkit.Builder
             public event Action<RootData> onWidthRateChanged;
             public float WidthRate { get; private set; } = 1f;
             
-            private float? _initialWidth;
-            private int _windowResizeFrame;
+            private float? _baseWidth;
+            private int _requestResizeWindowFrame;
             
             public RootData(VisualElement root)
             {
@@ -35,30 +35,38 @@ namespace RosettaUI.UIToolkit.Builder
                     () => initialFrame < Time.frameCount,
                     (evt) =>
                     {
-                        _initialWidth = evt.newRect.width;
+                        _baseWidth = evt.newRect.width;
                     }
                 );
 
                 root.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
                 
-                // WindowResize中（FoldのOn･Offなど）ではWidthRateは更新しない
+                // RequestResizeWindow中（FoldのOn/Offなど）ではWidthRateは更新しない
                 // WidthRateはユーザーが手動でResizeしたときのみ変更したい
-                // （勝手にラベル幅が変わってほしくない）
-                root.RegisterCallback<RequestResizeWindowEvent>(evt =>
+                // 勝手にラベル幅が変わってほしくない
+                root.RegisterCallback<RequestResizeWindowEvent>(_ =>
                 {
-                    _windowResizeFrame = Time.frameCount;
+                    _requestResizeWindowFrame = Time.frameCount;
                 });
             }
 
             private void OnGeometryChanged(GeometryChangedEvent evt)
             {
-                if (!_initialWidth.HasValue ) return;
-                if (_windowResizeFrame == Time.frameCount) return;
+                if (!_baseWidth.HasValue ) return;
+                
+                // RequestResizeWindowでサイズが変わった場合、以降のResizeでWidthが継続するように_baseWidthを更新しておく
+                // currentWidth / baseWidthNew[?] = WidthRate
+                // -> baseWidthNew = currentWidth / WidthRate
+                if (_requestResizeWindowFrame == Time.frameCount)
+                {
+                    _baseWidth = evt.newRect.width / WidthRate;
+                    return;
+                }
                     
                 // 幅以外の変化は無視
                 if ( evt.newRect.width <=0 || Mathf.Approximately(evt.oldRect.width ,evt.newRect.width)) return;
                     
-                var newWidthRate = evt.newRect.width / _initialWidth.Value;
+                var newWidthRate = evt.newRect.width / _baseWidth.Value;
 
                 if (Mathf.Approximately(WidthRate, newWidthRate)) return;
                 
@@ -118,8 +126,11 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 if (!IsVisible(ve.layout)) return;
                 if (rd?.WidthRate is not { } widthRate) return;
-
-                ve.style.width = Mathf.Max(CalcLabelWidth(labelWidthGlobal * widthRate), 30f);
+                
+                var width = CalcLabelWidth(labelWidthGlobal * widthRate);
+                if (width < 50f) return;
+                
+                ve.style.width = width;
             }
             
             float CalcLabelWidth(float widthGlobal)

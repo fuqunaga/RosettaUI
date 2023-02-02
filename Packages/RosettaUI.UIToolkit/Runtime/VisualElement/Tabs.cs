@@ -38,7 +38,7 @@ namespace RosettaUI.UIToolkit
                 UpdateTabActive();
                 onCurrentTabIndexChanged?.Invoke(_currentTabIndex);
                 
-                using var changeVisibleEvent = ChangeVisibleEvent.GetPooled();
+                using var changeVisibleEvent = RequestResizeWindowEvent.GetPooled();
                 changeVisibleEvent.target = this;
                 SendEvent(changeVisibleEvent);
             }

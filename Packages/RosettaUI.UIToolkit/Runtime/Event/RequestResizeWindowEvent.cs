@@ -2,9 +2,9 @@
 
 namespace RosettaUI.UIToolkit
 {
-    // 動的にエレメントが可視不可視が変更されたイベント
-    // Windowのサイズ再計算トリガーとして使う
-    public class ChangeVisibleEvent : EventBase<ChangeVisibleEvent>
+    // Windowのサイズ再計算のリクエスト
+    // 動的にエレメントが可視不可視が変更された際など
+    public class RequestResizeWindowEvent : EventBase<RequestResizeWindowEvent>
     {
         protected override void Init()
         {

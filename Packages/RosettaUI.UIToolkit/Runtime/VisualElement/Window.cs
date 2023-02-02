@@ -195,7 +195,7 @@ namespace RosettaUI.UIToolkit
             RegisterCallback<PointerDownEvent>(OnPointerDown);
             RegisterCallback<FocusEvent>(OnFocus, TrickleDown.TrickleDown);
             RegisterCallback<BlurEvent>(OnBlur, TrickleDown.TrickleDown);
-            RegisterCallback<ChangeVisibleEvent>(_ => ResetFixedSize());
+            RegisterCallback<RequestResizeWindowEvent>(_ => ResetFixedSize());
 
             // Focusable.ExecuteDefaultEvent() 内の this.focusController?.SwitchFocusOnEvent(evt) で
             // NavigationMoveEvent 方向にフォーカスを移動しようとする

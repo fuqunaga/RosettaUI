@@ -478,18 +478,15 @@ namespace RosettaUI.UIToolkit
                 var diff = resolvedStyle.left - position.x;
 
                 style.left = position.x;
-                style.minWidth = diff + layout.width;
-                FreeFixedSize();
+                style.width = diff + layout.width;
             }
 
             if (_resizeEdge.HasFlag(ResizeEdge.Right))
             {
                 var left = resolvedStyle.left;
-                style.minWidth = position.x - left;
-                FreeFixedSize();
+                style.width = position.x - left;
             }
         }
-
 
         private ResizeEdge CalcEdge(Vector2 localPosition)
         {

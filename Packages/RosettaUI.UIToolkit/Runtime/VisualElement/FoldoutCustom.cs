@@ -38,9 +38,9 @@ namespace RosettaUI.UIToolkit
             
             RegisterCallback<ChangeEvent<bool>>(_ =>
             {
-                using var changeVisibleEvent = RequestResizeWindowEvent.GetPooled();
-                changeVisibleEvent.target = contentContainer;
-                SendEvent(changeVisibleEvent);
+                using var requestResizeWindowEvent = RequestResizeWindowEvent.GetPooled();
+                requestResizeWindowEvent.target = contentContainer;
+                SendEvent(requestResizeWindowEvent);
             });
         }
     }

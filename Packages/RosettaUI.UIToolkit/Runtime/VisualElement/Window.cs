@@ -195,7 +195,11 @@ namespace RosettaUI.UIToolkit
             RegisterCallback<PointerDownEvent>(OnPointerDown);
             RegisterCallback<FocusEvent>(OnFocus, TrickleDown.TrickleDown);
             RegisterCallback<BlurEvent>(OnBlur, TrickleDown.TrickleDown);
-            RegisterCallback<RequestResizeWindowEvent>(_ => ResetFixedSize());
+            RegisterCallback<RequestResizeWindowEvent>(evt =>
+            {
+                ResetFixedSize();
+                evt.StopPropagation();
+            });
 
             // Focusable.ExecuteDefaultEvent() 内の this.focusController?.SwitchFocusOnEvent(evt) で
             // NavigationMoveEvent 方向にフォーカスを移動しようとする
@@ -209,7 +213,6 @@ namespace RosettaUI.UIToolkit
         // サイズ固定
         // ほぼルートのWindowエレメントのサイズが不定だとレイアウトの計算がめちゃくちゃ重い
         // これを回避するためWindowは内容物のレイアウトが落ち着いたらサイズを固定しておく
-        // widthだけだと、widthが固定/飛行艇でheightが変わる（リサイズのドラッグ中だけ高さが変わる）ことがあったのでheightも同様にしておく
         // 同一フレームだとGeometryChangedEventなどでサイズが変わるやつがいるので１フレーム待つ
         private void ResetFixedSize()
         {

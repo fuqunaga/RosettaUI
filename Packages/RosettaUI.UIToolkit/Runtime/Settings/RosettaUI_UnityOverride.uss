@@ -1,8 +1,3 @@
-.unity-label{
-    margin: 1px;
-    padding: 2px;
-}
-
 .unity-base-field:focus > .unity-base-field__label {
     color: var(--unity-colors-highlight-text);
 }
@@ -69,6 +64,17 @@
 .unity-base-text-field__input {
     --unity-cursor-color: var(--unity-colors-default-text);
 }
+
+/********************************************************************************
+* label
+********************************************************************************/
+.unity-label{
+    margin: 1px;
+    padding: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 
 /********************************************************************************
 * text field multiline

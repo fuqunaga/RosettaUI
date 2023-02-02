@@ -119,7 +119,7 @@ namespace RosettaUI.UIToolkit.Builder
                 if (!IsVisible(ve.layout)) return;
                 if (rd?.WidthRate is not { } widthRate) return;
 
-                ve.style.width = CalcLabelWidth(labelWidthGlobal * widthRate);
+                ve.style.width = Mathf.Max(CalcLabelWidth(labelWidthGlobal * widthRate), 30f);
             }
             
             float CalcLabelWidth(float widthGlobal)
@@ -141,8 +141,8 @@ namespace RosettaUI.UIToolkit.Builder
                         break;
                     }
                 }
-                
-                return widthGlobal - marginLeft;
+
+                return widthGlobal - marginLeft / ve.worldTransform.m00;
             }
             
             #endregion

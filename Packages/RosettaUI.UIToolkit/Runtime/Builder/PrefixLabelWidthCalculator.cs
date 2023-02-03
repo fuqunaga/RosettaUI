@@ -98,6 +98,8 @@ namespace RosettaUI.UIToolkit.Builder
                 _rootDataTable[root] = rootData = new RootData(root);
             }
 
+            var firstTime = true;
+
             // ラベルのサイズを変えるタイミングは３つ
             // 1. 初期化時可能であればとりあえず更新
             // 通常はサイズゼロの非表示状態のため効果がないが既存のVisualElementに再Bindされたときなどに対応
@@ -112,12 +114,8 @@ namespace RosettaUI.UIToolkit.Builder
             rootData.onWidthRateChanged += UpdateWidthWithRate;
 
 
-            label.GetViewBridge().onUnsubscribe += () =>
-            {
-                ve.UnregisterCallback<AttachToPanelEvent>(OnAttachToPanelEventFirst);
-                ve.UnregisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
-                rootData.onWidthRateChanged -= UpdateWidthWithRate;
-            };
+            // 削除
+            label.GetViewBridge().onUnsubscribe += Unsubscribe;
             
             #region Local Funcitons
 
@@ -141,11 +139,29 @@ namespace RosettaUI.UIToolkit.Builder
                 if (rd?.WidthRate is not { } widthRate) return;
                 
                 var width = CalcLabelWidth(LayoutSettings.LabelWidth * widthRate);
-                if (width < 50f) return;
-                
+
+                // 最低サイズ星
+                if (width < 50f)
+                {
+                    // 初回で最小サイズ以下ならPrefixLabel扱いにはしない
+                    // やたら右寄りのラベル
+                    if (firstTime) Unsubscribe();
+                    return;
+                }
+
+                firstTime = false;
                 ve.style.width = width;
             }
-            
+
+            void Unsubscribe()
+            {
+                label.GetViewBridge().onUnsubscribe -= Unsubscribe;
+
+                ve.UnregisterCallback<AttachToPanelEvent>(OnAttachToPanelEventFirst);
+                ve.UnregisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
+                rootData.onWidthRateChanged -= UpdateWidthWithRate;
+            }
+
             float CalcLabelWidth(float widthGlobal)
             {
                 if (label.Parent == null)

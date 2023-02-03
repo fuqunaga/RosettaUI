@@ -22,7 +22,7 @@ namespace RosettaUI.UIToolkit.Builder
             public float WidthRate { get; private set; } = 1f;
             
             private float? _baseWidth;
-            private int _requestResizeWindowFrame;
+            private bool _duringRequestResizeWindow;
             
             public RootData(VisualElement root)
             {
@@ -46,7 +46,8 @@ namespace RosettaUI.UIToolkit.Builder
                 // 勝手にラベル幅が変わってほしくない
                 root.RegisterCallback<RequestResizeWindowEvent>(_ =>
                 {
-                    _requestResizeWindowFrame = Time.frameCount;
+                    _duringRequestResizeWindow = true;
+                    root.schedule.Execute(() => _duringRequestResizeWindow = false);
                 });
             }
 
@@ -57,7 +58,7 @@ namespace RosettaUI.UIToolkit.Builder
                 // RequestResizeWindowでサイズが変わった場合、以降のResizeでWidthが継続するように_baseWidthを更新しておく
                 // currentWidth / baseWidthNew[?] = WidthRate
                 // -> baseWidthNew = currentWidth / WidthRate
-                if (_requestResizeWindowFrame == Time.frameCount)
+                if (_duringRequestResizeWindow)
                 {
                     _baseWidth = evt.newRect.width / WidthRate;
                     return;

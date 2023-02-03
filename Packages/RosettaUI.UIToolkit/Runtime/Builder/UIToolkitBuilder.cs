@@ -142,57 +142,7 @@ namespace RosettaUI.UIToolkit.Builder
 
         // プレフィックスラベルの幅を計算する
         protected override void CalcPrefixLabelWidthWithIndent(LabelElement label, VisualElement ve)
-        {
-            // すでにパネルにアタッチされている＝Build時ではなくBind時
-            // レイアウト計算が終わってるはずなので即計算する
-            if (ve.panel != null)
-            {
-                CalcMinWidth();
-            }
-            // Build時はまだレイアウト計算が終わっていないのでGeometryChangedを待つ
-            else
-            {
-                ve.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
-            }
-
-            // リストの要素など１回目のあとにレイアウト変更がされるので落ち着くまで複数回呼ばれるようにする
-            void OnGeometryChanged(GeometryChangedEvent evt)
-            {
-                // 移動してなければ落ち着いたと見てコールバック解除
-                // UpdateLabelWidth()でスタイルを変えているので少なくとも一度は再度呼ばれる
-                if (Mathf.Approximately(evt.oldRect.xMin, evt.newRect.xMin))
-                {
-                    ve.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
-                    return;
-                }
-
-                CalcMinWidth();
-            }
-
-            void CalcMinWidth()
-            {
-                if (label.Parent == null)
-                {
-                    Debug.LogWarning($"Label parent is null. [{label.Value}]");
-                }
-
-                var marginLeft = ve.worldBound.xMin;
-          
-                for (var element = label.Parent;
-                     element != null;
-                     element = element.Parent)
-                {
-                    if (LayoutHint.IsIndentOrigin(element))
-                    {
-                        marginLeft -= GetUIObj(element).worldBound.xMin;
-                        break;
-                    }
-                }
-
-                marginLeft /= ve.worldTransform.lossyScale.x; // ignore rotation
-                ve.style.minWidth = LayoutSettings.LabelWidth - marginLeft;
-            }
-        }
+            => PrefixLabelWidthCalculator.Register(label, ve);
 
         protected override void OnElementEnableChanged(Element _, VisualElement ve, bool enable)
         {

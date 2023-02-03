@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using RosettaUI.Reactive;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace RosettaUI
 {

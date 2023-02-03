@@ -195,11 +195,10 @@ namespace RosettaUI.UIToolkit
             RegisterCallback<PointerDownEvent>(OnPointerDown);
             RegisterCallback<FocusEvent>(OnFocus, TrickleDown.TrickleDown);
             RegisterCallback<BlurEvent>(OnBlur, TrickleDown.TrickleDown);
-
-            RegisterCallback<ChangeVisibleEvent>(_ =>
+            RegisterCallback<RequestResizeWindowEvent>(evt =>
             {
-                style.width = StyleKeyword.Null;
                 ResetFixedSize();
+                evt.StopPropagation();
             });
 
             // Focusable.ExecuteDefaultEvent() 内の this.focusController?.SwitchFocusOnEvent(evt) で
@@ -211,19 +210,28 @@ namespace RosettaUI.UIToolkit
             ResetFixedSize();
         }
 
-        // 幅固定
+        // サイズ固定
         // ほぼルートのWindowエレメントのサイズが不定だとレイアウトの計算がめちゃくちゃ重い
-        // 特にHorizontal方向はほとんどのエレメントが固定サイズを持っていないので再計算が走りまくるようで重い
-        // これを回避するためWindowは内容物のレイアウトが落ち着いたら幅を固定しておく
+        // これを回避するためWindowは内容物のレイアウトが落ち着いたらサイズを固定しておく
         // 同一フレームだとGeometryChangedEventなどでサイズが変わるやつがいるので１フレーム待つ
         private void ResetFixedSize()
         {
             var startFrameCount = Time.frameCount;
+            FreeFixedSize();
             schedule.Execute(() =>
             {
                 if (Time.frameCount <= startFrameCount) return;
-                style.width = layout.width;
+                FreezeFixedSize();
             }).Until(() => Time.frameCount > startFrameCount);
+        }
+
+        private void FreezeFixedSize()
+        {
+            style.width = layout.width;
+        }
+        private void FreeFixedSize()
+        {
+            style.width = StyleKeyword.Null;
         }
 
 
@@ -322,6 +330,11 @@ namespace RosettaUI.UIToolkit
         private void FinishDrag()
         {
             if (_dragMode == DragMode.None) return;
+            
+            if (_dragMode == DragMode.ResizeWindow)
+            {
+                FreezeFixedSize();
+            }
             
             _dragMode = DragMode.None;
             UnregisterPanelCallback();
@@ -465,16 +478,15 @@ namespace RosettaUI.UIToolkit
                 var diff = resolvedStyle.left - position.x;
 
                 style.left = position.x;
-                style.minWidth = diff + layout.width;
+                style.width = diff + layout.width;
             }
 
             if (_resizeEdge.HasFlag(ResizeEdge.Right))
             {
                 var left = resolvedStyle.left;
-                style.minWidth = position.x - left;
+                style.width = position.x - left;
             }
         }
-
 
         private ResizeEdge CalcEdge(Vector2 localPosition)
         {

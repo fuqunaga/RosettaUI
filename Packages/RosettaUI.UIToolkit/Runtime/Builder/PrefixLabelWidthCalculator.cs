@@ -103,15 +103,25 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 _rootDataTable[root] = rootData = new RootData(root);
             }
+
+            // ラベルのサイズを変えるタイミングは３つ
+            // 1. 初期化時可能であればとりあえず更新
+            // 通常はサイズゼロの非表示状態のため効果がないが
+            // Listのアイテムなど既存のVisualElementに再Bindされたときなどに対応
+            UpdateWidthWithRate(rootData);
             
-            // 非表示から表示に変化した場合
+            // 2. 非表示から表示に変化した場合
+            //  1.で対応されなかったがあとで可視になったとき 
+            // VisualElementが新規作成された場合はこちらが呼ばれる
             ve.RegisterCallback<GeometryChangedEvent>(evt =>
             {
+                // 自身のWidthが変化してまたGeometryChangedEventが呼ばれるのを防ぐため
+                // 可視になったときのみアップデート
                 if (IsVisible(evt.oldRect) || !IsVisible(evt.newRect)) return;
-
                 UpdateWidthWithRate(rootData);
             });
-
+            
+            // 3. あとはRootのサイズが変化したとき
             rootData.onWidthRateChanged += UpdateWidthWithRate;
             
             

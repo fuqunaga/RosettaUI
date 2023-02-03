@@ -83,17 +83,10 @@ namespace RosettaUI.UIToolkit.Builder
 
         public static void Register(LabelElement label, VisualElement ve)
         {
-            // TODO: OnAttachTOPanelなどあとで呼ば絵れるときに値が変化した場合の対応
-            var labelWidthGlobal = LayoutSettings.LabelWidth;
-
             // パネル未登録なら登録時に再度呼ばれるようにして一旦終了
             if (ve.panel == null)
             {
-                ve.RegisterCallbackOnce<AttachToPanelEvent>(_ =>
-                {
-                    Assert.IsNotNull(ve.parent);
-                    Register(label, ve);
-                });
+                ve.RegisterCallbackOnce<AttachToPanelEvent>(OnAttachToPanelEventFirst);
                 return;
             }
 
@@ -107,30 +100,39 @@ namespace RosettaUI.UIToolkit.Builder
 
             // ラベルのサイズを変えるタイミングは３つ
             // 1. 初期化時可能であればとりあえず更新
-            // 通常はサイズゼロの非表示状態のため効果がないが
-            // Listのアイテムなど既存のVisualElementに再Bindされたときなどに対応
+            // 通常はサイズゼロの非表示状態のため効果がないが既存のVisualElementに再Bindされたときなどに対応
             UpdateWidthWithRate(rootData);
             
             // 2. 非表示から表示に変化した場合
             //  1.で対応されなかったがあとで可視になったとき 
             // VisualElementが新規作成された場合はこちらが呼ばれる
-            ve.RegisterCallback<GeometryChangedEvent>(evt =>
+            ve.RegisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
+            
+            // 3. あとはRootのサイズが変化したとき
+            rootData.onWidthRateChanged += UpdateWidthWithRate;
+
+
+            label.GetViewBridge().onUnsubscribe += () =>
+            {
+                ve.UnregisterCallback<AttachToPanelEvent>(OnAttachToPanelEventFirst);
+                ve.UnregisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
+                rootData.onWidthRateChanged -= UpdateWidthWithRate;
+            };
+            
+            #region Local Funcitons
+
+            void OnAttachToPanelEventFirst(AttachToPanelEvent _)
+            {
+                Assert.IsNotNull(ve.parent);
+                Register(label, ve);
+            }
+
+            void OnGeometryChangedEvent(GeometryChangedEvent evt)
             {
                 // 自身のWidthが変化してまたGeometryChangedEventが呼ばれるのを防ぐため
                 // 可視になったときのみアップデート
                 if (IsVisible(evt.oldRect) || !IsVisible(evt.newRect)) return;
                 UpdateWidthWithRate(rootData);
-            });
-            
-            // 3. あとはRootのサイズが変化したとき
-            rootData.onWidthRateChanged += UpdateWidthWithRate;
-            
-            
-            #region Local Funcitons
-            
-            static bool IsVisible(in Rect rect)
-            {
-                return Mathf.Abs(rect.width) > 0f && Mathf.Abs(rect.height) > 0f;
             }
             
             void UpdateWidthWithRate(RootData rd)
@@ -138,7 +140,7 @@ namespace RosettaUI.UIToolkit.Builder
                 if (!IsVisible(ve.layout)) return;
                 if (rd?.WidthRate is not { } widthRate) return;
                 
-                var width = CalcLabelWidth(labelWidthGlobal * widthRate);
+                var width = CalcLabelWidth(LayoutSettings.LabelWidth * widthRate);
                 if (width < 50f) return;
                 
                 ve.style.width = width;
@@ -168,6 +170,11 @@ namespace RosettaUI.UIToolkit.Builder
             }
             
             #endregion
+        }
+        
+        private static bool IsVisible(in Rect rect)
+        {
+            return Mathf.Abs(rect.width) > 0f && Mathf.Abs(rect.height) > 0f;
         }
         
         private static VisualElement GetWidthRoot(VisualElement ve)

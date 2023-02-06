@@ -10,7 +10,14 @@ namespace RosettaUI.UIToolkit.Builder
             // visualElementがVisualElementを継承したクラスでもtrueになってしまうのでGetType()で厳密にチェックする
             if (element is not DynamicElement dynamicElement || visualElement.GetType() != typeof(VisualElement)) return false;
             
-            dynamicElement.GetViewBridge().RegisterBindViewAndCallOnce(e => Bind_ElementGroupContents(e, visualElement));
+            dynamicElement.GetViewBridge().RegisterBindViewAndCallOnce(e =>
+            {
+                Bind_ElementGroupContents(e, visualElement);
+
+                using var requestResizeWindowEvent = RequestResizeWindowEvent.GetPooled();
+                requestResizeWindowEvent.target = visualElement;
+                visualElement.SendEvent(requestResizeWindowEvent);
+            });
 
             return true;
         }

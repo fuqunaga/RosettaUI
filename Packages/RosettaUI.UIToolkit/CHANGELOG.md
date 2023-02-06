@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.1.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.1.0...ga.fuquna.rosettaui.uitoolkit-v1.1.1) (2023-02-06)
+
+
+### Bug Fixes
+
+* Window width could not be reduced after toggling Fold On/Off. ([2786049](https://github.com/fuqunaga/RosettaUI/commit/27860491c0a2f6f651b6868ef6bc337eff50b8a8))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.1.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.0.2...ga.fuquna.rosettaui.uitoolkit-v1.1.0) (2023-01-24)
 
 

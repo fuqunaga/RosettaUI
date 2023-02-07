@@ -59,6 +59,12 @@ namespace RosettaUI.Example
                             new MenuItem("Menu2", () => Debug.Log("Menu2"))
                         }
                     )
+                ),
+                ExampleTemplate.UIFunctionRow(nameof(UI.Clickable),
+                    UI.Clickable(
+                        UI.Box(UI.Label($"Set click callbacks for any element.")),
+                        clickEvent => Debug.Log($"{nameof(clickEvent)} Button[{clickEvent.Button}] Position[{clickEvent.Position}")
+                    )
                 )
             );
         }

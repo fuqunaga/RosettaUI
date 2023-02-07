@@ -59,5 +59,12 @@ namespace RosettaUI
             => new(message, helpBoxType);
 
         #endregion
+        
+        #region Clickable
+
+        public static ClickableElement Clickable(Element childElement, Action<IClickEvent> onClick)
+            => new ClickableElement(childElement, onClick);
+
+        #endregion
     }
 }

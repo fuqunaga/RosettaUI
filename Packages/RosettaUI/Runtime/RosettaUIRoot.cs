@@ -91,9 +91,9 @@ namespace RosettaUI
         }
 
         
-        #region static
+        #region Static
 
-        private static readonly HashSet<RosettaUIRoot> Roots = new HashSet<RosettaUIRoot>();
+        private static readonly HashSet<RosettaUIRoot> Roots = new();
 
         private static void Register(RosettaUIRoot root)
         {
@@ -108,6 +108,18 @@ namespace RosettaUI
         public static bool WillUseKeyInputAny()
         {
             return Roots.Any(r => r.WillUseKeyInput());
+        }
+
+        public static void GlobalBuild(Element element)
+        {
+            var root = Roots.FirstOrDefault();
+            if (root == null)
+            {
+                Debug.LogWarning($"There is no active {nameof(RosettaUIRoot)}.");
+                return;
+            }
+            
+            root.Build(element);
         }
 
         #endregion

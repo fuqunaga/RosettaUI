@@ -104,10 +104,19 @@ namespace RosettaUI
             element.onUpdate -= onUpdate;
             return element;
         }
-
+        
         public static T SetOpenFlag<T>(this T element, bool flag, bool recursive = false)
             where T : Element
         {
+            if (element is WindowElement windowElement)
+            {
+                // ビルドしていないWindowを手動でOpenしたときはGlobalBuild()でBuildする
+                if (flag && !windowElement.HasBuilt)
+                {
+                    RosettaUIRoot.GlobalBuild(windowElement);
+                }
+            }
+            
             var openCloseElements = element.Query<OpenCloseBaseElement>();
             if (!recursive)
             {
@@ -118,6 +127,7 @@ namespace RosettaUI
             {
                 e.IsOpen = flag;
             }
+            
             return element;
         }
 

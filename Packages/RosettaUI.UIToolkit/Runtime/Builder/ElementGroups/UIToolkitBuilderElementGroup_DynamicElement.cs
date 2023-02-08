@@ -13,10 +13,7 @@ namespace RosettaUI.UIToolkit.Builder
             dynamicElement.GetViewBridge().RegisterBindViewAndCallOnce(e =>
             {
                 Bind_ElementGroupContents(e, visualElement);
-
-                using var requestResizeWindowEvent = RequestResizeWindowEvent.GetPooled();
-                requestResizeWindowEvent.target = visualElement;
-                visualElement.SendEvent(requestResizeWindowEvent);
+                RequestResizeWindowEvent.Send(visualElement);
             });
 
             return true;

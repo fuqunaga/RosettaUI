@@ -7,7 +7,7 @@ namespace RosettaUI
     {
         public abstract ReactiveProperty<bool> IsOpenRx { get; }
 
-        public bool IsOpen
+        public virtual bool IsOpen
         {
             get => IsOpenRx.Value;
             set => IsOpenRx.Value = value;

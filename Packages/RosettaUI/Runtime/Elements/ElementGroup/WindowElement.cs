@@ -32,6 +32,12 @@ namespace RosettaUI
 
         public override ReactiveProperty<bool> IsOpenRx => enableRx;
 
+        public override bool IsOpen
+        {
+            get => base.IsOpen && HasBuilt;
+            set => base.IsOpen = value;
+        }
+
         public WindowElement(Element header, IEnumerable<Element> contents) : base(header, contents)
         {
         }

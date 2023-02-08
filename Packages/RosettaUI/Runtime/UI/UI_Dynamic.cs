@@ -46,7 +46,6 @@ namespace RosettaUI
                 return Field(null, binder);
             }, supportMultiple, includeInactive);
         }
-
         
         public static DynamicElement DynamicElementIfObjectFound<T>(Func<T, Element> build,  bool supportMultiple = false, bool includeInactive = false)
             where T : Object
@@ -68,8 +67,8 @@ namespace RosettaUI
 
             var currentObjectHash = 0;
             Func<Element> buildFunc = supportMultiple ? BuildMultipleTarget : BuildFirstTarget;
-            
-  
+ 
+
             return DynamicElementOnStatusChanged(
                 readStatus: () =>
                 {
@@ -85,7 +84,6 @@ namespace RosettaUI
                                 Object.FindObjectsOfType(type, includeInactive)
                                     .OrderBy(o => o.name)
                             );
-
                         }
                     }
                     
@@ -96,8 +94,6 @@ namespace RosettaUI
                 },
                 build: _ => buildFunc()
             );
-
-            
             
             Element BuildFirstTarget()
             {
@@ -149,6 +145,7 @@ namespace RosettaUI
                 }
             }
         }
+        
         #endregion
     }
 }

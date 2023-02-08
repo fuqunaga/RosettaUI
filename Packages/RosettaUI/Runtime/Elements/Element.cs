@@ -45,6 +45,16 @@ namespace RosettaUI
         
         public Element Parent { get; private set; }
 
+        public Element()
+        {
+            // 可視化したとき表示前にUpdate()が呼ばれていることを保証する
+            // onUpdateとかでサイズ調整しているやつを考慮
+            enableRx.Subscribe(flag =>
+            {
+                if (flag && HasBuilt) Update();
+            });
+        }
+
         private void SetParent(Element element)
         {
             this.ValidateSingleParent();

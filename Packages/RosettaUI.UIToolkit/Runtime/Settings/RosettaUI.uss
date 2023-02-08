@@ -84,6 +84,7 @@
     /*margin: var(--window-border-width-inverse) var(--window-border-width-inverse) 0px var(--window-border-width-inverse);*/
     margin: 2px;
     flex-direction: row;
+    flex-shrink: 0;
 }
 
 .rosettaui-window__titlebar-container__right {
@@ -113,6 +114,7 @@
 
 .rosettaui-window__content-container{
     overflow: hidden;
+    flex-grow: 1;
 }
 
 /********************************************************************************

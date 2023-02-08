@@ -38,6 +38,8 @@ namespace RosettaUI.UIToolkit
         public static KeyCode closeKey = KeyCode.Escape;
         public static EventModifiers closeKeyModifiers = EventModifiers.None;
 
+        public static Vector2 minSize = Vector2.one * 30f;
+
         public readonly bool resizable;
 
         public event Action onShow;
@@ -55,6 +57,7 @@ namespace RosettaUI.UIToolkit
         private bool _focused;
         private bool _closable;
         private IVisualElementScheduledItem _focusTask;
+        private IVisualElementScheduledItem _freezeFixedSizeTask;
 
         public bool IsMoved { get; protected set; }
 
@@ -216,22 +219,38 @@ namespace RosettaUI.UIToolkit
         // 同一フレームだとGeometryChangedEventなどでサイズが変わるやつがいるので１フレーム待つ
         private void ResetFixedSize()
         {
-            var startFrameCount = Time.frameCount;
             FreeFixedSize();
-            schedule.Execute(() =>
+            
+            var startFrameCount = Time.frameCount;
+            _freezeFixedSizeTask?.Pause();
+            _freezeFixedSizeTask = schedule.Execute(() =>
             {
                 if (Time.frameCount <= startFrameCount) return;
                 FreezeFixedSize();
             }).Until(() => Time.frameCount > startFrameCount);
         }
 
-        private void FreezeFixedSize()
+        private void FreezeFixedSize(bool fixHeight = false)
         {
             style.width = layout.width;
+            style.minWidth = StyleKeyword.Null;
+
+            // heightは基本的に内容物に応じるようにして固定しない
+            // しかし手動でResizeした場合は強制的に固定する
+            // そうしないとDragが終わった途端広がったりして変
+            if (fixHeight)
+            {
+                style.height = layout.height;
+            }
         }
+        
         private void FreeFixedSize()
         {
+            // 現状のサイズは保持。拡大しかしない。勝手に縮小されるのは違和感があるが拡大されるのは内容物で膨らんだ形で問題ない印象
+            style.minWidth = layout.width; 
             style.width = StyleKeyword.Null;
+
+            style.height = StyleKeyword.Null;
         }
 
 
@@ -333,7 +352,7 @@ namespace RosettaUI.UIToolkit
             
             if (_dragMode == DragMode.ResizeWindow)
             {
-                FreezeFixedSize();
+                FreezeFixedSize(fixHeight: true);
             }
             
             _dragMode = DragMode.None;
@@ -464,13 +483,13 @@ namespace RosettaUI.UIToolkit
                 var diff = resolvedStyle.top - position.y;
 
                 style.top = position.y;
-                style.minHeight = diff + layout.height;
+                style.height =  Mathf.Max(diff + layout.height, minSize.y);
             }
 
             if (_resizeEdge.HasFlag(ResizeEdge.Bottom))
             {
                 var top = resolvedStyle.top;
-                style.minHeight = position.y - top;
+                style.height = Mathf.Max(position.y - top, minSize.y);
             }
 
             if (_resizeEdge.HasFlag(ResizeEdge.Left))
@@ -478,13 +497,13 @@ namespace RosettaUI.UIToolkit
                 var diff = resolvedStyle.left - position.x;
 
                 style.left = position.x;
-                style.width = diff + layout.width;
+                style.width = Mathf.Max(diff + layout.width, minSize.x);
             }
 
             if (_resizeEdge.HasFlag(ResizeEdge.Right))
             {
                 var left = resolvedStyle.left;
-                style.width = position.x - left;
+                style.width = Mathf.Max(position.x - left, minSize.x);
             }
         }
 

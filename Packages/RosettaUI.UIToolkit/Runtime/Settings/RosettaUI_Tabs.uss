@@ -4,6 +4,7 @@
 .rosettaui-tabs__title-container
 {
     flex-direction: row;
+    flex-shrink: 0;
     border-top-width: 4px;
     border-color: var(--rosettaui-color-tabs-title-inactive-background);
 }

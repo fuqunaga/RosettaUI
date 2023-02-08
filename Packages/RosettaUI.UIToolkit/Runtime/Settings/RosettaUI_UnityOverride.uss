@@ -288,11 +288,8 @@ Unity2022.2.0b6
 * image
 ********************************************************************************/
 .unity-image{
-    align-self: flex-start;
-}
-
-.rosettaui-row > .unity-image {
-    flex-grow: 0; /* rosettaui-row > * を打消し */
+    align-self: stretch;
+    flex-grow: 1;
 }
 
 /********************************************************************************

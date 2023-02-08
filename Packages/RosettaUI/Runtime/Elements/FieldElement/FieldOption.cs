@@ -2,7 +2,7 @@
 {
     public struct FieldOption
     {
-        public static FieldOption Default = new();
+        public static FieldOption Default => new();
         public bool delayInput;
     }
 }

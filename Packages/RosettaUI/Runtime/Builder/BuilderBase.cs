@@ -1,9 +1,7 @@
-using RosettaUI.Reactive;
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using RosettaUI.Reactive;
 using UnityEngine;
-
 
 namespace RosettaUI.Builder
 {

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace RosettaUI
 {
@@ -73,18 +72,16 @@ namespace RosettaUI
         /// </summary>
         private void ProcessQueue()
         {
-            while (_registerQueue.Any())
+            while (_registerQueue.TryDequeue(out var e))
             {
-                var e = _registerQueue.Dequeue();
                 if (_elements.Add(e))
                 {
                     e.onDetachView += (element,_) => Unregister(element);
                 }
             }
 
-            while (_unregisterQueue.Any())
+            while (_unregisterQueue.TryDequeue(out var e))
             {
-                var e = _unregisterQueue.Dequeue();
                 _elements.Remove(e);
             }
         }

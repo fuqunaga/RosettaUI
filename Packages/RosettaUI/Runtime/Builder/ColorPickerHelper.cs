@@ -153,8 +153,8 @@ namespace RosettaUI.Builder
         /// </summary>
         public static void UpdateSvDiskTexture(RenderTexture rt, float hue)
         {
-#if true
-            _svDiskMaterial ??= Resources.Load<Material>(svDiskMaterialPath);
+            // リソースを書き換えないようにコピー
+            _svDiskMaterial ??= new Material(Resources.Load<Material>(svDiskMaterialPath));
 
             _svDiskMaterial.SetVector(SvCircleShaderParam.TargetSize, new Vector2(rt.width, rt.height));
             _svDiskMaterial.SetFloat(SvCircleShaderParam.BlendWidthNormalized, 2f / rt.width);
@@ -181,46 +181,6 @@ namespace RosettaUI.Builder
             GL.PopMatrix();
 
             RenderTexture.active = tmp;
-
-#else
-            Assert.AreEqual(texture.width, texture.height);
-            
-            var size = texture.width;
-            var radius = size * 0.5f;
-            var center = Vector2.one * radius;
-            
-            var blendWidth = 1f;
-            var blendWidthNormalized = blendWidth / radius;
-
-            var colorArray = ArrayPool<Color>.Shared.Rent(size * size);
-            var colors = colorArray.AsSpan();
-
-            for (var y = 0; y < size; y++)
-            {
-                for (var x = 0; x < size; x++)
-                {
-                    var color = Color.clear;
-                    
-                    var pos = (new Vector2(x + 0.5f, y + 0.5f) - center) / radius;
-                    if (pos.sqrMagnitude <= 1f)
-                    {
-                        var posOnSquare = CircleToSquare(pos);
-                        var sv = (posOnSquare + Vector2.one) * 0.5f; // map -1~1 > 0~1
-
-                        color = Color.HSVToRGB(hue, sv.x, sv.y);
-                        color.a = Mathf.InverseLerp(1f, 1f - blendWidthNormalized, pos.magnitude);
-                    }
-
-                    colors[x + y * size] = color;
-                }
-            }
-            
-            texture.SetPixels(colorArray);
-            
-            ArrayPool<Color>.Shared.Return(colorArray);
-
-            texture.Apply();
-#endif
         }
 
 

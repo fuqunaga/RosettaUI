@@ -1,3 +1,15 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.2.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.1.1...ga.fuquna.rosettaui.uitoolkit-v1.2.0) (2023-02-27)
+
+
+### Bug Fixes
+
+* **uitoolkit:** DynamicElement now sends RequestResizeWindowEvent on rebuild ([8b64fb3](https://github.com/fuqunaga/RosettaUI/commit/8b64fb371ac1c972bcfd881d84bafee431c3ad14))
+
+
+### Features
+
+* add UI.Clickable() ([12459b6](https://github.com/fuqunaga/RosettaUI/commit/12459b698fe7faf9a8ac97a592a54fa417a916ca))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.1.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.1.0...ga.fuquna.rosettaui.uitoolkit-v1.1.1) (2023-02-06)
 
 

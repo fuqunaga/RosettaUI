@@ -1,3 +1,16 @@
+# [ga.fuquna.rosettaui-v1.2.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.1.3...ga.fuquna.rosettaui-v1.2.0) (2023-02-27)
+
+
+### Bug Fixes
+
+* Circuler reference guard does not work on non-development build ([7eb341c](https://github.com/fuqunaga/RosettaUI/commit/7eb341cea41f0bca75b42a150cd6cbd6e4ecf165))
+* compile error when Api Compatibility Level == .NET framework ([5400b7b](https://github.com/fuqunaga/RosettaUI/commit/5400b7b6687649561c0635dc96f3c13f3364059d))
+
+
+### Features
+
+* add UI.Clickable() ([12459b6](https://github.com/fuqunaga/RosettaUI/commit/12459b698fe7faf9a8ac97a592a54fa417a916ca))
+
 # [ga.fuquna.rosettaui-v1.1.3](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.1.2...ga.fuquna.rosettaui-v1.1.3) (2023-01-30)
 
 

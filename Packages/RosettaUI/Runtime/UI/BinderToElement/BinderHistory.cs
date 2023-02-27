@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace RosettaUI
@@ -14,7 +15,7 @@ namespace RosettaUI
 
 
         public static bool IsTarget(IBinder binder) => !binder.ValueType.IsValueType;
-        
+
         public static bool IsCircularReference(IBinder binder)
         {
             if (!IsTarget(binder)) return false;
@@ -40,7 +41,8 @@ namespace RosettaUI
             {
                 if (IsTarget(binder))
                 {
-                    Assert.IsTrue(History.Add(binder));
+                    var added = History.Add(binder);
+                    Assert.IsTrue(added);
                     _binder = binder;
                 }
                 else

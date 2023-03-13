@@ -54,7 +54,10 @@ namespace RosettaUI.UIToolkit.Builder
             private void OnGeometryChanged(GeometryChangedEvent evt)
             {
                 if (!_baseWidth.HasValue ) return;
-                
+
+                // 幅以外の変化は無視
+                if ( evt.newRect.width <=0 || Mathf.Approximately(evt.oldRect.width ,evt.newRect.width)) return;
+
                 // RequestResizeWindowでサイズが変わった場合、以降のResizeでWidthが継続するように_baseWidthを更新しておく
                 // currentWidth / baseWidthNew[?] = WidthRate
                 // -> baseWidthNew = currentWidth / WidthRate
@@ -63,9 +66,6 @@ namespace RosettaUI.UIToolkit.Builder
                     _baseWidth = evt.newRect.width / WidthRate;
                     return;
                 }
-                    
-                // 幅以外の変化は無視
-                if ( evt.newRect.width <=0 || Mathf.Approximately(evt.oldRect.width ,evt.newRect.width)) return;
                     
                 var newWidthRate = evt.newRect.width / _baseWidth.Value;
 

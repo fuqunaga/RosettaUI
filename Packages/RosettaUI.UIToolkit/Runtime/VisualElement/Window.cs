@@ -140,7 +140,7 @@ namespace RosettaUI.UIToolkit
                         CloseButton.clicked += Hide;
                     }
 
-                    CloseButton.visible = true;
+                    CloseButton.style.display = DisplayStyle.Flex;;
                 }
                 else
                 {
@@ -148,7 +148,7 @@ namespace RosettaUI.UIToolkit
 
                     if (CloseButton != null)
                     {
-                        CloseButton.visible = false;
+                        CloseButton.style.display = DisplayStyle.None;
                     }
                 }
             }

@@ -7,8 +7,17 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         public static bool WillUseKeyInput(IPanel panel)
         {
 #if UNITY_2022_1_OR_NEWER
-            //TODO
-            return false;
+            // refs: TextInputBaseField.hasFocus, TextElement.hasFocus 
+            var element = panel?.focusController?.GetLeafFocusedElement();
+            return (element is TextElement textElement) &&
+                   (
+                       // Single line
+                       (textElement.parent?.name == TextInputBaseField<string>.textInputUssName) ||
+                       
+                       // Multi line
+                       // ref: TextInputBase.SetMultiline()
+                       (textElement.parent?.parent?.name == TextInputBaseField<string>.textInputUssName)
+                   );
 #else
             // refs: TextInputBase.hasFocus
             var element = panel?.focusController?.GetLeafFocusedElement();

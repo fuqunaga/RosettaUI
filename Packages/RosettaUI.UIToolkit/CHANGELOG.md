@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.2.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.2.0...ga.fuquna.rosettaui.uitoolkit-v1.2.1) (2023-03-13)
+
+
+### Bug Fixes
+
+* Infinite width of PrefixLabel when closing and reopening a Window in Unity2022. ([230d510](https://github.com/fuqunaga/RosettaUI/commit/230d510e18af45f68f8adf3623036858e6544791))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.2.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.1.1...ga.fuquna.rosettaui.uitoolkit-v1.2.0) (2023-02-27)
 
 

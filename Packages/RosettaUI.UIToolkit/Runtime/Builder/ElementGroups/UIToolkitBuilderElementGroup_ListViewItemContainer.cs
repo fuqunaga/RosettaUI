@@ -39,6 +39,7 @@ namespace RosettaUI.UIToolkit.Builder
             SetCallbacks();
 
             listView.itemsSource = itemsSource;
+            listView.Rebuild();
             
             return true;
             

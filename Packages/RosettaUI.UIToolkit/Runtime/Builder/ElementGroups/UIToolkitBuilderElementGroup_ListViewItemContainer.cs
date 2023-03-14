@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.UIToolkit.UnityInternalAccess;
-using UnityEngine;
-using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -55,6 +52,8 @@ namespace RosettaUI.UIToolkit.Builder
                 {
                     listView.itemsSource = list;
                     listView.Rebuild();
+                    
+                    RequestResizeWindowEvent.Send(listView);
                 });
                 
                 listView.itemsAdded += OnItemsAdded;
@@ -122,10 +121,13 @@ namespace RosettaUI.UIToolkit.Builder
 #endif
 
             // リストの最後への追加しかこないはず
+            // 右クリックメニューはRosettaUI側が担当
             void OnItemsAdded(IEnumerable<int> idxes)
             {
                 viewBridge.OnItemsAdded(idxes);
                 OnViewListChanged();
+                
+                RequestResizeWindowEvent.Send(listView);
             }
             
             // 複数選択できないので１つか、最後の要素の複数削除しかこないはず

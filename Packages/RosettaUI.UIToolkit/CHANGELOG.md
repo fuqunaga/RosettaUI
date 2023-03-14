@@ -1,3 +1,13 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.2.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.2.1...ga.fuquna.rosettaui.uitoolkit-v1.2.2) (2023-03-14)
+
+
+### Bug Fixes
+
+* **Unity2022:** "List is empty" is not displayed in UI.List() at Unity2022 ([c37cf2c](https://github.com/fuqunaga/RosettaUI/commit/c37cf2cb0ef185c1659810eb5c2b8a596059548e))
+* **Unity2022:** Supports suppression of the Input class when entering text in RosettaUI at Unity2022 ([a626134](https://github.com/fuqunaga/RosettaUI/commit/a626134d8e908a239d9381d77b10b19f446c2dc6))
+* When adding an element to an empty list in UI.List(), the field only shows a label ([cde3f7e](https://github.com/fuqunaga/RosettaUI/commit/cde3f7e41135954a2e251a66bb7e8c717f70b9b2))
+* Window's Close button remains when hidden from RosettaUIRoot ([cafe974](https://github.com/fuqunaga/RosettaUI/commit/cafe97479bc907e5ee3237cb501de903d374ec71))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.2.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.2.0...ga.fuquna.rosettaui.uitoolkit-v1.2.1) (2023-03-13)
 
 

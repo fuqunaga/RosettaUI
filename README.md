@@ -5,7 +5,7 @@ Code-based UI library for development menu for Unity
 ![](Documentation~/2023-01-25-15-48-22.png)
 
 
-<img src=Documentation~/simple.gif width=50% align="right" />
+
 
 ```csharp
 public class ExampleSimple : MonoBehaviour
@@ -39,7 +39,7 @@ public class ExampleSimple : MonoBehaviour
     }
 }
 ```
-
+<img src=Documentation~/simple.gif width=500px />
 
 # Installation
 
@@ -71,6 +71,12 @@ Select `RosettaUI - UI ToolKit` and click the Install button
 ![](Documentation~/2022-04-12-18-04-29.png)
 
 
+### Input System(optional)
+
+RosettaUI recommends using Input System.
+Install according to the official documentation.
+https://docs.unity3d.com/Packages/com.unity.inputsystem@1.5/manual/Installation.html
+
 # How to use
 
 1. Put `Packages/RosettaUI - UIToolkit/RosettaUIRootUIToolkit.prefab` in the Hierarchy
@@ -87,43 +93,35 @@ I recommend downloading and checking it out.
 
 ## UI.Field()
 
+![](Documentation~/field.gif)
+![](Documentation~/2023-01-25-16-36-00.png)
 
-<p float="left">
-<img src="Documentation~/field.gif" width=40% align=top  />
-<img src="Documentation~/2023-01-25-16-36-00.png" width=45% align=top />
-</p>
 
 
 ## UI.Slider()
 
-<p float="left">
-<img src="Documentation~/2023-01-25-16-41-59.png" width=45% align=top />
-<img src="Documentation~/2023-01-25-16-56-56.png" width=45% align=top />
-</p>
+![](Documentation~/2023-01-25-16-41-59.png)
+![](Documentation~/2023-01-25-16-56-56.png)
+
 
 ## UI.MinMaxSlider()
 
-<p float="left">
-<img src="Documentation~/2023-01-25-17-05-28.png" width=45% align=top />
-<img src="Documentation~/2023-01-25-17-07-45.png" width=45% align=top />
-</p>
-
+![](Documentation~/2023-01-25-17-05-28.png)
+![](Documentation~/2023-01-25-17-07-45.png)
 
 ## UI.List()
 
-<p float="left">
-<img src="Documentation~/2023-01-25-17-11-06.png" width=25% align=top />
-<img src="Documentation~/2023-01-25-17-25-46.png" width=30% align=top />
-</p>
+![](Documentation~/2023-01-25-17-11-06.png)
+![](Documentation~/2023-01-25-17-25-46.png)
 
 ## Layout elements
 
-<p float="left">
-<img src="Documentation~/2023-01-25-17-26-32.png" width=32% align=top />
-<img src="Documentation~/2023-01-25-17-27-30.png" width=45% align=top />
-</p>
 
-## And more
+![](Documentation~/2023-01-25-17-26-32.png)
+![](Documentation~/2023-01-25-17-27-30.png)
+
+
+## And more!
 Please check the [Examples](Assets/Scenes)
 
 # Enviroment
@@ -140,6 +138,28 @@ Please check the [Examples](Assets/Scenes)
 | UI Toolkit | ✔           |
 | UGUI       | Suspended   |
 | IMGUI      | Not planned |
+
+
+# Tips
+
+## Disable keyboard input outside the UI when typing in UI
+
+When using InputSystem, set `RosettaUIRoot.disableKeyboardInputWhileUITyping=true (default)` to disable keyboard input while typing in UI.
+```csharp
+// false while typing in UI
+if ( Keyboard.current[Key.A].wasPressedThisFrame )
+{
+    // do something
+}
+```
+
+For LegacyInputSystem, refer to `RosettaUIRoot.WillUseKeyInputAny()`.
+```csharp
+if ( !RosettaUIRoot.WillUseKeyInputAny() && Input.GetKeyDown(Key.A) )
+{
+    // do something
+}
+```
 
 
 # See also

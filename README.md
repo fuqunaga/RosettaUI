@@ -73,8 +73,10 @@ Select `RosettaUI - UI ToolKit` and click the Install button
 
 ### Input System(optional)
 
-RosettaUI recommends using Input System.
-Install according to the official documentation.
+RosettaUI recommends using Input System.  
+See [Tips](#disable-keyboard-input-when-typing-in-ui).
+
+Install according to the official documentation.  
 https://docs.unity3d.com/Packages/com.unity.inputsystem@1.5/manual/Installation.html
 
 # How to use
@@ -142,7 +144,7 @@ Please check the [Examples](Assets/Scenes)
 
 # Tips
 
-## Disable keyboard input outside the UI when typing in UI
+## Disable keyboard input when typing in UI
 
 When using InputSystem, set `RosettaUIRoot.disableKeyboardInputWhileUITyping=true (default)` to disable keyboard input while typing in UI.
 ```csharp

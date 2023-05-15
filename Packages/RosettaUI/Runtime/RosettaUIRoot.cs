@@ -1,13 +1,25 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
+
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
+#endif
 
 namespace RosettaUI
 {
+#if ENABLE_INPUT_SYSTEM && ! ENABLE_LEGACY_INPUT_MANAGER
+    [RequireComponent(typeof(InputSystemUIInputModule))]
+#endif
     public abstract class RosettaUIRoot : MonoBehaviour
     {
+#if ENABLE_INPUT_SYSTEM
+        public bool disableKeyboardInputWhileUITyping = true;
+#endif
+        
         public readonly ElementUpdater updater = new();
 
         private readonly List<Element> _elements = new();
@@ -42,6 +54,10 @@ namespace RosettaUI
         protected virtual void Update()
         {
             updater.Update();
+            
+#if ENABLE_INPUT_SYSTEM
+            UpdateInputSystem();
+#endif
         }
 
         protected void OnDestroy()
@@ -49,14 +65,8 @@ namespace RosettaUI
             foreach (var e in _elements) e.DetachView();
         }
 
-
-        // suppress Input trick
-        protected virtual void OnGUI()
-        {
-            SuppressInputKey();
-        }
-
         #endregion
+        
 
         public void Build(Element element)
         {
@@ -77,19 +87,22 @@ namespace RosettaUI
 
         protected abstract void BuildInternal(Element element);
 
-
-        private static PropertyInfo _textFieldInputPropertyInfo;
-        
-        protected void SuppressInputKey()
+#if ENABLE_INPUT_SYSTEM
+        // https://forum.unity.com/threads/prevent-key-input -when-inputfield-has-focus.651055/#post-4384975
+        private void UpdateInputSystem()
         {
-            _textFieldInputPropertyInfo ??= typeof(GUIUtility).GetProperty("textFieldInput", BindingFlags.NonPublic | BindingFlags.Static);
-
-            if (WillUseKeyInput())
+            if (!disableKeyboardInputWhileUITyping) return;
+            
+            var keyboard = Keyboard.current;
+            if (WillUseKeyInput() == keyboard.enabled)
             {
-                _textFieldInputPropertyInfo.SetValue(null, true);
+                if (keyboard.enabled)
+                    InputSystem.DisableDevice(keyboard);
+                else
+                    InputSystem.EnableDevice(keyboard);
             }
         }
-
+#endif
         
         #region Static
 

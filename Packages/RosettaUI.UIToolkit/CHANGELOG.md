@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.3.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.2.2...ga.fuquna.rosettaui.uitoolkit-v1.3.0) (2023-05-16)
+
+
+### Features
+
+* **UIToolkit:** depends RosettaUI 1.3.0 ([380b105](https://github.com/fuqunaga/RosettaUI/commit/380b1057b83ee83563fa5eaacd82d1d563d44dd0))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.2.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.2.1...ga.fuquna.rosettaui.uitoolkit-v1.2.2) (2023-03-14)
 
 

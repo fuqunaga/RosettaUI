@@ -23,9 +23,10 @@ namespace RosettaUI
         public readonly ElementUpdater updater = new();
 
         private readonly List<Element> _elements = new();
+        private readonly List<Element> _syncEnableElements = new();
         public IReadOnlyList<Element> Elements => _elements;
 
-        private readonly Queue<Func<Element>> _createElementOnEnableQueue = new();
+        private readonly Queue<(Func<Element>,bool)> _createElementOnEnableQueue = new();
 
 
         #region Unity
@@ -34,13 +35,13 @@ namespace RosettaUI
         {
             while (_createElementOnEnableQueue.Count > 0)
             {
-                var func = _createElementOnEnableQueue.Dequeue();
-                Build(func());
+                var (func, setEnableWhenRootEnabled) = _createElementOnEnableQueue.Dequeue();
+                Build(func(), setEnableWhenRootEnabled);
             }
 
             Register(this);
 
-            foreach (var element in _elements)
+            foreach (var element in _syncEnableElements)
             {
                 element.Enable = true;
             }
@@ -68,7 +69,7 @@ namespace RosettaUI
         #endregion
         
 
-        public void Build(Element element)
+        public void Build(Element element, bool setEnableWhenRootEnabled = true)
         {
             BuildInternal(element);
 
@@ -76,11 +77,15 @@ namespace RosettaUI
             updater.RegisterWindowRecursive(element);
 
             _elements.Add(element);
+            if (setEnableWhenRootEnabled)
+            {
+                _syncEnableElements.Add(element);
+            }
         }
 
-        public void BuildOnEnable(Func<Element> createElement)
+        public void BuildOnEnable(Func<Element> createElement, bool setEnableWhenRootEnabled = true)
         {
-            _createElementOnEnableQueue.Enqueue(createElement);
+            _createElementOnEnableQueue.Enqueue((createElement, setEnableWhenRootEnabled));
         }
 
         public abstract bool WillUseKeyInput();
@@ -123,7 +128,7 @@ namespace RosettaUI
             return Roots.Any(r => r.WillUseKeyInput());
         }
 
-        public static void GlobalBuild(Element element)
+        public static void GlobalBuild(Element element, bool setEnableWhenRootEnabled = false)
         {
             var root = Roots.FirstOrDefault();
             if (root == null)
@@ -132,7 +137,7 @@ namespace RosettaUI
                 return;
             }
             
-            root.Build(element);
+            root.Build(element, setEnableWhenRootEnabled);
         }
 
         #endregion

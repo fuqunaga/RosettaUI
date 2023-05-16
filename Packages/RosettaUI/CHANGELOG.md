@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.3.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.2.0...ga.fuquna.rosettaui-v1.3.0) (2023-05-16)
+
+
+### Features
+
+* Suppression of keyboard events at TextField input is now supported for NewInputSystem and not for LegacyInputSystem ([c6aa7b9](https://github.com/fuqunaga/RosettaUI/commit/c6aa7b9fada0c7a3480b24ef36f08ada7f44e06e))
+
 # [ga.fuquna.rosettaui-v1.3.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.2.0...ga.fuquna.rosettaui-v1.3.0) (2023-05-15)
 
 

@@ -1,5 +1,5 @@
 {
-    "name": "RosettaUI.Tests",
+    "name": "RosettaUI.Tests.Editor",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",

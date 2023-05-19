@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.3.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.3.0...ga.fuquna.rosettaui-v1.3.1) (2023-05-19)
+
+
+### Bug Fixes
+
+* Window generated outside of a window launcher reopens when RosettaUIRoot is enabled even if the window is closed. ([a72a7bf](https://github.com/fuqunaga/RosettaUI/commit/a72a7bf0f0c4afa324fc83fba1f146e9977dd642))
+
 # [ga.fuquna.rosettaui-v1.3.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.2.0...ga.fuquna.rosettaui-v1.3.0) (2023-05-16)
 
 

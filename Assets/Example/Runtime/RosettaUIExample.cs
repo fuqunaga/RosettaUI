@@ -2,12 +2,16 @@
 using System.Linq;
 using UnityEngine;
 
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
+
 namespace RosettaUI.Example
 {
     [RequireComponent(typeof(RosettaUIRoot))]
     public class RosettaUIExample : MonoBehaviour
     {
-        public static readonly Type[] ExampleTypes = {
+        private static readonly Type[] ExampleTypes = {
             typeof(FieldExample),
             typeof(SliderExample),
             typeof(MinMaxSliderExample),
@@ -21,7 +25,11 @@ namespace RosettaUI.Example
             typeof(SafetyExample)
         };
         
+#if ENABLE_INPUT_SYSTEM
+        public Key toggleUIKey = Key.U;
+#else
         public KeyCode toggleUIKey = KeyCode.U;
+#endif
         private RosettaUIRoot _root;
         
         private void Start()
@@ -30,16 +38,20 @@ namespace RosettaUI.Example
             _root.Build(CreateElement());
         }
         
-        private Element CreateElement()
+        private static Element CreateElement()
         {
             return UI.Window(
                 ExampleTypes.Select(type => UI.WindowLauncher(null, false, false, false, type))
             ).SetClosable(false);
         }
 
-        void Update()
+        private void Update()
         {
+#if ENABLE_INPUT_SYSTEM
+            if ( Keyboard.current[toggleUIKey].wasPressedThisFrame)
+#else
             if (Input.GetKeyDown(toggleUIKey))
+#endif
             {
                 _root.enabled = !_root.enabled;
             }

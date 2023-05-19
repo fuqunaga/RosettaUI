@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.3.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.3.0...ga.fuquna.rosettaui.uitoolkit-v1.3.1) (2023-05-19)
+
+
+### Bug Fixes
+
+* **dependency:** RosettaUI 1.3.1 ([fb64287](https://github.com/fuqunaga/RosettaUI/commit/fb642874fa51b9c6a23d00e47ea388f940960a59))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.3.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.2.2...ga.fuquna.rosettaui.uitoolkit-v1.3.0) (2023-05-16)
 
 

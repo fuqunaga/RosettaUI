@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.4.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.3.1...ga.fuquna.rosettaui-v1.4.0) (2023-05-22)
+
+
+### Features
+
+* UI.Dropdown() supports string value ([0a3b28e](https://github.com/fuqunaga/RosettaUI/commit/0a3b28e34aa355df500b066018eadf76a615ba85))
+
 # [ga.fuquna.rosettaui-v1.3.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.3.0...ga.fuquna.rosettaui-v1.3.1) (2023-05-19)
 
 

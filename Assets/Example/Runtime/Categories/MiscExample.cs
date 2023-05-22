@@ -8,6 +8,7 @@ namespace RosettaUI.Example
         public string multiLineStringValue = "this is\nmultiline\nstring";
         public Texture texture;
         public int dropDownIndex;
+        public string dropDownString = "One";
         public bool boolValue;
 
         public Element CreateElement(LabelElement _)
@@ -18,12 +19,20 @@ namespace RosettaUI.Example
                     UI.TextAreaReadOnly(nameof(UI.TextAreaReadOnly), () => multiLineStringValue)
                 ),
                 ExampleTemplate.UIFunctionColumn(nameof(UI.Dropdown),
-                    UI.Dropdown(nameof(UI.Dropdown),
+                    UI.Dropdown("Index",
                         () => dropDownIndex,
                         options: new[] { "One", "Two", "Three" }
                     ),
-                    UI.DropdownReadOnly($"{nameof(UI.DropdownReadOnly)}",
+                    UI.DropdownReadOnly("Index ReadOnly",
                         () => dropDownIndex,
+                        options: new[] { "One", "Two", "Three" }
+                    ),
+                    UI.Dropdown("String",
+                        () => dropDownString,
+                        options: new[] { "One", "Two", "Three" }
+                    ),
+                    UI.DropdownReadOnly("String ReadOnly",
+                        () => dropDownString,
                         options: new[] { "One", "Two", "Three" }
                     )
                 ),

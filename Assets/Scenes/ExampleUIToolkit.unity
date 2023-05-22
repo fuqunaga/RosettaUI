@@ -315,6 +315,7 @@ MonoBehaviour:
     string'
   texture: {fileID: 2800000, guid: f8fa76ac67c34254da2b9c9b263733c3, type: 3}
   dropDownIndex: 0
+  dropDownString: One
   boolValue: 0
 --- !u!1 &554616668
 GameObject:

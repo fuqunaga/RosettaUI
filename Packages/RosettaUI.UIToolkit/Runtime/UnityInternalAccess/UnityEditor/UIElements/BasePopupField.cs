@@ -106,7 +106,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         private void ProcessPointerDown<T>(PointerEventBase<T> evt) where T : PointerEventBase<T>, new()
         {
             if (evt.button != 0 ||
-                !this.visualInput.ContainsPoint(this.visualInput.WorldToLocal(evt.originalMousePosition)))
+                !this.visualInput.ContainsPoint(this.visualInput.WorldToLocal(evt.position)))
                 return;
             this.ShowMenu();
             evt.StopPropagation();

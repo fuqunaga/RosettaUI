@@ -179,6 +179,10 @@ Unity2022.2.0b6
     flex-grow: 1;
 }
 
+.unity-foldout__toggle > .unity-label {
+    padding-top: 4px;
+}
+
 .unity-foldout__content{
     margin-left: 0;
 }

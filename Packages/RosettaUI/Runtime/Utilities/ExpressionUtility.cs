@@ -18,11 +18,11 @@ namespace RosettaUI
 #if ENABLE_IL2CPP
             return IL2CPP.ExpressionUtility_IL2CPP.CreateBinder(expression);
 #else
-            return _CreateBinder(expression);
+            return CreateBinderStandard(expression);
 #endif
         }
 
-        static Binder<T> _CreateBinder<T>(Expression<Func<T>> expression)
+        private static Binder<T> CreateBinderStandard<T>(Expression<Func<T>> expression)
         {
             var type = typeof(T);
             var getFunc = expression.Compile();
@@ -169,7 +169,6 @@ namespace RosettaUI
             /// </summary>
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
-                var obj = node.Object;
                 var method = node.Method;
 
                 // add static class name

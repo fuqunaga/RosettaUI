@@ -17,7 +17,7 @@ namespace RosettaUI
             RegisterUnityBuiltinProperties();
         }
 
-        static void RegisterUnityBuiltinProperties()
+        private static void RegisterUnityBuiltinProperties()
         {
             RegisterUITargetPropertyOrFields(typeof(Vector2Int), "x", "y");
             RegisterUITargetPropertyOrFields(typeof(Vector2Int), "x", "y");

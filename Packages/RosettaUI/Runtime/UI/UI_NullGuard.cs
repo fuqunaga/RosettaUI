@@ -17,9 +17,14 @@ namespace RosettaUI
         {
             return DynamicElement.Create(
                 () => getter.IsNull,
-                isNull => isNull
-                    ? new TextFieldElement(label, NullStrBinder, FieldOption.Default).SetInteractable(false)
-                    : createElement(),
+                isNull =>
+                {
+                    // DetachView to account for cases where labels are reused
+                    label?.DetachView();
+                    return isNull
+                        ? new TextFieldElement(label, NullStrBinder, FieldOption.Default).SetInteractable(false)
+                        : createElement();
+                },
                 $"NullGuard({nameof(DynamicElement)})"
             );
         }

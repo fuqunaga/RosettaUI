@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace RosettaUI
 {
@@ -35,23 +36,23 @@ namespace RosettaUI
             var invalid = element.Parent != null;
             if ( invalid )
             {
-                var lineage = new List<string>();
-                var tgt = element;
-                while (tgt != null)
+                using var _ = ListPool<string>.Get(out var lineage);
+                var target = element;
+                while (target != null)
                 {
-                    var str = tgt switch
+                    var str = target switch
                     {
                         LabelElement l when !string.IsNullOrEmpty(l.Value) => $"Label[{l.Value}]",
-                        _ => tgt.GetType().ToString()
+                        _ => target.GetType().ToString()
                     };
                         
                     lineage.Add(str);
 
-                    tgt = tgt.Parent;
+                    target = target.Parent;
                 }
 
                 lineage.Reverse();
-                Debug.LogError($"Element already has a parent. {string.Join(" > ", lineage.ToArray())}.\nAn element can only have a single parent.");
+                Debug.LogError($"Element already has a parent. {string.Join(" > ", lineage)}.\nAn element can only have a single parent.");
             }
 
             return invalid;

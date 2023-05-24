@@ -31,7 +31,7 @@
     --rosettaui-color-list-background: var(--rosettaui-color-box-background);
     --rosettaui-color-tabs-title-inactive-background: rgba(0,0,0,0.4);
 
-    
+    --rosettaui-button-background-pressed: var(--rosettaui-highlight-dark-blue);
     
     font-size: 18px;
     color: var(--unity-colors-default-text);
@@ -102,7 +102,10 @@
     flex-direction: row;
 }
 .rosettaui-window-title-button:hover {
-    background-color: #D01010;
+    background-color: #C42B1C;
+}
+.rosettaui-window-title-button:active {
+    background-color: #C53E2C;
 }
 
 .rosettaui-window-title-button__icon {

@@ -277,6 +277,10 @@ Unity2022.2.0b6
     background-color: var(--unity-colors-button-background-hover);
 }
 
+.unity-button:active {
+    background-color: var(--rosettaui-button-background-pressed);
+}
+
 .unity-button,
 .unity-button:disabled 
 {
@@ -600,9 +604,16 @@ Unity2022.2.0b6
 .unity-list-view__footer > .unity-button:focus {
     background-color: var(--unity-colors-button-background-focus);
 }
+
 .unity-list-view__footer > .unity-button:hover {
     background-color: var(--unity-colors-button-background-hover);
 }
+
+.unity-list-view__footer > .unity-button:active
+{
+    background-color: var(--rosettaui-button-background-pressed);
+}
+
 
 /*
 .unity-list-view__foldout-header > .unity-foldout__toggle > .unity-toggle__input

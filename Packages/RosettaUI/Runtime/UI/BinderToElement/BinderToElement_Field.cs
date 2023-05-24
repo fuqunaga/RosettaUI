@@ -66,6 +66,7 @@ namespace RosettaUI
                     {
                         if (obj is IElementCreator elementCreator)
                         {
+                            label?.DetachView();
                             return elementCreator.CreateElement(label);
                         }
 

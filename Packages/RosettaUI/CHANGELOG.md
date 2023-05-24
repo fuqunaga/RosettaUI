@@ -1,3 +1,12 @@
+# [ga.fuquna.rosettaui-v1.4.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.4.0...ga.fuquna.rosettaui-v1.4.1) (2023-05-24)
+
+
+### Bug Fixes
+
+* Error when null is assigned to an element in UI.List() ([ce91f53](https://github.com/fuqunaga/RosettaUI/commit/ce91f534593eba5ed6db7257227b6135eda850b1))
+* label error when assigning a new instance to IElementCreator ([c8beef7](https://github.com/fuqunaga/RosettaUI/commit/c8beef7963ad7a913cd1178ed820faaf970a5d2a))
+* UI.List() element is an IElementCreator, it does not follow if the reference is changed. ([8021700](https://github.com/fuqunaga/RosettaUI/commit/802170036ad7cc15d06bc6d90ee19d75c20e7ec3))
+
 # [ga.fuquna.rosettaui-v1.4.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.3.1...ga.fuquna.rosettaui-v1.4.0) (2023-05-22)
 
 

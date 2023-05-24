@@ -1,3 +1,16 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.4.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.3.1...ga.fuquna.rosettaui.uitoolkit-v1.4.0) (2023-05-24)
+
+
+### Bug Fixes
+
+* **dependency:** RosettaUI 1.3.1 ([6c29282](https://github.com/fuqunaga/RosettaUI/commit/6c29282329ef612fbb5b32800424c91e635b66f9))
+* UI.Dropdown would not open when clicked in Unity2021 ([605dc8b](https://github.com/fuqunaga/RosettaUI/commit/605dc8bd4733841d0e2bd02c5099e682db6a3a7d))
+
+
+### Features
+
+* **design:** Now highlights when a button is pressed ([61ce7ef](https://github.com/fuqunaga/RosettaUI/commit/61ce7efbc4979236981d58462b07e7429f8cb7eb))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.3.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.3.0...ga.fuquna.rosettaui.uitoolkit-v1.3.1) (2023-05-19)
 
 

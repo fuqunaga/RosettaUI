@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace RosettaUI
 {
@@ -57,14 +58,28 @@ namespace RosettaUI
 
         private static Element CreateElementCreatorElement(LabelElement label, IBinder binder)
         {
+            var lastObject = binder.GetObject();
+            if (binder.ValueType.IsValueType)
+            {
+                var elementCreator = lastObject as IElementCreator;
+                Assert.IsNotNull(elementCreator);
+                return elementCreator?.CreateElement(label);
+            }
+            
             // ElementCreatorの場合、参照が変わったらUIを作り直す
             return UI.NullGuard(label, binder, () =>
-                UI.DynamicElementOnStatusChanged
+                UI.DynamicElementOnTrigger
                 (
-                    binder.GetObject,
-                    obj =>
+                    rebuildIf: _ =>
                     {
-                        if (obj is IElementCreator elementCreator)
+                        var current = binder.GetObject();
+                        var refChanged = !ReferenceEquals(lastObject, binder.GetObject());
+                        lastObject = current;
+                        return refChanged;
+                    },
+                    () =>
+                    {
+                        if (lastObject is IElementCreator elementCreator)
                         {
                             label?.DetachView();
                             return elementCreator.CreateElement(label);

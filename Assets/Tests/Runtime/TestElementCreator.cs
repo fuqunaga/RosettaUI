@@ -27,10 +27,28 @@ namespace RosettaUI.Test
             }
         }
 
+        private struct MyStruct : IElementCreator
+        {
+            public int intValue;
+
+
+            public Element CreateElement(LabelElement label)
+            {
+                return UI.Fold(label,
+                    UI.Row(
+                        UI.FieldReadOnly("IntValue", GetIntValue)
+                    )
+                ).Open();
+            }
+
+            private int GetIntValue() => intValue;
+        }
+
         #endregion
 
 
         private MyClass _myClass = new();
+        private MyStruct _myStruct = new() { intValue = 1 };
 
         private List<MyClass> _myClassList = new()
         {
@@ -54,6 +72,12 @@ namespace RosettaUI.Test
                         UI.Button("Set null", () => _myClass = null),
                         UI.Button("Set new", () => _myClass = new MyClass())
                     ),
+                    // TODO: need IElementCreator.CreateElement(LabelElement, IBinder, FieldOption)
+                    // IElementCreator.CreateElement()だと参照の変更に対応できない
+                    /*
+                    UI.Field(() => _myStruct),
+                    UI.Button("Set new", () => _myStruct.intValue++),
+                    */
                     UI.List(() => _myClassList),
                     UI.Row(
                         UI.Button("Set null", () => _myClassList = null),

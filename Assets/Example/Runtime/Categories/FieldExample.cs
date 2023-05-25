@@ -125,7 +125,7 @@ namespace RosettaUI.Example
     public float rangeFloat;
 
     [Multiline]
-    public float multiLineString;
+    public string multiLineString;
 
     [NonReorderable]
     public List<int> nonReorderableList;

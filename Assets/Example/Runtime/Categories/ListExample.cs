@@ -35,13 +35,13 @@ namespace RosettaUI.Example
                 ExampleTemplate.Tab("Codes",
                     ExampleTemplate.CodeElementSets("CustomItemElement",
                         (@"UI.List(() => intArray,
-    (itemBinder, idx) => UI.Row(
+    createItemElement: (itemBinder, idx) => UI.Row(
         UI.Field($""Item {idx}"", itemBinder),
         UI.Button(""+"", () => intArray[idx]++),
         UI.Button(""-"", () => intArray[idx]--)
 );",
                             UI.List(() => intArray,
-                                (itemBinder, idx) => UI.Row(
+                               createItemElement: (itemBinder, idx) => UI.Row(
                                     UI.Field($"Item {idx}", itemBinder),
                                     UI.Button("+", () => intArray[idx]++),
                                     UI.Button("-", () => intArray[idx]--)

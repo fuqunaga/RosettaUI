@@ -157,7 +157,7 @@ if ( Keyboard.current[Key.A].wasPressedThisFrame )
 
 For LegacyInputSystem, refer to `RosettaUIRoot.WillUseKeyInputAny()`.
 ```csharp
-if ( !RosettaUIRoot.WillUseKeyInputAny() && Input.GetKeyDown(Key.A) )
+if ( !RosettaUIRoot.WillUseKeyInputAny() && Input.GetKeyDown(KeyCode.A) )
 {
     // do something
 }

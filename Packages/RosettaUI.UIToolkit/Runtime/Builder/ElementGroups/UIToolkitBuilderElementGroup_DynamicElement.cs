@@ -6,9 +6,9 @@ namespace RosettaUI.UIToolkit.Builder
     {
         private bool Bind_DynamicElement(Element element, VisualElement visualElement)
         {
-            // (visualElement is not VisualElement) is not work
-            // visualElementがVisualElementを継承したクラスでもtrueになってしまうのでGetType()で厳密にチェックする
-            if (element is not DynamicElement dynamicElement || visualElement.GetType() != typeof(VisualElement)) return false;
+            // (visualElement is not WrapElement) is not work
+            // visualElement が WrapElement を継承したクラスでもtrueになってしまうのでGetType()で厳密にチェックする
+            if (element is not DynamicElement dynamicElement || visualElement.GetType() != typeof(WrapElement)) return false;
             
             dynamicElement.GetViewBridge().RegisterBindViewAndCallOnce(e =>
             {

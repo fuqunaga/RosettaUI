@@ -1,8 +1,6 @@
-﻿using UnityEngine.UIElements;
-
-namespace RosettaUI.UIToolkit
+﻿namespace RosettaUI.UIToolkit
 {
-    public class Indent : VisualElement
+    public class Indent : WrapElement
     {
         private const string UssClassName = "rosettaui-indent";
         

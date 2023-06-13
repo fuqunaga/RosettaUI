@@ -35,10 +35,10 @@ namespace RosettaUI.UIToolkit.Builder
             FuncTable = new()
             {
                 [typeof(BoxElement)] = BuildBindFunc<Box>.Create(Bind_ElementGroup<BoxElement, Box>),
-                [typeof(ClickableElement)] = BuildBindFunc<VisualElement>.Create(Bind_ClickableElement),
+                [typeof(ClickableElement)] = BuildBindFunc<WrapElement>.Create(Bind_ClickableElement),
                 [typeof(ColumnElement)] = BuildBindFunc<Column>.Create(Bind_ElementGroup<ColumnElement, Column>),
                 [typeof(CompositeFieldElement)] = BuildBindFunc<CompositeField>.Create(Bind_CompositeField),
-                [typeof(DynamicElement)] = BuildBindFunc<VisualElement>.Create(Bind_DynamicElement),
+                [typeof(DynamicElement)] = BuildBindFunc<WrapElement>.Create(Bind_DynamicElement),
                 [typeof(FoldElement)] = BuildBindFunc<FoldoutCustom>.Create(Bind_Fold),
                 [typeof(HelpBoxElement)] = BuildBindFunc<HelpBox>.Create(Bind_HelpBox),
                 [typeof(IndentElement)] = BuildBindFunc<Indent>.Create(Bind_Indent),

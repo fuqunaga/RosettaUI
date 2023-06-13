@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.4.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.4.0...ga.fuquna.rosettaui.uitoolkit-v1.4.1) (2023-06-13)
+
+
+### Bug Fixes
+
+* a bug that caused Elements in DynamicElement, etc. to shrink. ([5a4d374](https://github.com/fuqunaga/RosettaUI/commit/5a4d37497cbb7a5653b90c69ad3b5658de96f0c3))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.4.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.3.1...ga.fuquna.rosettaui.uitoolkit-v1.4.0) (2023-05-24)
 
 

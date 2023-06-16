@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UIElements;
+using RosettaUI.UIToolkit.UnityInternalAccess;
 
 namespace RosettaUI.UIToolkit.Builder
 {
@@ -38,6 +39,23 @@ namespace RosettaUI.UIToolkit.Builder
             }
         }
 
+        private bool Bind_GradientField(Element element, VisualElement visualElement)
+        {
+            if(element is not FieldBaseElement<Gradient> gradientElement || visualElement is not GradientField gradientField) return false;
+            
+            Bind_Field(gradientElement, gradientField, true);
+            
+            gradientField.showGradientPickerFunc += ShowGradientPicker;
+            element.GetViewBridge().onUnsubscribe += () => gradientField.showGradientPickerFunc -= ShowGradientPicker;
+            
+            return true;
+            
+            void ShowGradientPicker(Vector2 pos, UnityInternalAccess.GradientField target)
+            {
+                GradientPicker.Show(pos, target, gradientField.value, gradient => gradientField.value = gradient);
+            }
+        }
+        
         public bool Bind_Field<TValue, TField>(Element element, VisualElement visualElement)
             where TField : BaseField<TValue>, new()
         {

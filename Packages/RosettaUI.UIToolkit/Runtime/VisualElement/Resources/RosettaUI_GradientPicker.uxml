@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:DropdownField label="Mode" index="0" choices="Blend, Fixed" name="mode-enum" style="height: auto; flex-grow: 0.1; flex-shrink: 1;" />
+    <ui:GroupBox name="gradient-group" style="flex-grow: 3; margin-left: 8px; margin-right: 8px; margin-top: 2px; margin-bottom: 2px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-shrink: 1; height: 96px; min-height: 96px;">
+        <ui:VisualElement name="alpha-cursors" class="rosettaui-gradientpicker__gradient-group__alpha-cursors" style="flex-basis: auto; flex-grow: 1; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 1px; padding-right: 1px; padding-top: 1px; padding-bottom: 1px; min-height: 32px; flex-shrink: 0; height: 32px;" />
+        <ui:VisualElement name="gradient-preview" class="rosettaui-gradientpicker__gradient-preview" style="flex-basis: auto; -unity-background-image-tint-color: rgb(255, 255, 255); background-color: rgba(0, 0, 0, 0); flex-grow: 2; min-height: 32px; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; height: 32px; flex-shrink: 0;" />
+        <ui:VisualElement name="color-cursors" class="rosettaui-gradientpicker__gradient-group__color-cursors" style="flex-basis: auto; flex-grow: 1; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; min-height: 32px; flex-shrink: 0; height: 32px;" />
+    </ui:GroupBox>
+    <ui:VisualElement name="property-group" style="flex-grow: 0.1; background-color: rgba(0, 0, 0, 0); align-items: stretch; justify-content: flex-start; margin-left: 2px; margin-right: 2px; margin-top: 2px; margin-bottom: 2px;">
+        <ui:GroupBox style="flex-direction: column;">
+            <ui:Slider picking-mode="Ignore" label="Alpha" value="0" high-value="1" show-input-field="true" name="alpha-slider" inverted="false" page-size="0" style="opacity: 1; flex-shrink: 1; top: 0; position: relative;" />
+            <ui:VisualElement name="color-field-box" style="flex-direction: row; white-space: normal; align-items: stretch; margin-left: 4px; margin-right: 4px; margin-top: 2px; margin-bottom: 2px; top: 0; position: relative;">
+                <ui:Label text="Color&#10;" display-tooltip-when-elided="true" class="unity-base-field__label unity-color-field__label" />
+                <ui:VisualElement name="color-field" class="unity-imgui-container unity-base-field__input unity-color-field__input" style="background-color: rgb(255, 255, 255); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px;" />
+            </ui:VisualElement>
+        </ui:GroupBox>
+        <ui:Slider picking-mode="Ignore" label="Location" value="0" high-value="100" name="location-slider" show-input-field="true" style="flex-shrink: 1;">
+            <ui:Label text="%" display-tooltip-when-elided="true" name="location-per-label" style="align-items: stretch;" />
+        </ui:Slider>
+    </ui:VisualElement>
+</ui:UXML>

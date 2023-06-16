@@ -1,0 +1,59 @@
+/********************************************************************************
+* gradientpicker
+********************************************************************************/
+.rosettaui-gradientpicker__preview-prev
+{
+    width: 50%;
+    margin-top: -1px;
+    margin-bottom: -1px;
+
+    border-radius: 5px 0 0 5px;
+}
+
+.rosettaui-gradientpicker__gradient-preview
+{
+    position: absolute;
+    width: 100%;
+    height: 32px;
+    top: 32px;
+}
+
+.rosettaui-gradientpicker__gradient-group__alpha-cursors
+{
+    position: absolute;
+    width: 100%;
+    height: 16px;
+    top: 0;
+    flex-shrink: 0;
+    
+}
+
+.rosettaui-gradientpicker__gradient-group__color-cursors
+{
+    position: absolute;
+    width: 100%;
+    height: 32px;
+    top: 64px;
+    flex-shrink: 0;
+}
+
+.rosettaui-gradientpicker__cursor
+{
+    position: absolute;
+    width: 16px;
+    height: 32px;
+    /*margin: -8px 0 0 -8px;*/
+    margin: 0 0 0 -8px;
+    background-image: resource("gradient_cursor");
+}
+
+.rosettaui-gradientpicker__cursor__color
+{
+    position: absolute;
+    width: 16px;
+    height: 32px;
+    /*margin: -8px 0 0 -8px;*/
+    margin: 0 0 0 -8px;
+    background-image: resource("gradient_cursor");
+    scale: 1 -1;
+}

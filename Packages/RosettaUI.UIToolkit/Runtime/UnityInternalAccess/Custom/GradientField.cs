@@ -22,45 +22,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         public event Action<Vector2, GradientField> showGradientPickerFunc;
 
         private bool _valueNull;
-        /// <summary>
-        /// The <see cref="Gradient"/> currently being exposed by the field.
-        /// </summary>
-        /// <remarks>
-        /// Note that changing this will not trigger a change event to be sent.
-        /// </remarks>
-        public override Gradient value
-        {
-            get
-            {
-                if (_valueNull) return null;
 
-                return GradientCopy(rawValue);
-            }
-            set
-            {
-                if (value != null || !_valueNull)  // let's not reinitialize an initialized gradient
-                {
-                    using (ChangeEvent<Gradient> evt = ChangeEvent<Gradient>.GetPooled(rawValue, value))
-                    {
-                        // evt.elementTarget = this;
-                        evt.target = this;
-                        SetValueWithoutNotify(value);
-                        SendEvent(evt);
-                        // NotifyPropertyChanged(valueProperty);
-                    }
-                }
-            }
-        }
-
-        internal static Gradient GradientCopy(Gradient other)
-        {
-            Gradient gradientCopy = new Gradient();
-            gradientCopy.colorKeys = other.colorKeys;
-            gradientCopy.alphaKeys = other.alphaKeys;
-            gradientCopy.mode = other.mode;
-            return gradientCopy;
-        }
-        
         readonly Background m_DefaultBackground = new Background();
 
         /// <summary>
@@ -81,7 +43,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             visualInput.RegisterCallback<ClickEvent>(OnClickInput);
             RegisterCallback<NavigationSubmitEvent>(OnNavigationSubmit);
 
-            rawValue = new Gradient();
+            // rawValue = new Gradient();
         }
         
         protected override void ExecuteDefaultAction(EventBase evt)
@@ -120,7 +82,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             }
             else
             {
-                Texture2D gradientTexture = GradientPickerHelper.GenerateGradientPreview(rawValue, resolvedStyle.backgroundImage.texture);
+                Texture2D gradientTexture = GradientPickerHelper.GenerateGradientPreview(value, resolvedStyle.backgroundImage.texture);
                 visualInput.style.backgroundImage = gradientTexture;
 
                 IncrementVersion(VersionChangeType.Repaint); // since the Texture2D object can be reused, force dirty because the backgroundImage change will only trigger the Dirty if the Texture2D objects are different.
@@ -152,59 +114,26 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             
             evt.StopPropagation();
         }
-        
-        bool CompareGradient(Gradient a, Gradient b)
-        {
-            if (a == null || b == null)
-                return false;
 
-            if (a.colorKeys.Length != b.colorKeys.Length)
-                return false;
-            if (a.alphaKeys.Length != b.alphaKeys.Length)
-                return false;
-            if (a.mode != b.mode)
-                return false;
-            
-            for(int i = 0; i < a.colorKeys.Length; ++i)
-            {
-                if (a.colorKeys[i].color != b.colorKeys[i].color)
-                    return false;
-                if (Math.Abs(a.colorKeys[i].time - b.colorKeys[i].time) > float.Epsilon)
-                    return false;
-            }
-            
-            for(int i = 0; i < a.alphaKeys.Length; ++i)
-            {
-                if (Math.Abs(a.alphaKeys[i].alpha - b.alphaKeys[i].alpha) > float.Epsilon)
-                    return false;
-                if (Math.Abs(a.alphaKeys[i].time - b.alphaKeys[i].time) > float.Epsilon)
-                    return false;
-            }
-
-            return true;
-        }
-        
         public override void SetValueWithoutNotify(Gradient newValue)
         {
+            base.SetValueWithoutNotify(newValue);
+            
             _valueNull = newValue == null;
-            bool isChange = !CompareGradient(rawValue, newValue);
             if (newValue != null)
             {
-                rawValue.colorKeys = newValue.colorKeys;
-                rawValue.alphaKeys = newValue.alphaKeys;
-                rawValue.mode = newValue.mode;
+                value.colorKeys = newValue.colorKeys;
+                value.alphaKeys = newValue.alphaKeys;
+                value.mode = newValue.mode;
             }
             else // restore the internal gradient to the default state.
             {
-                rawValue.colorKeys = new[] { k_WhiteKeyBegin, k_WhiteKeyEnd };
-                rawValue.alphaKeys = new[] { k_AlphaKeyBegin, k_AlphaKeyEnd };
-                rawValue.mode = GradientMode.Blend;
+                value.colorKeys = new[] { k_WhiteKeyBegin, k_WhiteKeyEnd };
+                value.alphaKeys = new[] { k_AlphaKeyBegin, k_AlphaKeyEnd };
+                value.mode = GradientMode.Blend;
             }
 
-            if (isChange)
-            {
-                UpdateGradientTexture();
-            }
+            UpdateGradientTexture();
         }
 
         protected override void UpdateMixedValueContent()

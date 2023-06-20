@@ -21,6 +21,7 @@ namespace RosettaUI.UIToolkit
         private static GradientPicker _gradientPickerInstance;
         
         public static int TextDigit { get; set; } = 3;
+        public static int MaxKeyNum { get; set; } = 8;
         #endregion
 
         private Gradient PreviewGradient
@@ -119,6 +120,11 @@ namespace RosettaUI.UIToolkit
         private List<Swatch> _colorSwatches = new List<Swatch>();
         private Swatch _selectedSwatch = null;
         
+        static float Round(float value, int digit)
+        {
+            var scale = Mathf.Pow(10f, digit);
+            return Mathf.Round(value * scale) / scale;
+        }
         
         private GradientPicker()
         {
@@ -360,7 +366,7 @@ namespace RosettaUI.UIToolkit
             {
                 if(_selectedSwatch == null) return;
                 
-                var a = evt.newValue;
+                var a = Round(evt.newValue, TextDigit);
                 _selectedSwatch.Color = new Color(a, a, a, 1);
                 UpdateSwatches(_alphaSwatches, _alphaCursors);
                 OnGradientChanged();
@@ -370,7 +376,7 @@ namespace RosettaUI.UIToolkit
             {
                 if(_selectedSwatch == null) return;
 
-                var t = Mathf.Clamp01(_locationSlider.value / 100f);
+                var t = Round(Mathf.Clamp01(_locationSlider.value / 100f), TextDigit);
                 _selectedSwatch.Time = t;
                 if (_selectedSwatch.IsAlpha)
                 {
@@ -463,13 +469,20 @@ namespace RosettaUI.UIToolkit
             else
             {
                 // 無かったら新規追加
-                var t = LocalPosToTime(_alphaCursors, localPos.x);
-                var a = _gradient.Evaluate(t).a;
-                var newSwatch = CreateSwatch(t, new Color(a,a,a,1), true);
-                _alphaSwatches.Add(newSwatch);
-                _alphaCursors.Add(newSwatch.Cursor);
-                newSwatch.Cursor.style.left = localPos.x;
-                SelectSwatch(newSwatch);
+                if (_alphaSwatches.Count < MaxKeyNum)
+                {
+                    var t = LocalPosToTime(_alphaCursors, localPos.x);
+                    var a = _gradient.Evaluate(t).a;
+                    var newSwatch = CreateSwatch(t, new Color(a, a, a, 1), true);
+                    _alphaSwatches.Add(newSwatch);
+                    _alphaCursors.Add(newSwatch.Cursor);
+                    newSwatch.Cursor.style.left = localPos.x;
+                    SelectSwatch(newSwatch);
+                }
+                else
+                {
+                    Debug.LogWarning("Max 8 color keys and 8 alpha keys are allowed in a gradient.");
+                }
             }
 
             isClicking = true;
@@ -529,14 +542,20 @@ namespace RosettaUI.UIToolkit
             else
             {
                 // 無かったら新規追加
-                var t = LocalPosToTime(_colorCursors, localPos.x);
-                var c = _gradient.Evaluate(t);
-                c.a = 1;
-                var newSwatch = CreateSwatch(t, c, false);
-                _colorSwatches.Add(newSwatch);
-                _colorCursors.Add(newSwatch.Cursor);
-                newSwatch.Cursor.style.left = localPos.x;
-                SelectSwatch(newSwatch);
+                if (_colorSwatches.Count < MaxKeyNum)
+                {
+                    var t = LocalPosToTime(_colorCursors, localPos.x);
+                    var c = _gradient.Evaluate(t);
+                    c.a = 1;
+                    var newSwatch = CreateSwatch(t, c, false);
+                    _colorSwatches.Add(newSwatch);
+                    _colorCursors.Add(newSwatch.Cursor);
+                    newSwatch.Cursor.style.left = localPos.x;
+                    SelectSwatch(newSwatch);
+                }else
+                {
+                    Debug.LogWarning("Max 8 color keys and 8 alpha keys are allowed in a gradient.");
+                }
             }
 
             isClicking = true;

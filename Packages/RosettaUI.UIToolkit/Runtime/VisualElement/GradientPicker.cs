@@ -68,6 +68,11 @@ namespace RosettaUI.UIToolkit
                 
                 target?.Focus();
             }
+
+            if (_gradientPickerInstance.isInitialized)
+            {
+                _gradientPickerInstance.ResetUI();
+            }
         }
         
         #region static members
@@ -79,6 +84,8 @@ namespace RosettaUI.UIToolkit
         
         public event Action<Gradient> onGradientChanged;
         
+        public bool isInitialized = false;
+
         private DropdownField _modeEnum;
         
         private VisualElement _gradientPreview;
@@ -89,7 +96,7 @@ namespace RosettaUI.UIToolkit
         private VisualElement _colorFieldBox;
         private VisualElement _colorField;
         private Slider _locationSlider;
-
+        
         private bool isClicking = false;
         
         private class Swatch
@@ -149,7 +156,36 @@ namespace RosettaUI.UIToolkit
 
             SelectSwatch(_colorSwatches[0]);
         }
+        
+        public void ResetUI()
+        {
+            if (_alphaSwatches != null)
+            {
+                foreach (var swatch in _alphaSwatches)
+                {
+                    swatch.Cursor.RemoveFromHierarchy();
+                    swatch.Cursor = null;
+                }
+                _alphaSwatches.Clear();
+            }
 
+            if (_colorSwatches != null)
+            {
+                foreach (var swatch in _colorSwatches)
+                {
+                    swatch.Cursor.RemoveFromHierarchy();
+                    swatch.Cursor = null;
+                }
+                _colorSwatches.Clear();
+            }
+
+            _selectedSwatch = null;
+            
+            BuildArrays();
+            UpdateSwatches(_alphaSwatches, _alphaCursors);
+            UpdateSwatches(_colorSwatches, _colorCursors);
+        }
+        
         void UpdateGradient()
         {
             GradientColorKey[] colorKeys = new GradientColorKey[_colorSwatches.Count];
@@ -195,6 +231,8 @@ namespace RosettaUI.UIToolkit
             {
                 cursor.AddToClassList("rosettaui-gradientpicker__cursor__color");
             }
+
+            cursor.focusable = true;
             return cursor;
         }
 
@@ -217,7 +255,7 @@ namespace RosettaUI.UIToolkit
             if (_selectedSwatch.IsAlpha)
             {
                 _alphaSlider.visible = true;
-                _alphaSlider.value = _selectedSwatch.Color.a;
+                _alphaSlider.value = _selectedSwatch.Color.r;
 
                 _colorFieldBox.visible = false;
             }
@@ -257,15 +295,20 @@ namespace RosettaUI.UIToolkit
 
         void SelectSwatch(Swatch swatch)
         {
+            UnselectSwatch();
+            
             _selectedSwatch = swatch;
+            
             UpdateSelectedSwatchField();
+            
+            _selectedSwatch.Cursor.Focus();
         }
         
         void UnselectSwatch()
         {
             if (_selectedSwatch == null)
                 return;
-            
+
             _selectedSwatch = null;
             _alphaSlider.visible = false;
             _colorFieldBox.visible = false;
@@ -345,6 +388,7 @@ namespace RosettaUI.UIToolkit
                 BuildArrays();
                 UpdateSwatches(_alphaSwatches, _alphaCursors);
                 UpdateSwatches(_colorSwatches, _colorCursors);
+                isInitialized = true;
             });
         }
 
@@ -386,6 +430,24 @@ namespace RosettaUI.UIToolkit
             return swatch;
         }
 
+        void CheckCursorLeave(PointerLeaveEvent evt, VisualElement cursors, List<Swatch> swatches)
+        {
+            var localPos = cursors.WorldToLocal(evt.position);
+            
+            if (isClicking && _selectedSwatch != null)
+            {
+                if (localPos.y < 0 || localPos.y >= (cursors.resolvedStyle.height))
+                {
+                    // 縦にはみ出したら削除
+                    RemoveSwatch(_selectedSwatch, swatches, cursors);
+                    UnselectSwatch();
+                    OnGradientChanged();
+                }
+                
+                isClicking = false;
+            }
+        }
+        
         #region Alpha Cursors Events
         
         void OnPointerDownOnAlphaCursors(PointerDownEvent evt)
@@ -446,18 +508,8 @@ namespace RosettaUI.UIToolkit
 
         void OnPointerLeaveAlphaCursors(PointerLeaveEvent evt)
         {
-            var localPos = _alphaCursors.WorldToLocal(evt.position);
-            
-            if (isClicking && _selectedSwatch != null && 
-                localPos.x > -10 && localPos.x < (_alphaCursors.resolvedStyle.width + 10))
-            {
-                // 縦にはみ出したら削除
-                RemoveSwatch(_selectedSwatch, _alphaSwatches, _alphaCursors);
-                UnselectSwatch();
-                OnGradientChanged();
-                isClicking = false;
-            }
-            
+            CheckCursorLeave(evt, _alphaCursors, _alphaSwatches);
+
             evt.StopPropagation();
         }
         #endregion
@@ -471,7 +523,7 @@ namespace RosettaUI.UIToolkit
             var swatch = ContainsSwatchAtPosition(localPos, _colorSwatches, false);
             if (swatch != null)
             {
-                _selectedSwatch = swatch;
+                // _selectedSwatch = swatch;
                 SelectSwatch(swatch);
             }
             else
@@ -523,18 +575,8 @@ namespace RosettaUI.UIToolkit
 
         void OnPointerLeaveColorCursors(PointerLeaveEvent evt)
         {
-            var localPos = _colorCursors.WorldToLocal(evt.position);
-            
-            if (isClicking && _selectedSwatch != null && 
-                localPos.x > -10 && localPos.x < (_colorCursors.resolvedStyle.width + 10))
-            {
-                // 縦にはみ出したら削除
-                RemoveSwatch(_selectedSwatch, _colorSwatches, _colorCursors);
-                UnselectSwatch();
-                OnGradientChanged();
-                isClicking = false;
-            }
-            
+            CheckCursorLeave(evt, _colorCursors, _colorSwatches);
+
             evt.StopPropagation();
         }
         #endregion

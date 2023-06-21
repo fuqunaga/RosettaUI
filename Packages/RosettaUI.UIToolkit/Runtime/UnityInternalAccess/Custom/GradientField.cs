@@ -1,18 +1,16 @@
 using System;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Object = UnityEngine.Object;
 
 namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
-    using RosettaUI.Builder;
+    using Builder;
     
     public class GradientField :  BaseField<Gradient>
     {
         public new static readonly string ussClassName = "rosettaui-gradient-field";
         public new static readonly string labelUssClassName = ussClassName + "__label";
         public new static readonly string inputUssClassName = ussClassName + "__input";
-        // public static readonly string contentUssClassName = ussClassName + "__content";
 
         static readonly GradientColorKey k_WhiteKeyBegin = new GradientColorKey(Color.white, 0);
         static readonly GradientColorKey k_WhiteKeyEnd = new GradientColorKey(Color.white, 1);
@@ -28,8 +26,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         /// <summary>
         /// Constructor.
         /// </summary>
-        public GradientField()
-            : this(null) {}
+        public GradientField() : this(null) {}
 
         /// <summary>
         /// Constructor.
@@ -42,27 +39,8 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             visualInput.AddToClassList(inputUssClassName);
             visualInput.RegisterCallback<ClickEvent>(OnClickInput);
             RegisterCallback<NavigationSubmitEvent>(OnNavigationSubmit);
-
-            // rawValue = new Gradient();
         }
-        
-        protected override void ExecuteDefaultAction(EventBase evt)
-        {
-            base.ExecuteDefaultAction(evt);
 
-            if ((evt as MouseDownEvent)?.button == (int)MouseButton.LeftMouse)
-            {
-                var mde = (MouseDownEvent)evt;
-                if (visualInput.ContainsPoint(visualInput.WorldToLocal(mde.mousePosition)))
-                {
-                    // showGradientPicker = true;
-                    ShowGradientPicker(mde.mousePosition);
-                    evt.StopPropagation();
-                }
-            }
-
-        }
-        
         void ShowGradientPicker(Vector2 position)
         {
             showGradientPickerFunc?.Invoke(position, this);
@@ -152,11 +130,6 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
 
         public class GradientInput : VisualElement
         {
-            public GradientInput()
-            {
-                pickingMode = PickingMode.Ignore;
-
-            }
         }
     }
 }

@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.4.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.4.1...ga.fuquna.rosettaui-v1.4.2) (2023-06-21)
+
+
+### Bug Fixes
+
+* Changes to the value of items in the list were not notified outside the UI. ([306ea86](https://github.com/fuqunaga/RosettaUI/commit/306ea864348b18d3f331feeadfe5872740151fcb))
+
 # [ga.fuquna.rosettaui-v1.4.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.4.0...ga.fuquna.rosettaui-v1.4.1) (2023-05-24)
 
 

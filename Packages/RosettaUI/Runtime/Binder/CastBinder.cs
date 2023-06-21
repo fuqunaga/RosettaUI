@@ -3,6 +3,15 @@ using System.Linq.Expressions;
 
 namespace RosettaUI
 {
+    public static class CastBinder
+    {
+        public static IBinder Create(IBinder binder, Type fromType, Type toType)
+        {
+            var castBinderType = typeof(CastBinder<,>).MakeGenericType(fromType, toType);
+            return (IBinder) Activator.CreateInstance(castBinderType, binder);
+        }
+    }
+    
     public class CastBinder<TFrom, TTo> : ConvertBinder<TFrom, TTo>
     {
         public CastBinder(IBinder<TFrom> binder) : base(binder)

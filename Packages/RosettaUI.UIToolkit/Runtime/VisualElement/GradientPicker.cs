@@ -9,19 +9,21 @@ namespace RosettaUI.UIToolkit
 {
     public class GradientPicker : VisualElement
     {
+        [Serializable]
         public enum Mode
         {
-            Blend,
-            Fixed
+            Blend = 0,
+            Fixed = 1
         }
-        
+
         #region static interface
 
         private static ModalWindow _window;
         private static GradientPicker _gradientPickerInstance;
-        
+
         public static int TextDigit { get; set; } = 3;
         public static int MaxKeyNum { get; set; } = 8;
+
         #endregion
 
         private Gradient PreviewGradient
@@ -30,16 +32,19 @@ namespace RosettaUI.UIToolkit
             set
             {
                 _gradient = value;
-                Texture2D gradientTexture = GradientPickerHelper.GenerateGradientPreview(value, _gradientPreview.style.backgroundImage.value.texture);
+                Texture2D gradientTexture =
+                    GradientPickerHelper.GenerateGradientPreview(value,
+                        _gradientPreview.style.backgroundImage.value.texture);
                 _gradientPreview.style.backgroundImage = gradientTexture;
                 _gradientMode = value.mode;
             }
         }
-        
+
         private Gradient _gradient;
         private GradientMode _gradientMode = GradientMode.Blend;
-        
-        public static void Show(Vector2 position, VisualElement target, Gradient initialGradient, Action<Gradient> onGradientChanged)
+
+        public static void Show(Vector2 position, VisualElement target, Gradient initialGradient,
+            Action<Gradient> onGradientChanged)
         {
             if (_window == null)
             {
@@ -56,7 +61,7 @@ namespace RosettaUI.UIToolkit
             }
 
             _window.Show(position, target);
-            
+
             // Show()前はPanelが設定されていないのでコールバック系はShow()後
             _gradientPickerInstance.PreviewGradient = initialGradient;
             _gradientPickerInstance.onGradientChanged += onGradientChanged;
@@ -66,7 +71,7 @@ namespace RosettaUI.UIToolkit
             {
                 _gradientPickerInstance.onGradientChanged -= onGradientChanged;
                 _gradientPickerInstance.UnregisterCallback<DetachFromPanelEvent>(OnDetach);
-                
+
                 target?.Focus();
             }
 
@@ -75,38 +80,41 @@ namespace RosettaUI.UIToolkit
                 _gradientPickerInstance.ResetUI();
             }
         }
-        
+
         #region static members
 
         private static VisualTreeAsset _visualTreeAsset;
         private static RenderTexture _gradientTexture;
 
         #endregion
-        
+
         public event Action<Gradient> onGradientChanged;
-        
+
         public bool isInitialized = false;
 
         private DropdownField _modeEnum;
-        
+
         private VisualElement _gradientPreview;
         private VisualElement _alphaCursors;
         private VisualElement _colorCursors;
-        
+
         private Slider _alphaSlider;
         private VisualElement _colorFieldBox;
         private VisualElement _colorField;
         private Slider _locationSlider;
+        private Button _copyButton;
+        private Button _pasteButton;
+        private Label _infoLabel;
         
         private bool isClicking = false;
-        
+
         private class Swatch
         {
             public float Time;
             public Color Color;
             public bool IsAlpha;
             public VisualElement Cursor;
-            
+
             public Swatch(float time, Color value, bool isAlpha, VisualElement cursor)
             {
                 Time = time;
@@ -115,30 +123,30 @@ namespace RosettaUI.UIToolkit
                 Cursor = cursor;
             }
         }
-        
+
         private List<Swatch> _alphaSwatches = new List<Swatch>();
         private List<Swatch> _colorSwatches = new List<Swatch>();
         private Swatch _selectedSwatch = null;
-        
+
         static float Round(float value, int digit)
         {
             var scale = Mathf.Pow(10f, digit);
             return Mathf.Round(value * scale) / scale;
         }
-        
+
         private GradientPicker()
         {
             _visualTreeAsset ??= Resources.Load<VisualTreeAsset>("RosettaUI_GradientPicker");
             _visualTreeAsset.CloneTree(this);
-            
+
             InitUI();
         }
 
         void BuildArrays()
         {
-            if(_gradient == null)
+            if (_gradient == null)
                 return;
-            
+
             GradientColorKey[] colorKeys = _gradient.colorKeys;
             _colorSwatches = new List<Swatch>(colorKeys.Length);
             for (int i = 0; i < colorKeys.Length; i++)
@@ -149,7 +157,7 @@ namespace RosettaUI.UIToolkit
                 _colorSwatches.Add(swatch);
                 _colorCursors.Add(swatch.Cursor);
             }
-            
+
             GradientAlphaKey[] alphaKeys = _gradient.alphaKeys;
             _alphaSwatches = new List<Swatch>(alphaKeys.Length);
             for (int i = 0; i < alphaKeys.Length; i++)
@@ -161,8 +169,10 @@ namespace RosettaUI.UIToolkit
             }
 
             SelectSwatch(_colorSwatches[0]);
+            
+            InitGradientCode();
         }
-        
+
         public void ResetUI()
         {
             if (_alphaSwatches != null)
@@ -172,6 +182,7 @@ namespace RosettaUI.UIToolkit
                     swatch.Cursor.RemoveFromHierarchy();
                     swatch.Cursor = null;
                 }
+
                 _alphaSwatches.Clear();
             }
 
@@ -182,16 +193,17 @@ namespace RosettaUI.UIToolkit
                     swatch.Cursor.RemoveFromHierarchy();
                     swatch.Cursor = null;
                 }
+
                 _colorSwatches.Clear();
             }
 
             _selectedSwatch = null;
-            
+
             BuildArrays();
             UpdateSwatches(_alphaSwatches, _alphaCursors);
             UpdateSwatches(_colorSwatches, _colorCursors);
         }
-        
+
         void UpdateGradient()
         {
             GradientColorKey[] colorKeys = new GradientColorKey[_colorSwatches.Count];
@@ -199,7 +211,7 @@ namespace RosettaUI.UIToolkit
             {
                 colorKeys[i] = new GradientColorKey(_colorSwatches[i].Color, _colorSwatches[i].Time);
             }
-            
+
             GradientAlphaKey[] alphaKeys = new GradientAlphaKey[_alphaSwatches.Count];
             for (int i = 0; i < alphaKeys.Length; i++)
             {
@@ -211,13 +223,13 @@ namespace RosettaUI.UIToolkit
             newGradient.mode = _gradientMode;
             PreviewGradient = newGradient;
         }
-        
+
         void OnGradientChanged()
         {
             UpdateGradient();
             onGradientChanged?.Invoke(PreviewGradient);
         }
-        
+
         Swatch CreateSwatch(float time, Color color, bool isAlpha)
         {
             var cursor = CreateCursor(isAlpha);
@@ -225,7 +237,7 @@ namespace RosettaUI.UIToolkit
             var swatch = new Swatch(time, color, isAlpha, cursor);
             return swatch;
         }
-        
+
         VisualElement CreateCursor(bool isAlpha = false)
         {
             var cursor = new VisualElement();
@@ -247,7 +259,7 @@ namespace RosettaUI.UIToolkit
             var f = element.resolvedStyle.width * t;
             return f;
         }
-        
+
         float LocalPosToTime(VisualElement element, float x)
         {
             var f = x / element.resolvedStyle.width;
@@ -256,7 +268,7 @@ namespace RosettaUI.UIToolkit
 
         void UpdateSelectedSwatchField()
         {
-            if(_selectedSwatch == null)
+            if (_selectedSwatch == null)
                 return;
             if (_selectedSwatch.IsAlpha)
             {
@@ -269,18 +281,18 @@ namespace RosettaUI.UIToolkit
             {
                 _colorFieldBox.visible = true;
                 _colorField.style.backgroundColor = _selectedSwatch.Color;
-                
+
                 _alphaSlider.visible = false;
             }
 
             _locationSlider.visible = true;
             _locationSlider.value = _selectedSwatch.Time * 100f;
         }
-        
+
         void UpdateSwatches(List<Swatch> swatches, VisualElement element)
         {
-            swatches.Sort((a,b)=> a.Time.CompareTo(b.Time));
-            
+            swatches.Sort((a, b) => a.Time.CompareTo(b.Time));
+
             foreach (var swatch in swatches)
             {
                 var c = swatch.Cursor.style;
@@ -295,6 +307,7 @@ namespace RosettaUI.UIToolkit
             {
                 swatches.Remove(swatch);
             }
+
             swatch.Cursor.RemoveFromHierarchy();
             UpdateSwatches(swatches, element);
         }
@@ -302,14 +315,14 @@ namespace RosettaUI.UIToolkit
         void SelectSwatch(Swatch swatch)
         {
             UnselectSwatch();
-            
+
             _selectedSwatch = swatch;
-            
+
             UpdateSelectedSwatchField();
-            
+
             _selectedSwatch.Cursor.Focus();
         }
-        
+
         void UnselectSwatch()
         {
             if (_selectedSwatch == null)
@@ -320,14 +333,14 @@ namespace RosettaUI.UIToolkit
             _colorFieldBox.visible = false;
             _locationSlider.visible = false;
         }
-        
+
         private void InitUI()
         {
             _gradientPreview = this.Q("gradient-preview");
 
             _alphaCursors = this.Q("alpha-cursors");
             _colorCursors = this.Q("color-cursors");
-            
+
             _colorFieldBox = this.Q("color-field-box");
             _colorField = _colorFieldBox.Q("color-field");
 
@@ -339,17 +352,14 @@ namespace RosettaUI.UIToolkit
             _alphaCursors.RegisterCallback<PointerMoveEvent>(OnPointerMoveOnAlphaCursors);
             _alphaCursors.RegisterCallback<PointerUpEvent>(OnPointerUpOnAlphaCursors);
             _alphaCursors.RegisterCallback<PointerLeaveEvent>(OnPointerLeaveAlphaCursors);
-            
+
             _colorCursors.RegisterCallback<PointerDownEvent>(OnPointerDownOnColorCursors);
             _colorCursors.RegisterCallback<PointerMoveEvent>(OnPointerMoveOnColorCursors);
             _colorCursors.RegisterCallback<PointerUpEvent>(OnPointerUpOnColorCursors);
             _colorCursors.RegisterCallback<PointerLeaveEvent>(OnPointerLeaveColorCursors);
 
-            _modeEnum.RegisterValueChangedCallback(evt =>
-            {
-                SelectMode();
-            });
-            
+            _modeEnum.RegisterValueChangedCallback(evt => { SelectMode(); });
+
             _colorField.RegisterCallback<PointerDownEvent>(evt =>
             {
                 var position = evt.position;
@@ -361,11 +371,11 @@ namespace RosettaUI.UIToolkit
                     OnGradientChanged();
                 });
             });
-            
+
             _alphaSlider.RegisterValueChangedCallback(evt =>
             {
-                if(_selectedSwatch == null) return;
-                
+                if (_selectedSwatch == null) return;
+
                 var a = Round(evt.newValue, TextDigit);
                 _selectedSwatch.Color = new Color(a, a, a, 1);
                 UpdateSwatches(_alphaSwatches, _alphaCursors);
@@ -374,7 +384,7 @@ namespace RosettaUI.UIToolkit
 
             _locationSlider.RegisterValueChangedCallback(evt =>
             {
-                if(_selectedSwatch == null) return;
+                if (_selectedSwatch == null) return;
 
                 var t = Round(Mathf.Clamp01(_locationSlider.value / 100f), TextDigit);
                 _selectedSwatch.Time = t;
@@ -386,6 +396,7 @@ namespace RosettaUI.UIToolkit
                 {
                     UpdateSwatches(_colorSwatches, _colorCursors);
                 }
+
                 OnGradientChanged();
             });
 
@@ -398,6 +409,41 @@ namespace RosettaUI.UIToolkit
             });
         }
 
+        void InitGradientCode()
+        {
+            _copyButton = this.Q<Button>("copy-button");
+            _pasteButton = this.Q<Button>("paste-button");
+            _infoLabel = this.Q<Label>("info-label");
+            _infoLabel.text = "";
+            
+            _copyButton.clicked += () =>
+            {
+                var json = GradientPickerHelper.GradientToJson(_gradient);
+                if (json != null)
+                {
+                    GUIUtility.systemCopyBuffer = json;
+                    Debug.Log("Gradient copied to clipboard");
+                    _infoLabel.text = "Copy!";
+                }
+            };
+
+            _pasteButton.clicked += () =>
+            {
+                var clip = GUIUtility.systemCopyBuffer;
+                if (clip != null)
+                {
+                    if (GradientPickerHelper.JsonToGradient(clip) is { } gradient)
+                    {
+                        _gradient = gradient;
+                        ResetUI();
+                        OnGradientChanged();
+                        Debug.Log("Gradient pasted from clipboard");
+                        _infoLabel.text = "Paste!";
+                    }
+                }
+            };
+        }
+        
         Rect CalcRect(VisualElement cursor)
         {
             Rect rect = new Rect();
@@ -408,11 +454,11 @@ namespace RosettaUI.UIToolkit
             rect.height = cursorStyle.height;
             return rect;
         }
-        
+
         Swatch ContainsSwatchAtPosition(Vector2 position, List<Swatch> swatches, bool isAlpha)
         {
             Swatch swatch = null;
-            
+
             if (_selectedSwatch != null && swatches.Contains(_selectedSwatch) && _selectedSwatch.IsAlpha == isAlpha)
             {
                 var rect = CalcRect(_selectedSwatch.Cursor);
@@ -421,25 +467,25 @@ namespace RosettaUI.UIToolkit
                     return _selectedSwatch;
                 }
             }
-            
+
             for (int i = 0; i < swatches.Count; i++)
             {
                 var rect = CalcRect(swatches[i].Cursor);
-               
+
                 if (rect.Contains(position) && swatches[i].IsAlpha == isAlpha)
                 {
                     swatch = swatches[i];
                     break;
                 }
             }
-            
+
             return swatch;
         }
 
         void CheckCursorLeave(PointerLeaveEvent evt, VisualElement cursors, List<Swatch> swatches)
         {
             var localPos = cursors.WorldToLocal(evt.position);
-            
+
             if (isClicking && _selectedSwatch != null)
             {
                 if (localPos.y < 0 || localPos.y >= (cursors.resolvedStyle.height))
@@ -449,17 +495,17 @@ namespace RosettaUI.UIToolkit
                     UnselectSwatch();
                     OnGradientChanged();
                 }
-                
+
                 isClicking = false;
             }
         }
-        
+
         #region Alpha Cursors Events
-        
+
         void OnPointerDownOnAlphaCursors(PointerDownEvent evt)
         {
             var localPos = _alphaCursors.WorldToLocal(evt.position);
-            
+
             var swatch = ContainsSwatchAtPosition(localPos, _alphaSwatches, true);
             if (swatch != null)
             {
@@ -486,7 +532,7 @@ namespace RosettaUI.UIToolkit
             }
 
             isClicking = true;
-            
+
             evt.StopPropagation();
         }
 
@@ -495,7 +541,7 @@ namespace RosettaUI.UIToolkit
             if (isClicking)
             {
                 var localPos = _alphaCursors.WorldToLocal(evt.position);
-                
+
                 if (_selectedSwatch != null)
                 {
                     var rect = CalcRect(_alphaCursors);
@@ -525,14 +571,15 @@ namespace RosettaUI.UIToolkit
 
             evt.StopPropagation();
         }
+
         #endregion
 
         #region Color Cursors Events
-        
+
         void OnPointerDownOnColorCursors(PointerDownEvent evt)
         {
             var localPos = _colorCursors.WorldToLocal(evt.position);
-            
+
             var swatch = ContainsSwatchAtPosition(localPos, _colorSwatches, false);
             if (swatch != null)
             {
@@ -552,14 +599,15 @@ namespace RosettaUI.UIToolkit
                     _colorCursors.Add(newSwatch.Cursor);
                     newSwatch.Cursor.style.left = localPos.x;
                     SelectSwatch(newSwatch);
-                }else
+                }
+                else
                 {
                     Debug.LogWarning("Max 8 color keys and 8 alpha keys are allowed in a gradient.");
                 }
             }
 
             isClicking = true;
-            
+
             evt.StopPropagation();
         }
 
@@ -568,7 +616,7 @@ namespace RosettaUI.UIToolkit
             if (isClicking)
             {
                 var localPos = _colorCursors.WorldToLocal(evt.position);
-                
+
                 if (_selectedSwatch != null)
                 {
                     var rect = CalcRect(_colorCursors);
@@ -598,15 +646,13 @@ namespace RosettaUI.UIToolkit
 
             evt.StopPropagation();
         }
+
         #endregion
 
         void SelectMode()
         {
-            _gradientMode = (GradientMode)_modeEnum.index;
-            _gradient.mode = _gradientMode;
-            PreviewGradient = _gradient;
+            _gradientMode = (GradientMode) _modeEnum.index;
             OnGradientChanged();
         }
-        
     }
 }

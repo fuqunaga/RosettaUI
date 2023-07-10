@@ -422,7 +422,6 @@ namespace RosettaUI.UIToolkit
                 if (json != null)
                 {
                     GUIUtility.systemCopyBuffer = json;
-                    Debug.Log("Gradient copied to clipboard");
                     _infoLabel.text = "Copy!";
                 }
             };
@@ -437,7 +436,6 @@ namespace RosettaUI.UIToolkit
                         _gradient = gradient;
                         ResetUI();
                         OnGradientChanged();
-                        Debug.Log("Gradient pasted from clipboard");
                         _infoLabel.text = "Paste!";
                     }
                 }

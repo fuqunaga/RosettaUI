@@ -83,7 +83,6 @@ namespace RosettaUI.Builder
             try
             {
                 codeString = JsonUtility.ToJson(code);
-                Debug.Log("GradientToJson " + codeString);
             }
             catch(System.Exception e)
             {
@@ -126,8 +125,6 @@ namespace RosettaUI.Builder
 
                     gradient.mode = code.mode;
                     gradient.SetKeys(colorKeys, alphaKeys);
-                    
-                    Debug.Log("JsonToGradient");
                 }
             }
             catch(System.Exception e)

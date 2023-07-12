@@ -171,6 +171,9 @@ namespace RosettaUI.UIToolkit
                 _alphaCursors.Add(swatch.Cursor);
             }
 
+            _gradientMode = _gradient.mode;
+            _modeEnum.index = (int) _gradientMode;
+            
             SelectSwatch(_colorSwatches[0]);
             
             InitGradientCode();

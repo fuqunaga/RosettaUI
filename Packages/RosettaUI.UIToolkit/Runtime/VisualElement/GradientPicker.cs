@@ -13,7 +13,7 @@ namespace RosettaUI.UIToolkit
         public enum Mode
         {
             Blend = 0,
-            Fixed = 1
+            Fixed = 1,
 #if UNITY_2022_3_OR_NEWER
             PerceptualBlend = 2,
 #endif

@@ -14,6 +14,9 @@ namespace RosettaUI.UIToolkit
         {
             Blend = 0,
             Fixed = 1
+#if UNITY_2022_3_OR_NEWER
+            PerceptualBlend = 2,
+#endif
         }
 
         #region static interface
@@ -360,6 +363,10 @@ namespace RosettaUI.UIToolkit
 
             _modeEnum.RegisterValueChangedCallback(evt => { SelectMode(); });
 
+#if UNITY_2022_3_OR_NEWER
+            _modeEnum.choices.Add("PerceptualBlend");
+#endif
+            
             _colorField.RegisterCallback<PointerDownEvent>(evt =>
             {
                 var position = evt.position;

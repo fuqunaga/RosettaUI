@@ -424,7 +424,7 @@ namespace RosettaUI.UIToolkit
                 isInitialized = true;
                 
                 // はみ出し抑制
-                VisualElementExtension.CheckOutOfScreen(_window.Position, this);
+                VisualElementExtension.CheckOutOfScreen(_window.Position, _window);
             });
         }
 

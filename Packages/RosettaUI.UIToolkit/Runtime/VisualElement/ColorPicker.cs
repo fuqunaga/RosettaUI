@@ -32,6 +32,9 @@ namespace RosettaUI.UIToolkit
 
             _window.Show(position, target);
 
+            // はみ出し抑制
+            VisualElementExtension.CheckOutOfScreen(position, _window);
+            
             // Show()前はPanelが設定されていないのでコールバック系はShow()後
             _colorPickerInstance.PrevColor = initialColor;
             _colorPickerInstance.onColorChanged += onColorChanged;
@@ -168,6 +171,7 @@ namespace RosettaUI.UIToolkit
             
             this.ScheduleToUseResolvedLayoutBeforeRendering(() =>
             {
+                
                 // Hue Circle
                 var hueCircleSize = _hueHandler.resolvedStyle.width;
                 (_hueHandler.style.backgroundImage, _hueCircleThickness) = ColorPickerHelper.GetHueCircleTextureAndThickness(hueCircleSize);
@@ -178,17 +182,20 @@ namespace RosettaUI.UIToolkit
                 cursorStyle.height = cursorSize;
                 cursorStyle.marginLeft = cursorSize * -0.5f;
                 cursorStyle.marginTop = cursorSize * -0.5f;
-                
+            
                 // SV Disk
                 var width = Mathf.CeilToInt(_svHandler.resolvedStyle.width);
                 var height = Mathf.CeilToInt(_svHandler.resolvedStyle.height);
                 _svTexture = ColorPickerHelper.CreateRenderTexture(width, height);
                 _svHandler.style.backgroundImage = Background.FromRenderTexture(_svTexture);
-                
+
                 // 表示更新
                 UpdateSvDisk();
                 UpdateHueCursor(Hsv.x);
                 UpdateSvCursor(Hsv.y, Hsv.z);
+                    
+                // はみ出し抑制
+                VisualElementExtension.CheckOutOfScreen(_window.Position, _window);
             });
         }
 

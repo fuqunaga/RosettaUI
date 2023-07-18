@@ -45,7 +45,7 @@ namespace RosettaUI.UIToolkit
 
         private Gradient _gradient;
         private GradientMode _gradientMode = GradientMode.Blend;
-
+        
         public static void Show(Vector2 position, VisualElement target, Gradient initialGradient,
             Action<Gradient> onGradientChanged)
         {
@@ -65,6 +65,13 @@ namespace RosettaUI.UIToolkit
 
             _window.Show(position, target);
 
+
+            // はみ出し抑制
+            if(!float.IsNaN(_window.resolvedStyle.width) && !float.IsNaN(_window.resolvedStyle.height))
+            {
+                VisualElementExtension.CheckOutOfScreen(position, _window);
+            }
+            
             // Show()前はPanelが設定されていないのでコールバック系はShow()後
             _gradientPickerInstance.PreviewGradient = initialGradient;
             _gradientPickerInstance.onGradientChanged += onGradientChanged;
@@ -415,6 +422,9 @@ namespace RosettaUI.UIToolkit
                 UpdateSwatches(_alphaSwatches, _alphaCursors);
                 UpdateSwatches(_colorSwatches, _colorCursors);
                 isInitialized = true;
+                
+                // はみ出し抑制
+                VisualElementExtension.CheckOutOfScreen(_window.Position, this);
             });
         }
 

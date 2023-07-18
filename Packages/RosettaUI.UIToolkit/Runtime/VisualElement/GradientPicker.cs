@@ -151,7 +151,7 @@ namespace RosettaUI.UIToolkit
                 return;
 
             GradientColorKey[] colorKeys = _gradient.colorKeys;
-            _colorSwatches = new List<Swatch>(colorKeys.Length);
+            _colorSwatches.Clear();
             for (int i = 0; i < colorKeys.Length; i++)
             {
                 Color color = colorKeys[i].color;
@@ -162,7 +162,7 @@ namespace RosettaUI.UIToolkit
             }
 
             GradientAlphaKey[] alphaKeys = _gradient.alphaKeys;
-            _alphaSwatches = new List<Swatch>(alphaKeys.Length);
+            _alphaSwatches.Clear();
             for (int i = 0; i < alphaKeys.Length; i++)
             {
                 float a = alphaKeys[i].alpha;
@@ -175,8 +175,6 @@ namespace RosettaUI.UIToolkit
             _modeEnum.index = (int) _gradientMode;
             
             SelectSwatch(_colorSwatches[0]);
-            
-            InitGradientCode();
         }
 
         public void ResetUI()
@@ -413,6 +411,7 @@ namespace RosettaUI.UIToolkit
             this.ScheduleToUseResolvedLayoutBeforeRendering(() =>
             {
                 BuildArrays();
+                InitGradientCode();
                 UpdateSwatches(_alphaSwatches, _alphaCursors);
                 UpdateSwatches(_colorSwatches, _colorCursors);
                 isInitialized = true;

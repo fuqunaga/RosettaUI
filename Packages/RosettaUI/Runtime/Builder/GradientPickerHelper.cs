@@ -1,7 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
+using System.Buffers;
 using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace RosettaUI.Builder
 {
@@ -53,30 +53,30 @@ namespace RosettaUI.Builder
             public SerializedColorKey[] colorKeys;
             public GradientMode mode;
         }
-
+        
         [CanBeNull]
         public static string GradientToJson(Gradient gradient)
         {
             string codeString = null;
+
+            var code = GenericPool<GradientCode>.Get();
             
-            var code = new GradientCode();
-            code.alphaKeys = new SerializedAlphaKey[gradient.alphaKeys.Length];
+            // ArrayPoolの最小値が16なのでJson化した時に無駄なデータが出て、復元時に要素数オーバーでエラーになるため、仕方なくnewする
+            code.alphaKeys = new SerializedAlphaKey[gradient.alphaKeys.Length]; 
             for (int i = 0; i < gradient.alphaKeys.Length; i++)
             {
-                code.alphaKeys[i] = new SerializedAlphaKey()
-                {
-                    t = gradient.alphaKeys[i].time,
-                    a = gradient.alphaKeys[i].alpha
-                };
+                code.alphaKeys[i] = GenericPool<SerializedAlphaKey>.Get();
+                code.alphaKeys[i].t = gradient.alphaKeys[i].time;
+                code.alphaKeys[i].a = gradient.alphaKeys[i].alpha;
             }
+
+            // ArrayPoolの最小値が16なのでJson化した時に無駄なデータが出て、復元時に要素数オーバーでエラーになるため、仕方なくnewする
             code.colorKeys = new SerializedColorKey[gradient.colorKeys.Length];
             for (int i = 0; i < gradient.colorKeys.Length; i++)
             {
-                code.colorKeys[i] = new SerializedColorKey()
-                {
-                    t = gradient.colorKeys[i].time,
-                    c = gradient.colorKeys[i].color
-                };
+                code.colorKeys[i] = GenericPool<SerializedColorKey>.Get();
+                code.colorKeys[i].t = gradient.colorKeys[i].time;
+                code.colorKeys[i].c = gradient.colorKeys[i].color;
             }
             code.mode = gradient.mode;
 
@@ -89,6 +89,16 @@ namespace RosettaUI.Builder
                 Debug.LogError(e);
             }
 
+            // release
+            for (int i = 0; i < gradient.alphaKeys.Length; i++)
+            {
+                GenericPool<SerializedAlphaKey>.Release( code.alphaKeys[i]);
+            }
+            for (int i = 0; i < gradient.colorKeys.Length; i++)
+            {
+                GenericPool<SerializedColorKey>.Release(code.colorKeys[i]);
+            }
+            GenericPool<GradientCode>.Release(code);
             return codeString;
         }
 

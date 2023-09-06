@@ -71,6 +71,16 @@ namespace RosettaUI
             return GetMemberData(type, propertyOrFieldName).range;
         }
 
+        public static HeaderAttribute GetHeader(Type type, string propertyOrFieldName)
+        {
+            return GetMemberData(type, propertyOrFieldName).header;
+        }
+
+        public static SpaceAttribute GetSpace(Type type, string propertyOrFieldName)
+        {
+            return GetMemberData(type, propertyOrFieldName).space;
+        }
+
         public static bool IsReorderable(Type type, string propertyOrFieldName)
         {
             return GetMemberData(type, propertyOrFieldName).isReorderable;
@@ -205,6 +215,8 @@ namespace RosettaUI
                             type = pair.Item2,
                             memberInfo = pair.Item1,
                             range = pair.Item1.GetCustomAttribute<RangeAttribute>(),
+                            header = pair.Item1.GetCustomAttribute<HeaderAttribute>(),
+                            space = pair.Item1.GetCustomAttribute<SpaceAttribute>(),
                             isReorderable = pair.Item1.GetCustomAttribute<NonReorderableAttribute>() == null,
                             isMultiline =  pair.Item1.GetCustomAttribute<MultilineAttribute>() != null
                         }
@@ -225,6 +237,8 @@ namespace RosettaUI
                 public Type type;
                 public MemberInfo memberInfo;
                 public RangeAttribute range;
+                public HeaderAttribute header;
+                public SpaceAttribute space;
                 public bool isReorderable;
                 public bool isMultiline;
             }

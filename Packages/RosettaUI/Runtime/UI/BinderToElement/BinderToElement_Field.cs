@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace RosettaUI
 {
-    public  static partial class BinderToElement
+    public static partial class BinderToElement
     {
         public static Element CreateFieldElement(LabelElement label, IBinder binder, in FieldOption option)
         {
@@ -117,23 +118,18 @@ namespace RosettaUI
             {
                 var fieldBinder = PropertyOrFieldBinder.Create(binder, fieldName);
                 var fieldLabel = UICustom.ModifyPropertyOrFieldLabel(valueType, fieldName);
+                Element targetElement = null;
 
                 var range = TypeUtility.GetRange(valueType, fieldName);
                 if (range != null)
                 {
                     var (minGetter, maxGetter) = RangeUtility.CreateGetterMinMax(range, fieldBinder.ValueType);
-                    return UI.Slider(fieldLabel, fieldBinder, minGetter, maxGetter);
+                    targetElement ??= UI.Slider(fieldLabel, fieldBinder, minGetter, maxGetter);
                 }
                
-                var field = UI.Field(fieldLabel, fieldBinder, optionCaptured);
-                
-                
-                if (TypeUtility.IsMultiline(valueType, fieldName) && field is TextFieldElement textField)
-                {
-                    textField.IsMultiLine = true;
-                }
+                targetElement ??= UI.Field(fieldLabel, fieldBinder, optionCaptured);
 
-                return field;
+                return GetModifiedElementByAttributes(targetElement, valueType, fieldName);
             });
 
 
@@ -155,6 +151,38 @@ namespace RosettaUI
                 {
                     new HelpBoxElement($"[{type}] Circular reference detected.", HelpBoxType.Error)
                 }).SetInteractable(false);
+        }
+
+        private static Element GetModifiedElementByAttributes(Element el, Type valueType, string fieldName)
+        {
+            Element target = el;
+            List<Element> innerElements = new();
+
+            var space = TypeUtility.GetSpace(valueType,fieldName);
+            if (space is not null)
+            {
+                innerElements.Add(UI.Space().SetHeight(space.height));
+            }
+
+            var header = TypeUtility.GetHeader(valueType, fieldName);
+            if (header is not null)
+            {
+                innerElements.Add(UI.Space().SetHeight(12f));
+                innerElements.Add(UI.Label($"<b>{header.header}</b>"));
+            }
+
+            if (TypeUtility.IsMultiline(valueType, fieldName) && target is TextFieldElement textField)
+            {
+                textField.IsMultiLine = true;
+            }
+
+            if (innerElements.Count == 0)
+            {
+                return target;
+            }
+
+            innerElements.Add(target);
+            return UI.Column(innerElements);
         }
     }
 }

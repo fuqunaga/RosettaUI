@@ -11,8 +11,14 @@ namespace RosettaUI.Example
         [Serializable]
         public class AttributeExampleClass
         {
+            [Header("Header")]
+            public int headerInt;
+
             [Range(0f,100f)]
             public float rangeFloat;
+
+            [Space(12f)]
+            public uint spaceUint;
 
             [Multiline]
             public string multiLineString;

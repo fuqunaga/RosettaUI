@@ -65,30 +65,25 @@ namespace RosettaUI
         {
             return GetMemberData(type, propertyOrFieldName)?.memberInfo;
         }
+        
+        public static IEnumerable<PropertyAttribute> GetPropertyAttributes(Type type, string propertyOrFieldName)
+        {
+            return GetMemberData(type, propertyOrFieldName).propertyAttributes;
+        }
 
         public static RangeAttribute GetRange(Type type, string propertyOrFieldName)
         {
             return GetMemberData(type, propertyOrFieldName).range;
         }
-
-        public static HeaderAttribute GetHeader(Type type, string propertyOrFieldName)
+        
+        public static bool IsHideInInspector(Type type, string propertyOrFieldName)
         {
-            return GetMemberData(type, propertyOrFieldName).header;
-        }
-
-        public static SpaceAttribute GetSpace(Type type, string propertyOrFieldName)
-        {
-            return GetMemberData(type, propertyOrFieldName).space;
+            return GetMemberData(type, propertyOrFieldName).isHideInInspector;
         }
 
         public static bool IsReorderable(Type type, string propertyOrFieldName)
         {
             return GetMemberData(type, propertyOrFieldName).isReorderable;
-        }
-
-        public static bool IsMultiline(Type type, string propertyOrFieldName)
-        {
-            return GetMemberData(type, propertyOrFieldName).isMultiline;
         }
         
 
@@ -214,11 +209,10 @@ namespace RosettaUI
                         {
                             type = pair.Item2,
                             memberInfo = pair.Item1,
+                            propertyAttributes = pair.Item1.GetCustomAttributes<PropertyAttribute>().ToArray(),
                             range = pair.Item1.GetCustomAttribute<RangeAttribute>(),
-                            header = pair.Item1.GetCustomAttribute<HeaderAttribute>(),
-                            space = pair.Item1.GetCustomAttribute<SpaceAttribute>(),
+                            isHideInInspector = pair.Item1.GetCustomAttribute<HideInInspector>() != null,
                             isReorderable = pair.Item1.GetCustomAttribute<NonReorderableAttribute>() == null,
-                            isMultiline =  pair.Item1.GetCustomAttribute<MultilineAttribute>() != null
                         }
                     );
 
@@ -237,10 +231,9 @@ namespace RosettaUI
                 public Type type;
                 public MemberInfo memberInfo;
                 public RangeAttribute range;
-                public HeaderAttribute header;
-                public SpaceAttribute space;
+                public IEnumerable<PropertyAttribute> propertyAttributes;
+                public bool isHideInInspector;
                 public bool isReorderable;
-                public bool isMultiline;
             }
         }
         

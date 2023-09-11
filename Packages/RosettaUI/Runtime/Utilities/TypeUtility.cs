@@ -209,7 +209,7 @@ namespace RosettaUI
                         {
                             type = pair.Item2,
                             memberInfo = pair.Item1,
-                            propertyAttributes = pair.Item1.GetCustomAttributes<PropertyAttribute>().ToArray(),
+                            propertyAttributes = pair.Item1.GetCustomAttributes<PropertyAttribute>().OrderBy(attr => attr.order).ToArray(),
                             range = pair.Item1.GetCustomAttribute<RangeAttribute>(),
                             isHideInInspector = pair.Item1.GetCustomAttribute<HideInInspector>() != null,
                             isReorderable = pair.Item1.GetCustomAttribute<NonReorderableAttribute>() == null,

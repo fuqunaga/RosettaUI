@@ -137,7 +137,7 @@ namespace RosettaUI
                 
                 // 属性によるElementの付加, Propertyの変更
                 List<Element> innerElements = new();
-                foreach (var attr in TypeUtility.GetPropertyAttributes(valueType, fieldName).OrderBy(a => a.order))
+                foreach (var attr in TypeUtility.GetPropertyAttributes(valueType, fieldName))
                 {
                     switch (attr)
                     {

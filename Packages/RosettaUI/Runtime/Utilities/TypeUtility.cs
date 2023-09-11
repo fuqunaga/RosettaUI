@@ -75,11 +75,6 @@ namespace RosettaUI
         {
             return GetMemberData(type, propertyOrFieldName).range;
         }
-        
-        public static bool IsHideInInspector(Type type, string propertyOrFieldName)
-        {
-            return GetMemberData(type, propertyOrFieldName).isHideInInspector;
-        }
 
         public static bool IsReorderable(Type type, string propertyOrFieldName)
         {
@@ -211,7 +206,6 @@ namespace RosettaUI
                             memberInfo = pair.Item1,
                             propertyAttributes = pair.Item1.GetCustomAttributes<PropertyAttribute>().OrderBy(attr => attr.order).ToArray(),
                             range = pair.Item1.GetCustomAttribute<RangeAttribute>(),
-                            isHideInInspector = pair.Item1.GetCustomAttribute<HideInInspector>() != null,
                             isReorderable = pair.Item1.GetCustomAttribute<NonReorderableAttribute>() == null,
                         }
                     );
@@ -220,8 +214,9 @@ namespace RosettaUI
                 uiTargetPropertyOrFieldsNameTypeDic = fis
                     .Where(fi => !fi.IsInitOnly)
                     .Where(fi =>
-                        (fi.IsPublic && fi.GetCustomAttribute<NonSerializedAttribute>() == null)
-                        || fi.GetCustomAttribute<SerializeField>() != null
+                        ((fi.IsPublic && fi.GetCustomAttribute<NonSerializedAttribute>() == null)
+                        || fi.GetCustomAttribute<SerializeField>() != null)
+                        && fi.GetCustomAttribute<HideInInspector>() == null
                     )
                     .ToDictionary(fi => fi.Name, fi => fi.FieldType);
             }
@@ -232,7 +227,6 @@ namespace RosettaUI
                 public MemberInfo memberInfo;
                 public RangeAttribute range;
                 public IEnumerable<PropertyAttribute> propertyAttributes;
-                public bool isHideInInspector;
                 public bool isReorderable;
             }
         }

@@ -116,8 +116,6 @@ namespace RosettaUI
 
             var elements = TypeUtility.GetUITargetFieldNames(valueType).Select(fieldName =>
             {
-                if (TypeUtility.IsHideInInspector(valueType, fieldName)) return null;
-                
                 var fieldBinder = PropertyOrFieldBinder.Create(binder, fieldName);
                 var fieldLabel = UICustom.ModifyPropertyOrFieldLabel(valueType, fieldName);
 

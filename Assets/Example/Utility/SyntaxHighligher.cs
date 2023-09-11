@@ -18,9 +18,12 @@ namespace RosettaUI.Example
                 "T",
                 nameof(Enumerable),
                 
+                "(?<!\\.)Header",
+                "(?<!\\.)Space",
                 "Multiline",
                 "NonReorderable",
                 "NonSerialized",
+                "HideInInspector",
                 nameof(Vector2),
                 nameof(Color),
                 nameof(Screen),

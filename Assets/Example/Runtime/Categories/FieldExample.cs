@@ -11,14 +11,23 @@ namespace RosettaUI.Example
         [Serializable]
         public class AttributeExampleClass
         {
+            [Header("Header")]
+            public int headerInt;
+
             [Range(0f,100f)]
             public float rangeFloat;
+
+            [Space(24f)]
+            public uint spaceUint;
 
             [Multiline]
             public string multiLineString;
 
             [NonReorderable]
             public List<int> nonReorderableList;
+            
+            [HideInInspector]
+            public Vector2 hideInInspectorVector2;
         }
 
         public int intValue;
@@ -121,14 +130,23 @@ namespace RosettaUI.Example
                     ExampleTemplate.CodeElementSets("Attribute",
                         (@"public class AttributeExampleClass
 {
+    [Header(""Header"")]
+    public int headerInt;
+
     [Range(0f,100f)]
     public float rangeFloat;
+
+    [Space(24f)]
+    public uint spaceUint;
 
     [Multiline]
     public string multiLineString;
 
     [NonReorderable]
     public List<int> nonReorderableList;
+        
+    [HideInInspector]
+    public Vector2 hideInInspectorVector2;
 }
 
 UI.Field(() => attributeExampleClass).Open();

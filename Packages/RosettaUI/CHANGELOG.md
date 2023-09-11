@@ -1,3 +1,17 @@
+# [ga.fuquna.rosettaui-v1.5.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.4.2...ga.fuquna.rosettaui-v1.5.0) (2023-09-11)
+
+
+### Bug Fixes
+
+* changed OrderBy() position ([68af2a9](https://github.com/fuqunaga/RosettaUI/commit/68af2a965106c328d861161dfc802b2759d214c3))
+* fields with HideInInspector are no longer registered to the uiTargetDictionary ([beab198](https://github.com/fuqunaga/RosettaUI/commit/beab1985b856a913c2f22ab1c71a1bb658d478e0))
+
+
+### Features
+
+* support for header and tooltip attributes ([0422b4e](https://github.com/fuqunaga/RosettaUI/commit/0422b4e42f71adbc6e7a28a5b42aa7c78bf10455))
+* support for HideInInspectorAttr, mutil attributes, attribute order ([16b9a76](https://github.com/fuqunaga/RosettaUI/commit/16b9a76f1a93db129bff6b726b000f8e5e243396))
+
 # [ga.fuquna.rosettaui-v1.4.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.4.1...ga.fuquna.rosettaui-v1.4.2) (2023-06-21)
 
 

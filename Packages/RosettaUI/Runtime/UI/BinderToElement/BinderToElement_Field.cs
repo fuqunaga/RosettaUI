@@ -64,7 +64,9 @@ namespace RosettaUI
             {
                 var elementCreator = lastObject as IElementCreator;
                 Assert.IsNotNull(elementCreator);
-                return elementCreator?.CreateElement(label);
+                var element = elementCreator.CreateElement(label);
+                SetCallBinderSetterWhenValueChanged(element);
+                return element;
             }
             
             // ElementCreatorの場合、参照が変わったらUIを作り直す
@@ -83,7 +85,9 @@ namespace RosettaUI
                         if (lastObject is IElementCreator elementCreator)
                         {
                             label?.DetachView();
-                            return elementCreator.CreateElement(label);
+                            var element = elementCreator.CreateElement(label);
+                            SetCallBinderSetterWhenValueChanged(element);
+                            return element;
                         }
 
                         Debug.LogWarning($"{binder.ValueType} is not {nameof(IElementCreator)}");
@@ -91,6 +95,11 @@ namespace RosettaUI
                     }
                 )
             );
+
+            void SetCallBinderSetterWhenValueChanged(Element element)
+            {
+                element.RegisterValueChangeCallback(() => binder.SetObject(lastObject));
+            }
         }
 
         private static Element CreateListView(LabelElement label, IBinder binder)

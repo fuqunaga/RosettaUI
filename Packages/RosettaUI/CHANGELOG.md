@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.5.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.5.0...ga.fuquna.rosettaui-v1.5.1) (2023-12-05)
+
+
+### Bug Fixes
+
+* Binder.Set() of IElementCreator's parent is not called ([bfc8604](https://github.com/fuqunaga/RosettaUI/commit/bfc8604d50ea3de1369e63ff03413a8b7ae16dfd))
+
 # [ga.fuquna.rosettaui-v1.5.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.4.2...ga.fuquna.rosettaui-v1.5.0) (2023-09-11)
 
 

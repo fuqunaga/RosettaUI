@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.5.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.5.1...ga.fuquna.rosettaui-v1.5.2) (2023-12-27)
+
+
+### Bug Fixes
+
+* Null Excepion when IElementCreator returns null ([62f76a8](https://github.com/fuqunaga/RosettaUI/commit/62f76a8d496f8c5faeb49c6ccb65843cabb01734))
+
 # [ga.fuquna.rosettaui-v1.5.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.5.0...ga.fuquna.rosettaui-v1.5.1) (2023-12-05)
 
 

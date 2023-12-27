@@ -98,7 +98,7 @@ namespace RosettaUI
 
             void SetCallBinderSetterWhenValueChanged(Element element)
             {
-                element.RegisterValueChangeCallback(() => binder.SetObject(lastObject));
+                element?.RegisterValueChangeCallback(() => binder.SetObject(lastObject));
             }
         }
 

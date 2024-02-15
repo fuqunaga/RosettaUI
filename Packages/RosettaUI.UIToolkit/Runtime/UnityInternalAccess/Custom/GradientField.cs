@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -52,7 +53,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             UpdateGradientTexture();
         }
 
-        void UpdateGradientTexture()
+        private void UpdateGradientTexture()
         {
             if (_valueNull || showMixedValue)
             {
@@ -60,9 +61,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             }
             else
             {
-                Texture2D gradientTexture = GradientPickerHelper.GenerateGradientPreview(value, resolvedStyle.backgroundImage.texture);
-                visualInput.style.backgroundImage = gradientTexture;
-
+                visualInput.style.backgroundImage = GradientPickerHelper.GenerateGradientPreview(value, visualInput.style.backgroundImage.value.texture);
                 IncrementVersion(VersionChangeType.Repaint); // since the Texture2D object can be reused, force dirty because the backgroundImage change will only trigger the Dirty if the Texture2D objects are different.
             }
         }

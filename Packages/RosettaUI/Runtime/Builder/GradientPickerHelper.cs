@@ -1,7 +1,9 @@
+using System;
 using System.Buffers;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Pool;
+using Object = UnityEngine.Object;
 
 namespace RosettaUI.Builder
 {
@@ -10,43 +12,48 @@ namespace RosettaUI.Builder
 
         public static Texture2D GenerateGradientPreview(Gradient gradient, Texture2D texture)
         {
-            int width = 256;
-            if (texture != null)
+            const int width = 256;
+            const int height = 1;
+            if (texture != null && (texture.width != width || texture.height != height))
             {
-                width = texture.width;
                 Object.Destroy(texture);
             }
-            Color[] g = new Color[width];
-            for (int i = 0; i < g.Length; i++)
+            
+            var  colorArray = ArrayPool<Color>.Shared.Rent(width);
+            for (var i = 0; i < width; i++)
             {
-                g[i] = gradient.Evaluate(i / (float)g.Length);
+                colorArray[i] = gradient.Evaluate(i / (float)width);
             }
             
-            Texture2D tex = new Texture2D(g.Length, 1)
+            texture ??= new Texture2D(width, height)
             {
                 wrapMode = TextureWrapMode.Clamp,
                 filterMode = FilterMode.Bilinear
             };
-            tex.SetPixels(g);
-            tex.Apply();
-            return tex;
+            texture.SetPixels(0, 0, width, height, colorArray);
+            texture.Apply();
+            
+            ArrayPool<Color>.Shared.Return(colorArray);
+            
+            return texture;
         }
+        
 
-        [System.Serializable]
+        [Serializable]
         public class SerializedAlphaKey
         {
             public float t;
             public float a;
         }
         
-        [System.Serializable]
+        [Serializable]
         public class SerializedColorKey
         {
             public float t;
             public Color c;
         }
             
-        [System.Serializable]
+        [Serializable]
         public class GradientCode
         {
             public SerializedAlphaKey[] alphaKeys;
@@ -84,7 +91,7 @@ namespace RosettaUI.Builder
             {
                 codeString = JsonUtility.ToJson(code);
             }
-            catch(System.Exception e)
+            catch(Exception e)
             {
                 Debug.LogError(e);
             }
@@ -137,7 +144,7 @@ namespace RosettaUI.Builder
                     gradient.SetKeys(colorKeys, alphaKeys);
                 }
             }
-            catch(System.Exception e)
+            catch(Exception e)
             {
                 Debug.LogError(e);
             }

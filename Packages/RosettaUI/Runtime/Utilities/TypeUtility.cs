@@ -65,6 +65,11 @@ namespace RosettaUI
         {
             return GetMemberData(type, propertyOrFieldName)?.memberInfo;
         }
+        
+        public static IEnumerable<PropertyAttribute> GetPropertyAttributes(Type type, string propertyOrFieldName)
+        {
+            return GetMemberData(type, propertyOrFieldName).propertyAttributes;
+        }
 
         public static RangeAttribute GetRange(Type type, string propertyOrFieldName)
         {
@@ -74,11 +79,6 @@ namespace RosettaUI
         public static bool IsReorderable(Type type, string propertyOrFieldName)
         {
             return GetMemberData(type, propertyOrFieldName).isReorderable;
-        }
-
-        public static bool IsMultiline(Type type, string propertyOrFieldName)
-        {
-            return GetMemberData(type, propertyOrFieldName).isMultiline;
         }
         
 
@@ -204,9 +204,9 @@ namespace RosettaUI
                         {
                             type = pair.Item2,
                             memberInfo = pair.Item1,
+                            propertyAttributes = pair.Item1.GetCustomAttributes<PropertyAttribute>().OrderBy(attr => attr.order).ToArray(),
                             range = pair.Item1.GetCustomAttribute<RangeAttribute>(),
                             isReorderable = pair.Item1.GetCustomAttribute<NonReorderableAttribute>() == null,
-                            isMultiline =  pair.Item1.GetCustomAttribute<MultilineAttribute>() != null
                         }
                     );
 
@@ -214,8 +214,9 @@ namespace RosettaUI
                 uiTargetPropertyOrFieldsNameTypeDic = fis
                     .Where(fi => !fi.IsInitOnly)
                     .Where(fi =>
-                        (fi.IsPublic && fi.GetCustomAttribute<NonSerializedAttribute>() == null)
-                        || fi.GetCustomAttribute<SerializeField>() != null
+                        ((fi.IsPublic && fi.GetCustomAttribute<NonSerializedAttribute>() == null)
+                        || fi.GetCustomAttribute<SerializeField>() != null)
+                        && fi.GetCustomAttribute<HideInInspector>() == null
                     )
                     .ToDictionary(fi => fi.Name, fi => fi.FieldType);
             }
@@ -225,8 +226,8 @@ namespace RosettaUI
                 public Type type;
                 public MemberInfo memberInfo;
                 public RangeAttribute range;
+                public IEnumerable<PropertyAttribute> propertyAttributes;
                 public bool isReorderable;
-                public bool isMultiline;
             }
         }
         

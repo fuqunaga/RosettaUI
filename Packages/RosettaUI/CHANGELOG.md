@@ -1,3 +1,31 @@
+# [ga.fuquna.rosettaui-v1.5.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.5.1...ga.fuquna.rosettaui-v1.5.2) (2023-12-27)
+
+
+### Bug Fixes
+
+* Null Excepion when IElementCreator returns null ([62f76a8](https://github.com/fuqunaga/RosettaUI/commit/62f76a8d496f8c5faeb49c6ccb65843cabb01734))
+
+# [ga.fuquna.rosettaui-v1.5.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.5.0...ga.fuquna.rosettaui-v1.5.1) (2023-12-05)
+
+
+### Bug Fixes
+
+* Binder.Set() of IElementCreator's parent is not called ([bfc8604](https://github.com/fuqunaga/RosettaUI/commit/bfc8604d50ea3de1369e63ff03413a8b7ae16dfd))
+
+# [ga.fuquna.rosettaui-v1.5.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.4.2...ga.fuquna.rosettaui-v1.5.0) (2023-09-11)
+
+
+### Bug Fixes
+
+* changed OrderBy() position ([68af2a9](https://github.com/fuqunaga/RosettaUI/commit/68af2a965106c328d861161dfc802b2759d214c3))
+* fields with HideInInspector are no longer registered to the uiTargetDictionary ([beab198](https://github.com/fuqunaga/RosettaUI/commit/beab1985b856a913c2f22ab1c71a1bb658d478e0))
+
+
+### Features
+
+* support for header and tooltip attributes ([0422b4e](https://github.com/fuqunaga/RosettaUI/commit/0422b4e42f71adbc6e7a28a5b42aa7c78bf10455))
+* support for HideInInspectorAttr, mutil attributes, attribute order ([16b9a76](https://github.com/fuqunaga/RosettaUI/commit/16b9a76f1a93db129bff6b726b000f8e5e243396))
+
 # [ga.fuquna.rosettaui-v1.4.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.4.1...ga.fuquna.rosettaui-v1.4.2) (2023-06-21)
 
 

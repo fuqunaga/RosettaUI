@@ -9,15 +9,8 @@ namespace RosettaUI.UIToolkit
 {
     public class GradientEditor : VisualElement
     {
-        [Serializable]
-        public enum Mode
-        {
-            Blend = 0,
-            Fixed = 1,
-#if UNITY_2022_3_OR_NEWER
-            PerceptualBlend = 2,
-#endif
-        }
+        public static readonly string USSClassName = "rosettaui-gradient-editor";
+   
 
         #region static interface
 
@@ -102,7 +95,7 @@ namespace RosettaUI.UIToolkit
 
         public bool isInitialized = false;
 
-        private DropdownField _modeEnum;
+        private EnumField _modeEnum;
 
         private VisualElement _gradientPreview;
         private VisualElement _alphaCursors;
@@ -146,6 +139,7 @@ namespace RosettaUI.UIToolkit
 
         private GradientEditor()
         {
+            AddToClassList(USSClassName);
             _visualTreeAsset ??= Resources.Load<VisualTreeAsset>("RosettaUI_GradientEditor");
             _visualTreeAsset.CloneTree(this);
 
@@ -178,8 +172,7 @@ namespace RosettaUI.UIToolkit
                 _alphaCursors.Add(swatch.Cursor);
             }
 
-            _gradientMode = _gradient.mode;
-            _modeEnum.index = (int) _gradientMode;
+            _modeEnum.value = _gradient.mode;
             
             SelectSwatch(_colorSwatches[0]);
         }
@@ -347,6 +340,8 @@ namespace RosettaUI.UIToolkit
 
         private void InitUI()
         {
+            _modeEnum = this.Q<EnumField>("mode-enum");
+            
             _gradientPreview = this.Q("gradient-preview");
 
             _alphaCursors = this.Q("alpha-cursors");
@@ -355,7 +350,7 @@ namespace RosettaUI.UIToolkit
             _colorFieldBox = this.Q("color-field-box");
             _colorField = _colorFieldBox.Q("color-field");
 
-            _modeEnum = this.Q("mode-enum") as DropdownField;
+            
             _alphaSlider = this.Q("alpha-slider") as Slider;
             _locationSlider = this.Q("location-slider") as Slider;
 
@@ -369,11 +364,7 @@ namespace RosettaUI.UIToolkit
             _colorCursors.RegisterCallback<PointerUpEvent>(OnPointerUpOnColorCursors);
             _colorCursors.RegisterCallback<PointerLeaveEvent>(OnPointerLeaveColorCursors);
 
-            _modeEnum.RegisterValueChangedCallback(evt => { SelectMode(); });
-
-#if UNITY_2022_3_OR_NEWER
-            _modeEnum.choices.Add("PerceptualBlend");
-#endif
+            _modeEnum.RegisterValueChangedCallback(_ => OnGradientChanged());
             
             _colorField.RegisterCallback<PointerDownEvent>(evt =>
             {
@@ -665,11 +656,5 @@ namespace RosettaUI.UIToolkit
         }
 
         #endregion
-
-        void SelectMode()
-        {
-            _gradientMode = (GradientMode) _modeEnum.index;
-            OnGradientChanged();
-        }
     }
 }

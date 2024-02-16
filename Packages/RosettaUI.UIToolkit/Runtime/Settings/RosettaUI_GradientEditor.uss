@@ -1,13 +1,9 @@
 /********************************************************************************
-* gradientpicker
+* Gradient Editor
 ********************************************************************************/
-.rosettaui-gradientpicker__preview-prev
+.rosettaui-gradient-editor > #mode-enum > .unity-label 
 {
-    width: 50%;
-    margin-top: -1px;
-    margin-bottom: -1px;
-
-    border-radius: 5px 0 0 5px;
+    width: 250px;
 }
 
 .rosettaui-gradientpicker__gradient-preview

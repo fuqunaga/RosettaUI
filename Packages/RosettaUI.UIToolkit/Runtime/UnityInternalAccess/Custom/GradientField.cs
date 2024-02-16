@@ -1,12 +1,10 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
+using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.UnityInternalAccess
 {
-    using Builder;
-    
     public class GradientField :  BaseField<Gradient>
     {
         public new static readonly string ussClassName = "rosettaui-gradient-field";

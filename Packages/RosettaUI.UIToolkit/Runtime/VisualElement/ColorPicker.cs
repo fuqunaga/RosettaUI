@@ -165,8 +165,8 @@ namespace RosettaUI.UIToolkit
             _svHandler = this.Q("handler-sv");
             _svCursor = _svHandler.Q("circle");
 
-            PointerDrag.RegisterCallback(_hueHandler, OnPointerMoveOnPanel_Hue, CheckPointIsValid_Hue, true);
-            PointerDrag.RegisterCallback(_svHandler, OnPointerMoveOnPanel_SV, CheckPointerIsValid_SV, true);
+            PointerDrag.RegisterCallback(_hueHandler, OnPointerMoveOnPanel_Hue, null, CheckPointIsValid_Hue, true);
+            PointerDrag.RegisterCallback(_svHandler, OnPointerMoveOnPanel_SV, null, CheckPointerIsValid_SV, true);
 
             
             this.ScheduleToUseResolvedLayoutBeforeRendering(() =>

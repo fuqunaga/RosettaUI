@@ -3,10 +3,14 @@ using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    public static class PointerDrag
+    /// <summary>
+    /// 範囲外でのドラッグを検知するためのユーティリティ
+    /// </summary>
+   public static class PointerDrag
     {
         public static void RegisterCallback(VisualElement target,
             EventCallback<PointerMoveEvent> onPointerMoveOnPanel,
+            EventCallback<PointerUpEvent> onPointerUpOnPanel = null,
             Func<PointerDownEvent, bool> checkPointerIsValid = null,
             bool callMoveEventOnPointerDown = false)
         {
@@ -28,9 +32,12 @@ namespace RosettaUI.UIToolkit
                     evt.StopPropagation();
                 }
             });
+            return;
 
             void OnPointerUpOnPanel(PointerUpEvent evt)
             {
+                onPointerUpOnPanel?.Invoke(evt);
+                
                 root.UnregisterCallback<PointerMoveEvent>(onPointerMoveOnPanel);
                 root.UnregisterCallback<PointerUpEvent>(OnPointerUpOnPanel);
                 

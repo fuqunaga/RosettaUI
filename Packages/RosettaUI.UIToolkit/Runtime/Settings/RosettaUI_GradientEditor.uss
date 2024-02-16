@@ -14,47 +14,21 @@
     top: 32px;
 }
 
-.rosettaui-gradientpicker__gradient-group__alpha-cursors
-{
-    position: absolute;
-    width: 100%;
-    height: 16px;
-    top: 0;
-    flex-shrink: 0;
-    
-}
 
-.rosettaui-gradientpicker__gradient-group__color-cursors
+.rosettaui-gradient-editor__cursor
 {
     position: absolute;
-    width: 100%;
-    height: 32px;
-    top: 64px;
-    flex-shrink: 0;
-}
-
-.rosettaui-gradientpicker__cursor
-{
-    position: absolute;
-    width: 16px;
-    height: 32px;
-    /*margin: -8px 0 0 -8px;*/
-    margin: 0 0 0 -8px;
-    border-width: 0px;
-    border-color: #000;
+    width: 14px;
+    height: 24px;
+    margin: 0 0 0 -7px;
+    border-width: 0;
     background-image: resource("gradient_cursor");
 }
-.rosettaui-gradientpicker__cursor:focus
+.rosettaui-gradient-editor__cursor:focus
 {
-    border-width: 1px;
-    border-color: var(--unity-colors-input_field-border-focus);
+    background-image: resource("gradient_cursor_focus");
 }
 
-.rosettaui-gradientpicker__cursor:hover
-{
-    border-width: 1px;
-    border-color: var(--unity-colors-input_field-border-hover);
-}
 
 .rosettaui-gradientpicker__cursor__color
 {

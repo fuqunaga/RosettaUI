@@ -52,7 +52,7 @@ namespace RosettaUI.UIToolkit.Builder
             
             void ShowGradientPicker(Vector2 pos, UnityInternalAccess.GradientField target)
             {
-                GradientPicker.Show(pos, target, gradientField.value, gradient => gradientField.value = gradient);
+                GradientEditor.Show(pos, target, gradientField.value, gradient => gradientField.value = gradient);
             }
         }
         

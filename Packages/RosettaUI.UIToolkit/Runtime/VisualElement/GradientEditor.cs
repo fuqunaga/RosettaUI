@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    public class GradientPicker : VisualElement
+    public class GradientEditor : VisualElement
     {
         [Serializable]
         public enum Mode
@@ -22,7 +22,7 @@ namespace RosettaUI.UIToolkit
         #region static interface
 
         private static ModalWindow _window;
-        private static GradientPicker _gradientPickerInstance;
+        private static GradientEditor _gradientEditorInstance;
 
         public static int TextDigit { get; set; } = 3;
         public static int MaxKeyNum { get; set; } = 8;
@@ -52,8 +52,8 @@ namespace RosettaUI.UIToolkit
             if (_window == null)
             {
                 _window = new ModalWindow();
-                _gradientPickerInstance = new GradientPicker();
-                _window.Add(_gradientPickerInstance);
+                _gradientEditorInstance = new GradientEditor();
+                _window.Add(_gradientEditorInstance);
 
                 _window.RegisterCallback<NavigationSubmitEvent>(_ => _window.Hide());
                 _window.RegisterCallback<NavigationCancelEvent>(_ =>
@@ -73,21 +73,21 @@ namespace RosettaUI.UIToolkit
             }
             
             // Show()前はPanelが設定されていないのでコールバック系はShow()後
-            _gradientPickerInstance.PreviewGradient = initialGradient;
-            _gradientPickerInstance.onGradientChanged += onGradientChanged;
-            _gradientPickerInstance.RegisterCallback<DetachFromPanelEvent>(OnDetach);
+            _gradientEditorInstance.PreviewGradient = initialGradient;
+            _gradientEditorInstance.onGradientChanged += onGradientChanged;
+            _gradientEditorInstance.RegisterCallback<DetachFromPanelEvent>(OnDetach);
 
             void OnDetach(DetachFromPanelEvent _)
             {
-                _gradientPickerInstance.onGradientChanged -= onGradientChanged;
-                _gradientPickerInstance.UnregisterCallback<DetachFromPanelEvent>(OnDetach);
+                _gradientEditorInstance.onGradientChanged -= onGradientChanged;
+                _gradientEditorInstance.UnregisterCallback<DetachFromPanelEvent>(OnDetach);
 
                 target?.Focus();
             }
 
-            if (_gradientPickerInstance.isInitialized)
+            if (_gradientEditorInstance.isInitialized)
             {
-                _gradientPickerInstance.ResetUI();
+                _gradientEditorInstance.ResetUI();
             }
         }
 
@@ -144,9 +144,9 @@ namespace RosettaUI.UIToolkit
             return Mathf.Round(value * scale) / scale;
         }
 
-        private GradientPicker()
+        private GradientEditor()
         {
-            _visualTreeAsset ??= Resources.Load<VisualTreeAsset>("RosettaUI_GradientPicker");
+            _visualTreeAsset ??= Resources.Load<VisualTreeAsset>("RosettaUI_GradientEditor");
             _visualTreeAsset.CloneTree(this);
 
             InitUI();

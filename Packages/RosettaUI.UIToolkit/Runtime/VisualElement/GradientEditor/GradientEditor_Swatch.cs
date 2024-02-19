@@ -6,6 +6,7 @@ namespace RosettaUI.UIToolkit
 {
     public partial class GradientEditor
     {
+
         private Swatch _selectedSwatch;
         
         private class Swatch
@@ -56,20 +57,20 @@ namespace RosettaUI.UIToolkit
 
         private void OnPointerDownOnAlphaContainer(PointerDownEvent evt)
         {
-            var localPos = _alphaCursorContainer.WorldToLocal(evt.position);
-
-            var swatch = ContainsSwatchAtPosition(localPos, _alphaSwatches, true);
-            if (swatch != null)
-            {
-                SelectSwatch(swatch);
-            }
-            else
-            {
-                // 無かったら新規追加
-                AddAndSelectSwatch(localPos.x, _alphaSwatches, _alphaCursorContainer);
-            }
-
-            evt.StopPropagation();
+            // var localPos = _alphaCursorContainer.WorldToLocal(evt.position);
+            //
+            // var swatch = ContainsSwatchAtPosition(localPos, _alphaSwatches, true);
+            // if (swatch != null)
+            // {
+            //     SelectSwatch(swatch);
+            // }
+            // else
+            // {
+            //     // 無かったら新規追加
+            //     AddAndSelectSwatch(localPos.x, _alphaSwatches, _alphaCursorContainer);
+            // }
+            //
+            // evt.StopPropagation();
         }
 
         private void OnPointerMoveOnAlphaContainer(PointerMoveEvent evt)
@@ -131,5 +132,6 @@ namespace RosettaUI.UIToolkit
         }
 
         #endregion
+        
     }
 }

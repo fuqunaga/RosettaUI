@@ -513,7 +513,7 @@ namespace RosettaUI.UIToolkit
             static Texture2D InitSliderTexture(VisualElement slider)
             {
                 var tracker = slider.Q("unity-tracker");
-                var tex = ColorPickerHelper.CreateTexture(
+                var tex = TextureUtility.CreateTexture(
                     Mathf.CeilToInt(tracker.resolvedStyle.width),
                     1,
                     TextureFormat.RGB24);

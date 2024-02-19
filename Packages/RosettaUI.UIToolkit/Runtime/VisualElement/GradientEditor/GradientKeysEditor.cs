@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
@@ -15,27 +14,23 @@ namespace RosettaUI.UIToolkit
     {
         public static int MaxKeyNum { get; set; } = 8;
         
-        
         private readonly Gradient _gradient;
         private readonly VisualElement _container;
         private readonly List<GradientKeysSwatch> _showedSwatches;
         
         private GradientKeysSwatch _selectedSwatch;
-        private readonly Action<GradientKeysSwatch> _onSelectedSwatchChanged;
-        private readonly Action _onKeysChanged;
+        private readonly Action<GradientKeysSwatch> _onSwatchChanged;
         
         public IReadOnlyList<GradientKeysSwatch> ShowedSwatches => _showedSwatches;
         
         public GradientKeysEditor(Gradient gradient, VisualElement container, List<GradientKeysSwatch> showedSwatches,
-            Action onKeysChanged,
-            Action<GradientKeysSwatch> onSelectedSwatchChanged
+            Action<GradientKeysSwatch> onSwatchChanged
             )
         {
             _gradient = gradient;
             _container = container;
             _showedSwatches = showedSwatches;
-            _onKeysChanged = onKeysChanged;
-            _onSelectedSwatchChanged = onSelectedSwatchChanged;
+            _onSwatchChanged = onSwatchChanged;
             
             foreach(var swatch in _showedSwatches)
             {
@@ -58,7 +53,6 @@ namespace RosettaUI.UIToolkit
                 if (swatch != null)
                 {
                     ShowSwatch(swatch);
-                    _onKeysChanged?.Invoke();
                 }
             }
 
@@ -66,6 +60,7 @@ namespace RosettaUI.UIToolkit
             if (swatch != null)
             {
                 SelectSwatch(swatch);
+                OnSwatchChanged();
             }
 
             evt.StopPropagation();
@@ -88,19 +83,20 @@ namespace RosettaUI.UIToolkit
                 }
                 
                 _selectedSwatch.Time = Mathf.Clamp01(localPos.x / rect.width);
-                _onKeysChanged?.Invoke();
             }
             // 範囲外ではGradient的には削除するがセレクト状態は継続
             // 再度範囲内に戻った場合にColor/Alphaの値が復活する
             else 
             {
                 HideSwatch(_selectedSwatch);
-                _onKeysChanged?.Invoke();
             }
 
+            
+            OnSwatchChanged();
             evt.StopPropagation();
         }
-        
+
+
         private void ShowSwatch(GradientKeysSwatch swatch)
         {
             _showedSwatches.Add(swatch);
@@ -121,19 +117,17 @@ namespace RosettaUI.UIToolkit
                 return null;
             }
 
-            var t = Mathf.Clamp01(LocalPosToTime(_container, localPosX));
+            var t = Mathf.Clamp01(localPosX / _container.resolvedStyle.width);
             var a = _gradient.Evaluate(t).a;
             var newSwatch = new GradientKeysSwatch(true)
             {
                 Time = t,
-                Color = new Color(a, a, a, 1f)
+                Alpha = a
             };
             
             
             return newSwatch;
         }
-
-
 
         private void SelectSwatch(GradientKeysSwatch swatch)
         {
@@ -141,8 +135,6 @@ namespace RosettaUI.UIToolkit
 
             _selectedSwatch = swatch;
             _selectedSwatch.visualElement.Focus();
-            
-            _onSelectedSwatchChanged?.Invoke(_selectedSwatch);
         }
         
         private void UnselectSwatch()
@@ -152,14 +144,12 @@ namespace RosettaUI.UIToolkit
 
             _selectedSwatch.visualElement.Blur();
             _selectedSwatch = null;
-            
-            _onSelectedSwatchChanged?.Invoke(null);
         }
         
-        private static float LocalPosToTime(VisualElement element, float x)
+        
+        private void OnSwatchChanged()
         {
-            var f = x / element.resolvedStyle.width;
-            return f;
+            _onSwatchChanged?.Invoke(_selectedSwatch);
         }
     }
 }

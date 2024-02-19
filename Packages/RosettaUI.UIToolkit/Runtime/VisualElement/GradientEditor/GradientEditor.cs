@@ -7,13 +7,14 @@ using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    public partial class GradientEditor : VisualElement
+    public class GradientEditor : VisualElement
     {
         public static readonly string USSClassName = "rosettaui-gradient-editor";
         public static readonly string CursorUSSClassName = $"{USSClassName}__cursor";
         public static readonly string AlphaCursorUSSClassName = $"{USSClassName}__cursor-alpha";
         public static readonly string ColorCursorUSSClassName = $"{USSClassName}__cursor-color";
-   
+
+        private static Texture2D _previewCheckerBoardTexture;
 
         #region static interface
 
@@ -97,7 +98,7 @@ namespace RosettaUI.UIToolkit
         private Button _pasteButton;
         private Label _infoLabel;
         
-        private bool isClicking = false;
+
         
         private GradientKeysEditor _alphaKeysEditor;
         
@@ -125,7 +126,8 @@ namespace RosettaUI.UIToolkit
         {
             _modeEnum = this.Q<EnumField>("mode-enum");
             
-            _gradientPreview = this.Q("gradient-preview");
+            var previewBackground = this.Q("preview-background");
+            _gradientPreview = this.Q("preview");
 
             _alphaCursorContainer = this.Q("alpha-cursor-container");
             _colorCursors = this.Q("color-cursors");
@@ -153,23 +155,22 @@ namespace RosettaUI.UIToolkit
             _alphaSlider.RegisterValueChangedCallback(evt =>
             {
                 if (_selectedSwatch == null) return;
-
-                var a = Round(evt.newValue, TextDigit);
-                _selectedSwatch.Color = new Color(a, a, a, 1);
+                
+                _selectedSwatch.Alpha = evt.newValue;
                 OnGradientChanged();
             });
 
             _locationSlider.RegisterValueChangedCallback(evt =>
             {
                 if (_selectedSwatch == null) return;
-
-                var t = Round(Mathf.Clamp01(_locationSlider.value / 100f), TextDigit);
-                _selectedSwatch.Time = t;
+                
+                _selectedSwatch.Time = Mathf.Clamp01(_locationSlider.value / 100f);
                 OnGradientChanged();
             });
 
             this.ScheduleToUseResolvedLayoutBeforeRendering(() =>
             {
+                InitPreviewBackground(previewBackground);
                 UpdateGradientPreview();
                 InitAlphaKeysEditor();
                 BuildArrays();
@@ -180,23 +181,33 @@ namespace RosettaUI.UIToolkit
                 VisualElementExtension.CheckOutOfScreen(_window.Position, _window);
             });
         }
-        
+
+        private static void InitPreviewBackground(VisualElement previewBackground)
+        {
+            if (_previewCheckerBoardTexture == null)
+            {
+                const int gridSize = 6;
+                var rs = previewBackground.resolvedStyle;
+                var size = new Vector2Int(Mathf.CeilToInt(rs.width),  Mathf.CeilToInt(rs.height));
+                _previewCheckerBoardTexture = TextureUtility.CreateCheckerBoardTexture(size, gridSize);
+            }   
+            
+            previewBackground.style.backgroundImage = _previewCheckerBoardTexture;
+        }
+
         private void InitAlphaKeysEditor()
         {
-            var swatches = _gradient.alphaKeys.Select(ak => {
-                var a = ak.alpha;
-                return new GradientKeysSwatch(true)
-                {
-                    Time = ak.time,
-                    Color = new Color(a, a, a, 1f)
-                };
+            var swatches = _gradient.alphaKeys.Select(ak => new GradientKeysSwatch(true)
+            {
+                Time = ak.time,
+                Alpha = ak.alpha
             }).ToList();
             
             _alphaKeysEditor = new GradientKeysEditor(_gradient, _alphaCursorContainer, swatches,
-                onKeysChanged: OnGradientChanged, 
-                onSelectedSwatchChanged: UpdateSelectedSwatchField
+                onSwatchChanged: OnSwatchChanged
                 );
         }
+
 
         private void BuildArrays()
         {
@@ -276,7 +287,7 @@ namespace RosettaUI.UIToolkit
             // }
 
             var alphaSwatches = _alphaKeysEditor.ShowedSwatches;
-            var alphaKeys = alphaSwatches.Select(swatch => new GradientAlphaKey(swatch.Color.r, swatch.Time)).ToArray();
+            var alphaKeys = alphaSwatches.Select(swatch => new GradientAlphaKey(swatch.Alpha, swatch.Time)).ToArray();
             
             _gradient.SetKeys(_gradient.colorKeys, alphaKeys);
             _gradient.mode = _modeEnum.value as GradientMode? ?? GradientMode.Blend;
@@ -287,23 +298,30 @@ namespace RosettaUI.UIToolkit
             var gradientTexture = GradientPickerHelper.GenerateGradientPreview(_gradient, _gradientPreview.style.backgroundImage.value.texture);
             _gradientPreview.style.backgroundImage = gradientTexture;
         }
+
         
-        private float LocalPosToTime(VisualElement element, float x)
+        private void OnSwatchChanged(GradientKeysSwatch selectedSwatch)
         {
-            var f = x / element.resolvedStyle.width;
-            return f;
+            UpdateSelectedSwatchField(selectedSwatch);
+            OnGradientChanged();
         }
 
+        
         private void UpdateSelectedSwatchField(GradientKeysSwatch swatch)
         {
             if (swatch == null)
+            {
+                _colorFieldBox.visible = false;
+                _alphaSlider.visible = false;
+                _locationSlider.visible = false;
                 return;
+            }
             
             _selectedSwatch = swatch;
             if (swatch.isAlpha)
             {
                 _alphaSlider.visible = true;
-                _alphaSlider.value = swatch.Color.r;
+                _alphaSlider.value = swatch.Alpha;
 
                 _colorFieldBox.visible = false;
             }

@@ -6,15 +6,6 @@
     width: 250px;
 }
 
-.rosettaui-gradientpicker__gradient-preview
-{
-    position: absolute;
-    width: 100%;
-    height: 32px;
-    top: 32px;
-}
-
-
 .rosettaui-gradient-editor__cursor
 {
     position: absolute;

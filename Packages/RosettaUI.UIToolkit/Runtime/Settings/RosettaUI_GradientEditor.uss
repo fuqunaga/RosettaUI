@@ -15,31 +15,20 @@
     border-width: 0;
     background-image: resource("gradient_cursor");
 }
+
 .rosettaui-gradient-editor__cursor:focus
 {
     background-image: resource("gradient_cursor_focus");
 }
 
-
-.rosettaui-gradientpicker__cursor__color
+.rosettaui-gradient-editor__cursor-alpha 
 {
-    position: absolute;
-    width: 16px;
-    height: 32px;
-    /*margin: -8px 0 0 -8px;*/
-    margin: 0 0 0 -8px;
-    background-image: resource("gradient_cursor");
-    scale: 1 -1;
+    top: 8px;
 }
 
-.rosettaui-gradientpicker__cursor__color:focus
+.rosettaui-gradient-editor__cursor-color
 {
-    border-width: 1px;
-    border-color: var(--unity-colors-input_field-border-focus);
+    bottom: 8px;
+    scale: -1;
 }
 
-.rosettaui-gradientpicker__cursor__color:hover
-{
-    border-width: 1px;
-    border-color: var(--unity-colors-input_field-border-hover);
-}

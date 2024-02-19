@@ -1,11 +1,11 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:EnumField label="Mode" type="UnityEngine.GradientMode, UnityEngine.CoreModule" name="mode-enum" style="margin-right: 8px; margin-left: 8px;" />
-    <ui:GroupBox name="gradient-group" style="flex-grow: 3; margin-left: 8px; margin-right: 8px; margin-top: 8px; margin-bottom: 8px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-shrink: 1; height: 128px; min-height: 128px; max-height: none;">
-        <ui:VisualElement name="alpha-cursor-container" class="rosettaui-gradientpicker__gradient-group__alpha-cursors" style="flex-basis: auto; flex-grow: 0; flex-shrink: 0; height: 36px;" />
+    <ui:GroupBox name="gradient-group" style="flex-grow: 3; margin-left: 8px; margin-right: 8px; margin-top: 4px; margin-bottom: 4px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-shrink: 1; height: 128px; min-height: 128px; max-height: none;">
+        <ui:VisualElement name="alpha-cursor-container" class="rosettaui-gradientpicker__gradient-group__alpha-cursors" style="flex-basis: auto; flex-grow: 0; flex-shrink: 0; height: 44px;" />
         <ui:VisualElement name="preview-background" class="rosettaui-gradientpicker__gradient-preview" style="flex-basis: auto; -unity-background-image-tint-color: rgb(255, 255, 255); background-color: rgb(255, 52, 1); flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: -8px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; height: 64px; flex-shrink: 0; min-width: auto;">
             <ui:VisualElement name="preview" style="width: 100%; flex-shrink: 0; height: 100%;" />
         </ui:VisualElement>
-        <ui:VisualElement name="color-cursors" class="rosettaui-gradientpicker__gradient-group__color-cursors" style="flex-basis: auto; flex-grow: 1; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 1px; padding-right: 1px; padding-top: 1px; padding-bottom: 1px; min-height: 48px; flex-shrink: 0; height: 48px; top: 64px;" />
+        <ui:VisualElement name="color-cursor-container" class="rosettaui-gradientpicker__gradient-group__alpha-cursors" style="flex-basis: auto; flex-grow: 0; flex-shrink: 0; height: 44px; margin-top: -8px;" />
     </ui:GroupBox>
     <ui:VisualElement name="property-group" style="flex-grow: 0.1; background-color: rgba(0, 0, 0, 0); align-items: stretch; justify-content: flex-start; margin-left: 2px; margin-right: 2px; margin-top: 2px; margin-bottom: 2px;">
         <ui:GroupBox style="flex-direction: column;">

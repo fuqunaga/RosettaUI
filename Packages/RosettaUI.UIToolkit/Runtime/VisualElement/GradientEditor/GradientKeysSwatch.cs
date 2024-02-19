@@ -6,9 +6,10 @@ namespace RosettaUI.UIToolkit
     public class GradientKeysSwatch
     {
         public static readonly string CursorUSSClassName = $"{GradientEditor.USSClassName}__cursor";
+        public static readonly string AlphaCursorUSSClassName = $"{GradientEditor.USSClassName}__cursor-alpha";
+        public static readonly string ColorCursorUSSClassName = $"{GradientEditor.USSClassName}__cursor-color";
      
         public static int TextDigit { get; set; } = 3;
-        public static int MaxKeyNum { get; set; } = 8;
         
         private static float Round(float value, int digit)
         {
@@ -16,8 +17,29 @@ namespace RosettaUI.UIToolkit
             return Mathf.Round(value * scale) / scale;
         }
         
-        public readonly bool isAlpha;
         public readonly VisualElement visualElement;
+        
+        private bool _isAlpha;
+
+        public bool IsAlpha
+        {
+            get => _isAlpha; 
+            private set
+            {
+                _isAlpha = value;
+                if (_isAlpha)
+                {
+                    visualElement.RemoveFromClassList(ColorCursorUSSClassName);
+                    visualElement.AddToClassList(AlphaCursorUSSClassName);
+                }
+                else
+                {
+                    visualElement.RemoveFromClassList(AlphaCursorUSSClassName);
+                    visualElement.AddToClassList(ColorCursorUSSClassName);
+                }
+            }
+        }
+        
 
         public float Time
         {
@@ -28,7 +50,11 @@ namespace RosettaUI.UIToolkit
         public Color Color
         {
             get => visualElement.style.unityBackgroundImageTintColor.value;
-            set => visualElement.style.unityBackgroundImageTintColor = value;
+            set
+            {
+                visualElement.style.unityBackgroundImageTintColor = value;
+                IsAlpha = false;
+            }
         }
 
         public float Alpha
@@ -38,12 +64,12 @@ namespace RosettaUI.UIToolkit
             {
                 var v = Round(value, TextDigit);
                 visualElement.style.unityBackgroundImageTintColor = new Color(v,v,v,1f);
+                IsAlpha = true;
             }
         }
 
-        public GradientKeysSwatch(bool isAlpha)
-        {
-            this.isAlpha = isAlpha;
+        public GradientKeysSwatch()
+        { 
             visualElement = CreateVisualElement();
         }
 

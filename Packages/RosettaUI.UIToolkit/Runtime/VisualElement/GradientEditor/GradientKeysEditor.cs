@@ -17,6 +17,7 @@ namespace RosettaUI.UIToolkit
         private readonly Gradient _gradient;
         private readonly VisualElement _container;
         private readonly List<GradientKeysSwatch> _showedSwatches;
+        private readonly bool _isAlpha;
         
         private GradientKeysSwatch _selectedSwatch;
         private readonly Action<GradientKeysSwatch> _onSwatchChanged;
@@ -24,13 +25,15 @@ namespace RosettaUI.UIToolkit
         public IReadOnlyList<GradientKeysSwatch> ShowedSwatches => _showedSwatches;
         
         public GradientKeysEditor(Gradient gradient, VisualElement container, List<GradientKeysSwatch> showedSwatches,
-            Action<GradientKeysSwatch> onSwatchChanged
+            Action<GradientKeysSwatch> onSwatchChanged,
+            bool isAlpha
             )
         {
             _gradient = gradient;
             _container = container;
             _showedSwatches = showedSwatches;
             _onSwatchChanged = onSwatchChanged;
+            _isAlpha = isAlpha;
             
             foreach(var swatch in _showedSwatches)
             {
@@ -44,6 +47,8 @@ namespace RosettaUI.UIToolkit
         private void OnPointerDownOnContainer(PointerDownEvent evt)
         {
             var localPos = _container.WorldToLocal(evt.position);
+            
+            _showedSwatches.Sort((a, b) => a.Time.CompareTo(b.Time));
             var swatch = _showedSwatches.FirstOrDefault(s => s.visualElement.localBound.Contains(localPos));
             
             // 無かったら新規追加
@@ -118,12 +123,21 @@ namespace RosettaUI.UIToolkit
             }
 
             var t = Mathf.Clamp01(localPosX / _container.resolvedStyle.width);
-            var a = _gradient.Evaluate(t).a;
-            var newSwatch = new GradientKeysSwatch(true)
+            var color = _gradient.Evaluate(t);
+            
+            var newSwatch = new GradientKeysSwatch()
             {
-                Time = t,
-                Alpha = a
+                Time = t
             };
+            
+            if (_isAlpha)
+            {
+                newSwatch.Alpha = color.a;
+            }
+            else
+            {
+                newSwatch.Color = color;
+            }
             
             
             return newSwatch;
@@ -135,6 +149,7 @@ namespace RosettaUI.UIToolkit
 
             _selectedSwatch = swatch;
             _selectedSwatch.visualElement.Focus();
+            _selectedSwatch.visualElement.BringToFront();
         }
         
         private void UnselectSwatch()

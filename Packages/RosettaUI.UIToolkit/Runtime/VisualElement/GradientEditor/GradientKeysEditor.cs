@@ -41,9 +41,9 @@ namespace RosettaUI.UIToolkit
             }
         
             container.RegisterCallback<PointerDownEvent>(OnPointerDownOnContainer);
-            PointerDrag.RegisterCallback(container, OnPointerMoveOnContainer);
+            PointerDrag.RegisterCallback(container, OnPointerMoveOnContainer, OnPointerupOnContainer);
         }
-        
+
         private void OnPointerDownOnContainer(PointerDownEvent evt)
         {
             var localPos = _container.WorldToLocal(evt.position);
@@ -95,9 +95,23 @@ namespace RosettaUI.UIToolkit
             {
                 HideSwatch(_selectedSwatch);
             }
-
             
             OnSwatchChanged();
+            evt.StopPropagation();
+        }
+        
+        
+        private void OnPointerupOnContainer(PointerUpEvent evt)
+        {
+            if (_selectedSwatch == null) return;
+
+            // 非表示状態でドラッグ終了したら削除
+            if (!_showedSwatches.Contains(_selectedSwatch))
+            {
+                UnselectSwatch();
+                OnSwatchChanged();
+            }
+
             evt.StopPropagation();
         }
 

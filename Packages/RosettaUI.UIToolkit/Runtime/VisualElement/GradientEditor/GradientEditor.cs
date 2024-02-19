@@ -54,7 +54,7 @@ namespace RosettaUI.UIToolkit
             }
             
             // Show()前はPanelが設定されていないのでコールバック系はShow()後
-            _gradientEditorInstance._gradient = initialGradient;
+            _gradientEditorInstance.Initialize(initialGradient);
             _gradientEditorInstance.onGradientChanged += onGradientChanged;
             _gradientEditorInstance.RegisterCallback<DetachFromPanelEvent>(OnDetach);
             return;
@@ -145,21 +145,24 @@ namespace RosettaUI.UIToolkit
 
             this.ScheduleToUseResolvedLayoutBeforeRendering(() =>
             {
-                _modeEnum.value = _gradient.mode;
                 InitPreviewBackground(previewBackground);
-                UpdateGradientPreview();
-                InitAlphaKeysEditor();
-                InitColorKeysEditor();
-                InitGradientCode();
-                
-                _selectedSwatch = _colorKeysEditor.ShowedSwatches.FirstOrDefault();
                 
                 // はみ出し抑制
                 VisualElementExtension.CheckOutOfScreen(_window.Position, _window);
             });
         }
 
+        public void Initialize(Gradient gradient)
+        {
+            _gradient = gradient;
+            _modeEnum.value = _gradient.mode;
+            UpdateGradientPreview();
+            InitAlphaKeysEditor();
+            InitColorKeysEditor();
+            InitGradientCode();
 
+            _selectedSwatch = _colorKeysEditor.ShowedSwatches.FirstOrDefault();
+        }
 
         private static void InitPreviewBackground(VisualElement previewBackground)
         {
@@ -242,16 +245,13 @@ namespace RosettaUI.UIToolkit
         
         private void UpdateGradient()
         {
-            // GradientColorKey[] colorKeys = new GradientColorKey[_colorSwatches.Count];
-            // for (int i = 0; i < colorKeys.Length; i++)
-            // {
-            //     colorKeys[i] = new GradientColorKey(_colorSwatches[i].color, _colorSwatches[i].time);
-            // }
+            var colorSwatches = _colorKeysEditor.ShowedSwatches;
+            var colorKeys = colorSwatches.Select(swatch => new GradientColorKey(swatch.Color, swatch.Time)).ToArray();
 
             var alphaSwatches = _alphaKeysEditor.ShowedSwatches;
             var alphaKeys = alphaSwatches.Select(swatch => new GradientAlphaKey(swatch.Alpha, swatch.Time)).ToArray();
             
-            _gradient.SetKeys(_gradient.colorKeys, alphaKeys);
+            _gradient.SetKeys(colorKeys, alphaKeys);
             _gradient.mode = _modeEnum.value as GradientMode? ?? GradientMode.Blend;
         }
         

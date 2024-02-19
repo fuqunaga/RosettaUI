@@ -24,18 +24,7 @@ namespace RosettaUI.UIToolkit
         public static int MaxKeyNum { get; set; } = 8;
 
         #endregion
-
-        private Gradient PreviewGradient
-        {
-            get => _gradient;
-            set
-            {
-                _gradient = value;
-                var gradientTexture = GradientPickerHelper.GenerateGradientPreview(value, _gradientPreview.style.backgroundImage.value.texture);
-                _gradientPreview.style.backgroundImage = gradientTexture;
-            }
-        }
-
+        
         private Gradient _gradient;
         
         public static void Show(Vector2 position, VisualElement target, Gradient initialGradient,
@@ -65,7 +54,7 @@ namespace RosettaUI.UIToolkit
             }
             
             // Show()前はPanelが設定されていないのでコールバック系はShow()後
-            _gradientEditorInstance.PreviewGradient = initialGradient;
+            _gradientEditorInstance._gradient = initialGradient;
             _gradientEditorInstance.onGradientChanged += onGradientChanged;
             _gradientEditorInstance.RegisterCallback<DetachFromPanelEvent>(OnDetach);
 
@@ -111,11 +100,9 @@ namespace RosettaUI.UIToolkit
         private bool isClicking = false;
         
         private GradientKeysEditor _alphaKeysEditor;
+        
+        private GradientKeysSwatch _selectedSwatch;
 
-
-
-        private readonly List<Swatch> _alphaSwatches = new();
-        private readonly List<Swatch> _colorSwatches = new();
         
 
         private static float Round(float value, int digit)
@@ -150,24 +137,15 @@ namespace RosettaUI.UIToolkit
             _alphaSlider = this.Q("alpha-slider") as Slider;
             _locationSlider = this.Q("location-slider") as Slider;
 
-            
-            
-
-            _colorCursors.RegisterCallback<PointerDownEvent>(OnPointerDownOnColorCursors);
-            _colorCursors.RegisterCallback<PointerMoveEvent>(OnPointerMoveOnColorCursors);
-            _colorCursors.RegisterCallback<PointerUpEvent>(OnPointerUpOnColorCursors);
-            _colorCursors.RegisterCallback<PointerLeaveEvent>(OnPointerLeaveColorCursors);
-
             _modeEnum.RegisterValueChangedCallback(_ => OnGradientChanged());
             
             _colorField.RegisterCallback<PointerDownEvent>(evt =>
             {
                 var position = evt.position;
-                ColorPicker.Show(position, _colorField, _selectedSwatch.color, color =>
+                ColorPicker.Show(position, _colorField, _selectedSwatch.Color, color =>
                 {
                     _colorField.style.backgroundColor = color;
-                    _selectedSwatch.color = color;
-                    UpdateSwatches(_colorSwatches, _colorCursors);
+                    _selectedSwatch.Color = color;
                     OnGradientChanged();
                 });
             });
@@ -177,8 +155,7 @@ namespace RosettaUI.UIToolkit
                 if (_selectedSwatch == null) return;
 
                 var a = Round(evt.newValue, TextDigit);
-                _selectedSwatch.color = new Color(a, a, a, 1);
-                UpdateSwatches(_alphaSwatches, _alphaCursorContainer);
+                _selectedSwatch.Color = new Color(a, a, a, 1);
                 OnGradientChanged();
             });
 
@@ -187,26 +164,16 @@ namespace RosettaUI.UIToolkit
                 if (_selectedSwatch == null) return;
 
                 var t = Round(Mathf.Clamp01(_locationSlider.value / 100f), TextDigit);
-                _selectedSwatch.time = t;
-                if (_selectedSwatch.isAlpha)
-                {
-                    UpdateSwatches(_alphaSwatches, _alphaCursorContainer);
-                }
-                else
-                {
-                    UpdateSwatches(_colorSwatches, _colorCursors);
-                }
-
+                _selectedSwatch.Time = t;
                 OnGradientChanged();
             });
 
             this.ScheduleToUseResolvedLayoutBeforeRendering(() =>
             {
+                UpdateGradientPreview();
                 InitAlphaKeysEditor();
                 BuildArrays();
                 InitGradientCode();
-                UpdateSwatches(_alphaSwatches, _alphaCursorContainer);
-                UpdateSwatches(_colorSwatches, _colorCursors);
                 isInitialized = true;
                 
                 // はみ出し抑制
@@ -225,9 +192,9 @@ namespace RosettaUI.UIToolkit
                 };
             }).ToList();
             
-            _alphaKeysEditor = new GradientKeysEditor(PreviewGradient, _alphaCursorContainer, swatches,
+            _alphaKeysEditor = new GradientKeysEditor(_gradient, _alphaCursorContainer, swatches,
                 onKeysChanged: OnGradientChanged, 
-                onSelectedSwatchChanged: _ => UpdateSelectedSwatchField()
+                onSelectedSwatchChanged: UpdateSelectedSwatchField
                 );
         }
 
@@ -237,15 +204,15 @@ namespace RosettaUI.UIToolkit
                 return;
 
             var colorKeys = _gradient.colorKeys;
-            _colorSwatches.Clear();
-            for (var i = 0; i < colorKeys.Length; i++)
-            {
-                var color = colorKeys[i].color;
-                color.a = 1f;
-                var swatch = CreateSwatch(colorKeys[i].time, color, false);
-                _colorSwatches.Add(swatch);
-                _colorCursors.Add(swatch.cursor);
-            }
+            // _colorSwatches.Clear();
+            // for (var i = 0; i < colorKeys.Length; i++)
+            // {
+            //     var color = colorKeys[i].color;
+            //     color.a = 1f;
+            //     var swatch = CreateSwatch(colorKeys[i].time, color, false);
+            //     _colorSwatches.Add(swatch);
+            //     _colorCursors.Add(swatch.cursor);
+            // }
 
             // var alphaKeys = _gradient.alphaKeys;
             // _alphaSwatches.Clear();
@@ -259,139 +226,97 @@ namespace RosettaUI.UIToolkit
 
             _modeEnum.value = _gradient.mode;
             
-            SelectSwatch(_colorSwatches[0]);
+            // SelectSwatch(_colorSwatches[0]);
         }
 
         public void ResetUI()
         {
-            if (_alphaSwatches != null)
-            {
-                foreach (var swatch in _alphaSwatches)
-                {
-                    swatch.cursor.RemoveFromHierarchy();
-                    swatch.cursor = null;
-                }
+            // if (_alphaSwatches != null)
+            // {
+            //     foreach (var swatch in _alphaSwatches)
+            //     {
+            //         swatch.cursor.RemoveFromHierarchy();
+            //         swatch.cursor = null;
+            //     }
+            //
+            //     _alphaSwatches.Clear();
+            // }
 
-                _alphaSwatches.Clear();
-            }
-
-            if (_colorSwatches != null)
-            {
-                foreach (var swatch in _colorSwatches)
-                {
-                    swatch.cursor.RemoveFromHierarchy();
-                    swatch.cursor = null;
-                }
-
-                _colorSwatches.Clear();
-            }
+            // if (_colorSwatches != null)
+            // {
+            //     foreach (var swatch in _colorSwatches)
+            //     {
+            //         swatch.cursor.RemoveFromHierarchy();
+            //         swatch.cursor = null;
+            //     }
+            //
+            //     _colorSwatches.Clear();
+            // }
 
             _selectedSwatch = null;
 
             BuildArrays();
-            UpdateSwatches(_alphaSwatches, _alphaCursorContainer);
-            UpdateSwatches(_colorSwatches, _colorCursors);
-        }
-
-        private void UpdateGradient()
-        {
-            GradientColorKey[] colorKeys = new GradientColorKey[_colorSwatches.Count];
-            for (int i = 0; i < colorKeys.Length; i++)
-            {
-                colorKeys[i] = new GradientColorKey(_colorSwatches[i].color, _colorSwatches[i].time);
-            }
-
-            var alphaSwatches = _alphaKeysEditor.ShowedSwatches;
-            var alphaKeys = alphaSwatches.Select(swatch => new GradientAlphaKey(swatch.Color.r, swatch.Time)).ToArray();
-            
-            PreviewGradient.SetKeys(colorKeys, alphaKeys);
-            PreviewGradient.mode = _modeEnum.value as GradientMode? ?? GradientMode.Blend;
+            // UpdateSwatches(_alphaSwatches, _alphaCursorContainer);
+            // UpdateSwatches(_colorSwatches, _colorCursors);
         }
 
         private void OnGradientChanged()
         {
             UpdateGradient();
-            onGradientChanged?.Invoke(PreviewGradient);
+            UpdateGradientPreview();
+            onGradientChanged?.Invoke(_gradient);
         }
         
-        private float TimeToLocalPos(VisualElement element, float t)
+        private void UpdateGradient()
         {
-            var f = element.resolvedStyle.width * t;
-            return f;
-        }
+            // GradientColorKey[] colorKeys = new GradientColorKey[_colorSwatches.Count];
+            // for (int i = 0; i < colorKeys.Length; i++)
+            // {
+            //     colorKeys[i] = new GradientColorKey(_colorSwatches[i].color, _colorSwatches[i].time);
+            // }
 
+            var alphaSwatches = _alphaKeysEditor.ShowedSwatches;
+            var alphaKeys = alphaSwatches.Select(swatch => new GradientAlphaKey(swatch.Color.r, swatch.Time)).ToArray();
+            
+            _gradient.SetKeys(_gradient.colorKeys, alphaKeys);
+            _gradient.mode = _modeEnum.value as GradientMode? ?? GradientMode.Blend;
+        }
+        
+        private void UpdateGradientPreview()
+        {
+            var gradientTexture = GradientPickerHelper.GenerateGradientPreview(_gradient, _gradientPreview.style.backgroundImage.value.texture);
+            _gradientPreview.style.backgroundImage = gradientTexture;
+        }
+        
         private float LocalPosToTime(VisualElement element, float x)
         {
             var f = x / element.resolvedStyle.width;
             return f;
         }
 
-        private void UpdateSelectedSwatchField()
+        private void UpdateSelectedSwatchField(GradientKeysSwatch swatch)
         {
-            if (_selectedSwatch == null)
+            if (swatch == null)
                 return;
-            if (_selectedSwatch.isAlpha)
+            
+            _selectedSwatch = swatch;
+            if (swatch.isAlpha)
             {
                 _alphaSlider.visible = true;
-                _alphaSlider.value = _selectedSwatch.color.r;
+                _alphaSlider.value = swatch.Color.r;
 
                 _colorFieldBox.visible = false;
             }
             else
             {
                 _colorFieldBox.visible = true;
-                _colorField.style.backgroundColor = _selectedSwatch.color;
+                _colorField.style.backgroundColor = swatch.Color;
 
                 _alphaSlider.visible = false;
             }
 
             _locationSlider.visible = true;
-            _locationSlider.value = _selectedSwatch.time * 100f;
-        }
-
-        private void UpdateSwatches(List<Swatch> swatches, VisualElement element)
-        {
-            swatches.Sort((a, b) => a.time.CompareTo(b.time));
-
-            foreach (var swatch in swatches)
-            {
-                var c = swatch.cursor.style;
-                c.left = TimeToLocalPos(element, swatch.time);
-                c.unityBackgroundImageTintColor = swatch.color;
-            }
-        }
-
-        private void RemoveSwatch(Swatch swatch, List<Swatch> swatches, VisualElement element)
-        {
-            if (swatches.Contains(swatch))
-            {
-                swatches.Remove(swatch);
-            }
-
-            swatch.cursor.RemoveFromHierarchy();
-            UpdateSwatches(swatches, element);
-        }
-
-        private void SelectSwatch(Swatch swatch)
-        {
-            UnselectSwatch();
-
-            _selectedSwatch = swatch;
-
-            UpdateSelectedSwatchField();
-
-            _selectedSwatch.cursor.Focus();
-        }
-
-        private void UnselectSwatch()
-        {
-            if (_selectedSwatch == null)
-                return;
-
-            _selectedSwatch = null;
-            _alphaSlider.visible = false;
-            _colorFieldBox.visible = false;
-            _locationSlider.visible = false;
+            _locationSlider.value = swatch.Time * 100f;
         }
 
 
@@ -428,37 +353,7 @@ namespace RosettaUI.UIToolkit
             };
         }
 
-        private Rect CalcRect(VisualElement cursor)
-        {
-            Rect rect = new Rect();
-            var cursorStyle = cursor.resolvedStyle;
-            rect.x = cursorStyle.left;
-            rect.y = cursorStyle.top;
-            rect.width = cursorStyle.width;
-            rect.height = cursorStyle.height;
-            return rect;
-        }
-
-
-
-        private void CheckCursorLeave(PointerLeaveEvent evt, VisualElement cursors, List<Swatch> swatches)
-        {
-            var localPos = cursors.WorldToLocal(evt.position);
-
-            if (isClicking && _selectedSwatch != null)
-            {
-                if (localPos.y < 0 || localPos.y >= (cursors.resolvedStyle.height))
-                {
-                    // 縦にはみ出したら削除
-                    RemoveSwatch(_selectedSwatch, swatches, cursors);
-                    UnselectSwatch();
-                    OnGradientChanged();
-                }
-
-                isClicking = false;
-            }
-        }
-
+        
 
         #region Color Cursors Events
 
@@ -497,41 +392,41 @@ namespace RosettaUI.UIToolkit
             // evt.StopPropagation();
         }
 
-        private void OnPointerMoveOnColorCursors(PointerMoveEvent evt)
-        {
-            if (isClicking)
-            {
-                var localPos = _colorCursors.WorldToLocal(evt.position);
-
-                if (_selectedSwatch != null)
-                {
-                    var rect = CalcRect(_colorCursors);
-                    rect.y = 0;
-                    if (rect.Contains(localPos))
-                    {
-                        _selectedSwatch.time = LocalPosToTime(_colorCursors, localPos.x);
-                        UpdateSelectedSwatchField();
-                        UpdateSwatches(_colorSwatches, _colorCursors);
-                        OnGradientChanged();
-                    }
-                }
-            }
-
-            evt.StopPropagation();
-        }
-
-        private void OnPointerUpOnColorCursors(PointerUpEvent evt)
-        {
-            isClicking = false;
-            evt.StopPropagation();
-        }
-
-        private void OnPointerLeaveColorCursors(PointerLeaveEvent evt)
-        {
-            CheckCursorLeave(evt, _colorCursors, _colorSwatches);
-
-            evt.StopPropagation();
-        }
+        // private void OnPointerMoveOnColorCursors(PointerMoveEvent evt)
+        // {
+        //     if (isClicking)
+        //     {
+        //         var localPos = _colorCursors.WorldToLocal(evt.position);
+        //
+        //         if (_selectedSwatch != null)
+        //         {
+        //             var rect = CalcRect(_colorCursors);
+        //             rect.y = 0;
+        //             if (rect.Contains(localPos))
+        //             {
+        //                 _selectedSwatch.time = LocalPosToTime(_colorCursors, localPos.x);
+        //                 UpdateSelectedSwatchField();
+        //                 UpdateSwatches(_colorSwatches, _colorCursors);
+        //                 OnGradientChanged();
+        //             }
+        //         }
+        //     }
+        //
+        //     evt.StopPropagation();
+        // }
+        //
+        // private void OnPointerUpOnColorCursors(PointerUpEvent evt)
+        // {
+        //     isClicking = false;
+        //     evt.StopPropagation();
+        // }
+        //
+        // private void OnPointerLeaveColorCursors(PointerLeaveEvent evt)
+        // {
+        //     CheckCursorLeave(evt, _colorCursors, _colorSwatches);
+        //
+        //     evt.StopPropagation();
+        // }
 
         #endregion
     }

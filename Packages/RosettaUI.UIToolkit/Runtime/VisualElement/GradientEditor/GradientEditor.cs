@@ -138,8 +138,8 @@ namespace RosettaUI.UIToolkit
             _locationSlider.RegisterValueChangedCallback(_ =>
             {
                 if (_selectedSwatch == null) return;
-                
-                _selectedSwatch.Time = Mathf.Clamp01(_locationSlider.value / 100f);
+
+                _selectedSwatch.TimePercent = _locationSlider.value;
                 OnGradientChanged();
             });
 
@@ -270,7 +270,7 @@ namespace RosettaUI.UIToolkit
             }
 
             _locationSlider.visible = true;
-            _locationSlider.value = swatch.Time * 100f;
+            _locationSlider.value = swatch.TimePercent;
         }
 
 

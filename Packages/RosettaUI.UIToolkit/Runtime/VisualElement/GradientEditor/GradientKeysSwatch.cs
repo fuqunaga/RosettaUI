@@ -17,7 +17,7 @@ namespace RosettaUI.UIToolkit
             return Mathf.Round(value * scale) / scale;
         }
         
-        public readonly VisualElement visualElement;
+        public readonly VisualElement visualElement = CreateVisualElement();
         
         private bool _isAlpha;
 
@@ -43,9 +43,16 @@ namespace RosettaUI.UIToolkit
 
         public float Time
         {
-            get => visualElement.style.left.value.value * 0.01f;
-            set => visualElement.style.left = Length.Percent(Round(value * 100f, TextDigit));
+            get => TimePercent * 0.01f;
+            set => TimePercent = value * 100f;
         }
+
+        public float TimePercent
+        {
+            get => visualElement.style.left.value.value;
+            set => visualElement.style.left = Length.Percent(Round(value, 1));
+        }
+        
 
         public Color Color
         {
@@ -66,11 +73,6 @@ namespace RosettaUI.UIToolkit
                 visualElement.style.unityBackgroundImageTintColor = new Color(v,v,v,1f);
                 IsAlpha = true;
             }
-        }
-
-        public GradientKeysSwatch()
-        { 
-            visualElement = CreateVisualElement();
         }
 
         private static VisualElement CreateVisualElement()

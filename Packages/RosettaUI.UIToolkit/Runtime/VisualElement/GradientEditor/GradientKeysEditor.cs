@@ -58,7 +58,7 @@ namespace RosettaUI.UIToolkit
         {
             var localPos = _container.WorldToLocal(evt.position);
             
-            _showedSwatches.Sort((a, b) => a.Time.CompareTo(b.Time));
+            _showedSwatches.Sort((a, b) => a.TimePercent.CompareTo(b.TimePercent));
             var swatch = _showedSwatches.FirstOrDefault(s => s.visualElement.localBound.Contains(localPos));
             
             // 無かったら新規追加

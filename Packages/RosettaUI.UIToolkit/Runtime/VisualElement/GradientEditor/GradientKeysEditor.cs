@@ -16,7 +16,7 @@ namespace RosettaUI.UIToolkit
         
         private readonly Gradient _gradient;
         private readonly VisualElement _container;
-        private readonly List<GradientKeysSwatch> _showedSwatches;
+        private readonly List<GradientKeysSwatch> _showedSwatches = new();
         private readonly bool _isAlpha;
         
         private GradientKeysSwatch _selectedSwatch;
@@ -24,25 +24,33 @@ namespace RosettaUI.UIToolkit
         
         public IReadOnlyList<GradientKeysSwatch> ShowedSwatches => _showedSwatches;
         
-        public GradientKeysEditor(Gradient gradient, VisualElement container, List<GradientKeysSwatch> showedSwatches,
+        public GradientKeysEditor(VisualElement container, 
             Action<GradientKeysSwatch> onSwatchChanged,
             bool isAlpha
             )
         {
-            _gradient = gradient;
             _container = container;
-            _showedSwatches = showedSwatches;
             _onSwatchChanged = onSwatchChanged;
             _isAlpha = isAlpha;
             
-            foreach(var swatch in _showedSwatches)
-            {
-                container.Add(swatch.visualElement);
-            }
         
             container.RegisterCallback<PointerDownEvent>(OnPointerDownOnContainer);
             PointerDrag.RegisterCallback(container, OnPointerMoveOnContainer, OnPointerupOnContainer);
         }
+        
+        public void Initialize(Gradient gradient, IEnumerable<GradientKeysSwatch> showedSwatches)
+        {
+            _container.Clear();
+            
+            _showedSwatches.Clear();
+            _showedSwatches.AddRange(showedSwatches);
+            
+            foreach(var swatch in _showedSwatches)
+            {
+                _container.Add(swatch.visualElement);
+            }
+        }
+        
 
         private void OnPointerDownOnContainer(PointerDownEvent evt)
         {

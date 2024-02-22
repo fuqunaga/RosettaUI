@@ -8,13 +8,9 @@
         <ui:VisualElement name="color-cursor-container" class="rosettaui-gradientpicker__gradient-group__alpha-cursors" style="flex-basis: auto; flex-grow: 0; flex-shrink: 0; height: 44px; margin-top: -8px;" />
     </ui:GroupBox>
     <ui:VisualElement name="property-group" style="flex-grow: 0.1; background-color: rgba(0, 0, 0, 0); align-items: stretch; justify-content: flex-start; margin-left: 2px; margin-right: 2px; margin-top: 2px; margin-bottom: 2px;">
-        <ui:GroupBox style="flex-direction: column;">
-            <ui:Slider picking-mode="Ignore" label="Alpha" value="0" high-value="1" show-input-field="true" name="alpha-slider" inverted="false" page-size="0" style="opacity: 1; flex-shrink: 1; top: 0; position: relative;" />
-            <ui:VisualElement name="color-field-box" style="flex-direction: row; white-space: normal; align-items: stretch; margin-left: 4px; margin-right: 4px; margin-top: 2px; margin-bottom: 2px; top: 0; position: relative;">
-                <ui:Label text="Color&#10;" display-tooltip-when-elided="true" class="unity-base-field__label unity-color-field__label" />
-                <ui:VisualElement name="color-field" class="unity-imgui-container unity-base-field__input unity-color-field__input" style="background-color: rgb(255, 255, 255); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px;" />
-            </ui:VisualElement>
-        </ui:GroupBox>
+        <ui:VisualElement name="value-field-container" style="flex-grow: 1;">
+            <ui:Slider picking-mode="Ignore" label="Alpha" name="alpha-slider" high-value="1" show-input-field="true" style="visibility: hidden; display: flex;" />
+        </ui:VisualElement>
         <ui:Slider picking-mode="Ignore" label="Location" value="0" high-value="100" name="location-slider" show-input-field="true" style="flex-shrink: 1;">
             <ui:Label text="%" display-tooltip-when-elided="true" name="location-per-label" style="align-items: stretch;" />
         </ui:Slider>

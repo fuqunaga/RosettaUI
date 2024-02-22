@@ -18,7 +18,7 @@ namespace RosettaUI.UIToolkit
                 
                 var windowStyle = ve.resolvedStyle;
 
-                style.marginLeft = -(resolvedStyle.borderLeftWidth + windowStyle.borderLeftWidth) + 0.5f;
+                style.marginLeft = -(resolvedStyle.borderLeftWidth + windowStyle.borderLeftWidth + windowStyle.paddingLeft) + 0.5f;
                 style.marginTop = -(resolvedStyle.borderTopWidth + windowStyle.borderTopWidth) + 0.5f;
             });
         }

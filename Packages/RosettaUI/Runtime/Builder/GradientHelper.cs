@@ -7,7 +7,7 @@ using Object = UnityEngine.Object;
 
 namespace RosettaUI.Builder
 {
-    public static class GradientPickerHelper 
+    public static class GradientHelper 
     {
 
         public static Texture2D GenerateGradientPreview(Gradient gradient, Texture2D texture)

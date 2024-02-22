@@ -59,7 +59,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             }
             else
             {
-                visualInput.style.backgroundImage = GradientPickerHelper.GenerateGradientPreview(value, visualInput.style.backgroundImage.value.texture);
+                visualInput.style.backgroundImage = GradientHelper.GenerateGradientPreview(value, visualInput.style.backgroundImage.value.texture);
                 IncrementVersion(VersionChangeType.Repaint); // since the Texture2D object can be reused, force dirty because the backgroundImage change will only trigger the Dirty if the Texture2D objects are different.
             }
         }

@@ -146,6 +146,8 @@ namespace RosettaUI.UIToolkit
                 OnGradientChanged();
             });
 
+            InitGradientCode();
+            
             this.ScheduleToUseResolvedLayoutBeforeRendering(() =>
             {
                 InitPreviewBackground(previewBackground);
@@ -162,7 +164,6 @@ namespace RosettaUI.UIToolkit
             UpdateGradientPreview();
             InitAlphaKeysEditor();
             InitColorKeysEditor();
-            InitGradientCode();
             
             UpdateSelectedSwatchField(_colorKeysEditor.ShowedSwatches.FirstOrDefault());
         }
@@ -235,7 +236,7 @@ namespace RosettaUI.UIToolkit
         
         private void UpdateGradientPreview()
         {
-            var gradientTexture = GradientPickerHelper.GenerateGradientPreview(_gradient, _gradientPreview.style.backgroundImage.value.texture);
+            var gradientTexture = GradientHelper.GenerateGradientPreview(_gradient, _gradientPreview.style.backgroundImage.value.texture);
             _gradientPreview.style.backgroundImage = gradientTexture;
         }
 
@@ -294,7 +295,7 @@ namespace RosettaUI.UIToolkit
             
             _copyButton.clicked += () =>
             {
-                var json = GradientPickerHelper.GradientToJson(_gradient);
+                var json = GradientHelper.GradientToJson(_gradient);
                 if (json != null)
                 {
                     GUIUtility.systemCopyBuffer = json;
@@ -307,11 +308,11 @@ namespace RosettaUI.UIToolkit
                 var clip = GUIUtility.systemCopyBuffer;
                 if (clip != null)
                 {
-                    if (GradientPickerHelper.JsonToGradient(clip) is { } gradient)
+                    if (GradientHelper.JsonToGradient(clip) is { } gradient)
                     {
-                        _gradient = gradient;
-                        // ResetUI();
-                        OnGradientChanged();
+                        Initialize(gradient);
+                        UpdateGradientPreview();
+                        onGradientChanged?.Invoke(_gradient);
                         _infoLabel.text = "Paste!";
                     }
                 }

@@ -19,25 +19,6 @@ namespace RosettaUI.UIToolkit.Builder
 
             return true;
         }
-   
-
-        private bool Bind_ColorField(Element element, VisualElement visualElement)
-        {
-            if (element is not FieldBaseElement<Color> colorElement || visualElement is not ColorField colorField) return false;
-
-            Bind_Field(colorElement, colorField, true);
-            
-            colorField.showColorPickerFunc += ShowColorPicker;
-            element.GetViewBridge().onUnsubscribe += () => colorField.showColorPickerFunc -= ShowColorPicker;
-
-            return true;
-            
-            
-            void ShowColorPicker(Vector2 pos, UnityInternalAccess.ColorField target)
-            {
-                ColorPicker.Show(pos, target, colorField.value, color => colorField.value = color);
-            }
-        }
 
         private bool Bind_GradientField(Element element, VisualElement visualElement)
         {

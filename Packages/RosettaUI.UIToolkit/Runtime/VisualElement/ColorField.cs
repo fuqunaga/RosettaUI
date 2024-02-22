@@ -23,6 +23,14 @@ namespace RosettaUI.UIToolkit
             colorInput.Add(OverlapTextElement);
 
             UpdateOverlapText();
+            
+            showColorPickerFunc += ShowColorPicker;
+            return;
+
+            void ShowColorPicker(Vector2 pos, UnityInternalAccess.ColorField target)
+            {
+                ColorPicker.Show(pos, target, value, color => value = color, EnableAlpha);
+            }
         }
         
         public override void SetValueWithoutNotify(Color color)

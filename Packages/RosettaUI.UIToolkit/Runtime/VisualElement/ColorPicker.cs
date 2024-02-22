@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -14,7 +15,7 @@ namespace RosettaUI.UIToolkit
         public static int TextDigit { get; set; } = 3;
 
         public static void Show(Vector2 position, VisualElement target, Color initialColor,
-            Action<Color> onColorChanged)
+            Action<Color> onColorChanged, bool enableAlpha = true)
         {
             if (_window == null)
             {
@@ -37,8 +38,11 @@ namespace RosettaUI.UIToolkit
             
             // Show()前はPanelが設定されていないのでコールバック系はShow()後
             _colorPickerInstance.PrevColor = initialColor;
+            _colorPickerInstance.EnableAlpha = enableAlpha;
             _colorPickerInstance.onColorChanged += onColorChanged;
             _colorPickerInstance.RegisterCallback<DetachFromPanelEvent>(OnDetach);
+            
+            return;
 
             void OnDetach(DetachFromPanelEvent _)
             {
@@ -86,6 +90,12 @@ namespace RosettaUI.UIToolkit
             }
         }
 
+        private bool EnableAlpha
+        {
+            get => _sliderSet.DisplayAlpha;
+            set => _sliderSet.DisplayAlpha = value;
+        }
+
         public Color Color
         {
             get
@@ -130,6 +140,7 @@ namespace RosettaUI.UIToolkit
             get => _alpha;
             set
             {
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (_alpha == value) return;
                 _alpha = value;
                 OnAlphaChanged();
@@ -199,7 +210,7 @@ namespace RosettaUI.UIToolkit
             });
         }
 
-        void InitHex()
+        private void InitHex()
         {
             _hex = this.Q<TextField>("hex");
             
@@ -219,7 +230,7 @@ namespace RosettaUI.UIToolkit
             UpdateHex();
         }
 
-        bool CheckPointIsValid_Hue(PointerDownEvent evt)
+        private bool CheckPointIsValid_Hue(PointerDownEvent evt)
         {
             var pos = evt.localPosition;
             
@@ -243,7 +254,7 @@ namespace RosettaUI.UIToolkit
             evt.StopPropagation();
         }
 
-        bool CheckPointerIsValid_SV(PointerDownEvent evt)
+        private bool CheckPointerIsValid_SV(PointerDownEvent evt)
         {
             var pos = evt.localPosition;
 
@@ -278,7 +289,8 @@ namespace RosettaUI.UIToolkit
             evt.StopPropagation();
         }
 
-        void OnHsvChanged(Vector3 newValue, Vector3 oldValue)
+        [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
+        private void OnHsvChanged(Vector3 newValue, Vector3 oldValue)
         {
             var hChanged = newValue.x != oldValue.x;
             var sChanged = newValue.y != oldValue.y; 
@@ -299,20 +311,20 @@ namespace RosettaUI.UIToolkit
             _sliderSet.OnHsvChanged(hChanged, sChanged, vChanged);
         }
 
-        void OnAlphaChanged()
+        private void OnAlphaChanged()
         {
             _sliderSet.OnAlphaChanged();
         }
 
-        void OnColorChanged()
+        private void OnColorChanged()
         {
             _previewCurr.style.backgroundColor = Color;
             UpdateHex();
             onColorChanged?.Invoke(Color);
         }
-       
 
-        void UpdateHueCursor(float h)
+
+        private void UpdateHueCursor(float h)
         {
             var pos = HueToLocalPos(h);
             
@@ -322,7 +334,7 @@ namespace RosettaUI.UIToolkit
         }
 
 
-        Vector2 HueToLocalPos(float h)
+        private Vector2 HueToLocalPos(float h)
         {
             var circleSize =_hueHandler.resolvedStyle.width; 
             var radius = (circleSize * 0.5f) - (_hueCircleThickness * 0.5f);
@@ -332,7 +344,7 @@ namespace RosettaUI.UIToolkit
                       + (Vector2.one * circleSize * 0.5f);
         }
 
-        float LocalPosToHue(Vector2 pos)
+        private float LocalPosToHue(Vector2 pos)
         {
             var circleSize =_hueHandler.resolvedStyle.width;
 
@@ -344,7 +356,7 @@ namespace RosettaUI.UIToolkit
         }
 
 
-        void UpdateSvCursor(float s, float v)
+        private void UpdateSvCursor(float s, float v)
         {
             var xy = new Vector2(s, v) * 2f - Vector2.one; //map: 0~1 > -1~1
 
@@ -364,7 +376,7 @@ namespace RosettaUI.UIToolkit
             cursorStyle.top = Length.Percent((1f - circleXY.y) * 100f);
         }
 
-        void UpdateSvDisk()
+        private void UpdateSvDisk()
         {
             if (_svTexture != null)
             {
@@ -372,17 +384,17 @@ namespace RosettaUI.UIToolkit
             }
         }
 
-        void UpdateHex()
+        private void UpdateHex()
         {
             _hex.value = ColorPickerHelper.ColorToHex(Color);
         }
-        
 
-        class SliderSet
+
+        private class SliderSet
         {
             private static readonly string USSClassNameTextureSlider = "rosettaui-texture-slider";
-            
-            static Vector3 Round(Vector3 value, int digit)
+
+            private static Vector3 Round(Vector3 value, int digit)
             {
                 var scale = Mathf.Pow(10f, digit);
                 var v = value * scale;
@@ -394,7 +406,7 @@ namespace RosettaUI.UIToolkit
                 ) / scale;
             }
 
-            static float Round(float value, int digit)
+            private static float Round(float value, int digit)
             {
                 var scale = Mathf.Pow(10f, digit);
                 return Mathf.Round(value * scale) / scale;
@@ -402,7 +414,7 @@ namespace RosettaUI.UIToolkit
 
             #region Type Define
 
-            enum SliderType
+            private enum SliderType
             {
                 Hsv,
                 Rgb
@@ -444,6 +456,12 @@ namespace RosettaUI.UIToolkit
                 set => _colorPicker.Hsv = value;
             }
 
+            public bool DisplayAlpha
+            {
+                get => _slider3.resolvedStyle.display != DisplayStyle.None;
+                set => _slider3.style.display = value ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+
             public SliderSet(ColorPicker colorPicker)
             {
                 _colorPicker = colorPicker;
@@ -466,6 +484,7 @@ namespace RosettaUI.UIToolkit
                     
                     SetSliderType(SliderType.Hsv);
                 });
+                return;
 
                 Slider InitSlider(string name, int idx, bool isTextureSlider)
                 {
@@ -510,7 +529,7 @@ namespace RosettaUI.UIToolkit
                 }
             }
 
-            static Texture2D InitSliderTexture(VisualElement slider)
+            private static Texture2D InitSliderTexture(VisualElement slider)
             {
                 var tracker = slider.Q("unity-tracker");
                 var tex = TextureUtility.CreateTexture(
@@ -570,7 +589,7 @@ namespace RosettaUI.UIToolkit
                 ColorPickerHelper.UpdateBSliderTexture(_sliderTexture2, color);
             }
 
-            void Set3SliderValuesWithoutNotify(Vector3 value)
+            private void Set3SliderValuesWithoutNotify(Vector3 value)
             {
                 var v = Round(value, TextDigit); // 数値表示が枠に収まるように端数を丸める
 
@@ -579,7 +598,7 @@ namespace RosettaUI.UIToolkit
                 _slider2.SetValueWithoutNotify(v.z);
             }
 
-            void UpdateViewAll()
+            private void UpdateViewAll()
             {
                 OnHsvChanged(true, true, true);
                 OnAlphaChanged();
@@ -592,7 +611,7 @@ namespace RosettaUI.UIToolkit
                 SetSliderType(newType);
             }
 
-            void SetSliderType(SliderType sliderType)
+            private void SetSliderType(SliderType sliderType)
             {
                 _sliderType = sliderType;
 

@@ -86,6 +86,8 @@ namespace RosettaUI.UIToolkit
             var localPos = _container.WorldToLocal(evt.position);
             var rect = _container.contentRect;
             
+            var updateTime = false;
+            
             // 左右ではみ出てもカーソル表示はキープ
             if (rect.min.y <= localPos.y && localPos.y <= rect.max.y)
             {
@@ -95,15 +97,28 @@ namespace RosettaUI.UIToolkit
                     ShowSwatch(_selectedSwatch);
                 }
                 
-                _selectedSwatch.Time = Mathf.Clamp01(localPos.x / rect.width);
+                updateTime = true;   
             }
             // 範囲外ではGradient的には削除するがセレクト状態は継続
             // 再度範囲内に戻った場合にColor/Alphaの値が復活する
+            // ただし、1つしかない場合は削除せずTimeを更新する
             else 
             {
-                HideSwatch(_selectedSwatch);
+                if ( _showedSwatches.Count > 1)
+                {
+                    HideSwatch(_selectedSwatch);
+                }
+                else
+                {
+                    updateTime = true;
+                }
             }
-            
+
+            if (updateTime)
+            {
+                _selectedSwatch.Time = Mathf.Clamp01(localPos.x / rect.width);
+            }
+
             OnSwatchChanged();
             evt.StopPropagation();
         }

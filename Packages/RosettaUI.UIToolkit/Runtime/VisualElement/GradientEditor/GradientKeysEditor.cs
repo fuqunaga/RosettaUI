@@ -14,11 +14,11 @@ namespace RosettaUI.UIToolkit
     {
         public static int MaxKeyNum { get; set; } = 8;
         
-        private readonly Gradient _gradient;
         private readonly VisualElement _container;
         private readonly List<GradientKeysSwatch> _showedSwatches = new();
         private readonly bool _isAlpha;
         
+        private Gradient _gradient;
         private GradientKeysSwatch _selectedSwatch;
         private readonly Action<GradientKeysSwatch> _onSwatchChanged;
         
@@ -40,6 +40,8 @@ namespace RosettaUI.UIToolkit
         
         public void Initialize(Gradient gradient, IEnumerable<GradientKeysSwatch> showedSwatches)
         {
+            _gradient = gradient;
+            
             _container.Clear();
             
             _showedSwatches.Clear();

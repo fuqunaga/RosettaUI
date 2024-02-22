@@ -34,7 +34,7 @@ jobs:
             @semantic-release/changelog@6
             @semantic-release/git
         extends: |
-            semantic-release-monorepo
+            semantic-release-monorepo@7.0.8
         dry_run: ${{ inputs && inputs.dry_run }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

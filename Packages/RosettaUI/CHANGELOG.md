@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.5.4](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.5.3...ga.fuquna.rosettaui-v1.5.4) (2024-02-22)
+
+
+### Bug Fixes
+
+* target unity version 2021.3 > 2022.3 ([2231b41](https://github.com/fuqunaga/RosettaUI/commit/2231b4170f04cf8ef1fa6e9673307a3781fc2b8d))
+
 # [ga.fuquna.rosettaui-v1.5.3](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.5.2...ga.fuquna.rosettaui-v1.5.3) (2024-02-22)
 
 

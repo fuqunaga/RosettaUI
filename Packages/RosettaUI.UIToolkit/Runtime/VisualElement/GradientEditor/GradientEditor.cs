@@ -78,6 +78,7 @@ namespace RosettaUI.UIToolkit
         private VisualElement _gradientPreview;
         private VisualElement _alphaCursorContainer;
         private VisualElement _colorCursorContainer;
+        private VisualElement _propertyGroup;
         private Slider _alphaSlider;
         private ColorField _colorField;
         private Slider _locationSlider;
@@ -107,6 +108,8 @@ namespace RosettaUI.UIToolkit
             _alphaCursorContainer = this.Q("alpha-cursor-container");
             _colorCursorContainer = this.Q("color-cursor-container");
 
+            _propertyGroup = this.Q("property-group");
+            
             _colorField = new ColorField("Color")
             {
                 EnableAlpha = false
@@ -160,8 +163,8 @@ namespace RosettaUI.UIToolkit
             InitAlphaKeysEditor();
             InitColorKeysEditor();
             InitGradientCode();
-
-            _selectedSwatch = _colorKeysEditor.ShowedSwatches.FirstOrDefault();
+            
+            UpdateSelectedSwatchField(_colorKeysEditor.ShowedSwatches.FirstOrDefault());
         }
 
         private static void InitPreviewBackground(VisualElement previewBackground)
@@ -248,17 +251,18 @@ namespace RosettaUI.UIToolkit
         {
             if (swatch == null)
             {
-                _colorField.visible = false;
-                _alphaSlider.visible = false;
+                _propertyGroup.visible = false;
                 _locationSlider.visible = false;
                 return;
             }
             
+            _propertyGroup.visible = true;
+            
             _selectedSwatch = swatch;
             var isAlpha = swatch.IsAlpha;
             
-            _alphaSlider.visible = isAlpha;
-            _colorField.visible = !isAlpha;
+            SetDisplay(_alphaSlider, isAlpha);
+            SetDisplay(_colorField, !isAlpha);
             
             if (isAlpha)
             {
@@ -271,6 +275,13 @@ namespace RosettaUI.UIToolkit
 
             _locationSlider.visible = true;
             _locationSlider.value = swatch.TimePercent;
+
+            return;
+            
+            void SetDisplay(VisualElement element, bool display)
+            {
+                element.style.display = display ? DisplayStyle.Flex : DisplayStyle.None;
+            }
         }
 
 

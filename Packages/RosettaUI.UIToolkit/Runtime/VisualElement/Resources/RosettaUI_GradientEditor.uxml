@@ -7,17 +7,19 @@
         </ui:VisualElement>
         <ui:VisualElement name="color-cursor-container" class="rosettaui-gradientpicker__gradient-group__alpha-cursors" style="flex-basis: auto; flex-grow: 0; flex-shrink: 0; height: 44px; margin-top: -8px;" />
     </ui:GroupBox>
-    <ui:VisualElement name="property-group" style="flex-grow: 0.1; background-color: rgba(0, 0, 0, 0); align-items: stretch; justify-content: flex-start; margin-left: 2px; margin-right: 2px; margin-top: 2px; margin-bottom: 2px;">
+    <ui:VisualElement name="property-group" style="background-color: rgba(0, 0, 0, 0); margin-top: 8px; margin-right: 4px; margin-bottom: 8px; margin-left: 4px; visibility: hidden;">
         <ui:VisualElement name="value-field-container" style="flex-grow: 1;">
-            <ui:Slider picking-mode="Ignore" label="Alpha" name="alpha-slider" high-value="1" show-input-field="true" style="visibility: hidden; display: flex;" />
+            <ui:Slider picking-mode="Ignore" label="Alpha" name="alpha-slider" high-value="1" show-input-field="true">
+                <ui:Label display-tooltip-when-elided="true" name="alpha-per-label" text="%" style="align-items: stretch; visibility: hidden;" />
+            </ui:Slider>
         </ui:VisualElement>
-        <ui:Slider picking-mode="Ignore" label="Location" value="0" high-value="100" name="location-slider" show-input-field="true" style="flex-shrink: 1;">
+        <ui:Slider picking-mode="Ignore" label="Location" value="0" high-value="100" name="location-slider" show-input-field="true">
             <ui:Label text="%" display-tooltip-when-elided="true" name="location-per-label" style="align-items: stretch;" />
         </ui:Slider>
-        <ui:GroupBox style="align-items: stretch; flex-direction: row; flex-grow: 0; flex-basis: auto; justify-content: flex-end;">
-            <ui:Label display-tooltip-when-elided="true" name="info-label" style="flex-grow: 1;" />
-            <ui:Button text="Copy" display-tooltip-when-elided="true" name="copy-button" />
-            <ui:Button text="Paste" display-tooltip-when-elided="true" name="paste-button" />
-        </ui:GroupBox>
     </ui:VisualElement>
+    <ui:GroupBox style="align-items: stretch; flex-direction: row; flex-grow: 0; flex-basis: auto; justify-content: flex-end;">
+        <ui:Label display-tooltip-when-elided="true" name="info-label" style="flex-grow: 1;" />
+        <ui:Button text="Copy" display-tooltip-when-elided="true" name="copy-button" />
+        <ui:Button text="Paste" display-tooltip-when-elided="true" name="paste-button" />
+    </ui:GroupBox>
 </ui:UXML>

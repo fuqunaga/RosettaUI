@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.5.3](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.5.2...ga.fuquna.rosettaui-v1.5.3) (2024-02-22)
+
+
+### Bug Fixes
+
+* add GradientHelper ([8906ba2](https://github.com/fuqunaga/RosettaUI/commit/8906ba23fd3ac12def54675b8a8cd6fc73e407e5))
+
 # [ga.fuquna.rosettaui-v1.5.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.5.1...ga.fuquna.rosettaui-v1.5.2) (2023-12-27)
 
 

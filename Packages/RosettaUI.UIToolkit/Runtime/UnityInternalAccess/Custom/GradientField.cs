@@ -11,16 +11,16 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         public new static readonly string labelUssClassName = ussClassName + "__label";
         public new static readonly string inputUssClassName = ussClassName + "__input";
 
-        static readonly GradientColorKey k_WhiteKeyBegin = new GradientColorKey(Color.white, 0);
-        static readonly GradientColorKey k_WhiteKeyEnd = new GradientColorKey(Color.white, 1);
-        static readonly GradientAlphaKey k_AlphaKeyBegin = new GradientAlphaKey(1, 0);
-        static readonly GradientAlphaKey k_AlphaKeyEnd = new GradientAlphaKey(1, 1);
+        private static readonly GradientColorKey k_WhiteKeyBegin = new(Color.white, 0);
+        private static readonly GradientColorKey k_WhiteKeyEnd = new(Color.white, 1);
+        private static readonly GradientAlphaKey k_AlphaKeyBegin = new(1, 0);
+        private static readonly GradientAlphaKey k_AlphaKeyEnd = new(1, 1);
 
         public event Action<Vector2, GradientField> showGradientPickerFunc;
 
         private bool _valueNull;
 
-        readonly Background m_DefaultBackground = new Background();
+        private readonly Background m_DefaultBackground = new();
 
         /// <summary>
         /// Constructor.
@@ -40,7 +40,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             RegisterCallback<NavigationSubmitEvent>(OnNavigationSubmit);
         }
 
-        void ShowGradientPicker(Vector2 position)
+        private void ShowGradientPicker(Vector2 position)
         {
             showGradientPickerFunc?.Invoke(position, this);
         }

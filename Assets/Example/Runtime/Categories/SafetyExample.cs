@@ -15,6 +15,7 @@ namespace RosettaUI.Example
             int? nullableInt = null;
             List<float> nullList = null;
             SimpleClass nullClass = null;
+            Gradient nullGradient = null;
 
             CircularReferenceClass circularReferenceClass = new();
             CircularReferenceClass circularReferenceClassOther = new();
@@ -27,6 +28,7 @@ namespace RosettaUI.Example
                     UI.Field(() => nullableInt),
                     UI.Field(() => nullClass),
                     UI.Field(() => nullList),
+                    UI.Field(() => nullGradient),
                     UI.Field(() => circularReferenceClass)
                 ),
                 ExampleTemplate.UIFunctionPage(nameof(UI.Slider),

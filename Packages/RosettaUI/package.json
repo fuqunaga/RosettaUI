@@ -3,7 +3,7 @@
   "version": "1.5.3",
   "displayName": "RosettaUI",
   "description": "Code-based GUI library for development menus for Unity",
-  "unity": "2021.2",
+  "unity": "2022.3",
   "keywords": [
     "unity",
     "ui"

@@ -8,7 +8,16 @@ namespace RosettaUI.UIToolkit.Builder
         // Subscribe element -> field
         public static void SubscribeValueOnUpdateCallOnce<T>(this ReadOnlyValueElement<T> element, INotifyValueChanged<T> field)
         {
-            element.GetViewBridge().SubscribeValueOnUpdateCallOnce(field.SetValueWithoutNotifyIfNotEqual);
+            // string以外の参照型は比較しても更新されたかわからないのでSetValueWithoutNotify()で常にfieldに値をセットする
+            // 値に応じて何かを更新するかどうかはfield側の実装に任せる
+            Action<T> action =  typeof(T).IsValueType switch 
+            {
+                true => field.SetValueWithoutNotifyIfNotEqual,
+                false when typeof(T) == typeof(string) => field.SetValueWithoutNotifyIfNotEqual,
+                false => field.SetValueWithoutNotify
+            };
+            
+            element.GetViewBridge().SubscribeValueOnUpdateCallOnce(action);
         }
         
         // Subscribe field -> element

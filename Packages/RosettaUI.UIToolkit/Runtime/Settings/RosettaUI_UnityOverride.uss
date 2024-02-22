@@ -46,7 +46,7 @@
 }
 
 .unity-base-text-field:disabled > .unity-base-field__input {
-    border-color: var(--unity-colors-input_field-border));
+    border-color: var(--unity-colors-input_field-border);
 }
 
  /* status なしのデフォルトでカーソル指定がないと hover の指定で warning メッセージが出る*/
@@ -88,7 +88,6 @@ Unity2022.2.0b6
 .unity-base-text-field__input--multiline {
     align-self: auto;
 }
-
 
 /********************************************************************************
 * toggle
@@ -194,9 +193,41 @@ Unity2022.2.0b6
     background-color: initial;
 }
 
+/********************************************************************************
+* enum field
+********************************************************************************/
+.unity-enum-field__input
+{
+    background-color: var(--rosettaui-color-input-background);
+    border-color: var(--unity-colors-input_field-border);
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.unity-enum-field:hover >.unity-enum-field__input
+{
+    border-color: var(--unity-colors-input_field-border-hover);
+}
+
+.unity-enum-field:focus >.unity-enum-field__input
+{
+    border-color: var(--unity-colors-input_field-border-focus);
+}
+
+
+.unity-enum-field:disabled >.unity-enum-field__input
+{
+    background-color: var(--rosettaui-color-input-background);
+    border-color: var(--unity-colors-input_field-border);
+}
+
+.unity-enum-field__arrow
+{
+    -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
+}
 
 /********************************************************************************
-* popup
+* popup / enum field
 ********************************************************************************/
 .unity-base-popup-field:hover >.unity-base-popup-field__input,
 .unity-base-popup-field:active >.unity-base-popup-field__input
@@ -215,7 +246,8 @@ Unity2022.2.0b6
     -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
 }
 
-.unity-base-popup-field__input{
+.unity-base-popup-field__input
+{
     padding-left: 4px;
     padding-right: 4px;
 }
@@ -232,9 +264,6 @@ Unity2022.2.0b6
 {
     -unity-background-image-tint-color: initial;
 }
-
-
-
 
 /********************************************************************************
 * box

@@ -14,13 +14,6 @@ namespace RosettaUI.Builder
 
         public static string svDiskMaterialPath = "SvDisk";
 
-        public static Texture2D CreateTexture(int width, int height, TextureFormat format = TextureFormat.RGBA32)
-        {
-            return new Texture2D(width, height, format, false)
-            {
-                wrapMode = TextureWrapMode.Clamp
-            };
-        }
 
         public static RenderTexture CreateRenderTexture(int width, int height) => 
             new(width, height, 0)
@@ -30,38 +23,9 @@ namespace RosettaUI.Builder
         
         #region CheckerBoard
 
-        static Texture2D _checkerBoardTexture;
+        private static Texture2D _checkerBoardTexture;
 
-        public static Texture2D CheckerBoardTexture => _checkerBoardTexture ??= CreateCheckerBoardTexture(defaultCheckerBoardSize, defaultCheckerBoardGridSize);
-
-        public static Texture2D CreateCheckerBoardTexture(Vector2Int size, int gridSize)
-            => CreateCheckerBoardTexture(size, gridSize, Color.white, Color.HSVToRGB(0f, 0f, 0.8f));
-        
-        static Texture2D CreateCheckerBoardTexture(Vector2Int size, int gridSize, Color col0, Color col1)
-        {
-            var tex = CreateTexture(size.x, size.y, TextureFormat.RGB24);
-            tex.filterMode = FilterMode.Point;
-            tex.wrapMode = TextureWrapMode.Repeat;
-
-            var colorArray = ArrayPool<Color>.Shared.Rent(size.x * size.y);
-            var colors = colorArray.AsSpan();
-
-            for (var y = 0; y < size.y; y++)
-            {
-                var flagY = ((y / gridSize) % 2 == 0);
-                for (var x = 0; x < size.x; x++)
-                {
-                    var flagX = ((x / gridSize) % 2 == 0);
-                    colors[x + y * size.x] = (flagX ^ flagY) ? col0 : col1;
-                }
-            }
-
-            tex.SetPixels(colorArray);
-            ArrayPool<Color>.Shared.Return(colorArray);
-
-            tex.Apply();
-            return tex;
-        }
+        public static Texture2D CheckerBoardTexture => _checkerBoardTexture ??= TextureUtility.CreateCheckerBoardTexture(defaultCheckerBoardSize, defaultCheckerBoardGridSize);
 
         #endregion
 
@@ -85,7 +49,7 @@ namespace RosettaUI.Builder
         {
             var thickness = circleThickness;
             
-            var tex = CreateTexture(size, size);
+            var tex = TextureUtility.CreateTexture(size, size);
 
             var sizeHalf = size / 2;
 

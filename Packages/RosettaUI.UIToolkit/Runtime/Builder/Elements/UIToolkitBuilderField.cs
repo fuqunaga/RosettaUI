@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UIElements;
+using RosettaUI.UIToolkit.UnityInternalAccess;
 
 namespace RosettaUI.UIToolkit.Builder
 {
@@ -18,26 +19,24 @@ namespace RosettaUI.UIToolkit.Builder
 
             return true;
         }
-   
 
-        private bool Bind_ColorField(Element element, VisualElement visualElement)
+        private bool Bind_GradientField(Element element, VisualElement visualElement)
         {
-            if (element is not FieldBaseElement<Color> colorElement || visualElement is not ColorField colorField) return false;
-
-            Bind_Field(colorElement, colorField, true);
+            if(element is not FieldBaseElement<Gradient> gradientElement || visualElement is not GradientField gradientField) return false;
             
-            colorField.showColorPickerFunc += ShowColorPicker;
-            element.GetViewBridge().onUnsubscribe += () => colorField.showColorPickerFunc -= ShowColorPicker;
-
+            Bind_Field(gradientElement, gradientField, true);
+            
+            gradientField.showGradientPickerFunc += ShowGradientPicker;
+            element.GetViewBridge().onUnsubscribe += () => gradientField.showGradientPickerFunc -= ShowGradientPicker;
+            
             return true;
             
-            
-            void ShowColorPicker(Vector2 pos, UnityInternalAccess.ColorField target)
+            void ShowGradientPicker(Vector2 pos, UnityInternalAccess.GradientField target)
             {
-                ColorPicker.Show(pos, target, colorField.value, color => colorField.value = color);
+                GradientEditor.Show(pos, target, gradientField.value, gradient => gradientField.value = gradient);
             }
         }
-
+        
         public bool Bind_Field<TValue, TField>(Element element, VisualElement visualElement)
             where TField : BaseField<TValue>, new()
         {

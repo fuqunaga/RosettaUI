@@ -34,6 +34,7 @@ namespace RosettaUI
                 IBinder<string> ib => new TextFieldElement(label, ib, option),
                 IBinder<bool> ib => new ToggleElement(label, ib),
                 IBinder<Color> ib => new ColorFieldElement(label, ib),
+                IBinder<Gradient> ib => UI.NullGuard(label, ib, () => new GradientFieldElement(label, ib)),
                 _ when valueType.IsEnum => CreateEnumElement(label, binder),
                 _ when TypeUtility.IsNullable(valueType) => CreateNullableFieldElement(label, binder, option),
                 _ when typeof(IElementCreator).IsAssignableFrom(valueType) => CreateElementCreatorElement(label, binder),

@@ -13,7 +13,13 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         protected ColorInput colorInput => (ColorInput)visualInput;
 
         public event Action<Vector2, ColorField> showColorPickerFunc;
-
+        
+        public bool EnableAlpha
+        {
+            get => colorInput.DisplayAlpha;
+            set => colorInput.DisplayAlpha = value;
+        }
+        
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -69,13 +75,20 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
 
         public class ColorInput : VisualElement
         {
-            public VisualElement rgbField;
-            public VisualElement alphaField;
-
             static readonly string ussFieldInputRGB = ussClassName + "__input-rgb";
             static readonly string ussFieldInputAlpha = ussClassName + "__input-alpha";
             static readonly string ussFieldInputAlphaContainer = ussClassName + "__input-alpha-container";
 
+            public readonly VisualElement rgbField;
+            public readonly VisualElement alphaField;
+            public readonly VisualElement alphaFieldContainer;
+
+            public bool DisplayAlpha
+            {
+                get => alphaFieldContainer.resolvedStyle.display != DisplayStyle.None;
+                set => alphaFieldContainer.style.display = value ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+            
             public ColorInput()
             {
                 pickingMode = PickingMode.Ignore;
@@ -84,7 +97,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
                 rgbField.AddToClassList(ussFieldInputRGB);
                 Add(rgbField);
 
-                var alphaFieldContainer = new VisualElement();
+                alphaFieldContainer = new VisualElement();
                 alphaFieldContainer.AddToClassList(ussFieldInputAlphaContainer);
                 Add(alphaFieldContainer);
 
@@ -93,6 +106,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
                 alphaFieldContainer.Add(alphaField);
             }
 
+ 
             public void SetColor(Color color)
             {
                 rgbField.style.backgroundColor = new Color(color.r, color.g, color.b, 1f);

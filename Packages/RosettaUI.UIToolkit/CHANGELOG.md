@@ -1,3 +1,15 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.5.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.4.1...ga.fuquna.rosettaui.uitoolkit-v1.5.0) (2024-02-22)
+
+
+### Bug Fixes
+
+* **dependency:** RosettaUI 1.4.2 ([60b47e8](https://github.com/fuqunaga/RosettaUI/commit/60b47e8dee9aa4b9fb696151340de375ecafe942))
+
+
+### Features
+
+* Support for Gradient class ([6c50d69](https://github.com/fuqunaga/RosettaUI/commit/6c50d6962297f582abff3f08e1cb24386b6dcd88))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.4.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.4.0...ga.fuquna.rosettaui.uitoolkit-v1.4.1) (2023-06-13)
 
 

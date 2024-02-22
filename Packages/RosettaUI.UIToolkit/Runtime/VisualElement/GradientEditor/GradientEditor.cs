@@ -9,7 +9,10 @@ namespace RosettaUI.UIToolkit
     public class GradientEditor : VisualElement
     {
         public static readonly string USSClassName = "rosettaui-gradient-editor";
-
+        
+        private static readonly Color CheckerBoardColorBlack = new(0.427451f, 0.427451f, 0.427451f); // #6D6D6D;
+        private static readonly Color CheckerBoardColorWhite = new(0.5960785f, 0.5960785f, 0.5960785f); // #989898;
+        
         
         #region static interface
 
@@ -175,7 +178,7 @@ namespace RosettaUI.UIToolkit
                 const int gridSize = 6;
                 var rs = previewBackground.resolvedStyle;
                 var size = new Vector2Int(Mathf.CeilToInt(rs.width),  Mathf.CeilToInt(rs.height));
-                _previewCheckerBoardTexture = TextureUtility.CreateCheckerBoardTexture(size, gridSize);
+                _previewCheckerBoardTexture = TextureUtility.CreateCheckerBoardTexture(size, gridSize, CheckerBoardColorWhite, CheckerBoardColorBlack);
             }   
             
             previewBackground.style.backgroundImage = _previewCheckerBoardTexture;

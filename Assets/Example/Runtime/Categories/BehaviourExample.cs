@@ -6,6 +6,7 @@ namespace RosettaUI.Example
     {
         public Element CreateElement(LabelElement _)
             => UI.Column(
+                UI.Label(nameof(BehaviourExample)),
                 UI.FieldReadOnly(() => name),
                 UI.FieldReadOnly(() => isActiveAndEnabled)
             );

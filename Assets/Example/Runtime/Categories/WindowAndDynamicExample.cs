@@ -15,6 +15,7 @@ namespace RosettaUI.Example
             
             return UI.Tabs(
                 CreateTabWindowLauncher(),
+                CreateTabWindowLauncherTabs(),
                 CreateTabFieldIfObjectFound(),
                 CreateTabDynamicElement()
             );
@@ -41,6 +42,31 @@ namespace RosettaUI.Example
     includeInactive: true
 );",
                     UI.WindowLauncher<BehaviourExample>(supportMultiple: true, includeInactive: true))
+            );
+        }
+        
+        private static (string, Element) CreateTabWindowLauncherTabs()
+        {
+            return ExampleTemplate.CodeElementSetsTab(ExampleTemplate.UIFunctionStr(nameof(UI.WindowLauncherTabs)),
+                (@"UI.WindowLauncherTabs(nameof(UI.WindowLauncherTabs),
+    typeof(BehaviourExample),
+    typeof(BehaviourAnotherExample)
+);
+",
+                    UI.WindowLauncherTabs(nameof(UI.WindowLauncherTabs), typeof(BehaviourExample), typeof(BehaviourAnotherExample))
+                ),
+                (@"UI.WindowLauncherTabs($""{nameof(UI.WindowLauncherTabs)} with options"",
+    supportMultiple: true,
+    includeInactive: true,
+    typeof(BehaviourExample),
+    typeof(BehaviourAnotherExample)
+);",
+                    UI.WindowLauncherTabs($"{nameof(UI.WindowLauncherTabs)} with options", 
+                        supportMultiple: true,
+                        includeInactive: true,
+                        typeof(BehaviourExample),
+                        typeof(BehaviourAnotherExample))
+                )
             );
         }
 

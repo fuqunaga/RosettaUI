@@ -9,6 +9,7 @@ namespace RosettaUI.UIToolkit
     {
         private class SliderSet
         {
+            // ReSharper disable once ConvertToConstant.Local
             private static readonly string USSClassNameTextureSlider = "rosettaui-texture-slider";
 
             private static Vector3 Round(Vector3 value, int digit)
@@ -245,11 +246,16 @@ namespace RosettaUI.UIToolkit
                         buttonText = "RGB";
                         SetSliderLabels("R", "G", "B", "A");
                         break;
+                    
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(sliderType), sliderType, null);
                 }
 
                 _sliderTypeButton.text = buttonText;
 
                 UpdateViewAll();
+                
+                return;
 
                 void SetSliderLabels(string label0, string label1, string label2, string label3)
                 {

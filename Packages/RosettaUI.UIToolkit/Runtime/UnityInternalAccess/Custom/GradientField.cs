@@ -22,6 +22,38 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
 
         private readonly Background m_DefaultBackground = new();
 
+
+        public override Gradient value
+        {
+            get
+            {
+                if (_valueNull) return null;
+
+                return GradientCopy(rawValue);
+            }
+            set
+            {
+                if (value != null || !_valueNull) // let's not reinitialize an initialized gradient
+                {
+                    using (ChangeEvent<Gradient> evt = ChangeEvent<Gradient>.GetPooled(rawValue, value))
+                    {
+                        evt.target = this;
+                        SetValueWithoutNotify(value);
+                        SendEvent(evt);
+                    }
+                }
+            }
+        }
+
+        internal static Gradient GradientCopy(Gradient other)
+        {
+            Gradient gradientCopy = new Gradient();
+            gradientCopy.colorKeys = other.colorKeys;
+            gradientCopy.alphaKeys = other.alphaKeys;
+            gradientCopy.mode = other.mode;
+            return gradientCopy;
+        }
+
         /// <summary>
         /// Constructor.
         /// </summary>

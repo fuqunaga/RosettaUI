@@ -1,3 +1,13 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.5.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.5.0...ga.fuquna.rosettaui.uitoolkit-v1.5.1) (2024-02-26)
+
+
+### Bug Fixes
+
+* add GradientHelper ([8906ba2](https://github.com/fuqunaga/RosettaUI/commit/8906ba23fd3ac12def54675b8a8cd6fc73e407e5))
+* GradientField notify on value changed ([284601b](https://github.com/fuqunaga/RosettaUI/commit/284601bfd7b637b8b146442122dda97c529ddcc2))
+* S changes when V is edited in the color picker [#27](https://github.com/fuqunaga/RosettaUI/issues/27) ([30f7053](https://github.com/fuqunaga/RosettaUI/commit/30f705363b1c4a5a7ff715549a7824eab13efe71))
+* target unity version 2021.3 > 2022.3 ([2231b41](https://github.com/fuqunaga/RosettaUI/commit/2231b4170f04cf8ef1fa6e9673307a3781fc2b8d))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.5.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.4.1...ga.fuquna.rosettaui.uitoolkit-v1.5.0) (2024-02-22)
 
 

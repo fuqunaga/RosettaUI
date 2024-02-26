@@ -10,7 +10,7 @@ namespace RosettaUI
     {
         public static Element CreateFieldElement(LabelElement label, IBinder binder, in FieldOption option)
         {
-            var valueType = binder.ValueType;
+            var valueType = binder.GetObject()?.GetType() ??  binder.ValueType;
 
             if (BinderHistory.IsCircularReference(binder))
             {

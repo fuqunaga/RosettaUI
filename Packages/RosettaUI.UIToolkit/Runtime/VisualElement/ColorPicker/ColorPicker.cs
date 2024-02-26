@@ -386,7 +386,7 @@ namespace RosettaUI.UIToolkit
 
         private void UpdateHex()
         {
-            _hex.value = ColorPickerHelper.ColorToHex(Color);
+            _hex.SetValueWithoutNotify(ColorPickerHelper.ColorToHex(Color));
         }
     }
 }

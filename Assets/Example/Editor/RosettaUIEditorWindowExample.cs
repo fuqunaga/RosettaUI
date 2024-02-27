@@ -24,12 +24,7 @@ public class RosettaUIEditorWindowExample : RosettaUIEditorWindowUIToolkit
             types.Select(type =>
             {
                 var tabName = type.ToString().Split('.').Last();
-
-                return Tab.Create(tabName, () =>
-                {
-                    var obj = FindObjectOfType(type, true);
-                    return UI.Field(() => obj);
-                });
+                return Tab.Create(tabName, () => UI.FieldIfObjectFound(type, false, true));
             }).Concat(new[]{CreateUIEditorTab()})
         );
     }

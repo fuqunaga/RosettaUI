@@ -37,8 +37,12 @@ namespace RosettaUI
         private readonly Dictionary<int, Element> _itemIndexToElement = new();
         private readonly Dictionary<int, ElementState> _itemIndexToElementState = new();
         private int _lastListItemCount;
+        private IList _lastList;
+        
         private event Action<IList> onListChanged;
 
+        private IList CurrentList => ListBinder.GetIList(_binder);
+        
         public int ListItemCount
         {
             get => ListBinder.GetCount(_binder);
@@ -71,13 +75,13 @@ namespace RosettaUI
             
             _binderTypeHistorySnapshot = BinderHistory.Snapshot.Create();
 
+            _lastList = CurrentList;
             _lastListItemCount = ListItemCount;
         }
 
         protected override void UpdateInternal()
         {
-            var listItemCount = ListItemCount;
-            if (_lastListItemCount != listItemCount)
+            if (_lastListItemCount != ListItemCount || !ReferenceEquals(_lastList, CurrentList))
             {
                 StoreElementStateAll();
                 RemoveItemElementAll();
@@ -89,8 +93,9 @@ namespace RosettaUI
 
         protected void NotifyListChangedToView()
         {
+            _lastList = CurrentList;
             _lastListItemCount = ListItemCount;
-            onListChanged?.Invoke(ListBinder.GetIList(_binder));
+            onListChanged?.Invoke(CurrentList);
         }
 
         public Element GetItemElementAt(int index)

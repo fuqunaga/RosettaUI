@@ -1,3 +1,15 @@
+# [ga.fuquna.rosettaui-v1.6.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.5.4...ga.fuquna.rosettaui-v1.6.0) (2024-02-28)
+
+
+### Bug Fixes
+
+* incorrect behavior of ListView when the reference of List is changed. ([454a185](https://github.com/fuqunaga/RosettaUI/commit/454a185d67769e34c20af1fface1e11ce9b3d36c))
+
+
+### Features
+
+* add UI.WindowLauncherTabs ([01e5ebc](https://github.com/fuqunaga/RosettaUI/commit/01e5ebcf29b5bd6cd3aa911fd33ce755b1d367dc))
+
 # [ga.fuquna.rosettaui-v1.5.4](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.5.3...ga.fuquna.rosettaui-v1.5.4) (2024-02-22)
 
 

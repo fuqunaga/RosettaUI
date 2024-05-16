@@ -8,6 +8,10 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
     {
         public static object Generate(IEnumerable<MenuItem> menuItems, Rect position, VisualElement targetElement = null, bool anchored = false)
         {
+#if UNITY_2021_2_OR_NEWER
+            // TODO: Implement for Unity 2022.1 or newer
+            return null;
+#else
             if (menuItems == null) return null;
 
             // refs: BasePopupField
@@ -27,6 +31,7 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             menu.DropDown(position, targetElement, anchored);
 
             return menu;
+#endif
         }
     }
 }

@@ -2,17 +2,17 @@ using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace RosettaUI.UIToolkit.UnityInternalAccess
+namespace RosettaUI.UIToolkit
 {
-    public class ColorField : BaseField<Color>
+    public class ColorFieldBase : BaseField<Color>
     {
         public new static readonly string ussClassName = "rosettaui-color-field";
         public new static readonly string labelUssClassName = ussClassName + "__label";
         public new static readonly string inputUssClassName = ussClassName + "__input";
-        
-        protected ColorInput colorInput => (ColorInput)visualInput;
 
-        public event Action<Vector2, ColorField> showColorPickerFunc;
+        protected ColorInput colorInput;
+
+        public event Action<Vector2, ColorFieldBase> showColorPickerFunc;
         
         public bool EnableAlpha
         {
@@ -23,15 +23,16 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         /// <summary>
         /// Constructor.
         /// </summary>
-        public ColorField() : this(null) { }
+        public ColorFieldBase() : this(null) { }
 
-        public ColorField(string label) : base(label, new ColorInput())
+        public ColorFieldBase(string label) : base(label, new ColorInput())
         {
+            colorInput = (ColorInput)this[0];
             AddToClassList(ussClassName);
             labelElement.AddToClassList(labelUssClassName);
             
-            visualInput.AddToClassList(inputUssClassName);
-            visualInput.RegisterCallback<ClickEvent>(OnClickInput);
+            colorInput.AddToClassList(inputUssClassName);
+            colorInput.RegisterCallback<ClickEvent>(OnClickInput);
             RegisterCallback<NavigationSubmitEvent>(OnNavigationSubmit);
         }
 

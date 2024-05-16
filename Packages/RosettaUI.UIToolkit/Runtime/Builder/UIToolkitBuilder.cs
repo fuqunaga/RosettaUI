@@ -1,10 +1,24 @@
 using System;
 using System.Collections.Generic;
 using RosettaUI.Builder;
+
+#if !UNITY_2022_1_OR_NEWER
 using RosettaUI.UIToolkit.UnityInternalAccess;
+#endif
+
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.UIElements;
+
+#if UNITY_2023_1_OR_NEWER
+
+using UIntField = UnityEngine.UIElements.UnsignedIntegerField;
+// TODO: support ClampFree
+using ClampFreeSliderInt = UnityEngine.UIElements.SliderInt;
+using ClampFreeSlider = UnityEngine.UIElements.Slider;
+
+using ListViewCustom = UnityEngine.UIElements.ListView;
+
+#endif
 
 #if UNITY_2022_1_OR_NEWER
 

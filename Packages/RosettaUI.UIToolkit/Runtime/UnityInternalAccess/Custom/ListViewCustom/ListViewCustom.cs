@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !UNITY_2023_1_OR_NEWER
+
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -49,3 +51,5 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         #endregion
     }
 }
+
+#endif

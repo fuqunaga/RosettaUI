@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    public class ColorField : UnityInternalAccess.ColorField
+    public class ColorField : ColorFieldBase
     {
         public static readonly string OverlapTextUssClassName = ussClassName + "__overlap-text";
         public static readonly string OverlapTextLightUssClassName = OverlapTextUssClassName + "--light";
@@ -27,7 +27,7 @@ namespace RosettaUI.UIToolkit
             showColorPickerFunc += ShowColorPicker;
             return;
 
-            void ShowColorPicker(Vector2 pos, UnityInternalAccess.ColorField target)
+            void ShowColorPicker(Vector2 pos, ColorFieldBase target)
             {
                 ColorPicker.Show(pos, target, value, color => value = color, EnableAlpha);
             }

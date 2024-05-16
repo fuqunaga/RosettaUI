@@ -1,3 +1,5 @@
+#if !UNITY_2023_1_OR_NEWER
+
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -25,3 +27,5 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         }
     }
 }
+
+#endif

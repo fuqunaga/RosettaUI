@@ -1,4 +1,4 @@
-.unity-base-field:focus > .unity-base-field__label {
+.unity-base-field:focus:enabled > .unity-base-field__label {
     color: var(--unity-colors-highlight-text);
 }
 

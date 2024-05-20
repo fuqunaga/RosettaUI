@@ -27,7 +27,7 @@ namespace RosettaUI.UIToolkit
 
         public ColorFieldBase(string label) : base(label, new ColorInput())
         {
-            colorInput = (ColorInput)this[0];
+            colorInput = this.Q<ColorInput>();
             AddToClassList(ussClassName);
             labelElement.AddToClassList(labelUssClassName);
             

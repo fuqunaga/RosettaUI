@@ -67,7 +67,7 @@ namespace RosettaUI.UIToolkit
         /// </summary>
         public GradientField(string label) : base(label, new GradientInput())
         {
-            _gradientInput = (GradientInput)this[0];
+            _gradientInput = this.Q<GradientInput>();
             AddToClassList(ussClassName);
             labelElement.AddToClassList(labelUssClassName);
 

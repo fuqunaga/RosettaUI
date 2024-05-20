@@ -230,7 +230,9 @@ Unity2022.2.0b6
 * popup / enum field
 ********************************************************************************/
 .unity-base-popup-field:hover >.unity-base-popup-field__input,
-.unity-base-popup-field:active >.unity-base-popup-field__input
+.unity-base-popup-field:active >.unity-base-popup-field__input,
+.unity-base-popup-field:hover:enabled >.unity-base-popup-field__input,
+.unity-base-popup-field:active:enabled >.unity-base-popup-field__input
 {
     background-color: var(--rosettaui-color-input-background);
 }

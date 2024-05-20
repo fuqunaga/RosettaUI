@@ -7,10 +7,6 @@ namespace RosettaUI.UIToolkit
 {
     public class GradientField : BaseField<Gradient>
     {
-        public new class UxmlFactory : UxmlFactory<GradientField, UxmlTraits>
-        {
-        }
-
         public new static readonly string ussClassName = "rosettaui-gradient-field";
         public new static readonly string labelUssClassName = ussClassName + "__label";
         public new static readonly string inputUssClassName = ussClassName + "__input";

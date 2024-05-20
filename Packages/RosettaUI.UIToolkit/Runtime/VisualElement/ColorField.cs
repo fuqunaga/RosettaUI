@@ -11,8 +11,6 @@ namespace RosettaUI.UIToolkit
 
         public TextElement OverlapTextElement { get; protected set; }
         
-        public new class UxmlFactory : UxmlFactory<ColorField, UxmlTraits> { }
-        
         public ColorField() : this(null) { }
         
         public ColorField(string label) : base(label)

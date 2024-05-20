@@ -262,8 +262,13 @@ Unity2022.2.0b6
     background-color: var(--unity-colors-dropdown-background);
     border-color: var(--unity-colors-dropdown-border);
 }
-.unity-base-dropdown__checkmark
+.unity-base-dropdown__checkmark,
+.unity-base-dropdown__item:checked > .unity-base-dropdown__checkmark
 {
+    margin: 5px;
+    width: 24px;
+    height: 24px;
+    align-self: center;
     -unity-background-image-tint-color: initial;
 }
 

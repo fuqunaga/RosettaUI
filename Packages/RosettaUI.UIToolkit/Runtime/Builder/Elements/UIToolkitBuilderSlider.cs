@@ -11,38 +11,22 @@ namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
-        private bool Bind_Slider2<TValue>(Element element, VisualElement visualElement)
-            where TValue : IComparable<TValue>
-            // where TSliderAndField : SliderInField, new()
-        {
-            if (element is not SliderElement<TValue> sliderElement || visualElement is not SliderInField sliderInField) return false;
-
-            // sliderInField.Slider = sliderElement.showInputField;
-            
-            // BindRangeFieldElement(sliderElement,
-            //     (min) => sliderInField.Slider.lowValue = min,
-            //     (max) => sliderInField.Slider.highValue = max
-            // );
-            //
-            Bind_Field<float, SliderInField>(sliderElement, sliderInField);
-
-            return true;
-        }
-        
         private bool Bind_Slider<TValue, TSlider>(Element element, VisualElement visualElement)
             where TValue : IComparable<TValue>
-            where TSlider : BaseSlider<TValue>, new()
+            where TSlider : BaseField<TValue>, IClampFreeSlider<TValue>, new()
         {
-            if (element is not SliderElement<TValue> sliderElement || visualElement is not TSlider slider) return false;
+            if (element is not SliderElement<TValue> sliderElement || visualElement is not TSlider sliderInField) return false;
 
-            slider.showInputField = sliderElement.showInputField;
-            
+            sliderInField.SetShowInputField(sliderElement.showInputField);
+
             BindRangeFieldElement(sliderElement,
-                (min) => slider.lowValue = min,
-                (max) => slider.highValue = max
+                (min) => sliderInField.Slider.lowValue = min,
+                (max) => sliderInField.Slider.highValue = max
             );
             
-            return Bind_Field<TValue, TSlider>(element, visualElement);
+            Bind_Field<TValue, TSlider>(sliderElement, sliderInField);
+
+            return true;
         }
 
         private bool Bind_MinMaxSlider<TValue, TTextField>(Element element, VisualElement visualElement)

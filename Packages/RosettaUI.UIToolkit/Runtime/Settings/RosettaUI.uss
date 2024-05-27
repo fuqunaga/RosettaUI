@@ -284,6 +284,21 @@
     background-color: white;
 }
 
+/********************************************************************************
+* SliderInField
+********************************************************************************/
+.rosettaui-slider-in-field > .unity-base-slider--horizontal
+{
+    flex-grow: 1;
+}
+
+.rosettaui-slider-in-field > .unity-base-text-field__input
+{
+    width: var(--fixed-field-width-m);
+    min-width: var(--fixed-field-width-m);
+    flex-grow: 0;
+}
+
 
 /********************************************************************************
 * Window Launcher

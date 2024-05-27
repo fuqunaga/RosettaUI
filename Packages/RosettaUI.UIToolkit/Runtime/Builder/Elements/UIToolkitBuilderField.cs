@@ -47,7 +47,7 @@ namespace RosettaUI.UIToolkit.Builder
         }
 
         private void Bind_Field<TValue, TField>(FieldBaseElement<TValue> element, TField field, bool labelEnable)
-            where TField : BaseField<TValue>, new()
+            where TField : BaseField<TValue>
         {
             element.Bind(field);
 

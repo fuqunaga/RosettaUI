@@ -339,7 +339,7 @@ Unity2022.2.0b6
 /********************************************************************************
 * slider
 ********************************************************************************/
-.unity-base-slider__input{
+.unity-base-slider__input {
     border-width: 0;
 }
 
@@ -366,13 +366,6 @@ Unity2022.2.0b6
     min-width: var(--slider-min-width);
 }
 
-/* cancel unity default */
-.unity-base-slider--horizontal .unity-base-slider__text-field
-{
-    width: var(--fixed-field-width-m);
-    height: auto;
-    flex-grow: 0;
-}
 
 /********************************************************************************
 * min max slider

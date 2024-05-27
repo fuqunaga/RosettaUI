@@ -11,6 +11,24 @@ namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
     {
+        private bool Bind_Slider2<TValue>(Element element, VisualElement visualElement)
+            where TValue : IComparable<TValue>
+            // where TSliderAndField : SliderInField, new()
+        {
+            if (element is not SliderElement<TValue> sliderElement || visualElement is not SliderInField sliderInField) return false;
+
+            // sliderInField.Slider = sliderElement.showInputField;
+            
+            // BindRangeFieldElement(sliderElement,
+            //     (min) => sliderInField.Slider.lowValue = min,
+            //     (max) => sliderInField.Slider.highValue = max
+            // );
+            //
+            Bind_Field<float, SliderInField>(sliderElement, sliderInField);
+
+            return true;
+        }
+        
         private bool Bind_Slider<TValue, TSlider>(Element element, VisualElement visualElement)
             where TValue : IComparable<TValue>
             where TSlider : BaseSlider<TValue>, new()

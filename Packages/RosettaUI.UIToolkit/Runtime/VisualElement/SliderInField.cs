@@ -13,12 +13,30 @@ namespace RosettaUI.UIToolkit
         private const string UssClassName = "rosettaui-slider-in-field";
         
         public Slider Slider { get; }
+        public VisualElement InputField { get; }
+
+        public bool ShowInputField
+        {
+            get => InputField.style.display == DisplayStyle.Flex;
+            set => InputField.style.display = value ? DisplayStyle.Flex : DisplayStyle.None;
+        }
         
         public SliderInField()
         {
             AddToClassList(UssClassName);
+            InputField = this.Q<TextValueInput>();
             
             Slider = new Slider();
+            
+            // 矢印キーでスライダーを動かしたときにフォーカスも左右のエレメントに移動するのを抑制
+            Slider.RegisterCallback<NavigationMoveEvent>(evt =>
+            {
+                if (evt.direction is NavigationMoveEvent.Direction.Left or NavigationMoveEvent.Direction.Right)
+                {
+                    evt.StopPropagationAndFocusControllerIgnoreEvent();
+                }
+            });
+            
             Insert(0, Slider);
         }
 

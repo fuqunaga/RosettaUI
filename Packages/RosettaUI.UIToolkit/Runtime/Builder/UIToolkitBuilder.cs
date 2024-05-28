@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using RosettaUI.Builder;
 
-#if !UNITY_2022_1_OR_NEWER
+#if !UNITY_2023_1_OR_NEWER
 using RosettaUI.UIToolkit.UnityInternalAccess;
 #endif
 
@@ -11,15 +11,7 @@ using UnityEngine.UIElements;
 
 #if UNITY_2023_1_OR_NEWER
 
-using UIntField = UnityEngine.UIElements.UnsignedIntegerField;
 using ListViewCustom = UnityEngine.UIElements.ListView;
-
-#endif
-
-#if UNITY_2022_1_OR_NEWER
-
-using IntegerField = UnityEngine.UIElements.IntegerField;
-using FloatField = UnityEngine.UIElements.FloatField;
 
 #endif
 
@@ -65,7 +57,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(GradientFieldElement)] = BuildBindFunc<GradientField>.Create(Bind_GradientField),
                 [typeof(FloatFieldElement)] = BuildBindFunc<FloatField>.Create(Bind_Field<float, FloatField>),
                 [typeof(IntFieldElement)] = BuildBindFunc<IntegerField>.Create(Bind_Field<int, IntegerField>),
-                [typeof(UIntFieldElement)] = BuildBindFunc<UIntField>.Create(Bind_Field<uint, UIntField>),
+                [typeof(UIntFieldElement)] = BuildBindFunc<UnsignedIntegerField>.Create(Bind_Field<uint, UnsignedIntegerField>),
                 [typeof(TextFieldElement)] =  BuildBindFunc<TextField>.Create(Bind_TextField),
 
                 [typeof(IntSliderElement)] = BuildBindFunc<ClampFreeSliderInteger>.Create(Bind_Slider<int, ClampFreeSliderInteger>),

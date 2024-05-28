@@ -3,16 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UIElements;
 
-#if !UNITY_2023_1_OR_NEWER
-
-using RosettaUI.UIToolkit.UnityInternalAccess;
-
-#else
-
-using ListViewCustom = UnityEngine.UIElements.ListView;
-
-#endif
-
 namespace RosettaUI.UIToolkit.Builder
 {
     public partial class UIToolkitBuilder
@@ -20,7 +10,7 @@ namespace RosettaUI.UIToolkit.Builder
         private bool Bind_ListViewItemContainer(Element element, VisualElement visualElement)
         {
             if (element is not ListViewItemContainerElement itemContainerElement ||
-                visualElement is not ListViewCustom listView) return false;
+                visualElement is not ListView listView) return false;
             
             var option = itemContainerElement.option;           
             var viewBridge = itemContainerElement.GetViewBridge();

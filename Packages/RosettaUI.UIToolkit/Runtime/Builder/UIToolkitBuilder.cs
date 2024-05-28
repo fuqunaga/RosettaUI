@@ -1,20 +1,8 @@
 using System;
 using System.Collections.Generic;
 using RosettaUI.Builder;
-
-#if !UNITY_2023_1_OR_NEWER
-using RosettaUI.UIToolkit.UnityInternalAccess;
-#endif
-
 using UnityEngine;
 using UnityEngine.UIElements;
-
-#if UNITY_2023_1_OR_NEWER
-
-using ListViewCustom = UnityEngine.UIElements.ListView;
-
-#endif
-
 
 namespace RosettaUI.UIToolkit.Builder
 {
@@ -44,7 +32,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(FoldElement)] = BuildBindFunc<FoldoutCustom>.Create(Bind_Fold),
                 [typeof(HelpBoxElement)] = BuildBindFunc<HelpBox>.Create(Bind_HelpBox),
                 [typeof(IndentElement)] = BuildBindFunc<Indent>.Create(Bind_Indent),
-                [typeof(ListViewItemContainerElement)] = BuildBindFunc<ListViewCustom>.Create(Bind_ListViewItemContainer),
+                [typeof(ListViewItemContainerElement)] = BuildBindFunc<ListView>.Create(Bind_ListViewItemContainer),
                 [typeof(PageElement)] = BuildBindFunc<Column>.Create(Bind_ElementGroup<PageElement, Column>),
                 [typeof(PopupMenuElement)] = BuildBindFunc<PopupMenu>.Create(Bind_PopupMenu),
                 [typeof(RowElement)] = BuildBindFunc<Row>.Create(Bind_ElementGroup<RowElement, Row>),

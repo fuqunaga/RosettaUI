@@ -81,14 +81,6 @@ namespace RosettaUI.UIToolkit
             showGradientPickerFunc?.Invoke(position, this);
         }
 
-#if !UNITY_2023_1_OR_NEWER
-        internal override void OnViewDataReady()
-        {
-            base.OnViewDataReady();
-            UpdateGradientTexture();
-        }
-#endif
-
         private void UpdateGradientTexture()
         {
             if (_valueNull || showMixedValue)
@@ -99,9 +91,9 @@ namespace RosettaUI.UIToolkit
             {
                 _gradientInput.style.backgroundImage =
                     GradientHelper.GenerateGradientPreview(value, _gradientInput.style.backgroundImage.value.texture);
-#if !UNITY_2023_1_OR_NEWER
-                IncrementVersion(VersionChangeType.Repaint); // since the Texture2D object can be reused, force dirty because the backgroundImage change will only trigger the Dirty if the Texture2D objects are different.
-#endif
+// #if !UNITY_2023_1_OR_NEWER
+//                 IncrementVersion(VersionChangeType.Repaint); // since the Texture2D object can be reused, force dirty because the backgroundImage change will only trigger the Dirty if the Texture2D objects are different.
+// #endif
             }
         }
 

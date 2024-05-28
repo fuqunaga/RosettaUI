@@ -42,7 +42,8 @@ namespace RosettaUI.Example
                         )
                     )
                 ),
-                (@"UI.WindowLauncher(
+                (@"// Display UI of objects that found by FindObjectByType()
+UI.WindowLauncher(
     typeof(BehaviorExample),
     typeof(BehaviorAnotherExample)
 );

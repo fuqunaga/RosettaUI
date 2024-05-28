@@ -1,4 +1,6 @@
 ﻿#if !UNITY_2022_2_OR_NEWER
+
+#if !UNITY_2022_2_OR_NEWER
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -91,3 +93,5 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
 #endif
         
 }
+
+#endif

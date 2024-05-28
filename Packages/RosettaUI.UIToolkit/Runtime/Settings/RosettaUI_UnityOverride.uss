@@ -1,4 +1,4 @@
-.unity-base-field:focus > .unity-base-field__label {
+.unity-base-field:focus:enabled > .unity-base-field__label {
     color: var(--unity-colors-highlight-text);
 }
 
@@ -230,7 +230,9 @@ Unity2022.2.0b6
 * popup / enum field
 ********************************************************************************/
 .unity-base-popup-field:hover >.unity-base-popup-field__input,
-.unity-base-popup-field:active >.unity-base-popup-field__input
+.unity-base-popup-field:active >.unity-base-popup-field__input,
+.unity-base-popup-field:hover:enabled >.unity-base-popup-field__input,
+.unity-base-popup-field:active:enabled >.unity-base-popup-field__input
 {
     background-color: var(--rosettaui-color-input-background);
 }
@@ -260,8 +262,13 @@ Unity2022.2.0b6
     background-color: var(--unity-colors-dropdown-background);
     border-color: var(--unity-colors-dropdown-border);
 }
-.unity-base-dropdown__checkmark
+.unity-base-dropdown__checkmark,
+.unity-base-dropdown__item:checked > .unity-base-dropdown__checkmark
 {
+    margin: 5px;
+    width: 24px;
+    height: 24px;
+    align-self: center;
     -unity-background-image-tint-color: initial;
 }
 
@@ -332,7 +339,7 @@ Unity2022.2.0b6
 /********************************************************************************
 * slider
 ********************************************************************************/
-.unity-base-slider__input{
+.unity-base-slider__input {
     border-width: 0;
 }
 
@@ -359,13 +366,6 @@ Unity2022.2.0b6
     min-width: var(--slider-min-width);
 }
 
-/* cancel unity default */
-.unity-base-slider--horizontal .unity-base-slider__text-field
-{
-    width: var(--fixed-field-width-m);
-    height: auto;
-    flex-grow: 0;
-}
 
 /********************************************************************************
 * min max slider

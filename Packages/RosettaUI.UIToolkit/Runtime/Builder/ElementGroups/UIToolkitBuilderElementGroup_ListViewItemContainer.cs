@@ -1,8 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using RosettaUI.UIToolkit.UnityInternalAccess;
 using UnityEngine.UIElements;
+
+#if !UNITY_2023_1_OR_NEWER
+
+using RosettaUI.UIToolkit.UnityInternalAccess;
+
+#else
+
+using ListViewCustom = UnityEngine.UIElements.ListView;
+
+#endif
 
 namespace RosettaUI.UIToolkit.Builder
 {
@@ -17,6 +26,7 @@ namespace RosettaUI.UIToolkit.Builder
             var viewBridge = itemContainerElement.GetViewBridge();
             var itemsSource = viewBridge.GetIList();
 
+            listView.SetViewController(new ListViewControllerCustom());
             listView.virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight; //　これだけ定数
             listView.reorderable = option.reorderable;
             listView.reorderMode = option.reorderable ? ListViewReorderMode.Animated : ListViewReorderMode.Simple;

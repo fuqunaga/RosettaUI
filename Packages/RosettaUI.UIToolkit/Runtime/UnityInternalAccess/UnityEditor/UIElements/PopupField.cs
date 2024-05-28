@@ -1,3 +1,5 @@
+#if !UNITY_2022_1_OR_NEWER
+
 using System;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
@@ -153,3 +155,5 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         private void ChangeValueFromMenu(T menuItem) => this.value = menuItem;
     }
 }
+
+#endif

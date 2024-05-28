@@ -1,3 +1,5 @@
+#if !UNITY_2022_1_OR_NEWER
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -164,3 +166,5 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
         }
     }
 }
+
+#endif

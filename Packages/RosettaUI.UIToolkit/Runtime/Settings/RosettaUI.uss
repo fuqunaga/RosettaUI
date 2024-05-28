@@ -284,6 +284,21 @@
     background-color: white;
 }
 
+/********************************************************************************
+* SliderInField
+********************************************************************************/
+.rosettaui-slider-in-field > .unity-base-slider--horizontal
+{
+    flex-grow: 1;
+}
+
+.rosettaui-slider-in-field > .unity-base-text-field__input
+{
+    width: var(--fixed-field-width-m);
+    min-width: var(--fixed-field-width-m);
+    flex-grow: 0;
+}
+
 
 /********************************************************************************
 * Window Launcher
@@ -310,13 +325,12 @@
     border-width: 0;
 }
 
-.rosettaui-window-launcher .unity-toggle__checkmark,
-.rosettaui-window-launcher .unity-toggle__input:focus .unity-toggle__checkmark,
-.rosettaui-window-launcher .unity-toggle__input:hover .unity-toggle__checkmark,
-.rosettaui-window-launcher .unity-toggle__input:checked .unity-toggle__checkmark,
-.rosettaui-window-launcher .unity-toggle__input:hover:checked .unity-toggle__checkmark,
-.rosettaui-window-launcher .unity-toggle__input:focus:checked .unity-toggle__checkmark 
+.rosettaui-window-launcher__checkmark
 {
+    align-self: center;
+    width: 24px;
+    height: 24px;
+    border-width: 2px;
     -unity-background-image-tint-color: darkgray;
     background-image: resource("open-in-new");
     background-color: transparent;

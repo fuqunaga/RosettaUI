@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UIElements;
-using RosettaUI.UIToolkit.UnityInternalAccess;
 
 namespace RosettaUI.UIToolkit.Builder
 {
@@ -31,7 +30,7 @@ namespace RosettaUI.UIToolkit.Builder
             
             return true;
             
-            void ShowGradientPicker(Vector2 pos, UnityInternalAccess.GradientField target)
+            void ShowGradientPicker(Vector2 pos, GradientField target)
             {
                 GradientEditor.Show(pos, target, gradientField.value, gradient => gradientField.value = gradient);
             }
@@ -48,7 +47,7 @@ namespace RosettaUI.UIToolkit.Builder
         }
 
         private void Bind_Field<TValue, TField>(FieldBaseElement<TValue> element, TField field, bool labelEnable)
-            where TField : BaseField<TValue>, new()
+            where TField : BaseField<TValue>
         {
             element.Bind(field);
 

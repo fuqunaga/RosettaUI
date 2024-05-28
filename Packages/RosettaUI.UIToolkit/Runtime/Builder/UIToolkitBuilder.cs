@@ -1,10 +1,20 @@
 using System;
 using System.Collections.Generic;
 using RosettaUI.Builder;
+
+#if !UNITY_2022_1_OR_NEWER
 using RosettaUI.UIToolkit.UnityInternalAccess;
+#endif
+
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.UIElements;
+
+#if UNITY_2023_1_OR_NEWER
+
+using UIntField = UnityEngine.UIElements.UnsignedIntegerField;
+using ListViewCustom = UnityEngine.UIElements.ListView;
+
+#endif
 
 #if UNITY_2022_1_OR_NEWER
 
@@ -58,7 +68,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(UIntFieldElement)] = BuildBindFunc<UIntField>.Create(Bind_Field<uint, UIntField>),
                 [typeof(TextFieldElement)] =  BuildBindFunc<TextField>.Create(Bind_TextField),
 
-                [typeof(IntSliderElement)] = BuildBindFunc<ClampFreeSliderInt>.Create(Bind_Slider<int, ClampFreeSliderInt>),
+                [typeof(IntSliderElement)] = BuildBindFunc<ClampFreeSliderInteger>.Create(Bind_Slider<int, ClampFreeSliderInteger>),
                 [typeof(FloatSliderElement)] = BuildBindFunc<ClampFreeSlider>.Create(Bind_Slider<float, ClampFreeSlider>),
                 [typeof(IntMinMaxSliderElement)] = BuildBindFunc<MinMaxSliderWithField<int, IntegerField>>.Create(Bind_MinMaxSlider<int, IntegerField>),
                 [typeof(FloatMinMaxSliderElement)] = BuildBindFunc<MinMaxSliderWithField<float, FloatField>>.Create(Bind_MinMaxSlider<float, FloatField>),

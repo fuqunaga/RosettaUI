@@ -1,9 +1,10 @@
 ﻿using RosettaUI.UIToolkit.UnityInternalAccess;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    // ChangeVisibleEventを呼ぶFoldout
+    // RequestResizeWindowEventを呼ぶFoldout
     public class FoldoutCustom : Foldout
     {
         public Toggle Toggle { get; }
@@ -22,6 +23,12 @@ namespace RosettaUI.UIToolkit
 
                 Toggle.Add(value);
                 _headerContent = value;
+                
+                //　フィールドの値決定のエンターキーにToggleが反応してしまうので抑制
+                _headerContent?.RegisterCallback<NavigationSubmitEvent>(evt =>
+                {
+                    evt.StopPropagation();
+                }, TrickleDown.TrickleDown); // Unity2022だとTrickleDownが必要。2023では不要
             }
         }
 
@@ -36,7 +43,7 @@ namespace RosettaUI.UIToolkit
             // セレクタ例： .unity-foldout--depth-1 > .unity-fold__toggle
             Toggle.style.marginLeft = 0;
             
-            RegisterCallback<ChangeEvent<bool>>(_ =>
+            Toggle.RegisterCallback<ChangeEvent<bool>>(_ =>
             {
                 using var requestResizeWindowEvent = RequestResizeWindowEvent.GetPooled();
                 requestResizeWindowEvent.target = contentContainer;

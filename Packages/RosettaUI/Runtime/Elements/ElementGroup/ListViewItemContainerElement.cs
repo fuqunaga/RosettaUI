@@ -147,7 +147,7 @@ namespace RosettaUI
             void DuplicateItem()
             {
                 ListBinder.DuplicateItem(_binder, index);
-                OnItemIndexShiftPlus(index);
+                OnItemIndexShiftPlus(index + 1);
                 
                 NotifyListChangedToView();
             }

@@ -58,7 +58,12 @@ namespace RosettaUI.Example
                             )
                         ),
                         ExampleTemplate.UIFunctionColumnBox(nameof(UI.Box),
-                            UI.Label("box style frame")
+                            UI.Row(
+                                UI.Space().SetWidth(5f),
+                                UI.Box(
+                                    UI.Label("box style frame")
+                                )
+                            )
                         ),
                         ExampleTemplate.UIFunctionColumn(nameof(UI.Page),
                             UI.Label("Adjust the width of the prefix labels."),

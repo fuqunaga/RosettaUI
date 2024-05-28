@@ -193,7 +193,7 @@ namespace RosettaUI
                         ListBinder.SetCount(listBinder, count);
                     }
                 },
-                new FieldOption() { delayInput = true }
+                new FieldOption { delayInput = true }
             ).SetMinWidth(50f).SetInteractable(interactable);
         }
         

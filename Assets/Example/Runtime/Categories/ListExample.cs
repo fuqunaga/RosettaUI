@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace RosettaUI.Example
@@ -7,9 +6,21 @@ namespace RosettaUI.Example
     public class ListExample : MonoBehaviour, IElementCreator
     {
         public int[] intArray = {1, 2, 3};
-        public List<int> intList = new[] {1, 2, 3}.ToList();
-        public SimpleClass[] classArray = {new() {stringValue = "1"}, new() {stringValue = "2"}, new() {stringValue = "2"}};
-        public List<SimpleClass> classList = new SimpleClass[]{new() {stringValue = "1"}, new() {stringValue = "2"}, new() {stringValue = "2"}}.ToList();
+        public List<int> intList = new() {1, 2, 3};
+        
+        public SimpleClass[] classArray =
+        {
+            new() {stringValue = "1"}, 
+            new() {stringValue = "2"}, 
+            new() {stringValue = "2"}
+        };
+        
+        public List<SimpleClass> classList = new()
+        {
+            new SimpleClass {stringValue = "1"}, 
+            new SimpleClass {stringValue = "2"}, 
+            new SimpleClass {stringValue = "2"}
+        };
 
         [NonReorderable]
         public int[] nonReorderableArray = {1,2,3};

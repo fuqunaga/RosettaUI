@@ -35,6 +35,12 @@ namespace RosettaUI.Example
         {
             SyntaxHighlighter.AddPattern("type", "MyMinMax");
             
+            var sliderOption = new SliderOption()
+            {
+                showInputField = false,
+                fieldOption = FieldOption.Default
+            };
+            
             return UI.Tabs(
                 ExampleTemplate.UIFunctionTab(nameof(UI.MinMaxSlider),
                     UI.MinMaxSlider(() => intMinMax),
@@ -67,7 +73,7 @@ namespace RosettaUI.Example
                     UI.MinMaxSliderReadOnly(() => boundsIntMinMax)
                 ),
                 ExampleTemplate.Tab("Codes",
-                    ExampleTemplate.CodeElementSets("Argument",
+                    ExampleTemplate.CodeElementSets("Range",
                         (@"UI.MinMaxSlider(
     () => floatMinMax,
     range: MinMax.Create(-1f, 1f)
@@ -87,6 +93,30 @@ namespace RosettaUI.Example
                                 () => vector2MinMax,
                                 range: MinMax.Create(-Vector2.one, Vector2.one)
                             ).Open()
+                        )
+                    ),
+                    ExampleTemplate.CodeElementSets("Option",
+                        (@"var sliderOption = new SliderOption()
+{
+    showInputField = false,
+    fieldOption = FieldOption.Default
+};
+
+UI.Field(() => sliderOption).Open();
+                            
+UI.DynamicElementOnStatusChanged(
+    () => sliderOption,
+    _ => UI.Slider(() => intMinMax, sliderOption)
+        .RegisterValueChangeCallback(() => Debug.Log($""OnValueChanged[{intMinMax}]""))
+)",
+                            UI.Column(
+                                UI.Field(() => sliderOption).Open(),
+                                UI.DynamicElementOnStatusChanged(
+                                    () => sliderOption,
+                                    _ => UI.MinMaxSlider(() => intMinMax, sliderOption)
+                                        .RegisterValueChangeCallback(() => Debug.Log($"OnValueChanged[{intMinMax}]"))
+                                )
+                            )
                         )
                     ),
                     ExampleTemplate.CodeElementSets("Supported types",

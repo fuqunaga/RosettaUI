@@ -22,13 +22,11 @@
 
     public readonly struct SliderElementOption
     {
-        public static readonly SliderElementOption Default = new(null, null);
-        
         public readonly IGetter minGetter;
         public readonly IGetter maxGetter;
         public readonly SliderOption? sliderOption;
         
-        public SliderElementOption(IGetter minGetter, IGetter maxGetter, in SliderOption? sliderOption = null)
+        public SliderElementOption(IGetter minGetter, IGetter maxGetter, in SliderOption? sliderOption)
         {
             this.minGetter = minGetter;
             this.maxGetter = maxGetter;

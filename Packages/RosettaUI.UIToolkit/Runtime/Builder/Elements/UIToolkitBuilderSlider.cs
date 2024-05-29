@@ -34,6 +34,8 @@ namespace RosettaUI.UIToolkit.Builder
             Bind_FieldLabel(sliderElement,  slider);
             
             slider.ShowInputField = sliderElement.showInputField;
+            slider.MinField.isDelayed = sliderElement.Option.delayInput;
+            slider.MaxField.isDelayed = sliderElement.Option.delayInput;
             
             
             sliderElement.Bind(slider,

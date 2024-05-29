@@ -309,7 +309,7 @@ Unity2022.2.0b6
     background-color: var(--unity-colors-button-background-focus);
 }
 
-.unity-button:hover {
+.unity-button:hover:enabled {
     background-color: var(--unity-colors-button-background-hover);
 }
 

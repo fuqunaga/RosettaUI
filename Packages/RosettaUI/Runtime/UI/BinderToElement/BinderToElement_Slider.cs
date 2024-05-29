@@ -6,7 +6,7 @@ namespace RosettaUI
 {
     public  static partial class BinderToElement
     {
-        public static Element CreateSliderElement(LabelElement label, IBinder binder, SliderOption option)
+        public static Element CreateSliderElement(LabelElement label, IBinder binder, in SliderElementOption option)
         {
             return binder switch
             {
@@ -24,25 +24,24 @@ namespace RosettaUI
                      ?? CreateFieldElement(label, binder, FieldOption.Default)
             };
 
-            static SliderOption<int> CreateOptionUintToInt(SliderOption option)
+            static SliderElementOption<int> CreateOptionUintToInt(in SliderElementOption option)
             {
-                return new SliderOption<int>()
-                {
-                    minGetter = CastGetter.Create<uint, int>((IGetter<uint>) option.minGetter),
-                    maxGetter = CastGetter.Create<uint, int>((IGetter<uint>) option.maxGetter),
-                    showInputField = option.showInputField
-                };
+                return new SliderElementOption<int>(
+                    CastGetter.Create<uint, int>((IGetter<uint>)option.minGetter),
+                    CastGetter.Create<uint, int>((IGetter<uint>)option.maxGetter),
+                    option.sliderOption
+                );
             }
         }
 
-        private static Element CreateNullableSliderElement(LabelElement label, IBinder binder, SliderOption option)
+        private static Element CreateNullableSliderElement(LabelElement label, IBinder binder, SliderElementOption option)
         {
             var valueBinder = NullableToValueBinder.Create(binder);
             return UI.NullGuard(label, binder, () => CreateSliderElement(label, valueBinder, option));
         }
 
 
-        private static Element CreateCompositeSliderElement(LabelElement label, IBinder binder, SliderOption option)
+        private static Element CreateCompositeSliderElement(LabelElement label, IBinder binder, SliderElementOption option)
         {
             return CreateCompositeSliderElementBase(
                 label,
@@ -53,12 +52,11 @@ namespace RosettaUI
                     var fieldLabel = UICustom.ModifyPropertyOrFieldLabel(binder.ValueType, fieldName);
                     var fieldBinder = PropertyOrFieldBinder.Create(binder, fieldName);
                     
-                    var fieldOption = new SliderOption(option)
-                    {
-                        minGetter = PropertyOrFieldGetter.Create(option.minGetter, fieldName),
-                        maxGetter = PropertyOrFieldGetter.Create(option.maxGetter, fieldName),
-                    };
-
+                    var fieldOption = new SliderElementOption(
+                        option,
+                        PropertyOrFieldGetter.Create(option.minGetter, fieldName),
+                        PropertyOrFieldGetter.Create(option.maxGetter, fieldName)
+                    );
 
                     return UI.Slider(fieldLabel, fieldBinder, fieldOption);
                 }

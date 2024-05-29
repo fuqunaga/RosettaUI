@@ -64,6 +64,7 @@ namespace RosettaUI.Example
                         (@"var listViewOption = ListViewOption.Default;
 
 UI.Field(() => listViewOption).Open(),
+
 UI.DynamicElementOnStatusChanged(
     () => listViewOption,
     _ => UI.List(() => intArray, listViewOption)

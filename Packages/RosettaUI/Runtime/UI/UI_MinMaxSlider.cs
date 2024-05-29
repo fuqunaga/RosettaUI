@@ -78,7 +78,7 @@ namespace RosettaUI
             var minGetter = PropertyOrFieldGetter.Create(rangeGetter, minName);
             var maxGetter = PropertyOrFieldGetter.Create(rangeGetter, maxName);
             
-            return MinMaxSlider(label, binder, new SliderOption() {minGetter = minGetter, maxGetter = maxGetter});  
+            return MinMaxSlider(label, binder, new SliderElementOption(minGetter, maxGetter));  
             
             IBinder ConvertMinMaxBinder(IBinder binderFrom)
             {
@@ -88,11 +88,10 @@ namespace RosettaUI
                 return (IBinder)Activator.CreateInstance(binderType, binderFrom);
             }
         }
-
-        private static readonly SliderOption SliderOptionEmpty = new();
-        public static Element MinMaxSlider(LabelElement label, IBinder binder, SliderOption option)
+        
+        public static Element MinMaxSlider(LabelElement label, IBinder binder, in SliderElementOption? elementOption)
         {
-            var contents = BinderToElement.CreateMinMaxSliderElement(label, binder, option ?? SliderOptionEmpty);
+            var contents = BinderToElement.CreateMinMaxSliderElement(label, binder, elementOption ?? SliderElementOption.Default);
             if (contents == null) return null;
 
             UIInternalUtility.SetInteractableWithBinder(contents, binder);

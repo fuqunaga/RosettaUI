@@ -26,6 +26,12 @@ namespace RosettaUI.Example
 
         public Element CreateElement(LabelElement _)
         {
+            var sliderOption = new SliderOption()
+            {
+                showInputField = false,
+                fieldOption = FieldOption.Default
+            };
+            
             return UI.Tabs(
                 ExampleTemplate.UIFunctionTab(nameof(UI.Slider),
                     UI.Slider(() => intValue),
@@ -60,7 +66,7 @@ namespace RosettaUI.Example
                     UI.SliderReadOnly(() => simpleClass)
                 ),
                 ExampleTemplate.Tab("Codes",
-                    ExampleTemplate.CodeElementSets("Argument",
+                    ExampleTemplate.CodeElementSets("MinMax",
                         ("UI.Slider(() => floatValue, max: 2f);\n",
                             UI.Slider(() => floatValue, max: 2f)),
                         ("UI.Slider(() => floatValue, min: 0.5f, max: 2f);\n",
@@ -88,6 +94,30 @@ namespace RosettaUI.Example
                             ).Open()
                         )
                     ),
+                    ExampleTemplate.CodeElementSets("Option",
+                        (@"var sliderOption = new SliderOption()
+{
+    showInputField = false,
+    fieldOption = FieldOption.Default
+};
+
+UI.Field(() => sliderOption).Open();
+                            
+UI.DynamicElementOnStatusChanged(
+    () => sliderOption,
+    _ => UI.Slider(() => floatValue, sliderOption)
+        .RegisterValueChangeCallback(() => Debug.Log($""OnValueChanged[{floatValue}]""))
+)",
+                            UI.Column(
+                                UI.Field(() => sliderOption).Open(),
+                                UI.DynamicElementOnStatusChanged(
+                                    () => sliderOption,
+                                    _ => UI.Slider(() => floatValue, sliderOption)
+                                        .RegisterValueChangeCallback(() => Debug.Log($"OnValueChanged[{floatValue}]"))
+                                )
+                            )
+                        )
+                    ),
                     ExampleTemplate.CodeElementSets("Attribute", 
                         (@"[Range(0f, 100f)] 
 public float rangeFloat;
@@ -98,7 +128,7 @@ UI.Slider(() => rangeFloat);
                         )),
                     ExampleTemplate.CodeElementSets("Unsupported types",
                         "Unsupported types will fall back to UI.Field()", 
-                        ("\nUI.Slider(() => stringValue);\n", UI.Slider(() => stringValue)))
+                        ("UI.Slider(() => stringValue);\n", UI.Slider(() => stringValue)))
                 )
             );
         }

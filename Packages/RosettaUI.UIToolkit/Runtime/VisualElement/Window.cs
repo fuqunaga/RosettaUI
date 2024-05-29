@@ -208,7 +208,7 @@ namespace RosettaUI.UIToolkit
             // NavigationMoveEvent 方向にフォーカスを移動しようとする
             // キー入力をしている場合などにフォーカスが移ってしまうのは避けたいのでWindow単位で抑制しておく
             // UnityデフォルトでもTextFieldは抑制できているが、IntegerField.inputFieldでは出来ていないなど挙動に一貫性がない
-            RegisterCallback<NavigationMoveEvent>(evt => evt.PreventDefault());
+            RegisterCallback<NavigationMoveEvent>(evt => evt.StopPropagationAndFocusControllerIgnoreEvent());
 
             ResetFixedSize();
         }

@@ -68,8 +68,7 @@ namespace RosettaUI.UIToolkit
         {
             if (Apply(op))
             {
-                sourceEvent.StopPropagation();
-                sourceEvent.PreventDefault();
+                sourceEvent.StopPropagationAndFocusControllerIgnoreEvent();
             }
         }
 

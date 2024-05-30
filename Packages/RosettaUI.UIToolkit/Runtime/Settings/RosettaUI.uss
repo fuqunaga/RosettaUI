@@ -95,7 +95,7 @@
 }
 
 .rosettaui-window-title-button {
-    padding: 2px 12px;
+    padding: 1px 16px;
     height: 100%;
     align-items: center;
     flex-direction: row;
@@ -289,6 +289,7 @@
 .rosettaui-slider-in-field > .unity-base-slider--horizontal
 {
     flex-grow: 1;
+    min-height: 18px;
 }
 
 .rosettaui-slider-in-field > .unity-base-text-field__input

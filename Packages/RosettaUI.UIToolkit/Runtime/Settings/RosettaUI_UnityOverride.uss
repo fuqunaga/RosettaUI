@@ -4,6 +4,8 @@
 
 .unity-base-field {
     margin-left: 0;
+    margin-top: 1px;
+    margin-bottom: 1px;
 }
 
 .unity-base-field__input{
@@ -109,7 +111,9 @@ Unity2022.2.0b6
 }
 
 .unity-toggle__checkmark{
-    border-width: 2px;
+    width: 16px;
+    height: 16px;
+    border-width: 1px;
     -unity-background-image-tint-color: var(--unity-colors-default-text);
 }
 
@@ -157,8 +161,10 @@ Unity2022.2.0b6
 }
 .unity-foldout__toggle > .unity-toggle__input > .unity-toggle__checkmark
 {
+    width: 18px;
+    height: 18px;
     border-width: 0;
-    margin: 0 2px;
+    margin: 0;
     -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
 }
 
@@ -197,13 +203,15 @@ Unity2022.2.0b6
 
 .unity-base-popup-field__arrow
 {
+    width: 6px;
+    height: 6px;
     -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
 }
 
 .unity-base-popup-field__input
 {
     padding-left: 2px;
-    padding-right: 2px;
+    padding-right: 4px;
 }
 
 /********************************************************************************
@@ -299,6 +307,7 @@ Unity2022.2.0b6
     width: 10px;
     height: var(--rosettaui-slider-dragger-height);
     margin-top: -5px;
+    border-width: 0px;
     border-radius: var(--rosettaui-slider-dragger-border-radius);
     background-color: var(--unity-colors-slider_thumb-background);
 }
@@ -465,7 +474,7 @@ Unity2022.2.0b6
 
 .unity-list-view__reorderable-item__container
 {
-    padding-left: 0;
+    padding: 0;
 }
 
 .unity-list-view__reorderable-handle
@@ -483,16 +492,16 @@ Unity2022.2.0b6
 /*.unity-list-view__scroll-view--with-footer,*/
 .unity-list-view__footer
 {
-    background-color: var(--rosettaui-color-list-background);
+    padding: 0 4px;
+    margin-right: 16px;
     border-width: 0;
-    /*border-color: var(--unity-colors-input_field-border);*/
-    /*border-width: 2px;*/
-    /*margin: 2px 4px 4px 0;*/
+    background-color: var(--rosettaui-color-list-background);
 }
 
 .unity-list-view__footer > .unity-button,
 .unity-list-view__footer > .unity-button:hover:disabled
 {
+    font-size: 12px;
     background-color: transparent;
 }
 

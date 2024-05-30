@@ -194,7 +194,7 @@ namespace RosettaUI
                     }
                 },
                 new FieldOption { delayInput = true }
-            ).SetMinWidth(50f).SetInteractable(interactable);
+            ).SetMinWidth(32f).SetInteractable(interactable);
         }
         
         private static Element ListItemContainer(IBinder listBinder, Func<IBinder, int, Element> createItemElement, in ListViewOption option)

@@ -19,12 +19,6 @@
     min-width: initial;
 }
 
-.unity-base-text-field__input
-{
-    padding-left: 4px;
-    padding-right: 4px;
-}
-
 .unity-base-text-field__input,
 .unity-base-popup-field__input,
 .unity-base-text-field__input:disabled
@@ -92,11 +86,6 @@ Unity2022.2.0b6
 /********************************************************************************
 * toggle
 ********************************************************************************/
-.unity-toggle {
-    min-height: 28px;
-    margin: 1px 0 3px 0;
-}
-
 .unity-toggle.unity-base-field--no-label
 {
     flex-grow: 0;
@@ -145,7 +134,7 @@ Unity2022.2.0b6
 
 .unity-foldout__toggle
 {
-    height: 32px;
+    height: 24px;
     margin: 0;
 }
 
@@ -178,10 +167,6 @@ Unity2022.2.0b6
     flex-grow: 1;
 }
 
-.unity-foldout__toggle > .unity-label {
-    padding-top: 4px;
-}
-
 .unity-foldout__content{
     margin-left: 0;
 }
@@ -191,39 +176,6 @@ Unity2022.2.0b6
 .unity-foldout__toggle > .unity-toggle__input:checked > .unity-toggle__checkmark
 {
     background-color: initial;
-}
-
-/********************************************************************************
-* enum field
-********************************************************************************/
-.unity-enum-field__input
-{
-    background-color: var(--rosettaui-color-input-background);
-    border-color: var(--unity-colors-input_field-border);
-    padding-left: 4px;
-    padding-right: 4px;
-}
-
-.unity-enum-field:hover >.unity-enum-field__input
-{
-    border-color: var(--unity-colors-input_field-border-hover);
-}
-
-.unity-enum-field:focus >.unity-enum-field__input
-{
-    border-color: var(--unity-colors-input_field-border-focus);
-}
-
-
-.unity-enum-field:disabled >.unity-enum-field__input
-{
-    background-color: var(--rosettaui-color-input-background);
-    border-color: var(--unity-colors-input_field-border);
-}
-
-.unity-enum-field__arrow
-{
-    -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
 }
 
 /********************************************************************************
@@ -250,8 +202,8 @@ Unity2022.2.0b6
 
 .unity-base-popup-field__input
 {
-    padding-left: 4px;
-    padding-right: 4px;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
 /********************************************************************************
@@ -265,9 +217,9 @@ Unity2022.2.0b6
 .unity-base-dropdown__checkmark,
 .unity-base-dropdown__item:checked > .unity-base-dropdown__checkmark
 {
-    margin: 5px;
-    width: 24px;
-    height: 24px;
+    margin: 2px;
+    width: 16px;
+    height: 16px;
     align-self: center;
     -unity-background-image-tint-color: initial;
 }
@@ -297,10 +249,10 @@ Unity2022.2.0b6
 .unity-button
 {
     border-radius: 3px;
-    border-width: 2px;
-    padding: 2px 4px;
+    border-width: 1px;
+    padding: 2px 3px;
     margin: 2px;
-    min-width: 30px;
+    min-width: 20px;
     
     border-color: var(--unity-colors-button-border);
 }
@@ -344,9 +296,9 @@ Unity2022.2.0b6
 }
 
 .unity-base-slider--horizontal .unity-base-slider__dragger{
-    width: 14px;
+    width: 10px;
     height: var(--rosettaui-slider-dragger-height);
-    margin-top: -7px;
+    margin-top: -5px;
     border-radius: var(--rosettaui-slider-dragger-border-radius);
     background-color: var(--unity-colors-slider_thumb-background);
 }
@@ -456,8 +408,8 @@ Unity2022.2.0b6
 .unity-scroller--vertical .unity-base-slider__dragger,
 .unity-scroller--vertical .unity-base-slider__dragger:hover
 {
-    left: 2px;
-    width: 14px;
+    left: 1px;
+    width: 10px;
     -unity-slice-top: 8;
     -unity-slice-bottom: 8;
 }
@@ -465,8 +417,8 @@ Unity2022.2.0b6
 .unity-scroller--horizontal .unity-base-slider__dragger,
 .unity-scroller--horizontal .unity-base-slider__dragger:hover
 {
-    top: 2px;
-    height: 14px;
+    top: 1px;
+    height: 10px;
     -unity-slice-left: 8;
     -unity-slice-right: 8;
 }
@@ -489,8 +441,8 @@ Unity2022.2.0b6
 
 .unity-list-view__empty-label
 {
-    height: 34px;
-    padding-left: 8px;
+    height: 24px;
+    padding-left: 6px;
 }
 
 .unity-foldout__toggle > .unity-toggle__input:focus > .unity-label
@@ -518,16 +470,14 @@ Unity2022.2.0b6
 
 .unity-list-view__reorderable-handle
 {
-    min-width: 26px;
-    padding-top: 13px;
+    min-width: 18px;
+    padding-top: 9px;
     align-items: center;
-    justify-content: flex-start; /* for Unity2021. Default in Unity2022 */
 }
 
 .unity-list-view__reorderable-handle-bar
 {
     opacity: 0.4;
-    height: 2px;
 }
 
 /*.unity-list-view__scroll-view--with-footer,*/
@@ -558,14 +508,6 @@ Unity2022.2.0b6
 {
     background-color: var(--rosettaui-button-background-pressed);
 }
-
-
-/*
-.unity-list-view__foldout-header > .unity-foldout__toggle > .unity-toggle__input
-{
-    flex-grow: 1;
-}
-*/
 
 .unity-list-view__size-field
 {

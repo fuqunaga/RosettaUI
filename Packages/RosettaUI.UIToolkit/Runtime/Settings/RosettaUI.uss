@@ -97,6 +97,7 @@
 .rosettaui-window-title-button {
     padding: 1px 16px;
     height: 100%;
+    min-height: 18px;
     align-items: center;
     flex-direction: row;
 }

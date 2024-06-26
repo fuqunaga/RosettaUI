@@ -314,6 +314,10 @@ Unity2022.2.0b6
     border-width: 0;
 }
 
+.unity-base-slider--horizontal{
+    min-height: initial; /* 主にColorPickerで使用 */
+}
+
 .unity-base-slider--horizontal .unity-base-slider__dragger{
     width: 10px;
     height: var(--rosettaui-slider-dragger-height);

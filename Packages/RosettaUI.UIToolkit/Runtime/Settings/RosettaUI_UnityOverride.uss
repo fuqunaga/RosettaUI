@@ -1,3 +1,17 @@
+/********************************************************************************
+* label
+********************************************************************************/
+.unity-label{
+    margin: 1px;
+    padding: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 20px; /* 日本語が収まる高さ 16px + padding 2px */
+}
+
+/********************************************************************************
+* base-field
+********************************************************************************/
 .unity-base-field:focus:enabled > .unity-base-field__label {
     color: var(--unity-colors-highlight-text);
 }
@@ -6,6 +20,14 @@
     margin-left: 0;
     margin-top: 1px;
     margin-bottom: 1px;
+}
+
+.unity-base-field__label{
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 1px;
+    padding-bottom: 0;
+    min-height: 20px; /* paddingを考慮して .unity-label と同じ高さ */
 }
 
 .unity-base-field__input{
@@ -60,17 +82,6 @@
 .unity-base-text-field__input {
     --unity-cursor-color: var(--unity-colors-default-text);
 }
-
-/********************************************************************************
-* label
-********************************************************************************/
-.unity-label{
-    margin: 1px;
-    padding: 2px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 
 /********************************************************************************
 * text field multiline

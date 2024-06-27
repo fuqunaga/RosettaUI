@@ -22,7 +22,10 @@
     margin-bottom: 1px;
 }
 
-.unity-base-field__label{
+
+.unity-base-field__label,
+.unity-base-field > .unity-label /* TextInput部の後ろに単位を表示するラベルなど。現状GradientEditorのスライダーで使用　*/
+{
     margin-top: 0;
     margin-bottom: 0;
     padding-top: 1px;
@@ -44,7 +47,6 @@
 }
 
 .unity-base-text-field__input,
-.unity-base-popup-field__input,
 .unity-base-text-field__input:disabled
 {
     background-color: var(--rosettaui-color-input-background);
@@ -198,6 +200,15 @@ Unity2022.2.0b6
 /********************************************************************************
 * popup / enum field
 ********************************************************************************/
+.unity-base-popup-field__input,
+.unity-enum-field__input
+{
+    background-color: var(--rosettaui-color-input-background);
+    border-color: var(--unity-colors-input_field-border);
+    padding-left: 2px;
+    padding-right: 4px;
+}
+
 .unity-base-popup-field:hover >.unity-base-popup-field__input,
 .unity-base-popup-field:active >.unity-base-popup-field__input,
 .unity-base-popup-field:hover:enabled >.unity-base-popup-field__input,
@@ -212,17 +223,12 @@ Unity2022.2.0b6
     border-color: var(--unity-colors-input_field-border);
 }
 
-.unity-base-popup-field__arrow
+.unity-base-popup-field__arrow,
+.unity-enum-field__arrow
 {
     width: 6px;
     height: 6px;
     -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
-}
-
-.unity-base-popup-field__input
-{
-    padding-left: 2px;
-    padding-right: 4px;
 }
 
 /********************************************************************************

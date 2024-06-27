@@ -86,8 +86,13 @@
 }
 
 /********************************************************************************
-* text field multiline
+* text field / multiline
 ********************************************************************************/
+.unity-text-element--inner-input-field-component
+{
+    padding-left: 2px; /* unity6だと標準で設定されている。unity2022だと設定されていない */
+}
+
 /* 
 特定のTextField(Rowの子供、ラベルあり、multiline)
 align-self: flex-start

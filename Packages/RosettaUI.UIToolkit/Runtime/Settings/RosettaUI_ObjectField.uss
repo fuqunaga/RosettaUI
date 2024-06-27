@@ -11,11 +11,10 @@
     flex-direction: row;
     background-color: var(--rosettaui-color-input-background);
     border-color: var(--unity-colors-input_field-border);
-    /*border-width: 1px;*/
-    border-width: 0;
+    border-width: 1px;
 }
 
-.unity-object-field__input:hover
+.unity-object-field:hover > .unity-object-field__input
 {
     border-color: var(--unity-colors-input_field-border-hover);
 }
@@ -49,9 +48,9 @@
     flex: 1 0 0;
     /*margin-left: 2px;*/
     margin: 0 0 0 2px;
-    /*padding: 1px 2px 0 0;*/
-    padding: 2px 2px 0 0;
+    padding: 1px 2px 0 0;
     overflow: hidden;
+    min-height: 18px;
 }
 
 .unity-object-field__selector

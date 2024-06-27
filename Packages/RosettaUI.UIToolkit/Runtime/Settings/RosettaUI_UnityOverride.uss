@@ -57,11 +57,11 @@
 /*    background-color: var(--unity-colors-highlight-background-inactive);*/
 /*}*/
 
-.unity-base-text-field:hover > .unity-base-field__input {
+.unity-base-text-field:hover:enabled > .unity-base-field__input {
     border-color: var(--unity-colors-input_field-border-hover);
 }
 
-.unity-base-text-field:focus > .unity-base-field__input {
+.unity-base-text-field:focus:enabled > .unity-base-field__input {
     border-color: var(--unity-colors-input_field-border-focus);
 }
 
@@ -115,11 +115,11 @@ Unity2022.2.0b6
     border-width: 0;
 }
 
-.unity-toggle > .unity-toggle__input:hover > .unity-toggle__checkmark{
+.unity-toggle > .unity-toggle__input:hover:enabled > .unity-toggle__checkmark{
     border-color: var(--unity-colors-input_field-border-hover);
 }
 
-.unity-toggle > .unity-toggle__input:focus > .unity-toggle__checkmark{
+.unity-toggle > .unity-toggle__input:focus:enabled > .unity-toggle__checkmark{
     border-color: var(--unity-colors-input_field-border-focus);
 }
 

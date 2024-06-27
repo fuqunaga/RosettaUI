@@ -12,7 +12,7 @@
     background-color: var(--rosettaui-color-input-background);
     border-color: var(--unity-colors-input_field-border);
     /*border-width: 1px;*/
-    border-width: 2px;
+    border-width: 0;
 }
 
 .unity-object-field__input:hover
@@ -39,27 +39,25 @@
 {
     margin: 2px 0;
     padding: 0 0 0 2px;
-    /*max-width: 14px;*/
-    /*max-height: 12px;*/
-    max-width: 21px;
-    max-height: 18px;
+    max-width: 14px;
+    max-height: 12px;
     align-self: center;
 }
 
 .unity-object-field-display__label
 {
     flex: 1 0 0;
-    margin-left: 2px;
-    padding: 1px 2px 0 0;
+    /*margin-left: 2px;*/
+    margin: 0 0 0 2px;
+    /*padding: 1px 2px 0 0;*/
+    padding: 2px 2px 0 0;
     overflow: hidden;
 }
 
 .unity-object-field__selector
 {
-    /*width: 18px;*/
-    /*height: 16px;*/
-    width: 27px;
-    height: 24px;
+    width: 18px;
+    height: 16px;
     align-self: center;
     /*background-color: var(--unity-colors-object_field_button-background);*/
     background-color: #202020;

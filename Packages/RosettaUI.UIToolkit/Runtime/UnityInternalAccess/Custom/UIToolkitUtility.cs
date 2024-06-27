@@ -1,4 +1,6 @@
 using System.Reflection;
+using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.UnityInternalAccess
@@ -7,12 +9,20 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
     {
 #if UNITY_2022_1_OR_NEWER
         
+        private static MethodInfo _focusControllerGetLeafFocusedElementMethodInfo;
         private static PropertyInfo _baseBoolFieldAcceptClicksIfDisabledPropertyInfo;
         
         public static bool WillUseKeyInput(IPanel panel)
         {
-            // TODO
-            return false;
+            _focusControllerGetLeafFocusedElementMethodInfo ??= typeof(FocusController).GetMethod("GetLeafFocusedElement", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.IsNotNull(_focusControllerGetLeafFocusedElementMethodInfo);
+            
+            var focusController = panel?.focusController;
+            if (focusController == null) return false;
+            
+            var focusable = _focusControllerGetLeafFocusedElementMethodInfo.Invoke(focusController, null) as Focusable;
+
+            return focusable is ITextEdition { isReadOnly: false};
         }
 
         public static void SetAcceptClicksIfDisabled(BaseBoolField baseBoolField, bool flag = true)

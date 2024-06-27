@@ -3,9 +3,9 @@
 ********************************************************************************/
 .rosettaui-colorpicker__preview 
 {
-    width: 100px;
-    height: 25px;
-    margin: 4px;
+    width: 70px;
+    height: 20px;
+    margin: 3px;
     align-self: flex-end;
     flex-direction: row;
 
@@ -31,9 +31,10 @@
 
 .rosettaui-colorpicker__handler
 {
-    width: 360px;
-    height: 360px;
+    width: 250px;
+    height: 250px;
     flex-shrink: 0;
+    align-self: center;
 }
 
 .rosettaui-colorpicker__handler-h
@@ -73,8 +74,8 @@
 .rosettaui-colorpicker-slider-type-button
 {
     align-self: flex-end;
-    width: 80px;
-    margin: 4px 0;
+    width: 54px;
+    margin: 4px;
 }
 
 .rosettaui-colorpicker-slider-container .unity-base-slider__label
@@ -85,7 +86,7 @@
 .rosettaui-colorpicker-slider-container .unity-text-field
 {
     flex-grow: 0;
-    width: 80px;
+    width: 54px;
 }
 
 .rosettaui-texture-slider .unity-base-slider__tracker,
@@ -103,5 +104,5 @@
 .rosettaui-colorpicker__hex > .unity-text-field__input
 {
     flex-grow: 0;
-    min-width: 150px;
+    min-width: 100px;
 }

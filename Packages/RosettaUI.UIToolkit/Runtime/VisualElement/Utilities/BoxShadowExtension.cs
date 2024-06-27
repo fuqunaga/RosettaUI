@@ -13,13 +13,13 @@ namespace RosettaUI.UIToolkit
                 var style = boxShadow.style;
                 var resolvedStyle = boxShadow.resolvedStyle;
                 
-                style.width = evt.newRect.width + resolvedStyle.borderLeftWidth + resolvedStyle.borderRightWidth - 2f;
-                style.height = evt.newRect.height + resolvedStyle.borderTopWidth + resolvedStyle.borderBottomWidth- 2f;
+                style.width = evt.newRect.width + resolvedStyle.borderLeftWidth + resolvedStyle.borderRightWidth - 2.5f;
+                style.height = evt.newRect.height + resolvedStyle.borderTopWidth + resolvedStyle.borderBottomWidth - 2.5f;
                 
                 var windowStyle = ve.resolvedStyle;
 
-                style.marginLeft = -(resolvedStyle.borderLeftWidth + windowStyle.borderLeftWidth + windowStyle.paddingLeft) + 0.5f;
-                style.marginTop = -(resolvedStyle.borderTopWidth + windowStyle.borderTopWidth) + 0.5f;
+                style.marginLeft =  -(resolvedStyle.borderLeftWidth + windowStyle.borderLeftWidth + windowStyle.paddingLeft) + 1f;
+                style.marginTop = -(resolvedStyle.borderTopWidth + windowStyle.borderTopWidth) + 1f;
             });
         }
         

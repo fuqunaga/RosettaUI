@@ -18,13 +18,13 @@ namespace RosettaUI.UIToolkit.Editor.Builder
         private static void RegisterBuildFunc()
         {
             var builder = UIToolkitBuilder.Instance;
-            builder.RegisterBuildBindFunc(typeof(ObjectFieldElement), BuildBindFunc<ObjectFieldCustom>.Create(Bind_ObjectField));
+            builder.RegisterBuildBindFunc(typeof(ObjectFieldElement), BuildBindFunc<ObjectField>.Create(Bind_ObjectField));
         }
         
         private static bool Bind_ObjectField(Element element, VisualElement visualElement)
         {
             if (element is not ObjectFieldElement objectFieldElement ||
-                visualElement is not ObjectFieldCustom objectField) return false;
+                visualElement is not ObjectField objectField) return false;
             
             var builder = UIToolkitBuilder.Instance;
             

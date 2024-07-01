@@ -445,7 +445,13 @@ namespace RosettaUI.UIToolkit
                 var current = new Vector2(resolvedStyle.left, resolvedStyle.top);
                 var diff = pos - current;
 
-                if (Mathf.Abs(diff.x) < 5f && Mathf.Abs(diff.y) < 5f) return;
+                const float distanceToActivation = 10f;
+                const float distanceToActivationSqr = distanceToActivation * distanceToActivation;
+                if (Vector2.SqrMagnitude(diff) <  distanceToActivationSqr)
+                {
+                    return;
+                }
+                
                 _beforeDrag = false;
             }
 

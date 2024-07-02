@@ -23,6 +23,15 @@
 }
 
 
+/* 
+入れ子の.unity-base-fieldは親の margin があるので margin 0
+CompositeFieldを想定
+*/
+.unity-base-field .unity-base-field {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
 .unity-base-field__label,
 .unity-base-field > .unity-label /* TextInput部の後ろに単位を表示するラベルなど。現状GradientEditorのスライダーで使用　*/
 {
@@ -156,7 +165,7 @@ Unity2022.2.0b6
 
 .unity-foldout__toggle
 {
-    height: 24px;
+    height: 22px;
     margin: 0;
 }
 

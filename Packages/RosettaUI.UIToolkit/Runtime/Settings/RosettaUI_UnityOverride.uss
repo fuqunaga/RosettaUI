@@ -165,8 +165,8 @@ Unity2022.2.0b6
 
 .unity-foldout__toggle
 {
-    height: 22px;
-    margin: 0;
+    height: 20px;
+    margin: 1px 0;
 }
 
 .unity-foldout__toggle:hover

@@ -493,15 +493,18 @@ Unity2022.2.0b6
     color: var(--unity-colors-default-text); /* remove unity default */
 }
 
-.unity-list-view__item,
 .unity-list-view__item:hover,
-.unity-collection-view__item:hover:enabled,
 .unity-collection-view__item--selected
 {
-    background-color: transparent; /* remove unity default */
+    background-color: transparent;
 }
 
-.unity-collection-view:focus .unity-collection-view__item--selected
+.unity-collection-view__item:hover:enabled
+{
+    background-color: var(--rosettaui-highlight-dark-gray);
+}
+
+.unity-collection-view:focus:enabled .unity-collection-view__item--selected
 {
     background-color: var(--rosettaui-highlight-dark-blue);
 }

@@ -9,7 +9,7 @@
     --rosettaui-gray-button-tint: #A0A0A0;
 
     --rosettaui-highlight-gray: #606060;
-    --rosettaui-highlight-dark-gray: #404040;
+    --rosettaui-highlight-dark-gray: #303030;
     --rosettaui-highlight-blue: rgb(0, 150, 230);
     --rosettaui-highlight-dark-blue: var(--unity-colors-highlight-background);
 

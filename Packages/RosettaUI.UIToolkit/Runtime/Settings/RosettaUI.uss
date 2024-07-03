@@ -345,3 +345,17 @@
     flex-grow: 100;
     flex-shrink: 0;
 }
+
+/********************************************************************************
+* Checkerboard
+********************************************************************************/
+.rosettaui-checkerboard
+{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    background-position: 0 0;
+    background-repeat: repeat;
+}

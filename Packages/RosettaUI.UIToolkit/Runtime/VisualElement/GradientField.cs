@@ -19,39 +19,32 @@ namespace RosettaUI.UIToolkit
         public event Action<Vector2, GradientField> showGradientPickerFunc;
 
         private bool _valueNull;
-
-        private readonly Background m_DefaultBackground = new();
-
-        private GradientInput _gradientInput;
+        private readonly Background _mDefaultBackground = new();
+        private readonly GradientInput _gradientInput;
 
         public override Gradient value
         {
-            get
-            {
-                if (_valueNull) return null;
-
-                return GradientCopy(rawValue);
-            }
+            get => _valueNull ? null : GradientCopy(rawValue);
             set
             {
                 if (value != null || !_valueNull) // let's not reinitialize an initialized gradient
                 {
-                    using (ChangeEvent<Gradient> evt = ChangeEvent<Gradient>.GetPooled(rawValue, value))
-                    {
-                        evt.target = this;
-                        SetValueWithoutNotify(value);
-                        SendEvent(evt);
-                    }
+                    using var evt = ChangeEvent<Gradient>.GetPooled(rawValue, value);
+                    evt.target = this;
+                    SetValueWithoutNotify(value);
+                    SendEvent(evt);
                 }
             }
         }
 
         internal static Gradient GradientCopy(Gradient other)
         {
-            Gradient gradientCopy = new Gradient();
-            gradientCopy.colorKeys = other.colorKeys;
-            gradientCopy.alphaKeys = other.alphaKeys;
-            gradientCopy.mode = other.mode;
+            var gradientCopy = new Gradient
+            {
+                colorKeys = other.colorKeys,
+                alphaKeys = other.alphaKeys,
+                mode = other.mode
+            };
             return gradientCopy;
         }
 
@@ -83,17 +76,15 @@ namespace RosettaUI.UIToolkit
 
         private void UpdateGradientTexture()
         {
+            var preview = _gradientInput.preview;
+            
             if (_valueNull || showMixedValue)
             {
-                _gradientInput.style.backgroundImage = m_DefaultBackground;
+                preview.style.backgroundImage = _mDefaultBackground;
             }
             else
             {
-                _gradientInput.style.backgroundImage =
-                    GradientHelper.GenerateGradientPreview(value, _gradientInput.style.backgroundImage.value.texture);
-// #if !UNITY_2023_1_OR_NEWER
-//                 IncrementVersion(VersionChangeType.Repaint); // since the Texture2D object can be reused, force dirty because the backgroundImage change will only trigger the Dirty if the Texture2D objects are different.
-// #endif
+                preview.style.backgroundImage = GradientHelper.GenerateGradientPreview(value, preview.style.backgroundImage.value.texture);
             }
         }
 
@@ -148,8 +139,8 @@ namespace RosettaUI.UIToolkit
         {
             if (showMixedValue)
             {
-                _gradientInput.style.backgroundImage = m_DefaultBackground;
-                _gradientInput.Add(mixedValueLabel);
+                _gradientInput.preview.style.backgroundImage = _mDefaultBackground;
+                _gradientInput.preview.Add(mixedValueLabel);
             }
             else
             {
@@ -157,9 +148,30 @@ namespace RosettaUI.UIToolkit
                 mixedValueLabel.RemoveFromHierarchy();
             }
         }
-
+        
         public class GradientInput : VisualElement
         {
+            private static Texture2D _checkerBoardTexture;
+
+            public readonly VisualElement checkerBoard;
+            public readonly VisualElement preview;
+            
+            public GradientInput()
+            {
+                checkerBoard = new Checkerboard();
+
+                preview = new VisualElement()
+                {
+                    style =
+                    {
+                        width = Length.Percent(100),
+                        height = Length.Percent(100),
+                    }
+                };
+                
+                checkerBoard.Add(preview);
+                Add(checkerBoard);
+            }
         }
     }
 }

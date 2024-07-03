@@ -12,18 +12,29 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
             
 #if UNITY_2023_1_OR_NEWER
             // refs: DropdownUtility, EditorDelegateRegistration, GenericOSMenu
-            // var menu = isPlayer
-            //     ? new GenericDropdownMenu()
-            //     : new UnityEditor.GenericMenu();
             var menu = new GenericDropdownMenu();
 #else
             // refs: BasePopupField
             // https://github.com/Unity-Technologies/UnityCsReference/blob/c84064be69f20dcf21ebe4a7bbc176d48e2f289c/ModuleOverrides/com.unity.ui/Core/Controls/BasePopupField.cs#L206
             var isPlayer = targetElement?.elementPanel.contextType == ContextType.Player;
+
+            IGenericMenu menu;
+            if (isPlayer)
+            {
+                // Unity2022.3でスクロールバーが表示されてしまう（バグ？）のであらかじめ広めの幅を確保しておく
+                var genericMenu = new GenericDropdownMenu();
+                genericMenu.contentContainer.style.width = 200;
+
+                menu = genericMenu;
+            }
             
-            var menu = isPlayer
-                ? new GenericDropdownMenu()
-                : DropdownUtility.CreateDropdown();
+            // GenericDropdownMenu だとエディターでエラーになる場合があるのでDropdownUtility経由でOSのメニューを使用する
+            // RosettaUIEditorWindowExample > MiscExample > UI.Popup() でエラーになる
+            // Unity2022.3
+            else
+            {
+                menu = DropdownUtility.CreateDropdown();
+            }
 #endif
 
             foreach (var item in menuItems)

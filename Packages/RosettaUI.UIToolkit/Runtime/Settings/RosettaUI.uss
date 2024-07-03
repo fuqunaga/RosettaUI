@@ -22,7 +22,8 @@
     --rosettaui-slider-dragger-border-radius: 5px;
     
     --rosettaui-scroller-size: 12px;
-    --rosettaui-scroller-tint-color: #808080;
+    --rosettaui-scroller-tint-color: #707070;
+    --rosettaui-scroller-highlith-tint-color: #808080;
     
     --rosettaui-color-input-background: #181818;
     --rosettaui-color-window-background: rgba(45, 45, 45, 0.85);

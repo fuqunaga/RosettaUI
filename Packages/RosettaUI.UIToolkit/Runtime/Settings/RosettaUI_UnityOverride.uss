@@ -388,7 +388,6 @@ Unity2022.2.0b6
     height: 100%;
 }
 
-
 .unity-scroller--vertical > .unity-scroller__low-button,
 .unity-scroller--vertical > .unity-scroller__high-button,
 .unity-scroller--horizontal > .unity-scroller__low-button,
@@ -402,11 +401,15 @@ Unity2022.2.0b6
 }
 
 .unity-scroller--vertical > .unity-scroller__low-button:hover,
+.unity-scroller--vertical > .unity-scroller__low-button:hover:enabled,
 .unity-scroller--vertical > .unity-scroller__high-button:hover,
+.unity-scroller--vertical > .unity-scroller__high-button:hover:enabled,
 .unity-scroller--horizontal > .unity-scroller__low-button:hover,
-.unity-scroller--horizontal > .unity-scroller__high-button:hover
+.unity-scroller--horizontal > .unity-scroller__low-button:hover:enabled,
+.unity-scroller--horizontal > .unity-scroller__high-button:hover,
+.unity-scroller--horizontal > .unity-scroller__high-button:hover:enabled
 {
-    background-color: var(--rosettaui-highlight-dark-gray);
+    background-color: var(--rosettaui-highlight-gray);
 }
 
 .unity-scroller--vertical > .unity-scroller__slider
@@ -416,6 +419,7 @@ Unity2022.2.0b6
     margin-top: var(--rosettaui-scroller-size);
     margin-bottom: var(--rosettaui-scroller-size);
 }
+
 .unity-scroller--horizontal > .unity-scroller__slider
 {
     height: var(--rosettaui-scroller-size);
@@ -423,7 +427,6 @@ Unity2022.2.0b6
     margin-right: var(--rosettaui-scroller-size);
     margin-left: var(--rosettaui-scroller-size);
 }
-
 
 .unity-scroller--vertical .unity-slider__input,
 .unity-scroller--horizontal .unity-slider__input
@@ -441,21 +444,18 @@ Unity2022.2.0b6
     -unity-background-image-tint-color: var(--rosettaui-scroller-tint-color);
 }
 
+.unity-scroller .unity-scroller__slider:hover .unity-base-slider__dragger,
+.unity-scroller .unity-scroller__slider:focus .unity-base-slider__dragger
+{
+    -unity-background-image-tint-color: var(--rosettaui-scroller-tint-color);
+}
+
 .unity-scroller .unity-scroller__slider .unity-base-slider__dragger:hover:enabled,
 .unity-scroller .unity-scroller__slider .unity-base-slider__dragger:focus:enabled
 {
     background-color: initial;
+    -unity-background-image-tint-color: var(--rosettaui-scroller-highlith-tint-color);
 }
-
-.unity-scroller .unity-scroller__slider:hover .unity-base-slider__dragger
-{
-    -unity-background-image-tint-color: var(--rosettaui-scroller-tint-color);
-}
-.unity-scroller .unity-scroller__slider:focus .unity-base-slider__dragger
-{
-    -unity-background-image-tint-color: var(--rosettaui-highlight-dark-blue);
-}
-
 
 .unity-scroller--vertical .unity-base-slider__dragger,
 .unity-scroller--vertical .unity-base-slider__dragger:hover

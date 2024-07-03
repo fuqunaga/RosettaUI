@@ -1,11 +1,50 @@
 ﻿using System;
 using System.Buffers;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RosettaUI.Builder
 {
+    public enum CheckerboardTheme
+    {
+        Light,
+        Dark
+    }
+    
     public static class TextureUtility
     {
+        private static readonly Dictionary<CheckerboardTheme, Texture2D> CheckerBoardTexture2X2S = new();
+        
+        public static readonly Dictionary<CheckerboardTheme, (Color, Color)> CheckerBoardThemeColors = new()
+        {
+            {
+                CheckerboardTheme.Light,
+                (
+                    Color.white,
+                    Color.HSVToRGB(0f, 0f, 0.8f
+                    )
+                )
+            },
+            {
+                CheckerboardTheme.Dark,
+                (
+                    new Color(0.427451f, 0.427451f, 0.427451f), // #6D6D6D
+                    new Color(0.5960785f, 0.5960785f, 0.5960785f) // #989898;
+                )
+            }
+        };
+        
+        // ReSharper disable once InconsistentNaming
+        public static Texture2D GetOrCreateCheckerboardTexture2x2(CheckerboardTheme theme)
+        {
+            if (!CheckerBoardTexture2X2S.TryGetValue(theme, out var texture))
+            {
+                CheckerBoardTexture2X2S[theme] = texture = CreateCheckerBoardTexture(new Vector2Int(2, 2), 1, CheckerBoardThemeColors[theme].Item1, CheckerBoardThemeColors[theme].Item2);
+            }
+
+            return texture;
+        }
+        
         public static Texture2D CreateCheckerBoardTexture(Vector2Int size, int gridSize)
             => CreateCheckerBoardTexture(size, gridSize, Color.white, Color.HSVToRGB(0f, 0f, 0.8f));
         

@@ -8,25 +8,20 @@
     margin: 3px;
     align-self: flex-end;
     flex-direction: row;
-
     border-radius: 5px;
+    overflow: hidden;
 }
 
-.rosettaui-colorpicker__preview-prev
+.rosettaui-colorpicker__preview-checkerboard
 {
-    width: 50%;
-    margin-top: -1px;
-    margin-bottom: -1px;
-
-    border-radius: 5px 0 0 5px;
+    flex-direction: row;
 }
+
+.rosettaui-colorpicker__preview-prev,
 .rosettaui-colorpicker__preview-curr
 {
     width: 50%;
-    margin-top: -1px;
-    margin-bottom: -1px;
-
-    border-radius: 0 5px 5px 0;
+    height: 100%;
 }
 
 .rosettaui-colorpicker__handler

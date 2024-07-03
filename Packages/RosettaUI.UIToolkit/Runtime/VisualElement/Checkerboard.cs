@@ -1,28 +1,23 @@
 ﻿using RosettaUI.Builder;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
     public class Checkerboard : VisualElement
     {
+        public const int DefaultSize = 8;
         public const string UssClassName = "rosettaui-checkerboard";
 
-        public static Texture2D CheckerBoardTexture2X2 { get; private set; }
-        
-
-        public Checkerboard(int size = 12, Texture2D texture = null)
+        public static void SetupAsCheckerboard(VisualElement visualElement, CheckerboardTheme theme, int size = DefaultSize)
         {
-            AddToClassList(UssClassName);
+            visualElement.AddToClassList(UssClassName);
+            visualElement.style.backgroundImage = TextureUtility.GetOrCreateCheckerboardTexture2x2(theme);
+            visualElement.style.backgroundSize = new BackgroundSize(DefaultSize, DefaultSize);
+        }
 
-            if (texture == null)
-            {
-                CheckerBoardTexture2X2 ??= TextureUtility.CreateCheckerBoardTexture(new Vector2Int(2, 2), 1);
-                texture = CheckerBoardTexture2X2;
-            }
-
-            style.backgroundImage = texture;
-            style.backgroundSize = new BackgroundSize(size, size);
+        public Checkerboard(CheckerboardTheme theme, int size = DefaultSize)
+        {
+            SetupAsCheckerboard(this, theme, size);
         }
     }
 }

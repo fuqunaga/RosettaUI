@@ -2,9 +2,7 @@
     <ui:EnumField label="Mode" type="UnityEngine.GradientMode, UnityEngine.CoreModule" name="mode-enum" style="margin-right: 8px; margin-left: 8px;" />
     <ui:GroupBox name="gradient-group" style="flex-grow: 3; margin-left: 8px; margin-right: 8px; margin-top: 4px; margin-bottom: 4px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-shrink: 1;">
         <ui:VisualElement name="alpha-cursor-container" class="rosettaui-gradient-editor__alpha-cursor-container" style="flex-basis: auto; flex-grow: 0; flex-shrink: 0;" />
-        <ui:VisualElement name="preview-background" class="rosettaui-gradient-editor__gradient-preview" style="flex-basis: auto; -unity-background-image-tint-color: rgb(255, 255, 255); background-color: rgb(255, 52, 1); flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: -8px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-shrink: 0; min-width: auto;">
-            <ui:VisualElement name="preview" style="width: 100%; flex-shrink: 0; height: 100%;" />
-        </ui:VisualElement>
+        <ui:VisualElement name="preview-background" class="rosettaui-gradient-editor__gradient-preview" style="flex-basis: auto; -unity-background-image-tint-color: rgb(255, 255, 255); background-color: rgb(255, 52, 1); flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: -8px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-shrink: 0; min-width: auto;" />
         <ui:VisualElement name="color-cursor-container" class="rosettaui-gradient-editor__color-cursor-container" style="flex-basis: auto; flex-grow: 0; flex-shrink: 0; margin-top: -8px;" />
     </ui:GroupBox>
     <ui:VisualElement name="property-group" style="background-color: rgba(0, 0, 0, 0); margin-top: 8px; margin-right: 4px; margin-bottom: 8px; margin-left: 4px; visibility: hidden;">

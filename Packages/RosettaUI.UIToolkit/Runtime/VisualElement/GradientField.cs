@@ -158,7 +158,7 @@ namespace RosettaUI.UIToolkit
             
             public GradientInput()
             {
-                checkerBoard = new Checkerboard();
+                checkerBoard = new Checkerboard(CheckerboardTheme.Dark);
 
                 preview = new VisualElement()
                 {

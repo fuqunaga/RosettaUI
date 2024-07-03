@@ -21,14 +21,7 @@ namespace RosettaUI.Builder
                 wrapMode = TextureWrapMode.Clamp
             };
         
-        #region CheckerBoard
-
-        private static Texture2D _checkerBoardTexture;
-
-        public static Texture2D CheckerBoardTexture => _checkerBoardTexture ??= TextureUtility.CreateCheckerBoardTexture(defaultCheckerBoardSize, defaultCheckerBoardGridSize);
-
-        #endregion
-
+  
         #region Hue texture
 
         private static readonly Dictionary<float, Texture2D> HueCircleTextureDic = new();

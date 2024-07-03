@@ -161,11 +161,12 @@ namespace RosettaUI.UIToolkit
 
         private void InitPreview()
         {
-            var preview = this.Q("preview");
+            var checkerboard = this.Q("preview-checkerboard");
             _previewPrev = this.Q("preview-prev");
             _previewCurr = this.Q("preview-curr");
 
-            preview.style.backgroundImage = ColorPickerHelper.CheckerBoardTexture;
+           
+            Checkerboard.SetupAsCheckerboard(checkerboard, CheckerboardTheme.Light);
             _previewPrev.RegisterCallback<PointerDownEvent>((_) => Color = PrevColor);
         }
 

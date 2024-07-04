@@ -16,7 +16,8 @@ namespace RosettaUI.UIToolkit.Builder
             var viewBridge = itemContainerElement.GetViewBridge();
             var itemsSource = viewBridge.GetIList();
 
-            listView.SetViewController(new ListViewControllerCustom());
+            var listViewController = new ListViewControllerCustom();
+            listView.SetViewController(listViewController);
             listView.virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight; //　これだけ定数
             listView.reorderable = option.reorderable;
             listView.reorderMode = option.reorderable ? ListViewReorderMode.Animated : ListViewReorderMode.Simple;
@@ -57,18 +58,23 @@ namespace RosettaUI.UIToolkit.Builder
                     RequestResizeWindowEvent.Send(listView);
                 });
                 
+                //　itemsRemoved は要素が削除される前に呼ばれるので注意@Unity6
+                // 要素変化後の itemSource を参照するために itemsSourceSizeChanged を登録する
+                // listView.itemsSourceSizeChangedはinternalなのでListViewControllerCustomに登録ｓ
                 listView.itemsAdded += OnItemsAdded;
                 listView.itemsRemoved += OnItemsRemoved;
                 listView.itemIndexChanged += OnItemIndexChanged;
+                listViewController.itemsSourceSizeChanged += OnItemsSourceSizeChanged;
 
                 // ListView 内での参照先変更を通知
                 listView.itemsSourceChanged += OnItemsSourceChanged;
 
                 viewBridge.onUnsubscribe += () =>
                 {
-                    listView.itemsRemoved -= OnItemsAdded;
+                    listView.itemsAdded -= OnItemsAdded;
                     listView.itemsRemoved -= OnItemsRemoved;
                     listView.itemIndexChanged -= OnItemIndexChanged;
+                    listViewController.itemsSourceSizeChanged -= OnItemsSourceSizeChanged;
                     listView.itemsSourceChanged -= OnItemsSourceChanged;
                     
                     listView.itemsSource = Array.Empty<int>(); // null だとエラーになるので空配列で
@@ -126,8 +132,6 @@ namespace RosettaUI.UIToolkit.Builder
             void OnItemsAdded(IEnumerable<int> idxes)
             {
                 viewBridge.OnItemsAdded(idxes);
-                OnViewListChanged();
-                
                 RequestResizeWindowEvent.Send(listView);
             }
             
@@ -135,13 +139,19 @@ namespace RosettaUI.UIToolkit.Builder
             void OnItemsRemoved(IEnumerable<int> idxes)
             {
                 viewBridge.OnItemsRemoved(idxes);
-                OnViewListChanged();
+            }
+
+            // OnItemsRemoved()がlistView.itemsSource変更前に呼ばれてしまうので、
+            // listView.itemsSource変更御のOnItemsSourceSizeChanged()で変更を通知する
+            void OnItemsSourceSizeChanged()
+            {
+                OnViewListValueChanged();
             }
             
             void OnItemIndexChanged(int srcIdx, int dstIdx)
             {
                 viewBridge.OnItemIndexChanged(srcIdx, dstIdx);
-                OnViewListChanged();
+                OnViewListValueChanged();
                 
                 // ドラッグ中アニメーションでアイテムが移動中にドロップすると
                 // コンテナのサイズがおかしくなる
@@ -150,11 +160,13 @@ namespace RosettaUI.UIToolkit.Builder
                 listView.Rebuild();
             }
 
-            void OnItemsSourceChanged() => OnViewListChanged();
             
             // List になにか変更があった場合の通知
-            // 参照先変更、サイズ変更、アイテムの値変更
-            void OnViewListChanged() => viewBridge.OnViewListChanged(listView.itemsSource);
+            
+            // 参照先変更
+            void OnItemsSourceChanged() => viewBridge.OnViewListChanged(listView.itemsSource);
+            // サイズ変更、アイテムの値変更
+            void OnViewListValueChanged() => viewBridge.OnViewListValueChanged(listView.itemsSource);
             
             #endregion
         }

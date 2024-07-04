@@ -150,6 +150,7 @@ namespace RosettaUI
                 OnItemIndexShiftPlus(index + 1);
                 
                 NotifyListChangedToView();
+                NotifyViewValueChanged();
             }
 
             void RemoveItem()
@@ -158,6 +159,7 @@ namespace RosettaUI
                 OnItemIndexShiftMinus(index);
 
                 NotifyListChangedToView();
+                NotifyViewValueChanged();
             }
         }
         
@@ -330,12 +332,17 @@ namespace RosettaUI
             RemoveItemElementAll();
         }
         
-        // UI側でListの参照先が変わった(Arrayの要素数変更などすると変わる）
+        // UI側でListの参照先、要素数、値が変わった(Arrayの要素数変更などすると参照先が変わる）ときの通知
         // UI.List(writeValue, readValue); の readValue を呼んで通知したいので手動で呼ぶ
-        private void OnViewListChanged(IList list)
+        private void SetViewListWithoutNotify(IList list)
         {
             _binder.SetObject(list);
             _lastListItemCount = list.Count;
+        }
+
+        private void SetViewList(IList list)
+        {
+            SetViewListWithoutNotify(list);
             NotifyViewValueChanged();
         }
         
@@ -359,10 +366,15 @@ namespace RosettaUI
             public void OnItemsAdded(IEnumerable<int> indices) => Element.OnItemsAdded(indices);
             public void OnItemsRemoved(IEnumerable<int> indices) => Element.OnItemsRemoved(indices);
 
-            // UIでのリストの変更を通知
-            // 参照or要素数
-            public void OnViewListChanged(IList list) => Element.OnViewListChanged(list);
+            // UIでのリストの参照先の変更を通知
+            // 値や要素数の変更は別途OnViewListValueChanged()が呼ばれるのでこちらではNotifyしない
+            public void OnViewListChanged(IList list) => Element.SetViewListWithoutNotify(list);
 
+            // UIでのリストの変更を通知
+            // 要素数、値
+            public void OnViewListValueChanged(IList list) => Element.SetViewList(list);
+            
+            
             // UIではない外部でのリストの変更を通知
             // 参照or要素数
             public void SubscribeListChanged(Action<IList> action)

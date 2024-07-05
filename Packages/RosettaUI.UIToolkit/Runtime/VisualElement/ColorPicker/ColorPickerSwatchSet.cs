@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -13,20 +14,20 @@ namespace RosettaUI.UIToolkit
         public const string ListUssClassName = UssClassName + "-list";
         
         public readonly string colorPickerSwatchesKey = "ColorPickerSwatches";
-
-        private readonly ColorPickerSwatch _currentSwatch;
-        private readonly Clickable _currentSwatchClickableManipulator;
         
-        public ColorPickerSwatchSet()
+        private Action<Color> _setColorPickerColor; 
+        private readonly ColorPickerSwatch _currentSwatch;
+
+        public ColorPickerSwatchSet(Action<Color> setColorPickerColor)
         {
+            _setColorPickerColor = setColorPickerColor;
+            
             AddToClassList(GridUssClassName);
             
             text = "Swatches";
             
-            _currentSwatchClickableManipulator = new Clickable(OnCurrentSwatchClicked);
-            
             _currentSwatch = new ColorPickerSwatch { IsCurrent = true };
-            _currentSwatch.AddManipulator(_currentSwatchClickableManipulator);
+            _currentSwatch.RegisterCallback<ClickEvent>(OnCurrentSwatchClicked);
             
             Add(_currentSwatch);
             
@@ -35,15 +36,28 @@ namespace RosettaUI.UIToolkit
         
         public void SetColor(Color color) => _currentSwatch.Color = color;
 
-        private void OnCurrentSwatchClicked()
+        
+        private void OnCurrentSwatchClicked(ClickEvent evt)
         {
             AddSwatch(_currentSwatch.Color);
             SaveSwatches();
+            
+            evt.StopPropagation();
+        }
+        
+        private void OnSwatchClicked(ClickEvent evt)
+        {
+            if (evt.currentTarget is not ColorPickerSwatch swatch) return;
+
+            _setColorPickerColor(swatch.Color);
+            
+            evt.StopPropagation();
         }
 
         private void AddSwatch(Color color)
         {
             var swatch = new ColorPickerSwatch { Color = color };
+            swatch.RegisterCallback<ClickEvent>(OnSwatchClicked);
             Insert(childCount - 1, swatch);
         }
 

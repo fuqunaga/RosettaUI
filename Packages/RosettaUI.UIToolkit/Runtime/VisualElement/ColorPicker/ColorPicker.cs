@@ -159,14 +159,8 @@ namespace RosettaUI.UIToolkit
             _sliderSet = new SliderSet(this);
             InitHex();
 
-            _swatchSet= new ColorPickerSwatchSet();
+            _swatchSet= new ColorPickerSwatchSet(color => Color = color);
             Add(_swatchSet);
-            
-            // var swatch = new ColorPickerSwatch()
-            // {
-            //     Color = Color.red
-            // };
-            // Add(swatch);
         }
 
         private void InitPreview()

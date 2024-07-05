@@ -28,7 +28,6 @@ namespace RosettaUI.UIToolkit
                 {
                     RemoveFromClassList(CurrentClassName);
                 }
-                
             }
         }
         
@@ -65,8 +64,6 @@ namespace RosettaUI.UIToolkit
             _coreElement.Add(checkerboardElement);
             
             Add(_coreElement);
-
-            IsCurrent = true;
         }
     }
 }

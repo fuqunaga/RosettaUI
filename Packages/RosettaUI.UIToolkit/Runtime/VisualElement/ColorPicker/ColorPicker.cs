@@ -72,6 +72,7 @@ namespace RosettaUI.UIToolkit
         private VisualElement _svCursor;
 
         private readonly SliderSet _sliderSet;
+        private readonly ColorPickerSwatchSet _swatchSet;
         
         private TextField _hex;
 
@@ -158,11 +159,14 @@ namespace RosettaUI.UIToolkit
             _sliderSet = new SliderSet(this);
             InitHex();
 
-            var swatch = new ColorPickerSwatch()
-            {
-                Color = Color.red
-            };
-            Add(swatch);
+            _swatchSet= new ColorPickerSwatchSet();
+            Add(_swatchSet);
+            
+            // var swatch = new ColorPickerSwatch()
+            // {
+            //     Color = Color.red
+            // };
+            // Add(swatch);
         }
 
         private void InitPreview()
@@ -327,6 +331,7 @@ namespace RosettaUI.UIToolkit
         {
             _previewCurr.style.backgroundColor = Color;
             UpdateHex();
+            _swatchSet.SetColor(Color);
             onColorChanged?.Invoke(Color);
         }
 

@@ -20,5 +20,5 @@
         <engine:Slider name="slider2" show-input-field="true" />
         <engine:Slider name="slider3" show-input-field="true" />
     </engine:VisualElement>
-    <engine:TextField name="hex" label="Hex" class="rosettaui-colorpicker__hex" />
+    <engine:TextField name="hex" label="Hexadecimal" class="rosettaui-colorpicker__hex" />
 </engine:UXML>

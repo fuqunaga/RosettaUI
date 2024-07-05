@@ -96,8 +96,33 @@
     flex-grow: 1;
     min-width: auto;
 }
+
 .rosettaui-colorpicker__hex > .unity-text-field__input
 {
     flex-grow: 0;
     min-width: 100px;
+}
+
+/********************************************************************************
+* ColorPickerSwatch
+********************************************************************************/
+.rosettaui-colorpicker-swatch
+{
+    width: 16px;
+    height: 16px;
+    border-width: 1px;
+    border-color: black;
+}
+
+.rosettaui-colorpicker-swatch__color
+{
+    width: 100%;
+    height: 100%;
+}
+
+.rosettaui-colorpicker-swatch__color-opaque
+{
+    width: 100%;
+    height: 100%;
+    background-image: resource("half_triangle");
 }

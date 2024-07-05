@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace RosettaUI
 {
@@ -14,9 +15,16 @@ namespace RosettaUI
             if (PlayerPrefs.HasKey(key))
             {
                 var json = PlayerPrefs.GetString(key);
-                var wrapper = JsonUtility.FromJson<Wrapper<T>>(json);
-                value = wrapper.value;
-                return true;
+                try
+                {
+                    var wrapper = JsonUtility.FromJson<Wrapper<T>>(json);
+                    value = wrapper.value;
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"Failed to parse {key} as {typeof(T)}: {e}");
+                }
             }
 
             value = default;

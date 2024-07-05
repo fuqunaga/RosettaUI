@@ -9,13 +9,20 @@ namespace RosettaUI.UIToolkit
 {
     public class ColorPickerSwatchSet : Foldout
     {
+        [Serializable]
+        public struct NameAndColor
+        {
+            public string name;
+            public Color color;
+        }
+        
         public const string UssClassName = "rosettaui-colorpicker-swatchset";
         public const string GridUssClassName = UssClassName + "-grid";
         public const string ListUssClassName = UssClassName + "-list";
-        
-        public readonly string colorPickerSwatchesKey = "ColorPickerSwatches";
-        
-        private Action<Color> _setColorPickerColor; 
+
+        public const string ColorPickerSwatchesKey = "ColorPickerSwatches";
+
+        private readonly Action<Color> _setColorPickerColor; 
         private readonly ColorPickerSwatch _currentSwatch;
 
         public ColorPickerSwatchSet(Action<Color> setColorPickerColor)
@@ -27,7 +34,7 @@ namespace RosettaUI.UIToolkit
             text = "Swatches";
             
             _currentSwatch = new ColorPickerSwatch { IsCurrent = true };
-            _currentSwatch.RegisterCallback<ClickEvent>(OnCurrentSwatchClicked);
+            _currentSwatch.RegisterCallback<PointerDownEvent>(OnCurrentSwatchPointerDown);
             
             Add(_currentSwatch);
             
@@ -37,7 +44,7 @@ namespace RosettaUI.UIToolkit
         public void SetColor(Color color) => _currentSwatch.Color = color;
 
         
-        private void OnCurrentSwatchClicked(ClickEvent evt)
+        private void OnCurrentSwatchPointerDown(PointerDownEvent evt)
         {
             AddSwatch(_currentSwatch.Color);
             SaveSwatches();
@@ -45,42 +52,77 @@ namespace RosettaUI.UIToolkit
             evt.StopPropagation();
         }
         
-        private void OnSwatchClicked(ClickEvent evt)
+        private void OnSwatchPointerDown(PointerDownEvent evt)
         {
             if (evt.currentTarget is not ColorPickerSwatch swatch) return;
 
-            _setColorPickerColor(swatch.Color);
-            
-            evt.StopPropagation();
+            switch (evt.button)
+            {
+                case 0:
+                    _setColorPickerColor(swatch.Color);
+                    evt.StopPropagation();
+                    break;
+                case 1:
+                    PopupMenu.Show(new[]
+                        {
+                            new MenuItem("Replace", () => ReplaceSwatchColorToCurrent(swatch)),
+                            new MenuItem("Delete", () => DeleteSwatch(swatch)),
+                            new MenuItem("Move To First", () => MoveToFirstSwatch(swatch)),
+                        }, 
+                        evt.position, 
+                        swatch);
+                
+                    evt.StopPropagationAndFocusControllerIgnoreEvent();
+                    break;
+            }
         }
 
         private void AddSwatch(Color color)
         {
             var swatch = new ColorPickerSwatch { Color = color };
-            swatch.RegisterCallback<ClickEvent>(OnSwatchClicked);
+            swatch.RegisterCallback<PointerDownEvent>(OnSwatchPointerDown);
             Insert(childCount - 1, swatch);
         }
+
+        private void DeleteSwatch(ColorPickerSwatch swatch)
+        {
+            Remove(swatch);
+            SaveSwatches();
+        }
+
+        private void ReplaceSwatchColorToCurrent(ColorPickerSwatch swatch)
+        {
+            swatch.Color = _currentSwatch.Color;
+            SaveSwatches();
+        }
+
+        private void MoveToFirstSwatch(ColorPickerSwatch swatch)
+        {
+            Remove(swatch);
+            Insert(0, swatch);
+            SaveSwatches();
+        }
+        
 
         private void SaveSwatches()
         {
             var swatches = Children().Select(v => v as ColorPickerSwatch).Where(s => s != _currentSwatch);
 
-            using var _ = ListPool<Color>.Get(out var colors);
-            colors.AddRange(swatches.Select(s => s.Color));
+            using var _ = ListPool<NameAndColor>.Get(out var nameAndColors);
+            nameAndColors.AddRange(swatches.Select(s => new NameAndColor { name = null, color = s.Color }));
             
-            PersistantData.Set(colorPickerSwatchesKey, colors);
+            PersistantData.Set(ColorPickerSwatchesKey, nameAndColors);
         }
         
         private void LoadSwatches()
         {
-            if (!PersistantData.TryGet<List<Color>>(colorPickerSwatchesKey, out var colors))
+            if (PersistantData.TryGet<List<NameAndColor>>(ColorPickerSwatchesKey, out var nameAndColors) 
+                && nameAndColors != null)
             {
-                return;
-            }
-            
-            foreach (var color in colors)
-            {
-                AddSwatch(color);
+                foreach (var nameAndColor in nameAndColors)
+                {
+                    AddSwatch(nameAndColor.color);
+                }
             }
         }
     }

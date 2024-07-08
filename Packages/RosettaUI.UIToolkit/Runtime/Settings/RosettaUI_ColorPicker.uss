@@ -137,6 +137,11 @@
     height: 16px;
 }
 
+.rosettaui-colorpicker-swatch--enable-text >.rosettaui-colorpicker-swatch__tile
+{
+    margin: 2px;
+}
+
 .rosettaui-colorpicker-swatch__tile-current
 {
     padding: 1px;
@@ -170,4 +175,32 @@
     width: 100%;
     height: 100%;
     background-image: resource("half_triangle");
+}
+
+.rosettaui-colorpicker-swatch__text-container
+{
+    flex-grow: 1;
+}
+
+.rosettaui-colorpicker-swatch > .rosettaui-colorpicker-swatch__text-container
+{
+    display: none;
+}
+
+.rosettaui-colorpicker-swatch--enable-text > .rosettaui-colorpicker-swatch__text-container
+{
+    display: flex;
+}
+
+.rosettaui-colorpicker-swatch__text-container > .unity-label
+{
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.rosettaui-colorpicker-swatch__text-container__text-input
+{
+    flex-grow: 1;
+    margin-top: 0;
+    margin-bottom: 0;
 }

@@ -9,6 +9,12 @@ namespace RosettaUI.UIToolkit
 {
     public class ColorPickerSwatchSet : Foldout
     {
+        public enum TileLayout
+        {
+            Grid,
+            List
+        }
+        
         [Serializable]
         public struct NameAndColor
         {
@@ -22,16 +28,38 @@ namespace RosettaUI.UIToolkit
 
         public const string ColorPickerSwatchesKey = "ColorPickerSwatches";
 
+        private readonly VisualElement _swatchSetMenu;
+
         private readonly Action<Color> _setColorPickerColor; 
         private readonly ColorPickerSwatch _currentSwatch;
-
+  
+        public TileLayout Layout
+        {
+            get => ClassListContains(GridUssClassName) ? TileLayout.Grid : TileLayout.List;
+            
+            set
+            {
+                var isGrid = value == TileLayout.Grid;
+                EnableInClassList(GridUssClassName, isGrid);
+                EnableInClassList(ListUssClassName, !isGrid);
+            }
+        }
+  
         public ColorPickerSwatchSet(Action<Color> setColorPickerColor)
         {
             _setColorPickerColor = setColorPickerColor;
-            
-            AddToClassList(GridUssClassName);
-            
             text = "Swatches";
+            
+            AddToClassList(UssClassName);
+
+            _swatchSetMenu = CreateSwatchSetMenu();
+            var toggle = this.Q<Toggle>();
+            toggle.Add(_swatchSetMenu);
+
+            value = false;
+            SetMenuVisible(false);
+            
+            this.RegisterValueChangedCallback(evt => SetMenuVisible(evt.newValue));
             
             _currentSwatch = new ColorPickerSwatch { IsCurrent = true };
             _currentSwatch.RegisterCallback<PointerDownEvent>(OnCurrentSwatchPointerDown);
@@ -40,10 +68,33 @@ namespace RosettaUI.UIToolkit
             
             LoadSwatches();
         }
-        
+
+        private VisualElement CreateSwatchSetMenu()
+        {
+            return new MoreVertMenuButton()
+            {
+                ButtonIndex = 0,
+                CreateMenuItems = () => new[]
+                {
+                    CreateTileLayoutItem(TileLayout.Grid),
+                    CreateTileLayoutItem(TileLayout.List)
+                }
+            };
+            
+            MenuItem CreateTileLayoutItem(TileLayout tileLayout)
+            {
+                return new MenuItem(tileLayout.ToString(), () => Layout = tileLayout)
+                {
+                    isChecked = Layout == tileLayout
+                };
+            }
+        }
+   
         public void SetColor(Color color) => _currentSwatch.Color = color;
 
+        private void SetMenuVisible(bool visible) => _swatchSetMenu.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
         
+    
         private void OnCurrentSwatchPointerDown(PointerDownEvent evt)
         {
             AddSwatch(_currentSwatch.Color);
@@ -79,7 +130,11 @@ namespace RosettaUI.UIToolkit
 
         private void AddSwatch(Color color)
         {
-            var swatch = new ColorPickerSwatch { Color = color };
+            var swatch = new ColorPickerSwatch
+            {
+                Color = color,
+                Label = color.ToString()
+            };
             swatch.RegisterCallback<PointerDownEvent>(OnSwatchPointerDown);
             Insert(childCount - 1, swatch);
         }

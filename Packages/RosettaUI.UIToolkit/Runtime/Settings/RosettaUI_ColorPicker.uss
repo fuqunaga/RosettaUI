@@ -106,10 +106,21 @@
 /********************************************************************************
 * ColorPickerSwatchSet
 ********************************************************************************/
+.rosettaui-colorpicker-swatchset
+{
+    margin-top: 12px;
+    margin-right: 4px;
+}
+
 .rosettaui-colorpicker-swatchset-grid > .unity-foldout__content
 {
     flex-direction: row;
     flex-wrap: wrap;
+}
+
+.rosettaui-colorpicker-swatchset__menu
+{
+    margin: 0 0 0 auto;
 }
 
 /********************************************************************************
@@ -117,11 +128,16 @@
 ********************************************************************************/
 .rosettaui-colorpicker-swatch
 {
+    flex-direction: row;
+}
+
+.rosettaui-colorpicker-swatch__tile
+{
     width: 16px;
     height: 16px;
 }
 
-.rosettaui-colorpicker-swatch-current
+.rosettaui-colorpicker-swatch__tile-current
 {
     padding: 1px;
     border-width: 1px;
@@ -130,12 +146,12 @@
     background-color: var(--unity-colors-button-background);
 }
 
-.rosettaui-colorpicker-swatch-current:hover 
+.rosettaui-colorpicker-swatch__tile-current:hover 
 {
     background-color: var(--unity-colors-button-background-hover);
 }
 
-.rosettaui-colorpicker-swatch-core
+.rosettaui-colorpicker-swatch__tile-core
 {
     width: 100%;
     height: 100%;
@@ -143,13 +159,13 @@
     border-color: black;
 }
 
-.rosettaui-colorpicker-swatch-color
+.rosettaui-colorpicker-swatch__tile-color
 {
     width: 100%;
     height: 100%;
 }
 
-.rosettaui-colorpicker-swatch-color-opaque
+.rosettaui-colorpicker-swatch__tile-color-opaque
 {
     width: 100%;
     height: 100%;

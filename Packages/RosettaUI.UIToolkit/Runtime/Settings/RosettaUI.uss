@@ -360,3 +360,27 @@
     background-position: 0 0;
     background-repeat: repeat;
 }
+
+/********************************************************************************
+* MoreVertMenuButton
+********************************************************************************/
+.rosettaui-morevert-menu-button
+{
+    min-width: 16px;
+    width: 16px;
+    height: 16px;
+    margin: 0 0 0 auto;
+    padding: 2px;
+    border-width: 0;
+    border-radius: 1px;
+    align-self: center;
+    background-color: transparent;
+    background-image: resource("more_vert");
+    -unity-background-image-tint-color: var(--unity-colors-default-text);
+}
+
+.rosettaui-morevert-menu-button:active:enabled,
+.rosettaui-morevert-menu-button:focus:enabled
+{
+    background-color: transparent;
+}

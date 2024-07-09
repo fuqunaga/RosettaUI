@@ -268,33 +268,5 @@ namespace RosettaUI.Builder
             => color.r.ToString("X2") + color.g.ToString("X2") + color.b.ToString("X2");
         
         #endregion
-        
-#if false
-
-        static void FillArea(int xSize, int ySize, Color[] retval, Color topLeftColor, Color rightGradient, Color downGradient, bool convertToGamma)
-        {
-            // Calc the deltas for stepping.
-            Color rightDelta = new Color(0, 0, 0, 0), downDelta  = new Color(0, 0, 0, 0);
-            if (xSize > 1)
-                rightDelta = rightGradient / (xSize - 1);
-            if (ySize > 1)
-                downDelta = downGradient / (ySize - 1);
-
-            // Assign all colors into the array
-            Color p = topLeftColor;
-            int current = 0;
-            for (int y = 0; y < ySize; y++)
-            {
-                Color p2 = p;
-                for (int x = 0; x < xSize; x++)
-                {
-                    retval[current++] = convertToGamma ? p2.gamma : p2;
-                    p2 += rightDelta;
-                }
-                p += downDelta;
-            }
-        }
-        
-#endif
     }
 }

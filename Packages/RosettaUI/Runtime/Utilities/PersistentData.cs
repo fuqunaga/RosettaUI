@@ -117,6 +117,11 @@ namespace RosettaUI
 
         private static T GetAny<T>(string key)
         {
+            if (!PlayerPrefs.HasKey(key))
+            {
+                return default;
+            }
+            
             var json = PlayerPrefs.GetString(key);
             try
             {

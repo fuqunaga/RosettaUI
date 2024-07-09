@@ -30,7 +30,7 @@ namespace RosettaUI.UIToolkit
         {
             if (_window == null)
             {
-                _window = new ModalWindow();
+                _window = new ModalWindow(true);
                 _gradientEditorInstance = new GradientEditor();
                 _window.Add(_gradientEditorInstance);
 

@@ -96,8 +96,115 @@
     flex-grow: 1;
     min-width: auto;
 }
+
 .rosettaui-colorpicker__hex > .unity-text-field__input
 {
     flex-grow: 0;
     min-width: 100px;
+}
+
+/********************************************************************************
+* ColorPickerSwatchSet
+********************************************************************************/
+.rosettaui-colorpicker-swatchset
+{
+    margin-top: 12px;
+    margin-right: 4px;
+}
+
+.rosettaui-colorpicker-swatchset__menu
+{
+    margin: 0 0 0 auto;
+}
+
+.rosettaui-colorpicker-swatchset__tile-scroll-view
+{
+    max-height: 200px;
+}
+
+.rosettaui-colorpicker-swatchset__tile-scroll-view .unity-scroll-view__content-container--horizontal
+{
+    flex-wrap: wrap;
+}
+
+/********************************************************************************
+* ColorPickerSwatch
+********************************************************************************/
+.rosettaui-colorpicker-swatch
+{
+    flex-direction: row;
+}
+
+.rosettaui-colorpicker-swatch__tile
+{
+    width: 16px;
+    height: 16px;
+}
+
+.rosettaui-colorpicker-swatch--enable-text >.rosettaui-colorpicker-swatch__tile
+{
+    margin: 2px;
+}
+
+.rosettaui-colorpicker-swatch__tile-current
+{
+    padding: 1px;
+    border-width: 1px;
+    border-radius: 3px;
+    border-color: var(--rosettaui-dark-gray);
+    background-color: var(--unity-colors-button-background);
+}
+
+.rosettaui-colorpicker-swatch__tile-current:hover 
+{
+    background-color: var(--unity-colors-button-background-hover);
+}
+
+.rosettaui-colorpicker-swatch__tile-core
+{
+    width: 100%;
+    height: 100%;
+    border-width: 1px;
+    border-color: black;
+}
+
+.rosettaui-colorpicker-swatch__tile-color
+{
+    width: 100%;
+    height: 100%;
+}
+
+.rosettaui-colorpicker-swatch__tile-color-opaque
+{
+    width: 100%;
+    height: 100%;
+    background-image: resource("half_triangle");
+}
+
+.rosettaui-colorpicker-swatch__text-container
+{
+    flex-grow: 1;
+}
+
+.rosettaui-colorpicker-swatch > .rosettaui-colorpicker-swatch__text-container
+{
+    display: none;
+}
+
+.rosettaui-colorpicker-swatch--enable-text > .rosettaui-colorpicker-swatch__text-container
+{
+    display: flex;
+}
+
+.rosettaui-colorpicker-swatch__text-container > .unity-label
+{
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.rosettaui-colorpicker-swatch__text-container__text-input
+{
+    flex-grow: 1;
+    margin-top: 0;
+    margin-bottom: 0;
 }

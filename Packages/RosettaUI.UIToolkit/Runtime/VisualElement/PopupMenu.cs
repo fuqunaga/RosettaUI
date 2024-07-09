@@ -12,6 +12,19 @@ namespace RosettaUI.UIToolkit
     /// </summary>
     public class PopupMenu : VisualElement
     {
+        public static void Show(IEnumerable<MenuItem> menuItems, Vector2 position, VisualElement targetElement)
+        {
+            var menu = DropDownMenuGenerator.Generate(
+                menuItems,
+                new Rect() { position = position },
+                targetElement);
+                    
+            if (menu is GenericDropdownMenu gdm)
+            {
+                gdm.AddBoxShadow();
+            }
+        }
+        
         public int ButtonIndex { get; set; } = 1;
         public Func<IEnumerable<MenuItem>> CreateMenuItems { get; set; }
         
@@ -24,15 +37,7 @@ namespace RosettaUI.UIToolkit
                 var menuItems = CreateMenuItems?.Invoke();
                 if (menuItems == null) return;
                 
-                var menu = DropDownMenuGenerator.Generate(
-                    menuItems,
-                    new Rect() { position = evt.position },
-                    this);
-                    
-                if (menu is GenericDropdownMenu gdm)
-                {
-                    gdm.AddBoxShadow();
-                }
+                Show(menuItems, evt.position, this);
 
                 evt.StopPropagationAndFocusControllerIgnoreEvent();
             });

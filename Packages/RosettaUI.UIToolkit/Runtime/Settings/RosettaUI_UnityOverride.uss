@@ -497,7 +497,7 @@ Unity2022.2.0b6
     padding-left: 6px;
 }
 
-.unity-foldout__toggle > .unity-toggle__input:focus > .unity-label
+.unity-foldout__toggle > .unity-toggle__input:focus:enabled > .unity-label
 {
     color: var(--unity-colors-default-text); /* remove unity default */
 }

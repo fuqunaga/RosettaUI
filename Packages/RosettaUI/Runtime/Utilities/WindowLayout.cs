@@ -67,13 +67,11 @@ namespace RosettaUI
 
             if ((openedWindows?.Any() ?? false) && alignX)
             {
-                var rect = getWindowRect(window);
                 var previousRect = getWindowRect(openedWindows.Last());
 
-                //　previousの下に表示
+                //　新しいWindowの上部が画面の半分より上なら、previousの下に表示
                 var newY = previousRect.yMax + delta;
-                if ((newY + rect.height <= screenRect.yMax) // はみ出ない 
-                    || newY < screenRect.center.y) // はみ出てても半分より上
+                if (newY < screenRect.center.y) // 半分より上
                 {
                     pos.x = previousRect.xMin;
                     pos.y = newY;

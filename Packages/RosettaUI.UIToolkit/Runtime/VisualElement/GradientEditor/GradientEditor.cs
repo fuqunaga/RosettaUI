@@ -10,10 +10,6 @@ namespace RosettaUI.UIToolkit
     {
         public static readonly string USSClassName = "rosettaui-gradient-editor";
         
-        private static readonly Color CheckerBoardColorBlack = new(0.427451f, 0.427451f, 0.427451f); // #6D6D6D;
-        private static readonly Color CheckerBoardColorWhite = new(0.5960785f, 0.5960785f, 0.5960785f); // #989898;
-        
-        
         #region static interface
 
         private static ModalWindow _window;
@@ -105,8 +101,21 @@ namespace RosettaUI.UIToolkit
         {
             _modeEnum = this.Q<EnumField>("mode-enum");
             
+            _gradientPreview = new VisualElement()
+            {
+                style =
+                {
+                    width = Length.Percent(100),
+                    height = Length.Percent(100),
+                }
+            };
+            
+            var checkerboard = new Checkerboard(CheckerboardTheme.Dark);
+            
             var previewBackground = this.Q("preview-background");
-            _gradientPreview = this.Q("preview");
+            
+            checkerboard.Add(_gradientPreview);
+            previewBackground.Add(checkerboard);
 
             _alphaCursorContainer = this.Q("alpha-cursor-container");
             _colorCursorContainer = this.Q("color-cursor-container");
@@ -153,8 +162,6 @@ namespace RosettaUI.UIToolkit
             
             this.ScheduleToUseResolvedLayoutBeforeRendering(() =>
             {
-                InitPreviewBackground(previewBackground);
-                
                 // はみ出し抑制
                 VisualElementExtension.CheckOutOfScreen(_window.Position, _window);
             });
@@ -169,19 +176,6 @@ namespace RosettaUI.UIToolkit
             InitColorKeysEditor();
             
             UpdateSelectedSwatchField(_colorKeysEditor.ShowedSwatches.FirstOrDefault());
-        }
-
-        private static void InitPreviewBackground(VisualElement previewBackground)
-        {
-            if (_previewCheckerBoardTexture == null)
-            {
-                const int gridSize = 6;
-                var rs = previewBackground.resolvedStyle;
-                var size = new Vector2Int(Mathf.CeilToInt(rs.width),  Mathf.CeilToInt(rs.height));
-                _previewCheckerBoardTexture = TextureUtility.CreateCheckerBoardTexture(size, gridSize, CheckerBoardColorWhite, CheckerBoardColorBlack);
-            }   
-            
-            previewBackground.style.backgroundImage = _previewCheckerBoardTexture;
         }
 
         private void InitAlphaKeysEditor()

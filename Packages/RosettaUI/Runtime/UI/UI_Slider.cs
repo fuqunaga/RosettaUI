@@ -5,107 +5,113 @@ namespace RosettaUI
 {
     public static partial class UI
     {
-        public static Element Slider<T>(Expression<Func<T>> targetExpression)
-            => Slider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression);
+        public static Element Slider<T>(Expression<Func<T>> targetExpression, in SliderOption? option = null)
+            => Slider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, option);
 
-        public static Element Slider<T>(Expression<Func<T>> targetExpression, T max)
-            => Slider(targetExpression, default(T), max);
+        public static Element Slider<T>(Expression<Func<T>> targetExpression, T max, in SliderOption? option = null)
+            => Slider(targetExpression, default(T), max, option);
 
-        public static Element Slider<T>(Expression<Func<T>> targetExpression, T min, T max)
+        public static Element Slider<T>(Expression<Func<T>> targetExpression, T min, T max, in SliderOption? option = null)
             => Slider(ExpressionUtility.CreateLabelString(targetExpression),
                 targetExpression,
                 min,
-                max
+                max,
+                option
             );
 
 
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression)
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, in SliderOption? option = null)
         {
             var (rangeMinGetter, rangeMaxGetter) = UIInternalUtility.CreateMinMaxGetterFromRangeAttribute(targetExpression);
-            return Slider(label, UIInternalUtility.CreateBinder(targetExpression), rangeMinGetter, rangeMaxGetter);
+            return Slider(label, UIInternalUtility.CreateBinder(targetExpression), rangeMinGetter, rangeMaxGetter, option);
         }
         
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T max)
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T max, in SliderOption? option = null)
         {
-            return Slider(label, targetExpression, default, max);
+            return Slider(label, targetExpression, default, max, option);
         }
 
-        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T min, T max)
+        public static Element Slider<T>(LabelElement label, Expression<Func<T>> targetExpression, T min, T max, in SliderOption? option = null)
         {
             return Slider(label,
                 UIInternalUtility.CreateBinder(targetExpression),
                 ConstGetter.Create(min),
-                ConstGetter.Create(max)
-                );
+                ConstGetter.Create(max),
+                option
+            );
         }
 
 
-        public static Element Slider<T>(Expression<Func<T>> targetExpression, Action<T> writeValue)
-            => Slider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue);
+        public static Element Slider<T>(Expression<Func<T>> targetExpression, Action<T> writeValue, in SliderOption? option = null)
+            => Slider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue, option);
 
-        public static Element Slider<T>(Expression<Func<T>> targetExpression, Action<T> writeValue, T max)
-            => Slider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue, max);
+        public static Element Slider<T>(Expression<Func<T>> targetExpression, Action<T> writeValue, T max, in SliderOption? option = null)
+            => Slider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue, max, option);
 
-        public static Element Slider<T>(Expression<Func<T>> targetExpression, Action<T> writeValue, T min, T max)
-            => Slider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue, min, max);
+        public static Element Slider<T>(Expression<Func<T>> targetExpression, Action<T> writeValue, T min, T max, in SliderOption? option = null)
+            => Slider(ExpressionUtility.CreateLabelString(targetExpression), targetExpression.Compile(), writeValue, min, max, option);
 
         
-        public static Element Slider<T>(LabelElement label, Func<T> readValue, Action<T> writeValue) 
-            => Slider(label, Binder.Create(readValue, writeValue), null, null);
+        public static Element Slider<T>(LabelElement label, Func<T> readValue, Action<T> writeValue, in SliderOption? option = null) 
+            => Slider(label, Binder.Create(readValue, writeValue), null, null, option);
 
-        public static Element Slider<T>(LabelElement label, Func<T> readValue, Action<T> writeValue, T max) 
-            => Slider(label, readValue, writeValue, default, max);
+        public static Element Slider<T>(LabelElement label, Func<T> readValue, Action<T> writeValue, T max, in SliderOption? option = null) 
+            => Slider(label, readValue, writeValue, default, max, option);
 
-        public static Element Slider<T>(LabelElement label, Func<T> readValue, Action<T> writeValue, T min, T max)
+        public static Element Slider<T>(LabelElement label, Func<T> readValue, Action<T> writeValue, T min, T max, in SliderOption? option = null)
         {
             return Slider(label, 
                 Binder.Create(readValue, writeValue), 
                 ConstGetter.Create(min), 
-                ConstGetter.Create(max));
+                ConstGetter.Create(max),
+                option
+            );
         }
 
         
 
-        public static Element SliderReadOnly<T>(Expression<Func<T>> targetExpression)
+        public static Element SliderReadOnly<T>(Expression<Func<T>> targetExpression, in SliderOption? option = null)
         {
             var (rangeMinGetter, rangeMaxGetter) = UIInternalUtility.CreateMinMaxGetterFromRangeAttribute(targetExpression);
             return Slider(ExpressionUtility.CreateLabelString(targetExpression),
                 UIInternalUtility.CreateReadOnlyBinder(targetExpression),
                 rangeMinGetter,
-                rangeMaxGetter
+                rangeMaxGetter,
+                option
             );
         }
 
-        public static Element SliderReadOnly<T>(Expression<Func<T>> targetExpression, T max)
-            => SliderReadOnly(targetExpression, default, max);
+        public static Element SliderReadOnly<T>(Expression<Func<T>> targetExpression, T max, in SliderOption? option = null)
+            => SliderReadOnly(targetExpression, default, max, option);
 
-        public static Element SliderReadOnly<T>(Expression<Func<T>> targetExpression, T min, T max)
+        public static Element SliderReadOnly<T>(Expression<Func<T>> targetExpression, T min, T max, in SliderOption? option = null)
         {
             return Slider(ExpressionUtility.CreateLabelString(targetExpression),
                 UIInternalUtility.CreateReadOnlyBinder(targetExpression),
                 ConstGetter.Create(min),
-                ConstGetter.Create(max)
+                ConstGetter.Create(max),
+                option
             );
         }
 
 
-        public static Element SliderReadOnly<T>(LabelElement label, Func<T> readValue)
-            => Slider(label, Binder.Create(readValue, null), null, null);
+        public static Element SliderReadOnly<T>(LabelElement label, Func<T> readValue, in SliderOption? option = null)
+            => Slider(label, Binder.Create(readValue, null), null, null, option);
         
-        public static Element SliderReadOnly<T>(LabelElement label, Func<T> readValue, T max)
-            => SliderReadOnly(label, readValue, default, max);
+        public static Element SliderReadOnly<T>(LabelElement label, Func<T> readValue, T max, in SliderOption? option = null)
+            => SliderReadOnly(label, readValue, default, max, option);
 
-        public static Element SliderReadOnly<T>(LabelElement label, Func<T> readValue, T min, T max)
-            => Slider(label, readValue, null, min, max);
+        public static Element SliderReadOnly<T>(LabelElement label, Func<T> readValue, T min, T max, in SliderOption? option = null)
+            => Slider(label, readValue, null, min, max, option);
 
 
 
-        public static Element Slider(LabelElement label, IBinder binder, IGetter minGetter, IGetter maxGetter)
-            => Slider(label, binder, new SliderOption() {minGetter = minGetter, maxGetter = maxGetter});
+        public static Element Slider(LabelElement label, IBinder binder, IGetter minGetter, IGetter maxGetter, in SliderOption? option = null)
+            => Slider(label, binder, new SliderElementOption(minGetter, maxGetter, option));
         
-        public static Element Slider(LabelElement label, IBinder binder, SliderOption option)
+        public static Element Slider(LabelElement label, IBinder binder, in SliderElementOption elementOption)
         {
-            var contents = BinderToElement.CreateSliderElement(label, binder, option);
+            var contents = BinderToElement.CreateSliderElement(label, binder, elementOption);
             if (contents == null) return null;
 
             UIInternalUtility.SetInteractableWithBinder(contents, binder);

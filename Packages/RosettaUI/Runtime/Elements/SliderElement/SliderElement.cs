@@ -2,7 +2,7 @@
 {
     public abstract class SliderElement<T> : SliderBaseElement<T, T>
     {
-        public SliderElement(LabelElement label, IBinder<T> binder, SliderOption<T> option) 
+        protected SliderElement(LabelElement label, IBinder<T> binder, in SliderElementOption<T> option) 
             : base(label, binder, option)
         {
         }
@@ -11,58 +11,72 @@
     public abstract class SliderBaseElement<T, TRange> : RangeFieldElement<T, TRange>
     {
         public readonly bool showInputField;
+
+        protected SliderBaseElement(LabelElement label, IBinder<T> binder, in SliderElementOption<TRange> option) 
+            : base(label, binder, option.minGetter, option.maxGetter, option.FieldOption)
+        {
+            showInputField = option.ShowInputField;
+        }
+    }
+
+
+    public readonly struct SliderElementOption
+    {
+        public readonly IGetter minGetter;
+        public readonly IGetter maxGetter;
+        public readonly SliderOption? sliderOption;
         
-        public SliderBaseElement(LabelElement label, IBinder<T> binder, SliderOption<TRange> option) 
-            : base(label, binder, option.minGetter, option.maxGetter)
+        public SliderElementOption(IGetter minGetter, IGetter maxGetter, in SliderOption? sliderOption)
         {
-            this.showInputField = option.showInputField;
+            this.minGetter = minGetter;
+            this.maxGetter = maxGetter;
+            this.sliderOption = sliderOption;
+        }
+
+        public SliderElementOption(in SliderElementOption baseOption, IGetter newMinGetter, IGetter newMaxGetter)
+        {
+            minGetter = newMinGetter;
+            maxGetter = newMaxGetter;
+            sliderOption = baseOption.sliderOption;
+        }
+
+        public SliderElementOption<T> Cast<T>()
+        {
+            return new SliderElementOption<T>
+            (
+                (IGetter<T>) minGetter,
+                (IGetter<T>) maxGetter,
+                sliderOption
+            );
         }
     }
 
-
-    public class SliderOption
+    public readonly struct SliderElementOption<T>
     {
-        public IGetter minGetter;
-        public IGetter maxGetter;
-        public bool showInputField = true;
-
-        public SliderOption()
+        public readonly IGetter<T> minGetter;
+        public readonly IGetter<T> maxGetter;
+        public readonly SliderOption? sliderOption;
+        
+        public bool ShowInputField => sliderOption?.showInputField ?? true;
+        public FieldOption FieldOption => sliderOption?.fieldOption ?? FieldOption.Default;
+        
+        public SliderElementOption(IGetter<T> minGetter, IGetter<T> maxGetter, SliderOption? sliderOption)
         {
-        }
-
-        public SliderOption(SliderOption other)
-        {
-            minGetter = other.minGetter;
-            minGetter = other.minGetter;
-            showInputField = other.showInputField;
-        }
-
-        public SliderOption<T> Cast<T>()
-        {
-            return new SliderOption<T>()
-            {
-                minGetter = (IGetter<T>) minGetter,
-                maxGetter = (IGetter<T>) maxGetter,
-                showInputField = showInputField
-            };
+            this.minGetter = minGetter;
+            this.maxGetter = maxGetter;
+            this.sliderOption = sliderOption;
         }
     }
 
-    public class SliderOption<T>
+    public static class SliderElementOptionExtension
     {
-        public IGetter<T> minGetter;
-        public IGetter<T> maxGetter;
-        public bool showInputField = true;
-    }
-
-    public static class SliderOptionExtension
-    {
-        public static SliderOption<T> SetMinMaxGetterIfNotExist<T>(this SliderOption<T> option, IGetter<T> minGetter, IGetter<T> maxGetter)
+        public static SliderElementOption<T> SetMinMaxGetterIfNotExist<T>(this SliderElementOption<T> elementOption, IGetter<T> minGetter, IGetter<T> maxGetter)
         {
-            option.minGetter ??= minGetter;
-            option.maxGetter ??= maxGetter;
-
-            return option;
+            return new SliderElementOption<T>(
+                elementOption.minGetter ?? minGetter,
+                elementOption.maxGetter ?? maxGetter,
+                elementOption.sliderOption
+            );
         }
     }
 }

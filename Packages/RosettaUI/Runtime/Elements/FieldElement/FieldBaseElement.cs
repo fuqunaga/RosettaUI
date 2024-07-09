@@ -5,7 +5,7 @@
     /// </summary>
     public abstract class FieldBaseElement<T> : ReadOnlyFieldElement<T>
     {
-        public FieldOption Option { get; protected set; }
+        public FieldOption Option { get; }
         private readonly IBinder<T> _binder;
         
         protected FieldBaseElement(LabelElement label, IBinder<T> binder, in FieldOption option = default) : base(label, binder)

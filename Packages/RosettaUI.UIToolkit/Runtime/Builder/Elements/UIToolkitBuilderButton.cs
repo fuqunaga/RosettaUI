@@ -8,9 +8,13 @@ namespace RosettaUI.UIToolkit.Builder
         {
             if (element is not ButtonElement buttonElement || visualElement is not Button button) return false;
 
-            buttonElement.SubscribeValueOnUpdateCallOnce(button);
-            
             var viewBridge = buttonElement.GetViewBridge();
+            
+            // Button は TextElement を継承しているが SetValueWithoutNotify() で文字をセットしても正しく反応しない @Unity6000.0.2f1
+            // Button.text に直接セット必要がある
+            // - buttonElement.SubscribeValueOnUpdateCallOnce(button);
+            viewBridge.SubscribeValueOnUpdateCallOnce(text => button.text = text);
+            
             button.clicked += buttonElement.OnClick;
             viewBridge.onUnsubscribe += () => button.clicked -= buttonElement.OnClick;
 

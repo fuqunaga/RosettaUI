@@ -21,6 +21,7 @@ namespace RosettaUI.UIToolkit
         public static void ScheduleToUseResolvedLayoutBeforeRendering(this VisualElement ve, Action action)
         {
             ve.RegisterCallback<GeometryChangedEvent>(Callback);
+            return;
 
             void Callback(GeometryChangedEvent _)
             {

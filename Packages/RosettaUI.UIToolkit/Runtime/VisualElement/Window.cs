@@ -208,7 +208,7 @@ namespace RosettaUI.UIToolkit
             // NavigationMoveEvent 方向にフォーカスを移動しようとする
             // キー入力をしている場合などにフォーカスが移ってしまうのは避けたいのでWindow単位で抑制しておく
             // UnityデフォルトでもTextFieldは抑制できているが、IntegerField.inputFieldでは出来ていないなど挙動に一貫性がない
-            RegisterCallback<NavigationMoveEvent>(evt => evt.PreventDefault());
+            RegisterCallback<NavigationMoveEvent>(evt => evt.StopPropagationAndFocusControllerIgnoreEvent());
 
             ResetFixedSize();
         }
@@ -445,7 +445,13 @@ namespace RosettaUI.UIToolkit
                 var current = new Vector2(resolvedStyle.left, resolvedStyle.top);
                 var diff = pos - current;
 
-                if (Mathf.Abs(diff.x) < 5f && Mathf.Abs(diff.y) < 5f) return;
+                const float distanceToActivation = 10f;
+                const float distanceToActivationSqr = distanceToActivation * distanceToActivation;
+                if (Vector2.SqrMagnitude(diff) <  distanceToActivationSqr)
+                {
+                    return;
+                }
+                
                 _beforeDrag = false;
             }
 

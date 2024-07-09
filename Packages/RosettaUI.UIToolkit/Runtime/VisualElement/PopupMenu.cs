@@ -34,8 +34,7 @@ namespace RosettaUI.UIToolkit
                     gdm.AddBoxShadow();
                 }
 
-                evt.StopPropagation();
-                evt.PreventDefault();
+                evt.StopPropagationAndFocusControllerIgnoreEvent();
             });
         }
     }

@@ -9,9 +9,9 @@ namespace RosettaUI
 
         public readonly ReactiveProperty<TRange> minRx;
         public readonly ReactiveProperty<TRange> maxRx;
-        
-        public RangeFieldElement(LabelElement label, IBinder<T> binder, IGetter<TRange> minGetter, IGetter<TRange> maxGetter)
-            : base(label, binder)
+
+        protected RangeFieldElement(LabelElement label, IBinder<T> binder, IGetter<TRange> minGetter, IGetter<TRange> maxGetter, in FieldOption option = default)
+            : base(label, binder, option)
         {
             _minGetter = minGetter;
             _maxGetter = maxGetter;

@@ -21,14 +21,14 @@ namespace RosettaUI.UIToolkit.Builder
         }
         
         // Subscribe field -> element
-        private static void Subscribe<TValue>(this BaseField<TValue> field, FieldBaseElement<TValue> element)
+        private static void Subscribe<TValue>(this INotifyValueChanged<TValue> field, FieldBaseElement<TValue> element)
         {
             field.Subscribe(element, v => v);
         }
         
         // Subscribe field -> element
         private static void Subscribe<TFieldValue, TElementValue>(
-            this BaseField<TFieldValue> field,
+            this INotifyValueChanged<TFieldValue> field,
             FieldBaseElement<TElementValue> element,
             Func<TFieldValue, TElementValue> fieldValueToElementValue)
         {
@@ -39,7 +39,12 @@ namespace RosettaUI.UIToolkit.Builder
             
             // TFieldValueがstringのとき
             // ラベルの更新とBaseFieldの値の更新の区別がつかないのでラベルのイベントは止めておく
-            field.labelElement.RegisterValueChangedCallback(e => e.StopPropagation());
+            if (field is BaseField<TFieldValue> baseField)
+            {
+                baseField.labelElement.RegisterValueChangedCallback(e => e.StopPropagation());
+            }
+
+            return;
 
             void OnValueChanged(ChangeEvent<TFieldValue> evt)
             {
@@ -48,7 +53,7 @@ namespace RosettaUI.UIToolkit.Builder
         }
 
         // Subscribe element <-> field
-        public static void Bind<T>(this FieldBaseElement<T> element, BaseField<T> field)
+        public static void Bind<T>(this FieldBaseElement<T> element, INotifyValueChanged<T> field)
         {
             element.SubscribeValueOnUpdateCallOnce(field);
             field.Subscribe(element);

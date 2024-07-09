@@ -13,6 +13,8 @@ namespace RosettaUI
             item1 = min;
             item2 = max;
         }
+
+        public override string ToString() => $"({min}, {max})";
     }
 
     public static class MinMax

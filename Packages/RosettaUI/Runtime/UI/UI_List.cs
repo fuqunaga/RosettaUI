@@ -176,7 +176,7 @@ namespace RosettaUI
         public static Element ListCounterField(IBinder listBinder,　Element itemContainerElement, in ListViewOption option)
         {
             var interactable = !ListBinder.IsReadOnly(listBinder) && !option.fixedSize;
-            
+
             return Field(null,
                 () => ListBinder.GetCount(listBinder),
                 count =>
@@ -192,7 +192,9 @@ namespace RosettaUI
                     {
                         ListBinder.SetCount(listBinder, count);
                     }
-                }).SetMinWidth(50f).SetInteractable(interactable);
+                },
+                new FieldOption { delayInput = true }
+            ).SetMinWidth(32f).SetInteractable(interactable);
         }
         
         private static Element ListItemContainer(IBinder listBinder, Func<IBinder, int, Element> createItemElement, in ListViewOption option)

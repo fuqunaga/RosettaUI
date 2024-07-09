@@ -81,7 +81,7 @@ namespace RosettaUI
                             targets.Clear();
                             targets.AddRange(
                                 // includeInactive==false でも Behaviour.enabled==falseなものは含まれるので注意
-                                Object.FindObjectsOfType(type, includeInactive)
+                                Object.FindObjectsByType(type, includeInactive ? FindObjectsInactive.Include : FindObjectsInactive.Exclude, FindObjectsSortMode.None)
                                     .OrderBy(o => o.name)
                             );
                         }

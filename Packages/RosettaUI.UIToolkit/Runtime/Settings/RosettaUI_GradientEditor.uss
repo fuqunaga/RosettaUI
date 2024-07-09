@@ -1,17 +1,33 @@
 /********************************************************************************
 * Gradient Editor
 ********************************************************************************/
+.rosettaui-gradient-editor .unity-base-field__label
+{
+    min-width: 100px; /* デフォルトは150px だがGradientEditor内ではもっと詰めたい */
+}
+
 .rosettaui-gradient-editor > #mode-enum > .unity-label 
 {
-    width: 250px;
+    width: 150px;
+}
+
+.rosettaui-gradient-editor__alpha-cursor-container,
+.rosettaui-gradient-editor__color-cursor-container
+{
+    height: 30px;
+}
+
+.rosettaui-gradient-editor__gradient-preview
+{
+    height: 42px;
 }
 
 .rosettaui-gradient-editor__cursor
 {
     position: absolute;
-    width: 14px;
-    height: 24px;
-    margin: 0 0 0 -7px;
+    width: 8px;
+    height: 14px;
+    margin: 0 0 0 -4px;
     border-width: 0;
     background-image: resource("gradient_cursor");
 }

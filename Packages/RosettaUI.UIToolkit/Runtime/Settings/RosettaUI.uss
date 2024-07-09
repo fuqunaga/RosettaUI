@@ -1,28 +1,29 @@
 :root {
-    --fixed-field-width-m: 120px; /* マイナスfloat値が収まる枠 */
-    --fixed-field-width-s: 80px;
-    --slider-min-width: 248px;
-    --input-border-width: 2px;
+    --fixed-field-width-m: 80px; /* マイナスfloat値が収まる枠 */
+    --fixed-field-width-s: 48px;
+    --slider-min-width: 180px;
+    --input-border-width: 1px;
     --cursor-resize-horizontal: resource("cursor_ew") 24 9;
     --close-icon: resource("close");
     
     --rosettaui-gray-button-tint: #A0A0A0;
 
     --rosettaui-highlight-gray: #606060;
-    --rosettaui-highlight-dark-gray: #404040;
+    --rosettaui-highlight-dark-gray: #303030;
     --rosettaui-highlight-blue: rgb(0, 150, 230);
     --rosettaui-highlight-dark-blue: var(--unity-colors-highlight-background);
 
-    --rosettaui-slider-tracker-height: 4px;
-    --rosettaui-slider-tracker-margin-top: -2px; /* half of height */
-    --rosettaui-slider-tracker-border-radius: 3px;
+    --rosettaui-slider-tracker-height: 2px;
+    --rosettaui-slider-tracker-margin-top: -1px; /* half of height */
+    --rosettaui-slider-tracker-border-radius: 2px;
     
-    --rosettaui-slider-dragger-height: 14px;
-    --rosettaui-slider-dragger-margin-top: -7px; /* half of height */
-    --rosettaui-slider-dragger-border-radius: 7px;
+    --rosettaui-slider-dragger-height: 10px;
+    --rosettaui-slider-dragger-margin-top: -5px; /* half of height */
+    --rosettaui-slider-dragger-border-radius: 5px;
     
-    --rosettaui-scroller-size: 18px;
-    --rosettaui-scroller-tint-color: #808080;
+    --rosettaui-scroller-size: 12px;
+    --rosettaui-scroller-tint-color: #707070;
+    --rosettaui-scroller-highlith-tint-color: #808080;
     
     --rosettaui-color-input-background: #181818;
     --rosettaui-color-window-background: rgba(45, 45, 45, 0.85);
@@ -33,7 +34,7 @@
 
     --rosettaui-button-background-pressed: var(--rosettaui-highlight-dark-blue);
     
-    font-size: 18px;
+    font-size: 12px;
     color: var(--unity-colors-default-text);
 }
 
@@ -64,7 +65,7 @@
 * Window
 ********************************************************************************/
 .rosettaui-window {
-    --rosettaui-window-border-width: 2px;
+    --rosettaui-window-border-width: 1px;
     --rosettaui-window-border-color: rgba(5, 5, 5, 0.2);
 
     background-color: var(--rosettaui-color-window-background);
@@ -72,7 +73,6 @@
     border-radius: 1px;
     border-width: var(--rosettaui-window-border-width);
     border-color: var(--rosettaui-window-border-color);
-    /*padding-left: 15px;*/
     padding-bottom: 8px;
 }
 
@@ -96,8 +96,9 @@
 }
 
 .rosettaui-window-title-button {
-    padding: 4px 20px;
+    padding: 1px 16px;
     height: 100%;
+    min-height: 18px;
     align-items: center;
     flex-direction: row;
 }
@@ -110,8 +111,8 @@
 
 .rosettaui-window-title-button__icon {
     background-image: var(--close-icon);
-    width: 14px;
-    height: 14px;
+    width: 10px;
+    height: 10px;
     -unity-background-image-tint-color: var(--gray-button-tint);
 }
 
@@ -167,8 +168,6 @@
 .rosettaui-composite-field
 {
     flex-direction: row;
-    margin-top: 0;
-    margin-bottom: 0;
     margin-right: 0;
 }
 
@@ -179,7 +178,7 @@
 
 .rosettaui-composite-field .unity-base-field__label 
 {
-    min-width: 15px;
+    min-width: 10px;
 }
 
 .rosettaui-composite-field .unity-base-field__input 
@@ -205,7 +204,7 @@
 {
     padding: 0;
     border-color: var(--unity-colors-input_field-border);
-    width: 185px;
+    width: 124px;
 }
 
 .rosettaui-color-field__input-rgb {
@@ -260,7 +259,7 @@
 {
     padding: 0;
     border-color: var(--unity-colors-input_field-border);
-    width: 185px;
+    width: 124px;
 }
 
 .rosettaui-gradient-field__input-rgb {
@@ -284,13 +283,29 @@
     background-color: white;
 }
 
+/********************************************************************************
+* SliderInField
+********************************************************************************/
+.rosettaui-slider-in-field > .unity-base-slider--horizontal
+{
+    flex-grow: 1;
+    min-height: 18px;
+}
+
+.rosettaui-slider-in-field > .unity-base-text-field__input
+{
+    width: var(--fixed-field-width-m);
+    min-width: var(--fixed-field-width-m);
+    flex-grow: 0;
+}
+
 
 /********************************************************************************
 * Window Launcher
 ********************************************************************************/
 .rosettaui-window-launcher 
 {
-    margin: 2px 0 4px 0;
+    margin: 2px 0 2px 0;
     padding-right: 3px;
 }
 
@@ -310,13 +325,12 @@
     border-width: 0;
 }
 
-.rosettaui-window-launcher .unity-toggle__checkmark,
-.rosettaui-window-launcher .unity-toggle__input:focus .unity-toggle__checkmark,
-.rosettaui-window-launcher .unity-toggle__input:hover .unity-toggle__checkmark,
-.rosettaui-window-launcher .unity-toggle__input:checked .unity-toggle__checkmark,
-.rosettaui-window-launcher .unity-toggle__input:hover:checked .unity-toggle__checkmark,
-.rosettaui-window-launcher .unity-toggle__input:focus:checked .unity-toggle__checkmark 
+.rosettaui-window-launcher__checkmark
 {
+    align-self: center;
+    width: 16px;
+    height: 16px;
+    border-width: 1px;
     -unity-background-image-tint-color: darkgray;
     background-image: resource("open-in-new");
     background-color: transparent;
@@ -330,4 +344,18 @@
 {
     flex-grow: 100;
     flex-shrink: 0;
+}
+
+/********************************************************************************
+* Checkerboard
+********************************************************************************/
+.rosettaui-checkerboard
+{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    background-position: 0 0;
+    background-repeat: repeat;
 }

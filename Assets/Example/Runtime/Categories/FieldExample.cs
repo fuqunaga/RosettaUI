@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace RosettaUI.Example
 {
@@ -52,12 +50,12 @@ namespace RosettaUI.Example
         public float[] floatArray = {1f, 2f, 3f};
         public SimpleClass simpleClass;
 
-        public List<SimpleClass> classList = new[]
+        public List<SimpleClass> classList = new List<SimpleClass>
         {
-            new SimpleClass {floatValue = 1f, stringValue = "First"}
-        }.ToList();
+            new() { floatValue = 1f, stringValue = "First" }
+        };
         
-        [FormerlySerializedAs("attributeTestClass")] public AttributeExampleClass attributeExampleClass;
+        public AttributeExampleClass attributeExampleClass;
 
 
         public Element CreateElement(LabelElement _)
@@ -114,7 +112,7 @@ namespace RosettaUI.Example
                     UI.FieldReadOnly(() => classList)
                 ),
                 ExampleTemplate.Tab("Codes",
-                    ExampleTemplate.CodeElementSets("Argument",
+                    ExampleTemplate.CodeElementSets("Option",
                         "If FieldOption.delayInput == true, the value isn't updated until Enter is pressed or the focus is lost.",
                         (@"UI.Field(
     () => intValue,

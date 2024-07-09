@@ -31,63 +31,13 @@ namespace RosettaUI.UIToolkit.Editor
             
             rootVisualElement.styleSheets.Clear();
             rootVisualElement.styleSheets.Add(StyleSheet);
-
-            var scalingContainer = CreateScalingContainer();
-            scalingContainer.AddToClassList(RosettaUIRootUIToolkit.USSRootClassName);
-           
-            scalingContainer.Add(ve);
-            rootVisualElement.Add(scalingContainer);
+            
+            rootVisualElement.AddToClassList(RosettaUIRootUIToolkit.USSRootClassName);
+            rootVisualElement.Add(ve);
             
             updater ??= new ElementUpdater();
             updater.Register(element);
             updater.RegisterWindowRecursive(element);
-        }
-
-
-        // PanelSetting like scaling for Editor
-        // transform.scale でスケールするが、width、heightをスケール後の見た目が変わらないように調整する
-        // またスケールはElementの中心を中心として行われるので左上中心のスケールになるようにする
-        // https://forum.unity.com/threads/configuring-panelsettings-used-by-editor-windows.1058072/
-        VisualElement CreateScalingContainer()
-        {
-            const float scale = 12f / 18f;
-            
-            var scalingContainer = new VisualElement()
-            {
-                name = "ScalingContainer",
-                style =
-                {
-                    flexShrink = 0
-                }
-            };
-
-            rootVisualElement.RegisterCallback<GeometryChangedEvent>(_ => UpdateScale());
-            scalingContainer.RegisterCallback<AttachToPanelEvent>(_ => UpdateScale()); // EditorWindow を開いたまま Play したとき GeometryChangedEvent が呼ばれないようなので必要
-            
-            scalingContainer.RegisterCallback<GeometryChangedEvent>(evt =>
-            {
-                var rect = evt.newRect;
-                
-                scalingContainer.transform.position = new Vector2(
-                    rect.width * (scale - 1f) * 0.5f,
-                    rect.height * (scale - 1f) * 0.5f
-                );
-            });
-      
-            return scalingContainer;
-
-            void UpdateScale()
-            {
-                var rect = rootVisualElement.layout;
-                
-                var width = rect.width / scale;
-                var height = rect.height / scale;
-
-                scalingContainer.style.width = width;
-                scalingContainer.style.height = height;
-
-                scalingContainer.transform.scale = new Vector3(scale, scale, 1f);
-            }
         }
 
         protected virtual void Update()

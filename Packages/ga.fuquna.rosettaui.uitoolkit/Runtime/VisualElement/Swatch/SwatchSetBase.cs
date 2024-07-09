@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if false
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,7 +8,7 @@ using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    public class ColorPickerSwatchSet : Foldout
+    public class SwatchSetBase<TValue> : Foldout
     {
         public enum TileLayout
         {
@@ -31,14 +32,14 @@ namespace RosettaUI.UIToolkit
 
         private readonly VisualElement _swatchSetMenu;
         private readonly ScrollView _tileScrollView;
-        private readonly Action<Color> _setColorPickerColor; 
-        private readonly ColorPickerSwatch _currentSwatch;
+        private readonly SwatchBase<TValue> _currentSwatch;
+        private readonly Action<TValue> _applyValueFunc; 
 
         private TileLayout _tileLayout;
         
         private bool IsSwatchDisplayLabel => Layout == TileLayout.List;
-        private IEnumerable<ColorPickerSwatch> SwatchesWithCurrent => _tileScrollView.Children().Select(v => v as ColorPickerSwatch);
-        private IEnumerable<ColorPickerSwatch> Swatches => SwatchesWithCurrent.Where(s => s != _currentSwatch);
+        private IEnumerable<SwatchBase<TValue>> SwatchesWithCurrent => _tileScrollView.Children().Select(v => v as SwatchBase<TValue>);
+        private IEnumerable<SwatchBase<TValue>> Swatches => SwatchesWithCurrent.Where(s => s != _currentSwatch);
         
         public TileLayout Layout
         {
@@ -56,10 +57,10 @@ namespace RosettaUI.UIToolkit
         }
 
         
-        public ColorPickerSwatchSet(Action<Color> setColorPickerColor)
+        public SwatchSetBase(string label, Action<TValue> applyValueFunc)
         {
-            _setColorPickerColor = setColorPickerColor;
-            text = "Swatches";
+            _applyValueFunc = applyValueFunc;
+            text = "label";
             
             AddToClassList(UssClassName);
 
@@ -68,8 +69,6 @@ namespace RosettaUI.UIToolkit
             toggle.Add(_swatchSetMenu);
 
             value = false;
-            SetMenuVisible(false);
-            
             this.RegisterValueChangedCallback(OnValueChanged);
 
 
@@ -80,7 +79,8 @@ namespace RosettaUI.UIToolkit
             
             _tileScrollView.AddToClassList(TileScrollViewUssClassName);
             
-            _currentSwatch = new ColorPickerSwatch { IsCurrent = true };
+            // TODO:
+            // _currentSwatch = new ColorPickerSwatch { IsCurrent = true };
             _currentSwatch.RegisterCallback<PointerDownEvent>(OnCurrentSwatchPointerDown);
             
             _tileScrollView.Add(_currentSwatch);
@@ -128,7 +128,9 @@ namespace RosettaUI.UIToolkit
             Layout = (TileLayout)PersistentData.Get<int>(ColorPickerSwatchSetLayoutKey);
         }
    
-        public void SetColor(Color color) => _currentSwatch.Color = color;
+
+        //TODO:
+        // public void SetColor( color) => _currentSwatch.Color = color;
 
         private void SetMenuVisible(bool v)
         {
@@ -147,7 +149,7 @@ namespace RosettaUI.UIToolkit
     
         private void OnCurrentSwatchPointerDown(PointerDownEvent evt)
         {
-            var newSwatch = AddSwatch(_currentSwatch.Color);
+            var newSwatch = AddSwatch(_currentSwatch.Value);
             SaveSwatches();
             
             if ( IsSwatchDisplayLabel )
@@ -165,7 +167,8 @@ namespace RosettaUI.UIToolkit
             switch (evt.button)
             {
                 case 0:
-                    _setColorPickerColor(swatch.Color);
+                    // TODO:
+                    // _applyValueFunc(swatch.Color);
                     evt.StopPropagation();
                     break;
                 case 1:
@@ -204,7 +207,7 @@ namespace RosettaUI.UIToolkit
         }
         
 
-        private ColorPickerSwatch AddSwatch(Color color, string swatchName = null)
+        private SwatchBase<TValue> AddSwatch(TValue color, string swatchName = null)
         {
             var swatch = new ColorPickerSwatch
             {
@@ -257,3 +260,5 @@ namespace RosettaUI.UIToolkit
         }
     }
 }
+
+#endif

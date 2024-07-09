@@ -55,13 +55,13 @@
       }
     },
     "ga.fuquna.rosettaui": {
-      "version": "file:RosettaUI",
+      "version": "file:ga.fuquna.rosettaui",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}
     },
     "ga.fuquna.rosettaui.ugui": {
-      "version": "file:RosettaUI.UGUI",
+      "version": "file:ga.fuquna.rosettaui.ugui",
       "depth": 0,
       "source": "embedded",
       "dependencies": {
@@ -70,7 +70,7 @@
       }
     },
     "ga.fuquna.rosettaui.uitoolkit": {
-      "version": "file:RosettaUI.UIToolkit",
+      "version": "file:ga.fuquna.rosettaui.uitoolkit",
       "depth": 0,
       "source": "embedded",
       "dependencies": {

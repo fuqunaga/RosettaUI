@@ -1,14 +1,13 @@
-﻿#if false
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    public class SwatchSetBase<TValue> : Foldout
+    public abstract class SwatchSetBase<TValue, TSwatch> : Foldout
+        where TSwatch : SwatchBase<TValue>, new()
     {
         public enum TileLayout
         {
@@ -17,25 +16,25 @@ namespace RosettaUI.UIToolkit
         }
         
         [Serializable]
-        public struct NameAndColor
+        public struct NameAndValue
         {
             public string name;
-            public Color color;
+            public TValue value;
         }
         
-        public const string UssClassName = "rosettaui-colorpicker-swatchset";
+        public const string UssClassName = "rosettaui-swatchset";
         public const string TileScrollViewUssClassName = UssClassName + "__tile-scroll-view";
-
-        public const string ColorPickerSwatchSetLayoutKey = "ColorPickerSwatchSetLayout";
-        public const string ColorPickerSwatchSetIsOpenKey = "ColorPickerSwatchSetIsOpen";
-        public const string ColorPickerSwatchesKey = "ColorPickerSwatches";
-
+        
         private readonly VisualElement _swatchSetMenu;
         private readonly ScrollView _tileScrollView;
         private readonly SwatchBase<TValue> _currentSwatch;
         private readonly Action<TValue> _applyValueFunc; 
 
         private TileLayout _tileLayout;
+        
+        protected abstract string DataKeyLayout { get; }
+        protected abstract string DataKeyIsOpen { get; }
+        protected abstract string DataKeySwatches { get; }
         
         private bool IsSwatchDisplayLabel => Layout == TileLayout.List;
         private IEnumerable<SwatchBase<TValue>> SwatchesWithCurrent => _tileScrollView.Children().Select(v => v as SwatchBase<TValue>);
@@ -52,7 +51,7 @@ namespace RosettaUI.UIToolkit
                 
                 UpdateSwatchesEnableText();
                 
-                PersistentData.Set(ColorPickerSwatchSetLayoutKey, (int)value);
+                PersistentData.Set(DataKeyLayout, (int)value);
             }
         }
 
@@ -60,7 +59,7 @@ namespace RosettaUI.UIToolkit
         public SwatchSetBase(string label, Action<TValue> applyValueFunc)
         {
             _applyValueFunc = applyValueFunc;
-            text = "label";
+            text = label;
             
             AddToClassList(UssClassName);
 
@@ -79,8 +78,8 @@ namespace RosettaUI.UIToolkit
             
             _tileScrollView.AddToClassList(TileScrollViewUssClassName);
             
-            // TODO:
-            // _currentSwatch = new ColorPickerSwatch { IsCurrent = true };
+            
+            _currentSwatch = new TSwatch { IsCurrent = true };
             _currentSwatch.RegisterCallback<PointerDownEvent>(OnCurrentSwatchPointerDown);
             
             _tileScrollView.Add(_currentSwatch);
@@ -122,15 +121,14 @@ namespace RosettaUI.UIToolkit
         
         private void LoadStatus()
         {
-            var isOpen = PersistentData.Get<bool>(ColorPickerSwatchSetIsOpenKey);
+            var isOpen = PersistentData.Get<bool>(DataKeyIsOpen);
             value = isOpen;
             
-            Layout = (TileLayout)PersistentData.Get<int>(ColorPickerSwatchSetLayoutKey);
+            Layout = (TileLayout)PersistentData.Get<int>(DataKeyLayout);
         }
    
-
-        //TODO:
-        // public void SetColor( color) => _currentSwatch.Color = color;
+        
+        public void SetValue(TValue currentValue) => _currentSwatch.Value = currentValue;
 
         private void SetMenuVisible(bool v)
         {
@@ -142,7 +140,7 @@ namespace RosettaUI.UIToolkit
             var isOpen = evt.newValue;
             SetMenuVisible(isOpen);
             
-            PersistentData.Set(ColorPickerSwatchSetIsOpenKey, isOpen);
+            PersistentData.Set(DataKeyIsOpen, isOpen);
         }
 
 
@@ -162,13 +160,12 @@ namespace RosettaUI.UIToolkit
         
         private void OnSwatchPointerDown(PointerDownEvent evt)
         {
-            if (evt.currentTarget is not ColorPickerSwatch swatch) return;
+            if (evt.currentTarget is not TSwatch swatch) return;
 
             switch (evt.button)
             {
                 case 0:
-                    // TODO:
-                    // _applyValueFunc(swatch.Color);
+                    _applyValueFunc(swatch.Value);
                     evt.StopPropagation();
                     break;
                 case 1:
@@ -185,7 +182,7 @@ namespace RosettaUI.UIToolkit
 
             IEnumerable<MenuItem> CreateMenuItems()
             {
-                yield return new MenuItem("Replace", () => ReplaceSwatchColorToCurrent(swatch));
+                yield return new MenuItem("Replace", () => ReplaceSwatchValueToCurrent(swatch));
                 yield return new MenuItem("Delete", () => DeleteSwatch(swatch));
                 if (Layout == TileLayout.List)
                 {
@@ -207,12 +204,12 @@ namespace RosettaUI.UIToolkit
         }
         
 
-        private SwatchBase<TValue> AddSwatch(TValue color, string swatchName = null)
+        private SwatchBase<TValue> AddSwatch(TValue swatchValue, string swatchName = null)
         {
-            var swatch = new ColorPickerSwatch
+            var swatch = new TSwatch
             {
                 Label = swatchName,
-                Color = color,
+                Value = swatchValue,
             };
             swatch.RegisterCallback<PointerDownEvent>(OnSwatchPointerDown);
             swatch.EnableText = IsSwatchDisplayLabel;
@@ -221,19 +218,19 @@ namespace RosettaUI.UIToolkit
             return swatch;
         }
 
-        private void DeleteSwatch(ColorPickerSwatch swatch)
+        private void DeleteSwatch(TSwatch swatch)
         {
             _tileScrollView.Remove(swatch);
             SaveSwatches();
         }
 
-        private void ReplaceSwatchColorToCurrent(ColorPickerSwatch swatch)
+        private void ReplaceSwatchValueToCurrent(TSwatch swatch)
         {
-            swatch.Color = _currentSwatch.Color;
+            swatch.Value = _currentSwatch.Value;
             SaveSwatches();
         }
 
-        private void MoveToFirstSwatch(ColorPickerSwatch swatch)
+        private void MoveToFirstSwatch(TSwatch swatch)
         {
             _tileScrollView.Remove(swatch);
             _tileScrollView.Insert(0, swatch);
@@ -242,23 +239,21 @@ namespace RosettaUI.UIToolkit
         
         private void SaveSwatches()
         {
-            using var _ = ListPool<NameAndColor>.Get(out var nameAndColors);
-            nameAndColors.AddRange(Swatches.Select(s => new NameAndColor { name = s.Label, color = s.Color }));
+            using var _ = ListPool<NameAndValue>.Get(out var nameAndValues);
+            nameAndValues.AddRange(Swatches.Select(s => new NameAndValue { name = s.Label, value = s.Value }));
             
-            PersistentData.Set(ColorPickerSwatchesKey, nameAndColors);
+            PersistentData.Set(DataKeySwatches, nameAndValues);
         }
         
         private void LoadSwatches()
         {
-            var nameAndColors = PersistentData.Get<List<NameAndColor>>(ColorPickerSwatchesKey);
-            if (nameAndColors == null) return;
+            var nameAndValues = PersistentData.Get<List<NameAndValue>>(DataKeySwatches);
+            if (nameAndValues == null) return;
             
-            foreach (var nameAndColor in nameAndColors)
+            foreach (var nameAndValue in nameAndValues)
             {
-                AddSwatch(nameAndColor.color, nameAndColor.name);
+                AddSwatch(nameAndValue.value, nameAndValue.name);
             }
         }
     }
 }
-
-#endif

@@ -4,10 +4,12 @@
 @import url("RosettaUI_UnityOverride.uss");
 @import url("RosettaUI.uss");
 @import url("RosettaUI_MinMaxSlider.uss");
-@import url("RosettaUI_ColorPicker.uss");
 @import url("RosettaUI_Tabs.uss");
-@import url("RosettaUI_ObjectField.uss");
+@import url("RosettaUI_Swatch.uss");
+@import url("RosettaUI_ColorPicker.uss");
 @import url("RosettaUI_GradientEditor.uss");
+@import url("RosettaUI_ObjectField.uss");
+
 
 
 

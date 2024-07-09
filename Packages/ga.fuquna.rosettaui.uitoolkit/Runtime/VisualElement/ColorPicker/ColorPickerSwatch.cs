@@ -53,11 +53,5 @@ namespace RosettaUI.UIToolkit
                 _opaqueElement.style.unityBackgroundImageTintColor = colorWithoutAlpha;
             }
         }
-
-        public Color Color
-        {
-            get => Value;
-            set => Value = value;
-        }
     }
 }

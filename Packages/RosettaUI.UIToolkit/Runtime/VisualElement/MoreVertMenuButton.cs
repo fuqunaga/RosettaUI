@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
@@ -20,14 +21,21 @@ namespace RosettaUI.UIToolkit
 
         private void OnClick(EventBase evtBase)
         {
-            if (evtBase is not PointerUpEvent evt) return;
+            Vector2? position = evtBase switch
+            {
+                PointerUpEvent pointerUpEvent => pointerUpEvent.position,
+                MouseUpEvent mouseUpEvent => mouseUpEvent.mousePosition,
+                _ => null
+            };
+            
+            if (position == null) return;
             
             var menuItems = CreateMenuItems?.Invoke();
             if (menuItems == null) return;
                 
-            PopupMenu.Show(menuItems, evt.position, this);
+            PopupMenu.Show(menuItems, position.Value, this);
 
-            evt.StopPropagationAndFocusControllerIgnoreEvent();
+            evtBase.StopPropagationAndFocusControllerIgnoreEvent();
         }
     }
 }

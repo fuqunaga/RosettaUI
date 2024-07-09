@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Loading;
 using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UIElements;
@@ -25,6 +26,8 @@ namespace RosettaUI.UIToolkit
         public const string UssClassName = "rosettaui-colorpicker-swatchset";
         public const string TileScrollViewUssClassName = UssClassName + "__tile-scroll-view";
 
+        public const string ColorPickerSwatchSetLayoutKey = "ColorPickerSwatchSetLayout";
+        public const string ColorPickerSwatchSetIsOpenKey = "ColorPickerSwatchSetIsOpen";
         public const string ColorPickerSwatchesKey = "ColorPickerSwatches";
 
         private readonly VisualElement _swatchSetMenu;
@@ -48,6 +51,8 @@ namespace RosettaUI.UIToolkit
                 _tileScrollView.mode = _tileLayout == TileLayout.Grid ? ScrollViewMode.Horizontal : ScrollViewMode.Vertical;
                 
                 UpdateSwatchesEnableText();
+                
+                PersistentData.Set(ColorPickerSwatchSetLayoutKey, (int)value);
             }
         }
 
@@ -66,7 +71,7 @@ namespace RosettaUI.UIToolkit
             value = false;
             SetMenuVisible(false);
             
-            this.RegisterValueChangedCallback(evt => SetMenuVisible(evt.newValue));
+            this.RegisterValueChangedCallback(OnValueChanged);
 
 
             _tileScrollView = new ScrollView()
@@ -81,14 +86,18 @@ namespace RosettaUI.UIToolkit
             
             _tileScrollView.Add(_currentSwatch);
             Add(_tileScrollView);
+
             
             LoadSwatches();
             
-            UpdateSwatchesEnableText();
-
-            Layout = TileLayout.List;
+            // すぐにLoadStatusしてSwatchSetが
+            // ・Foldがオープン
+            // ・TileLayoutがList
+            // ・Swatchの名前が長い
+            // 場合、自動レイアウトでColorPickerのWindow自体が広がってしまうので
+            // しばらくはデフォルトの閉じてる状態をキープしてからLoadStatusする
+            schedule.Execute(LoadStatus).ExecuteLater(32);
         }
-
 
         private VisualElement CreateSwatchSetMenu()
         {
@@ -110,11 +119,32 @@ namespace RosettaUI.UIToolkit
                 };
             }
         }
+        
+        
+        private void LoadStatus()
+        {
+            var isOpen = PersistentData.Get<bool>(ColorPickerSwatchSetIsOpenKey);
+            value = isOpen;
+            
+            Layout = (TileLayout)PersistentData.Get<int>(ColorPickerSwatchSetLayoutKey);
+        }
    
         public void SetColor(Color color) => _currentSwatch.Color = color;
 
-        private void SetMenuVisible(bool v) => _swatchSetMenu.style.display = v ? DisplayStyle.Flex : DisplayStyle.None;
+        private void SetMenuVisible(bool v)
+        {
+            _swatchSetMenu.style.display = v ? DisplayStyle.Flex : DisplayStyle.None;
+        } 
         
+        private void OnValueChanged(ChangeEvent<bool> evt)
+        {
+            var isOpen = evt.newValue;
+            SetMenuVisible(isOpen);
+            
+            PersistentData.Set(ColorPickerSwatchSetIsOpenKey, isOpen);
+        }
+
+
     
         private void OnCurrentSwatchPointerDown(PointerDownEvent evt)
         {
@@ -213,18 +243,17 @@ namespace RosettaUI.UIToolkit
             using var _ = ListPool<NameAndColor>.Get(out var nameAndColors);
             nameAndColors.AddRange(Swatches.Select(s => new NameAndColor { name = s.Label, color = s.Color }));
             
-            PersistantData.Set(ColorPickerSwatchesKey, nameAndColors);
+            PersistentData.Set(ColorPickerSwatchesKey, nameAndColors);
         }
         
         private void LoadSwatches()
         {
-            if (PersistantData.TryGet<List<NameAndColor>>(ColorPickerSwatchesKey, out var nameAndColors) 
-                && nameAndColors != null)
+            var nameAndColors = PersistentData.Get<List<NameAndColor>>(ColorPickerSwatchesKey);
+            if (nameAndColors == null) return;
+            
+            foreach (var nameAndColor in nameAndColors)
             {
-                foreach (var nameAndColor in nameAndColors)
-                {
-                    AddSwatch(nameAndColor.color, nameAndColor.name);
-                }
+                AddSwatch(nameAndColor.color, nameAndColor.name);
             }
         }
     }

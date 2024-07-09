@@ -23,44 +23,41 @@ namespace RosettaUI.UIToolkit
         }
         
         public const string UssClassName = "rosettaui-colorpicker-swatchset";
-        public const string GridUssClassName = UssClassName + "-grid";
-        public const string ListUssClassName = UssClassName + "-list";
+        public const string TileScrollViewUssClassName = UssClassName + "__tile-scroll-view";
 
         public const string ColorPickerSwatchesKey = "ColorPickerSwatches";
 
         private readonly VisualElement _swatchSetMenu;
-
+        private readonly ScrollView _tileScrollView;
         private readonly Action<Color> _setColorPickerColor; 
         private readonly ColorPickerSwatch _currentSwatch;
 
+        private TileLayout _tileLayout;
         
         private bool IsSwatchDisplayLabel => Layout == TileLayout.List;
-        
-        private IEnumerable<ColorPickerSwatch> SwatchesWithCurrent => Children().Select(v => v as ColorPickerSwatch);
+        private IEnumerable<ColorPickerSwatch> SwatchesWithCurrent => _tileScrollView.Children().Select(v => v as ColorPickerSwatch);
         private IEnumerable<ColorPickerSwatch> Swatches => SwatchesWithCurrent.Where(s => s != _currentSwatch);
         
-
         public TileLayout Layout
         {
-            get => ClassListContains(GridUssClassName) ? TileLayout.Grid : TileLayout.List;
+            get => _tileLayout;
             
             set
             {
-                var isGrid = value == TileLayout.Grid;
-                EnableInClassList(GridUssClassName, isGrid);
-                EnableInClassList(ListUssClassName, !isGrid);
+                _tileLayout = value;
+                _tileScrollView.mode = _tileLayout == TileLayout.Grid ? ScrollViewMode.Horizontal : ScrollViewMode.Vertical;
                 
                 UpdateSwatchesEnableText();
             }
         }
 
+        
         public ColorPickerSwatchSet(Action<Color> setColorPickerColor)
         {
             _setColorPickerColor = setColorPickerColor;
             text = "Swatches";
             
             AddToClassList(UssClassName);
-            AddToClassList(ListUssClassName);
 
             _swatchSetMenu = CreateSwatchSetMenu();
             var toggle = this.Q<Toggle>();
@@ -70,16 +67,28 @@ namespace RosettaUI.UIToolkit
             SetMenuVisible(false);
             
             this.RegisterValueChangedCallback(evt => SetMenuVisible(evt.newValue));
+
+
+            _tileScrollView = new ScrollView()
+            {
+                horizontalScrollerVisibility = ScrollerVisibility.Hidden,
+            };
+            
+            _tileScrollView.AddToClassList(TileScrollViewUssClassName);
             
             _currentSwatch = new ColorPickerSwatch { IsCurrent = true };
             _currentSwatch.RegisterCallback<PointerDownEvent>(OnCurrentSwatchPointerDown);
             
-            Add(_currentSwatch);
+            _tileScrollView.Add(_currentSwatch);
+            Add(_tileScrollView);
             
             LoadSwatches();
             
             UpdateSwatchesEnableText();
+
+            Layout = TileLayout.List;
         }
+
 
         private VisualElement CreateSwatchSetMenu()
         {
@@ -175,14 +184,14 @@ namespace RosettaUI.UIToolkit
             };
             swatch.RegisterCallback<PointerDownEvent>(OnSwatchPointerDown);
             swatch.EnableText = IsSwatchDisplayLabel;
-            Insert(childCount - 1, swatch);
+            _tileScrollView.Insert(_tileScrollView.childCount - 1, swatch);
 
             return swatch;
         }
 
         private void DeleteSwatch(ColorPickerSwatch swatch)
         {
-            Remove(swatch);
+            _tileScrollView.Remove(swatch);
             SaveSwatches();
         }
 
@@ -194,8 +203,8 @@ namespace RosettaUI.UIToolkit
 
         private void MoveToFirstSwatch(ColorPickerSwatch swatch)
         {
-            Remove(swatch);
-            Insert(0, swatch);
+            _tileScrollView.Remove(swatch);
+            _tileScrollView.Insert(0, swatch);
             SaveSwatches();
         }
         

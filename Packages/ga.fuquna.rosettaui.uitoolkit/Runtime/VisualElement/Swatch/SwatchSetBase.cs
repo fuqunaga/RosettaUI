@@ -55,8 +55,8 @@ namespace RosettaUI.UIToolkit
             }
         }
 
-        
-        public SwatchSetBase(string label, Action<TValue> applyValueFunc)
+
+        protected SwatchSetBase(string label, Action<TValue> applyValueFunc)
         {
             _applyValueFunc = applyValueFunc;
             text = label;
@@ -94,8 +94,8 @@ namespace RosettaUI.UIToolkit
             // ・TileLayoutがList
             // ・Swatchの名前が長い
             // 場合、自動レイアウトでColorPickerのWindow自体が広がってしまうので
-            // しばらくはデフォルトの閉じてる状態をキープしてからLoadStatusする
-            schedule.Execute(LoadStatus).ExecuteLater(32);
+            // レイアウト確定後にLoadStatusする
+            this.ScheduleToUseResolvedLayoutBeforeRendering(LoadStatus);
         }
 
         private VisualElement CreateSwatchSetMenu()

@@ -12,11 +12,6 @@
     margin: 0 0 0 auto;
 }
 
-.rosettaui-swatchset__tile-scroll-view
-{
-    max-height: 200px;
-}
-
 .rosettaui-swatchset__tile-scroll-view .unity-scroll-view__content-container--horizontal
 {
     flex-wrap: wrap;

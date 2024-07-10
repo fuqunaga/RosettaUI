@@ -1,6 +1,11 @@
 /********************************************************************************
 * Gradient Editor
 ********************************************************************************/
+.rosettaui-gradient-editor-fixed-size-area
+{
+    flex-shrink: 0;
+}
+
 .rosettaui-gradient-editor .unity-base-field__label
 {
     min-width: 100px; /* デフォルトは150px だがGradientEditor内ではもっと詰めたい */

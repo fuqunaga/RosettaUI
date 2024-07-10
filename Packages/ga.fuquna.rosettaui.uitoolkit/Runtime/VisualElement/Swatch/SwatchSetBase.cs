@@ -97,7 +97,7 @@ namespace RosettaUI.UIToolkit
             // ・Swatchの名前が長い
             // 場合、自動レイアウトでColorPickerのWindow自体が広がってしまうので
             // レイアウト確定後にLoadStatusする
-            this.ScheduleToUseResolvedLayoutBeforeRendering(LoadStatus);
+            schedule.Execute(LoadStatus).ExecuteLater(32);
         }
 
         private VisualElement CreateSwatchSetMenu()
@@ -191,7 +191,9 @@ namespace RosettaUI.UIToolkit
                 {
                     yield return new MenuItem("Rename", () => swatch.StartRename(SaveSwatches));
                 }
-                yield return new MenuItem("Move To First", () => MoveToFirstSwatch(swatch));
+                
+                // "Move To First"が途中までしか表示されないのでスペースとダミー文字で文字数を増やす @Unity6000.0.2f1
+                yield return new MenuItem("Move To First <size=0>a</size>", () => MoveToFirstSwatch(swatch));
             }
         }
         

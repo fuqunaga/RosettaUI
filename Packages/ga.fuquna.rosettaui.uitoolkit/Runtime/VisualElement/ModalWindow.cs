@@ -19,7 +19,7 @@ namespace RosettaUI.UIToolkit
 
         protected override VisualElement SelfRoot => _eventBlockerElement;
 
-        public ModalWindow() : base(false, true)
+        public ModalWindow(bool resizable = false) : base(resizable, true)
         {
             _eventBlockerElement = new VisualElement();
             _eventBlockerElement.AddToClassList(USSClassNameEventBlocker);

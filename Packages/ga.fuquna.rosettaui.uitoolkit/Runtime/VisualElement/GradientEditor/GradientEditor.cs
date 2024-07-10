@@ -30,7 +30,7 @@ namespace RosettaUI.UIToolkit
         {
             if (_window == null)
             {
-                _window = new ModalWindow();
+                _window = new ModalWindow(true);
                 _gradientEditorInstance = new GradientEditor();
                 _window.Add(_gradientEditorInstance);
 
@@ -52,7 +52,7 @@ namespace RosettaUI.UIToolkit
             }
             
             // Show()前はPanelが設定されていないのでコールバック系はShow()後
-            _gradientEditorInstance.Initialize(initialGradient);
+            _gradientEditorInstance.SetGradient(initialGradient);
             _gradientEditorInstance.onGradientChanged += onGradientChanged;
             _gradientEditorInstance.RegisterCallback<DetachFromPanelEvent>(OnDetach);
             return;
@@ -72,6 +72,7 @@ namespace RosettaUI.UIToolkit
         private GradientKeysEditor _alphaKeysEditor;
         private GradientKeysEditor _colorKeysEditor;
         private GradientKeysSwatch _selectedSwatch;
+        private GradientEditorPresetSet _presetSet;
                 
         private EnumField _modeEnum;
         private VisualElement _gradientPreview;
@@ -84,7 +85,6 @@ namespace RosettaUI.UIToolkit
         private Button _copyButton;
         private Button _pasteButton;
         private Label _infoLabel;
-        
         
 
         private GradientEditor()
@@ -100,22 +100,12 @@ namespace RosettaUI.UIToolkit
         private void InitUI()
         {
             _modeEnum = this.Q<EnumField>("mode-enum");
-            
-            _gradientPreview = new VisualElement()
-            {
-                style =
-                {
-                    width = Length.Percent(100),
-                    height = Length.Percent(100),
-                }
-            };
-            
-            var checkerboard = new Checkerboard(CheckerboardTheme.Dark);
+
+            _gradientPreview = this.Q("preview-front");
             
             var previewBackground = this.Q("preview-background");
-            
-            checkerboard.Add(_gradientPreview);
-            previewBackground.Add(checkerboard);
+            Checkerboard.SetupAsCheckerboard(previewBackground, CheckerboardTheme.Dark);
+            previewBackground.Add(_gradientPreview);
 
             _alphaCursorContainer = this.Q("alpha-cursor-container");
             _colorCursorContainer = this.Q("color-cursor-container");
@@ -132,14 +122,14 @@ namespace RosettaUI.UIToolkit
             _alphaSlider = this.Q("alpha-slider") as Slider;
             _locationSlider = this.Q("location-slider") as Slider;
 
-            _modeEnum.RegisterValueChangedCallback(_ => OnGradientChanged());
+            _modeEnum.RegisterValueChangedCallback(_ => UpdateGradient());
             
             _colorField.RegisterValueChangedCallback(evt =>
             {
                 if (_selectedSwatch == null) return;
                 
                 _selectedSwatch.Color = evt.newValue;
-                OnGradientChanged();
+                UpdateGradient();
             });
             
             _alphaSlider.RegisterValueChangedCallback(evt =>
@@ -147,7 +137,7 @@ namespace RosettaUI.UIToolkit
                 if (_selectedSwatch == null) return;
                 
                 _selectedSwatch.Alpha = evt.newValue;
-                OnGradientChanged();
+                UpdateGradient();
             });
 
             _locationSlider.RegisterValueChangedCallback(_ =>
@@ -155,10 +145,17 @@ namespace RosettaUI.UIToolkit
                 if (_selectedSwatch == null) return;
 
                 _selectedSwatch.TimePercent = _locationSlider.value;
-                OnGradientChanged();
+                UpdateGradient();
             });
 
             InitGradientCode();
+            
+            _presetSet = new GradientEditorPresetSet(gradient =>
+            {
+                SetGradient(gradient);
+                onGradientChanged?.Invoke(_gradient);
+            });
+            Add(_presetSet);
             
             this.ScheduleToUseResolvedLayoutBeforeRendering(() =>
             {
@@ -167,22 +164,29 @@ namespace RosettaUI.UIToolkit
             });
         }
 
-        public void Initialize(Gradient gradient)
+        // GradientEditor外部から値をセットする
+        // - GradientEditorを開いたとき
+        // - Presetが選択されたとき
+        public void SetGradient(Gradient gradient)
         {
             _gradient = gradient;
-            _modeEnum.value = _gradient.mode;
+            _modeEnum.SetValueWithoutNotify(_gradient.mode);
             UpdateGradientPreview();
-            InitAlphaKeysEditor();
-            InitColorKeysEditor();
-            
+            UpdateAlphaKeysEditor();
+            UpdateColorKeysEditor();
             UpdateSelectedSwatchField(_colorKeysEditor.ShowedSwatches.FirstOrDefault());
+            
+            _presetSet.SetValue(_gradient);
         }
 
-        private void InitAlphaKeysEditor()
+        private void UpdateAlphaKeysEditor()
         {
             _alphaKeysEditor ??= new GradientKeysEditor(
                 _alphaCursorContainer,
-                onSwatchChanged: OnSwatchChanged,
+                OnAddSwatch,
+                OnRemoveSwatch,
+                OnSelectedSwatchChanged,
+                OnSwatchValueChanged,
                 isAlpha: true
             );
 
@@ -195,11 +199,14 @@ namespace RosettaUI.UIToolkit
             _alphaKeysEditor.Initialize(_gradient, swatches);
         }
 
-        private void InitColorKeysEditor()
+        private void UpdateColorKeysEditor()
         {
             _colorKeysEditor ??= new GradientKeysEditor(
-                _colorCursorContainer, 
-                onSwatchChanged: OnSwatchChanged,
+                _colorCursorContainer,
+                OnAddSwatch,
+                OnRemoveSwatch,
+                OnSelectedSwatchChanged,
+                OnSwatchValueChanged,
                 isAlpha: false
             );
 
@@ -212,10 +219,11 @@ namespace RosettaUI.UIToolkit
             _colorKeysEditor.Initialize(_gradient, swatches);
         }
 
+        // GradientEditorのUIから値が変更されたとき
         private void OnGradientChanged()
         {
-            UpdateGradient();
             UpdateGradientPreview();
+            _presetSet.SetValue(_gradient);
             onGradientChanged?.Invoke(_gradient);
         }
         
@@ -229,19 +237,34 @@ namespace RosettaUI.UIToolkit
             
             _gradient.SetKeys(colorKeys, alphaKeys);
             _gradient.mode = _modeEnum.value as GradientMode? ?? GradientMode.Blend;
+
+            OnGradientChanged();
         }
         
         private void UpdateGradientPreview()
         {
-            var gradientTexture = GradientHelper.GenerateGradientPreview(_gradient, _gradientPreview.style.backgroundImage.value.texture);
-            _gradientPreview.style.backgroundImage = gradientTexture;
+            GradientHelper.UpdateGradientPreviewToBackgroundImage(_gradient, _gradientPreview);
         }
 
         
-        private void OnSwatchChanged(GradientKeysSwatch selectedSwatch)
+        private void OnAddSwatch(GradientKeysSwatch swatch)
+        {
+            UpdateGradient();
+        }
+        
+        private void OnRemoveSwatch(GradientKeysSwatch swatch)
+        {
+            UpdateGradient();
+        }
+        
+        private void OnSelectedSwatchChanged(GradientKeysSwatch selectedSwatch)
         {
             UpdateSelectedSwatchField(selectedSwatch);
-            OnGradientChanged();
+        }
+        private void OnSwatchValueChanged(GradientKeysSwatch selectedSwatch)
+        {
+            UpdateSelectedSwatchField(selectedSwatch);
+            UpdateGradient();
         }
 
         
@@ -264,15 +287,15 @@ namespace RosettaUI.UIToolkit
             
             if (isAlpha)
             {
-                _alphaSlider.value = swatch.Alpha;
+                _alphaSlider.SetValueWithoutNotify(swatch.Alpha);
             }
             else
             {
-                _colorField.value = swatch.Color;
+                _colorField.SetValueWithoutNotify(swatch.Color);
             }
 
             _locationSlider.visible = true;
-            _locationSlider.value = swatch.TimePercent;
+            _locationSlider.SetValueWithoutNotify(swatch.TimePercent);
 
             return;
             
@@ -307,7 +330,7 @@ namespace RosettaUI.UIToolkit
                 {
                     if (GradientHelper.JsonToGradient(clip) is { } gradient)
                     {
-                        Initialize(gradient);
+                        SetGradient(gradient);
                         UpdateGradientPreview();
                         onGradientChanged?.Invoke(_gradient);
                         _infoLabel.text = "Paste!";

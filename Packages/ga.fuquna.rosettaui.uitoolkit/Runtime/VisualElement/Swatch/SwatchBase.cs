@@ -1,54 +1,26 @@
 ﻿using System;
-using RosettaUI.Builder;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    public class ColorPickerSwatch : VisualElement
+    public abstract class SwatchBase<TValue> : VisualElement
     {
-        public const string UssClassName = "rosettaui-colorpicker-swatch";
+        public const string UssClassName = "rosettaui-swatch";
         public const string EnableTextUssClassName = UssClassName + "--enable-text";
+        public const string CurrentClassName = UssClassName + "--current";
         public const string TileClassName = UssClassName + "__tile";
-        public const string TileCurrentClassName = TileClassName + "-current";
-        public const string TileCoreClassName = TileClassName + "-core";
-        public const string TileColorUssClassName = TileClassName + "-color";
-        public const string TileColorOpaqueUssClassName = TileClassName + "-color-opaque";
         public const string TextContainerUssClassName = UssClassName + "__text-container";
         public const string TextInputUssClassName = TextContainerUssClassName + "__text-input";
         
-        private readonly VisualElement _tileElement;
-        private readonly VisualElement _colorElement;
-        private readonly VisualElement _colorOpaque;
         private readonly VisualElement _textContainer;
+        private VisualElement _tileElement;
         private Label _label;
+        
+        public abstract TValue Value { get; set; }
 
         public bool IsCurrent
         {
-            set
-            {
-                if (value)
-                {
-                    _tileElement.AddToClassList(TileCurrentClassName);
-                }
-                else
-                {
-                    _tileElement.RemoveFromClassList(TileCurrentClassName);
-                }
-            }
-        }
-        
-        public Color Color
-        {
-            get => _colorElement.style.backgroundColor.value;
-            set
-            {
-                _colorElement.style.backgroundColor = value;
-
-                var colorWithoutAlpha = value;
-                colorWithoutAlpha.a = 1;
-                _colorOpaque.style.unityBackgroundImageTintColor = colorWithoutAlpha;
-            }
+            set => EnableInClassList(CurrentClassName, value);
         }
 
         public string Label
@@ -75,36 +47,30 @@ namespace RosettaUI.UIToolkit
             set => EnableInClassList(EnableTextUssClassName, value);
         }
 
-        public ColorPickerSwatch()
+        
+        protected SwatchBase()
         {
             AddToClassList(UssClassName);
-            
-            _tileElement = new VisualElement();
-            _tileElement.AddToClassList(TileClassName);
-            
-            var coreElement = new VisualElement();
-            coreElement.AddToClassList(TileCoreClassName);
-            
-            var checkerboardElement = new Checkerboard(CheckerboardTheme.Light);
 
-            _colorElement = new VisualElement();
-            _colorElement.AddToClassList(TileColorUssClassName);
-
-            _colorOpaque = new VisualElement();
-            _colorOpaque.AddToClassList(TileColorOpaqueUssClassName);
-
-            _colorElement.Add(_colorOpaque);
-            checkerboardElement.Add(_colorElement);
-            coreElement.Add(checkerboardElement);
-            _tileElement.Add(coreElement);
-            
             _textContainer = new VisualElement();
             _textContainer.AddToClassList(TextContainerUssClassName);
             
-            Add(_tileElement);
             Add(_textContainer);
         }
 
+        protected void SetTileElement(VisualElement tileElement)
+        {
+            if (_tileElement != null)
+            {
+                Remove(_tileElement);
+            }
+            
+            _tileElement = tileElement;
+            _tileElement.AddToClassList(TileClassName);
+            Insert(0, tileElement);
+        }
+
+        
         public void StartRename(Action onRenameFinished)
         {
             var textField = new TextField

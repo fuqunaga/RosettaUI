@@ -325,7 +325,7 @@ namespace RosettaUI.UIToolkit
         {
             _previewCurr.style.backgroundColor = Color;
             UpdateHex();
-            _swatchSet.SetColor(Color);
+            _swatchSet.SetValue(Color);
             onColorChanged?.Invoke(Color);
         }
 

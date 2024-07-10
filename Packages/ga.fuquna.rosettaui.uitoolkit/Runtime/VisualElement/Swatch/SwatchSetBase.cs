@@ -68,6 +68,7 @@ namespace RosettaUI.UIToolkit
             toggle.Add(_swatchSetMenu);
 
             value = false;
+            SetMenuVisible(false);
             this.RegisterValueChangedCallback(OnValueChanged);
 
 

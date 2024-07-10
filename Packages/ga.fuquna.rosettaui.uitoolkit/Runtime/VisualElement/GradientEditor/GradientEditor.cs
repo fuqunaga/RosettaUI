@@ -100,22 +100,12 @@ namespace RosettaUI.UIToolkit
         private void InitUI()
         {
             _modeEnum = this.Q<EnumField>("mode-enum");
-            
-            _gradientPreview = new VisualElement()
-            {
-                style =
-                {
-                    width = Length.Percent(100),
-                    height = Length.Percent(100),
-                }
-            };
-            
-            var checkerboard = new Checkerboard(CheckerboardTheme.Dark);
+
+            _gradientPreview = this.Q("preview-front");
             
             var previewBackground = this.Q("preview-background");
-            
-            checkerboard.Add(_gradientPreview);
-            previewBackground.Add(checkerboard);
+            Checkerboard.SetupAsCheckerboard(previewBackground, CheckerboardTheme.Dark);
+            previewBackground.Add(_gradientPreview);
 
             _alphaCursorContainer = this.Q("alpha-cursor-container");
             _colorCursorContainer = this.Q("color-cursor-container");

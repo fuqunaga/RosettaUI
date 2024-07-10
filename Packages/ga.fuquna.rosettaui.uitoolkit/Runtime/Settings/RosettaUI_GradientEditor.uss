@@ -17,10 +17,18 @@
     height: 30px;
 }
 
-.rosettaui-gradient-editor__gradient-preview
+.rosettaui-gradient-editor__preview-background
 {
     height: 42px;
+    margin-top: -8px;
 }
+
+.rosettaui-gradient-editor__preview-front
+{
+    width: 100%;
+    height: 100%;
+}
+
 
 .rosettaui-gradient-editor__cursor
 {

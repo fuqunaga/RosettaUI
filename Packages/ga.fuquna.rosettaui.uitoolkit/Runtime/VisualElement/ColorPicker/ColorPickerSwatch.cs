@@ -1,5 +1,4 @@
-﻿using System;
-using RosettaUI.Builder;
+﻿using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
 

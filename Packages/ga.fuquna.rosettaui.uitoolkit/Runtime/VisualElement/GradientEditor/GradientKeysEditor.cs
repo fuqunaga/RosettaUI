@@ -20,17 +20,26 @@ namespace RosettaUI.UIToolkit
         
         private Gradient _gradient;
         private GradientKeysSwatch _selectedSwatch;
-        private readonly Action<GradientKeysSwatch> _onSwatchChanged;
+        private readonly Action<GradientKeysSwatch> _onAddSwatch;
+        private readonly Action<GradientKeysSwatch> _onRemoveSwatch;
+        private readonly Action<GradientKeysSwatch> _onSelectedSwatchChanged;
+        private readonly Action<GradientKeysSwatch> _onSwatchValueChanged;
         
         public IReadOnlyList<GradientKeysSwatch> ShowedSwatches => _showedSwatches;
         
         public GradientKeysEditor(VisualElement container, 
-            Action<GradientKeysSwatch> onSwatchChanged,
+            Action<GradientKeysSwatch> onAddSwatch,
+            Action<GradientKeysSwatch> onRemoveSwatch,
+            Action<GradientKeysSwatch> onSelectedSwatchChanged,
+            Action<GradientKeysSwatch> onSwatchValueChanged,
             bool isAlpha
             )
         {
             _container = container;
-            _onSwatchChanged = onSwatchChanged;
+            _onAddSwatch = onAddSwatch;
+            _onRemoveSwatch = onRemoveSwatch;
+            _onSelectedSwatchChanged = onSelectedSwatchChanged;
+            _onSwatchValueChanged = onSwatchValueChanged;
             _isAlpha = isAlpha;
             
         
@@ -68,6 +77,7 @@ namespace RosettaUI.UIToolkit
                 if (swatch != null)
                 {
                     ShowSwatch(swatch);
+                    OnAddSwatch(swatch);
                 }
             }
 
@@ -75,7 +85,7 @@ namespace RosettaUI.UIToolkit
             if (swatch != null)
             {
                 SelectSwatch(swatch);
-                OnSwatchChanged();
+                OnSelectedSwatchChanged();
             }
 
             evt.StopPropagation();
@@ -121,7 +131,7 @@ namespace RosettaUI.UIToolkit
                 _selectedSwatch.Time = Mathf.Clamp01(localPos.x / rect.width);
             }
 
-            OnSwatchChanged();
+            OnSwatchValueChanged();
             evt.StopPropagation();
         }
         
@@ -133,8 +143,9 @@ namespace RosettaUI.UIToolkit
             // 非表示状態でドラッグ終了したら削除
             if (!_showedSwatches.Contains(_selectedSwatch))
             {
+                var swatch = _selectedSwatch;
                 UnselectSwatch();
-                OnSwatchChanged();
+                OnRemoveSwatch(swatch);
             }
 
             evt.StopPropagation();
@@ -152,7 +163,9 @@ namespace RosettaUI.UIToolkit
             _showedSwatches.Remove(swatch);
             swatch.visualElement.RemoveFromHierarchy();
         }
-        
+
+        private bool IsShowedSwatch(GradientKeysSwatch swatch) => _showedSwatches.Contains(swatch);
+
         private GradientKeysSwatch CreateSwatch(float localPosX)
         {
             if (_showedSwatches.Count >= MaxKeyNum)
@@ -201,9 +214,28 @@ namespace RosettaUI.UIToolkit
         }
         
         
-        private void OnSwatchChanged()
+        private void OnAddSwatch(GradientKeysSwatch swatch)
         {
-            _onSwatchChanged?.Invoke(_selectedSwatch);
+            _onAddSwatch?.Invoke(swatch);
+        }
+        
+        private void OnRemoveSwatch(GradientKeysSwatch swatch)
+        {
+            _onRemoveSwatch?.Invoke(swatch);
+        }
+        
+        private void OnSelectedSwatchChanged()
+        {
+            _onSelectedSwatchChanged?.Invoke(_selectedSwatch);
+        }
+
+        private void OnSwatchValueChanged()
+        {
+            // 非表示中の値の変化は通知しない
+            if ( IsShowedSwatch(_selectedSwatch))
+            {
+                _onSwatchValueChanged?.Invoke(_selectedSwatch);
+            }
         }
     }
 }

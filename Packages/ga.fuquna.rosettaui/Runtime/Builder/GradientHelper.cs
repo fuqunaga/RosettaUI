@@ -3,12 +3,34 @@ using System.Buffers;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Pool;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace RosettaUI.Builder
 {
     public static class GradientHelper 
     {
+        public static Gradient Clone(Gradient src)
+        {
+            var dst = new Gradient();
+            Copy(src, dst);
+            return dst;
+        }
+        
+        public static void Copy(Gradient src, Gradient dst)
+        {
+            dst.SetKeys(src.colorKeys, src.alphaKeys);
+            dst.mode = src.mode;
+            dst.colorSpace = src.colorSpace;
+        }
+
+        public static void UpdateGradientPreviewToBackgroundImage(Gradient gradient, VisualElement visualElement)
+        {
+            var style = visualElement.style;
+            var texture = style.backgroundImage.value.texture;
+            style.backgroundImage = GenerateGradientPreview(gradient, texture);
+        }
+        
         public static Texture2D GenerateGradientPreview(Gradient gradient, Texture2D texture)
         {
             const int width = 256;

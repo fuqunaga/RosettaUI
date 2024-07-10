@@ -32,9 +32,11 @@ namespace RosettaUI.UIToolkit
 
         private TileLayout _tileLayout;
         
-        protected abstract string DataKeyLayout { get; }
-        protected abstract string DataKeyIsOpen { get; }
-        protected abstract string DataKeySwatches { get; }
+        
+        protected abstract string DataKeyPrefix { get; }
+        protected virtual string DataKeyLayout => $"{DataKeyPrefix}-Layout";
+        protected virtual string DataKeyIsOpen => $"{DataKeyPrefix}-IsOpen";
+        protected virtual string DataKeySwatches => $"{DataKeyPrefix}-Swatches";
         
         private bool IsSwatchDisplayLabel => Layout == TileLayout.List;
         private IEnumerable<SwatchBase<TValue>> SwatchesWithCurrent => _tileScrollView.Children().Select(v => v as SwatchBase<TValue>);

@@ -24,7 +24,7 @@ namespace RosettaUI.UIToolkit
 
         public override Gradient value
         {
-            get => _valueNull ? null : GradientCopy(rawValue);
+            get => _valueNull ? null : GradientHelper.Clone(rawValue);
             set
             {
                 if (value != null || !_valueNull) // let's not reinitialize an initialized gradient
@@ -35,17 +35,6 @@ namespace RosettaUI.UIToolkit
                     SendEvent(evt);
                 }
             }
-        }
-
-        internal static Gradient GradientCopy(Gradient other)
-        {
-            var gradientCopy = new Gradient
-            {
-                colorKeys = other.colorKeys,
-                alphaKeys = other.alphaKeys,
-                mode = other.mode
-            };
-            return gradientCopy;
         }
 
         /// <summary>
@@ -84,7 +73,7 @@ namespace RosettaUI.UIToolkit
             }
             else
             {
-                preview.style.backgroundImage = GradientHelper.GenerateGradientPreview(value, preview.style.backgroundImage.value.texture);
+                GradientHelper.UpdateGradientPreviewToBackgroundImage(value, preview);
             }
         }
 

@@ -5,12 +5,12 @@ namespace RosettaUI.UIToolkit
 {
     public class ColorPickerSwatchSet : SwatchSetBase<Color, ColorPickerSwatch>
     {
+        public const string KeyPrefix = "RosettaUI-ColorPickerSwatchSet";
+        
         public ColorPickerSwatchSet(Action<Color> applyValueFunc) : base("Swatches", applyValueFunc)
         {
         }
 
-        protected override string DataKeyLayout => "ColorPickerSwatchSetLayout";
-        protected override string DataKeyIsOpen => "ColorPickerSwatchSetIsOpen";
-        protected override string DataKeySwatches => "ColorPickerSwatches";
+        protected override string DataKeyPrefix => KeyPrefix;
     }
 }

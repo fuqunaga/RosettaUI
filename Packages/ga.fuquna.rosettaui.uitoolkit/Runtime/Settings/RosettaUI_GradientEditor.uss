@@ -56,3 +56,31 @@
     scale: -1;
 }
 
+/********************************************************************************
+* GradientEditorPreset
+********************************************************************************/
+.rosettaui-gradient-editor-preset__tile
+{
+    width: 128px;
+    height: 16px;
+}
+
+.rosettaui-gradient-editor-preset__tile-core
+{
+    width: 100%;
+    height: 100%;
+    border-width: 1px;
+    border-color: black;
+}
+
+.rosettaui-gradient-editor-preset__tile-checkerboard
+{
+    width: 100%;
+    height: 100%;
+}
+
+.rosettaui-gradient-editor-preset__tile-gradient
+{
+    width: 100%;
+    height: 100%;
+}

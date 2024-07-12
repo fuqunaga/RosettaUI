@@ -39,8 +39,20 @@ namespace RosettaUI.UIToolkit.UnityInternalAccess
 
             foreach (var item in menuItems)
             {
-                if (item.isEnable) menu.AddItem(item.name, item.isChecked, item.action);
-                else menu.AddDisabledItem(item.name, item.isChecked);
+                if ( item == MenuItem.Separator)
+                {
+                    menu.AddSeparator("");
+                    continue;
+                }
+                
+                if (item.isEnable)
+                {
+                    menu.AddItem(item.name, item.isChecked, item.action);
+                }
+                else
+                {
+                    menu.AddDisabledItem(item.name, item.isChecked);
+                }
             }
 
             menu.DropDown(position, targetElement, anchored);

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using RosettaUI.UIToolkit.UnityInternalAccess;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
@@ -12,24 +10,14 @@ namespace RosettaUI.UIToolkit
     /// </summary>
     public class PopupMenu : VisualElement
     {
-        public static void Show(IEnumerable<MenuItem> menuItems, Vector2 position, VisualElement targetElement)
-        {
-            var menu = DropDownMenuGenerator.Generate(
-                menuItems,
-                new Rect() { position = position },
-                targetElement);
-                    
-            if (menu is GenericDropdownMenu gdm)
-            {
-                gdm.AddBoxShadow();
-            }
-        }
-        
-        public int ButtonIndex { get; set; } = 1;
         public Func<IEnumerable<MenuItem>> CreateMenuItems { get; set; }
+        
         
         public PopupMenu()
         {
+#if true
+            this.AddManipulator(new PopupMenuManipulator(() => CreateMenuItems?.Invoke()));
+#else
             RegisterCallback<PointerDownEvent>(evt =>
             {
                 if (evt.button != ButtonIndex) return;
@@ -37,10 +25,11 @@ namespace RosettaUI.UIToolkit
                 var menuItems = CreateMenuItems?.Invoke();
                 if (menuItems == null) return;
                 
-                Show(menuItems, evt.position, this);
+                PopupMenuUtility.Show(menuItems, evt.position, this);
 
                 evt.StopPropagationAndFocusControllerIgnoreEvent();
             });
+#endif
         }
     }
 }

@@ -172,7 +172,7 @@ namespace RosettaUI.UIToolkit
                     evt.StopPropagation();
                     break;
                 case 1:
-                    PopupMenu.Show(
+                    PopupMenuUtility.Show(
                         CreateMenuItems(),
                         evt.position, 
                         swatch);

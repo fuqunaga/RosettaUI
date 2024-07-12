@@ -6,6 +6,8 @@ namespace RosettaUI
 {
     public class MenuItem
     {
+        public static readonly MenuItem Separator = new();
+        
         public string name;
         public bool isChecked;
         public bool isEnable = true;

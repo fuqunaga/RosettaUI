@@ -21,19 +21,15 @@ namespace RosettaUI.UIToolkit
 
         private void OnClick(EventBase evtBase)
         {
-            Vector2? position = evtBase switch
+            if (!evtBase.TryGetPosition(out var position))
             {
-                PointerUpEvent pointerUpEvent => pointerUpEvent.position,
-                MouseUpEvent mouseUpEvent => mouseUpEvent.mousePosition,
-                _ => null
-            };
-            
-            if (position == null) return;
+                return;
+            }
             
             var menuItems = CreateMenuItems?.Invoke();
             if (menuItems == null) return;
                 
-            PopupMenu.Show(menuItems, position.Value, this);
+            PopupMenuUtility.Show(menuItems, position, this);
 
             evtBase.StopPropagationAndFocusControllerIgnoreEvent();
         }

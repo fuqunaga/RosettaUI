@@ -32,9 +32,9 @@ namespace RosettaUI
                 IBinder<uint> ib => new UIntFieldElement(label, ib, option),
                 IBinder<float> ib => new FloatFieldElement(label, ib, option),
                 IBinder<string> ib => new TextFieldElement(label, ib, option),
-                IBinder<bool> ib => AddCopyAndPastePopupMenuIfPossibleBool(ib, new ToggleElement(label, ib)),
+                IBinder<bool> ib => AddCopyAndPastePopupMenu(new ToggleElement(label, ib), ib),
                 IBinder<Color> ib => new ColorFieldElement(label, ib),
-                IBinder<Gradient> ib => UI.NullGuard(label, ib, () => new GradientFieldElement(label, ib)),
+                IBinder<Gradient> ib => UI.NullGuard(label, ib, () => AddCopyAndPastePopupMenu(new GradientFieldElement(label, ib), ib)),
                 _ when valueType.IsEnum => CreateEnumElement(label, binder),
                 _ when TypeUtility.IsNullable(valueType) => CreateNullableFieldElement(label, binder, option),
                 _ when typeof(IElementCreator).IsAssignableFrom(valueType) => CreateElementCreatorElement(label, binder),
@@ -44,17 +44,20 @@ namespace RosettaUI
             };
 
 
-            Element AddCopyAndPastePopupMenuIfPossibleBool(IBinder<bool> typedBinder, Element element)
+            Element AddCopyAndPastePopupMenu<T>(Element element, IBinder<T> typedBinder)
             {
                 return UI.Popup(element, () =>
                 {
-                    var success = ClipboardParser.DeserializeBool(GUIUtility.systemCopyBuffer, out var value);
+                    var success = Clipboard.TryGet(out T value);
 
                     return new[]
                     {
-                        new MenuItem("Copy",
-                            () => GUIUtility.systemCopyBuffer = ClipboardParser.SerializeBool(typedBinder.Get())),
-                        new MenuItem("Paste", () => typedBinder.Set(value)) { isEnable = success }
+                        new MenuItem("Copy", () => Clipboard.Set(typedBinder.Get())),
+                        new MenuItem("Paste", () =>
+                        {
+                            typedBinder.Set(value);
+                            element.NotifyViewValueChanged();
+                        }) { isEnable = success }
                     };
                 });
             }

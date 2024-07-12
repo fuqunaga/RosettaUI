@@ -32,7 +32,7 @@ namespace RosettaUI
                 IBinder<uint> ib => new UIntFieldElement(label, ib, option),
                 IBinder<float> ib => new FloatFieldElement(label, ib, option),
                 IBinder<string> ib => new TextFieldElement(label, ib, option),
-                IBinder<bool> ib => new ToggleElement(label, ib),
+                IBinder<bool> ib => AddCopyAndPastePopupMenuIfPossibleBool(ib, new ToggleElement(label, ib)),
                 IBinder<Color> ib => new ColorFieldElement(label, ib),
                 IBinder<Gradient> ib => UI.NullGuard(label, ib, () => new GradientFieldElement(label, ib)),
                 _ when valueType.IsEnum => CreateEnumElement(label, binder),
@@ -42,6 +42,22 @@ namespace RosettaUI
 
                 _ => UI.NullGuardIfNeed(label, binder, () => CreateMemberFieldElement(label, binder, optionCaptured))
             };
+
+
+            Element AddCopyAndPastePopupMenuIfPossibleBool(IBinder<bool> typedBinder, Element element)
+            {
+                return UI.Popup(element, () =>
+                {
+                    var success = ClipboardParser.DeserializeBool(GUIUtility.systemCopyBuffer, out var value);
+
+                    return new[]
+                    {
+                        new MenuItem("Copy",
+                            () => GUIUtility.systemCopyBuffer = ClipboardParser.SerializeBool(typedBinder.Get())),
+                        new MenuItem("Paste", () => typedBinder.Set(value)) { isEnable = success }
+                    };
+                });
+            }
         }
 
         private static Element CreateEnumElement(LabelElement label, IBinder binder)

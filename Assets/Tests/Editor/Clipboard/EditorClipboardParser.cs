@@ -44,5 +44,13 @@ namespace RosettaUI.Test
         }
 
         public static string WriteBool(bool value) => value.ToString();
+        public static (bool, bool) ParseBool(string text)
+        {
+            var mi = EditorClipboardParserType.GetMethod("ParseBool");
+            var parameters = new object[] { text, null };
+            var success = (bool)mi.Invoke(null, parameters);
+
+            return (success, (bool)parameters[1]);
+        }
     }
 }

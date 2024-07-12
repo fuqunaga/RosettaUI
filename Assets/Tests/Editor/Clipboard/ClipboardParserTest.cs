@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
@@ -8,16 +10,16 @@ namespace RosettaUI.Test
     public class ClipboardParserTest
     {
         [TestCaseSource(nameof(TestSerializeSource))]
-        public void TestSerialize<T>(T value, Func<T, string> expectedFunc, Func<T, string> testFunc)
+        public void TestSerialize<T>(T value, Func<T, string> expectedFunc)
         {
-            Assert.AreEqual(expectedFunc(value), testFunc(value));
+            Assert.AreEqual(expectedFunc(value), ClipboardParser.Serialize(value));
         }
         
         [TestCaseSource(nameof(TestDeserializeSource))]
-        public void TestDeserialize<T>(string text, Func<string, (bool, T)> expectedFunc, Func<string, (bool, T)> testFunc)
+        public void TestDeserialize<T>(string text, Func<string, (bool, T)> expectedFunc)
         {
             var (expectedSuccess, expectedValue) = expectedFunc(text);
-            var (testSuccess, testValue) = testFunc(text);
+            var (testSuccess, testValue) = ClipboardParser.Deserialize<T>(text);
             Assert.AreEqual(expectedSuccess, testSuccess);
             
             if ( !expectedSuccess ) return;
@@ -32,39 +34,53 @@ namespace RosettaUI.Test
         }
 
         
-        private static object[] TestSerializeSource()
+        private static IEnumerable<object[]> TestSerializeSource()
         {
-            return new object[]
-            {
-                MakeData(new Gradient(), EditorClipBoardParser.WriteGradient, ClipboardParser.SerializeGradient),
-                MakeData(true, EditorClipBoardParser.WriteBool, ClipboardParser.SerializeBool),
-                MakeData(false, EditorClipBoardParser.WriteBool, ClipboardParser.SerializeBool)
-            };
-            
-            object[] MakeData<T>(T value, Func<T, string> expectedFunc, Func<T, string> testFunc) => new object[] { value, expectedFunc, testFunc };
-        }
-        
-        private static object[] TestDeserializeSource()
-        {
-            return new object[]
-            {
-                MakeDeserializeData<Gradient>.MakeData(
-                    EditorClipBoardParser.WriteGradient(new Gradient(){mode = GradientMode.Fixed} ), 
-                    EditorClipBoardParser.ParseGradient, ClipboardParser.DeserializeGradient)
-            };
-        }
-        
-        public static class MakeDeserializeData<T>
-        {
-            public delegate bool DeserializeFunc(string value, out T result);
-            
-            public static object[] MakeData(string text, Func<string, (bool, T)>  expectedFunc, DeserializeFunc testFunc)
-            {
-                return new object[]{text, expectedFunc, DeserializeFuncToFunc(testFunc)};
-                
-                static Func<string, (bool, T)> DeserializeFuncToFunc(DeserializeFunc deserializeFunc)
+            var data = new[]
                 {
-                    return value => (deserializeFunc(value, out var result), result);
+                    MakeData(EditorClipBoardParser.WriteGradient, new Gradient()),
+                    MakeData(EditorClipBoardParser.WriteBool, true, false),
+                }
+                .SelectMany(x => x);
+
+            foreach (var d in data)
+            {
+                yield return d;
+            }
+            yield break;
+            
+            IEnumerable<object[]> MakeData<T>(Func<T, string> expectedFunc, params T[] parameters)
+            {
+                foreach (var p in parameters)
+                {
+                    yield return new object[] { p, expectedFunc };
+                }
+            }
+        }
+        
+        private static IEnumerable<object[]>TestDeserializeSource()
+        {
+            var data = new[]
+                {
+                    MakeData(EditorClipBoardParser.ParseGradient, EditorClipBoardParser.WriteGradient(new Gradient() { mode = GradientMode.Fixed })),
+                    MakeData(EditorClipBoardParser.ParseBool, "True", "False", "true", "false", "", null),
+                }
+                .SelectMany(x => x);
+            
+
+            foreach (var d in data)
+            {
+                yield return d;
+            }
+
+            yield break;
+
+
+            IEnumerable<object[]> MakeData<T>(Func<string, (bool, T)> expectedFunc, params string[] texts)
+            {
+                foreach (var text in texts)
+                {
+                    yield return new object[] { text, expectedFunc };
                 }
             }
         }

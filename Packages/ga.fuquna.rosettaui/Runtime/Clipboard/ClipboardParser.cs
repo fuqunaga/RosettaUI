@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Globalization;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
@@ -14,46 +14,57 @@ namespace RosettaUI
     {
         public static (bool success, T value) Deserialize<T>(string text)
         {
-            if (typeof(T) == typeof(bool))
+            var type = typeof(T);
+            return Type.GetTypeCode(type) switch
             {
-                var success = DeserializeBool(text, out var value);
-                return (success, UnsafeUtility.As<bool, T>(ref value));
-            }
+                TypeCode.Boolean                              => (DeserializeBool(text, out var v),     From(ref v)),
+                TypeCode.Int32                                => (DeserializeInteger(text, out var v),  From(ref v)),
+                TypeCode.Single                               => (DeserializeFloat(text, out var v),    From(ref v)),
+                TypeCode.Object when typeof(Gradient) == type => (DeserializeGradient(text, out var v), From(ref v)),
+                _ => (false, default)
+            };
 
-            if (typeof(T) == typeof(Gradient))
-            {
-                var success = DeserializeGradient(text, out var value);
-                return (success, UnsafeUtility.As<Gradient, T>(ref value));
-            }
-
-            return (false, default);
+            static T From<TOriginal>(ref TOriginal value) => UnsafeUtility.As<TOriginal, T>(ref value);
         }
         
         public static string Serialize<T>(T value)
         {
-            if (typeof(T) == typeof(bool))
+            var type = typeof(T);
+            return Type.GetTypeCode(type) switch
             {
-                return SerializeBool(UnsafeUtility.As<T, bool>(ref value));
-            }
-
-            if (typeof(T) == typeof(Gradient))
-            {
-                return SerializeGradient(UnsafeUtility.As<T, Gradient>(ref value));
-            }
-
-            return string.Empty;
+                TypeCode.Boolean                              => SerializeBool(To<bool>(ref value)),
+                TypeCode.Int32                                => SerializeInteger(To<int>(ref value)),
+                TypeCode.Single                               => SerializeFloat(To<float>(ref value)),
+                TypeCode.Object when typeof(Gradient) == type => SerializeGradient(To<Gradient>(ref value)),
+                _ => ""
+            };
+                
+                static TOriginal To<TOriginal>(ref T value) => UnsafeUtility.As<T, TOriginal>(ref value);
         }
         
         
+        public static string SerializeBool(bool value) => value.ToString();
         public static bool DeserializeBool(string text, out bool value)
         {
-            value = false;
+            value = default;
             return !string.IsNullOrEmpty(text) && bool.TryParse(text, out value);
         }
 
-        public static string SerializeBool(bool value) => value.ToString();
+        public static string SerializeInteger(int value) => value.ToString();
+        public static bool DeserializeInteger(string text, out int value)
+        {
+            value = default;
+            return !string.IsNullOrEmpty(text) && int.TryParse(text, out value);
+        }
 
+        public static string SerializeFloat(float value) => value.ToString(CultureInfo.InvariantCulture);
+        public static bool DeserializeFloat(string text, out float value)
+        {
+            value = default;
+            return !string.IsNullOrEmpty(text) && float.TryParse(text, out value);
+        }
 
+        
         public const string PrefixGradient = nameof(UnityEditor) + ".GradientWrapperJSON:";
 
         //　Gradient

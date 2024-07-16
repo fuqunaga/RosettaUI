@@ -18,7 +18,8 @@ namespace RosettaUI
             return Type.GetTypeCode(type) switch
             {
                 TypeCode.Boolean                              => (DeserializeBool(text, out var v),     From(ref v)),
-                TypeCode.Int32                                => (DeserializeInteger(text, out var v),  From(ref v)),
+                TypeCode.Int32                                => (DeserializeInt(text, out var v),  From(ref v)),
+                TypeCode.UInt32                               => (DeserializeUInt(text, out var v),  From(ref v)),
                 TypeCode.Single                               => (DeserializeFloat(text, out var v),    From(ref v)),
                 TypeCode.Object when typeof(Gradient) == type => (DeserializeGradient(text, out var v), From(ref v)),
                 _ => (false, default)
@@ -32,8 +33,9 @@ namespace RosettaUI
             var type = typeof(T);
             return Type.GetTypeCode(type) switch
             {
-                TypeCode.Boolean                              => SerializeBool(To<bool>(ref value)),
-                TypeCode.Int32                                => SerializeInteger(To<int>(ref value)),
+                TypeCode.Boolean                              => value.ToString(),
+                TypeCode.Int32                                => value.ToString(),
+                TypeCode.UInt32                               => value.ToString(),
                 TypeCode.Single                               => SerializeFloat(To<float>(ref value)),
                 TypeCode.Object when typeof(Gradient) == type => SerializeGradient(To<Gradient>(ref value)),
                 _ => ""
@@ -43,25 +45,29 @@ namespace RosettaUI
         }
         
         
-        public static string SerializeBool(bool value) => value.ToString();
         public static bool DeserializeBool(string text, out bool value)
         {
             value = default;
             return !string.IsNullOrEmpty(text) && bool.TryParse(text, out value);
         }
-
-        public static string SerializeInteger(int value) => value.ToString();
-        public static bool DeserializeInteger(string text, out int value)
+        
+        public static bool DeserializeInt(string text, out int value)
         {
             value = default;
             return !string.IsNullOrEmpty(text) && int.TryParse(text, out value);
         }
-
+        
+        public static bool DeserializeUInt(string text, out uint value)
+        {
+            value = default;
+            return !string.IsNullOrEmpty(text) && uint.TryParse(text, out value);
+        }
+        
         public static string SerializeFloat(float value) => value.ToString(CultureInfo.InvariantCulture);
         public static bool DeserializeFloat(string text, out float value)
         {
             value = default;
-            return !string.IsNullOrEmpty(text) && float.TryParse(text, out value);
+            return !string.IsNullOrEmpty(text) && float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
         }
 
         

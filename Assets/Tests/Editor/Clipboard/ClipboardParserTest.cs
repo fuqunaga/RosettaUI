@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
@@ -40,6 +41,9 @@ namespace RosettaUI.Test
                 {
                     MakeData(EditorClipBoardParser.WriteGradient, new Gradient()),
                     MakeData(EditorClipBoardParser.WriteBool, true, false),
+                    MakeData(EditorClipBoardParser.WriteInt,  0, 1, 10, -1, -10, int.MinValue, int.MaxValue),
+                    MakeData(EditorClipBoardParser.WriteUInt, 0u, 1u, 10u, uint.MinValue, uint.MaxValue),
+                    MakeData(EditorClipBoardParser.WriteFloat, 0f, 0.1f, 1f, 10f, -0.1f, -1f, -10f, float.MinValue, float.MaxValue),
                 }
                 .SelectMany(x => x);
 
@@ -63,7 +67,10 @@ namespace RosettaUI.Test
             var data = new[]
                 {
                     MakeData(EditorClipBoardParser.ParseGradient, EditorClipBoardParser.WriteGradient(new Gradient() { mode = GradientMode.Fixed })),
-                    MakeData(EditorClipBoardParser.ParseBool, "True", "False", "true", "false", "", null),
+                    MakeData(EditorClipBoardParser.ParseBool, "True", "False", "true", "false", "", null, "expect parse fail"),
+                    MakeData(EditorClipBoardParser.ParseInteger,  "0", "1", "10", "-1", "-10", int.MinValue.ToString(), int.MaxValue.ToString(), "expect parse fail"),
+                    MakeData(EditorClipBoardParser.ParseUint, "0", "1", "10", uint.MinValue.ToString(), uint.MaxValue.ToString(), "expect parse fail"),
+                    MakeData(EditorClipBoardParser.ParseFloat, "0", "0.1", "1.0", "10", "-0.1", "-1", "-10", float.MinValue.ToString(CultureInfo.InvariantCulture), float.MaxValue.ToString(CultureInfo.InvariantCulture), "expect parse fail"),
                 }
                 .SelectMany(x => x);
             

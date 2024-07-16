@@ -2,6 +2,8 @@
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Unity.Collections.LowLevel.Unsafe;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -30,6 +32,52 @@ namespace RosettaUI.Test
         public static (bool, int) ParseInteger(string text) => Parse<int>(text);
         public static (bool, uint) ParseUint(string text) => Parse<uint>(text);
         public static (bool, float) ParseFloat(string text) => Parse<float>(text);
+        
+        
+        public static string WriteEnum<TEnum>(TEnum value)
+        {
+            // only support EnumForTest
+            Assert.AreEqual(typeof(TEnum), typeof(EnumForTest));
+            
+            var enumForTestObject = Resources.Load<EnumForTestObject>("EnumForTest");
+            enumForTestObject.enumValue = UnsafeUtility.As<TEnum, EnumForTest>(ref value);
+            using var so = new SerializedObject(enumForTestObject);
+            var prop = so.FindProperty(nameof(EnumForTestObject.enumValue));
+            
+            var mi = EditorClipboardParserType.GetMethod("WriteEnumProperty");
+            Assert.IsNotNull(mi);
+            
+            var parameters = new object[] { prop };
+            return (string)mi.Invoke(null, parameters);
+        }
+        
+        public static (bool, TEnum) ParseEnum<TEnum>(string text)
+        {
+            // only support EnumForTest
+            Assert.AreEqual(typeof(TEnum), typeof(EnumForTest));
+            
+            if (string.IsNullOrEmpty(text))
+            {
+                return (false, default);
+            }
+            
+            var enumForTestObject = Resources.Load<EnumForTestObject>("EnumForTest");
+            using var so = new SerializedObject(enumForTestObject);
+            var prop = so.FindProperty(nameof(EnumForTestObject.enumValue));
+
+            // TODO: support flag enum
+            var mi = EditorClipboardParserType.GetMethod("ParseEnumPropertyIndex");
+            Assert.IsNotNull(mi);
+            var parameters = new object[] { text, prop };
+            var idx = (int)mi.Invoke(null, parameters);
+            var success = idx >= 0;
+            var value = success
+                ? (TEnum)Enum.GetValues(typeof(TEnum)).GetValue(idx)
+                : default;  
+            
+            
+            return (success, value);
+        }
         
         
         

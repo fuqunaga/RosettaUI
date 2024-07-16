@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
@@ -12,15 +13,21 @@ namespace RosettaUI
     /// </summary>
     public static class ClipboardParser
     {
+        public const string PrefixEnum = "Enum:";
+        public const string PrefixGradient = nameof(UnityEditor) + ".GradientWrapperJSON:";
+
+        
         public static (bool success, T value) Deserialize<T>(string text)
         {
             var type = typeof(T);
             return Type.GetTypeCode(type) switch
             {
-                TypeCode.Boolean                              => (DeserializeBool(text, out var v),     From(ref v)),
-                TypeCode.Int32                                => (DeserializeInt(text, out var v),  From(ref v)),
-                TypeCode.UInt32                               => (DeserializeUInt(text, out var v),  From(ref v)),
-                TypeCode.Single                               => (DeserializeFloat(text, out var v),    From(ref v)),
+                // TypeCodeは Enum の実態の型なので TypeCode.Int32 などになる。先にEnumの判定を行う
+                _ when type.IsEnum                            => (DeserializeEnum<T> (text, out var v), v),
+                TypeCode.Boolean                              => (DeserializeBool    (text, out var v), From(ref v)),
+                TypeCode.Int32                                => (DeserializeInt     (text, out var v), From(ref v)),
+                TypeCode.UInt32                               => (DeserializeUInt    (text, out var v), From(ref v)),
+                TypeCode.Single                               => (DeserializeFloat   (text, out var v), From(ref v)),
                 TypeCode.Object when typeof(Gradient) == type => (DeserializeGradient(text, out var v), From(ref v)),
                 _ => (false, default)
             };
@@ -33,6 +40,8 @@ namespace RosettaUI
             var type = typeof(T);
             return Type.GetTypeCode(type) switch
             {
+                // TypeCodeは Enum の実態の型なので TypeCode.Int32 などになる。先にEnumの判定を行う
+                _ when type.IsEnum                            => SerializeEnum(value),
                 TypeCode.Boolean                              => value.ToString(),
                 TypeCode.Int32                                => value.ToString(),
                 TypeCode.UInt32                               => value.ToString(),
@@ -63,16 +72,49 @@ namespace RosettaUI
             return !string.IsNullOrEmpty(text) && uint.TryParse(text, out value);
         }
         
-        public static string SerializeFloat(float value) => value.ToString(CultureInfo.InvariantCulture);
         public static bool DeserializeFloat(string text, out float value)
         {
             value = default;
             return !string.IsNullOrEmpty(text) && float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
         }
 
+        //TODO: supports flag enum
+        public static string SerializeEnum<TEnum>(TEnum value)
+        {
+            var displayName = RuntimeObjectNames.NicifyVariableName(value.ToString());
+            return $"{PrefixEnum}{displayName}";
+        }
         
-        public const string PrefixGradient = nameof(UnityEditor) + ".GradientWrapperJSON:";
+        //TODO: supports flag enum
+        public static bool DeserializeEnum<TEnum>(string text, out TEnum value)
+        {
+            value = default;
+            if (string.IsNullOrEmpty(text)) return false;
+            
+            if (!text.StartsWith(PrefixEnum))
+                return false;
+            
+            var val = text[PrefixEnum.Length..];
+            if (string.IsNullOrEmpty(val))
+                return false;
 
+            var names = Enum.GetNames(typeof(TEnum));
+            foreach (var name in names)
+            {
+                var displayName = RuntimeObjectNames.NicifyVariableName(name);
+                if (displayName != text) continue;
+                
+                value = (TEnum)Enum.Parse(typeof(TEnum), name);
+                return true;
+            }
+
+            return false;
+        }
+        
+        
+        public static string SerializeFloat(float value) => value.ToString(CultureInfo.InvariantCulture);
+
+        
         //　Gradient
         // インスペクタはCustomPrefix付きでEditorJsonUtilityでシリアライズしている
         // https://github.com/Unity-Technologies/UnityCsReference/blob/5406f17521a16bb37880960352990229987aa676/Editor/Mono/Clipboard/ClipboardParser.cs#L353

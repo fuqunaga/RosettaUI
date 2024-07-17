@@ -24,13 +24,15 @@ namespace RosettaUI.Test
         private static readonly FieldInfo GradientWrapperGradientFieldInfo = GradientWrapperType.GetField("gradient");
 
         public static string WriteBool(bool value) => value.ToString();
-        public static string WriteInt(int value) => value.ToString();
-        public static string WriteUInt(uint value) => value.ToString();
-        public static string WriteFloat(float value) => value.ToString(CultureInfo.InvariantCulture);
-        
         public static (bool, bool) ParseBool(string text) => Parse<bool>(text);
+        
+        public static string WriteInt(int value) => value.ToString();
         public static (bool, int) ParseInteger(string text) => Parse<int>(text);
+        
+        public static string WriteUInt(uint value) => value.ToString();
         public static (bool, uint) ParseUint(string text) => Parse<uint>(text);
+        
+        public static string WriteFloat(float value) => value.ToString(CultureInfo.InvariantCulture);
         public static (bool, float) ParseFloat(string text) => Parse<float>(text);
         
         
@@ -78,7 +80,10 @@ namespace RosettaUI.Test
             
             return (success, value);
         }
+
         
+        public static string WriteVector2(Vector2 value) => Write(value);
+        public static (bool, Vector2) ParseVector2(string text) => Parse<Vector2>(text);
         
         
         private static string WriteCustom(object value)
@@ -108,6 +113,14 @@ namespace RosettaUI.Test
             return (success, (Gradient)GradientWrapperGradientFieldInfo.GetValue(gradientWrapper));
         }
 
+        
+        private static string Write<T>(T value)
+        {
+            var mi = EditorClipboardParserType.GetMethod($"Write{typeof(T).Name}");
+            Assert.IsNotNull(mi);
+            return (string)mi.Invoke(null, new object[] { value });
+        }
+        
         private static (bool, T) Parse<T>(string text, [CallerMemberName] string methodName = null)
         {
             Assert.IsFalse(string.IsNullOrEmpty(methodName));

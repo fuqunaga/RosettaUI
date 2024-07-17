@@ -23,6 +23,9 @@ namespace RosettaUI.Test
 
         [TestCaseSource(nameof(EnumSource))]
         public void MatchUnityEditorMethod_Enum<TEnum>(TEnum value) => TestMatch(value, EditorClipBoardParser.WriteEnum);
+
+        [TestCaseSource(nameof(Vector2Source))]
+        public void MatchUnityEditorMethod_Vector2(Vector2 value) => TestMatch(value, EditorClipBoardParser.WriteVector2);
         
         [TestCaseSource(nameof(GradientSource))]
         public void MatchUnityEditorMethod_Gradient(Gradient value) => TestMatch(value, EditorClipBoardParser.WriteGradient);
@@ -33,6 +36,14 @@ namespace RosettaUI.Test
         private static uint[] UIntSource => new[] {0u, 1u, 10u, uint.MinValue, uint.MaxValue};
         private static float[] FloatSource => new[] {0f, 0.1f, 1f, 10f, -0.1f, -1f, -10f, float.MinValue, float.MaxValue, float.NaN, float.NegativeInfinity, float.PositiveInfinity, float.Epsilon};
         private static EnumForTest[] EnumSource => Enum.GetValues(typeof(EnumForTest)).Cast<EnumForTest>().ToArray();
+
+        private static Vector2[] Vector2Source => new[]
+        {
+            Vector2.zero, Vector2.one,
+            Vector2.up, Vector2.down, Vector2.left, Vector2.right, 
+            Vector2.negativeInfinity, Vector2.positiveInfinity
+        };
+        
         private static IEnumerable<object> GradientSource()
         {
             yield return new object[] { new Gradient() };

@@ -1,7 +1,5 @@
 using System;
-using System.Buffers;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Unity.Collections.LowLevel.Unsafe;
@@ -19,6 +17,7 @@ namespace RosettaUI
         public const string PrefixEnum = "Enum:";
         public const string PrefixGradient = nameof(UnityEditor) + ".GradientWrapperJSON:";
 
+        private delegate bool DeserializeFunc<T>(string text, out T value);
         
         public static (bool success, T value) Deserialize<T>(string text)
         {
@@ -34,11 +33,22 @@ namespace RosettaUI
                 _ when typeof(Vector2) == type => (DeserializeVector2(text, out var v), From(ref v)),
                 _ when typeof(Vector3) == type => (DeserializeVector3(text, out var v), From(ref v)),
                 _ when typeof(Vector4) == type => (DeserializeVector4(text, out var v), From(ref v)),
+                _ when typeof(Vector2Int) == type => Cast<Vector2, Vector2Int>(text, DeserializeVector2, Vector2Int.FloorToInt),
+                _ when typeof(Vector3Int) == type => Cast<Vector3, Vector3Int>(text, DeserializeVector3, Vector3Int.FloorToInt),
                 _ when typeof(Gradient) == type => (DeserializeGradient(text, out var v), From(ref v)),
                 _ => (false, default)
             };
 
             static T From<TOriginal>(ref TOriginal value) => UnsafeUtility.As<TOriginal, T>(ref value);
+
+            static (bool, T) Cast<TDeserialize, TTarget>(string text, DeserializeFunc<TDeserialize> deserialize, Func<TDeserialize, TTarget> castFunc)
+            {
+                var s = deserialize(text, out var v);
+                if(!s) return(false, default);
+
+                var value = castFunc(v);
+                return (true, From(ref value));
+            }
         }
         
         public static string Serialize<T>(T value)
@@ -55,6 +65,8 @@ namespace RosettaUI
                 _ when typeof(Vector2) == type => SerializeVector2(To<Vector2>(ref value)),
                 _ when typeof(Vector3) == type => SerializeVector3(To<Vector3>(ref value)),
                 _ when typeof(Vector4) == type => SerializeVector4(To<Vector4>(ref value)),
+                _ when typeof(Vector2Int) == type => SerializeVector2(To<Vector2Int>(ref value)),
+                _ when typeof(Vector3Int) == type => SerializeVector3(To<Vector3Int>(ref value)),
                 _ when typeof(Gradient) == type => SerializeGradient(To<Gradient>(ref value)),
                 _ => ""
             };

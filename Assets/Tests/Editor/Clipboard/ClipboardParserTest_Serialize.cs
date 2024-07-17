@@ -33,8 +33,17 @@ namespace RosettaUI.Test
         [TestCaseSource(nameof(Vector4Source))]
         public void MatchUnityEditorMethod_Vector4(Vector4 value) => TestMatch(value, EditorClipBoardParser.WriteVector4);
         
+        // UnityEditor.ClipboardParserはVector2Int非対応。ClipboardContextMenuでVector2からキャストしている
+        [TestCaseSource(nameof(Vector2IntSource))]
+        public void MatchUnityEditorMethod_Vector2Int(Vector2Int value) => TestMatch(value, (v) => EditorClipBoardParser.WriteVector2(v));
+        
+        // UnityEditor.ClipboardParserはVector3Int非対応。ClipboardContextMenuでVector3からキャストしている
+        [TestCaseSource(nameof(Vector3IntSource))]
+        public void MatchUnityEditorMethod_Vector3Int(Vector3Int value) => TestMatch(value, (v) => EditorClipBoardParser.WriteVector3(v));
+        
         [TestCaseSource(nameof(GradientSource))]
         public void MatchUnityEditorMethod_Gradient(Gradient value) => TestMatch(value, EditorClipBoardParser.WriteGradient);
+
 
         
         private static bool[] BoolSource => new[] {true, false};
@@ -67,6 +76,20 @@ namespace RosettaUI.Test
             Vector4.negativeInfinity, Vector4.positiveInfinity,
             Vector4.one * float.Epsilon, Vector4.one * float.NaN, 
             Vector4.one * float.MinValue, Vector4.one * float.MaxValue
+        };
+        
+        private static Vector2Int[] Vector2IntSource => new[]
+        {
+            Vector2Int.zero, Vector2Int.one,
+            Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right, 
+            Vector2Int.one * int.MinValue, Vector2Int.one * int.MaxValue
+        };
+        
+        private static Vector3Int[] Vector3IntSource => new[]
+        {
+            Vector3Int.zero, Vector3Int.one,
+            Vector3Int.up, Vector3Int.down, Vector3Int.left, Vector3Int.right, Vector3Int.forward, Vector3Int.back,  
+            Vector3Int.one * int.MinValue, Vector3Int.one * int.MaxValue
         };
         
         private static IEnumerable<object> GradientSource()

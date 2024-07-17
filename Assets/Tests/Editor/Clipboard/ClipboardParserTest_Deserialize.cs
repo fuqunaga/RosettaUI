@@ -32,11 +32,28 @@ namespace RosettaUI.Test
         [TestCaseSource(nameof(Vector4Source))]
         public void MatchUnityEditorMethod_Vector4(string text) => TestMatch(text, EditorClipBoardParser.ParseVector4);
 
+        // UnityEditor.ClipboardParserはVector2Int非対応。ClipboardContextMenuでVector2からキャストしている
+        // Vector2Intのシリアライズ書式はVector2と同じなのでTestCastSourceを共有する
+        [TestCaseSource(nameof(Vector2Source))]
+        public void MatchUnityEditorMethod_Vector2Int(string text) => TestMatch(text, CastParser(EditorClipBoardParser.ParseVector2, Vector2Int.FloorToInt));
+
+        // UnityEditor.ClipboardParserはVector3Int非対応。ClipboardContextMenuでVector3からキャストしている
+        // Vector3Intのシリアライズ書式はVector3と同じなのでTestCastSourceを共有する
+        [TestCaseSource(nameof(Vector3Source))]
+        public void MatchUnityEditorMethod_Vector3Int(string text) => TestMatch(text, CastParser(EditorClipBoardParser.ParseVector3, Vector3Int.FloorToInt));
         
         [TestCaseSource(nameof(GradientSource))]
         public void MatchUnityEditorMethod_Gradient(string text) =>
             TestMatch(text, EditorClipBoardParser.ParseGradient);
 
+        private static Func<string, (bool, TTarget)> CastParser<TOriginal, TTarget>(Func<string, (bool, TOriginal)> func, Func<TOriginal, TTarget> castFunc)
+        {
+            return (text) =>
+            {
+                var (success, value) = func(text);
+                return (success, success ? castFunc(value) : default);
+            };
+        }
 
         private static string[] BoolSource => new[]
         {

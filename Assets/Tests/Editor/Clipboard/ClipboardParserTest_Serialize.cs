@@ -49,6 +49,9 @@ namespace RosettaUI.Test
 
         [TestCaseSource(nameof(BoundsSource))]
         public void MatchUnityEditorMethod_Bounds(Bounds value) => TestMatch(value, EditorClipBoardParser.WriteBounds);
+
+        [TestCaseSource(nameof(ColorSource))]
+        public void MatchUnityEditorMethod_Color(Color value) => TestMatch(value, EditorClipBoardParser.WriteColor);
         
         [TestCaseSource(nameof(GradientSource))]
         public void MatchUnityEditorMethod_Gradient(Gradient value) => TestMatch(value, EditorClipBoardParser.WriteGradient);
@@ -127,7 +130,11 @@ namespace RosettaUI.Test
         };
 
         private static IEnumerable<Bounds> BoundsSource => Vector3Source.Select(v3 => new Bounds(v3, v3));
-  
+
+        private static IEnumerable<Color> ColorSource => Vector4Source.Select(v4 => (Color)v4).Concat(new[]
+        {
+            Color.red, Color.green, Color.blue, Color.white, Color.black, Color.gray, Color.clear,
+        });
         
         private static IEnumerable<object> GradientSource()
         {

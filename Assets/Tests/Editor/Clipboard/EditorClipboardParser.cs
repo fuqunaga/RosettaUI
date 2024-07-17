@@ -100,6 +100,9 @@ namespace RosettaUI.Test
         public static string WriteBounds(Bounds value) => Write(value);
         public static (bool, Bounds) ParseBounds(string text) => Parse<Bounds>(text);
 
+        public static string WriteColor(Color value) => Write(value);
+        public static (bool, Color) ParseColor(string text) => Parse<Color>(text);
+
         
         private static string WriteCustom(object value)
         {

@@ -53,6 +53,9 @@ namespace RosettaUI.Test
         [TestCaseSource(nameof(BoundsSource))]
         public void MatchUnityEditorMethod_Bounds(string text) => TestMatch(text, EditorClipBoardParser.ParseBounds);
 
+        [TestCaseSource(nameof(ColorSource))]
+        public void MatchUnityEditorMethod_Color(string text) => TestMatch(text, EditorClipBoardParser.ParseColor);
+
         [TestCaseSource(nameof(GradientSource))]
         public void MatchUnityEditorMethod_Gradient(string text) =>
             TestMatch(text, EditorClipBoardParser.ParseGradient);
@@ -109,6 +112,7 @@ namespace RosettaUI.Test
         private static IEnumerable<string> RectSource => FloatsSourceFill("Rect", 4).Concat(FloatsSourceInvalid());
         private static IEnumerable<string> QuaternionSource => FloatsSourceFill("Quaternion", 4).Concat(FloatsSourceInvalid());
         private static IEnumerable<string> BoundsSource => FloatsSourceFill("Bounds", 6).Concat(FloatsSourceInvalid());
+        private static IEnumerable<string> ColorSource => FloatsSourceFill("Color", 4).Concat(FloatsSourceInvalid());
         
         
         private static IEnumerable<string> FloatsSourceFill(string prefix, int count)

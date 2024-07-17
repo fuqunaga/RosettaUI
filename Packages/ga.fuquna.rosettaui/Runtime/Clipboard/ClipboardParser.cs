@@ -39,6 +39,7 @@ namespace RosettaUI
                 _ when typeof(Rect) == type => SerializeRect(To<Rect>(ref value)),
                 _ when typeof(Quaternion) == type => SerializeQuaternion(To<Quaternion>(ref value)),
                 _ when typeof(Bounds) == type => SerializeBounds(To<Bounds>(ref value)),
+                _ when typeof(Color) == type => SerializeColor(To<Color>(ref value)),
                 _ when typeof(Gradient) == type => SerializeGradient(To<Gradient>(ref value)),
                 _ => ""
             };
@@ -66,6 +67,7 @@ namespace RosettaUI
                 _ when typeof(Rect) == type => (DeserializeRect(text, out var v), From(ref v)),
                 _ when typeof(Quaternion) == type => (DeserializeQuaternion(text, out var v), From(ref v)),
                 _ when typeof(Bounds) == type => (DeserializeBounds(text, out var v), From(ref v)),
+                _ when typeof(Color) == type => (DeserializeColor(text, out var v), From(ref v)),
                 _ when typeof(Gradient) == type => (DeserializeGradient(text, out var v), From(ref v)),
                 _ => (false, default)
             };
@@ -154,7 +156,6 @@ namespace RosettaUI
         public static string SerializeBounds(Bounds value) => SerializeFloats(nameof(Bounds), value.center.x, value.center.y, value.center.z, value.extents.x, value.extents.y, value.extents.z);
         
         
-        
         public static bool DeserializeVector2(string text, out Vector2 value)
         {
             return DeserializeFloats(text, 2, out value, values => new Vector2(values[0], values[1]));
@@ -188,6 +189,29 @@ namespace RosettaUI
             ));
         }
 
+
+
+        public static string SerializeColor(Color value)
+        {
+            Color32 ldr = value;
+            Color hdrFromLdr = ldr;
+            
+            if (((Vector4)value - (Vector4)hdrFromLdr).sqrMagnitude < 0.0001f)
+            {
+                return ldr.a == 255 
+                    ? $"#{ColorUtility.ToHtmlStringRGB(value)}"
+                    : $"#{ColorUtility.ToHtmlStringRGBA(value)}";
+            }
+
+            return SerializeFloats(nameof(Color), value.r, value.g, value.b, value.a);
+        }
+
+        public static bool DeserializeColor(string text, out Color value)
+        {
+            return ColorUtility.TryParseHtmlString(text, out value) 
+                   || DeserializeFloats(text, 4, out value, values => new Color(values[0], values[1], values[2], values[3]), Color.black);
+        }
+        
         
         
         private static string SerializeFloats(string prefix, params float[] values)

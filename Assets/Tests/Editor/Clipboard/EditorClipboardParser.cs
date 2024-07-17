@@ -91,6 +91,15 @@ namespace RosettaUI.Test
         public static string WriteVector4(Vector4 value) => Write(value);
         public static (bool, Vector4) ParseVector4(string text) => Parse<Vector4>(text);
         
+        public static string WriteRect(Rect value) => Write(value);
+        public static (bool, Rect) ParseRect(string text) => Parse<Rect>(text);
+
+        public static string WriteQuaternion(Quaternion value) => Write(value);
+        public static (bool, Quaternion) ParseQuaternion(string text) => Parse<Quaternion>(text);
+
+        public static string WriteBounds(Bounds value) => Write(value);
+        public static (bool, Bounds) ParseBounds(string text) => Parse<Bounds>(text);
+
         
         private static string WriteCustom(object value)
         {

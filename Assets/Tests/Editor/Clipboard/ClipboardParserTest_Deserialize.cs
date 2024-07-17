@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -42,6 +44,15 @@ namespace RosettaUI.Test
         [TestCaseSource(nameof(Vector3Source))]
         public void MatchUnityEditorMethod_Vector3Int(string text) => TestMatch(text, CastParser(EditorClipBoardParser.ParseVector3, Vector3Int.FloorToInt));
         
+        [TestCaseSource(nameof(RectSource))]
+        public void MatchUnityEditorMethod_Rect(string text) => TestMatch(text, EditorClipBoardParser.ParseRect);
+
+        [TestCaseSource(nameof(QuaternionSource))]
+        public void MatchUnityEditorMethod_Quaternion(string text) => TestMatch(text, EditorClipBoardParser.ParseQuaternion);
+
+        [TestCaseSource(nameof(BoundsSource))]
+        public void MatchUnityEditorMethod_Bounds(string text) => TestMatch(text, EditorClipBoardParser.ParseBounds);
+
         [TestCaseSource(nameof(GradientSource))]
         public void MatchUnityEditorMethod_Gradient(string text) =>
             TestMatch(text, EditorClipBoardParser.ParseGradient);
@@ -92,45 +103,33 @@ namespace RosettaUI.Test
             "expect parse fail"
         };
 
-        private static string[] Vector2Source => new[]
-        {
-            "Vector2(0,0)", "Vector2(1,1)", "Vector2(0,1)", "Vector2(1,0)",
-            "Vector2(0.1,0.1)", "Vector2(-0.1,-0.1)",
-            "Vector2(1e+32,1e+32)", "Vector2(-1e+32,-1e+32)", 
-            "Vector2(NaN,Nan)", "Vector2(Infinity,Infinity)", "Vector2(-Infinity, -Infinity)",
-            "Vector2(0,)", "Vector2(,0)", "Vector2(,)", "Vector2()", "Vector2(,)", "Vector2(,0)", "Vector2(0,)",
-            "Vector2(0,0,0)", "Vector2(0,0,0,0)", "Vector2(0,0,0,0,0)", "Vector2(0,0,0,0,0,0)",
-            "Vector2 (0,0)", "Vector2( 0,0)", "Vector2(0 ,0)", "Vector2(0, 0)", "Vector2(0,0 )", "Vector2(0,0) ",
-            "Vector3(0,0)", "Vector4(0,0)",
-            null, "expect parse fail"
-        };
+        private static IEnumerable<string> Vector2Source => FloatsSourceFill("Vector2", 2).Concat(FloatsSourceInvalid());
+        private static IEnumerable<string> Vector3Source => FloatsSourceFill("Vector3", 3).Concat(FloatsSourceInvalid());
+        private static IEnumerable<string> Vector4Source => FloatsSourceFill("Vector4", 4).Concat(FloatsSourceInvalid());
+        private static IEnumerable<string> RectSource => FloatsSourceFill("Rect", 4).Concat(FloatsSourceInvalid());
+        private static IEnumerable<string> QuaternionSource => FloatsSourceFill("Quaternion", 4).Concat(FloatsSourceInvalid());
+        private static IEnumerable<string> BoundsSource => FloatsSourceFill("Bounds", 6).Concat(FloatsSourceInvalid());
         
-        private static string[] Vector3Source => new[]
-        {
-            "Vector3(0,0,0)", "Vector3(1,1,1)", "Vector3(0,0,1)", "Vector3(0,1,0)", "Vector3(1,0,0)",
-            "Vector3(0.1,0.1,0.1)", "Vector3(-0.1,-0.1,,-0.1)", 
-            "Vector3(1e+32,1e+32,1e+32)", "Vector2(-1e+32,-1e+32,-1e+32)",
-            "Vector3(NaN,Nan,Nan)", "Vector3(Infinity,Infinity,Infinity)", "Vector3(-Infinity,-Infinity,-Infinity)",
-            "Vector3(0,)", "Vector3(,0)", "Vector3(,)", "Vector3()", "Vector3(,)", "Vector3(,0)", "Vector3(0,)",
-            "Vector3(0,0)", "Vector3(0,0,0,0)", "Vector3(0,0,0,0,0)", "Vector3(0,0,0,0,0,0)",
-            "Vector3 (0,0,0)", "Vector3( 0,0,0)", "Vector3(0 ,0,0)", "Vector3(0, 0,0)", "Vector3(0,0 ,0)","Vector3(0,0, 0)","Vector3(0,0,0 )","Vector3(0,0,0) ",    
-            "Vector2(0,0,0)", "Vector4(0,0,0)",
-            null, "expect parse fail"
-        };
         
-        private static string[] Vector4Source => new[]
+        private static IEnumerable<string> FloatsSourceFill(string prefix, int count)
         {
-            "Vector4(0,0,0,0)", "Vector4(1,1,1,1)", "Vector4(0,0,0,1)", "Vector4(0,0,1,0)", "Vector4(0,1,0,0)", "Vector4(1,0,0,0)",
-            "Vector4(0.1,0.1,0.1,0.1)", "Vector4(-0.1,-0.1,-0.1,-0.1)", 
-            "Vector4(1e+32,1e+32,1e+32,1e+32)", "Vector4(-1e+32,-1e+32,-1e+32,-1e+32)",
-            "Vector4(NaN,Nan,Nan,Nan)", "Vector4(Infinity,Infinity,Infinity,Infinity)", "Vector4(-Infinity,-Infinity,-Infinity,-Infinity)",
-            "Vector4(0,)", "Vector4(,0)", "Vector4(,)", "Vector4()", "Vector4(,)", "Vector4(,0)", "Vector4(0,)",
-            "Vector4(0,0)", "Vector4(0,0,0)", "Vector4(0,0,0,0,0)", "Vector4(0,0,0,0,0,0)",
-            "Vector4 (0,0,0,0)", "Vector4( 0,0,0,0)", "Vector4(0 ,0,0,0)", "Vector4(0, 0,0,0)", "Vector4(0,0 ,0,0)","Vector4(0,0, 0,0)","Vector4(0,0,0 ,0)","Vector4(0,0,0, 0)","Vector4(0,0,0,0 )","Vector4(0,0,0,0) ",   
-            "Vector2(0,0,0,0)", "Vector3(0,0,0,0)",
-            null, "expect parse fail"
-        };
-        
+            var floatTexts = new[]
+            {
+                "0", "1", "0.1", "-0.1", "1e+32", "-1e+32", "Nan", "Infinity", "-Infinity",
+            };
+
+            return floatTexts.Select(text => $"{prefix}({string.Join(',', Enumerable.Repeat(text, count))})");
+        }
+
+        private static IEnumerable<string> FloatsSourceInvalid()
+        {
+            return new[]
+            {
+                "Vector2(0,0,0,0)", "Vector3(0,0,0,0)", "Vector4(0,0,0,0)",
+                null, "expect parse fail"
+            };
+        }
+
         private static string[] GradientSource => new[]
             { EditorClipBoardParser.WriteGradient(new Gradient() { mode = GradientMode.Fixed }) };
 

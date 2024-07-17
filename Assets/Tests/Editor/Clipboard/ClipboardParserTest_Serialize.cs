@@ -41,6 +41,15 @@ namespace RosettaUI.Test
         [TestCaseSource(nameof(Vector3IntSource))]
         public void MatchUnityEditorMethod_Vector3Int(Vector3Int value) => TestMatch(value, (v) => EditorClipBoardParser.WriteVector3(v));
         
+        [TestCaseSource(nameof(RectSource))]
+        public void MatchUnityEditorMethod_Rect(Rect value) => TestMatch(value, EditorClipBoardParser.WriteRect);
+
+        [TestCaseSource(nameof(QuaternionSource))]
+        public void MatchUnityEditorMethod_Quaternion(Quaternion value) => TestMatch(value, EditorClipBoardParser.WriteQuaternion);
+
+        [TestCaseSource(nameof(BoundsSource))]
+        public void MatchUnityEditorMethod_Bounds(Bounds value) => TestMatch(value, EditorClipBoardParser.WriteBounds);
+        
         [TestCaseSource(nameof(GradientSource))]
         public void MatchUnityEditorMethod_Gradient(Gradient value) => TestMatch(value, EditorClipBoardParser.WriteGradient);
 
@@ -91,6 +100,34 @@ namespace RosettaUI.Test
             Vector3Int.up, Vector3Int.down, Vector3Int.left, Vector3Int.right, Vector3Int.forward, Vector3Int.back,  
             Vector3Int.one * int.MinValue, Vector3Int.one * int.MaxValue
         };
+        
+        private static Rect[] RectSource => new[]
+        {
+            Rect.zero, new Rect(Vector2.one, Vector2.one),
+            new Rect(Vector2.one * float.Epsilon, Vector2.one * float.Epsilon),
+            new Rect(Vector2.one * float.NaN, Vector2.one * float.NaN),
+            new Rect(Vector2.one * float.NegativeInfinity, Vector2.one * float.NegativeInfinity),
+            new Rect(Vector2.one * float.PositiveInfinity, Vector2.one * float.PositiveInfinity),
+            new Rect(Vector2.one * float.MinValue, Vector2.one * float.MinValue),
+            new Rect(Vector2.one * float.MaxValue, Vector2.one * float.MaxValue),
+        };
+        
+        private static Quaternion[] QuaternionSource => new[]
+        {
+            default(Quaternion), Quaternion.identity, 
+            Quaternion.Euler(90f, 0f, 0f),Quaternion.Euler(0f, 90f, 0f),Quaternion.Euler(0f, 0f, 90f),
+            Quaternion.Euler(180f, 0f, 0f),Quaternion.Euler(0f, 180f, 0f),Quaternion.Euler(0f, 0f, 180f),
+            Quaternion.Euler(270f, 0f, 0f),Quaternion.Euler(0f, 270f, 0f),Quaternion.Euler(0f, 0f, 270f),
+            new Quaternion(float.Epsilon, float.Epsilon, float.Epsilon, float.Epsilon),
+            new Quaternion(float.NaN, float.NaN, float.NaN, float.NaN),
+            new Quaternion(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity),
+            new Quaternion(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity),
+            new Quaternion(float.MinValue, float.MinValue, float.MinValue, float.MinValue),
+            new Quaternion(float.MaxValue, float.MaxValue, float.MaxValue, float.MaxValue),
+        };
+
+        private static IEnumerable<Bounds> BoundsSource => Vector3Source.Select(v3 => new Bounds(v3, v3));
+  
         
         private static IEnumerable<object> GradientSource()
         {

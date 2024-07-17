@@ -18,6 +18,34 @@ namespace RosettaUI
         public const string PrefixGradient = nameof(UnityEditor) + ".GradientWrapperJSON:";
 
         private delegate bool DeserializeFunc<T>(string text, out T value);
+        private delegate T InitializeWithSpanFunc<out T>(Span<float> values);
+                
+        public static string Serialize<T>(T value)
+        {
+            var type = typeof(T);
+            return Type.GetTypeCode(type) switch
+            {
+                // TypeCodeは Enum の実態の型なので TypeCode.Int32 などになる。先にEnumの判定を行う
+                _ when type.IsEnum                            => SerializeEnum(value),
+                TypeCode.Boolean                              => value.ToString(),
+                TypeCode.Int32                                => value.ToString(),
+                TypeCode.UInt32                               => value.ToString(),
+                TypeCode.Single                               => SerializeFloat(To<float>(ref value)),
+                _ when typeof(Vector2) == type => SerializeVector2(To<Vector2>(ref value)),
+                _ when typeof(Vector3) == type => SerializeVector3(To<Vector3>(ref value)),
+                _ when typeof(Vector4) == type => SerializeVector4(To<Vector4>(ref value)),
+                _ when typeof(Vector2Int) == type => SerializeVector2(To<Vector2Int>(ref value)),
+                _ when typeof(Vector3Int) == type => SerializeVector3(To<Vector3Int>(ref value)),
+                _ when typeof(Rect) == type => SerializeRect(To<Rect>(ref value)),
+                _ when typeof(Quaternion) == type => SerializeQuaternion(To<Quaternion>(ref value)),
+                _ when typeof(Bounds) == type => SerializeBounds(To<Bounds>(ref value)),
+                _ when typeof(Gradient) == type => SerializeGradient(To<Gradient>(ref value)),
+                _ => ""
+            };
+
+            static TOriginal To<TOriginal>(ref T value) => UnsafeUtility.As<T, TOriginal>(ref value);
+        }
+        
         
         public static (bool success, T value) Deserialize<T>(string text)
         {
@@ -35,6 +63,9 @@ namespace RosettaUI
                 _ when typeof(Vector4) == type => (DeserializeVector4(text, out var v), From(ref v)),
                 _ when typeof(Vector2Int) == type => Cast<Vector2, Vector2Int>(text, DeserializeVector2, Vector2Int.FloorToInt),
                 _ when typeof(Vector3Int) == type => Cast<Vector3, Vector3Int>(text, DeserializeVector3, Vector3Int.FloorToInt),
+                _ when typeof(Rect) == type => (DeserializeRect(text, out var v), From(ref v)),
+                _ when typeof(Quaternion) == type => (DeserializeQuaternion(text, out var v), From(ref v)),
+                _ when typeof(Bounds) == type => (DeserializeBounds(text, out var v), From(ref v)),
                 _ when typeof(Gradient) == type => (DeserializeGradient(text, out var v), From(ref v)),
                 _ => (false, default)
             };
@@ -50,29 +81,7 @@ namespace RosettaUI
                 return (true, From(ref value));
             }
         }
-        
-        public static string Serialize<T>(T value)
-        {
-            var type = typeof(T);
-            return Type.GetTypeCode(type) switch
-            {
-                // TypeCodeは Enum の実態の型なので TypeCode.Int32 などになる。先にEnumの判定を行う
-                _ when type.IsEnum                            => SerializeEnum(value),
-                TypeCode.Boolean                              => value.ToString(),
-                TypeCode.Int32                                => value.ToString(),
-                TypeCode.UInt32                               => value.ToString(),
-                TypeCode.Single                               => SerializeFloat(To<float>(ref value)),
-                _ when typeof(Vector2) == type => SerializeVector2(To<Vector2>(ref value)),
-                _ when typeof(Vector3) == type => SerializeVector3(To<Vector3>(ref value)),
-                _ when typeof(Vector4) == type => SerializeVector4(To<Vector4>(ref value)),
-                _ when typeof(Vector2Int) == type => SerializeVector2(To<Vector2Int>(ref value)),
-                _ when typeof(Vector3Int) == type => SerializeVector3(To<Vector3Int>(ref value)),
-                _ when typeof(Gradient) == type => SerializeGradient(To<Gradient>(ref value)),
-                _ => ""
-            };
 
-            static TOriginal To<TOriginal>(ref T value) => UnsafeUtility.As<T, TOriginal>(ref value);
-        }
         
         
         public static bool DeserializeBool(string text, out bool value)
@@ -136,11 +145,16 @@ namespace RosettaUI
             return false;
         }
 
+
+        public static string SerializeVector2(Vector2 value) => SerializeFloats(nameof(Vector2), value.x, value.y);
+        public static string SerializeVector3(Vector3 value) => SerializeFloats(nameof(Vector3),value.x, value.y, value.z);
+        public static string SerializeVector4(Vector4 value) => SerializeFloats(nameof(Vector4),value.x, value.y, value.z, value.w);
+        public static string SerializeRect(Rect value) => SerializeFloats(nameof(Rect),value.x, value.y, value.width, value.height);
+        public static string SerializeQuaternion(Quaternion value) => SerializeFloats(nameof(Quaternion),value.x, value.y, value.z, value.w);
+        public static string SerializeBounds(Bounds value) => SerializeFloats(nameof(Bounds), value.center.x, value.center.y, value.center.z, value.extents.x, value.extents.y, value.extents.z);
         
-        public static string SerializeVector2(Vector2 value) =>   string.Format(CultureInfo.InvariantCulture, "Vector2({0:g9},{1:g9})", value.x, value.y);
-        public static string SerializeVector3(Vector3 value) =>   string.Format(CultureInfo.InvariantCulture, "Vector3({0:g9},{1:g9},{2:g9})", value.x, value.y, value.z);
-        public static string SerializeVector4(Vector4 value) =>   string.Format(CultureInfo.InvariantCulture, "Vector4({0:g9},{1:g9},{2:g9},{3:g9})", value.x, value.y, value.z, value.w);
-    
+        
+        
         public static bool DeserializeVector2(string text, out Vector2 value)
         {
             return DeserializeFloats(text, 2, out value, values => new Vector2(values[0], values[1]));
@@ -156,8 +170,41 @@ namespace RosettaUI
             return DeserializeFloats(text, 4, out value, values => new Vector4(values[0], values[1], values[2], values[3]));
         }
 
+        public static bool DeserializeRect(string text, out Rect value)
+        {
+            return DeserializeFloats(text, 4, out value, values => new Rect(values[0], values[1], values[2], values[3]));
+        }
+        
+        public static bool DeserializeQuaternion(string text, out Quaternion value)
+        {
+            return DeserializeFloats(text, 4, out value, values => new Quaternion(values[0], values[1], values[2], values[3]), Quaternion.identity);
+        }
 
-        private delegate T InitializeWithSpanFunc<out T>(Span<float> values);
+        public static bool DeserializeBounds(string text, out Bounds value)
+        {
+            return DeserializeFloats(text, 6, out value, values => new Bounds(
+                new Vector3(values[0], values[1], values[2]),
+                new Vector3(values[3], values[4], values[5]) * 2f
+            ));
+        }
+
+        
+        
+        private static string SerializeFloats(string prefix, params float[] values)
+        {
+            var sb = new StringBuilder();
+            sb.Append(prefix);
+            sb.Append('(');
+            for (var i = 0; i < values.Length; ++i)
+            {
+                if (i != 0)
+                    sb.Append(',');
+                sb.Append(values[i].ToString("g9", CultureInfo.InvariantCulture));
+            }
+            sb.Append(')');
+            return sb.ToString();
+        }
+        
         private static bool DeserializeFloats<T>(string text, int count, out T value, InitializeWithSpanFunc<T> initializeFunc, T? defaultValue = null)
             where T : struct
         {

@@ -84,6 +84,12 @@ namespace RosettaUI.Test
         
         public static string WriteVector2(Vector2 value) => Write(value);
         public static (bool, Vector2) ParseVector2(string text) => Parse<Vector2>(text);
+
+        public static string WriteVector3(Vector3 value) => Write(value);
+        public static (bool, Vector3) ParseVector3(string text) => Parse<Vector3>(text);
+
+        public static string WriteVector4(Vector4 value) => Write(value);
+        public static (bool, Vector4) ParseVector4(string text) => Parse<Vector4>(text);
         
         
         private static string WriteCustom(object value)

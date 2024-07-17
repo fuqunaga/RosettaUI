@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -31,6 +32,8 @@ namespace RosettaUI
                 TypeCode.UInt32                               => (DeserializeUInt    (text, out var v), From(ref v)),
                 TypeCode.Single                               => (DeserializeFloat   (text, out var v), From(ref v)),
                 _ when typeof(Vector2) == type => (DeserializeVector2(text, out var v), From(ref v)),
+                _ when typeof(Vector3) == type => (DeserializeVector3(text, out var v), From(ref v)),
+                _ when typeof(Vector4) == type => (DeserializeVector4(text, out var v), From(ref v)),
                 _ when typeof(Gradient) == type => (DeserializeGradient(text, out var v), From(ref v)),
                 _ => (false, default)
             };
@@ -50,6 +53,8 @@ namespace RosettaUI
                 TypeCode.UInt32                               => value.ToString(),
                 TypeCode.Single                               => SerializeFloat(To<float>(ref value)),
                 _ when typeof(Vector2) == type => SerializeVector2(To<Vector2>(ref value)),
+                _ when typeof(Vector3) == type => SerializeVector3(To<Vector3>(ref value)),
+                _ when typeof(Vector4) == type => SerializeVector4(To<Vector4>(ref value)),
                 _ when typeof(Gradient) == type => SerializeGradient(To<Gradient>(ref value)),
                 _ => ""
             };
@@ -120,23 +125,40 @@ namespace RosettaUI
         }
 
         
-        public static string SerializeVector2(Vector2 value) => string.Format(CultureInfo.InvariantCulture, "Vector2({0:g9},{1:g9})", value.x, value.y);
-        
+        public static string SerializeVector2(Vector2 value) =>   string.Format(CultureInfo.InvariantCulture, "Vector2({0:g9},{1:g9})", value.x, value.y);
+        public static string SerializeVector3(Vector3 value) =>   string.Format(CultureInfo.InvariantCulture, "Vector3({0:g9},{1:g9},{2:g9})", value.x, value.y, value.z);
+        public static string SerializeVector4(Vector4 value) =>   string.Format(CultureInfo.InvariantCulture, "Vector4({0:g9},{1:g9},{2:g9},{3:g9})", value.x, value.y, value.z, value.w);
+    
         public static bool DeserializeVector2(string text, out Vector2 value)
         {
-            value = default;
-            
-            Span<float> values = stackalloc float[2];
-            if (!DeserializeFloats(text, "Vector2", ref values))
-            {
-                return false;
-            }
-            
-            value = new Vector2(values[0], values[1]);
-            return true;
+            return DeserializeFloats(text, 2, out value, values => new Vector2(values[0], values[1]));
+        }
+
+        public static bool DeserializeVector3(string text, out Vector3 value)
+        {
+            return DeserializeFloats(text, 3, out value, values => new Vector3(values[0], values[1], values[2]));
+        }
+
+        public static bool DeserializeVector4(string text, out Vector4 value)
+        {
+            return DeserializeFloats(text, 4, out value, values => new Vector4(values[0], values[1], values[2], values[3]));
+        }
+
+
+        private delegate T InitializeWithSpanFunc<out T>(Span<float> values);
+        private static bool DeserializeFloats<T>(string text, int count, out T value, InitializeWithSpanFunc<T> initializeFunc, T? defaultValue = null)
+            where T : struct
+        {
+            Span<float> values = stackalloc float[count];
+            var success = DeserializeFloats(text, typeof(T).Name, ref values);
+            value = success 
+                ? initializeFunc(values)
+                : defaultValue ?? default;
+
+            return success;
         }
         
-        public static bool DeserializeFloats(string text, string prefix, ref Span<float> values)
+        private static bool DeserializeFloats(string text, string prefix, ref Span<float> values)
         {
             if (string.IsNullOrEmpty(text)) return false;
             

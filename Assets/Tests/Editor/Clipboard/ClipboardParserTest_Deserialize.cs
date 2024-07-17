@@ -26,6 +26,13 @@ namespace RosettaUI.Test
         [TestCaseSource(nameof(Vector2Source))]
         public void MatchUnityEditorMethod_Vector2(string text) => TestMatch(text, EditorClipBoardParser.ParseVector2);
 
+        [TestCaseSource(nameof(Vector3Source))]
+        public void MatchUnityEditorMethod_Vector3(string text) => TestMatch(text, EditorClipBoardParser.ParseVector3);
+
+        [TestCaseSource(nameof(Vector4Source))]
+        public void MatchUnityEditorMethod_Vector4(string text) => TestMatch(text, EditorClipBoardParser.ParseVector4);
+
+        
         [TestCaseSource(nameof(GradientSource))]
         public void MatchUnityEditorMethod_Gradient(string text) =>
             TestMatch(text, EditorClipBoardParser.ParseGradient);
@@ -71,12 +78,39 @@ namespace RosettaUI.Test
         private static string[] Vector2Source => new[]
         {
             "Vector2(0,0)", "Vector2(1,1)", "Vector2(0,1)", "Vector2(1,0)",
-            "Vector2(0.1,0.1)", "Vector2(-0.1,-0.1)", 
+            "Vector2(0.1,0.1)", "Vector2(-0.1,-0.1)",
+            "Vector2(1e+32,1e+32)", "Vector2(-1e+32,-1e+32)", 
             "Vector2(NaN,Nan)", "Vector2(Infinity,Infinity)", "Vector2(-Infinity, -Infinity)",
             "Vector2(0,)", "Vector2(,0)", "Vector2(,)", "Vector2()", "Vector2(,)", "Vector2(,0)", "Vector2(0,)",
             "Vector2(0,0,0)", "Vector2(0,0,0,0)", "Vector2(0,0,0,0,0)", "Vector2(0,0,0,0,0,0)",
             "Vector2 (0,0)", "Vector2( 0,0)", "Vector2(0 ,0)", "Vector2(0, 0)", "Vector2(0,0 )", "Vector2(0,0) ",
             "Vector3(0,0)", "Vector4(0,0)",
+            null, "expect parse fail"
+        };
+        
+        private static string[] Vector3Source => new[]
+        {
+            "Vector3(0,0,0)", "Vector3(1,1,1)", "Vector3(0,0,1)", "Vector3(0,1,0)", "Vector3(1,0,0)",
+            "Vector3(0.1,0.1,0.1)", "Vector3(-0.1,-0.1,,-0.1)", 
+            "Vector3(1e+32,1e+32,1e+32)", "Vector2(-1e+32,-1e+32,-1e+32)",
+            "Vector3(NaN,Nan,Nan)", "Vector3(Infinity,Infinity,Infinity)", "Vector3(-Infinity,-Infinity,-Infinity)",
+            "Vector3(0,)", "Vector3(,0)", "Vector3(,)", "Vector3()", "Vector3(,)", "Vector3(,0)", "Vector3(0,)",
+            "Vector3(0,0)", "Vector3(0,0,0,0)", "Vector3(0,0,0,0,0)", "Vector3(0,0,0,0,0,0)",
+            "Vector3 (0,0,0)", "Vector3( 0,0,0)", "Vector3(0 ,0,0)", "Vector3(0, 0,0)", "Vector3(0,0 ,0)","Vector3(0,0, 0)","Vector3(0,0,0 )","Vector3(0,0,0) ",    
+            "Vector2(0,0,0)", "Vector4(0,0,0)",
+            null, "expect parse fail"
+        };
+        
+        private static string[] Vector4Source => new[]
+        {
+            "Vector4(0,0,0,0)", "Vector4(1,1,1,1)", "Vector4(0,0,0,1)", "Vector4(0,0,1,0)", "Vector4(0,1,0,0)", "Vector4(1,0,0,0)",
+            "Vector4(0.1,0.1,0.1,0.1)", "Vector4(-0.1,-0.1,-0.1,-0.1)", 
+            "Vector4(1e+32,1e+32,1e+32,1e+32)", "Vector4(-1e+32,-1e+32,-1e+32,-1e+32)",
+            "Vector4(NaN,Nan,Nan,Nan)", "Vector4(Infinity,Infinity,Infinity,Infinity)", "Vector4(-Infinity,-Infinity,-Infinity,-Infinity)",
+            "Vector4(0,)", "Vector4(,0)", "Vector4(,)", "Vector4()", "Vector4(,)", "Vector4(,0)", "Vector4(0,)",
+            "Vector4(0,0)", "Vector4(0,0,0)", "Vector4(0,0,0,0,0)", "Vector4(0,0,0,0,0,0)",
+            "Vector4 (0,0,0,0)", "Vector4( 0,0,0,0)", "Vector4(0 ,0,0,0)", "Vector4(0, 0,0,0)", "Vector4(0,0 ,0,0)","Vector4(0,0, 0,0)","Vector4(0,0,0 ,0)","Vector4(0,0,0, 0)","Vector4(0,0,0,0 )","Vector4(0,0,0,0) ",   
+            "Vector2(0,0,0,0)", "Vector3(0,0,0,0)",
             null, "expect parse fail"
         };
         

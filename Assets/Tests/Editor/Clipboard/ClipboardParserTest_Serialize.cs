@@ -27,6 +27,12 @@ namespace RosettaUI.Test
         [TestCaseSource(nameof(Vector2Source))]
         public void MatchUnityEditorMethod_Vector2(Vector2 value) => TestMatch(value, EditorClipBoardParser.WriteVector2);
         
+        [TestCaseSource(nameof(Vector3Source))]
+        public void MatchUnityEditorMethod_Vector3(Vector3 value) => TestMatch(value, EditorClipBoardParser.WriteVector3);
+        
+        [TestCaseSource(nameof(Vector4Source))]
+        public void MatchUnityEditorMethod_Vector4(Vector4 value) => TestMatch(value, EditorClipBoardParser.WriteVector4);
+        
         [TestCaseSource(nameof(GradientSource))]
         public void MatchUnityEditorMethod_Gradient(Gradient value) => TestMatch(value, EditorClipBoardParser.WriteGradient);
 
@@ -41,7 +47,26 @@ namespace RosettaUI.Test
         {
             Vector2.zero, Vector2.one,
             Vector2.up, Vector2.down, Vector2.left, Vector2.right, 
-            Vector2.negativeInfinity, Vector2.positiveInfinity
+            Vector2.negativeInfinity, Vector2.positiveInfinity,
+            Vector2.one * float.Epsilon, Vector2.one * float.NaN, 
+            Vector2.one * float.MinValue, Vector2.one * float.MaxValue
+        };
+        
+        private static Vector3[] Vector3Source => new[]
+        {
+            Vector3.zero, Vector3.one,
+            Vector3.up, Vector3.down, Vector3.left, Vector3.right, Vector3.forward, Vector3.back,
+            Vector3.negativeInfinity, Vector3.positiveInfinity,
+            Vector3.one * float.Epsilon, Vector3.one * float.NaN, 
+            Vector3.one * float.MinValue, Vector3.one * float.MaxValue
+        };
+        
+        private static Vector4[] Vector4Source => new[]
+        {
+            Vector4.zero, Vector4.one,
+            Vector4.negativeInfinity, Vector4.positiveInfinity,
+            Vector4.one * float.Epsilon, Vector4.one * float.NaN, 
+            Vector4.one * float.MinValue, Vector4.one * float.MaxValue
         };
         
         private static IEnumerable<object> GradientSource()

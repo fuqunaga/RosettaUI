@@ -235,9 +235,10 @@ UI.Tabs(
 
         private Element CreateElement_FoldArgument()
         {
+            var boolValue = false;
             return ExampleTemplate.CodeElementSets("Fold argument",
                 (@"UI.Fold(
-    UI.Field(""CustomBar"", () => intValue), 
+    UI.Toggle(""CustomBar"", () => boolValue), 
     new[]
     {
         UI.Label(""Element"")
@@ -245,7 +246,8 @@ UI.Tabs(
 );
 ",
                     UI.Fold(
-                        UI.Field("CustomBar", () => intValue),
+                        // UI.Field("CustomBar", () => intValue),
+                        UI.Toggle("CustomBar", () => boolValue),
                         new[]
                         {
                             UI.Label("Element")

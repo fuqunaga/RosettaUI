@@ -7,6 +7,9 @@ namespace RosettaUI.UIToolkit
     // RequestResizeWindowEventを呼ぶFoldout
     public class FoldoutCustom : Foldout
     {
+        public const string UssClassName = "rosettaui-foldout-custom";
+        public const string HeaderContentUssClassName = UssClassName + "__header-content";
+        
         public Toggle Toggle { get; }
         
         private VisualElement _headerContent;
@@ -23,6 +26,7 @@ namespace RosettaUI.UIToolkit
 
                 Toggle.Add(value);
                 _headerContent = value;
+                _headerContent.AddToClassList(HeaderContentUssClassName);
                 
                 //　フィールドの値決定のエンターキーにToggleが反応してしまうので抑制
                 _headerContent?.RegisterCallback<NavigationSubmitEvent>(evt =>

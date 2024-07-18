@@ -195,11 +195,6 @@ Unity2022.2.0b6
     -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
 }
 
-.unity-foldout__toggle > .rosettaui-row
-{
-    flex-grow: 1;
-}
-
 .unity-foldout__content{
     margin-left: 0;
 }

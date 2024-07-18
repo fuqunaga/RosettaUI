@@ -37,12 +37,12 @@ namespace RosettaUI.Test
         // UnityEditor.ClipboardParserはVector2Int非対応。ClipboardContextMenuでVector2からキャストしている
         // Vector2Intのシリアライズ書式はVector2と同じなのでTestCastSourceを共有する
         [TestCaseSource(nameof(Vector2Source))]
-        public void MatchUnityEditorMethod_Vector2Int(string text) => TestMatch(text, CastParser(EditorClipBoardParser.ParseVector2, Vector2Int.FloorToInt));
+        public void MatchUnityEditorMethod_Vector2Int(string text) => TestMatch(text, CastParser(EditorClipBoardParser.ParseVector2, ClipboardParserUtility.Vector2ToVector2Int));
 
         // UnityEditor.ClipboardParserはVector3Int非対応。ClipboardContextMenuでVector3からキャストしている
         // Vector3Intのシリアライズ書式はVector3と同じなのでTestCastSourceを共有する
         [TestCaseSource(nameof(Vector3Source))]
-        public void MatchUnityEditorMethod_Vector3Int(string text) => TestMatch(text, CastParser(EditorClipBoardParser.ParseVector3, Vector3Int.FloorToInt));
+        public void MatchUnityEditorMethod_Vector3Int(string text) => TestMatch(text, CastParser(EditorClipBoardParser.ParseVector3, ClipboardParserUtility.Vector3ToVector3Int));
         
         [TestCaseSource(nameof(RectSource))]
         public void MatchUnityEditorMethod_Rect(string text) => TestMatch(text, EditorClipBoardParser.ParseRect);

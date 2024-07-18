@@ -118,7 +118,10 @@ namespace RosettaUI
         private static Element CreateMemberFieldElement(LabelElement label, IBinder binder, in FieldOption option)
         {
             var valueType = binder.ValueType;
+            var isSingleLine = TypeUtility.IsSingleLine(valueType);
+            
             var optionCaptured = option;
+            optionCaptured.suppressClipboardContextMenu |= isSingleLine;
 
             // UICustomCreationScopeをキャンセル
             // クラスのメンバーに同じクラスがある場合はUICustomを有効にする
@@ -173,15 +176,18 @@ namespace RosettaUI
             });
 
 
-            Element ret;
-            if (TypeUtility.IsSingleLine(valueType))
-                ret = new CompositeFieldElement(label, elements);
-            else if (label != null)
-                ret = UI.Fold(label, elements);
-            else
-                ret = UI.Column(elements);
-
-            return ret;
+            
+            if (isSingleLine)
+            {
+                return new CompositeFieldElement(label, elements).AddClipboardMenu(binder, option);
+            }
+            
+            if (label != null)
+            {
+                return UI.Fold(label.AddClipboardMenu(binder, option), elements);
+            }
+            
+            return UI.Column(elements);
         }
         
         private static Element CreateCircularReferenceElement(LabelElement label, Type type)

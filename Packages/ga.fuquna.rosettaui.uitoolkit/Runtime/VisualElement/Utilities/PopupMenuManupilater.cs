@@ -57,13 +57,11 @@ namespace RosettaUI.UIToolkit
         private void OnPopupMenuTrickleDown(PopupMenuEvent evt)
         {
             var menuItems = evt.MenuItems;
+            var newItems = _createMenuItemsFunc();
             
-            if (menuItems.Any())
-            {
-                menuItems.Add(MenuItem.Separator);
-            }
-            
-            evt.MenuItems.AddRange(_createMenuItemsFunc());
+            menuItems.InsertRange(0, menuItems.Any() 
+                ? newItems.Append(MenuItem.Separator)
+                : newItems); 
         }
 
 

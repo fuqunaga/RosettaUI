@@ -28,41 +28,22 @@ namespace RosettaUI
 
             return binder switch
             {
-                IBinder<int> ib => new IntFieldElement(label, ib, option),
-                IBinder<uint> ib => new UIntFieldElement(label, ib, option),
-                IBinder<float> ib => new FloatFieldElement(label, ib, option),
-                IBinder<string> ib => new TextFieldElement(label, ib, option),
-                IBinder<bool> ib => AddCopyAndPastePopupMenu(new ToggleElement(label, ib), ib),
-                IBinder<Color> ib => new ColorFieldElement(label, ib),
-                IBinder<Gradient> ib => UI.NullGuard(label, ib, () => AddCopyAndPastePopupMenu(new GradientFieldElement(label, ib), ib)),
-                _ when valueType.IsEnum => CreateEnumElement(label, binder),
+                IBinder<int> ib => new IntFieldElement(label, ib, option).AddClipboardMenu(ib, option),
+                IBinder<uint> ib => new UIntFieldElement(label, ib, option).AddClipboardMenu(ib, option),
+                IBinder<float> ib => new FloatFieldElement(label, ib, option).AddClipboardMenu(ib, option),
+                IBinder<string> ib => new TextFieldElement(label, ib, option).AddClipboardMenu(ib, option),
+                IBinder<bool> ib => new ToggleElement(label, ib).AddClipboardMenu(ib, option),
+                IBinder<Color> ib => new ColorFieldElement(label, ib).AddClipboardMenu(ib, option),
+                IBinder<Gradient> ib => UI.NullGuard(label, ib, () => new GradientFieldElement(label, ib)).AddClipboardMenu(ib, option),
+                _ when valueType.IsEnum => CreateEnumElement(label, binder).AddClipboardMenu(binder, option),
                 _ when TypeUtility.IsNullable(valueType) => CreateNullableFieldElement(label, binder, option),
                 _ when typeof(IElementCreator).IsAssignableFrom(valueType) => CreateElementCreatorElement(label, binder),
                 _ when ListBinder.IsListBinder(binder) => CreateListView(label, binder),
 
                 _ => UI.NullGuardIfNeed(label, binder, () => CreateMemberFieldElement(label, binder, optionCaptured))
             };
-
-
-            Element AddCopyAndPastePopupMenu<T>(Element element, IBinder<T> typedBinder)
-            {
-                return UI.Popup(element, () =>
-                {
-                    var success = Clipboard.TryGet(out T value);
-
-                    return new[]
-                    {
-                        new MenuItem("Copy", () => Clipboard.Set(typedBinder.Get())),
-                        new MenuItem("Paste", () =>
-                        {
-                            typedBinder.Set(value);
-                            element.NotifyViewValueChanged();
-                        }) { isEnable = success }
-                    };
-                });
-            }
         }
-
+        
         private static Element CreateEnumElement(LabelElement label, IBinder binder)
         {
             var valueType = binder.ValueType;
@@ -210,6 +191,24 @@ namespace RosettaUI
                 {
                     new HelpBoxElement($"[{type}] Circular reference detected.", HelpBoxType.Error)
                 }).SetInteractable(false);
+        }
+    }
+    
+    
+    internal static class ElementExtensionForBinderToElement
+    {
+        public static Element AddClipboardMenu(this Element element, IBinder ib, in FieldOption option)
+        {
+            return option.suppressClipboardContextMenu 
+                ? element 
+                : UI.ClipboardContextMenu(element, ib);
+        }
+        
+        public static Element AddClipboardMenu<T>(this Element element, IBinder<T> ib, in FieldOption option)
+        {
+            return option.suppressClipboardContextMenu 
+                ? element 
+                : UI.ClipboardContextMenu(element, ib);
         }
     }
 }

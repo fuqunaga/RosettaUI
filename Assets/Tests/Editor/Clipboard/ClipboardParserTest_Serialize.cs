@@ -44,11 +44,20 @@ namespace RosettaUI.Test
         [TestCaseSource(nameof(RectSource))]
         public void MatchUnityEditorMethod_Rect(Rect value) => TestMatch(value, EditorClipBoardParser.WriteRect);
 
+        // UnityEditor.ClipboardParserはRectInt非対応。ClipboardContextMenuでRectからキャストしている
+        [TestCaseSource(nameof(RectIntSource))]
+        public void MatchUnityEditorMethod_RectInt(RectInt value) => TestMatch(value, v => EditorClipBoardParser.WriteRect(ClipboardParserUtility.RectIntToRect(v)));
+
+        // UnityEditor.ClipboardParserはBoundsInt非対応。ClipboardContextMenuでBoundsからキャストしている
+        [TestCaseSource(nameof(BoundsIntSource))]
+        public void MatchUnityEditorMethod_BoundsInt(BoundsInt value) => TestMatch(value, v => EditorClipBoardParser.WriteBounds(ClipboardParserUtility.BoundsIntToBounds(v)));
+        
+        [TestCaseSource(nameof(BoundsSource))]
+        public void MatchUnityEditorMethod_Bounds(Bounds value) => TestMatch(value, EditorClipBoardParser.WriteBounds);
+
         [TestCaseSource(nameof(QuaternionSource))]
         public void MatchUnityEditorMethod_Quaternion(Quaternion value) => TestMatch(value, EditorClipBoardParser.WriteQuaternion);
 
-        [TestCaseSource(nameof(BoundsSource))]
-        public void MatchUnityEditorMethod_Bounds(Bounds value) => TestMatch(value, EditorClipBoardParser.WriteBounds);
 
         [TestCaseSource(nameof(ColorSource))]
         public void MatchUnityEditorMethod_Color(Color value) => TestMatch(value, EditorClipBoardParser.WriteColor);
@@ -114,7 +123,13 @@ namespace RosettaUI.Test
             new Rect(Vector2.one * float.MinValue, Vector2.one * float.MinValue),
             new Rect(Vector2.one * float.MaxValue, Vector2.one * float.MaxValue),
         };
+
+        public static IEnumerable<RectInt> RectIntSource => RectSource.Select(ClipboardParserUtility.RectToRectInt);
+
+        private static IEnumerable<Bounds> BoundsSource => Vector3Source.Select(v3 => new Bounds(v3, v3));
         
+        public static IEnumerable<BoundsInt> BoundsIntSource => BoundsSource.Select(ClipboardParserUtility.BoundsToBoundsInt);
+
         private static Quaternion[] QuaternionSource => new[]
         {
             default(Quaternion), Quaternion.identity, 
@@ -128,9 +143,6 @@ namespace RosettaUI.Test
             new Quaternion(float.MinValue, float.MinValue, float.MinValue, float.MinValue),
             new Quaternion(float.MaxValue, float.MaxValue, float.MaxValue, float.MaxValue),
         };
-
-        private static IEnumerable<Bounds> BoundsSource => Vector3Source.Select(v3 => new Bounds(v3, v3));
-
         private static IEnumerable<Color> ColorSource => Vector4Source.Select(v4 => (Color)v4).Concat(new[]
         {
             Color.red, Color.green, Color.blue, Color.white, Color.black, Color.gray, Color.clear,

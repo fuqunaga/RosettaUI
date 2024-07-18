@@ -26,25 +26,29 @@ namespace RosettaUI
             return Type.GetTypeCode(type) switch
             {
                 // TypeCodeは Enum の実態の型なので TypeCode.Int32 などになる。先にEnumの判定を行う
-                _ when type.IsEnum                            => SerializeEnum(value),
-                TypeCode.Boolean                              => value.ToString(),
-                TypeCode.Int32                                => value.ToString(),
-                TypeCode.UInt32                               => value.ToString(),
-                TypeCode.Single                               => SerializeFloat(To<float>(ref value)),
+                _ when type.IsEnum => SerializeEnum(value),
+                TypeCode.Boolean => value.ToString(),
+                TypeCode.Int32 => value.ToString(),
+                TypeCode.UInt32 => value.ToString(),
+                TypeCode.Single => SerializeFloat(To<float>(ref value)),
                 _ when typeof(Vector2) == type => SerializeVector2(To<Vector2>(ref value)),
                 _ when typeof(Vector3) == type => SerializeVector3(To<Vector3>(ref value)),
                 _ when typeof(Vector4) == type => SerializeVector4(To<Vector4>(ref value)),
                 _ when typeof(Vector2Int) == type => SerializeVector2(To<Vector2Int>(ref value)),
                 _ when typeof(Vector3Int) == type => SerializeVector3(To<Vector3Int>(ref value)),
                 _ when typeof(Rect) == type => SerializeRect(To<Rect>(ref value)),
-                _ when typeof(Quaternion) == type => SerializeQuaternion(To<Quaternion>(ref value)),
+                _ when typeof(RectInt) == type => SerializeRect(ClipboardParserUtility.RectIntToRect(To<RectInt>(ref value))),
                 _ when typeof(Bounds) == type => SerializeBounds(To<Bounds>(ref value)),
+                _ when typeof(BoundsInt) == type => SerializeBounds(ClipboardParserUtility.BoundsIntToBounds(To<BoundsInt>(ref value))),
+                _ when typeof(Quaternion) == type => SerializeQuaternion(To<Quaternion>(ref value)),
                 _ when typeof(Color) == type => SerializeColor(To<Color>(ref value)),
                 _ when typeof(Gradient) == type => SerializeGradient(To<Gradient>(ref value)),
                 _ => ""
             };
 
             static TOriginal To<TOriginal>(ref T value) => UnsafeUtility.As<T, TOriginal>(ref value);
+            
+
         }
         
         
@@ -54,19 +58,21 @@ namespace RosettaUI
             return Type.GetTypeCode(type) switch
             {
                 // TypeCodeは Enum の実態の型なので TypeCode.Int32 などになる。先にEnumの判定を行う
-                _ when type.IsEnum                            => (DeserializeEnum<T> (text, out var v), v),
-                TypeCode.Boolean                              => (DeserializeBool    (text, out var v), From(ref v)),
-                TypeCode.Int32                                => (DeserializeInt     (text, out var v), From(ref v)),
-                TypeCode.UInt32                               => (DeserializeUInt    (text, out var v), From(ref v)),
-                TypeCode.Single                               => (DeserializeFloat   (text, out var v), From(ref v)),
+                _ when type.IsEnum => (DeserializeEnum<T>(text, out var v), v),
+                TypeCode.Boolean => (DeserializeBool(text, out var v), From(ref v)),
+                TypeCode.Int32 => (DeserializeInt(text, out var v), From(ref v)),
+                TypeCode.UInt32 => (DeserializeUInt(text, out var v), From(ref v)),
+                TypeCode.Single => (DeserializeFloat(text, out var v), From(ref v)),
                 _ when typeof(Vector2) == type => (DeserializeVector2(text, out var v), From(ref v)),
                 _ when typeof(Vector3) == type => (DeserializeVector3(text, out var v), From(ref v)),
                 _ when typeof(Vector4) == type => (DeserializeVector4(text, out var v), From(ref v)),
                 _ when typeof(Vector2Int) == type => Cast<Vector2, Vector2Int>(text, DeserializeVector2, Vector2Int.FloorToInt),
                 _ when typeof(Vector3Int) == type => Cast<Vector3, Vector3Int>(text, DeserializeVector3, Vector3Int.FloorToInt),
                 _ when typeof(Rect) == type => (DeserializeRect(text, out var v), From(ref v)),
-                _ when typeof(Quaternion) == type => (DeserializeQuaternion(text, out var v), From(ref v)),
+                _ when typeof(RectInt) == type => Cast<Rect, RectInt>(text, DeserializeRect, ClipboardParserUtility.RectToRectInt),
                 _ when typeof(Bounds) == type => (DeserializeBounds(text, out var v), From(ref v)),
+                _ when typeof(BoundsInt) == type => Cast<Bounds, BoundsInt>(text, DeserializeBounds, ClipboardParserUtility.BoundsToBoundsInt),
+                _ when typeof(Quaternion) == type => (DeserializeQuaternion(text, out var v), From(ref v)),
                 _ when typeof(Color) == type => (DeserializeColor(text, out var v), From(ref v)),
                 _ when typeof(Gradient) == type => (DeserializeGradient(text, out var v), From(ref v)),
                 _ => (false, default)

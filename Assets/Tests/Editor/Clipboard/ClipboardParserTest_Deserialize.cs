@@ -47,11 +47,22 @@ namespace RosettaUI.Test
         [TestCaseSource(nameof(RectSource))]
         public void MatchUnityEditorMethod_Rect(string text) => TestMatch(text, EditorClipBoardParser.ParseRect);
 
-        [TestCaseSource(nameof(QuaternionSource))]
-        public void MatchUnityEditorMethod_Quaternion(string text) => TestMatch(text, EditorClipBoardParser.ParseQuaternion);
+        // UnityEditor.ClipboardParserはRectInt非対応。ClipboardContextMenuでRectからキャストしている
+        // RectIntのシリアライズ書式はRectと同じなのでTestCastSourceを共有する
+        [TestCaseSource(nameof(RectSource))]
+        public void MatchUnityEditorMethod_RectInt(string text) => TestMatch(text, CastParser(EditorClipBoardParser.ParseRect, ClipboardParserUtility.RectToRectInt));
 
         [TestCaseSource(nameof(BoundsSource))]
         public void MatchUnityEditorMethod_Bounds(string text) => TestMatch(text, EditorClipBoardParser.ParseBounds);
+
+        // UnityEditor.ClipboardParserはBoundsInt非対応。ClipboardContextMenuでBoundsからキャストしている
+        // BoundsIntのシリアライズ書式はBoundsと同じなのでTestCastSourceを共有する
+        [TestCaseSource(nameof(BoundsSource))]
+        public void MatchUnityEditorMethod_BoundsInt(string text) => TestMatch(text, CastParser(EditorClipBoardParser.ParseBounds, ClipboardParserUtility.BoundsToBoundsInt));
+
+        [TestCaseSource(nameof(QuaternionSource))]
+        public void MatchUnityEditorMethod_Quaternion(string text) => TestMatch(text, EditorClipBoardParser.ParseQuaternion);
+
 
         [TestCaseSource(nameof(ColorSource))]
         public void MatchUnityEditorMethod_Color(string text) => TestMatch(text, EditorClipBoardParser.ParseColor);

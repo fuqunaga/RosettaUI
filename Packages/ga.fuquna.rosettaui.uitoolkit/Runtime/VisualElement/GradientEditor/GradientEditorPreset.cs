@@ -14,7 +14,7 @@ namespace RosettaUI.UIToolkit
 
         private readonly VisualElement _gradientElement;
         
-        private readonly Gradient _gradient = new Gradient();
+        private readonly Gradient _gradient = new();
         
         
         public override Gradient Value 

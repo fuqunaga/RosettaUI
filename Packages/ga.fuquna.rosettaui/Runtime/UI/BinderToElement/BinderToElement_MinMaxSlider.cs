@@ -26,6 +26,7 @@
                 label, 
                 binder,
                 binder.GetMinMaxValueType(),
+                elementOption,
                 fieldName =>
                 {
                     var fieldBinder = PropertyOrFieldMinMaxBinder.Create(binder, fieldName);

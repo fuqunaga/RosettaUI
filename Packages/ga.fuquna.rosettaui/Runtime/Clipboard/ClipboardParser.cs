@@ -43,12 +43,10 @@ namespace RosettaUI
                 _ when typeof(Quaternion) == type => SerializeQuaternion(To<Quaternion>(ref value)),
                 _ when typeof(Color) == type => SerializeColor(To<Color>(ref value)),
                 _ when typeof(Gradient) == type => SerializeGradient(To<Gradient>(ref value)),
-                _ => ""
+                // _ => SerializeGeneric(in value)
             };
 
             static TOriginal To<TOriginal>(ref T value) => UnsafeUtility.As<T, TOriginal>(ref value);
-            
-
         }
         
         
@@ -121,7 +119,7 @@ namespace RosettaUI
 
         
         //TODO: supports flag enum
-        public static string SerializeEnum<TEnum>(TEnum value)
+        public static string SerializeEnum(object value)
         {
             var displayName = RuntimeObjectNames.NicifyVariableName(value.ToString());
             return $"{PrefixEnum}{displayName}";
@@ -322,5 +320,110 @@ namespace RosettaUI
         {
             public Gradient gradient;
         }
+        
+        
+        // public static string SerializeGeneric<T>(in T value)
+        // {
+        //     var json = EditorJsonUtility.ToJson(value);
+        //     return json;
+        // }
+
+        // ClipboardParser.ParseGenericSerializedProperty() ライクの機能
+        // https://github.com/Unity-Technologies/UnityCsReference/blob/77b37cd9f002e27b45be07d6e3667ee53985ec82/Editor/Mono/Clipboard/ClipboardParser.cs#L452
+        // 最終的にMiniJsonの出力がインスペクタと揃えばいいので、SerializePropertyType使用せずに簡易化できるかも
+#if false
+        
+        // UnityのClipboardParser.WriteGenericSerializedProperty()を同じ処理を行う
+        public static Dictionary<string, object> ObjectToDictionary(object obj, SerializedPropertyTypeRuntime propertyType,  string fieldName = null)
+        {
+            var res = new Dictionary<string, object>()
+            {
+                ["name"] = fieldName,
+                ["type"] = (int)propertyType
+            };
+
+
+            switch (propertyType)
+            {
+                case SerializedPropertyTypeRuntime.Integer:
+                case SerializedPropertyTypeRuntime.LayerMask:
+                case SerializedPropertyTypeRuntime.Character:
+                case SerializedPropertyTypeRuntime.RenderingLayerMask:
+                case SerializedPropertyTypeRuntime.Boolean:
+                case SerializedPropertyTypeRuntime.Float:
+                case SerializedPropertyTypeRuntime.String:
+                    res["val"] = obj;
+                    break;
+                
+                case SerializedPropertyTypeRuntime.ObjectReference:
+                    // res["val"] = WriteCustom(new ObjectWrapper(p.objectReferenceValue));
+                    break;
+                case SerializedPropertyTypeRuntime.ArraySize:
+                    res["val"] = obj;
+                    break;
+                case SerializedPropertyTypeRuntime.AnimationCurve:
+                    // res["val"] = WriteCustom(new AnimationCurveWrapper(p.animationCurveValue));
+                    break;
+                case SerializedPropertyTypeRuntime.Enum:
+                    res["val"] = SerializeEnum(obj);
+                    break;
+                case SerializedPropertyTypeRuntime.Bounds:
+                    res["val"] = SerializeBounds((Bounds)obj);
+                    break;
+                case SerializedPropertyTypeRuntime.Gradient:
+                    res["val"] = SerializeGradient((Gradient)obj);
+                    break;
+                case SerializedPropertyTypeRuntime.Quaternion:
+                    res["val"] = SerializeQuaternion((Quaternion)obj);
+                    break;
+                case SerializedPropertyTypeRuntime.Vector2Int:
+                    res["val"] = SerializeVector2((Vector2Int)obj);
+                    break;
+                case SerializedPropertyTypeRuntime.Vector3Int:
+                    res["val"] = SerializeVector3((Vector3Int)obj);
+                    break;
+                case SerializedPropertyTypeRuntime.RectInt:
+                    res["val"] = SerializeRect(ClipboardParserUtility.RectIntToRect((RectInt)obj));
+                    break;
+                case SerializedPropertyTypeRuntime.BoundsInt:
+                    var bi = (BoundsInt)obj;
+                    res["val"] = SerializeBounds(new Bounds(bi.center, bi.size)); // ClipboardParserUtility.BoundsIntToBounds() とは変換式が異なる
+                    break;
+
+                // Copy/Paste of these for generic serialized properties is not implemented yet.
+                case SerializedPropertyTypeRuntime.ExposedReference: break;
+                case SerializedPropertyTypeRuntime.FixedBufferSize: break;
+                case SerializedPropertyTypeRuntime.ManagedReference: break;
+
+                default:
+                    var type = obj.GetType();
+                    if (type.IsArray)
+                    {
+                        res["arraySize"] = ((Array)obj).Length;
+                        res["arrayType"] = type.GetElementType();
+                    }
+
+                    if (p.hasChildren)
+                    {
+                        var children = new List<object>();
+                        SerializedProperty chit = p.Copy();
+                        var end = chit.GetEndProperty();
+                        chit.Next(true);
+                        while (!SerializedProperty.EqualContents(chit, end))
+                        {
+                            children.Add(WriteGenericSerializedProperty(chit));
+                            if (!chit.Next(false))
+                                break;
+                        }
+
+                        res["children"] = children;
+                    }
+
+                    break;
+            }
+
+            return res;
+        }
+#endif
     }
 }

@@ -18,10 +18,5 @@
                 <ui:Label text="%" display-tooltip-when-elided="true" name="location-per-label" style="align-items: stretch;" />
             </ui:Slider>
         </ui:VisualElement>
-        <ui:GroupBox style="align-items: stretch; flex-direction: row; flex-grow: 0; flex-basis: auto; justify-content: flex-end;">
-            <ui:Label display-tooltip-when-elided="true" name="info-label" style="flex-grow: 1;" />
-            <ui:Button text="Copy" display-tooltip-when-elided="true" name="copy-button" />
-            <ui:Button text="Paste" display-tooltip-when-elided="true" name="paste-button" />
-        </ui:GroupBox>
     </ui:VisualElement>
 </ui:UXML>

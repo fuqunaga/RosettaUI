@@ -116,6 +116,9 @@ namespace RosettaUI.UIToolkit
             {
                 EnableAlpha = false
             };
+            _colorField.AddManipulator(new PopupMenuManipulator(
+                ClipboardUtility.GenerateContextMenuItemsFunc(() => _colorField.value, v => _colorField.value = v))
+            );
             var valueFieldContainer = this.Q("value-field-container");
             valueFieldContainer.Add(_colorField);
             

@@ -26,21 +26,14 @@ namespace RosettaUI
         
         public static PopupMenuElement ClipboardContextMenu<T>(Element element, IBinder<T> binder)
         {
-            return Popup(element, () =>
-            {
-                var success = Clipboard.TryGet(out T value);
-
-                return new[]
+            return Popup(element, ClipboardUtility.GenerateContextMenuItemsFunc(
+                binder.Get,
+                value =>
                 {
-                    new MenuItem("Copy", () => Clipboard.Set(binder.Get())),
-                    new MenuItem("Paste", () =>
-                    {
-                        binder.Set(value);
-                        element.NotifyViewValueChanged();
-                    }) { isEnable = success }
-                };
-            });
-
+                    binder.Set(value);
+                    element.NotifyViewValueChanged();
+                })
+            );
         }
     }
 }

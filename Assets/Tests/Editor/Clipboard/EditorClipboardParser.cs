@@ -16,6 +16,10 @@ namespace RosettaUI.Test
     /// </summary>
     public static class EditorClipBoardParser
     {
+        private static readonly Type EditorClipboardType = Type.GetType("UnityEditor.Clipboard, UnityEditor.CoreModule");
+        private static readonly MethodInfo ClipboardSetSerializedPropertyMethodInfo = EditorClipboardType.GetMethod("SetSerializedProperty");
+        private static readonly PropertyInfo ClipboardStringValueFieldInfo = EditorClipboardType.GetProperty("stringValue");
+        
         private static readonly Type EditorClipboardParserType = Type.GetType("UnityEditor.ClipboardParser, UnityEditor.CoreModule");
         private static readonly MethodInfo WriteCustomMethodInfo = EditorClipboardParserType.GetMethod("WriteCustom");
         private static readonly MethodInfo ParseCustomMethodInfo = EditorClipboardParserType.GetMethod("ParseCustom");
@@ -43,6 +47,7 @@ namespace RosettaUI.Test
             
             var enumForTestObject = Resources.Load<EnumForTestObject>("EnumForTest");
             enumForTestObject.enumValue = UnsafeUtility.As<TEnum, EnumForTest>(ref value);
+            
             using var so = new SerializedObject(enumForTestObject);
             var prop = so.FindProperty(nameof(EnumForTestObject.enumValue));
             
@@ -102,7 +107,36 @@ namespace RosettaUI.Test
 
         public static string WriteColor(Color value) => Write(value);
         public static (bool, Color) ParseColor(string text) => Parse<Color>(text);
+            
+        public static string WriteGradient(Gradient gradient)
+        {
+            var gradientWrapper = Activator.CreateInstance(GradientWrapperType, gradient);
+            return WriteCustom(gradientWrapper);
+        }
+            
+        public static (bool, Gradient) ParseGradient(string text)
+        {
+            var (success, gradientWrapper) = ParseCustom(text, GradientWrapperType);
+            return (success, (Gradient)GradientWrapperGradientFieldInfo.GetValue(gradientWrapper));
+        }
 
+        public static string WriteGeneric<T>(T value)
+        {
+            // only support ClassForTest
+            Assert.AreEqual(typeof(T), typeof(ClassForTest));
+            
+            var classForTest = Resources.Load<ClassForTestObject>("ClassForTest");
+            classForTest.classValue = UnsafeUtility.As<T, ClassForTest>(ref value);
+            
+            using var so = new SerializedObject(classForTest);
+            var prop = so.FindProperty(nameof(ClassForTestObject.classValue));
+
+            
+            ClipboardSetSerializedPropertyMethodInfo.Invoke(null, new object[] {prop});
+
+            var ret = ClipboardStringValueFieldInfo.GetValue(null);
+            return (string)ret;
+        }
         
         private static string WriteCustom(object value)
         {
@@ -118,19 +152,6 @@ namespace RosettaUI.Test
 
             return (success, parameters[1]);
         }
-            
-        public static string WriteGradient(Gradient gradient)
-        {
-            var gradientWrapper = Activator.CreateInstance(GradientWrapperType, gradient);
-            return WriteCustom(gradientWrapper);
-        }
-            
-        public static (bool, Gradient) ParseGradient(string text)
-        {
-            var (success, gradientWrapper) = ParseCustom(text, GradientWrapperType);
-            return (success, (Gradient)GradientWrapperGradientFieldInfo.GetValue(gradientWrapper));
-        }
-
         
         private static string Write<T>(T value)
         {

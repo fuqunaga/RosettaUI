@@ -1,5 +1,9 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using Unity.Collections.LowLevel.Unsafe;
@@ -16,6 +20,7 @@ namespace RosettaUI
     {
         public const string PrefixEnum = "Enum:";
         public const string PrefixGradient = nameof(UnityEditor) + ".GradientWrapperJSON:";
+        public const string PrefixGeneric = "GenericPropertyJSON:";
 
         private delegate bool DeserializeFunc<T>(string text, out T value);
         private delegate T InitializeWithSpanFunc<out T>(Span<float> values);
@@ -23,27 +28,26 @@ namespace RosettaUI
         public static string Serialize<T>(T value)
         {
             var type = typeof(T);
-            return Type.GetTypeCode(type) switch
+            return type.Name switch
             {
-                // TypeCodeは Enum の実態の型なので TypeCode.Int32 などになる。先にEnumの判定を行う
+                nameof(Boolean) => value.ToString(),
+                nameof(Int32) => value.ToString(),
+                nameof(UInt32) => value.ToString(),
+                nameof(Single) => SerializeFloat(To<float>(ref value)),
+                nameof(Vector2) => SerializeVector2(To<Vector2>(ref value)),
+                nameof(Vector3) => SerializeVector3(To<Vector3>(ref value)),
+                nameof(Vector4) => SerializeVector4(To<Vector4>(ref value)),
+                nameof(Vector2Int) => SerializeVector2(To<Vector2Int>(ref value)),
+                nameof(Vector3Int) => SerializeVector3(To<Vector3Int>(ref value)),
+                nameof(Rect) => SerializeRect(To<Rect>(ref value)),
+                nameof(RectInt) => SerializeRect(ClipboardParserUtility.RectIntToRect(To<RectInt>(ref value))),
+                nameof(Bounds) => SerializeBounds(To<Bounds>(ref value)),
+                nameof(BoundsInt) => SerializeBounds(ClipboardParserUtility.BoundsIntToBounds(To<BoundsInt>(ref value))),
+                nameof(Quaternion) => SerializeQuaternion(To<Quaternion>(ref value)),
+                nameof(Color) => SerializeColor(To<Color>(ref value)),
+                nameof(Gradient) => SerializeGradient(To<Gradient>(ref value)),
                 _ when type.IsEnum => SerializeEnum(value),
-                TypeCode.Boolean => value.ToString(),
-                TypeCode.Int32 => value.ToString(),
-                TypeCode.UInt32 => value.ToString(),
-                TypeCode.Single => SerializeFloat(To<float>(ref value)),
-                _ when typeof(Vector2) == type => SerializeVector2(To<Vector2>(ref value)),
-                _ when typeof(Vector3) == type => SerializeVector3(To<Vector3>(ref value)),
-                _ when typeof(Vector4) == type => SerializeVector4(To<Vector4>(ref value)),
-                _ when typeof(Vector2Int) == type => SerializeVector2(To<Vector2Int>(ref value)),
-                _ when typeof(Vector3Int) == type => SerializeVector3(To<Vector3Int>(ref value)),
-                _ when typeof(Rect) == type => SerializeRect(To<Rect>(ref value)),
-                _ when typeof(RectInt) == type => SerializeRect(ClipboardParserUtility.RectIntToRect(To<RectInt>(ref value))),
-                _ when typeof(Bounds) == type => SerializeBounds(To<Bounds>(ref value)),
-                _ when typeof(BoundsInt) == type => SerializeBounds(ClipboardParserUtility.BoundsIntToBounds(To<BoundsInt>(ref value))),
-                _ when typeof(Quaternion) == type => SerializeQuaternion(To<Quaternion>(ref value)),
-                _ when typeof(Color) == type => SerializeColor(To<Color>(ref value)),
-                _ when typeof(Gradient) == type => SerializeGradient(To<Gradient>(ref value)),
-                // _ => SerializeGeneric(in value)
+                _ => SerializeGeneric(in value)
             };
 
             static TOriginal To<TOriginal>(ref T value) => UnsafeUtility.As<T, TOriginal>(ref value);
@@ -53,26 +57,25 @@ namespace RosettaUI
         public static (bool success, T value) Deserialize<T>(string text)
         {
             var type = typeof(T);
-            return Type.GetTypeCode(type) switch
+            return type.Name switch
             {
-                // TypeCodeは Enum の実態の型なので TypeCode.Int32 などになる。先にEnumの判定を行う
+                nameof(Boolean) => (DeserializeBool(text, out var v), From(ref v)),
+                nameof(Int32) => (DeserializeInt(text, out var v), From(ref v)),
+                nameof(UInt32) => (DeserializeUInt(text, out var v), From(ref v)),
+                nameof(Single) => (DeserializeFloat(text, out var v), From(ref v)),
+                nameof(Vector2) => (DeserializeVector2(text, out var v), From(ref v)),
+                nameof(Vector3) => (DeserializeVector3(text, out var v), From(ref v)),
+                nameof(Vector4) => (DeserializeVector4(text, out var v), From(ref v)),
+                nameof(Vector2Int) => Cast<Vector2, Vector2Int>(text, DeserializeVector2, ClipboardParserUtility.Vector2ToVector2Int),
+                nameof(Vector3Int) => Cast<Vector3, Vector3Int>(text, DeserializeVector3, ClipboardParserUtility.Vector3ToVector3Int),
+                nameof(Rect) => (DeserializeRect(text, out var v), From(ref v)),
+                nameof(RectInt) => Cast<Rect, RectInt>(text, DeserializeRect, ClipboardParserUtility.RectToRectInt),
+                nameof(Bounds) => (DeserializeBounds(text, out var v), From(ref v)),
+                nameof(BoundsInt) => Cast<Bounds, BoundsInt>(text, DeserializeBounds, ClipboardParserUtility.BoundsToBoundsInt),
+                nameof(Quaternion) => (DeserializeQuaternion(text, out var v), From(ref v)),
+                nameof(Color) => (DeserializeColor(text, out var v), From(ref v)),
+                nameof(Gradient) => (DeserializeGradient(text, out var v), From(ref v)),
                 _ when type.IsEnum => (DeserializeEnum<T>(text, out var v), v),
-                TypeCode.Boolean => (DeserializeBool(text, out var v), From(ref v)),
-                TypeCode.Int32 => (DeserializeInt(text, out var v), From(ref v)),
-                TypeCode.UInt32 => (DeserializeUInt(text, out var v), From(ref v)),
-                TypeCode.Single => (DeserializeFloat(text, out var v), From(ref v)),
-                _ when typeof(Vector2) == type => (DeserializeVector2(text, out var v), From(ref v)),
-                _ when typeof(Vector3) == type => (DeserializeVector3(text, out var v), From(ref v)),
-                _ when typeof(Vector4) == type => (DeserializeVector4(text, out var v), From(ref v)),
-                _ when typeof(Vector2Int) == type => Cast<Vector2, Vector2Int>(text, DeserializeVector2, ClipboardParserUtility.Vector2ToVector2Int),
-                _ when typeof(Vector3Int) == type => Cast<Vector3, Vector3Int>(text, DeserializeVector3, ClipboardParserUtility.Vector3ToVector3Int),
-                _ when typeof(Rect) == type => (DeserializeRect(text, out var v), From(ref v)),
-                _ when typeof(RectInt) == type => Cast<Rect, RectInt>(text, DeserializeRect, ClipboardParserUtility.RectToRectInt),
-                _ when typeof(Bounds) == type => (DeserializeBounds(text, out var v), From(ref v)),
-                _ when typeof(BoundsInt) == type => Cast<Bounds, BoundsInt>(text, DeserializeBounds, ClipboardParserUtility.BoundsToBoundsInt),
-                _ when typeof(Quaternion) == type => (DeserializeQuaternion(text, out var v), From(ref v)),
-                _ when typeof(Color) == type => (DeserializeColor(text, out var v), From(ref v)),
-                _ when typeof(Gradient) == type => (DeserializeGradient(text, out var v), From(ref v)),
                 _ => (false, default)
             };
 
@@ -322,20 +325,20 @@ namespace RosettaUI
         }
         
         
-        // public static string SerializeGeneric<T>(in T value)
-        // {
-        //     var json = EditorJsonUtility.ToJson(value);
-        //     return json;
-        // }
-
-        // ClipboardParser.ParseGenericSerializedProperty() ライクの機能
-        // https://github.com/Unity-Technologies/UnityCsReference/blob/77b37cd9f002e27b45be07d6e3667ee53985ec82/Editor/Mono/Clipboard/ClipboardParser.cs#L452
-        // 最終的にMiniJsonの出力がインスペクタと揃えばいいので、SerializePropertyType使用せずに簡易化できるかも
-#if false
-        
-        // UnityのClipboardParser.WriteGenericSerializedProperty()を同じ処理を行う
-        public static Dictionary<string, object> ObjectToDictionary(object obj, SerializedPropertyTypeRuntime propertyType,  string fieldName = null)
+        public static string SerializeGeneric<T>(in T value)
         {
+            var dic = ObjectToDictionary(value);
+            var json = Json.Serialize(dic);
+            return $"{PrefixGeneric}{json}";
+        }
+        
+        // UnityのClipboardParser.WriteGenericSerializedProperty() 風の機能
+        // https://github.com/Unity-Technologies/UnityCsReference/blob/77b37cd9f002e27b45be07d6e3667ee53985ec82/Editor/Mono/Clipboard/ClipboardParser.cs#L385
+        public static Dictionary<string, object> ObjectToDictionary(object obj, string fieldName = null)
+        {
+            if (obj is null) return null;
+            var propertyType = SerializedPropertyTypeRuntimeUtility.TypeToSerializedPropertyType(obj.GetType()); 
+            
             var res = new Dictionary<string, object>()
             {
                 ["name"] = fieldName,
@@ -346,24 +349,29 @@ namespace RosettaUI
             switch (propertyType)
             {
                 case SerializedPropertyTypeRuntime.Integer:
-                case SerializedPropertyTypeRuntime.LayerMask:
-                case SerializedPropertyTypeRuntime.Character:
-                case SerializedPropertyTypeRuntime.RenderingLayerMask:
                 case SerializedPropertyTypeRuntime.Boolean:
                 case SerializedPropertyTypeRuntime.Float:
                 case SerializedPropertyTypeRuntime.String:
-                    res["val"] = obj;
-                    break;
-                
-                case SerializedPropertyTypeRuntime.ObjectReference:
-                    // res["val"] = WriteCustom(new ObjectWrapper(p.objectReferenceValue));
-                    break;
                 case SerializedPropertyTypeRuntime.ArraySize:
                     res["val"] = obj;
                     break;
+                
+                case SerializedPropertyTypeRuntime.Character:
+                    res["val"] = (int)(char)obj;
+                    break;
+
+                case SerializedPropertyTypeRuntime.LayerMask:
+                    res["val"] = ((LayerMask)obj).value;
+                    break;
+                
+                case SerializedPropertyTypeRuntime.RenderingLayerMask:
+                    res["val"] = ((RenderingLayerMask)obj).value;
+                    break;
+                
                 case SerializedPropertyTypeRuntime.AnimationCurve:
                     // res["val"] = WriteCustom(new AnimationCurveWrapper(p.animationCurveValue));
                     break;
+                
                 case SerializedPropertyTypeRuntime.Enum:
                     res["val"] = SerializeEnum(obj);
                     break;
@@ -389,34 +397,57 @@ namespace RosettaUI
                     var bi = (BoundsInt)obj;
                     res["val"] = SerializeBounds(new Bounds(bi.center, bi.size)); // ClipboardParserUtility.BoundsIntToBounds() とは変換式が異なる
                     break;
-
-                // Copy/Paste of these for generic serialized properties is not implemented yet.
+                
+                // Not supported
+                case SerializedPropertyTypeRuntime.ObjectReference: break;
                 case SerializedPropertyTypeRuntime.ExposedReference: break;
                 case SerializedPropertyTypeRuntime.FixedBufferSize: break;
                 case SerializedPropertyTypeRuntime.ManagedReference: break;
 
+                // UnityEditorのClipboardParserでも以下の型はcaseで書かれていないのでそのまま踏襲
+                //
+                // case SerializedPropertyTypeRuntime.Generic:
+                // case SerializedPropertyTypeRuntime.Vector2:
+                // case SerializedPropertyTypeRuntime.Vector3:
+                // case SerializedPropertyTypeRuntime.Vector4:
+                // case SerializedPropertyTypeRuntime.Rect:
+                // case SerializedPropertyTypeRuntime.Hash128:
+                // case SerializedPropertyTypeRuntime.Color:
+                    
                 default:
                     var type = obj.GetType();
-                    if (type.IsArray)
+                    if (obj is IList list)
                     {
-                        res["arraySize"] = ((Array)obj).Length;
-                        res["arrayType"] = type.GetElementType();
+                        res["arraySize"] = list.Count;
+                        res["arrayType"] = GetArrayElementType(type);
+                        res["children"] = new[] { SerializeIList(list) }; // Unityのシリアライズはなぜか配列扱いっぽい
+                        
+                        return res;
                     }
 
-                    if (p.hasChildren)
+                    // Supports UITargetFieldNames(include Property)
+                    // インスペクターでは表示されないプロパティもUI内でやりとり可能にするためサポートする
+                    var childrenNames = TypeUtility.GetUITargetFieldNames(type);
+                    if (childrenNames.Any())
                     {
-                        var children = new List<object>();
-                        SerializedProperty chit = p.Copy();
-                        var end = chit.GetEndProperty();
-                        chit.Next(true);
-                        while (!SerializedProperty.EqualContents(chit, end))
+                        res["children"] = childrenNames.Select(n =>
                         {
-                            children.Add(WriteGenericSerializedProperty(chit));
-                            if (!chit.Next(false))
-                                break;
-                        }
+                            var mi = TypeUtility.GetMemberInfo(type, n);
+                            var val = mi switch
+                            {
+                                FieldInfo fi => fi.GetValue(obj),
+                                PropertyInfo pi => pi.GetValue(obj),
+                                _ => null
+                            };
 
-                        res["children"] = children;
+                            // Unityのシリアラズが独自の名前に変換するもの
+                            if (type == typeof(RectOffset))
+                            {
+                                n = _rectOffsetMemberNameTable[n];
+                            }
+
+                            return ObjectToDictionary(val, n);
+                        }).ToArray();
                     }
 
                     break;
@@ -424,6 +455,75 @@ namespace RosettaUI
 
             return res;
         }
-#endif
+
+        private static Dictionary<string, object> SerializeIList(IList list)
+        {
+            var size = list.Count;
+            
+            var res = new Dictionary<string, object>
+            {
+                ["name"] = nameof(Array),
+                ["type"] = (int)SerializedPropertyTypeRuntime.Generic,
+                ["arraySize"] = size,
+                ["arrayType"] = GetArrayElementType(list.GetType())
+            };
+
+            var children = new object[size + 1];
+            children[0] = new Dictionary<string, object>
+            {
+                ["name"] = "size",
+                ["type"] = (int)SerializedPropertyTypeRuntime.ArraySize,
+                ["val"] = size
+            };
+            
+            for (var i = 0; i < size; ++i)
+            {
+                children[i + 1] = ObjectToDictionary(list[i], "data"); 
+            }
+
+            res["children"] = children;
+
+            return res;
+        }
+
+        private static string GetArrayElementType(Type type)
+        {
+            var elementType = type.IsArray
+                ? type.GetElementType()
+                : type.GetGenericArguments()[0];
+            
+            return TypeNameOrAlias(elementType);
+        }
+
+        private static readonly Dictionary<Type, string> TypeAlias = new Dictionary<Type, string>
+        {
+            { typeof(bool), "bool" },
+            { typeof(byte), "byte" },
+            { typeof(char), "char" },
+            { typeof(decimal), "decimal" },
+            { typeof(double), "double" },
+            { typeof(float), "float" },
+            { typeof(int), "int" },
+            { typeof(long), "long" },
+            { typeof(object), "object" },
+            { typeof(sbyte), "sbyte" },
+            { typeof(short), "short" },
+            { typeof(string), "string" },
+            { typeof(uint), "uint" },
+            { typeof(ulong), "ulong" },
+        };
+
+        private static string TypeNameOrAlias(Type type) =>
+            TypeAlias.TryGetValue(type, out var alias) 
+                ? alias 
+                : type.Name;
+
+        private static Dictionary<string, string> _rectOffsetMemberNameTable = new()
+        {
+            { "left", "m_Left" },
+            { "right", "m_Right" },
+            { "top", "m_Top" },
+            { "bottom", "m_Bottom" },
+        };
     }
 }

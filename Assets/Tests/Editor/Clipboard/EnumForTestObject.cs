@@ -1,7 +1,6 @@
 using UnityEngine;
 
 // ReSharper disable InconsistentNaming
-
 namespace RosettaUI.Test
 {
     public enum EnumForTest

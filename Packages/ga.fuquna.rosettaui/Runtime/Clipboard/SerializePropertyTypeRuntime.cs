@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RosettaUI
+﻿namespace RosettaUI
 {
     /// <summary>
     ///   <para>Represents the type of a SerializedProperty.</para>

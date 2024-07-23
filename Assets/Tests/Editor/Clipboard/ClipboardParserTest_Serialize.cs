@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -57,13 +58,27 @@ namespace RosettaUI.Test
 
         [TestCaseSource(nameof(QuaternionSource))]
         public void MatchUnityEditorMethod_Quaternion(Quaternion value) => TestMatch(value, EditorClipBoardParser.WriteQuaternion);
-
-
+        
         [TestCaseSource(nameof(ColorSource))]
         public void MatchUnityEditorMethod_Color(Color value) => TestMatch(value, EditorClipBoardParser.WriteColor);
         
         [TestCaseSource(nameof(GradientSource))]
         public void MatchUnityEditorMethod_Gradient(Gradient value) => TestMatch(value, EditorClipBoardParser.WriteGradient);
+
+        [TestCaseSource(nameof(GenericSource))]
+        public void MatchUnityEditorMethod_Generic<T>(T value)
+        {
+            var expected = EditorClipBoardParser.WriteGeneric(value);
+            var actual = ClipboardParser.Serialize(value);
+            
+            // 最初のnameは無視
+            // フィールド名だがコピペの機能では使用されていないっぽい
+            // またUI上で取得するのが大変
+            var pattern = @"(?<=GenericPropertyJSON:\s*{\s*""name"":\s*)null";
+            actual = Regex.Replace(actual, pattern, $"\"{nameof(ClassForTestObject.classValue)}\"");
+            
+            Assert.AreEqual(expected, actual);
+        }
 
 
         
@@ -153,6 +168,17 @@ namespace RosettaUI.Test
             yield return new object[] { new Gradient() };
         }
 
+        private static IEnumerable<ClassForTest> GenericSource()
+        {
+            yield return new ClassForTest()
+            {
+                intValue = -1,
+                uintValue = 2,
+                floatValue = 3.0f,
+                stringValue = "4",
+                gradient = new Gradient(),
+            };
+        }
         
         private static void TestMatch<T>(T value, Func<T, string> expectedFunc)
         {

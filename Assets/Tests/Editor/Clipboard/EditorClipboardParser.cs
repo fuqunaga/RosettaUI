@@ -18,6 +18,7 @@ namespace RosettaUI.Test
     {
         private static readonly Type EditorClipboardType = Type.GetType("UnityEditor.Clipboard, UnityEditor.CoreModule");
         private static readonly MethodInfo ClipboardSetSerializedPropertyMethodInfo = EditorClipboardType.GetMethod("SetSerializedProperty");
+        private static readonly MethodInfo ClipboardGetSerializedPropertyMethodInfo = EditorClipboardType.GetMethod("GetSerializedProperty");
         private static readonly PropertyInfo ClipboardStringValueFieldInfo = EditorClipboardType.GetProperty("stringValue");
         
         private static readonly Type EditorClipboardParserType = Type.GetType("UnityEditor.ClipboardParser, UnityEditor.CoreModule");
@@ -137,6 +138,28 @@ namespace RosettaUI.Test
             var ret = ClipboardStringValueFieldInfo.GetValue(null);
             return (string)ret;
         }
+
+        public static (bool, T) ParseGeneric<T>(string text)
+        {
+            // only support EnumForTest
+            Assert.AreEqual(typeof(T), typeof(ClassForTest));
+            
+            if (string.IsNullOrEmpty(text))
+            {
+                return (false, default);
+            }
+            
+            var classForTestObject = Resources.Load<ClassForTestObject>("ClassForTest");
+            using var so = new SerializedObject(classForTestObject);
+            var prop = so.FindProperty(nameof(classForTestObject.classValue));
+
+            ClipboardStringValueFieldInfo.SetValue(null, text);
+            ClipboardGetSerializedPropertyMethodInfo.Invoke(null, new object[] {prop});
+            so.ApplyModifiedProperties();
+            
+            return (true, UnsafeUtility.As<ClassForTest,T>(ref classForTestObject.classValue));
+        }
+        
         
         private static string WriteCustom(object value)
         {

@@ -1,9 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using Unity.Collections.LowLevel.Unsafe;
@@ -16,7 +13,7 @@ namespace RosettaUI
     ///
     /// ref: https://github.com/Unity-Technologies/UnityCsReference/blob/6000.0/Editor/Mono/Clipboard/ClipboardParser.cs
     /// </summary>
-    public static class ClipboardParser
+    public static partial class ClipboardParser
     {
         public const string PrefixEnum = "Enum:";
         public const string PrefixGradient = nameof(UnityEditor) + ".GradientWrapperJSON:";
@@ -40,9 +37,9 @@ namespace RosettaUI
                 nameof(Vector2Int) => SerializeVector2(To<Vector2Int>(ref value)),
                 nameof(Vector3Int) => SerializeVector3(To<Vector3Int>(ref value)),
                 nameof(Rect) => SerializeRect(To<Rect>(ref value)),
-                nameof(RectInt) => SerializeRect(ClipboardParserUtility.RectIntToRect(To<RectInt>(ref value))),
+                nameof(RectInt) => SerializeRect(ClipboardParserUtility.FromInt(To<RectInt>(ref value))),
                 nameof(Bounds) => SerializeBounds(To<Bounds>(ref value)),
-                nameof(BoundsInt) => SerializeBounds(ClipboardParserUtility.BoundsIntToBounds(To<BoundsInt>(ref value))),
+                nameof(BoundsInt) => SerializeBounds(ClipboardParserUtility.FromIntKeepValueLook(To<BoundsInt>(ref value))),
                 nameof(Quaternion) => SerializeQuaternion(To<Quaternion>(ref value)),
                 nameof(Color) => SerializeColor(To<Color>(ref value)),
                 nameof(Gradient) => SerializeGradient(To<Gradient>(ref value)),
@@ -66,17 +63,17 @@ namespace RosettaUI
                 nameof(Vector2) => (DeserializeVector2(text, out var v), From(ref v)),
                 nameof(Vector3) => (DeserializeVector3(text, out var v), From(ref v)),
                 nameof(Vector4) => (DeserializeVector4(text, out var v), From(ref v)),
-                nameof(Vector2Int) => Cast<Vector2, Vector2Int>(text, DeserializeVector2, ClipboardParserUtility.Vector2ToVector2Int),
-                nameof(Vector3Int) => Cast<Vector3, Vector3Int>(text, DeserializeVector3, ClipboardParserUtility.Vector3ToVector3Int),
+                nameof(Vector2Int) => Cast<Vector2, Vector2Int>(text, DeserializeVector2, ClipboardParserUtility.ToInt),
+                nameof(Vector3Int) => Cast<Vector3, Vector3Int>(text, DeserializeVector3, ClipboardParserUtility.ToInt),
                 nameof(Rect) => (DeserializeRect(text, out var v), From(ref v)),
-                nameof(RectInt) => Cast<Rect, RectInt>(text, DeserializeRect, ClipboardParserUtility.RectToRectInt),
+                nameof(RectInt) => Cast<Rect, RectInt>(text, DeserializeRect, ClipboardParserUtility.ToInt),
                 nameof(Bounds) => (DeserializeBounds(text, out var v), From(ref v)),
-                nameof(BoundsInt) => Cast<Bounds, BoundsInt>(text, DeserializeBounds, ClipboardParserUtility.BoundsToBoundsInt),
+                nameof(BoundsInt) => Cast<Bounds, BoundsInt>(text, DeserializeBounds, ClipboardParserUtility.ToIntKeepValueLook),
                 nameof(Quaternion) => (DeserializeQuaternion(text, out var v), From(ref v)),
                 nameof(Color) => (DeserializeColor(text, out var v), From(ref v)),
                 nameof(Gradient) => (DeserializeGradient(text, out var v), From(ref v)),
                 _ when type.IsEnum => (DeserializeEnum<T>(text, out var v), v),
-                _ => (false, default)
+                _ => (DeserializeGeneric<T>(text, out var v), v)
             };
 
             static T From<TOriginal>(ref TOriginal value) => UnsafeUtility.As<TOriginal, T>(ref value);
@@ -132,6 +129,18 @@ namespace RosettaUI
         public static bool DeserializeEnum<TEnum>(string text, out TEnum value)
         {
             value = default;
+            if (!DeserializeEnum(text, typeof(TEnum), out var obj))
+            {
+                return false;
+            }
+
+            value = (TEnum)obj;
+            return true;
+        }
+
+        public static bool DeserializeEnum(string text, Type type, out object value)
+        {
+            value = default;
             if (string.IsNullOrEmpty(text)) return false;
             
             if (!text.StartsWith(PrefixEnum))
@@ -141,13 +150,13 @@ namespace RosettaUI
             if (string.IsNullOrEmpty(val))
                 return false;
 
-            var names = Enum.GetNames(typeof(TEnum));
+            var names = Enum.GetNames(type);
             foreach (var name in names)
             {
                 var displayName = RuntimeObjectNames.NicifyVariableName(name);
                 if (displayName != text) continue;
                 
-                value = (TEnum)Enum.Parse(typeof(TEnum), name);
+                value = Enum.Parse(type, name);
                 return true;
             }
 
@@ -289,6 +298,12 @@ namespace RosettaUI
         // https://github.com/Unity-Technologies/UnityCsReference/blob/5406f17521a16bb37880960352990229987aa676/Editor/Mono/Clipboard/ClipboardParser.cs#L353
         //
         // さらにGradientWrapperでかぶせている
+        public static string SerializeGradient(Gradient gradient)
+        {
+            var wrapper = new GradientWrapper { gradient = gradient };
+            return $"{PrefixGradient}{JsonUtility.ToJson(wrapper)}";
+        }
+        
         public static bool DeserializeGradient(string text, out Gradient gradient)
         {
             gradient = new Gradient();
@@ -312,11 +327,6 @@ namespace RosettaUI
             return true;
         }
 
-        public static string SerializeGradient(Gradient gradient)
-        {
-            var wrapper = new GradientWrapper { gradient = gradient };
-            return $"{PrefixGradient}{JsonUtility.ToJson(wrapper)}";
-        }
 
         [Serializable]
         private class GradientWrapper
@@ -331,199 +341,21 @@ namespace RosettaUI
             var json = Json.Serialize(dic);
             return $"{PrefixGeneric}{json}";
         }
-        
-        // UnityのClipboardParser.WriteGenericSerializedProperty() 風の機能
-        // https://github.com/Unity-Technologies/UnityCsReference/blob/77b37cd9f002e27b45be07d6e3667ee53985ec82/Editor/Mono/Clipboard/ClipboardParser.cs#L385
-        public static Dictionary<string, object> ObjectToDictionary(object obj, string fieldName = null)
+
+        public static bool DeserializeGeneric<T>(string text, out T value)
         {
-            if (obj is null) return null;
-            var propertyType = SerializedPropertyTypeRuntimeUtility.TypeToSerializedPropertyType(obj.GetType()); 
+            value = default;
+            if (!text.StartsWith(PrefixGeneric))
+                return false;
             
-            var res = new Dictionary<string, object>()
-            {
-                ["name"] = fieldName,
-                ["type"] = (int)propertyType
-            };
+            if (Json.Deserialize(text[PrefixGeneric.Length..]) is not Dictionary<string, object> jsonObjects)
+                return false;
 
+            if (!DictionaryToObject(typeof(T), jsonObjects, out var obj))
+                return false;
 
-            switch (propertyType)
-            {
-                case SerializedPropertyTypeRuntime.Integer:
-                case SerializedPropertyTypeRuntime.Boolean:
-                case SerializedPropertyTypeRuntime.Float:
-                case SerializedPropertyTypeRuntime.String:
-                case SerializedPropertyTypeRuntime.ArraySize:
-                    res["val"] = obj;
-                    break;
-                
-                case SerializedPropertyTypeRuntime.Character:
-                    res["val"] = (int)(char)obj;
-                    break;
-
-                case SerializedPropertyTypeRuntime.LayerMask:
-                    res["val"] = ((LayerMask)obj).value;
-                    break;
-                
-                case SerializedPropertyTypeRuntime.RenderingLayerMask:
-                    res["val"] = ((RenderingLayerMask)obj).value;
-                    break;
-                
-                case SerializedPropertyTypeRuntime.AnimationCurve:
-                    // res["val"] = WriteCustom(new AnimationCurveWrapper(p.animationCurveValue));
-                    break;
-                
-                case SerializedPropertyTypeRuntime.Enum:
-                    res["val"] = SerializeEnum(obj);
-                    break;
-                case SerializedPropertyTypeRuntime.Bounds:
-                    res["val"] = SerializeBounds((Bounds)obj);
-                    break;
-                case SerializedPropertyTypeRuntime.Gradient:
-                    res["val"] = SerializeGradient((Gradient)obj);
-                    break;
-                case SerializedPropertyTypeRuntime.Quaternion:
-                    res["val"] = SerializeQuaternion((Quaternion)obj);
-                    break;
-                case SerializedPropertyTypeRuntime.Vector2Int:
-                    res["val"] = SerializeVector2((Vector2Int)obj);
-                    break;
-                case SerializedPropertyTypeRuntime.Vector3Int:
-                    res["val"] = SerializeVector3((Vector3Int)obj);
-                    break;
-                case SerializedPropertyTypeRuntime.RectInt:
-                    res["val"] = SerializeRect(ClipboardParserUtility.RectIntToRect((RectInt)obj));
-                    break;
-                case SerializedPropertyTypeRuntime.BoundsInt:
-                    var bi = (BoundsInt)obj;
-                    res["val"] = SerializeBounds(new Bounds(bi.center, bi.size)); // ClipboardParserUtility.BoundsIntToBounds() とは変換式が異なる
-                    break;
-                
-                // Not supported
-                case SerializedPropertyTypeRuntime.ObjectReference: break;
-                case SerializedPropertyTypeRuntime.ExposedReference: break;
-                case SerializedPropertyTypeRuntime.FixedBufferSize: break;
-                case SerializedPropertyTypeRuntime.ManagedReference: break;
-
-                // UnityEditorのClipboardParserでも以下の型はcaseで書かれていないのでそのまま踏襲
-                //
-                // case SerializedPropertyTypeRuntime.Generic:
-                // case SerializedPropertyTypeRuntime.Vector2:
-                // case SerializedPropertyTypeRuntime.Vector3:
-                // case SerializedPropertyTypeRuntime.Vector4:
-                // case SerializedPropertyTypeRuntime.Rect:
-                // case SerializedPropertyTypeRuntime.Hash128:
-                // case SerializedPropertyTypeRuntime.Color:
-                    
-                default:
-                    var type = obj.GetType();
-                    if (obj is IList list)
-                    {
-                        res["arraySize"] = list.Count;
-                        res["arrayType"] = GetArrayElementType(type);
-                        res["children"] = new[] { SerializeIList(list) }; // Unityのシリアライズはなぜか配列扱いっぽい
-                        
-                        return res;
-                    }
-
-                    // Supports UITargetFieldNames(include Property)
-                    // インスペクターでは表示されないプロパティもUI内でやりとり可能にするためサポートする
-                    var childrenNames = TypeUtility.GetUITargetFieldNames(type);
-                    if (childrenNames.Any())
-                    {
-                        res["children"] = childrenNames.Select(n =>
-                        {
-                            var mi = TypeUtility.GetMemberInfo(type, n);
-                            var val = mi switch
-                            {
-                                FieldInfo fi => fi.GetValue(obj),
-                                PropertyInfo pi => pi.GetValue(obj),
-                                _ => null
-                            };
-
-                            // Unityのシリアラズが独自の名前に変換するもの
-                            if (type == typeof(RectOffset))
-                            {
-                                n = _rectOffsetMemberNameTable[n];
-                            }
-
-                            return ObjectToDictionary(val, n);
-                        }).ToArray();
-                    }
-
-                    break;
-            }
-
-            return res;
+            value = (T)obj;
+            return true;
         }
-
-        private static Dictionary<string, object> SerializeIList(IList list)
-        {
-            var size = list.Count;
-            
-            var res = new Dictionary<string, object>
-            {
-                ["name"] = nameof(Array),
-                ["type"] = (int)SerializedPropertyTypeRuntime.Generic,
-                ["arraySize"] = size,
-                ["arrayType"] = GetArrayElementType(list.GetType())
-            };
-
-            var children = new object[size + 1];
-            children[0] = new Dictionary<string, object>
-            {
-                ["name"] = "size",
-                ["type"] = (int)SerializedPropertyTypeRuntime.ArraySize,
-                ["val"] = size
-            };
-            
-            for (var i = 0; i < size; ++i)
-            {
-                children[i + 1] = ObjectToDictionary(list[i], "data"); 
-            }
-
-            res["children"] = children;
-
-            return res;
-        }
-
-        private static string GetArrayElementType(Type type)
-        {
-            var elementType = type.IsArray
-                ? type.GetElementType()
-                : type.GetGenericArguments()[0];
-            
-            return TypeNameOrAlias(elementType);
-        }
-
-        private static readonly Dictionary<Type, string> TypeAlias = new Dictionary<Type, string>
-        {
-            { typeof(bool), "bool" },
-            { typeof(byte), "byte" },
-            { typeof(char), "char" },
-            { typeof(decimal), "decimal" },
-            { typeof(double), "double" },
-            { typeof(float), "float" },
-            { typeof(int), "int" },
-            { typeof(long), "long" },
-            { typeof(object), "object" },
-            { typeof(sbyte), "sbyte" },
-            { typeof(short), "short" },
-            { typeof(string), "string" },
-            { typeof(uint), "uint" },
-            { typeof(ulong), "ulong" },
-        };
-
-        private static string TypeNameOrAlias(Type type) =>
-            TypeAlias.TryGetValue(type, out var alias) 
-                ? alias 
-                : type.Name;
-
-        private static Dictionary<string, string> _rectOffsetMemberNameTable = new()
-        {
-            { "left", "m_Left" },
-            { "right", "m_Right" },
-            { "top", "m_Top" },
-            { "bottom", "m_Bottom" },
-        };
     }
 }

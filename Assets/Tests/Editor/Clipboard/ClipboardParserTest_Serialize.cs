@@ -47,11 +47,11 @@ namespace RosettaUI.Test
 
         // UnityEditor.ClipboardParserはRectInt非対応。ClipboardContextMenuでRectからキャストしている
         [TestCaseSource(nameof(RectIntSource))]
-        public void MatchUnityEditorMethod_RectInt(RectInt value) => TestMatch(value, v => EditorClipBoardParser.WriteRect(ClipboardParserUtility.RectIntToRect(v)));
+        public void MatchUnityEditorMethod_RectInt(RectInt value) => TestMatch(value, v => EditorClipBoardParser.WriteRect(ClipboardParserUtility.FromInt(v)));
 
         // UnityEditor.ClipboardParserはBoundsInt非対応。ClipboardContextMenuでBoundsからキャストしている
         [TestCaseSource(nameof(BoundsIntSource))]
-        public void MatchUnityEditorMethod_BoundsInt(BoundsInt value) => TestMatch(value, v => EditorClipBoardParser.WriteBounds(ClipboardParserUtility.BoundsIntToBounds(v)));
+        public void MatchUnityEditorMethod_BoundsInt(BoundsInt value) => TestMatch(value, v => EditorClipBoardParser.WriteBounds(ClipboardParserUtility.FromIntKeepValueLook(v)));
         
         [TestCaseSource(nameof(BoundsSource))]
         public void MatchUnityEditorMethod_Bounds(Bounds value) => TestMatch(value, EditorClipBoardParser.WriteBounds);
@@ -74,8 +74,18 @@ namespace RosettaUI.Test
             // 最初のnameは無視
             // フィールド名だがコピペの機能では使用されていないっぽい
             // またUI上で取得するのが大変
-            var pattern = @"(?<=GenericPropertyJSON:\s*{\s*""name"":\s*)null";
+            const string pattern = @"(?<=GenericPropertyJSON:\s*{\s*""name"":\s*)null";
             actual = Regex.Replace(actual, pattern, $"\"{nameof(ClassForTestObject.classValue)}\"");
+            
+            // RectOffsetのメンバー
+            // インスペクターは left -> m_Left などでシリアラズされる
+            // おそらく後方互換のためだと思われる
+            // leftでもインスペクターへのPasteは反映されるのでそちらに合わせる
+            foreach (var kv in ClipboardParser.RectOffsetMemberNameTable)
+            {
+                var (prev, next) = kv;
+                expected = expected.Replace(prev, next);
+            }
             
             Assert.AreEqual(expected, actual);
         }
@@ -139,11 +149,11 @@ namespace RosettaUI.Test
             new Rect(Vector2.one * float.MaxValue, Vector2.one * float.MaxValue),
         };
 
-        public static IEnumerable<RectInt> RectIntSource => RectSource.Select(ClipboardParserUtility.RectToRectInt);
+        public static IEnumerable<RectInt> RectIntSource => RectSource.Select(ClipboardParserUtility.ToInt);
 
         private static IEnumerable<Bounds> BoundsSource => Vector3Source.Select(v3 => new Bounds(v3, v3));
         
-        public static IEnumerable<BoundsInt> BoundsIntSource => BoundsSource.Select(ClipboardParserUtility.BoundsToBoundsInt);
+        public static IEnumerable<BoundsInt> BoundsIntSource => BoundsSource.Select(ClipboardParserUtility.ToIntKeepValueLook);
 
         private static Quaternion[] QuaternionSource => new[]
         {
@@ -177,6 +187,7 @@ namespace RosettaUI.Test
                 floatValue = 3.0f,
                 stringValue = "4",
                 gradient = new Gradient(),
+                boundsIntValue = new BoundsInt(Vector3Int.one * -1, Vector3Int.one * -2 )
             };
         }
         

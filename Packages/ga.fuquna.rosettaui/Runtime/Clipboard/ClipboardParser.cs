@@ -337,7 +337,9 @@ namespace RosettaUI
         
         public static string SerializeGeneric<T>(in T value)
         {
-            var dic = ObjectToDictionary(value);
+            // 第2引数 fieldName はルートの名前はなんでもいいが
+            // string.IsNullOrEmpty() == true だとインスペクタが無視するのでなにかしら名前をいれておく
+            var dic = ObjectToDictionary(value, typeof(T).Name);
             var json = Json.Serialize(dic);
             return $"{PrefixGeneric}{json}";
         }

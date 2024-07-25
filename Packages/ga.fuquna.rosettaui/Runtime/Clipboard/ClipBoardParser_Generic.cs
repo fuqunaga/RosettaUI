@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -11,160 +10,334 @@ namespace RosettaUI
 {
     public static partial class ClipboardParser
     {
+        private static class EditorFormatKey
+        {
+            public const string Name = "name";
+            public const string Type = "type";
+            public const string Value = "val";
+            public const string ArraySize = "arraySize";
+            public const string ArrayType = "arrayType";
+            public const string Children = "children";
+            public const string Data = "data";
+        }
+        
+        
         // UnityのClipboardParser.WriteGenericSerializedProperty() 風の機能
         // https://github.com/Unity-Technologies/UnityCsReference/blob/77b37cd9f002e27b45be07d6e3667ee53985ec82/Editor/Mono/Clipboard/ClipboardParser.cs#L385
-        public static Dictionary<string, object> ObjectToDictionary(object obj, string fieldName = null)
+        public static Dictionary<string, object> ObjectToDictionary(object obj, string fieldName)
         {
             if (obj is null) return null;
-            var propertyType = SerializedPropertyTypeRuntimeUtility.TypeToSerializedPropertyType(obj.GetType()); 
+            var type = obj.GetType();
+            var propertyType = SerializedPropertyTypeRuntimeUtility.TypeToSerializedPropertyType(type); 
             
             var res = new Dictionary<string, object>
             {
-                ["name"] = fieldName,
-                ["type"] = (int)propertyType
+                [EditorFormatKey.Name] = fieldName,
+                [EditorFormatKey.Type] = (int)propertyType
             };
 
 
-            switch (propertyType)
+            var value = propertyType switch
             {
-                case SerializedPropertyTypeRuntime.Integer:
-                case SerializedPropertyTypeRuntime.Boolean:
-                case SerializedPropertyTypeRuntime.Float:
-                case SerializedPropertyTypeRuntime.String:
-                case SerializedPropertyTypeRuntime.ArraySize:
-                    res["val"] = obj;
-                    break;
-                
-                case SerializedPropertyTypeRuntime.Character:
-                    res["val"] = (int)(char)obj;
-                    break;
-
-                case SerializedPropertyTypeRuntime.LayerMask:
-                    res["val"] = ((LayerMask)obj).value;
-                    break;
-                
-                case SerializedPropertyTypeRuntime.RenderingLayerMask:
-                    res["val"] = ((RenderingLayerMask)obj).value;
-                    break;
-                
-                case SerializedPropertyTypeRuntime.AnimationCurve:
-                    // res["val"] = WriteCustom(new AnimationCurveWrapper(p.animationCurveValue));
-                    break;
-                
-                case SerializedPropertyTypeRuntime.Enum:
-                    res["val"] = SerializeEnum(obj);
-                    break;
-                case SerializedPropertyTypeRuntime.Bounds:
-                    res["val"] = SerializeBounds((Bounds)obj);
-                    break;
-                case SerializedPropertyTypeRuntime.Gradient:
-                    res["val"] = SerializeGradient((Gradient)obj);
-                    break;
-                case SerializedPropertyTypeRuntime.Quaternion:
-                    res["val"] = SerializeQuaternion((Quaternion)obj);
-                    break;
-                case SerializedPropertyTypeRuntime.Vector2Int:
-                    res["val"] = SerializeVector2((Vector2Int)obj);
-                    break;
-                case SerializedPropertyTypeRuntime.Vector3Int:
-                    res["val"] = SerializeVector3((Vector3Int)obj);
-                    break;
-                case SerializedPropertyTypeRuntime.RectInt:
-                    res["val"] = SerializeRect(ClipboardParserUtility.FromInt((RectInt)obj));
-                    break;
-                case SerializedPropertyTypeRuntime.BoundsInt:
-                    var bi = (BoundsInt)obj;
-                    res["val"] = SerializeBounds(new Bounds(bi.center, bi.size)); // ClipboardParserUtility.BoundsIntToBounds() とは変換式が異なる
-                    break;
+                SerializedPropertyTypeRuntime.Integer => obj,
+                SerializedPropertyTypeRuntime.Boolean => obj,
+                SerializedPropertyTypeRuntime.Float => obj,
+                SerializedPropertyTypeRuntime.String => obj,
+                SerializedPropertyTypeRuntime.ArraySize => obj,
+                SerializedPropertyTypeRuntime.Character => (int)(char)obj,
+                SerializedPropertyTypeRuntime.LayerMask => ((LayerMask)obj).value,
+                SerializedPropertyTypeRuntime.RenderingLayerMask => ((RenderingLayerMask)obj).value,
+                // SerializedPropertyTypeRuntime.AnimationCurve:
+                SerializedPropertyTypeRuntime.Enum => SerializeEnum(obj),
+                SerializedPropertyTypeRuntime.Bounds => SerializeBounds((Bounds)obj),
+                SerializedPropertyTypeRuntime.Gradient => SerializeGradient((Gradient)obj),
+                SerializedPropertyTypeRuntime.Quaternion => SerializeQuaternion((Quaternion)obj),
+                SerializedPropertyTypeRuntime.Vector2Int => SerializeVector2((Vector2Int)obj),
+                SerializedPropertyTypeRuntime.Vector3Int => SerializeVector3((Vector3Int)obj),
+                SerializedPropertyTypeRuntime.RectInt => SerializeRect(ClipboardParserUtility.FromInt((RectInt)obj)),
+                SerializedPropertyTypeRuntime.BoundsInt => SerializeBounds(ClipboardParserUtility.FromInt((BoundsInt)obj)),
                 
                 // Not supported
-                case SerializedPropertyTypeRuntime.ObjectReference: break;
-                case SerializedPropertyTypeRuntime.ExposedReference: break;
-                case SerializedPropertyTypeRuntime.FixedBufferSize: break;
-                case SerializedPropertyTypeRuntime.ManagedReference: break;
+                // SerializedPropertyTypeRuntime.ObjectReference
+                // SerializedPropertyTypeRuntime.ExposedReference
+                // SerializedPropertyTypeRuntime.FixedBufferSize
+                // SerializedPropertyTypeRuntime.ManagedReference
+                _ => null
+            };
+            
+            if ( value != null)
+            {
+                res[EditorFormatKey.Value] = value;
+                return res;
+            }
 
-                // UnityEditorのClipboardParserでも以下の型はcaseで書かれていないのでそのまま踏襲
-                //
-                // case SerializedPropertyTypeRuntime.Generic:
-                // case SerializedPropertyTypeRuntime.Vector2:
-                // case SerializedPropertyTypeRuntime.Vector3:
-                // case SerializedPropertyTypeRuntime.Vector4:
-                // case SerializedPropertyTypeRuntime.Rect:
-                // case SerializedPropertyTypeRuntime.Hash128:
-                // case SerializedPropertyTypeRuntime.Color:
-                    
-                default:
-                    var type = obj.GetType();
-                    if (obj is IList list)
+
+            if (obj is IList list)
+            {
+                res[EditorFormatKey.ArraySize] = list.Count;
+                res[EditorFormatKey.ArrayType] = GetArrayElementTypeName(type);
+                res[EditorFormatKey.Children] = new[] { ListToDictionary(list) };
+
+                return res;
+            }
+
+            // Supports UITargetFieldNames(include Property)
+            // インスペクターでは表示されないプロパティもUI内でやりとり可能にするためサポートする
+            var childrenNames = TypeUtility.GetUITargetFieldNames(type);
+            if (childrenNames.Any())
+            {
+                res["children"] = childrenNames.Select(n =>
+                {
+                    var mi = TypeUtility.GetMemberInfo(type, n);
+                    var val = mi switch
                     {
-                        res["arraySize"] = list.Count;
-                        res["arrayType"] = GetArrayElementTypeName(type);
-                        res["children"] = new[] { SerializeIList(list) }; // Unityのシリアライズはなぜか配列扱いっぽい
-                        
-                        return res;
-                    }
+                        FieldInfo fi => fi.GetValue(obj),
+                        PropertyInfo pi => pi.GetValue(obj),
+                        _ => null
+                    };
 
-                    // Supports UITargetFieldNames(include Property)
-                    // インスペクターでは表示されないプロパティもUI内でやりとり可能にするためサポートする
-                    var childrenNames = TypeUtility.GetUITargetFieldNames(type);
-                    if (childrenNames.Any())
-                    {
-                        res["children"] = childrenNames.Select(n =>
-                        {
-                            var mi = TypeUtility.GetMemberInfo(type, n);
-                            var val = mi switch
-                            {
-                                FieldInfo fi => fi.GetValue(obj),
-                                PropertyInfo pi => pi.GetValue(obj),
-                                _ => null
-                            };
-
-                            return ObjectToDictionary(val, n);
-                        }).ToArray();
-                    }
-
-                    break;
+                    return ObjectToDictionary(val, n);
+                }).ToArray();
             }
 
             return res;
         }
 
-        private static Dictionary<string, object> SerializeIList(IList list)
+        /// <summary>
+        /// インスペクタのシリアライズ準拠
+        /// arraySizeを含むDictionaryが入れ子になっている
+        /// 
+        /// {"name":null,"type":-1,"arraySize":3,"arrayType":"int","children":[
+        ///     {"name":"Array","type":-1,"arraySize":3,"arrayType":"int","children":[
+        ///         {"name":"size","type":12,"val":3},
+        ///         {"name":"data","type":0,"val":1},{"name":"data","type":0,"val":2},{"name":"data","type":0,"val":3}
+        ///      ]}
+        /// ]}
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        private static Dictionary<string, object> ListToDictionary(IList list)
         {
             var size = list.Count;
             
             var res = new Dictionary<string, object>
             {
-                ["name"] = nameof(Array),
-                ["type"] = (int)SerializedPropertyTypeRuntime.Generic,
-                ["arraySize"] = size,
-                ["arrayType"] = GetArrayElementTypeName(list.GetType())
+                [EditorFormatKey.Name] = nameof(Array),
+                [EditorFormatKey.Type] = (int)SerializedPropertyTypeRuntime.Generic,
+                [EditorFormatKey.ArraySize] = size,
+                [EditorFormatKey.ArrayType] = GetArrayElementTypeName(list.GetType())
             };
 
             var children = new object[size + 1];
             children[0] = new Dictionary<string, object>
             {
-                ["name"] = "size",
-                ["type"] = (int)SerializedPropertyTypeRuntime.ArraySize,
-                ["val"] = size
+                [EditorFormatKey.Name] = "size",
+                [EditorFormatKey.Type] = (int)SerializedPropertyTypeRuntime.ArraySize,
+                [EditorFormatKey.Value] = size
             };
             
             for (var i = 0; i < size; ++i)
             {
-                children[i + 1] = ObjectToDictionary(list[i], "data"); 
+                children[i + 1] = ObjectToDictionary(list[i], EditorFormatKey.Data); 
             }
 
-            res["children"] = children;
+            res[EditorFormatKey.Children] = children;
 
             return res;
         }
 
-        private static Type GetArrayElementType(Type type) =>
-            type.IsArray
-                ? type.GetElementType()
-                : type.GetGenericArguments()[0];
+        
+               
+        // UnityのClipboardParser.ParseGenericSerializedProperty() 風の機能
+        // https://github.com/Unity-Technologies/UnityCsReference/blob/77b37cd9f002e27b45be07d6e3667ee53985ec82/Editor/Mono/Clipboard/ClipboardParser.cs#L452
+        public static bool DictionaryToObject(Type type, Dictionary<string, object> dictionary, out object value)
+        {
+            value = null;
+            var hasVal = dictionary.TryGetValue(EditorFormatKey.Value, out var val);
 
-        private static string GetArrayElementTypeName(Type type) => TypeNameOrAlias(GetArrayElementType(type));
+            if (hasVal)
+            {
+                bool success;
+                (success, value) = DictionaryToObject_Primitive(type, val);
+                return success;
+            }
+
+
+            // "val" がないタイプ
+            var children = TryGetChildren(dictionary);
+            if (children is null)
+                return false;
+            
+            return dictionary.ContainsKey(EditorFormatKey.ArraySize)
+                ? DictionaryToObject_IList(type, children, out value) 
+                : DictionaryToObject_Generic(type, children, out value);
+        }
+
+        private static (bool success, object value) DictionaryToObject_Primitive(Type type, object val)
+        {
+            try
+            {
+                return type.Name switch
+                {
+                    nameof(Int32) => ToSuccessTuple(Convert.ToInt32(val)),
+                    nameof(UInt32) => ToSuccessTuple(Convert.ToUInt32(val)),
+                    nameof(Boolean) => ToSuccessTuple(Convert.ToBoolean(val)),
+                    nameof(Single) => ToSuccessTuple(Convert.ToSingle(val)),
+                    nameof(String) => ToSuccessTuple(Convert.ToString(val)),
+                    nameof(Char) => ToSuccessTuple(Convert.ToChar(val)),
+                    nameof(LayerMask) => ToSuccessTuple(new LayerMask { value = Convert.ToInt32(val) }),
+                    nameof(RenderingLayerMask) => ToSuccessTuple(new RenderingLayerMask
+                        { value = Convert.ToUInt32(val) }),
+                    // nameof(AnimationCurve) => { /* res["val"] = WriteCustom(new AnimationCurveWrapper(p.animationCurveValue)); */ },
+                    nameof(Bounds) => ToResultTuple<Bounds>(DeserializeBounds, val),
+                    nameof(Gradient) => ToResultTuple<Gradient>(DeserializeGradient, val),
+                    nameof(Quaternion) => ToResultTuple<Quaternion>(DeserializeQuaternion, val),
+                    nameof(Vector2Int) => ToResultTupleWithConvert<Vector2, Vector2Int>(DeserializeVector2, val,
+                        ClipboardParserUtility.ToInt),
+                    nameof(Vector3Int) => ToResultTupleWithConvert<Vector3, Vector3Int>(DeserializeVector3, val,
+                        ClipboardParserUtility.ToInt),
+                    nameof(RectInt) => ToResultTupleWithConvert<Rect, RectInt>(DeserializeRect, val,
+                        ClipboardParserUtility.ToInt),
+                    nameof(BoundsInt) => ToResultTupleWithConvert<Bounds, BoundsInt>(DeserializeBounds, val,
+                        ClipboardParserUtility.ToInt),
+                    _ when type.IsEnum => (DeserializeEnum(Convert.ToString(val), type, out var enumValue), enumValue),
+
+                    _ => throw new InvalidCastException()
+                };
+            }
+            catch (InvalidCastException)
+            {
+            }
+
+            return (false, default);
+
+
+            static (bool, object) ToSuccessTuple<T>(T val) => (true, val);
+
+            static (bool, object) ToResultTuple<T>(DeserializeFunc<T> func, object obj) =>
+                (func(Convert.ToString(obj), out var tv), tv);
+
+            static (bool, object) ToResultTupleWithConvert<TBase, TTarget>(DeserializeFunc<TBase> func, object obj,
+                Func<TBase, TTarget> convert)
+            {
+                return func(Convert.ToString(obj), out var baseValue)
+                    ? (true, convert(baseValue))
+                    : (false, default);
+            }
+        }
+
+        private static bool DictionaryToObject_IList(Type type, IEnumerable<Dictionary<string, object>> children, out object value)
+        {
+            value = default;
+
+            if (type.GetInterface(nameof(IList)) == null)
+                return false;
+
+            // children の１項目目は name:Array, arraySize, arrayType, children が含まれている
+            // data このうちの children
+            var firstChild = children.FirstOrDefault();
+            if (firstChild is null)
+                return false;
+
+            children = TryGetChildren(firstChild);
+            
+
+            var elementType = ListUtility.GetItemType(type);
+
+            using var _ = ListPool<object>.Get(out var childrenList);
+            childrenList.AddRange(children
+                .Where(dic => dic.TryGetValue("name", out var nameObj) && (nameObj is "data"))
+                .Select(dic => (DictionaryToObject(elementType, dic, out var v), v))
+                .Where(t => t.Item1)
+                .Select(t => t.Item2)
+            );
+            
+            if (childrenList.Count == 0)
+                return false;
+
+            IList list;
+            if (type.IsArray)
+            {
+                list = Array.CreateInstance(elementType, childrenList.Count);
+                for (var i = 0; i < childrenList.Count; ++i)
+                {
+                    list[i] = childrenList[i];
+                }
+            }
+            else
+            {
+                list = (IList)Activator.CreateInstance(type);
+                foreach (var child in childrenList)
+                {
+                    list.Add(child);
+                }
+            }
+
+            value = list;
+            return true;
+        }
+
+        private static bool DictionaryToObject_Generic(Type type, IEnumerable<Dictionary<string, object>> children, out object value)
+        {
+            value = default;
+
+            var childrenNames = TypeUtility.GetUITargetFieldNames(type);
+            if (!childrenNames.Any())
+                return false;
+
+            var obj = Activator.CreateInstance(type);
+            foreach (var child in children)
+            {
+                if (!child.TryGetValue("name", out var nameObject))
+                    continue;
+
+                if (nameObject is not string name || string.IsNullOrEmpty(name))
+                    continue;
+
+                if (type == typeof(RectOffset))
+                {
+                    name = RectOffsetMemberNameTable[name];
+                }
+
+                var mi = TypeUtility.GetMemberInfo(type, name);
+                if (mi is null)
+                    continue;
+
+
+                switch (mi)
+                {
+                    case FieldInfo fi:
+                        if (!DictionaryToObject(fi.FieldType, child, out var fv))
+                            continue;
+                        fi.SetValue(obj, fv);
+                        break;
+
+                    case PropertyInfo pi:
+                        if (!DictionaryToObject(pi.PropertyType, child, out var pv))
+                            continue;
+                        pi.SetValue(obj, pv);
+                        break;
+                }
+            }
+
+            value = obj;
+
+            return true;
+        }
+
+        private static IEnumerable<Dictionary<string, object>> TryGetChildren(IReadOnlyDictionary<string, object> dictionary)
+        {
+            if (!dictionary.TryGetValue("children", out var obj))
+                return null;
+
+            return obj is not List<object> list 
+                ? null 
+                : list.OfType<Dictionary<string, object>>();
+        }
+        
+        
+        
+        private static string GetArrayElementTypeName(Type type) => TypeNameOrAlias(ListUtility.GetItemType(type));
 
         private static readonly Dictionary<Type, string> TypeAlias = new Dictionary<Type, string>
         {
@@ -200,219 +373,5 @@ namespace RosettaUI
             { "m_Top", "top" },
             { "m_Bottom", "bottom" },
         };
-        
-        
-               
-        // UnityのClipboardParser.ParseGenericSerializedProperty() 風の機能
-        // https://github.com/Unity-Technologies/UnityCsReference/blob/77b37cd9f002e27b45be07d6e3667ee53985ec82/Editor/Mono/Clipboard/ClipboardParser.cs#L452
-        public static bool DictionaryToObject(Type type, Dictionary<string, object> dictionary, out object value)
-        {
-            value = null;
-            dictionary.TryGetValue("val", out var val);
-            
-            try
-            {
-                switch (type.Name)
-                {
-                    case nameof(Int32):
-                        value = Convert.ToInt32(val);
-                        break;
-
-                    case nameof(UInt32):
-                        value = Convert.ToUInt32(val);
-                        break;
-
-                    case nameof(Boolean):
-                        value = Convert.ToBoolean(val);
-                        break;
-
-                    case nameof(Single):
-                        value = Convert.ToSingle(val);
-                        break;
-
-                    case nameof(String):
-                        value = Convert.ToString(val);
-                        break;
-
-                    case nameof(Char):
-                        value = Convert.ToChar(val);
-                        break;
-
-                    case nameof(LayerMask):
-                        value = new LayerMask { value = Convert.ToInt32(val) };
-                        break;
-
-                    case nameof(RenderingLayerMask):
-                        value = new RenderingLayerMask() { value = Convert.ToUInt32(val) };
-                        break;
-
-
-                    case nameof(AnimationCurve):
-                        // res["val"] = WriteCustom(new AnimationCurveWrapper(p.animationCurveValue));
-                        break;
-
-                    case nameof(Bounds):
-                        if (DeserializeBounds(Convert.ToString(val), out var bounds))
-                        {
-                            value = bounds;
-                        }
-
-                        break;
-
-                    case nameof(Gradient):
-                        if (DeserializeGradient(Convert.ToString(val), out var gradient))
-                        {
-                            value = gradient;
-                        }
-
-                        break;
-
-                    case nameof(Quaternion):
-                        if (DeserializeQuaternion(Convert.ToString(val), out var quaternion))
-                        {
-                            value = quaternion;
-                        }
-
-                        break;
-
-                    case nameof(Vector2Int):
-                        if (DeserializeVector2(Convert.ToString(val), out var v2))
-                        {
-                            value = ClipboardParserUtility.ToInt(v2);
-                        }
-
-                        break;
-
-                    case nameof(Vector3Int):
-                        if (DeserializeVector3(Convert.ToString(val), out var v3))
-                        {
-                            value = ClipboardParserUtility.ToInt(v3);
-                        }
-
-                        break;
-
-                    case nameof(RectInt):
-                        if (DeserializeRect(Convert.ToString(val), out var rect))
-                        {
-                            value = ClipboardParserUtility.ToInt(rect);
-                        }
-
-                        break;
-
-                    case nameof(BoundsInt):
-                        if (DeserializeBounds(Convert.ToString(val), out var bi))
-                        {
-                            value = ClipboardParserUtility.ToInt(bi);
-                        }
-
-                        break;
-
-                    default:
-                        if (type.IsEnum)
-                        {
-                            if (DeserializeEnum(Convert.ToString(val), type, out var enumValue))
-                            {
-                                value = enumValue;
-                            }
-
-                            break;
-                        }
-                        
-                        if (!dictionary.TryGetValue("children", out var childrenObj))
-                            break;
-                        
-                        var children = ((List<object>)childrenObj).Cast<Dictionary<string, object>>();
-
-
-                        // Array/List
-                        if (type.GetInterface(nameof(IList)) != null)
-                        {
-                            var elementType = GetArrayElementType(type);
-                            
-                            // children は name:Array, arraySize, arrayType, children が含まれている
-                            // data このうちの children
-                            children = ((List<object>)children.First()["children"]).Cast<Dictionary<string, object>>();
-                            Assert.IsNotNull(children);
-                            
-                            using var _ = ListPool<object>.Get(out var childrenList);
-                            childrenList.AddRange(children
-                                .Where(dic => dic.TryGetValue("name", out var nameObj) && (nameObj is "data"))
-                                .Select(dic => (DictionaryToObject(elementType, dic, out var v), v))
-                                .Where(t => t.Item1)
-                                .Select(t => t.Item2)
-                            );
-
-                            IList list;
-                            if (type.IsArray)
-                            {
-                                list = Array.CreateInstance(elementType, childrenList.Count());
-                            }
-                            else
-                            {
-                                list = (IList)Activator.CreateInstance(type);
-                            }
-
-                            foreach (var child in childrenList)
-                            {
-                                list.Add(child);
-                            }
-
-                            value = list;
-                            
-                            break;
-                        }
-
-                        // Generic class
-                        var childrenNames = TypeUtility.GetUITargetFieldNames(type);
-                        if (childrenNames.Any())
-                        {
-                            var obj = Activator.CreateInstance(type);
-                            foreach (var child in children)
-                            {
-                                if (!child.TryGetValue("name", out var nameObject))
-                                    continue;
-                                
-                                if ( nameObject is not string name || string.IsNullOrEmpty(name))
-                                    continue;
-
-                                if (type == typeof(RectOffset))
-                                {
-                                    name = RectOffsetMemberNameTable[name];
-                                }
-                                
-                                var mi = TypeUtility.GetMemberInfo(type, name);
-                                if (mi is null)
-                                    continue;
-                                
-
-                                switch (mi)
-                                {
-                                    case FieldInfo fi:
-                                        if (!DictionaryToObject(fi.FieldType, child, out var fv))
-                                            continue;
-                                        fi.SetValue(obj, fv);
-                                        break;
-                                    
-                                    case PropertyInfo pi:
-                                        if (!DictionaryToObject(pi.PropertyType, child, out var pv))
-                                            continue;
-                                        pi.SetValue(obj, pv);
-                                        break;
-                                }
-                            }
-
-                            value = obj;
-                        }
-                        break;
-                }
-            }
-            catch (InvalidCastException e)
-            {
-                Debug.LogException(e);
-            }
-
-            return true;
-        }
-
     }
 }

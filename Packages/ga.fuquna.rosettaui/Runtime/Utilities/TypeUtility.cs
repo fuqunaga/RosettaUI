@@ -20,7 +20,6 @@ namespace RosettaUI
         private static void RegisterUnityBuiltinProperties()
         {
             RegisterUITargetPropertyOrFields(typeof(Vector2Int), "x", "y");
-            RegisterUITargetPropertyOrFields(typeof(Vector2Int), "x", "y");
             RegisterUITargetPropertyOrFields(typeof(Vector3Int), "x", "y", "z");
             RegisterUITargetPropertyOrFields(typeof(Rect),       "x", "y", "width", "height");
             RegisterUITargetPropertyOrFields(typeof(RectInt),    "x", "y", "width", "height");

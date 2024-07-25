@@ -160,7 +160,7 @@ namespace RosettaUI
                 var countField = ListCounterField(listBinder, listItemContainer, option);
 
                 ret = Fold(
-                    label, countField,
+                    Row(label, Space(), countField).AddClipboardMenu(listBinder, FieldOption.Default),
                     new[]
                     {
                         listItemContainer

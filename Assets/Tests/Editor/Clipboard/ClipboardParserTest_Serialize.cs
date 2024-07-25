@@ -74,7 +74,7 @@ namespace RosettaUI.Test
             // 最初のnameは無視
             // フィールド名だがコピペの機能では使用されていないっぽい
             // またUI上で取得するのが大変
-            const string pattern = @"(?<=GenericPropertyJSON:\s*{\s*""name"":\s*)null";
+            const string pattern = @"(?<=GenericPropertyJSON:\s*{\s*""name"":\s*)""\w+""";
             actual = Regex.Replace(actual, pattern, $"\"{nameof(ClassForTestObject.classValue)}\"");
             
             // RectOffsetのメンバー

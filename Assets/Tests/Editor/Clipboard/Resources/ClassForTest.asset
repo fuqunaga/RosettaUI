@@ -75,7 +75,7 @@ MonoBehaviour:
       width: -3
       height: 4
     boundsIntValue:
-      m_Position: {x: 1, y: 0, z: 0}
+      m_Position: {x: 1, y: -1, z: -1}
       m_Size: {x: 4, y: -5, z: 6}
     renderingLayerMask:
       serializedVersion: 0

@@ -46,10 +46,15 @@ namespace RosettaUI
             return cache;
         }
 
-        private static ReflectionCache.MemberData GetMemberData(Type type, string propertyOrFieldName)
+        private static ReflectionCache.MemberData GetMemberData(Type type, string propertyOrFieldName, bool enableLogError = true)
         {
             if (!GetReflectionCache(type).memberDataTable.TryGetValue(propertyOrFieldName, out var ret))
-                Debug.LogError($"{type} does not have a field or property named [{propertyOrFieldName}].");
+            {
+                if (enableLogError)
+                {
+                    Debug.LogError($"{type} does not have a field or property named [{propertyOrFieldName}].");
+                }
+            }
 
             return ret;
         }
@@ -63,6 +68,11 @@ namespace RosettaUI
         public static MemberInfo GetMemberInfo(Type type, string propertyOrFieldName)
         {
             return GetMemberData(type, propertyOrFieldName)?.memberInfo;
+        }
+
+        public static MemberInfo TryGetMemberInfo(Type type, string propertyOrFieldName)
+        {
+            return GetMemberData(type, propertyOrFieldName, false)?.memberInfo;
         }
         
         public static IEnumerable<PropertyAttribute> GetPropertyAttributes(Type type, string propertyOrFieldName)

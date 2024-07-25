@@ -4,9 +4,11 @@
     {
         public static Element CreateMinMaxSliderElement(LabelElement label, IBinder binder, in SliderElementOption elementOption)
         {
+            var fieldOption = elementOption.sliderOption?.fieldOption ?? FieldOption.Default;
+            
             return binder switch
             {
-                IBinder<MinMax<int>> b => new IntMinMaxSliderElement(label, b, elementOption.Cast<int>()),
+                IBinder<MinMax<int>> b => new IntMinMaxSliderElement(label, b, elementOption.Cast<int>()).AddClipboardMenu(binder, fieldOption),
 
                 // IBinder<MinMax<uint>> b => new IntMinMaxSliderElement(label,
                 //     new CastMinMaxBinder<uint, int>(b),
@@ -14,7 +16,7 @@
                 //     (IGetter<int>) maxGetter),
                 IBinder<MinMax<uint>> b => null,
 
-                IBinder<MinMax<float>> b => new FloatMinMaxSliderElement(label, b, elementOption.Cast<float>()),
+                IBinder<MinMax<float>> b => new FloatMinMaxSliderElement(label, b, elementOption.Cast<float>()).AddClipboardMenu(binder, fieldOption),
 
                 _ => CreateCompositeMinMaxSliderElement(label, binder, elementOption)
             };

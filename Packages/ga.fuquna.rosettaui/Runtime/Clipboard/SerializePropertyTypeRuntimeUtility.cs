@@ -36,7 +36,9 @@ namespace RosettaUI
                 nameof(BoundsInt) => SerializedPropertyTypeRuntime.BoundsInt,
                 // nameof(ManagedReference) => SerializedPropertyTypeRuntime.ManagedReference,
                 nameof(Hash128) => SerializedPropertyTypeRuntime.Hash128,
+#if UNITY_6000_0_OR_NEWER
                 nameof(RenderingLayerMask) => SerializedPropertyTypeRuntime.RenderingLayerMask,
+#endif
                 
                 _ when type.IsEnum => SerializedPropertyTypeRuntime.Enum,
                 _ when type.IsSubclassOf(typeof(Object)) =>  SerializedPropertyTypeRuntime.ObjectReference,

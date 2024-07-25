@@ -18,7 +18,7 @@ namespace RosettaUI
             public const string ArraySize = "arraySize";
             public const string ArrayType = "arrayType";
             public const string Children = "children";
-            public const string Data = "data";
+            public const string ValueNameData = "data";
         }
         
         
@@ -46,7 +46,9 @@ namespace RosettaUI
                 SerializedPropertyTypeRuntime.ArraySize => obj,
                 SerializedPropertyTypeRuntime.Character => (int)(char)obj,
                 SerializedPropertyTypeRuntime.LayerMask => ((LayerMask)obj).value,
+#if UNITY_6000_0_OR_NEWER
                 SerializedPropertyTypeRuntime.RenderingLayerMask => ((RenderingLayerMask)obj).value,
+#endif
                 // SerializedPropertyTypeRuntime.AnimationCurve:
                 SerializedPropertyTypeRuntime.Enum => SerializeEnum(obj),
                 SerializedPropertyTypeRuntime.Bounds => SerializeBounds((Bounds)obj),
@@ -86,7 +88,7 @@ namespace RosettaUI
             var childrenNames = TypeUtility.GetUITargetFieldNames(type);
             if (childrenNames.Any())
             {
-                res["children"] = childrenNames.Select(n =>
+                res[EditorFormatKey.Children] = childrenNames.Select(n =>
                 {
                     var mi = TypeUtility.GetMemberInfo(type, n);
                     var val = mi switch
@@ -138,7 +140,7 @@ namespace RosettaUI
             
             for (var i = 0; i < size; ++i)
             {
-                children[i + 1] = ObjectToDictionary(list[i], EditorFormatKey.Data); 
+                children[i + 1] = ObjectToDictionary(list[i], EditorFormatKey.ValueNameData); 
             }
 
             res[EditorFormatKey.Children] = children;
@@ -186,8 +188,10 @@ namespace RosettaUI
                     nameof(String) => ToSuccessTuple(Convert.ToString(val)),
                     nameof(Char) => ToSuccessTuple(Convert.ToChar(val)),
                     nameof(LayerMask) => ToSuccessTuple(new LayerMask { value = Convert.ToInt32(val) }),
-                    nameof(RenderingLayerMask) => ToSuccessTuple(new RenderingLayerMask
-                        { value = Convert.ToUInt32(val) }),
+#if UNITY_6000_0_OR_NEWER
+                    nameof(RenderingLayerMask) => ToSuccessTuple(new RenderingLayerMask { value =
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  Convert.ToUInt32(val) }),
+#endif
                     // nameof(AnimationCurve) => { /* res["val"] = WriteCustom(new AnimationCurveWrapper(p.animationCurveValue)); */ },
                     nameof(Bounds) => ToResultTuple<Bounds>(DeserializeBounds, val),
                     nameof(Gradient) => ToResultTuple<Gradient>(DeserializeGradient, val),
@@ -246,7 +250,7 @@ namespace RosettaUI
 
             using var _ = ListPool<object>.Get(out var childrenList);
             childrenList.AddRange(children
-                .Where(dic => dic.TryGetValue("name", out var nameObj) && (nameObj is "data"))
+                .Where(dic => dic.TryGetValue(EditorFormatKey.Name, out var nameObj) && (nameObj is EditorFormatKey.ValueNameData))
                 .Select(dic => (DictionaryToObject(elementType, dic, out var v), v))
                 .Where(t => t.Item1)
                 .Select(t => t.Item2)
@@ -285,10 +289,13 @@ namespace RosettaUI
             if (!childrenNames.Any())
                 return false;
 
+            // 一つも一致する値がないと場合は失敗
+            var hasValue = false;
+            
             var obj = Activator.CreateInstance(type);
             foreach (var child in children)
             {
-                if (!child.TryGetValue("name", out var nameObject))
+                if (!child.TryGetValue(EditorFormatKey.Name, out var nameObject))
                     continue;
 
                 if (nameObject is not string name || string.IsNullOrEmpty(name))
@@ -299,7 +306,7 @@ namespace RosettaUI
                     name = RectOffsetMemberNameTable[name];
                 }
 
-                var mi = TypeUtility.GetMemberInfo(type, name);
+                var mi = TypeUtility.TryGetMemberInfo(type, name);
                 if (mi is null)
                     continue;
 
@@ -310,16 +317,25 @@ namespace RosettaUI
                         if (!DictionaryToObject(fi.FieldType, child, out var fv))
                             continue;
                         fi.SetValue(obj, fv);
+                        hasValue = true;
                         break;
 
                     case PropertyInfo pi:
                         if (!DictionaryToObject(pi.PropertyType, child, out var pv))
                             continue;
+                        var hasSetter = pi.SetMethod != null;
+                        if (!hasSetter)
+                            continue;
+                        
+                        
                         pi.SetValue(obj, pv);
+                        hasValue = true;
                         break;
                 }
             }
 
+            if (!hasValue) return false;
+            
             value = obj;
 
             return true;
@@ -327,7 +343,7 @@ namespace RosettaUI
 
         private static IEnumerable<Dictionary<string, object>> TryGetChildren(IReadOnlyDictionary<string, object> dictionary)
         {
-            if (!dictionary.TryGetValue("children", out var obj))
+            if (!dictionary.TryGetValue(EditorFormatKey.Children, out var obj))
                 return null;
 
             return obj is not List<object> list 

@@ -19,11 +19,16 @@ namespace RosettaUI.Test
         [TestCaseSource(nameof(UIntSource))]
         public void MatchUnityEditorMethod_UInt(string text) => TestMatch(text, EditorClipBoardParser.ParseUint);
 
+        [TestCaseSource(nameof(StringSource))]
+        public void MatchUnityEditorMethod_String(string text) => TestMatch(text, EditorClipBoardParser.ParseString);
+
+
         [TestCaseSource(nameof(FloatSource))]
         public void MatchUnityEditorMethod_Float(string text) => TestMatch(text, EditorClipBoardParser.ParseFloat);
 
         [TestCaseSource(nameof(EnumSource))]
-        public void MatchUnityEditorMethod_Enum(string text) => TestMatch(text, EditorClipBoardParser.ParseEnum<EnumForTest>);
+        public void MatchUnityEditorMethod_Enum(string text) =>
+            TestMatch(text, EditorClipBoardParser.ParseEnum<EnumForTest>);
 
         [TestCaseSource(nameof(Vector2Source))]
         public void MatchUnityEditorMethod_Vector2(string text) => TestMatch(text, EditorClipBoardParser.ParseVector2);
@@ -37,20 +42,23 @@ namespace RosettaUI.Test
         // UnityEditor.ClipboardParserはVector2Int非対応。ClipboardContextMenuでVector2からキャストしている
         // Vector2Intのシリアライズ書式はVector2と同じなのでTestCastSourceを共有する
         [TestCaseSource(nameof(Vector2Source))]
-        public void MatchUnityEditorMethod_Vector2Int(string text) => TestMatch(text, CastParser(EditorClipBoardParser.ParseVector2, ClipboardParserUtility.ToInt));
+        public void MatchUnityEditorMethod_Vector2Int(string text) => TestMatch(text,
+            CastParser(EditorClipBoardParser.ParseVector2, ClipboardParserUtility.ToInt));
 
         // UnityEditor.ClipboardParserはVector3Int非対応。ClipboardContextMenuでVector3からキャストしている
         // Vector3Intのシリアライズ書式はVector3と同じなのでTestCastSourceを共有する
         [TestCaseSource(nameof(Vector3Source))]
-        public void MatchUnityEditorMethod_Vector3Int(string text) => TestMatch(text, CastParser(EditorClipBoardParser.ParseVector3, ClipboardParserUtility.ToInt));
-        
+        public void MatchUnityEditorMethod_Vector3Int(string text) => TestMatch(text,
+            CastParser(EditorClipBoardParser.ParseVector3, ClipboardParserUtility.ToInt));
+
         [TestCaseSource(nameof(RectSource))]
         public void MatchUnityEditorMethod_Rect(string text) => TestMatch(text, EditorClipBoardParser.ParseRect);
 
         // UnityEditor.ClipboardParserはRectInt非対応。ClipboardContextMenuでRectからキャストしている
         // RectIntのシリアライズ書式はRectと同じなのでTestCastSourceを共有する
         [TestCaseSource(nameof(RectSource))]
-        public void MatchUnityEditorMethod_RectInt(string text) => TestMatch(text, CastParser(EditorClipBoardParser.ParseRect, ClipboardParserUtility.ToInt));
+        public void MatchUnityEditorMethod_RectInt(string text) => TestMatch(text,
+            CastParser(EditorClipBoardParser.ParseRect, ClipboardParserUtility.ToInt));
 
         [TestCaseSource(nameof(BoundsSource))]
         public void MatchUnityEditorMethod_Bounds(string text) => TestMatch(text, EditorClipBoardParser.ParseBounds);
@@ -58,23 +66,28 @@ namespace RosettaUI.Test
         // UnityEditor.ClipboardParserはBoundsInt非対応。ClipboardContextMenuでBoundsからキャストしている
         // BoundsIntのシリアライズ書式はBoundsと同じなのでTestCastSourceを共有する
         [TestCaseSource(nameof(BoundsSource))]
-        public void MatchUnityEditorMethod_BoundsInt(string text) => TestMatch(text, CastParser(EditorClipBoardParser.ParseBounds, ClipboardParserUtility.ToIntKeepValueLook));
+        public void MatchUnityEditorMethod_BoundsInt(string text) => TestMatch(text,
+            CastParser(EditorClipBoardParser.ParseBounds, ClipboardParserUtility.ToIntKeepValueLook));
 
         [TestCaseSource(nameof(QuaternionSource))]
-        public void MatchUnityEditorMethod_Quaternion(string text) => TestMatch(text, EditorClipBoardParser.ParseQuaternion);
+        public void MatchUnityEditorMethod_Quaternion(string text) =>
+            TestMatch(text, EditorClipBoardParser.ParseQuaternion);
 
 
         [TestCaseSource(nameof(ColorSource))]
         public void MatchUnityEditorMethod_Color(string text) => TestMatch(text, EditorClipBoardParser.ParseColor);
 
         [TestCaseSource(nameof(GradientSource))]
-        public void MatchUnityEditorMethod_Gradient(string text) => TestMatch(text, EditorClipBoardParser.ParseGradient);
+        public void MatchUnityEditorMethod_Gradient(string text) =>
+            TestMatch(text, EditorClipBoardParser.ParseGradient);
 
         [TestCaseSource(nameof(GenericSource))]
-        public void MatchUnityEditorMethod_Generic(string text) => TestMatch(text, EditorClipBoardParser.ParseGeneric<ClassForTest>);
+        public void MatchUnityEditorMethod_Generic(string text) =>
+            TestMatch(text, EditorClipBoardParser.ParseGeneric<ClassForTest>);
 
-        
-        private static Func<string, (bool, TTarget)> CastParser<TOriginal, TTarget>(Func<string, (bool, TOriginal)> func, Func<TOriginal, TTarget> castFunc)
+
+        private static Func<string, (bool, TTarget)> CastParser<TOriginal, TTarget>(
+            Func<string, (bool, TOriginal)> func, Func<TOriginal, TTarget> castFunc)
         {
             return (text) =>
             {
@@ -96,6 +109,11 @@ namespace RosettaUI.Test
         private static string[] UIntSource => new[]
         {
             "0", "1", "10", "-1", "-10", uint.MinValue.ToString(), uint.MaxValue.ToString(), null, "expect parse fail"
+        };
+
+        private static string[] StringSource => new[]
+        {
+            "", "a", "012346789", "this is a pen.", "これはペンです。", null
         };
 
         private static string[] FloatSource => new[]

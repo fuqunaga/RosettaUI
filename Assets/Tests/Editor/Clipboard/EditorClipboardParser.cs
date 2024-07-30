@@ -36,7 +36,10 @@ namespace RosettaUI.Test
         
         public static string WriteUInt(uint value) => value.ToString();
         public static (bool, uint) ParseUint(string text) => Parse<uint>(text);
-        
+
+        public static string WriteString(string value) => value;
+        public static (bool, string) ParseString(string text) => (true, text);
+
         public static string WriteFloat(float value) => value.ToString(CultureInfo.InvariantCulture);
         public static (bool, float) ParseFloat(string text) => Parse<float>(text);
         

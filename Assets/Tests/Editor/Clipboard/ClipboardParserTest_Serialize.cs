@@ -19,6 +19,9 @@ namespace RosettaUI.Test
         [TestCaseSource(nameof(UIntSource))]
         public void MatchUnityEditorMethod_UInt(uint value) => TestMatch(value, EditorClipBoardParser.WriteUInt);
         
+        [TestCaseSource(nameof(StringSource))]
+        public void MatchUnityEditorMethod_String(string value) => TestMatch(value, EditorClipBoardParser.WriteString);
+        
         [TestCaseSource(nameof(FloatSource))]
         public void MatchUnityEditorMethod_Float(float value) => TestMatch(value, EditorClipBoardParser.WriteFloat);
 
@@ -95,6 +98,7 @@ namespace RosettaUI.Test
         private static bool[] BoolSource => new[] {true, false};
         private static int[] IntSource => new[] {0, 1, 10, -1, -10, int.MinValue, int.MaxValue};
         private static uint[] UIntSource => new[] {0u, 1u, 10u, uint.MinValue, uint.MaxValue};
+        private static string[] StringSource => new[] { "", "a", "012346789", "this is a pen.", "これはペンです。", null };
         private static float[] FloatSource => new[] {0f, 0.1f, 1f, 10f, -0.1f, -1f, -10f, float.MinValue, float.MaxValue, float.NaN, float.NegativeInfinity, float.PositiveInfinity, float.Epsilon};
         private static EnumForTest[] EnumSource => Enum.GetValues(typeof(EnumForTest)).Cast<EnumForTest>().ToArray();
 

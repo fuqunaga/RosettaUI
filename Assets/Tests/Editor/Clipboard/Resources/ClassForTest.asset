@@ -77,9 +77,6 @@ MonoBehaviour:
     boundsIntValue:
       m_Position: {x: 1, y: -1, z: -1}
       m_Size: {x: 4, y: -5, z: 6}
-    renderingLayerMask:
-      serializedVersion: 0
-      m_Bits: 4294967295
     rectOffset:
       m_Left: 1
       m_Right: -2

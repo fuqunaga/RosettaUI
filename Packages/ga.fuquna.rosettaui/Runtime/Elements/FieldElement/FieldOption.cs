@@ -4,5 +4,6 @@
     {
         public static FieldOption Default => new();
         public bool delayInput;
+        public bool suppressClipboardContextMenu;
     }
 }

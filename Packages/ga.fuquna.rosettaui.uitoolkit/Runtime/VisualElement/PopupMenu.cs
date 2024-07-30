@@ -12,24 +12,9 @@ namespace RosettaUI.UIToolkit
     {
         public Func<IEnumerable<MenuItem>> CreateMenuItems { get; set; }
         
-        
         public PopupMenu()
         {
-#if true
             this.AddManipulator(new PopupMenuManipulator(() => CreateMenuItems?.Invoke()));
-#else
-            RegisterCallback<PointerDownEvent>(evt =>
-            {
-                if (evt.button != ButtonIndex) return;
-                
-                var menuItems = CreateMenuItems?.Invoke();
-                if (menuItems == null) return;
-                
-                PopupMenuUtility.Show(menuItems, evt.position, this);
-
-                evt.StopPropagationAndFocusControllerIgnoreEvent();
-            });
-#endif
         }
     }
 }

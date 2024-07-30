@@ -8,15 +8,16 @@ namespace RosettaUI
     {
         public static Element CreateSliderElement(LabelElement label, IBinder binder, in SliderElementOption option)
         {
+            var fieldOption = option.sliderOption?.fieldOption ?? FieldOption.Default;
+            
             return binder switch
             {
-                IBinder<int> bb => new IntSliderElement(label, bb, option.Cast<int>()),
-                IBinder<uint> bb => new IntSliderElement(label,
-                    new CastBinder<uint, int>(bb),
+                IBinder<int> ib => new IntSliderElement(label, ib, option.Cast<int>()).AddClipboardMenu(ib, fieldOption),
+                IBinder<uint> ib => new IntSliderElement(label,
+                    new CastBinder<uint, int>(ib),
                     CreateOptionUintToInt(option)
-                ),
-                IBinder<float> bb => new FloatSliderElement(label, bb, option.Cast<float>()
-                ),
+                ).AddClipboardMenu(ib, fieldOption),
+                IBinder<float> ib => new FloatSliderElement(label, ib, option.Cast<float>()).AddClipboardMenu(ib, fieldOption),
                 
                 _ when TypeUtility.IsNullable(binder.ValueType) => CreateNullableSliderElement(label, binder, option),
                 
@@ -47,6 +48,7 @@ namespace RosettaUI
                 label,
                 binder,
                 binder.ValueType,
+                option,
                 fieldName =>
                 {
                     var fieldLabel = UICustom.ModifyPropertyOrFieldLabel(binder.ValueType, fieldName);
@@ -64,7 +66,7 @@ namespace RosettaUI
         }
         
         
-        private static Element CreateCompositeSliderElementBase(LabelElement label, IBinder binder, Type valueType,
+        private static Element CreateCompositeSliderElementBase(LabelElement label, IBinder binder, Type valueType, in SliderElementOption option,
             Func<string, Element> createFieldElementFunc)
         {
             var fieldNames = TypeUtility.GetUITargetFieldNames(valueType).ToList();
@@ -74,42 +76,43 @@ namespace RosettaUI
             {
                 return CreateCircularReferenceElement(label, valueType);
             }
-            using var binderHistory = BinderHistory.GetScope(binder);
-
-            var elements = fieldNames.Select(createFieldElementFunc);
-
-            return UI.NullGuardIfNeed(label, binder, CreateElementFunc);
             
+            using var binderHistory = BinderHistory.GetScope(binder);
+            
+            var fieldOption = option.sliderOption?.fieldOption ?? FieldOption.Default;
+            var isSingleLine = TypeUtility.IsSingleLine(binder.ValueType);
 
             // NullGuard前にelements.ToList()などで評価していまうとbinder.Get()のオブジェクトがnullであるケースがある
-            // 評価を遅延させる
-            Element CreateElementFunc()
+            // elements の評価は遅延させる
+            return UI.NullGuardIfNeed(label, binder, isSingleLine ? CreateElementSingleLine : CreateElementMultiLine);
+            
+            Element CreateElementMultiLine()
             {
-                if (TypeUtility.IsSingleLine(binder.ValueType))
-                {
-                    var titleField = CreateMemberFieldElement(new LabelElement(label), binder, FieldOption.Default);
-                    
-                    // Foldが閉じてるときは titleField を、開いているときは label を表示
-                    // UI.Row(label, titleField) だと titleField のラベルがPrefixLabel判定されないので
-                    // 下記の順番である必要がある
-                    var bar = UI.Row(titleField, label);
+                return UI.Fold(label.AddClipboardMenu(binder, fieldOption), fieldNames.Select(createFieldElementFunc));
+            }
+            
+            Element CreateElementSingleLine()
+            {
+                var titleFieldOption = fieldOption;
+                titleFieldOption.suppressClipboardContextMenu = true;
+                
+                var titleField = CreateMemberFieldElement(new LabelElement(label), binder, titleFieldOption);
 
-                    // ReSharper disable once PossibleMultipleEnumeration
-                    var fold = UI.Fold(bar, elements);
+                // Foldが閉じてるときは titleField を、開いているときは label を表示
+                // UI.Row(label, titleField) だと titleField のラベルがPrefixLabel判定されないので
+                // 下記の順番である必要がある
+                var bar = UI.Row(titleField, label).AddClipboardMenu(binder, fieldOption);
                     
-                    fold.IsOpenRx.SubscribeAndCallOnce(isOpen =>
-                    {
-                        label.Enable = isOpen;
-                        titleField.Enable = !isOpen;
-                    });
+                var elements = fieldNames.Select(createFieldElementFunc);
+                var fold = UI.Fold(bar, elements);
 
-                    return fold;
-                }
-                else
+                fold.IsOpenRx.SubscribeAndCallOnce(isOpen =>
                 {
-                    // ReSharper disable once PossibleMultipleEnumeration
-                    return UI.Fold(label, elements);
-                }
+                    label.Enable = isOpen;
+                    titleField.Enable = !isOpen;
+                });
+
+                return fold;
             }
         }
     }

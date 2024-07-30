@@ -13,6 +13,11 @@ namespace RosettaUI
         
         public static Type GetItemType(Type type)
         {
+            if (type.IsArray)
+            {
+                return type.GetElementType();
+            }
+            
             if (!ListItemTypeTable.TryGetValue(type, out var itemType))
             {
                 itemType = type.GetInterfaces().Concat(new[] {type})

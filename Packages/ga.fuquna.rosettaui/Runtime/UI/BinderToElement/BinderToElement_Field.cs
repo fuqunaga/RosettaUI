@@ -28,14 +28,14 @@ namespace RosettaUI
 
             return binder switch
             {
-                IBinder<int> ib => new IntFieldElement(label, ib, option),
-                IBinder<uint> ib => new UIntFieldElement(label, ib, option),
-                IBinder<float> ib => new FloatFieldElement(label, ib, option),
-                IBinder<string> ib => new TextFieldElement(label, ib, option),
-                IBinder<bool> ib => new ToggleElement(label, ib),
-                IBinder<Color> ib => new ColorFieldElement(label, ib),
-                IBinder<Gradient> ib => UI.NullGuard(label, ib, () => new GradientFieldElement(label, ib)),
-                _ when valueType.IsEnum => CreateEnumElement(label, binder),
+                IBinder<int> ib => new IntFieldElement(label, ib, option).AddClipboardMenu(ib, option),
+                IBinder<uint> ib => new UIntFieldElement(label, ib, option).AddClipboardMenu(ib, option),
+                IBinder<float> ib => new FloatFieldElement(label, ib, option).AddClipboardMenu(ib, option),
+                IBinder<string> ib => new TextFieldElement(label, ib, option).AddClipboardMenu(ib, option),
+                IBinder<bool> ib => new ToggleElement(label, ib).AddClipboardMenu(ib, option),
+                IBinder<Color> ib => new ColorFieldElement(label, ib).AddClipboardMenu(ib, option),
+                IBinder<Gradient> ib => UI.NullGuard(label, ib, () => new GradientFieldElement(label, ib)).AddClipboardMenu(ib, option),
+                _ when valueType.IsEnum => CreateEnumElement(label, binder).AddClipboardMenu(binder, option),
                 _ when TypeUtility.IsNullable(valueType) => CreateNullableFieldElement(label, binder, option),
                 _ when typeof(IElementCreator).IsAssignableFrom(valueType) => CreateElementCreatorElement(label, binder),
                 _ when ListBinder.IsListBinder(binder) => CreateListView(label, binder),
@@ -43,7 +43,7 @@ namespace RosettaUI
                 _ => UI.NullGuardIfNeed(label, binder, () => CreateMemberFieldElement(label, binder, optionCaptured))
             };
         }
-
+        
         private static Element CreateEnumElement(LabelElement label, IBinder binder)
         {
             var valueType = binder.ValueType;
@@ -118,7 +118,10 @@ namespace RosettaUI
         private static Element CreateMemberFieldElement(LabelElement label, IBinder binder, in FieldOption option)
         {
             var valueType = binder.ValueType;
+            var isSingleLine = TypeUtility.IsSingleLine(valueType);
+            
             var optionCaptured = option;
+            optionCaptured.suppressClipboardContextMenu |= isSingleLine;
 
             // UICustomCreationScopeをキャンセル
             // クラスのメンバーに同じクラスがある場合はUICustomを有効にする
@@ -173,15 +176,18 @@ namespace RosettaUI
             });
 
 
-            Element ret;
-            if (TypeUtility.IsSingleLine(valueType))
-                ret = new CompositeFieldElement(label, elements);
-            else if (label != null)
-                ret = UI.Fold(label, elements);
-            else
-                ret = UI.Column(elements);
-
-            return ret;
+            
+            if (isSingleLine)
+            {
+                return new CompositeFieldElement(label, elements).AddClipboardMenu(binder, option);
+            }
+            
+            if (label != null)
+            {
+                return UI.Fold(label.AddClipboardMenu(binder, option), elements);
+            }
+            
+            return UI.Column(elements);
         }
         
         private static Element CreateCircularReferenceElement(LabelElement label, Type type)
@@ -191,6 +197,24 @@ namespace RosettaUI
                 {
                     new HelpBoxElement($"[{type}] Circular reference detected.", HelpBoxType.Error)
                 }).SetInteractable(false);
+        }
+    }
+    
+    
+    internal static class ElementExtensionForBinderToElement
+    {
+        public static Element AddClipboardMenu(this Element element, IBinder ib, in FieldOption option)
+        {
+            return option.suppressClipboardContextMenu 
+                ? element 
+                : UI.ClipboardContextMenu(element, ib);
+        }
+        
+        public static Element AddClipboardMenu<T>(this Element element, IBinder<T> ib, in FieldOption option)
+        {
+            return option.suppressClipboardContextMenu 
+                ? element 
+                : UI.ClipboardContextMenu(element, ib);
         }
     }
 }

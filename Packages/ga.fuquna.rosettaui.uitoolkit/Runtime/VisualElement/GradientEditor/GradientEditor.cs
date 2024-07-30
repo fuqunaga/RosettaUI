@@ -116,6 +116,9 @@ namespace RosettaUI.UIToolkit
             {
                 EnableAlpha = false
             };
+            _colorField.AddManipulator(new PopupMenuManipulator(
+                ClipboardUtility.GenerateContextMenuItemsFunc(() => _colorField.value, v => _colorField.value = v))
+            );
             var valueFieldContainer = this.Q("value-field-container");
             valueFieldContainer.Add(_colorField);
             
@@ -148,8 +151,6 @@ namespace RosettaUI.UIToolkit
                 UpdateGradient();
             });
 
-            InitGradientCode();
-            
             _presetSet = new GradientEditorPresetSet(gradient =>
             {
                 SetGradient(gradient);
@@ -303,40 +304,6 @@ namespace RosettaUI.UIToolkit
             {
                 element.style.display = display ? DisplayStyle.Flex : DisplayStyle.None;
             }
-        }
-
-
-        private void InitGradientCode()
-        {
-            _copyButton = this.Q<Button>("copy-button");
-            _pasteButton = this.Q<Button>("paste-button");
-            _infoLabel = this.Q<Label>("info-label");
-            _infoLabel.text = "";
-            
-            _copyButton.clicked += () =>
-            {
-                var json = GradientHelper.GradientToJson(_gradient);
-                if (json != null)
-                {
-                    GUIUtility.systemCopyBuffer = json;
-                    _infoLabel.text = "Copy!";
-                }
-            };
-
-            _pasteButton.clicked += () =>
-            {
-                var clip = GUIUtility.systemCopyBuffer;
-                if (clip != null)
-                {
-                    if (GradientHelper.JsonToGradient(clip) is { } gradient)
-                    {
-                        SetGradient(gradient);
-                        UpdateGradientPreview();
-                        onGradientChanged?.Invoke(_gradient);
-                        _infoLabel.text = "Paste!";
-                    }
-                }
-            };
         }
     }
 }

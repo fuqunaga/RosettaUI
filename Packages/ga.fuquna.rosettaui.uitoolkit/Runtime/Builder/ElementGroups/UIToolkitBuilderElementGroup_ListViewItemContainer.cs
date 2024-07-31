@@ -187,21 +187,20 @@ namespace RosettaUI.UIToolkit.Builder
         //
         // Unity6で発生。Unity2022では大丈夫
         // 現状Slider.highValueがかなりゼロに近い値で起こるっぽいのでそこだけイベントを止める
-        private void SuppressListViewStackOverFlow(ListView listView)
+        private static void SuppressListViewStackOverFlow(ListView listView)
         {
             var scrollView = listView.Q<ScrollView>();
             var slider = scrollView.verticalScroller.slider;
-            var clampedPropertyInfo = typeof(Slider).GetProperty("clamped", BindingFlags.Instance | BindingFlags.NonPublic);
-        
+            
             slider.RegisterCallback<ChangeEvent<float>>(evt =>
             {
                 if ((evt.previousValue == 0f || evt.newValue == 0f)
-                    && Mathf.Abs(evt.previousValue - evt.newValue) < 0.00001f)
+                    && Mathf.Abs(evt.previousValue - evt.newValue) < 0.0001f)
                 {
-                    Debug.Log($"highValue{slider.highValue} pre:{evt.previousValue} new:{evt.newValue} {evt.target.GetType()}");
+                    // Debug.Log($"pre:{evt.previousValue} new:{evt.newValue} {evt.target.GetType()}");
                     if ( evt.target == slider)
                     {
-                        Debug.Log("StopImmediatePropagation");
+                        // Debug.Log("StopImmediatePropagation");
                         evt.StopImmediatePropagation();
                     }
                 }

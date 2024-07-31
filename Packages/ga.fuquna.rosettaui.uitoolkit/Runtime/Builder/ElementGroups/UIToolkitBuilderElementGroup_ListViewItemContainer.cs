@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -36,6 +38,10 @@ namespace RosettaUI.UIToolkit.Builder
             // ・VisualElementが再利用されない場合はElementは無効なVisualElementとBind()されたままになる。が表示されていないので問題ない・・・と思う
             // 
             // listView.unbindItem = UnbindItem;
+            
+#if UNITY_6000_0_OR_NEWER
+            SuppressListViewStackOverFlow(listView);
+#endif
             
             SetCallbacks();
 
@@ -169,6 +175,36 @@ namespace RosettaUI.UIToolkit.Builder
             void OnViewListValueChanged() => viewBridge.OnViewListValueChanged(listView.itemsSource);
             
             #endregion
+        }
+
+        // + ボタンで要素を追加したとき高確率でスタックオーバーフローする
+        // 1. Scroller.OnSliderValueChange() で
+        //  a. Slider.value の値を変更しNotifyする（ChangedEventを発行する）
+        //  b. BaseVerticalCollectionView.OnScroll() が呼ばれSlider.highValueとSlider.valueをNotifyなしで更新する
+        // 2.のChangedEventがDispatchされてScroller.OnSliderValueChange()が再度呼ばれる
+        //　　再度、a.の処理が行われるが通常は1.と2. で同じ Slider.value となり、値が同じなのでNotifyが行われないが
+        //   b. が常に a. と異なる値で更新する場合無限ループになる
+        //
+        // Unity6で発生。Unity2022では大丈夫
+        // 現状Slider.highValueがかなりゼロに近い値で起こるっぽいのでそこだけイベントを止める
+        private static void SuppressListViewStackOverFlow(ListView listView)
+        {
+            var scrollView = listView.Q<ScrollView>();
+            var slider = scrollView.verticalScroller.slider;
+            
+            slider.RegisterCallback<ChangeEvent<float>>(evt =>
+            {
+                if ((evt.previousValue == 0f || evt.newValue == 0f)
+                    && Mathf.Abs(evt.previousValue - evt.newValue) < 0.0001f)
+                {
+                    // Debug.Log($"pre:{evt.previousValue} new:{evt.newValue} {evt.target.GetType()}");
+                    if ( evt.target == slider)
+                    {
+                        // Debug.Log("StopImmediatePropagation");
+                        evt.StopImmediatePropagation();
+                    }
+                }
+            }, TrickleDown.TrickleDown);
         }
     }
 }

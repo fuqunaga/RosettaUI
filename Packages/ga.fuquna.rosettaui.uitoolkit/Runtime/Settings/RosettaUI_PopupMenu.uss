@@ -2,7 +2,7 @@
 * PopupMenu
 * :active になるので子要素を :focus と同様のスタイルにしたい
 ********************************************************************************/
-.rosettaui-popup-menu:active .unity-base-field__label 
+.rosettaui-popup-menu:active .unity-label 
 {
     color: var(--unity-colors-highlight-text);
 }

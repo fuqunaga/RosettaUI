@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
@@ -56,12 +57,8 @@ namespace RosettaUI.UIToolkit
 
         private void OnPopupMenuTrickleDown(PopupMenuEvent evt)
         {
-            var menuItems = evt.MenuItems;
-            var newItems = _createMenuItemsFunc();
-            
-            menuItems.InsertRange(0, menuItems.Any() 
-                ? newItems.Append(MenuItem.Separator)
-                : newItems); 
+            if (_createMenuItemsFunc == null) return;
+            evt.MenuItemSets.Add(_createMenuItemsFunc());
         }
 
 
@@ -69,8 +66,29 @@ namespace RosettaUI.UIToolkit
         {
             if (evt.target != target) return;
             
+            // メニューアイテムを整理する
+            // 後から追加されたMenuItemSetを優先してリストの先頭に追加する
+            // 同じ名前のメニューアイテムはPopupMenuUtility内のGenericDropdownMenuで先に登録されたもののみ適用されるが、
+            // セパレーターがメニューの最初か最後にあるのは避けたいので、ここで重複チェックしセパレーターの必要性を判断する
+            using var _0 = ListPool<MenuItem>.Get(out var menuItems);
+            using var _1 = ListPool<MenuItem>.Get(out var addItems);
+
+            foreach (var addItemSet in Enumerable.Reverse(evt.MenuItemSets))
+            {
+                addItems.Clear();
+                addItems.AddRange(addItemSet.Except(menuItems, MenuItem.NameComparer));
+                if ( addItems.Count <= 0 ) continue;
+
+                if (menuItems.Count > 0)
+                {
+                    menuItems.Add(MenuItem.Separator);
+                }
+
+                menuItems.AddRange(addItems);
+            }
+            
             PopupMenuUtility.Show(
-                evt.MenuItems,
+                menuItems,
                 evt.Position,
                 target
             );

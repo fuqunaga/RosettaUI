@@ -7,6 +7,7 @@ namespace RosettaUI
     public class MenuItem
     {
         public static readonly MenuItem Separator = new();
+        public static IEqualityComparer<MenuItem> NameComparer { get; } = new NameComparerImpl();
         
         public string name;
         public bool isChecked;
@@ -21,6 +22,22 @@ namespace RosettaUI
         {
             this.name = name;
             this.action = action;
+        }
+
+
+        private class NameComparerImpl : IEqualityComparer<MenuItem>
+        {
+            public bool Equals(MenuItem x, MenuItem y)
+            {
+                if (x == null && y == null) return true;
+                if (x == Separator || y == Separator) return false;
+                return x?.name == y?.name;
+            }
+
+            public int GetHashCode(MenuItem obj)
+            {
+                return obj.name.GetHashCode();
+            }
         }
     }
 

@@ -7,7 +7,7 @@ namespace RosettaUI.UIToolkit
     public class PopupMenuEvent : EventBase<PopupMenuEvent>
     {
         public Vector2 Position { get; protected set; }
-        public List<MenuItem> MenuItems { get; } = new();
+        public List<IEnumerable<MenuItem>> MenuItemSets { get; } = new();
         
         
         public static void Send(VisualElement visualElement, Vector2 position)
@@ -16,7 +16,7 @@ namespace RosettaUI.UIToolkit
             
             evt.target = visualElement;
             evt.Position = position;
-            evt.MenuItems.Clear();
+            evt.MenuItemSets.Clear();
             
             visualElement.SendEvent(evt);
         }

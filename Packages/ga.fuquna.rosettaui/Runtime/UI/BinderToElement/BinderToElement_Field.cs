@@ -115,14 +115,11 @@ namespace RosettaUI
             return UI.List(label, binder, null, option);
         }
 
-        private static Element CreateMemberFieldElement(LabelElement label, IBinder binder, in FieldOption option)
+        private static Element CreateMemberFieldElement(LabelElement label, IBinder binder, FieldOption option)
         {
             var valueType = binder.ValueType;
             var isSingleLine = TypeUtility.IsSingleLine(valueType);
             
-            var optionCaptured = option;
-            optionCaptured.suppressClipboardContextMenu |= isSingleLine;
-
             // UICustomCreationScopeをキャンセル
             // クラスのメンバーに同じクラスがある場合はUICustomを有効にする
             using var uiCustomScope = new UICustomCreationScope(null);
@@ -143,7 +140,7 @@ namespace RosettaUI
                 }
                 else
                 {
-                    targetElement = UI.Field(fieldLabel, fieldBinder, optionCaptured);
+                    targetElement = UI.Field(fieldLabel, fieldBinder, option);
                 }
                 
                 // 属性によるElementの付加, Propertyの変更

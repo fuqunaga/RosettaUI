@@ -218,10 +218,24 @@ Unity2022.2.0b6
     padding-right: 4px;
 }
 
-.unity-base-popup-field:hover >.unity-base-popup-field__input,
-.unity-base-popup-field:active >.unity-base-popup-field__input,
-.unity-base-popup-field:hover:enabled >.unity-base-popup-field__input,
-.unity-base-popup-field:active:enabled >.unity-base-popup-field__input
+.unity-base-popup-field:active > .unity-base-field__label,
+.unity-enum-field:active > .unity-base-field__label
+{
+    color: var(--unity-colors-highlight-text);
+}
+
+.unity-base-popup-field:active:enabled > .unity-base-popup-field__input,
+.unity-base-popup-field:focus:enabled > .unity-base-popup-field__input,
+.unity-enum-field:active:enabled > .unity-enum-field__input,
+.unity-enum-field:focus:enabled > .unity-enum-field__input
+{
+    border-color: var(--unity-colors-input_field-border-focus);
+}
+
+.unity-base-popup-field:hover:enabled > .unity-base-popup-field__input,
+.unity-base-popup-field:active:enabled > .unity-base-popup-field__input,
+.unity-enum-field:hover:enabled > .unity-enum-field__input,
+.unity-enum-field:active:enabled > .unity-enum-field__input
 {
     background-color: var(--rosettaui-color-input-background);
 }

@@ -10,10 +10,14 @@ namespace RosettaUI.UIToolkit
     /// </summary>
     public class PopupMenu : VisualElement
     {
+        public const string UssClassName = "rosettaui-popup-menu";
+        
         public Func<IEnumerable<MenuItem>> CreateMenuItems { get; set; }
         
         public PopupMenu()
         {
+            AddToClassList(UssClassName);
+            
             this.AddManipulator(new PopupMenuManipulator(() => CreateMenuItems?.Invoke()));
         }
     }

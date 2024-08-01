@@ -1,0 +1,14 @@
+/********************************************************************************
+* PopupMenu
+* :active になるので子要素を :focus と同様のスタイルにしたい
+********************************************************************************/
+.rosettaui-popup-menu:active .unity-base-field__label 
+{
+    color: var(--unity-colors-highlight-text);
+}
+
+.rosettaui-popup-menu:active .unity-base-field__input,
+.rosettaui-popup-menu:active .unity-toggle__checkmark
+{
+    border-color: var(--unity-colors-input_field-border-focus);
+}

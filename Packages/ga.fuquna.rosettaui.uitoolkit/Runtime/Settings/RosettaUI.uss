@@ -1,5 +1,5 @@
 :root {
-    --fixed-field-width-m: 80px; /* マイナスfloat値が収まる枠 */
+    --fixed-field-width-m: 80px; /* マイナスfloat値が収まる幅 */
     --fixed-field-width-s: 48px;
     --slider-min-width: 180px;
     --input-border-width: 1px;
@@ -175,6 +175,15 @@
 .rosettaui-composite-field__content-container 
 {
     flex-direction: row;
+}
+
+/*
+ Unity2022で.unity-base-field__inputの右端が途切れて表示されてしまう問題の対策
+ Unity6ではこの問題は起きていない
+ */
+.rosettaui-composite-field .unity-base-field
+{
+    padding-right: 2px;
 }
 
 .rosettaui-composite-field .unity-base-field__label 

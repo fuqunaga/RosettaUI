@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.UIElements;
 
 namespace RosettaUI
 {
@@ -156,8 +157,12 @@ namespace RosettaUI
                         case SpaceAttribute spaceAttr:
                             innerElements.Add(UI.Space().SetHeight(spaceAttr.height));
                             break;
-                        case MultilineAttribute _ when targetElement is TextFieldElement textField:
-                            textField.IsMultiLine = true;
+                        case MultilineAttribute _:
+                            var textField = targetElement.Query<TextFieldElement>().FirstOrDefault();
+                            if (textField != null)
+                            {
+                                textField.IsMultiLine = true;
+                            }
                             break;
                     }
                 }

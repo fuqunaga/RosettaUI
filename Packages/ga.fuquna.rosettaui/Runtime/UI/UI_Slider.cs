@@ -105,10 +105,12 @@ namespace RosettaUI
             => Slider(label, readValue, null, min, max, option);
 
 
+        public static Element Slider(LabelElement label, IBinder binder, in SliderOption? option = null)
+            => Slider(label, binder, null, null, option);
 
         public static Element Slider(LabelElement label, IBinder binder, IGetter minGetter, IGetter maxGetter, in SliderOption? option = null)
             => Slider(label, binder, new SliderElementOption(minGetter, maxGetter, option));
-        
+
         public static Element Slider(LabelElement label, IBinder binder, in SliderElementOption elementOption)
         {
             var contents = BinderToElement.CreateSliderElement(label, binder, elementOption);

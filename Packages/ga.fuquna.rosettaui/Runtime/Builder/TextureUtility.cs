@@ -33,6 +33,18 @@ namespace RosettaUI.Builder
                 )
             }
         };
+
+        static TextureUtility()
+        {
+            StaticResourceUtility.AddResetStaticResourceCallback(() =>
+            {
+                foreach (var texture in CheckerBoardTexture2X2S.Values)
+                {
+                    UnityEngine.Object.Destroy(texture);
+                }
+                CheckerBoardTexture2X2S.Clear();
+            });
+        }
         
         // ReSharper disable once InconsistentNaming
         public static Texture2D GetOrCreateCheckerboardTexture2x2(CheckerboardTheme theme)

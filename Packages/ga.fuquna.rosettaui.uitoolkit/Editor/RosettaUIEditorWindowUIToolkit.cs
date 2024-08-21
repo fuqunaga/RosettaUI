@@ -1,6 +1,5 @@
 using RosettaUI.UIToolkit.Builder;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Editor

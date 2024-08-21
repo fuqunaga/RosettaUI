@@ -10,21 +10,24 @@ namespace RosettaUI.UIToolkit
     {
         public static readonly string USSClassName = "rosettaui-gradient-editor";
         
-        #region static interface
+        #region static 
 
         private static ModalWindow _window;
         private static GradientEditor _gradientEditorInstance;
 
-        #endregion
-        
-        #region static members
-        
         private static VisualTreeAsset _visualTreeAsset;
-        private static RenderTexture _gradientTexture;
-        private static Texture2D _previewCheckerBoardTexture;
-
-        #endregion
         
+        static GradientEditor()
+        {
+            StaticResourceUtility.AddResetStaticResourceCallback(() =>
+            {
+                _window?.Hide();
+                _window = null;
+                _gradientEditorInstance = null;
+                _visualTreeAsset = null;
+            });
+        }
+
         public static void Show(Vector2 position, VisualElement target, Gradient initialGradient,
             Action<Gradient> onGradientChanged)
         {
@@ -65,7 +68,10 @@ namespace RosettaUI.UIToolkit
                 target?.Focus();
             }
         }
+        
+        #endregion
 
+        
         public event Action<Gradient> onGradientChanged;
 
         private Gradient _gradient;

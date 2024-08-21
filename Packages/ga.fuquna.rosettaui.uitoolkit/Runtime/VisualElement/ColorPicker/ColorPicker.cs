@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using RosettaUI.Builder;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -8,12 +9,29 @@ namespace RosettaUI.UIToolkit
 {
     public partial class ColorPicker : VisualElement
     {
-        #region static interface
+        #region static
 
         private static ModalWindow _window;
         private static ColorPicker _colorPickerInstance;
+        
+        private static VisualTreeAsset _visualTreeAsset;
+        private static RenderTexture _svTexture;
+
         public static int TextDigit { get; set; } = 3;
 
+        
+        static ColorPicker()
+        {
+            StaticResourceUtility.AddResetStaticResourceCallback(() =>
+            {
+                _window?.Hide();
+                _window = null;
+                _colorPickerInstance = null;
+                _visualTreeAsset = null;
+                _svTexture = null;
+            });
+        }
+        
         public static void Show(Vector2 position, VisualElement target, Color initialColor,
             Action<Color> onColorChanged, bool enableAlpha = true)
         {
@@ -53,13 +71,8 @@ namespace RosettaUI.UIToolkit
             }
         }
 
-        #endregion
-
-        #region static members
-
-        private static VisualTreeAsset _visualTreeAsset;
-        private static RenderTexture _svTexture;
-
+        
+        
         #endregion
 
         public event Action<Color> onColorChanged;

@@ -8,13 +8,34 @@ namespace RosettaUI.Builder
 {
     public static class ColorPickerHelper
     {
-        public static Vector2Int defaultCheckerBoardSize = new(100, 25);
-        public static int defaultCheckerBoardGridSize = 5;
+        private static class SvCircleShaderParam
+        {
+            public static readonly int TargetSize = Shader.PropertyToID("_TargetSize");
+            public static readonly int BlendWidthNormalized = Shader.PropertyToID("_BlendWidthNormalized");
+            public static readonly int Hue = Shader.PropertyToID("_Hue");
+        }
+        
+        
         public static float defaultHueCircleThicknessRate = 0.1f;
-
         public static string svDiskMaterialPath = "SvDisk";
 
+        private static readonly Dictionary<float, Texture2D> HueCircleTextureDic = new();
+        private static Material _svDiskMaterial;
+        
+        static ColorPickerHelper()
+        {
+            StaticResourceUtility.AddResetStaticResourceCallback(() =>
+            {
+                foreach (var tex in HueCircleTextureDic.Values)
+                {
+                    UnityEngine.Object.Destroy(tex);
+                }
+                HueCircleTextureDic.Clear();
 
+                _svDiskMaterial = null;
+            });
+        }
+        
         public static RenderTexture CreateRenderTexture(int width, int height) => 
             new(width, height, 0)
             {
@@ -23,8 +44,6 @@ namespace RosettaUI.Builder
         
   
         #region Hue texture
-
-        private static readonly Dictionary<float, Texture2D> HueCircleTextureDic = new();
 
         public static (Texture2D, int) GetHueCircleTextureAndThickness(float size)
         {
@@ -38,7 +57,7 @@ namespace RosettaUI.Builder
             return (tex, thickness);
         }
 
-        static Texture2D CreateHueTexture(int size, int circleThickness)
+        private static Texture2D CreateHueTexture(int size, int circleThickness)
         {
             var thickness = circleThickness;
             
@@ -94,16 +113,8 @@ namespace RosettaUI.Builder
 
         #endregion
 
-        #region SV texture
-
-        private static class SvCircleShaderParam
-        {
-            public static readonly int TargetSize = Shader.PropertyToID("_TargetSize");
-            public static readonly int BlendWidthNormalized = Shader.PropertyToID("_BlendWidthNormalized");
-            public static readonly int Hue = Shader.PropertyToID("_Hue");
-        }
         
-        private static Material _svDiskMaterial;
+        #region SV texture
 
         /// <summary>
         /// 横軸S縦軸Vの正方形でのSVを計算し、それを円形にマップする
@@ -141,8 +152,7 @@ namespace RosettaUI.Builder
         }
 
 
-        
-        static readonly float TwoSqrt2 = 2f * Mathf.Sqrt(2f);
+        private static readonly float TwoSqrt2 = 2f * Mathf.Sqrt(2f);
         
         /// <summary>
         /// 半径１の円内の座標を１辺２(-1~1)の正方形に射影する
@@ -212,8 +222,8 @@ namespace RosettaUI.Builder
         public static void UpdateRSliderTexture(Texture2D tex, Color color) => UpdateRgbSliderTexture(tex, color, 0);
         public static void UpdateGSliderTexture(Texture2D tex, Color color) => UpdateRgbSliderTexture(tex, color, 1);
         public static void UpdateBSliderTexture(Texture2D tex, Color color) => UpdateRgbSliderTexture(tex, color, 2);
-        
-        static void UpdateRgbSliderTexture(Texture2D tex, Color color, int index)
+
+        private static void UpdateRgbSliderTexture(Texture2D tex, Color color, int index)
         {
             WriteSliderTexture(tex, rate =>
             {
@@ -221,9 +231,9 @@ namespace RosettaUI.Builder
                 return color;
             });
         }
-        
 
-        static void WriteSliderTexture(Texture2D tex, Func<float, Color> rateToColor)
+
+        private static void WriteSliderTexture(Texture2D tex, Func<float, Color> rateToColor)
         {
             var width = tex.width;
             var invWidth = 1f / width;

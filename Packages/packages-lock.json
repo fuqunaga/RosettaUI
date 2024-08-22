@@ -74,7 +74,7 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {
-        "ga.fuquna.rosettaui": "1.5.3"
+        "ga.fuquna.rosettaui": "1.7.0"
       }
     },
     "com.unity.modules.accessibility": {

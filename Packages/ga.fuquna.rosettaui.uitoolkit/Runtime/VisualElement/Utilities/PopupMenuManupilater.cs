@@ -37,6 +37,7 @@ namespace RosettaUI.UIToolkit
             }
         }
 
+        
         protected override void RegisterCallbacksOnTarget()
         {
             base.RegisterCallbacksOnTarget();

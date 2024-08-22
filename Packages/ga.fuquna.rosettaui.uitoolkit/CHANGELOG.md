@@ -3,7 +3,11 @@
 
 ### Features
 
-* depends on RosettaUI 1.7.0 ([60ceeb9](https://github.com/fuqunaga/RosettaUI/commit/60ceeb99a6abe08f97fb274bd319a66fc9efb747))
+* Supports Unity6
+* ColorPicker swatches
+* GradientEditor presets
+* change Default Reference DPI 144 to 96 at RosettaUI_DefaultPanelSettings.  
+If you set the size specified by SetWidth() and similar functions to 2/3, it will be the same size as before.
 
 # [ga.fuquna.rosettaui.uitoolkit-v1.5.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.5.0...ga.fuquna.rosettaui.uitoolkit-v1.5.1) (2024-02-26)
 

@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.7.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.6.0...ga.fuquna.rosettaui-v1.7.0) (2024-08-22)
+
+
+### Features
+
+* Commit to run semantic-release ([1b52c56](https://github.com/fuqunaga/RosettaUI/commit/1b52c5672da19f441cd1e0fbe54d60bf9e4feb69))
+
 # [ga.fuquna.rosettaui-v1.6.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.5.4...ga.fuquna.rosettaui-v1.6.0) (2024-02-28)
 
 

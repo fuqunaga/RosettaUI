@@ -58,7 +58,12 @@ namespace RosettaUI.Example
                             )
                         ),
                         ExampleTemplate.UIFunctionColumnBox(nameof(UI.Box),
-                            UI.Label("box style frame")
+                            UI.Row(
+                                UI.Space().SetWidth(5f),
+                                UI.Box(
+                                    UI.Label("box style frame")
+                                )
+                            )
                         ),
                         ExampleTemplate.UIFunctionColumn(nameof(UI.Page),
                             UI.Label("Adjust the width of the prefix labels."),
@@ -230,9 +235,10 @@ UI.Tabs(
 
         private Element CreateElement_FoldArgument()
         {
+            var boolValue = false;
             return ExampleTemplate.CodeElementSets("Fold argument",
                 (@"UI.Fold(
-    UI.Field(""CustomBar"", () => intValue), 
+    UI.Toggle(""CustomBar"", () => boolValue), 
     new[]
     {
         UI.Label(""Element"")
@@ -240,7 +246,8 @@ UI.Tabs(
 );
 ",
                     UI.Fold(
-                        UI.Field("CustomBar", () => intValue),
+                        // UI.Field("CustomBar", () => intValue),
+                        UI.Toggle("CustomBar", () => boolValue),
                         new[]
                         {
                             UI.Label("Element")

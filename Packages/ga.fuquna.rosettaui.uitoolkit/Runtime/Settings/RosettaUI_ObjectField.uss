@@ -1,0 +1,73 @@
+/********************************************************************************
+* ObjectField 
+*  DefaultCommonDark_inter.uss clone
+********************************************************************************/
+.unity-object-field
+{
+    align-items: flex-start;
+}
+.unity-object-field__input
+{
+    flex-direction: row;
+    background-color: var(--rosettaui-color-input-background);
+    border-color: var(--unity-colors-input_field-border);
+    border-width: 1px;
+}
+
+.unity-object-field:hover > .unity-object-field__input
+{
+    border-color: var(--unity-colors-input_field-border-hover);
+}
+
+.unity-object-field:focus > .unity-object-field__input
+{
+    border-color: var(--unity-colors-input_field-border-focus);
+}
+
+.unity-object-field__object
+{
+    flex-direction: row;
+    flex: 1 0 0;
+    -unity-slice-left: 4;
+    -unity-slice-top: 4;
+    -unity-slice-right: 4;
+    -unity-slice-bottom: 4;
+}
+
+.unity-object-field-display__icon
+{
+    margin: 2px 0;
+    padding: 0 0 0 2px;
+    max-width: 14px;
+    max-height: 12px;
+    align-self: center;
+}
+
+.unity-object-field-display__label
+{
+    flex: 1 0 0;
+    /*margin-left: 2px;*/
+    margin: 0 0 0 2px;
+    padding: 1px 2px 0 0;
+    overflow: hidden;
+    min-height: 18px;
+}
+
+.unity-object-field__selector
+{
+    width: 18px;
+    height: 16px;
+    align-self: center;
+    /*background-color: var(--unity-colors-object_field_button-background);*/
+    background-color: #202020;
+    background-image: resource("uipackageresources/images/d_pick_uielements.png");
+    -unity-slice-left: 1;
+    -unity-slice-top: 1;
+    -unity-slice-right: 1;
+    -unity-slice-bottom: 1;
+}
+
+.unity-object-field__selector:hover
+{
+    background-color: var(--unity-colors-object_field_button-background-hover);
+}

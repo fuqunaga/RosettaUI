@@ -124,7 +124,7 @@ UI.Field(() => intValue);
 public MyClass myClass;
 
 using var propertyOrFieldsScope = new UICustom.PropertyOrFieldsScope<MyClass>(
-    ""privateValue"", 
+    ""_privateValue"", 
     ""publicValueNonSerialized"",
     ""PropertyValue""
 );

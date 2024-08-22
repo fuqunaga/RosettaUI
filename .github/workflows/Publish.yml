@@ -16,7 +16,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        pkg_root: [./Packages/RosettaUI, ./Packages/RosettaUI.UIToolkit]
+        pkg_root: [./Packages/ga.fuquna.rosettaui, ./Packages/ga.fuquna.rosettaui.uitoolkit]
 
     steps:
     - name: Checkout

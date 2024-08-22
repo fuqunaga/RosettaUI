@@ -1,0 +1,74 @@
+/********************************************************************************
+* SwatchSet
+********************************************************************************/
+.rosettaui-swatchset
+{
+    margin-top: 12px;
+    margin-right: 4px;
+}
+
+.rosettaui-swatchset__menu
+{
+    margin: 0 0 0 auto;
+}
+
+.rosettaui-swatchset__tile-scroll-view .unity-scroll-view__content-container--horizontal
+{
+    flex-wrap: wrap;
+}
+
+/********************************************************************************
+* Swatch
+********************************************************************************/
+.rosettaui-swatch
+{
+    flex-direction: row;
+}
+
+.rosettaui-swatch--enable-text >.rosettaui-swatch__tile
+{
+    margin: 2px;
+}
+
+.rosettaui-swatch--current > .rosettaui-swatch__tile
+{
+    padding: 1px;
+    border-width: 1px;
+    border-radius: 3px;
+    border-color: var(--rosettaui-dark-gray);
+    background-color: var(--unity-colors-button-background);
+}
+
+.rosettaui-swatch__tile-current:hover
+{
+    background-color: var(--unity-colors-button-background-hover);
+}
+
+
+.rosettaui-swatch__text-container
+{
+    flex-grow: 1;
+}
+
+.rosettaui-swatch > .rosettaui-swatch__text-container
+{
+    display: none;
+}
+
+.rosettaui-swatch--enable-text > .rosettaui-swatch__text-container
+{
+    display: flex;
+}
+
+.rosettaui-swatch__text-container > .unity-label
+{
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.rosettaui-swatch__text-container__text-input
+{
+    flex-grow: 1;
+    margin-top: 0;
+    margin-bottom: 0;
+}

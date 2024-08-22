@@ -1,0 +1,92 @@
+/********************************************************************************
+* Gradient Editor
+********************************************************************************/
+.rosettaui-gradient-editor-fixed-size-area
+{
+    flex-shrink: 0;
+}
+
+.rosettaui-gradient-editor .unity-base-field__label
+{
+    min-width: 100px; /* デフォルトは150px だがGradientEditor内ではもっと詰めたい */
+}
+
+.rosettaui-gradient-editor > #mode-enum > .unity-label 
+{
+    width: 150px;
+}
+
+.rosettaui-gradient-editor__alpha-cursor-container,
+.rosettaui-gradient-editor__color-cursor-container
+{
+    height: 30px;
+}
+
+.rosettaui-gradient-editor__preview-background
+{
+    height: 42px;
+    margin-top: -8px;
+}
+
+.rosettaui-gradient-editor__preview-front
+{
+    width: 100%;
+    height: 100%;
+}
+
+
+.rosettaui-gradient-editor__cursor
+{
+    position: absolute;
+    width: 8px;
+    height: 14px;
+    margin: 0 0 0 -4px;
+    border-width: 0;
+    background-image: resource("gradient_cursor");
+}
+
+.rosettaui-gradient-editor__cursor:focus
+{
+    background-image: resource("gradient_cursor_focus");
+}
+
+.rosettaui-gradient-editor__cursor-alpha 
+{
+    top: 8px;
+}
+
+.rosettaui-gradient-editor__cursor-color
+{
+    bottom: 8px;
+    scale: -1;
+}
+
+/********************************************************************************
+* GradientEditorPreset
+********************************************************************************/
+.rosettaui-gradient-editor-preset__tile
+{
+    width: 118px;
+    height: 16px;
+    margin: 1px 2px;
+}
+
+.rosettaui-gradient-editor-preset__tile-core
+{
+    width: 100%;
+    height: 100%;
+    border-width: 1px;
+    border-color: black;
+}
+
+.rosettaui-gradient-editor-preset__tile-checkerboard
+{
+    width: 100%;
+    height: 100%;
+}
+
+.rosettaui-gradient-editor-preset__tile-gradient
+{
+    width: 100%;
+    height: 100%;
+}

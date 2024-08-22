@@ -27,6 +27,7 @@ namespace RosettaUI
         }
 #endif
         
+        
         [Conditional("UNITY_EDITOR")]
         public static void AddResetStaticResourceCallback(Action callback)
         {

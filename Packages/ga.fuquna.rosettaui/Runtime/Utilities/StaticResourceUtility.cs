@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -15,7 +14,7 @@ namespace RosettaUI
     {
 #if UNITY_EDITOR
         public static event Action onResetStaticResource;
-
+        
         static StaticResourceUtility()
         {
             EditorApplication.playModeStateChanged += state =>
@@ -31,7 +30,9 @@ namespace RosettaUI
         [Conditional("UNITY_EDITOR")]
         public static void AddResetStaticResourceCallback(Action callback)
         {
+#if UNITY_EDITOR
             onResetStaticResource += callback;
+#endif
         }
     }
 }

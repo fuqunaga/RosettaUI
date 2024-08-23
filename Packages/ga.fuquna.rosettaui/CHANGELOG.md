@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.7.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.7.0...ga.fuquna.rosettaui-v1.7.1) (2024-08-23)
+
+
+### Bug Fixes
+
+* build error ([21ccc69](https://github.com/fuqunaga/RosettaUI/commit/21ccc695ceed5a62d6204d9f919be37b383b33b0))
+
 # [ga.fuquna.rosettaui-v1.7.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.6.0...ga.fuquna.rosettaui-v1.7.0) (2024-08-22)
 
 

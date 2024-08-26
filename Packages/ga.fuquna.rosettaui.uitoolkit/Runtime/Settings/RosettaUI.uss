@@ -1,6 +1,7 @@
 :root {
     --fixed-field-width-m: 80px; /* マイナスfloat値が収まる幅 */
     --fixed-field-width-s: 48px;
+    --field-height: 20px;
     --slider-min-width: 180px;
     --input-border-width: 1px;
     --cursor-resize-horizontal: resource("cursor_ew") 24 9;
@@ -313,12 +314,6 @@
 /********************************************************************************
 * Window Launcher
 ********************************************************************************/
-.rosettaui-window-launcher 
-{
-    margin: 2px 0 2px 0;
-    padding-right: 3px;
-}
-
 .rosettaui-window-launcher:hover
 {
     background-color: var(--rosettaui-highlight-dark-gray);

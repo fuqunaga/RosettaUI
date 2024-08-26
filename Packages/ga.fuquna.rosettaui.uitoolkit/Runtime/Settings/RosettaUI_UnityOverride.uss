@@ -6,7 +6,7 @@
     padding: 2px;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-height: 20px; /* 日本語が収まる高さ 16px + padding 2px */
+    min-height: var(--field-height); /* 日本語が収まる高さ 18px + padding 2px */
 }
 
 /********************************************************************************
@@ -17,29 +17,14 @@
 }
 
 .unity-base-field {
-    margin-left: 0;
-    margin-top: 1px;
-    margin-bottom: 1px;
-}
-
-
-/* 
-入れ子の.unity-base-fieldは親の margin があるので margin 0
-CompositeFieldを想定
-*/
-.unity-base-field .unity-base-field {
-    margin-top: 0;
-    margin-bottom: 0;
+    margin: 0 4px 0 0
 }
 
 .unity-base-field__label,
 .unity-base-field > .unity-label /* TextInput部の後ろに単位を表示するラベルなど。現状GradientEditorのスライダーで使用　*/
 {
-    margin-top: 0;
-    margin-bottom: 0;
-    padding-top: 1px;
-    padding-bottom: 0;
-    min-height: 20px; /* paddingを考慮して .unity-label と同じ高さ */
+    padding: 1px 2px 0 2px;
+    min-height: var(--field-height); /* paddingを考慮して .unity-label と同じ高さ */
 }
 
 .unity-base-field__input{
@@ -47,8 +32,9 @@ CompositeFieldを想定
     padding: 0;
     border-width: var(--input-border-width);
     border-radius: 3px;
-    margin-left: 2px;
+    margin: 1px 0 1px 2px;
     min-width: var(--fixed-field-width-s);
+    min-height: var(--field-height); /* ラベルのないフィールドでも潰れないように高さ指定 */
 }
 
 .unity-base-field--no-label > .unity-base-field__input {
@@ -165,8 +151,7 @@ Unity2022.2.0b6
 
 .unity-foldout__toggle
 {
-    height: 20px;
-    margin: 1px 0;
+    margin: 0;
 }
 
 .unity-foldout__toggle:hover
@@ -298,10 +283,10 @@ Unity2022.2.0b6
 {
     border-radius: 3px;
     border-width: 1px;
-    padding: 2px 3px;
-    margin: 2px;
+    padding: 0 3px;
+    margin: 1px 2px 1px 2px;
     min-width: 20px;
-    
+    min-height: 20px;
     border-color: var(--unity-colors-button-border);
 }
 

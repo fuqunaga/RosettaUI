@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.7.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.7.1...ga.fuquna.rosettaui-v1.7.2) (2024-08-27)
+
+
+### Bug Fixes
+
+* can not paste enum ([0a0e607](https://github.com/fuqunaga/RosettaUI/commit/0a0e607d1e53226067adb83d616cdeb70f355a7c))
+
 # [ga.fuquna.rosettaui-v1.7.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.7.0...ga.fuquna.rosettaui-v1.7.1) (2024-08-23)
 
 

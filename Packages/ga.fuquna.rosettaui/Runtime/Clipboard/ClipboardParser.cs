@@ -156,7 +156,7 @@ namespace RosettaUI
             foreach (var name in names)
             {
                 var displayName = RuntimeObjectNames.NicifyVariableName(name);
-                if (displayName != text) continue;
+                if (displayName != val) continue;
                 
                 value = Enum.Parse(type, name);
                 return true;

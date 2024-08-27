@@ -126,14 +126,16 @@ namespace RosettaUI.Test
 
         private static string[] EnumSource => new[]
         {
-            "", "_",
+            "", "_","Enum:",
             "one", "One",
-            "_two", "Two",
-            "three_", "Three",
-            "fourthItem", "FourthItem",
-            "FifthItem", "fifthItem",
-            "Sixth_Item", "SixthItem",
-            "SEVEN", "Seven",
+            "Enum:one", "Enum:One",
+            "Enum one", "Enum;one",
+            "Enum:_two", "Enum:Two",
+            "Enum:three_", "Enum:Three",
+            "Enum:fourthItem", "Enum:FourthItem",
+            "Enum:FifthItem", "Enum:fifthItem",
+            "Enum:Sixth_Item", "Enum:SixthItem",
+            "Enum:SEVEN", "Enum:Seven",
             null,
             "expect parse fail"
         };

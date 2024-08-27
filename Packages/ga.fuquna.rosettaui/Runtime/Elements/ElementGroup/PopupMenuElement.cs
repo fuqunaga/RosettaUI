@@ -23,8 +23,9 @@ namespace RosettaUI
             this.name = name;
             this.action = action;
         }
-
-
+        
+        // 名前で比較する
+        // Separator同士は一致させない
         private class NameComparerImpl : IEqualityComparer<MenuItem>
         {
             public bool Equals(MenuItem x, MenuItem y)
@@ -36,7 +37,7 @@ namespace RosettaUI
 
             public int GetHashCode(MenuItem obj)
             {
-                return obj.name.GetHashCode();
+                return obj.name?.GetHashCode() ?? 0;
             }
         }
     }

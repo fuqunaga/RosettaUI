@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.7.3](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.7.2...ga.fuquna.rosettaui-v1.7.3) (2024-08-27)
+
+
+### Bug Fixes
+
+* Error when right-clicking on a nested list ([090bae6](https://github.com/fuqunaga/RosettaUI/commit/090bae6c9d86a16042ecf41653ce1dfe3e67b241))
+
 # [ga.fuquna.rosettaui-v1.7.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.7.1...ga.fuquna.rosettaui-v1.7.2) (2024-08-27)
 
 

@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.6.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.6.0...ga.fuquna.rosettaui.uitoolkit-v1.6.1) (2024-08-27)
+
+
+### Bug Fixes
+
+* style changed ([a5f89c6](https://github.com/fuqunaga/RosettaUI/commit/a5f89c61b7364fd148df8c20baf12821561c238a))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.6.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.5.1...ga.fuquna.rosettaui.uitoolkit-v1.6.0) (2024-08-22)
 
 

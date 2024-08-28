@@ -60,6 +60,11 @@ namespace RosettaUI
         }
 
 
+        public static bool HasParameterlessConstructor(Type type)
+        {
+            return GetReflectionCache(type).HasParameterlessConstructor;
+        }
+        
         public static Type GetPropertyOrFieldType(Type type, string propertyOrFieldName)
         {
             return GetMemberData(type, propertyOrFieldName).type;
@@ -203,8 +208,15 @@ namespace RosettaUI
             public readonly Dictionary<string, MemberData> memberDataTable;
             public readonly Dictionary<string, Type> uiTargetPropertyOrFieldsNameTypeDic;
 
+            private readonly Type _type;
+            private bool? _hasParameterlessConstructor;
+
+            public bool HasParameterlessConstructor => _hasParameterlessConstructor ??= _type.IsValueType || _type.GetConstructor(Type.EmptyTypes) != null;
+            
             public ReflectionCache(Type type, IReadOnlyCollection<FieldInfo> fis, IEnumerable<PropertyInfo> pis)
             {
+                _type = type;
+                
                 memberDataTable = fis.Select(fi => (fi as MemberInfo, fi.FieldType))
                     .Concat(pis.Select(pi => (pi as MemberInfo, pi.PropertyType)))
                     .ToDictionary(

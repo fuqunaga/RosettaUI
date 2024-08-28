@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -291,8 +292,11 @@ namespace RosettaUI
 
             // 一つも一致する値がないと場合は失敗
             var hasValue = false;
+
+            var obj = TypeUtility.HasParameterlessConstructor(type)
+                ? Activator.CreateInstance(type)
+                : RuntimeHelpers.GetUninitializedObject(type);
             
-            var obj = Activator.CreateInstance(type);
             foreach (var child in children)
             {
                 if (!child.TryGetValue(EditorFormatKey.Name, out var nameObject))

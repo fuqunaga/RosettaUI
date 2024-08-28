@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.7.4](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.7.3...ga.fuquna.rosettaui-v1.7.4) (2024-08-28)
+
+
+### Bug Fixes
+
+* Error in copy and paste menu when right clicking on a type without parameterless constructor ([dec40c4](https://github.com/fuqunaga/RosettaUI/commit/dec40c472f59c89697220b67ecca4b0fa1c3411f))
+
 # [ga.fuquna.rosettaui-v1.7.3](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.7.2...ga.fuquna.rosettaui-v1.7.3) (2024-08-27)
 
 

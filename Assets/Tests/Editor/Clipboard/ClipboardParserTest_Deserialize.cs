@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -171,10 +172,26 @@ namespace RosettaUI.Test
         private static string[] GradientSource => new[]
             { EditorClipBoardParser.WriteGradient(new Gradient() { mode = GradientMode.Fixed }) };
 
-        private static string[] GenericSource => new[]
+        private static string[] GenericSource ()
         {
-            EditorClipBoardParser.WriteGeneric(new ClassForTest())
-        };
+            var expectSuccessString = EditorClipBoardParser.WriteGeneric(new ClassForTest()
+            {
+                layerMask = 1
+            });
+            
+            
+            // 同名型違いのデータがある場合はEditorと挙動が異なる
+            // RosettaUIでは型違いのデータはパースできないものとする
+            // var expectFailString = Regex.Replace(expectSuccessString, "\"type\":\\d,\"val\":0", "\"type\":3,\"val\":\"\"");
+            
+            return new[]
+            {
+                expectSuccessString,
+                // expectFailString,
+                null,
+                "expect parse fail"
+            };
+        }
         
 
         public void TestMatch<T>(string text, Func<string, (bool, T)> expectedFunc)

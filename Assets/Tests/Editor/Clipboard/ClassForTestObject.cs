@@ -7,10 +7,17 @@ namespace RosettaUI.Test
     [Serializable]
     public class ClassForTest
     {
+        public bool boolValue;
+        public byte byteValue;
+        public sbyte sbyteValue;
         public int intValue;
         public uint uintValue;
-        public bool boolValue;
+        public long longValue;
+        public ulong ulongValue;
+        public short shortValue;
+        public ushort ushortValue;
         public float floatValue;
+        public double doubleValue;
         public string stringValue;
         public Color colorValue;
         public LayerMask layerMask;

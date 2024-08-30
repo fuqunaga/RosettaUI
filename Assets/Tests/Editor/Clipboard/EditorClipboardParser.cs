@@ -19,7 +19,9 @@ namespace RosettaUI.Test
         private static readonly Type EditorClipboardType = Type.GetType("UnityEditor.Clipboard, UnityEditor.CoreModule");
         private static readonly MethodInfo ClipboardSetSerializedPropertyMethodInfo = EditorClipboardType.GetMethod("SetSerializedProperty");
         private static readonly MethodInfo ClipboardGetSerializedPropertyMethodInfo = EditorClipboardType.GetMethod("GetSerializedProperty");
+        private static readonly MethodInfo ClipboardHasSerializedPropertyMethodInfo = EditorClipboardType.GetMethod("HasSerializedProperty");
         private static readonly PropertyInfo ClipboardStringValueFieldInfo = EditorClipboardType.GetProperty("stringValue");
+        
         
         private static readonly Type EditorClipboardParserType = Type.GetType("UnityEditor.ClipboardParser, UnityEditor.CoreModule");
         private static readonly MethodInfo WriteCustomMethodInfo = EditorClipboardParserType.GetMethod("WriteCustom");
@@ -157,6 +159,10 @@ namespace RosettaUI.Test
             var prop = so.FindProperty(nameof(classForTestObject.classValue));
 
             ClipboardStringValueFieldInfo.SetValue(null, text);
+            if (!(bool)ClipboardHasSerializedPropertyMethodInfo.Invoke(null, null))
+            {
+                return (false, default);
+            }
             ClipboardGetSerializedPropertyMethodInfo.Invoke(null, new object[] {prop});
             so.ApplyModifiedProperties();
             

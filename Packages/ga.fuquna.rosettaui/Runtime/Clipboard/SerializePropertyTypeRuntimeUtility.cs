@@ -10,9 +10,12 @@ namespace RosettaUI
         {
             return type.Name switch
             {
-                nameof(Int32) or nameof(UInt32) => SerializedPropertyTypeRuntime.Integer,
+                nameof(Int16) or nameof(UInt16) or
+                    nameof(Int32) or nameof(UInt32) or
+                    nameof(Byte) or nameof(SByte) or
+                    nameof(Int64) or nameof(UInt64) => SerializedPropertyTypeRuntime.Integer,
                 nameof(Boolean) => SerializedPropertyTypeRuntime.Boolean,
-                nameof(Single) => SerializedPropertyTypeRuntime.Float,
+                nameof(Single) or nameof(Double) => SerializedPropertyTypeRuntime.Float,
                 nameof(String) => SerializedPropertyTypeRuntime.String,
                 nameof(Color) => SerializedPropertyTypeRuntime.Color,
                 // ObjectReferenceは下部で判定

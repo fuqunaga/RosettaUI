@@ -13,42 +13,49 @@ MonoBehaviour:
   m_Name: ClassForTest
   m_EditorClassIdentifier: 
   classValue:
+    boolValue: 0
+    byteValue: 1
+    sbyteValue: -2
     intValue: -1
-    uintValue: 1
-    boolValue: 1
-    floatValue: -0.5
-    stringValue: text
-    colorValue: {r: 0.7106918, g: 0.37769464, b: 0.37769464, a: 0.46666667}
+    uintValue: 2
+    longValue: -3
+    ulongValue: 4
+    shortValue: -5
+    ushortValue: 6
+    floatValue: 7
+    doubleValue: 8
+    stringValue: some string
+    colorValue: {r: 1, g: 0, b: 0, a: 0.5568628}
     layerMask:
       serializedVersion: 2
-      m_Bits: 1
-    enumValue: 1
-    vector2Value: {x: 1.1, y: -2.2}
-    vector3Value: {x: 1.1, y: -2.2, z: 3.3}
-    vector4Value: {x: 1.1, y: -2.2, z: 3.3, w: -4.4}
+      m_Bits: 33
+    enumValue: 0
+    vector2Value: {x: 0, y: 0}
+    vector3Value: {x: 0, y: 0, z: 0}
+    vector4Value: {x: 0, y: 0, z: 0, w: 0}
     rectValue:
       serializedVersion: 2
-      x: 1.1
-      y: -2.2
-      width: 3.3
-      height: -4.4
-    charValue: 97
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    charValue: 57
     boundsValue:
-      m_Center: {x: 1.1, y: -2.2, z: 3.3}
-      m_Extent: {x: -4.4, y: 5.5, z: -6.6}
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
     gradient:
       serializedVersion: 2
-      key0: {r: 1, g: 0, b: 0, a: 1}
-      key1: {r: 0.22817227, g: 1, b: 0.14615381, a: 1}
-      key2: {r: 0, g: 0.14748335, b: 1, a: 0}
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
       key5: {r: 0, g: 0, b: 0, a: 0}
       key6: {r: 0, g: 0, b: 0, a: 0}
       key7: {r: 0, g: 0, b: 0, a: 0}
       ctime0: 0
-      ctime1: 33539
-      ctime2: 65535
+      ctime1: 65535
+      ctime2: 0
       ctime3: 0
       ctime4: 0
       ctime5: 0
@@ -64,36 +71,36 @@ MonoBehaviour:
       atime7: 0
       m_Mode: 0
       m_ColorSpace: -1
-      m_NumColorKeys: 3
+      m_NumColorKeys: 2
       m_NumAlphaKeys: 2
-    quaternion: {x: 1.1, y: -2.2, z: 3.3, w: -4.4}
-    vector2IntValue: {x: -1, y: 2}
-    vector3IntValue: {x: -1, y: 2, z: -3}
+    quaternion: {x: 0, y: 0, z: 0, w: 0}
+    vector2IntValue: {x: 0, y: 0}
+    vector3IntValue: {x: 0, y: 0, z: 0}
     rectIntValue:
-      x: -1
-      y: 2
-      width: -3
-      height: 4
+      x: 0
+      y: 0
+      width: 0
+      height: 0
     boundsIntValue:
-      m_Position: {x: 1, y: -1, z: -1}
-      m_Size: {x: 4, y: -5, z: 6}
+      m_Position: {x: -1, y: -1, z: -1}
+      m_Size: {x: -2, y: -2, z: -2}
     rectOffset:
-      m_Left: 1
-      m_Right: -2
-      m_Top: 3
-      m_Bottom: -4
+      m_Left: 0
+      m_Right: 0
+      m_Top: 0
+      m_Bottom: 0
     intArray: 010000000200000003000000
     floatList:
     - 1
     - 2
     - 3
     classArray:
-    - m_Left: 1
-      m_Right: -2
-      m_Top: 3
-      m_Bottom: -4
+    - m_Left: 0
+      m_Right: 0
+      m_Top: 0
+      m_Bottom: 0
     classList:
-    - m_Left: 1
-      m_Right: -2
-      m_Top: 3
-      m_Bottom: -4
+    - m_Left: 0
+      m_Right: 0
+      m_Top: 0
+      m_Bottom: 0

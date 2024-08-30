@@ -11,6 +11,9 @@ namespace RosettaUI
     /// <summary>
     /// Unity inspector compatible parser
     ///
+    /// 同名だが型違いのデータがある場合、UnityEditorと挙動が異なる
+    /// RosettaUIではパースできないものとする
+    ///
     /// ref: https://github.com/Unity-Technologies/UnityCsReference/blob/6000.0/Editor/Mono/Clipboard/ClipboardParser.cs
     /// </summary>
     public static partial class ClipboardParser
@@ -349,6 +352,9 @@ namespace RosettaUI
         public static bool DeserializeGeneric<T>(string text, out T value)
         {
             value = default;
+            if ( text == null) 
+                return false;
+            
             if (!text.StartsWith(PrefixGeneric))
                 return false;
             

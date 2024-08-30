@@ -182,10 +182,17 @@ namespace RosettaUI
             {
                 return type.Name switch
                 {
+                    nameof(Byte) => ToSuccessTuple(Convert.ToByte(val)),
+                    nameof(SByte) => ToSuccessTuple(Convert.ToSByte(val)),
+                    nameof(Int16) => ToSuccessTuple(Convert.ToInt16(val)),
+                    nameof(UInt16) => ToSuccessTuple(Convert.ToUInt16(val)),
                     nameof(Int32) => ToSuccessTuple(Convert.ToInt32(val)),
                     nameof(UInt32) => ToSuccessTuple(Convert.ToUInt32(val)),
+                    nameof(Int64) => ToSuccessTuple(Convert.ToInt64(val)),
+                    nameof(UInt64) => ToSuccessTuple(Convert.ToUInt64(val)),
                     nameof(Boolean) => ToSuccessTuple(Convert.ToBoolean(val)),
                     nameof(Single) => ToSuccessTuple(Convert.ToSingle(val)),
+                    nameof(Double) => ToSuccessTuple(Convert.ToDouble(val)),
                     nameof(String) => ToSuccessTuple(Convert.ToString(val)),
                     nameof(Char) => ToSuccessTuple(Convert.ToChar(val)),
                     nameof(LayerMask) => ToSuccessTuple(new LayerMask { value = Convert.ToInt32(val) }),
@@ -210,8 +217,9 @@ namespace RosettaUI
                     _ => throw new InvalidCastException()
                 };
             }
-            catch (InvalidCastException)
+            catch (Exception)
             {
+                // ignored
             }
 
             return (false, default);
@@ -252,9 +260,9 @@ namespace RosettaUI
             using var _ = ListPool<object>.Get(out var childrenList);
             childrenList.AddRange(children
                 .Where(dic => dic.TryGetValue(EditorFormatKey.Name, out var nameObj) && (nameObj is EditorFormatKey.ValueNameData))
-                .Select(dic => (DictionaryToObject(elementType, dic, out var v), v))
-                .Where(t => t.Item1)
-                .Select(t => t.Item2)
+                .Select(dic => (success: DictionaryToObject(elementType, dic, out var v), value: v))
+                .Where(t => t.success)
+                .Select(t => t.value)
             );
             
             if (childrenList.Count == 0)
@@ -290,9 +298,6 @@ namespace RosettaUI
             if (!childrenNames.Any())
                 return false;
 
-            // 一つも一致する値がないと場合は失敗
-            var hasValue = false;
-
             var obj = TypeUtility.HasParameterlessConstructor(type)
                 ? Activator.CreateInstance(type)
                 : RuntimeHelpers.GetUninitializedObject(type);
@@ -319,27 +324,22 @@ namespace RosettaUI
                 {
                     case FieldInfo fi:
                         if (!DictionaryToObject(fi.FieldType, child, out var fv))
-                            continue;
+                            return false;
                         fi.SetValue(obj, fv);
-                        hasValue = true;
                         break;
 
                     case PropertyInfo pi:
                         if (!DictionaryToObject(pi.PropertyType, child, out var pv))
-                            continue;
+                            return false;
                         var hasSetter = pi.SetMethod != null;
                         if (!hasSetter)
-                            continue;
-                        
+                            return false;
                         
                         pi.SetValue(obj, pv);
-                        hasValue = true;
                         break;
                 }
             }
 
-            if (!hasValue) return false;
-            
             value = obj;
 
             return true;

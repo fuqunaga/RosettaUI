@@ -19,11 +19,11 @@ namespace RosettaUI.UIToolkit
             }
         }
 
-        public PopupMenuManipulator(Func<IEnumerable<MenuItem>> createMenuItemsFunc) : base((Action)null)
+        public PopupMenuManipulator(Func<IEnumerable<MenuItem>> createMenuItemsFunc, MouseButton mouseButton = MouseButton.RightMouse) : base((Action)null)
         {
             clickedWithEventInfo += OnClick;
             _createMenuItemsFunc = createMenuItemsFunc;
-            Button = MouseButton.RightMouse;
+            Button = mouseButton;
         }
 
         private void OnClick(EventBase evt)

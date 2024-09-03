@@ -9,6 +9,8 @@ namespace RosettaUI.UIToolkit.Builder
             if (element is not PopupMenuElement popupMenuElement || visualElement is not PopupMenu popupMenu) return false;
 
             popupMenu.CreateMenuItems = popupMenuElement.CreateMenuItems;
+            popupMenu.MouseButton = popupMenuElement.MouseButton;
+            
             popupMenuElement.GetViewBridge().onUnsubscribe += () => popupMenu.CreateMenuItems = null;
             
             return Bind_ElementGroupContents(popupMenuElement, popupMenu);

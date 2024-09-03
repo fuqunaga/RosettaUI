@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace RosettaUI
 {
@@ -45,9 +46,9 @@ namespace RosettaUI
         
         #region PopupMenu
 
-        public static PopupMenuElement Popup(Element childElement, Func<IEnumerable<MenuItem>> createMenuItems)
+        public static PopupMenuElement Popup(Element childElement, Func<IEnumerable<MenuItem>> createMenuItems, MouseButton mouseButton = MouseButton.RightMouse)
         {
-            return new PopupMenuElement(childElement, createMenuItems);
+            return new PopupMenuElement(childElement, createMenuItems, mouseButton);
         }
         
         

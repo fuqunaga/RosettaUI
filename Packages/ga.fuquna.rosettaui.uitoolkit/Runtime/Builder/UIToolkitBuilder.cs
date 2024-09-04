@@ -12,6 +12,11 @@ namespace RosettaUI.UIToolkit.Builder
 
         public static readonly UIToolkitBuilder Instance = new();
 
+        static UIToolkitBuilder()
+        {
+            RosettaUI.PopupMenu.Implement ??= new PopupMenuUIToolkit();
+        }
+        
         public static VisualElement Build(Element element)
         {
             return Instance.BuildInternal(element);

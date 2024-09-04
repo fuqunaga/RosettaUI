@@ -46,6 +46,15 @@ namespace RosettaUI.Example
                 ExampleTemplate.UIFunctionRow(nameof(UI.Button),
                     UI.Button(nameof(UI.Button), () => print("On button clicked"))
                 ),
+                ExampleTemplate.UIFunctionRow(nameof(UI.PopupMenuButton),
+                    UI.PopupMenuButton(nameof(UI.PopupMenuButton), () => new[]
+                        {
+                            new MenuItem("Menu0", () => Debug.Log("Menu0")),
+                            new MenuItem("Menu1", () => Debug.Log("Menu1")),
+                            new MenuItem("Menu2", () => Debug.Log("Menu2"))
+                        }
+                    )
+                ),
                 ExampleTemplate.UIFunctionRow(nameof(UI.HelpBox),
                     UI.Column(
                         UI.HelpBox($"{nameof(UI.HelpBox)} {nameof(HelpBoxType.None)}", HelpBoxType.None),

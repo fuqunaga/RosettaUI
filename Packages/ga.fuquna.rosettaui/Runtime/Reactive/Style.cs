@@ -8,14 +8,16 @@ namespace RosettaUI
     {
         #region Parameters
 
-        float? _width;
-        float? _height;
-        float? _minWidth;
-        float? _minHeight;
-        float? _maxWidth;
-        float? _maxHeight;
-        Color? _color;
-        Color? _backgroundColor;
+        private float? _width;
+        private float? _height;
+        private float? _minWidth;
+        private float? _minHeight;
+        private float? _maxWidth;
+        private float? _maxHeight;
+        private Color? _color;
+        private Color? _backgroundColor;
+        private float? _flexGrow;
+        private float? _flexShrink;
 
         public float? Width
         {
@@ -63,10 +65,22 @@ namespace RosettaUI
             get => _backgroundColor;
             set => SetValue(ref _backgroundColor, value);
         }
+
+        public float? FlexGrow
+        {
+            get => _flexGrow;
+            set => SetValue(ref _flexGrow, value);
+        }
+        
+        public float? FlexShrink
+        {
+            get => _flexShrink;
+            set => SetValue(ref _flexShrink, value);
+        }
         
         #endregion
-        
-        void SetValue<T>(ref T current, T newValue)
+
+        private void SetValue<T>(ref T current, T newValue)
         {
             if (!EqualityComparer<T>.Default.Equals(current, newValue))
             {

@@ -76,6 +76,20 @@ namespace RosettaUI
             return element;
         }
         
+        public static T SetFlexGrow<T>(this T element, float? flexGrow)
+            where T : Element
+        {
+            element.Style.FlexGrow = flexGrow;
+            return element;
+        }
+        
+        public static T SetFlexShrink<T>(this T element, float? flexShrink)
+            where T : Element
+        {
+            element.Style.FlexShrink = flexShrink;
+            return element;
+        }
+        
         public static T RegisterValueChangeCallback<T>(this T element, Action onValueChanged)
             where T : Element
         {

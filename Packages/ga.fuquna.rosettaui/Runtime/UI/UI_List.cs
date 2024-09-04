@@ -205,7 +205,7 @@ namespace RosettaUI
                     listBinder,
                     createItemElement ?? ListItemDefault,
                     optionCaptured)
-            );
+            ).SetFlexShrink(1f);
         }
         
         public static Element ListItemDefault(IBinder binder, int index) => Field($"Item {index}", binder);

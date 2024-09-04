@@ -181,12 +181,17 @@ namespace RosettaUI.UIToolkit.Builder
             }
             else
             {
-                veStyle.flexGrow = StyleKeyword.Null;
-                veStyle.flexShrink = StyleKeyword.Null;
+                veStyle.flexGrow = ToStyleFloat(style.FlexGrow);
+                veStyle.flexShrink = ToStyleFloat(style.FlexShrink);
             }
+            
+            return;
             
             static StyleLength ToStyleLength(float? nullable)
                 => nullable ?? (StyleLength)StyleKeyword.Null;
+
+            static StyleFloat ToStyleFloat(float? nullable)
+                => nullable ?? (StyleFloat)StyleKeyword.Null;
             
             static StyleColor ToStyleColor(Color? nullable)
                 => nullable ?? (StyleColor)StyleKeyword.Null;

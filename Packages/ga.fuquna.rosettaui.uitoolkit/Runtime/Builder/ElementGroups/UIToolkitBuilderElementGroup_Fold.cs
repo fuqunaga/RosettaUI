@@ -1,4 +1,5 @@
-﻿using RosettaUI.Reactive;
+﻿using NUnit.Framework;
+using RosettaUI.Reactive;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
@@ -33,6 +34,10 @@ namespace RosettaUI.UIToolkit.Builder
             // スクロール中はWindowサイズを替えたくない→ChangeVisibleEventは飛ばさない→Notifyしない
             fold.SetValueWithoutNotify(foldElement.IsOpen);
             
+            // 処理負荷軽減のため初回OpenまではBind（≒Build）しない
+            var firstOpen = true;
+            BindContentsIfNeedWhenFirstOpen();
+            
             // 通常時の値の相互通知
             var openDisposable = foldElement.IsOpenRx.Subscribe(isOpen => fold.value = isOpen);
             fold.RegisterValueChangedCallback(OnFoldValueChanged);
@@ -43,14 +48,25 @@ namespace RosettaUI.UIToolkit.Builder
                 fold.UnregisterValueChangedCallback(OnFoldValueChanged);
             };
 
-            return Bind_ElementGroupContents(foldElement, fold);
-            
+            return true;
+
+
             void OnFoldValueChanged(ChangeEvent<bool> evt)
             {
-                if (evt.target == fold)
-                {
-                    foldElement.IsOpen = evt.newValue;
-                }
+                if (evt.target != fold) return;
+
+                foldElement.IsOpen = evt.newValue;
+                BindContentsIfNeedWhenFirstOpen();
+            }
+            
+            void BindContentsIfNeedWhenFirstOpen()
+            {
+                // ReSharper disable once AccessToModifiedClosure
+                if (!firstOpen || !foldElement.IsOpen) return;
+
+                firstOpen = false;
+                var success = Bind_ElementGroupContents(foldElement, fold);
+                Assert.IsTrue(success);
             }
         }
     }

@@ -97,7 +97,10 @@ namespace RosettaUI.UIToolkit.Builder
                 // リストの要素は見栄えを気にしてとりあえず強制インデント
                 // marginでのインデントだとreorderable==falseのとき
                 // 選択時の青色がmarginのスペースには反映されないのでpadding
-                ApplyIndent(itemVe, padding: true);
+                if (!option.suppressAutoIndent)
+                {
+                    ApplyIndent(itemVe, padding: true);
+                }
 
                 return itemVe;
             }

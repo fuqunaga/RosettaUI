@@ -118,7 +118,7 @@ namespace RosettaUI
             }
 
             element = _createItemElement(itemBinder, index);
-            if (!isReadOnly)
+            if (!isReadOnly && !option.fixedSize)
             {
                 element = AddPopupMenu(element, index);
             }

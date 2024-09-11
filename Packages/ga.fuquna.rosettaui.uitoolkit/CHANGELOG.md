@@ -1,3 +1,18 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.7.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.6.1...ga.fuquna.rosettaui.uitoolkit-v1.7.0) (2024-09-11)
+
+
+### Features
+
+* Add ListViewOption.suppressAutoIndent ([0df33d2](https://github.com/fuqunaga/RosettaUI/commit/0df33d2b544c59f52b06cdd8f752da8629e0c04a))
+* add UI.PopupMenuButton() ([7ee2ded](https://github.com/fuqunaga/RosettaUI/commit/7ee2ded79cb0d1c8502557a4532e9d5c19cd449e))
+* **experimental:** Element.SetFlexGrow()/SetFlexShrink() ([7896dff](https://github.com/fuqunaga/RosettaUI/commit/7896dff9ccdcbcd4316bea8bbf68275f6204b473))
+* MouseButton can now be specified in UI.Popup(). ([d9121d1](https://github.com/fuqunaga/RosettaUI/commit/d9121d1cdde334c69e46296f4f40563dcabb8ed6))
+
+
+### Performance Improvements
+
+* Fold content is not generated until the first time it is displayed. [#14](https://github.com/fuqunaga/RosettaUI/issues/14) ([3c38327](https://github.com/fuqunaga/RosettaUI/commit/3c38327ffb8a42a500c14fa391a510894369beb5))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.6.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.6.0...ga.fuquna.rosettaui.uitoolkit-v1.6.1) (2024-08-27)
 
 

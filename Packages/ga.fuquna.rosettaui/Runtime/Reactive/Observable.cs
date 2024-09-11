@@ -5,7 +5,7 @@ namespace RosettaUI.Reactive
 {
     public abstract class Observable<T> : IObservable<T>
     {
-        List<IObserver<T>> _observers;
+        private List<IObserver<T>> _observers;
 
         public abstract T GetNotifyValue();
         

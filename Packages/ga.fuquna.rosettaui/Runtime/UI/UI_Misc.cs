@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace RosettaUI
 {
@@ -26,30 +27,12 @@ namespace RosettaUI
         
         #endregion
         
-        #region Button
-
-        public static ButtonElement Button(LabelElement label, Action onClick = null)
-        {
-            return new ButtonElement(label?.getter, onClick);
-        }
-
-        public static ButtonElement Button(LabelElement label, Action<ButtonElement> onClick)
-        {
-            var button = Button(label);
-            button.onClick += () => onClick(button);
-
-            return button;
-        }
-
-        #endregion
-        
         #region PopupMenu
 
-        public static PopupMenuElement Popup(Element childElement, Func<IEnumerable<MenuItem>> createMenuItems)
+        public static PopupMenuElement Popup(Element childElement, Func<IEnumerable<MenuItem>> createMenuItems, MouseButton mouseButton = MouseButton.RightMouse)
         {
-            return new PopupMenuElement(childElement, createMenuItems);
+            return new PopupMenuElement(childElement, createMenuItems, mouseButton);
         }
-        
         
         #endregion
 

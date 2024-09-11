@@ -38,6 +38,6 @@ namespace RosettaUI
         public static FoldElement Fold(Element barLeft, Element barRight, IEnumerable<Element> elements) =>
             Fold(Row(barLeft, Space(), barRight), elements);
 
-        public static FoldElement Fold(Element bar, IEnumerable<Element> elements) => new(bar, new[] {Indent(elements, 2)});
+        public static FoldElement Fold(Element bar, IEnumerable<Element> elements) => new(bar, new[] {Indent(elements, 2).SetFlexShrink(1f)});
     }
 }

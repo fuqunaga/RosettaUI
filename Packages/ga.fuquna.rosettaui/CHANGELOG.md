@@ -1,3 +1,19 @@
+# [ga.fuquna.rosettaui-v1.8.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.7.4...ga.fuquna.rosettaui-v1.8.0) (2024-09-11)
+
+
+### Bug Fixes
+
+* ClipBoardParse_Generic error when same name but different type ([fdbd36e](https://github.com/fuqunaga/RosettaUI/commit/fdbd36eee3d88a823be9cbd2b1e8429867c4f527))
+* The AddRemove menu is not displayed when the List is fixedSize. ([ca01c8a](https://github.com/fuqunaga/RosettaUI/commit/ca01c8a6fce35ad1f9077e606bde50f5a053480e))
+
+
+### Features
+
+* Add ListViewOption.suppressAutoIndent ([0df33d2](https://github.com/fuqunaga/RosettaUI/commit/0df33d2b544c59f52b06cdd8f752da8629e0c04a))
+* add UI.PopupMenuButton() ([7ee2ded](https://github.com/fuqunaga/RosettaUI/commit/7ee2ded79cb0d1c8502557a4532e9d5c19cd449e))
+* **experimental:** Element.SetFlexGrow()/SetFlexShrink() ([7896dff](https://github.com/fuqunaga/RosettaUI/commit/7896dff9ccdcbcd4316bea8bbf68275f6204b473))
+* MouseButton can now be specified in UI.Popup(). ([d9121d1](https://github.com/fuqunaga/RosettaUI/commit/d9121d1cdde334c69e46296f4f40563dcabb8ed6))
+
 # [ga.fuquna.rosettaui-v1.7.4](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.7.3...ga.fuquna.rosettaui-v1.7.4) (2024-08-28)
 
 

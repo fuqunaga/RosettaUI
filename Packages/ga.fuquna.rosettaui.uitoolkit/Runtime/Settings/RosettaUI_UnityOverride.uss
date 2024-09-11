@@ -239,6 +239,11 @@ Unity2022.2.0b6
     -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
 }
 
+.unity-base-popup-field__text
+{
+    margin-right: 20px;
+}
+
 /********************************************************************************
 * dropdown
 ********************************************************************************/

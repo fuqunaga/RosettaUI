@@ -258,6 +258,8 @@ Unity2022.2.0b6
     margin: 2px;
     width: 16px;
     height: 16px;
+    min-width: 16px;
+    min-height: 16px;
     align-self: center;
     -unity-background-image-tint-color: initial;
 }

@@ -1,3 +1,11 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.7.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.7.0...ga.fuquna.rosettaui.uitoolkit-v1.7.1) (2024-10-10)
+
+
+### Bug Fixes
+
+* Incorrect size of check mark in dropdown in Unity2022 ([b46b738](https://github.com/fuqunaga/RosettaUI/commit/b46b7388c927e7eb47b8c2682cbabf2376552f90))
+* Unnatural scrollbar in dropdown menu at Unity6. ([4871a3b](https://github.com/fuqunaga/RosettaUI/commit/4871a3ba85c023155600436f20e63a2c2062af25))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.7.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.6.1...ga.fuquna.rosettaui.uitoolkit-v1.7.0) (2024-09-11)
 
 

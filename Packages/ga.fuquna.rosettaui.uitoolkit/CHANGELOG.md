@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.7.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.7.1...ga.fuquna.rosettaui.uitoolkit-v1.7.2) (2024-10-11)
+
+
+### Bug Fixes
+
+* Build error when updating from 1.7.0 or earlier to 1.7.1 ([c66955f](https://github.com/fuqunaga/RosettaUI/commit/c66955f9777c21dfef2e96660da200739c9564b4))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.7.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.7.0...ga.fuquna.rosettaui.uitoolkit-v1.7.1) (2024-10-10)
 
 

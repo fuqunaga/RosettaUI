@@ -9,6 +9,9 @@ namespace RosettaUI.UIToolkit
         private static MethodInfo _focusControllerGetLeafFocusedElementMethodInfo;
 #if UNITY_2023_1_OR_NEWER
         private static PropertyInfo _baseBoolFieldAcceptClicksIfDisabledPropertyInfo;
+#else
+        private static FieldInfo _baseBoolFieldClickableFieldInfo;
+        private static PropertyInfo _clickableAcceptClicksIfDisabledPropertyInfo;
 #endif
         
         public static bool WillUseKeyInput(IPanel panel)
@@ -30,7 +33,11 @@ namespace RosettaUI.UIToolkit
             _baseBoolFieldAcceptClicksIfDisabledPropertyInfo ??= typeof(BaseBoolField).GetProperty("acceptClicksIfDisabled", BindingFlags.NonPublic | BindingFlags.Instance);
             _baseBoolFieldAcceptClicksIfDisabledPropertyInfo?.SetValue(baseBoolField, flag);
 #else
-            baseBoolField.m_Clickable.acceptClicksIfDisabled = flag;
+            _baseBoolFieldClickableFieldInfo ??= typeof(BaseBoolField).GetField("m_Clickable", BindingFlags.NonPublic | BindingFlags.Instance);
+            _clickableAcceptClicksIfDisabledPropertyInfo ??= typeof(Clickable).GetProperty("acceptClicksIfDisabled", BindingFlags.NonPublic | BindingFlags.Instance);
+            
+            var baseBoolFieldClickable = _baseBoolFieldClickableFieldInfo?.GetValue(baseBoolField);
+            _clickableAcceptClicksIfDisabledPropertyInfo?.SetValue(baseBoolFieldClickable, flag);
 #endif
         }
     }

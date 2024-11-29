@@ -84,10 +84,7 @@ namespace RosettaUI.UIToolkit
         
         public PopupFieldCustom()
         {
-            CreateMenuCallbackFieldInfo.SetValue(this, (Func<GenericDropdownMenu>)CreateMenu);
-            return;
-
-            GenericDropdownMenu CreateMenu() => new GenericDropdownMenuIgnoreAnchored();
+            CreateMenuCallbackFieldInfo.SetValue(this, (Func<GenericDropdownMenu>)GenericDropdownMenuIgnoreAnchoredBuilder.CreateGenericDropdownMenuIgnoreAnchored);
         }
         
         #endregion

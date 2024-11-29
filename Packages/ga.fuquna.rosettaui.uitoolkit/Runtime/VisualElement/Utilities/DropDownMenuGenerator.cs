@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace RosettaUI.UIToolkit.UnityInternalAccess
+namespace RosettaUI.UIToolkit
 {
     public static class DropDownMenuGenerator
     {

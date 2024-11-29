@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.7.3](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.7.2...ga.fuquna.rosettaui.uitoolkit-v1.7.3) (2024-11-29)
+
+
+### Bug Fixes
+
+* [#31](https://github.com/fuqunaga/RosettaUI/issues/31) remove UnityInternalAccess ([b63ce8b](https://github.com/fuqunaga/RosettaUI/commit/b63ce8b90e64132be2cb74b32d37c28927cfe78c))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.7.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.7.1...ga.fuquna.rosettaui.uitoolkit-v1.7.2) (2024-10-11)
 
 

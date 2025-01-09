@@ -294,6 +294,47 @@
     background-color: white;
 }
 
+
+/********************************************************************************
+* AnimationCurveField
+********************************************************************************/
+.rosettaui-animation-curve-field__input:hover {
+    border-color: var(--unity-colors-input_field-border-hover);
+}
+
+.rosettaui-animation-curve-field:focus > .rosettaui-animation-curve-field__input {
+    border-color: var(--unity-colors-input_field-border-focus);
+}
+
+.rosettaui-animation-curve-field__input,
+.rosettaui-animation-curve-field__input:disabled
+{
+    padding: 0;
+    border-color: var(--unity-colors-input_field-border);
+    width: 124px;
+}
+
+.rosettaui-animation-curve-field__input-rgb {
+    flex-grow: 1;
+    width: 100%;
+    background-color: black;
+}
+
+.rosettaui-animation-curve-field__input-alpha-container {
+    height: 20%;
+    width: 100%;
+    background-color: black;
+}
+
+.rosettaui-animation-curve-field__input-alpha {
+    flex-grow: 0;
+    flex-shrink: 0;
+    position: absolute;
+    width: 0;
+    height: 100%;
+    background-color: white;
+}
+
 /********************************************************************************
 * SliderInField
 ********************************************************************************/

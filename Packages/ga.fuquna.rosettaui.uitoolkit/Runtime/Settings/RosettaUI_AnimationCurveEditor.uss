@@ -1,0 +1,71 @@
+/********************************************************************************
+* Animation Curve Editor
+********************************************************************************/
+.rosettaui-animation-curve-editor-fixed-size-area {
+    flex-shrink: 0;
+}
+
+.rosettaui-animation-curve-editor .unity-base-field__label {
+    min-width: 100px; /* デフォルトは150px だがGradientEditor内ではもっと詰めたい */
+}
+
+.rosettaui-animation-curve-editor > #mode-enum > .unity-label {
+    width: 150px;
+}
+
+.rosettaui-animation-curve-editor__alpha-cursor-container,
+.rosettaui-animation-curve-editor__color-cursor-container {
+    height: 30px;
+}
+
+.rosettaui-animation-curve-editor__curve-group {
+    flex-grow: 3;
+    flex-shrink: 1;
+    margin: 4px 8px;
+    padding: 0;
+}
+
+.rosettaui-animation-curve-editor__preview-background {
+    flex-grow: 1;
+    height: 100%;
+    margin-top: -8px;
+}
+
+.rosettaui-animation-curve-editor__preview-front {
+    width: 100%;
+    height: 100%;
+}
+
+
+.rosettaui-animation-curve-editor__cursor {
+    position: absolute;
+    width: 8px;
+    height: 14px;
+    margin: 0 0 0 -4px;
+    border-width: 0;
+    background-image: resource("gradient_cursor");
+}
+
+.rosettaui-animation-curve-editor__cursor:focus {
+    background-image: resource("gradient_cursor_focus");
+}
+
+.rosettaui-animation-curve-editor__cursor-alpha {
+    top: 8px;
+}
+
+.rosettaui-animation-curve-editor__cursor-color {
+    bottom: 8px;
+    scale: -1;
+}
+
+/********************************************************************************
+* Control Point
+********************************************************************************/
+.rosettaui-animation-curve-editor__control-point {
+    margin: 0;
+    padding: 0;
+    background-color: #00ff00;
+    border-radius: 5px;
+    position: absolute;
+}

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Builder;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace RosettaUI.UIToolkit
 {
     public class AnimationCurveEditor : VisualElement, IDisposable
     {
-        public static readonly string USSClassName = "rosettaui-gradient-editor";
+        public static readonly string USSClassName = "rosettaui-animation-curve-editor";
         
         #region static 
 
@@ -34,7 +35,13 @@ namespace RosettaUI.UIToolkit
         {
             if (_window == null)
             {
-                _window = new ModalWindow(true);
+                _window = new ModalWindow(true)
+                {
+                    style = {
+                        width = 600,
+                        height = 400
+                    }
+                };
                 _animationCurveEditorInstance = new AnimationCurveEditor();
                 _window.Add(_animationCurveEditorInstance);
 
@@ -86,6 +93,7 @@ namespace RosettaUI.UIToolkit
         }
 
         private VisualElement _curvePreviewElement;
+        private List<AnimationCurveEditorControlPoint> _controlPoints = new List<AnimationCurveEditorControlPoint>();
 
         private float _zoom = 1.0f;
         private Vector2 _offset = Vector2.zero;
@@ -128,24 +136,29 @@ namespace RosettaUI.UIToolkit
         private void InitUI()
         {
             style.flexGrow = 1;
-
-            this.Q("curve-group").style.height = 300;
             
             _curvePreviewElement = this.Q("preview-front");
-            _curvePreviewElement.RegisterCallback<GeometryChangedEvent>(_ => UpdateCurvePreview());
+            _curvePreviewElement.RegisterCallback<GeometryChangedEvent>(_ =>
+            {
+                UpdateCurvePreview();
+                UpdateControlPoints();
+            });
             
             _curvePreviewElement.RegisterCallback<WheelEvent>(evt =>
             {
                 var mouseUv = new Vector2(evt.localMousePosition.x / _curvePreviewElement.resolvedStyle.width, 1f - evt.localMousePosition.y / _curvePreviewElement.resolvedStyle.height);
-                mouseUv = mouseUv / _zoom + _offset;
+                mouseUv = ScreenToGraphCoordinate(mouseUv);
                 
                 float amount = 1f + Mathf.Clamp(evt.delta.y, -0.1f, 0.1f);
                 _zoom /= amount;
                 _offset = mouseUv - (mouseUv - _offset) * amount;
                 UpdateCurvePreview();
+                UpdateControlPoints();
             });
             
             _curvePreviewElement.RegisterCallback<MouseDownEvent>(OnMouseDown);
+            
+            
         }
         
         /// <summary>
@@ -159,6 +172,7 @@ namespace RosettaUI.UIToolkit
             // _gradient = gradient;
             // _modeEnum.SetValueWithoutNotify(_gradient.mode);
             UpdateCurvePreview();
+            UpdateControlPoints();
             // UpdateAlphaKeysEditor();
             // UpdateColorKeysEditor();
             // UpdateSelectedSwatchField(_colorKeysEditor.ShowedSwatches.FirstOrDefault());
@@ -188,6 +202,46 @@ namespace RosettaUI.UIToolkit
             // _gradient.mode = _modeEnum.value as GradientMode? ?? GradientMode.Blend;
             //
             // OnGradientChanged();
+        }
+
+        private void UpdateControlPoints()
+        {
+            if (_curve == null) return;
+            
+            if (_curve.keys.Length > _controlPoints.Count)
+            {
+                for (int i = _controlPoints.Count; i < _curve.keys.Length; i++)
+                {
+                    int index = i;
+                    var controlPoint = new AnimationCurveEditorControlPoint(newPos =>
+                    {
+                        newPos = ScreenToGraphCoordinate(newPos);
+                        _curve.MoveKey(index, new Keyframe(newPos.x, newPos.y));
+                        UpdateCurvePreview();
+                        UpdateControlPoints();
+                        onCurveChanged?.Invoke(_curve);
+                    });
+                    _controlPoints.Add(controlPoint);
+                    _curvePreviewElement.Add(controlPoint);
+                }
+            }
+            else if (_curve.keys.Length < _controlPoints.Count)
+            {
+                for (int i = _controlPoints.Count - 1; i >= _curve.keys.Length; i--)
+                {
+                    _curvePreviewElement.Remove(_controlPoints[i]);
+                    _controlPoints.RemoveAt(i);
+                }
+            }
+
+            for (var i = 0; i < _curve.keys.Length; i++)
+            {
+                var key = _curve.keys[i];
+                var controlPoint = _controlPoints[i];
+                _curvePreviewElement.Add(controlPoint);
+                var position = GraphToScreenCoordinate(new Vector2(key.time, key.value));
+                controlPoint.SetPosition(position.x * _curvePreviewElement.resolvedStyle.width, (1f - position.y) * _curvePreviewElement.resolvedStyle.height);
+            }
         }
         
         private void UpdateCurvePreview()
@@ -235,6 +289,7 @@ namespace RosettaUI.UIToolkit
             {
                 _offset = _initialOffset + (evt.localMousePosition - _mouseDownPosition) / new Vector2(-_curvePreviewElement.resolvedStyle.width, _curvePreviewElement.resolvedStyle.height) / _zoom;
                 UpdateCurvePreview();
+                UpdateControlPoints();
                 evt.StopPropagation();
             }
             
@@ -252,6 +307,16 @@ namespace RosettaUI.UIToolkit
             _curvePreviewElement.UnregisterCallback<MouseMoveEvent>(OnMouseMove);
             _curvePreviewElement.UnregisterCallback<MouseUpEvent>(OnMouseUp);
             evt.StopPropagation();
+        }
+        
+        private Vector2 ScreenToGraphCoordinate(Vector2 screenPos)
+        {
+            return screenPos / _zoom + _offset;
+        }
+        
+        private Vector2 GraphToScreenCoordinate(Vector2 graphPos)
+        {
+            return (graphPos - _offset) * _zoom;
         }
 
     }

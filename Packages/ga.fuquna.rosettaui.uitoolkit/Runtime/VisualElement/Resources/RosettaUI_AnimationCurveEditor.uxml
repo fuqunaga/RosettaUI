@@ -1,10 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="fixed-size-area" class="rosettaui-gradient-editor-fixed-size-area" style="flex-grow: 1;">
-        <ui:GroupBox name="curve-group" style="flex-grow: 3; margin-left: 8px; margin-right: 8px; margin-top: 4px; margin-bottom: 4px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-shrink: 1;">
+    <ui:VisualElement name="fixed-size-area" class="rosettaui-animation-curve-editor-fixed-size-area" style="flex-grow: 1;">
+        <ui:GroupBox name="curve-group" class="rosettaui-animation-curve-editor__curve-group">
             <ui:VisualElement name="preview-container" style="flex-grow: 1; flex-direction: row;">
-                <ui:VisualElement name="preview-background" class="rosettaui-gradient-editor__preview-background" style="flex-grow: 1; height: 100%;">
-                    <ui:VisualElement name="preview-front" class="rosettaui-gradient-editor__preview-front" style="height: 100%;" />
-                </ui:VisualElement>
+                <ui:VisualElement name="preview-front" class="rosettaui-animation-curve-editor__preview-front" />
                 <ui:Scroller high-value="100" direction="Vertical" value="42" name="vertical-scroller" />
             </ui:VisualElement>
             <ui:Scroller high-value="100" direction="Horizontal" value="42" name="horizontal-scroller" />

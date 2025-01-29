@@ -94,9 +94,12 @@ namespace RosettaUI.UIToolkit
 
         private VisualElement _curvePreviewElement;
         private List<AnimationCurveEditorControlPoint> _controlPoints = new List<AnimationCurveEditorControlPoint>();
+        private FloatField _timeField;
+        private FloatField _valueField;
 
         private float _zoom = 1.0f;
         private Vector2 _offset = Vector2.zero;
+        private int _selectedControlPointIndex = -1;
         
         private int _mouseButton;
         private Vector2 _mouseDownPosition;
@@ -137,6 +140,7 @@ namespace RosettaUI.UIToolkit
         {
             style.flexGrow = 1;
             
+            // Curve Preview
             _curvePreviewElement = this.Q("preview-front");
             _curvePreviewElement.RegisterCallback<GeometryChangedEvent>(_ =>
             {
@@ -158,7 +162,27 @@ namespace RosettaUI.UIToolkit
             
             _curvePreviewElement.RegisterCallback<MouseDownEvent>(OnMouseDown);
             
+            // Time Field
+            _timeField = this.Q<FloatField>("time-field");
+            _timeField.RegisterValueChangedCallback(evt =>
+            {
+                if (_curve == null || _selectedControlPointIndex < 0) return;
+                _curve.MoveKey(_selectedControlPointIndex, new Keyframe(evt.newValue, _curve.keys[_selectedControlPointIndex].value));
+                UpdateCurvePreview();
+                UpdateControlPoints();
+                onCurveChanged?.Invoke(_curve);
+            });
             
+            // Value Field
+            _valueField = this.Q<FloatField>("value-field");
+            _valueField.RegisterValueChangedCallback(evt =>
+            {
+                if (_curve == null || _selectedControlPointIndex < 0) return;
+                _curve.MoveKey(_selectedControlPointIndex, new Keyframe(_curve.keys[_selectedControlPointIndex].time, evt.newValue));
+                UpdateCurvePreview();
+                UpdateControlPoints();
+                onCurveChanged?.Invoke(_curve);
+            });
         }
         
         /// <summary>
@@ -213,14 +237,23 @@ namespace RosettaUI.UIToolkit
                 for (int i = _controlPoints.Count; i < _curve.keys.Length; i++)
                 {
                     int index = i;
-                    var controlPoint = new AnimationCurveEditorControlPoint(newPos =>
-                    {
-                        newPos = ScreenToGraphCoordinate(newPos);
-                        _curve.MoveKey(index, new Keyframe(newPos.x, newPos.y));
-                        UpdateCurvePreview();
-                        UpdateControlPoints();
-                        onCurveChanged?.Invoke(_curve);
-                    });
+                    var controlPoint = new AnimationCurveEditorControlPoint(
+                        () =>
+                        {
+                            _selectedControlPointIndex = index;
+                            _timeField.SetValueWithoutNotify(_curve.keys[index].time);
+                            _valueField.SetValueWithoutNotify(_curve.keys[index].value);
+                        },
+                        newPos =>
+                        {
+                            newPos = ScreenToGraphCoordinate(newPos);
+                            _curve.MoveKey(index, new Keyframe(newPos.x, newPos.y));
+                            UpdateCurvePreview();
+                            UpdateControlPoints();
+                            _timeField.SetValueWithoutNotify(_curve.keys[index].time);
+                            _valueField.SetValueWithoutNotify(_curve.keys[index].value);
+                            onCurveChanged?.Invoke(_curve);
+                        });
                     _controlPoints.Add(controlPoint);
                     _curvePreviewElement.Add(controlPoint);
                 }
@@ -292,7 +325,6 @@ namespace RosettaUI.UIToolkit
                 UpdateControlPoints();
                 evt.StopPropagation();
             }
-            
         }
         
         private void OnMouseUp(MouseUpEvent evt)

@@ -9,14 +9,16 @@ namespace RosettaUI.UIToolkit
     /// </summary>
     public class AnimationCurveEditorControlPoint : VisualElement
     {
+        private Action _onPointSelected;
         private Action<Vector2> _onPointMoved;
         private Vector2 _elementPositionOnDown;
         private Vector2 _mouseDownPosition;
         
         private const float ControlPointSize = 10f;
         
-        public AnimationCurveEditorControlPoint(Action<Vector2> onPointMoved)
+        public AnimationCurveEditorControlPoint(Action onPointSelected, Action<Vector2> onPointMoved)
         {
+            _onPointSelected = onPointSelected;
             _onPointMoved = onPointMoved;
             RegisterCallback<MouseDownEvent>(OnMouseDown);
             
@@ -40,6 +42,7 @@ namespace RosettaUI.UIToolkit
             RegisterCallback<MouseUpEvent>(OnMouseUp);
             _mouseDownPosition = evt.mousePosition;
             _elementPositionOnDown = new Vector2(style.left.value.value, style.top.value.value);
+            _onPointSelected?.Invoke();
             evt.StopPropagation();
             this.CaptureMouse();
         }

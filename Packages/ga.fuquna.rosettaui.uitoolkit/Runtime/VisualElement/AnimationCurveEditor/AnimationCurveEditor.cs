@@ -244,10 +244,10 @@ namespace RosettaUI.UIToolkit
                             _timeField.SetValueWithoutNotify(_curve.keys[index].time);
                             _valueField.SetValueWithoutNotify(_curve.keys[index].value);
                         },
-                        newPos =>
+                        (newPos, lt, rt) =>
                         {
                             newPos = ScreenToGraphCoordinate(newPos);
-                            _curve.MoveKey(index, new Keyframe(newPos.x, newPos.y));
+                            _curve.MoveKey(index, new Keyframe(newPos.x, newPos.y, lt, rt));
                             UpdateCurvePreview();
                             UpdateControlPoints();
                             _timeField.SetValueWithoutNotify(_curve.keys[index].time);
@@ -273,7 +273,12 @@ namespace RosettaUI.UIToolkit
                 var controlPoint = _controlPoints[i];
                 _curvePreviewElement.Add(controlPoint);
                 var position = GraphToScreenCoordinate(new Vector2(key.time, key.value));
-                controlPoint.SetPosition(position.x * _curvePreviewElement.resolvedStyle.width, (1f - position.y) * _curvePreviewElement.resolvedStyle.height);
+                controlPoint.SetPosition(
+                    position.x * _curvePreviewElement.resolvedStyle.width, 
+                    (1f - position.y) * _curvePreviewElement.resolvedStyle.height,
+                    key.inTangent, 
+                    key.outTangent
+                );
             }
         }
         

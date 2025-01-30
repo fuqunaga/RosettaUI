@@ -102,22 +102,23 @@
                     }
                 }
 
-                if (dist < LINE_WIDTH_PX * 0.5f) // radius
-                {
-                    return float4(0,1,0,1);
-                }
+                float4 col = 0;
 
                 // Grid (Temp)
                 if (abs(frac(uv.x - 0.5) - 0.5) < _Resolution.z * 2.0 / _OffsetZoom.z || abs(frac(uv.y - 0.5) - 0.5) < _Resolution.w * 2.0 / _OffsetZoom.z)
                 {
-                    return float4(0.4, 0.4, 0.4, 0.5);
+                    col = float4(0.4, 0.4, 0.4, 0.5);
                 }
-                if (abs(frac(uv.x * 10.0 - 0.5) - 0.5) < _Resolution.z * 10.0 / _OffsetZoom.z || abs(frac(uv.y * 10.0 - 0.5) - 0.5) < _Resolution.w * 10.0 / _OffsetZoom.z)
+                else if (abs(frac(uv.x * 10.0 - 0.5) - 0.5) < _Resolution.z * 10.0 / _OffsetZoom.z || abs(frac(uv.y * 10.0 - 0.5) - 0.5) < _Resolution.w * 10.0 / _OffsetZoom.z)
                 {
-                    return float4(0.4, 0.4, 0.4, 0.5);
+                    col = float4(0.4, 0.4, 0.4, 0.5);
                 }
 
-                return 0.0;
+                const float radius = LINE_WIDTH_PX * 0.5f;
+                dist -= radius;
+                col = lerp(float4(0, 1, 0, 1), col, smoothstep(-.5f, .5f, dist));
+
+                return col;
             }
             ENDHLSL
         }

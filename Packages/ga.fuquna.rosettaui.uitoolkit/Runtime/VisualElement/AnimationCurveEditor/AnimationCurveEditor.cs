@@ -109,10 +109,13 @@ namespace RosettaUI.UIToolkit
         private RenderTexture _curveEditorTexture = null;
         private GraphicsBuffer _keyframesBuffer;
 
+        private AnimationCurveEditorCurvePreview _curvePreview;
+
         private AnimationCurveEditor()
         {
             _curveEditorMaterial = new Material(Resources.Load<Shader>("RosettaUI_AnimationCurveEditorShader"));
-            
+            _curvePreview = new AnimationCurveEditorCurvePreview();
+
             AddToClassList(USSClassName);
             _visualTreeAsset ??= Resources.Load<VisualTreeAsset>("RosettaUI_AnimationCurveEditor");
             _visualTreeAsset.CloneTree(this);
@@ -123,6 +126,11 @@ namespace RosettaUI.UIToolkit
                 
         public void Dispose()
         {
+            if (_curvePreview != null)
+            {
+                _curvePreview.Dispose();
+                _curvePreview = null;
+            }
             if (_curveEditorMaterial != null)
             {
                 UnityEngine.Object.DestroyImmediate(_curveEditorMaterial);
@@ -307,6 +315,12 @@ namespace RosettaUI.UIToolkit
             _curveEditorMaterial.SetVector("_OffsetZoom", new Vector4(_offset.x, _offset.y, _zoom, 0f));
             
             Graphics.Blit(null, PreviewTexture, _curveEditorMaterial);
+
+            // _curvePreview.Render(_curve, new AnimationCurveEditorCurvePreview.CurvePreviewViewInfo {
+            //     resolution = new Vector4(width, height, 1f / width, 1f / height),
+            //     offsetZoom = new Vector4(_offset.x, _offset.y, _zoom, 0f),
+            //     outputTexture = PreviewTexture,
+            // });
         }
         
         private void OnMouseDown(MouseDownEvent evt)

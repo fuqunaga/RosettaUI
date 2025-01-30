@@ -105,15 +105,12 @@ namespace RosettaUI.UIToolkit
         private Vector2 _mouseDownPosition;
         private Vector2 _initialOffset;
         private AnimationCurve _curve;
-        private Material _curveEditorMaterial;
         private RenderTexture _curveEditorTexture = null;
-        private GraphicsBuffer _keyframesBuffer;
 
         private AnimationCurveEditorCurvePreview _curvePreview;
 
         private AnimationCurveEditor()
         {
-            _curveEditorMaterial = new Material(Resources.Load<Shader>("RosettaUI_AnimationCurveEditorShader"));
             _curvePreview = new AnimationCurveEditorCurvePreview();
 
             AddToClassList(USSClassName);
@@ -130,11 +127,6 @@ namespace RosettaUI.UIToolkit
             {
                 _curvePreview.Dispose();
                 _curvePreview = null;
-            }
-            if (_curveEditorMaterial != null)
-            {
-                UnityEngine.Object.DestroyImmediate(_curveEditorMaterial);
-                _curveEditorMaterial = null;
             }
             if (PreviewTexture != null)
             {
@@ -301,26 +293,12 @@ namespace RosettaUI.UIToolkit
                 PreviewTexture?.Release();
                 PreviewTexture = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32);
             }
-            
-            if (_keyframesBuffer == null || _keyframesBuffer.count != _curve.keys.Length)
-            {
-                _keyframesBuffer?.Dispose();
-                _keyframesBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, _curve.keys.Length, sizeof(float) * 4);
-            }
-            
-            _keyframesBuffer.SetData(_curve.keys.Select(key => new Vector4(key.time, key.value, key.inTangent, key.outTangent)).ToArray());
-            _curveEditorMaterial.SetBuffer("_Keyframes", _keyframesBuffer);
-            _curveEditorMaterial.SetInt("_KeyframesCount", _curve.keys.Length);
-            _curveEditorMaterial.SetVector("_Resolution", new Vector4(width, height, 1f / width, 1f / height));
-            _curveEditorMaterial.SetVector("_OffsetZoom", new Vector4(_offset.x, _offset.y, _zoom, 0f));
-            
-            Graphics.Blit(null, PreviewTexture, _curveEditorMaterial);
 
-            // _curvePreview.Render(_curve, new AnimationCurveEditorCurvePreview.CurvePreviewViewInfo {
-            //     resolution = new Vector4(width, height, 1f / width, 1f / height),
-            //     offsetZoom = new Vector4(_offset.x, _offset.y, _zoom, 0f),
-            //     outputTexture = PreviewTexture,
-            // });
+            _curvePreview.Render(_curve, new AnimationCurveEditorCurvePreview.CurvePreviewViewInfo {
+                resolution = new Vector4(width, height, 1f / width, 1f / height),
+                offsetZoom = new Vector4(_offset.x, _offset.y, _zoom, 0f),
+                outputTexture = PreviewTexture,
+            });
         }
         
         private void OnMouseDown(MouseDownEvent evt)

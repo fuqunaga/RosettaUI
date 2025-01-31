@@ -28,7 +28,6 @@
             };
 
             StructuredBuffer<float4> _Keyframes;
-            int _KeyframesCount;
             float4 _Resolution;
             float4 _OffsetZoom;
 

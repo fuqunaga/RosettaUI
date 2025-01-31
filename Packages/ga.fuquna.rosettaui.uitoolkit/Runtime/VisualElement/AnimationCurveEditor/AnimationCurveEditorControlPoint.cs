@@ -9,34 +9,42 @@ namespace RosettaUI.UIToolkit
     /// </summary>
     public class AnimationCurveEditorControlPoint : VisualElement
     {
-        private Action _onPointSelected;
-        private Action<Vector2, float, float> _onPointMoved;
+        private Action<AnimationCurveEditorControlPoint> _onPointSelected;
+        private OnPointMoved _onPointMoved;
         private Vector2 _elementPositionOnDown;
         private Vector2 _mouseDownPosition;
-        private float _leftTan;
-        private float _rightTan;
         
+        private VisualElement _controlPoint;
         private AnimationCurveEditorControlPointHandle _leftHandle;
         private AnimationCurveEditorControlPointHandle _rightHandle;
-        
+
+        private float _inTangent;
+        private float _outTangent;
+
         private const float ControlPointSize = 10f;
         
-        public AnimationCurveEditorControlPoint(Action onPointSelected, Action<Vector2, float, float> onPointMoved)
+        public delegate int OnPointMoved(Vector2 position, float inTan, float outTan);
+        
+        public AnimationCurveEditorControlPoint(Action<AnimationCurveEditorControlPoint> onPointSelected, OnPointMoved onPointMoved)
         {
             _onPointSelected = onPointSelected;
             _onPointMoved = onPointMoved;
-            RegisterCallback<MouseDownEvent>(OnMouseDown);
-            
-            // Styles
-            AddToClassList("rosettaui-animation-curve-editor__control-point");
-            style.width = ControlPointSize;
-            style.height = ControlPointSize;
             
             // Handles
             _leftHandle = new AnimationCurveEditorControlPointHandle(0f);
             Add(_leftHandle);
             _rightHandle = new AnimationCurveEditorControlPointHandle(180f);
             Add(_rightHandle);
+            
+            // Control point
+            _controlPoint = new VisualElement();
+            _controlPoint.RegisterCallback<MouseDownEvent>(OnMouseDown);
+            Add(_controlPoint);
+            
+            // Styles
+            _controlPoint.AddToClassList("rosettaui-animation-curve-editor__control-point");
+            _controlPoint.style.width = ControlPointSize;
+            _controlPoint.style.height = ControlPointSize;
         }
         
         public void SetPosition(float x, float y, float leftTan, float rightTan)
@@ -45,9 +53,8 @@ namespace RosettaUI.UIToolkit
             style.top = y - ControlPointSize * 0.5f;
             _leftHandle.SetAngle(Mathf.Atan(leftTan) * Mathf.Rad2Deg);
             _rightHandle.SetAngle(180f + Mathf.Atan(rightTan) * Mathf.Rad2Deg);
-            _leftTan = leftTan;
-            _rightTan = rightTan;
-            Debug.Log($"SetPosition: {x}, {y}, {leftTan}, {rightTan}");
+            _inTangent = leftTan;
+            _outTangent = rightTan;
         }
         
         private void OnMouseDown(MouseDownEvent evt)
@@ -58,7 +65,7 @@ namespace RosettaUI.UIToolkit
             RegisterCallback<MouseUpEvent>(OnMouseUp);
             _mouseDownPosition = evt.mousePosition;
             _elementPositionOnDown = new Vector2(style.left.value.value, style.top.value.value);
-            _onPointSelected?.Invoke();
+            _onPointSelected?.Invoke(this);
             evt.StopPropagation();
             this.CaptureMouse();
         }
@@ -77,11 +84,11 @@ namespace RosettaUI.UIToolkit
         {
             style.left = _elementPositionOnDown.x + (mousePosition.x - _mouseDownPosition.x);
             style.top = _elementPositionOnDown.y + (mousePosition.y - _mouseDownPosition.y);
-            _onPointMoved?.Invoke(
+            _onPointMoved.Invoke(
                 Vector2.up + new Vector2(style.left.value.value, 
                     -style.top.value.value) / parent.layout.size,
-                _leftTan,
-                _rightTan
+                _inTangent,
+                _outTangent
             );
         }
         
@@ -96,8 +103,5 @@ namespace RosettaUI.UIToolkit
                 this.ReleaseMouse();
             }
         }
-        
-        
-        
     }
 }

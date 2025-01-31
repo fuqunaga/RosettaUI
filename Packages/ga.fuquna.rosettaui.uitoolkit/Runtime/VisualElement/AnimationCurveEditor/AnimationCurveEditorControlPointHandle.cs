@@ -8,6 +8,8 @@ namespace RosettaUI.UIToolkit
         private VisualElement _lineElement;
         private VisualElement _handleElement;
         
+        private Vector2 _mouseDownPosition;
+        
         public AnimationCurveEditorControlPointHandle(float angle)
         {
             AddToClassList("rosettaui-animation-curve-editor__control-point-handle");
@@ -19,45 +21,50 @@ namespace RosettaUI.UIToolkit
         {
             _lineElement = new VisualElement();
             _lineElement.AddToClassList("rosettaui-animation-curve-editor__control-point-handle__line");
-            _lineElement.style.position = Position.Absolute;
-            _lineElement.style.left = 5;
-            _lineElement.style.top = 4;
-            _lineElement.style.backgroundColor = new StyleColor(Color.white);
-            _lineElement.style.borderTopWidth = 0.5f;
-            _lineElement.style.borderBottomWidth = 0.5f;
-            _lineElement.style.borderLeftWidth = 0.5f;
-            _lineElement.style.borderRightWidth = 0.5f;
-            _lineElement.style.borderTopColor = new StyleColor(Color.black);
-            _lineElement.style.borderBottomColor = new StyleColor(Color.black);
-            _lineElement.style.borderLeftColor = new StyleColor(Color.black);
-            _lineElement.style.borderRightColor = new StyleColor(Color.black);
-            _lineElement.style.transformOrigin = new StyleTransformOrigin(new TransformOrigin(0, Length.Percent(50)));
-            _lineElement.style.opacity = 0.5f;
-            _lineElement.style.width = 50;
-            _lineElement.style.height = 2;
-            // _lineElement.style.zIndex = 1;
             Add(_lineElement);
             
-            float handleSize = 8;
             _handleElement = new VisualElement();
             _handleElement.AddToClassList("rosettaui-animation-curve-editor__control-point-handle__handle");
-            _handleElement.style.position = Position.Absolute;
-            _handleElement.style.right = -handleSize * 0.5f;
-            _handleElement.style.top = -handleSize * 0.5f;
-            _handleElement.style.width = handleSize;
-            _handleElement.style.height = handleSize;
-            _handleElement.style.borderTopLeftRadius = handleSize * 0.5f;
-            _handleElement.style.borderTopRightRadius = handleSize * 0.5f;
-            _handleElement.style.borderBottomLeftRadius = handleSize * 0.5f;
-            _handleElement.style.borderBottomRightRadius = handleSize * 0.5f;
-            _handleElement.style.backgroundColor = new StyleColor(Color.gray);
             _lineElement.Add(_handleElement);
-            
+            _handleElement.RegisterCallback<MouseDownEvent>(OnMouseDown);
         }
         
         public void SetAngle(float angle)
         {
-            _lineElement.style.rotate = new StyleRotate(new Rotate(Angle.Degrees(-angle)));
+            _lineElement.style.rotate = new StyleRotate(new Rotate(Angle.Degrees(180f - angle)));
+        }
+        
+        private void OnMouseDown(MouseDownEvent evt)
+        {
+            if (evt.button != 0) return;
+            _mouseDownPosition = evt.mousePosition;
+            _handleElement.CaptureMouse();
+            _handleElement.RegisterCallback<PointerMoveEvent>(OnPointerMove);
+            _handleElement.RegisterCallback<PointerLeaveEvent>(OnPointerLeave);
+            _handleElement.RegisterCallback<PointerUpEvent>(OnPointerUp);
+            evt.StopPropagation();
+        }
+        
+        private void OnPointerMove(PointerMoveEvent evt)
+        {
+            var centerPoint = parent.LocalToWorld(Vector2.one * 0.5f);
+            var mousePoint = evt.position;
+            var angle = Mathf.Atan2(mousePoint.y - centerPoint.y, mousePoint.x - centerPoint.x) * Mathf.Rad2Deg;
+            SetAngle(180f - angle);
+            evt.StopPropagation();
+        }
+        
+        private void OnPointerLeave(PointerLeaveEvent evt)
+        {
+            // _handleElement.UnregisterCallback<MouseMoveEvent>(OnMouseMove);
+            // _handleElement.UnregisterCallback<MouseLeaveEvent>(OnMouseLeave);
+        }
+        
+        private void OnPointerUp(PointerUpEvent evt)
+        {
+            _handleElement.ReleaseMouse();
+            _handleElement.UnregisterCallback<PointerMoveEvent>(OnPointerMove);
+            _handleElement.UnregisterCallback<PointerLeaveEvent>(OnPointerLeave);
         }
     }
 }

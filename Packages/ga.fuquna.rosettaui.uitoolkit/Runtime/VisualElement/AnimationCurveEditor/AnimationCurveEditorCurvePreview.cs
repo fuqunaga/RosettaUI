@@ -60,6 +60,7 @@ namespace RosettaUI.UIToolkit
 
         public void Render(AnimationCurve animationCurve, CurvePreviewViewInfo viewInfo)
         {
+            _commandBuffer.Clear();
             UpdateData(_commandBuffer, animationCurve);
 
             _commandBuffer.SetGlobalVector("_Resolution", viewInfo.resolution);

@@ -69,3 +69,28 @@
     border-radius: 5px;
     position: absolute;
 }
+
+.rosettaui-animation-curve-editor__control-point-handle__line
+{
+    position: absolute;
+    left: 5px;
+    top: 4px;
+    width: 50px;
+    height: 2px;
+    background-color: whitesmoke;
+    border-width: 0.5px;
+    border-color: black;
+    transform-origin: 0 50%;
+    opacity: 0.5;
+}
+
+.rosettaui-animation-curve-editor__control-point-handle__handle
+{
+    position: absolute;
+    right: -4px;
+    top: -4px;
+    width: 8px;
+    height: 8px;
+    background-color: whitesmoke;
+    border-radius: 4px;
+}

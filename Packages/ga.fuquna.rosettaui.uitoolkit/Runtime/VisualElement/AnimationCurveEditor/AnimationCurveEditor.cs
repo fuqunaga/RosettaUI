@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -144,8 +143,7 @@ namespace RosettaUI.UIToolkit
             _curvePreviewElement = this.Q("preview-front");
             _curvePreviewElement.RegisterCallback<GeometryChangedEvent>(_ =>
             {
-                UpdateCurvePreview();
-                UpdateControlPoints();
+                UpdateView();
             });
             
             _curvePreviewElement.RegisterCallback<WheelEvent>(evt =>
@@ -156,8 +154,7 @@ namespace RosettaUI.UIToolkit
                 float amount = 1f + Mathf.Clamp(evt.delta.y, -0.1f, 0.1f);
                 _zoom /= amount;
                 _offset = mouseUv - (mouseUv - _offset) * amount;
-                UpdateCurvePreview();
-                UpdateControlPoints();
+                UpdateView();
             });
             
             _curvePreviewElement.RegisterCallback<MouseDownEvent>(OnMouseDown);
@@ -167,9 +164,10 @@ namespace RosettaUI.UIToolkit
             _timeField.RegisterValueChangedCallback(evt =>
             {
                 if (_curve == null || _selectedControlPointIndex < 0) return;
-                _curve.MoveKey(_selectedControlPointIndex, new Keyframe(evt.newValue, _curve.keys[_selectedControlPointIndex].value));
-                UpdateCurvePreview();
-                UpdateControlPoints();
+                var key = _curve.keys[_selectedControlPointIndex];
+                key.time = evt.newValue;
+                MoveKey(key);
+                UpdateView();
                 onCurveChanged?.Invoke(_curve);
             });
             
@@ -178,9 +176,10 @@ namespace RosettaUI.UIToolkit
             _valueField.RegisterValueChangedCallback(evt =>
             {
                 if (_curve == null || _selectedControlPointIndex < 0) return;
-                _curve.MoveKey(_selectedControlPointIndex, new Keyframe(_curve.keys[_selectedControlPointIndex].time, evt.newValue));
-                UpdateCurvePreview();
-                UpdateControlPoints();
+                var key = _curve.keys[_selectedControlPointIndex];
+                key.value = evt.newValue;
+                MoveKey(key);
+                UpdateView();
                 onCurveChanged?.Invoke(_curve);
             });
         }
@@ -192,16 +191,7 @@ namespace RosettaUI.UIToolkit
         public void SetCurve(AnimationCurve curve)
         {
             _curve = curve;
-            
-            // _gradient = gradient;
-            // _modeEnum.SetValueWithoutNotify(_gradient.mode);
-            UpdateCurvePreview();
-            UpdateControlPoints();
-            // UpdateAlphaKeysEditor();
-            // UpdateColorKeysEditor();
-            // UpdateSelectedSwatchField(_colorKeysEditor.ShowedSwatches.FirstOrDefault());
-            //
-            // _presetSet.SetValue(_gradient);
+            UpdateView();
         }
         
         /// <summary>
@@ -227,32 +217,35 @@ namespace RosettaUI.UIToolkit
             //
             // OnGradientChanged();
         }
+        
+        private void UpdateView()
+        {
+            UpdateCurvePreview();
+            UpdateControlPoints();
+        }
 
         private void UpdateControlPoints()
         {
             if (_curve == null) return;
             
+            // Add or Remove control points
             if (_curve.keys.Length > _controlPoints.Count)
             {
                 for (int i = _controlPoints.Count; i < _curve.keys.Length; i++)
                 {
-                    int index = i;
-                    var controlPoint = new AnimationCurveEditorControlPoint(
-                        () =>
+                    var controlPoint = new AnimationCurveEditorControlPoint(cp =>
                         {
-                            _selectedControlPointIndex = index;
-                            _timeField.SetValueWithoutNotify(_curve.keys[index].time);
-                            _valueField.SetValueWithoutNotify(_curve.keys[index].value);
+                            _selectedControlPointIndex = _controlPoints.IndexOf(cp);
+                            UpdateFields();
                         },
-                        (newPos, lt, rt) =>
+                        (newPos, it, ot) =>
                         {
                             newPos = ScreenToGraphCoordinate(newPos);
-                            _curve.MoveKey(index, new Keyframe(newPos.x, newPos.y, lt, rt));
-                            UpdateCurvePreview();
-                            UpdateControlPoints();
-                            _timeField.SetValueWithoutNotify(_curve.keys[index].time);
-                            _valueField.SetValueWithoutNotify(_curve.keys[index].value);
+                            MoveKey(new Keyframe(newPos.x, newPos.y, it, ot));
+                            UpdateView();
+                            UpdateFields();
                             onCurveChanged?.Invoke(_curve);
+                            return _selectedControlPointIndex;
                         });
                     _controlPoints.Add(controlPoint);
                     _curvePreviewElement.Add(controlPoint);
@@ -267,10 +260,11 @@ namespace RosettaUI.UIToolkit
                 }
             }
 
+            // Update control points
             for (var i = 0; i < _curve.keys.Length; i++)
             {
-                var key = _curve.keys[i];
                 var controlPoint = _controlPoints[i];
+                var key = _curve.keys[i];
                 _curvePreviewElement.Add(controlPoint);
                 var position = GraphToScreenCoordinate(new Vector2(key.time, key.value));
                 controlPoint.SetPosition(
@@ -301,16 +295,38 @@ namespace RosettaUI.UIToolkit
             });
         }
         
+        private void MoveKey(Keyframe key)
+        {
+            int newIdx = _curve.MoveKey(_selectedControlPointIndex, key);
+
+            if (newIdx != _selectedControlPointIndex)
+            {
+                var temp = _controlPoints[_selectedControlPointIndex];
+                _controlPoints.RemoveAt(_selectedControlPointIndex);
+                _controlPoints.Insert(newIdx, temp);
+                _selectedControlPointIndex = newIdx;
+            }
+        }
+
+        private void UpdateFields()
+        {
+            _timeField.SetValueWithoutNotify(_curve.keys[_selectedControlPointIndex].time);
+            _valueField.SetValueWithoutNotify(_curve.keys[_selectedControlPointIndex].value);
+        }
+        
         private void OnMouseDown(MouseDownEvent evt)
         {
-            _curvePreviewElement.RegisterCallback<MouseMoveEvent>(OnMouseMove);
-            _curvePreviewElement.RegisterCallback<MouseUpEvent>(OnMouseUp);
-            _curvePreviewElement.RegisterCallback<MouseLeaveEvent>(OnMouseLeave);
             _mouseButton = evt.button;
-            _mouseDownPosition = evt.localMousePosition;
-            _initialOffset = _offset;
-            
-            evt.StopPropagation();
+            if (_mouseButton == 2)
+            {
+                _curvePreviewElement.RegisterCallback<MouseMoveEvent>(OnMouseMove);
+                _curvePreviewElement.RegisterCallback<MouseUpEvent>(OnMouseUp);
+                _curvePreviewElement.RegisterCallback<MouseLeaveEvent>(OnMouseLeave);
+                _mouseDownPosition = evt.localMousePosition;
+                _initialOffset = _offset;
+
+                evt.StopPropagation();
+            }
         }
         
         private void OnMouseMove(MouseMoveEvent evt)
@@ -318,8 +334,7 @@ namespace RosettaUI.UIToolkit
             if (_mouseButton == 2)
             {
                 _offset = _initialOffset + (evt.localMousePosition - _mouseDownPosition) / new Vector2(-_curvePreviewElement.resolvedStyle.width, _curvePreviewElement.resolvedStyle.height) / _zoom;
-                UpdateCurvePreview();
-                UpdateControlPoints();
+                UpdateView();
                 evt.StopPropagation();
             }
         }

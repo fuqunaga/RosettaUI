@@ -18,6 +18,7 @@ namespace RosettaUI.UIToolkit
         private AnimationCurveEditorControlPointHandle _leftHandle;
         private AnimationCurveEditorControlPointHandle _rightHandle;
 
+        private Vector2 _position;
         private float _inTangent;
         private float _outTangent;
 
@@ -31,9 +32,38 @@ namespace RosettaUI.UIToolkit
             _onPointMoved = onPointMoved;
             
             // Handles
-            _leftHandle = new AnimationCurveEditorControlPointHandle(0f);
+            _leftHandle = new AnimationCurveEditorControlPointHandle(180f, () => _onPointSelected(this), angle =>
+            {
+                angle = Mathf.Clamp(Mathf.Abs(angle), 90f, 180f) * Mathf.Sign(angle);
+                _inTangent = angle switch
+                {
+                    90f => float.PositiveInfinity,
+                    -90f => float.NegativeInfinity,
+                    _ => Mathf.Tan(angle * Mathf.Deg2Rad)
+                };
+                
+                _onPointMoved.Invoke(
+                    _position,
+                    _inTangent,
+                    _outTangent
+                );
+            });
             Add(_leftHandle);
-            _rightHandle = new AnimationCurveEditorControlPointHandle(180f);
+            _rightHandle = new AnimationCurveEditorControlPointHandle(0f, () => _onPointSelected(this), angle =>
+            {
+                angle = Mathf.Clamp(angle, -90f, 90f);
+                _outTangent = angle switch
+                {
+                    90f => float.PositiveInfinity,
+                    -90f => float.NegativeInfinity,
+                    _ => Mathf.Tan(angle * Mathf.Deg2Rad)
+                };
+                _onPointMoved.Invoke(
+                    _position,
+                    _inTangent,
+                    _outTangent
+                );
+            });
             Add(_rightHandle);
             
             // Control point
@@ -47,10 +77,28 @@ namespace RosettaUI.UIToolkit
             _controlPoint.style.height = ControlPointSize;
         }
         
+        public void SetActive(bool active)
+        {
+            if (active)
+            {
+                _controlPoint.style.backgroundColor = new StyleColor(Color.white);
+                _leftHandle.style.visibility = Visibility.Visible;
+                _rightHandle.style.visibility = Visibility.Visible;
+            }
+            else
+            {
+                _controlPoint.style.backgroundColor = new StyleColor(Color.green);
+                _leftHandle.style.visibility = Visibility.Hidden;
+                _rightHandle.style.visibility = Visibility.Hidden;
+            }
+        }
+        
         public void SetPosition(float x, float y, float leftTan, float rightTan)
         {
+            
             style.left = x - ControlPointSize * 0.5f;
             style.top = y - ControlPointSize * 0.5f;
+            _position = Vector2.up + new Vector2(x, -y) / parent.layout.size;
             _leftHandle.SetAngle(Mathf.Atan(leftTan) * Mathf.Rad2Deg);
             _rightHandle.SetAngle(180f + Mathf.Atan(rightTan) * Mathf.Rad2Deg);
             _inTangent = leftTan;
@@ -84,9 +132,9 @@ namespace RosettaUI.UIToolkit
         {
             style.left = _elementPositionOnDown.x + (mousePosition.x - _mouseDownPosition.x);
             style.top = _elementPositionOnDown.y + (mousePosition.y - _mouseDownPosition.y);
+            _position = Vector2.up + new Vector2(style.left.value.value, -style.top.value.value) / parent.layout.size;
             _onPointMoved.Invoke(
-                Vector2.up + new Vector2(style.left.value.value, 
-                    -style.top.value.value) / parent.layout.size,
+                _position,
                 _inTangent,
                 _outTangent
             );

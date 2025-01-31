@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -182,6 +181,8 @@ namespace RosettaUI.UIToolkit
                 UpdateView();
                 onCurveChanged?.Invoke(_curve);
             });
+            
+            UpdateFields();
         }
         
         /// <summary>
@@ -192,6 +193,7 @@ namespace RosettaUI.UIToolkit
         {
             _curve = curve;
             UpdateView();
+            
         }
         
         /// <summary>
@@ -237,6 +239,10 @@ namespace RosettaUI.UIToolkit
                         {
                             _selectedControlPointIndex = _controlPoints.IndexOf(cp);
                             UpdateFields();
+                            foreach (var c in _controlPoints)
+                            {
+                                c.SetActive(c == cp);
+                            }
                         },
                         (newPos, it, ot) =>
                         {
@@ -310,6 +316,14 @@ namespace RosettaUI.UIToolkit
 
         private void UpdateFields()
         {
+            if (_selectedControlPointIndex < 0)
+            {
+                _timeField.style.visibility = Visibility.Hidden;
+                _valueField.style.visibility = Visibility.Hidden;
+                return;
+            }
+            _timeField.style.visibility = Visibility.Visible;
+            _valueField.style.visibility = Visibility.Visible;
             _timeField.SetValueWithoutNotify(_curve.keys[_selectedControlPointIndex].time);
             _valueField.SetValueWithoutNotify(_curve.keys[_selectedControlPointIndex].value);
         }
@@ -326,6 +340,15 @@ namespace RosettaUI.UIToolkit
                 _initialOffset = _offset;
 
                 evt.StopPropagation();
+            }
+            else if (_mouseButton == 0)
+            {
+                _selectedControlPointIndex = -1;
+                UpdateFields();
+                foreach (var c in _controlPoints)
+                {
+                    c.SetActive(false);
+                }
             }
         }
         

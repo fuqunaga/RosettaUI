@@ -11,53 +11,9 @@
             #pragma fragment Frag
 
             #include "UnityCG.cginc"
+            #include "SdfBezierSpline.cginc"
+            #define LINE_WIDTH_PX 2.0f
 
-
-
-            float EvaluateCurve(float t, float4 keyFrame0, float4 keyFrame1)
-            {
-                float dt = keyFrame1.x - keyFrame0.x;
-
-                float m0 = keyFrame0.w * dt;
-                float m1 = keyFrame1.z * dt;
-
-                float t2 = t * t;
-                float t3 = t2 * t;
-
-                float a = 2 * t3 - 3 * t2 + 1;
-                float b = t3 - 2 * t2 + t;
-                float c = t3 - t2;
-                float d = -2 * t3 + 3 * t2;
-
-                return a * keyFrame0.y + b * m0 + c * m1 + d * keyFrame1.y;
-            }
-
-            float CurveDeriv(float t, float4 keyFrame0, float4 keyFrame1)
-            {
-                float dt = keyFrame1.x - keyFrame0.x;
-
-                float m0 = keyFrame0.w * dt;
-                float m1 = keyFrame1.z * dt;
-
-                float t2 = t * t;
-                float t3 = t2 * t;
-
-                float a = 6 * t2 - 6 * t;
-                float b = 3 * t2 - 4 * t + 1;
-                float c = 3 * t2 - 2 * t;
-                float d = -6 * t2 + 6 * t;
-
-                return a * keyFrame0.y + b * m0 + c * m1 + d * keyFrame1.y;
-            }
-
-            // float EvaluateCurveSDF(float2 p, float4 keyFrame0, float4 keyFrame1)
-            // {
-            //     float2 b0 = keyFrame0.xy;
-            //     float2 b1 = keyFrame0.xy + float2(1.0, keyFrame0.w) / 3.0;
-            //     float2 b2 = keyFrame1.xy - float2(1.0, keyFrame1.z) / 3.0;
-            //     float2 b3 = keyFrame1.xy;
-            //     
-            // }
 
             struct appdata
             {
@@ -76,6 +32,17 @@
             float4 _Resolution;
             float4 _OffsetZoom;
 
+            struct spline_segment
+            {
+                float2 startPos;
+                float2 startVel;
+                float2 endPos;
+                float2 endVel;
+            };
+
+            StructuredBuffer<spline_segment> _Spline;
+            int _SegmentCount;
+
             v2f Vert(appdata v)
             {
                 v2f o;
@@ -89,42 +56,69 @@
                 float2 uv = i.uv;
                 uv = uv / _OffsetZoom.z + _OffsetZoom.xy;
 
-                // Curve (Temp)
-                for (int idx = 0; idx < _KeyframesCount - 1; idx++)
+                // Curve
+                float2x3 CurveUvToViewUv = {
+                    1, 0, -_OffsetZoom.x,
+                    0, 1, -_OffsetZoom.y,
+                };
+                CurveUvToViewUv *= _OffsetZoom.z;
+                float2 ViewUvToPx = _Resolution.xy;
+
+                float dist = INITIALLY_FAR;
+                for (int idx = 0; idx < _SegmentCount; idx++)
                 {
-                    float4 keyFrame0 = _Keyframes[idx];
-                    float4 keyFrame1 = _Keyframes[idx + 1];
+                    /* if startVel or endVel inf draw HV
+                     * elif startVel or endVel -inf draw VH
+                     * else draw curve
+                     */
+                    spline_segment seg = _Spline[idx];
 
-                    float t0 = keyFrame0.x;
-                    float t1 = keyFrame1.x;
-                    float t = (uv.x - t0) / (t1 - t0);
-                    if (0.0 <= t && t <= 1.0)
+                    const float2 p = ViewUvToPx * i.uv;
+                    const float2 pStart = ViewUvToPx * mul(CurveUvToViewUv, float3(seg.startPos, 1));
+                    const float2 vStart = ViewUvToPx * mul(CurveUvToViewUv, float3(seg.startVel, 0));
+                    const float2 pEnd = ViewUvToPx * mul(CurveUvToViewUv, float3(seg.endPos, 1));
+                    const float2 vEnd = ViewUvToPx * mul(CurveUvToViewUv, float3(seg.endVel, 0));
+
+                    const bool isStartPosInf = any(isinf(seg.startVel) && seg.startVel > 0);
+                    const bool isStartNegInf = any(isinf(seg.startVel) && seg.startVel < 0);
+                    const bool isEndPosInf = any(isinf(seg.endVel) && seg.endVel > 0);
+                    const bool isEndNegInf = any(isinf(seg.endVel) && seg.endVel < 0);
+
+                    if (isStartPosInf || isStartNegInf || isEndPosInf || isEndNegInf)
                     {
-                        float y = EvaluateCurve(t, keyFrame0, keyFrame1);
-                        float dy = CurveDeriv(t, keyFrame0, keyFrame1);
-
-                        if (abs(y - uv.y) < _Resolution.w * 1.5 * sqrt(1 + dy * dy) / _OffsetZoom.z)
-                        {
-                            return float4(0.0, 1.0, 0.0, 1.0);
-                        }
+                        const float2 mid = isStartPosInf || isEndPosInf
+                                               ? float2(pEnd.x, pStart.y)
+                                               : float2(pStart.x, pEnd.y);
+                        dist = min(dist, sdSegment(p, pStart, mid));
+                        dist = min(dist, sdSegment(p, mid, pEnd));
+                    }
+                    else
+                    {
+                        const float2 p0 = pStart;
+                        const float2 p1 = pStart + vStart / 3.;
+                        const float2 p2 = pEnd - vEnd / 3.;
+                        const float2 p3 = pEnd;
+                        dist = min(dist, CubicBezierSegmentSdfL2(p, p0, p1, p2, p3));
                     }
                 }
+
+                float4 col = 0;
 
                 // Grid (Temp)
                 if (abs(frac(uv.x - 0.5) - 0.5) < _Resolution.z * 2.0 / _OffsetZoom.z || abs(frac(uv.y - 0.5) - 0.5) < _Resolution.w * 2.0 / _OffsetZoom.z)
                 {
-                    return float4(0.4, 0.4, 0.4, 0.5);
+                    col = float4(0.4, 0.4, 0.4, 0.5);
                 }
-                if (abs(frac(uv.x * 10.0 - 0.5) - 0.5) < _Resolution.z * 10.0 / _OffsetZoom.z || abs(frac(uv.y * 10.0 - 0.5) - 0.5) < _Resolution.w * 10.0 / _OffsetZoom.z)
+                else if (abs(frac(uv.x * 10.0 - 0.5) - 0.5) < _Resolution.z * 10.0 / _OffsetZoom.z || abs(frac(uv.y * 10.0 - 0.5) - 0.5) < _Resolution.w * 10.0 / _OffsetZoom.z)
                 {
-                    return float4(0.4, 0.4, 0.4, 0.5);
+                    col = float4(0.4, 0.4, 0.4, 0.5);
                 }
 
-                
-                // float4 col = tex2D(_MainTex, i.uv);
-                // // just invert the colors
-                // col = 1 - col;
-                return 0.0;
+                const float radius = LINE_WIDTH_PX * 0.5f;
+                dist -= radius;
+                col = lerp(float4(0, 1, 0, 1), col, smoothstep(-.5f, .5f, dist));
+
+                return col;
             }
             ENDHLSL
         }

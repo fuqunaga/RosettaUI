@@ -36,6 +36,7 @@ namespace RosettaUI.UIToolkit
         
         public void SetAngle(float angle)
         {
+            if (parent == null) return;
             if (Mathf.Approximately(Mathf.Abs(angle), 90f)) angle *= -1f;
             _lineElement.transform.rotation = Quaternion.AngleAxis(angle + 180f, Vector3.back);
         }
@@ -56,8 +57,6 @@ namespace RosettaUI.UIToolkit
             var centerPoint = parent.LocalToWorld(Vector2.one * 0.5f);
             var mousePoint = evt.position;
             var angle = Mathf.Atan2(-mousePoint.y + centerPoint.y, mousePoint.x - centerPoint.x) * Mathf.Rad2Deg;
-
-            Debug.Log(angle);
             SetAngle(angle);
             _onAngleChanged?.Invoke(angle);
             evt.StopPropagation();

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,6 +10,19 @@ namespace RosettaUI.UIToolkit
     /// </summary>
     public class AnimationCurveEditorControlPoint : VisualElement
     {
+        #region enums
+
+        public enum TangentMode
+        {
+            Smooth,
+            Flat,
+            Broken
+        }        
+
+        #endregion
+        
+        public TangentMode CurrentTangentMode { get; private set; } = TangentMode.Smooth;
+        
         private Action<AnimationCurveEditorControlPoint> _onPointSelected;
         private OnPointMoved _onPointMoved;
         private Vector2 _elementPositionOnDown;
@@ -21,8 +35,8 @@ namespace RosettaUI.UIToolkit
         private Vector2 _position;
         private float _inTangent;
         private float _outTangent;
-
-        private const float ControlPointSize = 10f;
+        
+        private Dictionary<TangentMode, MenuItem> _tangentModeMenuItems = new Dictionary<TangentMode, MenuItem>();
         
         public delegate int OnPointMoved(Vector2 position, float inTan, float outTan);
         
@@ -35,12 +49,12 @@ namespace RosettaUI.UIToolkit
             _leftHandle = new AnimationCurveEditorControlPointHandle(180f, () => _onPointSelected(this), angle =>
             {
                 angle = Mathf.Clamp(Mathf.Abs(angle), 90f, 180f) * Mathf.Sign(angle);
-                _inTangent = angle switch
+                _inTangent = AnimationCurveEditorUtility.GetTangentFromDegree(angle);
+                if (!AnimationCurveEditorUtility.GetKey(KeyCode.LeftAlt) && !AnimationCurveEditorUtility.GetKey(KeyCode.RightAlt))
                 {
-                    90f => float.PositiveInfinity,
-                    -90f => float.NegativeInfinity,
-                    _ => Mathf.Tan(angle * Mathf.Deg2Rad)
-                };
+                    if (CurrentTangentMode == TangentMode.Flat) CurrentTangentMode = TangentMode.Smooth;
+                    if (CurrentTangentMode == TangentMode.Smooth) _outTangent = _inTangent;
+                }
                 
                 _onPointMoved.Invoke(
                     _position,
@@ -49,15 +63,17 @@ namespace RosettaUI.UIToolkit
                 );
             });
             Add(_leftHandle);
+            
             _rightHandle = new AnimationCurveEditorControlPointHandle(0f, () => _onPointSelected(this), angle =>
             {
                 angle = Mathf.Clamp(angle, -90f, 90f);
-                _outTangent = angle switch
+                _outTangent = AnimationCurveEditorUtility.GetTangentFromDegree(angle);
+                if (!AnimationCurveEditorUtility.GetKey(KeyCode.LeftAlt) && !AnimationCurveEditorUtility.GetKey(KeyCode.RightAlt))
                 {
-                    90f => float.PositiveInfinity,
-                    -90f => float.NegativeInfinity,
-                    _ => Mathf.Tan(angle * Mathf.Deg2Rad)
-                };
+                    if (CurrentTangentMode == TangentMode.Flat) CurrentTangentMode = TangentMode.Smooth;
+                    if (CurrentTangentMode == TangentMode.Smooth) _inTangent = _outTangent;
+                }
+                
                 _onPointMoved.Invoke(
                     _position,
                     _inTangent,
@@ -66,15 +82,45 @@ namespace RosettaUI.UIToolkit
             });
             Add(_rightHandle);
             
+            // Control point container
+            AddToClassList("rosettaui-animation-curve-editor__control-point-container");
+            
             // Control point
-            _controlPoint = new VisualElement();
+            _controlPoint = new VisualElement { name = "AnimationCurveEditorControlPoint" };
             _controlPoint.RegisterCallback<MouseDownEvent>(OnMouseDown);
+            _controlPoint.AddToClassList("rosettaui-animation-curve-editor__control-point");
+            _tangentModeMenuItems[TangentMode.Smooth] = new MenuItem("Smooth", () => SetTangentModeAndUpdateView(TangentMode.Smooth));
+            _tangentModeMenuItems[TangentMode.Flat] = new MenuItem("Flat", () => SetTangentModeAndUpdateView(TangentMode.Flat));
+            _tangentModeMenuItems[TangentMode.Broken] = new MenuItem("Broken", () => SetTangentModeAndUpdateView(TangentMode.Broken));
+            _controlPoint.AddManipulator(new PopupMenuManipulator(() => new []
+            {
+                new MenuItem("Delete Key", () => {}),
+                MenuItem.Separator, 
+                _tangentModeMenuItems[TangentMode.Smooth],
+                _tangentModeMenuItems[TangentMode.Flat],
+                _tangentModeMenuItems[TangentMode.Broken]
+            }));
             Add(_controlPoint);
             
-            // Styles
-            _controlPoint.AddToClassList("rosettaui-animation-curve-editor__control-point");
-            _controlPoint.style.width = ControlPointSize;
-            _controlPoint.style.height = ControlPointSize;
+            return;
+            
+            void SetTangentModeAndUpdateView(TangentMode mode)
+            {
+                SetTangentMode(mode);
+                switch (mode)
+                {
+                    case TangentMode.Broken:
+                        return;
+                    case TangentMode.Flat:
+                        _inTangent = 0f;
+                        _outTangent = 0f;
+                        break;
+                    case TangentMode.Smooth:
+                        _inTangent = _outTangent;
+                        break;
+                }
+                _onPointMoved.Invoke(_position, _inTangent, _outTangent);
+            }
         }
         
         public void SetActive(bool active)
@@ -93,16 +139,29 @@ namespace RosettaUI.UIToolkit
             }
         }
         
+        public void SetTangentMode(TangentMode mode)
+        {
+            CurrentTangentMode = mode;
+            foreach (var item in _tangentModeMenuItems)
+            {
+                item.Value.isChecked = item.Key == mode;
+            }
+        }
+        
         public void SetPosition(float x, float y, float leftTan, float rightTan)
         {
-            
-            style.left = x - ControlPointSize * 0.5f;
-            style.top = y - ControlPointSize * 0.5f;
+            style.left = x;
+            style.top = y;
             _position = Vector2.up + new Vector2(x, -y) / parent.layout.size;
-            _leftHandle.SetAngle(Mathf.Atan(leftTan) * Mathf.Rad2Deg);
-            _rightHandle.SetAngle(180f + Mathf.Atan(rightTan) * Mathf.Rad2Deg);
-            _inTangent = leftTan;
-            _outTangent = rightTan;
+            SetTangent(leftTan, rightTan);
+        }
+        
+        private void SetTangent(float inTan, float outTan)
+        {
+            _inTangent = inTan;
+            _outTangent = outTan;
+            _leftHandle.SetAngle(AnimationCurveEditorUtility.GetDegreeFromTangent(inTan));
+            _rightHandle.SetAngle(180f + AnimationCurveEditorUtility.GetDegreeFromTangent(outTan));
         }
         
         private void OnMouseDown(MouseDownEvent evt)

@@ -34,8 +34,17 @@
 .rosettaui-animation-curve-editor__preview-front {
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 
+.rosettaui-animation-curve-editor__field-row {
+    width: 100%;
+    height: 22px;
+    flex-direction: row;
+    flex-grow: 1;
+    padding: 0;
+    margin: 0 4px 0 0;
+}
 
 .rosettaui-animation-curve-editor__cursor {
     position: absolute;
@@ -62,12 +71,23 @@
 /********************************************************************************
 * Control Point
 ********************************************************************************/
-.rosettaui-animation-curve-editor__control-point {
+.rosettaui-animation-curve-editor__control-point-container {
+    position: absolute;
     margin: 0;
     padding: 0;
+    width: 10px;
+    height: 10px;
+    translate: -5px -5px;
+}
+
+.rosettaui-animation-curve-editor__control-point {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    width: 10px;
+    height: 10px;
     background-color: #00ff00;
     border-radius: 5px;
-    position: absolute;
 }
 
 .rosettaui-animation-curve-editor__control-point-handle__line

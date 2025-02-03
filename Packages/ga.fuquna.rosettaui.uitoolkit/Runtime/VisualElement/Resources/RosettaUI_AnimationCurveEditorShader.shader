@@ -94,8 +94,8 @@
                     else
                     {
                         const float2 p0 = pStart;
-                        const float2 p1 = pStart + vStart / 3.;
-                        const float2 p2 = pEnd - vEnd / 3.;
+                        const float2 p1 = pStart + vStart; // Hermite curve 1/3 factor rolled into tangent value
+                        const float2 p2 = pEnd - vEnd;
                         const float2 p3 = pEnd;
                         dist = min(dist, CubicBezierSegmentSdfL2(p, p0, p1, p2, p3));
                     }

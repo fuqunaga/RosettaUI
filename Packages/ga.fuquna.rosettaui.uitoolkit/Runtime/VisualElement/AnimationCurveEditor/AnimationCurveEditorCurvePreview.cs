@@ -92,13 +92,4 @@ namespace RosettaUI.UIToolkit
             _curveDataBuffer = null;
         }
     }
-
-    internal static class KeyframeExt
-    {
-        public static float GetOutWeight(this Keyframe keyframe) =>
-            keyframe.weightedMode is WeightedMode.Out or WeightedMode.Both ? keyframe.outWeight : 1;
-
-        public static float GetInWeight(this Keyframe keyframe) =>
-            keyframe.weightedMode is WeightedMode.In or WeightedMode.Both ? keyframe.inWeight : 1;
-    }
 }

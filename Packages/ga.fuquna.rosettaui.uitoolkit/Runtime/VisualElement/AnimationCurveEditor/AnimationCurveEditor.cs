@@ -76,7 +76,6 @@ namespace RosettaUI.UIToolkit
         }
         
         #endregion
-
         
         public event Action<AnimationCurve> onCurveChanged;
         
@@ -94,6 +93,10 @@ namespace RosettaUI.UIToolkit
         private List<AnimationCurveEditorControlPoint> _controlPoints = new List<AnimationCurveEditorControlPoint>();
         private FloatField _timeField;
         private FloatField _valueField;
+        private EnumField _tangentModeField;
+        private Slider _inTangentSlider;
+        private Slider _outTangentSlider;
+        private VisualElement _propertyField;
 
         private float _zoom = 1.0f;
         private Vector2 _offset = Vector2.zero;
@@ -157,6 +160,44 @@ namespace RosettaUI.UIToolkit
             });
             
             _curvePreviewElement.RegisterCallback<MouseDownEvent>(OnMouseDown);
+            
+            _propertyField = this.Q("property-group");
+            
+            // Tangent Field
+            _inTangentSlider = this.Q<Slider>("in-tangent-slider");
+            _inTangentSlider.RegisterValueChangedCallback(evt =>
+            {
+                if (_curve == null || _selectedControlPointIndex < 0) return;
+                var key = _curve.keys[_selectedControlPointIndex];
+                key.inTangent = AnimationCurveEditorUtility.GetTangentFromDegree(evt.newValue);
+                MoveKey(key);
+                UpdateView();
+                onCurveChanged?.Invoke(_curve);
+            });
+            _outTangentSlider = this.Q<Slider>("out-tangent-slider");
+            _outTangentSlider.RegisterValueChangedCallback(evt =>
+            {
+                if (_curve == null || _selectedControlPointIndex < 0) return;
+                var key = _curve.keys[_selectedControlPointIndex];
+                key.outTangent = AnimationCurveEditorUtility.GetTangentFromDegree(evt.newValue);
+                MoveKey(key);
+                UpdateView();
+                onCurveChanged?.Invoke(_curve);
+            });
+            _tangentModeField = this.Q<EnumField>("tangent-mode-field");
+            _tangentModeField.Init(AnimationCurveEditorControlPoint.TangentMode.Smooth);
+            _tangentModeField.RegisterValueChangedCallback(evt =>
+            {
+                if (_curve == null || _selectedControlPointIndex < 0) return;
+                AnimationCurveEditorControlPoint.TangentMode mode = (AnimationCurveEditorControlPoint.TangentMode)evt.newValue;
+                var key = _curve.keys[_selectedControlPointIndex];
+                AnimationCurveEditorUtility.SetTangentMode(ref key, mode);
+                var point = _controlPoints[_selectedControlPointIndex];
+                point.SetTangentMode(mode);
+                MoveKey(key);
+                if (mode != AnimationCurveEditorControlPoint.TangentMode.Broken) UpdateView();
+                onCurveChanged?.Invoke(_curve);
+            });
             
             // Time Field
             _timeField = this.Q<FloatField>("time-field");
@@ -279,6 +320,7 @@ namespace RosettaUI.UIToolkit
                     key.inTangent, 
                     key.outTangent
                 );
+                controlPoint.SetTangentMode(key.GetTangentMode());
             }
         }
         
@@ -318,14 +360,15 @@ namespace RosettaUI.UIToolkit
         {
             if (_selectedControlPointIndex < 0)
             {
-                _timeField.style.visibility = Visibility.Hidden;
-                _valueField.style.visibility = Visibility.Hidden;
+                _propertyField.style.visibility = Visibility.Hidden;
                 return;
             }
-            _timeField.style.visibility = Visibility.Visible;
-            _valueField.style.visibility = Visibility.Visible;
+            _propertyField.style.visibility = Visibility.Visible;
             _timeField.SetValueWithoutNotify(_curve.keys[_selectedControlPointIndex].time);
             _valueField.SetValueWithoutNotify(_curve.keys[_selectedControlPointIndex].value);
+            _tangentModeField.SetValueWithoutNotify(_controlPoints[_selectedControlPointIndex].CurrentTangentMode);
+            _inTangentSlider.SetValueWithoutNotify(Mathf.Atan(_curve.keys[_selectedControlPointIndex].inTangent) * Mathf.Rad2Deg);
+            _outTangentSlider.SetValueWithoutNotify(Mathf.Atan(_curve.keys[_selectedControlPointIndex].outTangent) * Mathf.Rad2Deg);
         }
         
         private void OnMouseDown(MouseDownEvent evt)

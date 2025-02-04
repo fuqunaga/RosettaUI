@@ -74,10 +74,10 @@
 .rosettaui-animation-curve-editor__control-point-container {
     position: absolute;
     margin: 0;
-    padding: 0;
-    width: 10px;
-    height: 10px;
-    translate: -5px -5px;
+    padding: 5px 0 0 5px;
+    width: 20px;
+    height: 20px;
+    translate: -10px -10px;
 }
 
 .rosettaui-animation-curve-editor__control-point {

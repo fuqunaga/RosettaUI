@@ -25,6 +25,8 @@ namespace RosettaUI.UIToolkit
         
         private Action<AnimationCurveEditorControlPoint> _onPointSelected;
         private OnPointMoved _onPointMoved;
+        private Action<AnimationCurveEditorControlPoint> _onPointRemoved;
+        
         private Vector2 _elementPositionOnDown;
         private Vector2 _mouseDownPosition;
         
@@ -40,10 +42,11 @@ namespace RosettaUI.UIToolkit
         
         public delegate int OnPointMoved(Vector2 position, float inTan, float outTan);
         
-        public AnimationCurveEditorControlPoint(Action<AnimationCurveEditorControlPoint> onPointSelected, OnPointMoved onPointMoved)
+        public AnimationCurveEditorControlPoint(Action<AnimationCurveEditorControlPoint> onPointSelected, OnPointMoved onPointMoved, Action<AnimationCurveEditorControlPoint> onPointRemoved)
         {
             _onPointSelected = onPointSelected;
             _onPointMoved = onPointMoved;
+            _onPointRemoved = onPointRemoved;
             
             // Handles
             _leftHandle = new AnimationCurveEditorControlPointHandle(180f, () => _onPointSelected(this), angle =>
@@ -55,12 +58,7 @@ namespace RosettaUI.UIToolkit
                     if (CurrentTangentMode == TangentMode.Flat) CurrentTangentMode = TangentMode.Smooth;
                     if (CurrentTangentMode == TangentMode.Smooth) _outTangent = _inTangent;
                 }
-                
-                _onPointMoved.Invoke(
-                    _position,
-                    _inTangent,
-                    _outTangent
-                );
+                _onPointMoved.Invoke(_position, _inTangent, _outTangent);
             });
             Add(_leftHandle);
             
@@ -73,33 +71,28 @@ namespace RosettaUI.UIToolkit
                     if (CurrentTangentMode == TangentMode.Flat) CurrentTangentMode = TangentMode.Smooth;
                     if (CurrentTangentMode == TangentMode.Smooth) _inTangent = _outTangent;
                 }
-                
-                _onPointMoved.Invoke(
-                    _position,
-                    _inTangent,
-                    _outTangent
-                );
+                _onPointMoved.Invoke(_position, _inTangent, _outTangent);
             });
             Add(_rightHandle);
             
             // Control point container
             AddToClassList("rosettaui-animation-curve-editor__control-point-container");
-            
-            // Control point
-            _controlPoint = new VisualElement { name = "AnimationCurveEditorControlPoint" };
-            _controlPoint.RegisterCallback<MouseDownEvent>(OnMouseDown);
-            _controlPoint.AddToClassList("rosettaui-animation-curve-editor__control-point");
-            _tangentModeMenuItems[TangentMode.Smooth] = new MenuItem("Smooth", () => SetTangentModeAndUpdateView(TangentMode.Smooth));
-            _tangentModeMenuItems[TangentMode.Flat] = new MenuItem("Flat", () => SetTangentModeAndUpdateView(TangentMode.Flat));
-            _tangentModeMenuItems[TangentMode.Broken] = new MenuItem("Broken", () => SetTangentModeAndUpdateView(TangentMode.Broken));
-            _controlPoint.AddManipulator(new PopupMenuManipulator(() => new []
+            RegisterCallback<MouseDownEvent>(OnMouseDown);
+            this.AddManipulator(new PopupMenuManipulator(() => new []
             {
-                new MenuItem("Delete Key", () => {}),
+                new MenuItem("Delete Key", () => _onPointRemoved(this)),
                 MenuItem.Separator, 
                 _tangentModeMenuItems[TangentMode.Smooth],
                 _tangentModeMenuItems[TangentMode.Flat],
                 _tangentModeMenuItems[TangentMode.Broken]
             }));
+            
+            // Control point
+            _controlPoint = new VisualElement { name = "AnimationCurveEditorControlPoint" };
+            _controlPoint.AddToClassList("rosettaui-animation-curve-editor__control-point");
+            _tangentModeMenuItems[TangentMode.Smooth] = new MenuItem("Smooth", () => SetTangentModeAndUpdateView(TangentMode.Smooth));
+            _tangentModeMenuItems[TangentMode.Flat] = new MenuItem("Flat", () => SetTangentModeAndUpdateView(TangentMode.Flat));
+            _tangentModeMenuItems[TangentMode.Broken] = new MenuItem("Broken", () => SetTangentModeAndUpdateView(TangentMode.Broken));
             Add(_controlPoint);
             
             return;

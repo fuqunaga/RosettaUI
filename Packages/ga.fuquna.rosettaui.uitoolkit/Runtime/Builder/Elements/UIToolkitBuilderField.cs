@@ -49,7 +49,7 @@ namespace RosettaUI.UIToolkit.Builder
             
             void ShowAnimationCurveEditor(Vector2 pos, AnimationCurveField target)
             {
-                AnimationCurveEditor.Show(pos, target, animationCurveField.value, gradient => animationCurveField.value = gradient);
+                AnimationCurveEditor.AnimationCurveEditor.Show(pos, target, animationCurveField.value, gradient => animationCurveField.value = gradient);
             }
         }
         

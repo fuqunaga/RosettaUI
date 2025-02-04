@@ -4,9 +4,9 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace RosettaUI.UIToolkit
+namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
-    public class AnimationCurveEditorCurvePreview : IDisposable
+    public class CurvePreview : IDisposable
     {
         private CommandBuffer _commandBuffer;
         private Material _curveDrawMaterial;
@@ -36,8 +36,8 @@ namespace RosettaUI.UIToolkit
             var splineData = segments.Select(seg => new SplineSegmentData {
                 startPos = new Vector2(seg.Item1.time, seg.Item1.value),
                 endPos = new Vector2(seg.Item2.time, seg.Item2.value),
-                startVel = (seg.Item2.time - seg.Item1.time) * seg.Item1.GetOutWeight() * new Vector2(1, seg.Item1.outTangent),
-                endVel = (seg.Item2.time - seg.Item1.time) * seg.Item2.GetInWeight() * new Vector2(1, seg.Item2.inTangent),
+                startVel = (seg.Item2.time - seg.Item1.time) * seg.Item1.GetStartVel(),
+                endVel = (seg.Item2.time - seg.Item1.time) * seg.Item2.GetEndVel()
             }).ToArray();
 
             _numActiveSegments = splineData.Length;
@@ -71,7 +71,7 @@ namespace RosettaUI.UIToolkit
             Graphics.ExecuteCommandBuffer(_commandBuffer);
         }
 
-        public AnimationCurveEditorCurvePreview()
+        public CurvePreview()
         {
             _curveDrawMaterial = new Material(Resources.Load<Shader>("RosettaUI_AnimationCurveEditorShader"));
             _commandBuffer = new CommandBuffer() { name = "AnimationCurvePreview" };

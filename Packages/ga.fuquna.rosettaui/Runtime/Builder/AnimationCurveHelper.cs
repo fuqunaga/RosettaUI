@@ -21,6 +21,23 @@ namespace RosettaUI.Builder
             dst.preWrapMode = src.preWrapMode;
         }
         
+        public static (Vector2 xRange, Vector2 yRange) ComputeCurveRange(this AnimationCurve curve, int stepNum = 64)
+        {
+            var xRange = new Vector2(float.MaxValue, float.MinValue);
+            var yRange = new Vector2(float.MaxValue, float.MinValue);
+            foreach (var keyframe in curve.keys)
+            {
+                xRange.x = Mathf.Min(xRange.x, keyframe.time);
+                xRange.y = Mathf.Max(xRange.y, keyframe.time);
+            }
+            for (int i = 0; i < stepNum; i++)
+            {
+                float y = curve.Evaluate(i / (stepNum - 1f));
+                yRange.x = Mathf.Min(yRange.x, y);
+                yRange.y = Mathf.Max(yRange.y, y);
+            }
+            return (xRange, yRange);
+        }
         
         public static void UpdateAnimationCurvePreviewToBackgroundImage(AnimationCurve curve, VisualElement visualElement)
         {
@@ -41,25 +58,12 @@ namespace RosettaUI.Builder
                 texture = null;
             }
             
-            // Compute the range of the curve
-            Vector2 xRange = new Vector2(float.MaxValue, float.MinValue);
-            Vector2 yRange = new Vector2(float.MaxValue, float.MinValue);
-            foreach (var keyframe in curve.keys)
-            {
-                xRange.x = Mathf.Min(xRange.x, keyframe.time);
-                xRange.y = Mathf.Max(xRange.y, keyframe.time);
-            }
-            for (int i = 0; i < width; i++)
-            {
-                float y = curve.Evaluate(i / (width - 1f));
-                yRange.x = Mathf.Min(yRange.x, y);
-                yRange.y = Mathf.Max(yRange.y, y);
-            }
+            var range = curve.ComputeCurveRange();
             
             var colorArray = ArrayPool<Color>.Shared.Rent(width * height);
             for (int i = 0; i < width; i++)
             {
-                int targetHeight = (int)((curve.Evaluate(xRange.x + i / (width - 1f) * (xRange.y - xRange.x)) - yRange.x) / (yRange.y - yRange.x) * height);
+                int targetHeight = (int)((curve.Evaluate(range.xRange.x + i / (width - 1f) * (range.xRange.y - range.xRange.x)) - range.yRange.x) / (range.yRange.y - range.yRange.x) * height);
                 for (int j = 0; j < height; j++)
                 {
                     colorArray[j * width + i] = j == targetHeight ? Color.green : new Color(0.3372549f, 0.3372549f, 0.3372549f);

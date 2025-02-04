@@ -13,5 +13,32 @@ namespace RosettaUI
                        Screen.height - Input.mousePosition.y
                    );
         }
+        
+        public static bool GetKey(KeyCode key)
+        {
+#if UNITY_INPUT_SYSTEM_ENABLED
+        return Keyboard.current != null && Keyboard.current[(Key)key].isPressed;
+#else
+            return Input.GetKey(key);
+#endif
+        }
+
+        public static bool GetKeyDown(KeyCode key)
+        {
+#if UNITY_INPUT_SYSTEM_ENABLED
+        return Keyboard.current != null && Keyboard.current[(Key)key].wasPressedThisFrame;
+#else
+            return Input.GetKeyDown(key);
+#endif
+        }
+
+        public static bool GetKeyUp(KeyCode key)
+        {
+#if UNITY_INPUT_SYSTEM_ENABLED
+        return Keyboard.current != null && Keyboard.current[(Key)key].wasReleasedThisFrame;
+#else
+            return Input.GetKeyUp(key);
+#endif
+        }
     }
 }

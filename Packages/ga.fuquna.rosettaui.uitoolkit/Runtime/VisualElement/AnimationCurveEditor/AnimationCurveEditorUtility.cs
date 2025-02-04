@@ -1,45 +1,95 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
-namespace RosettaUI.UIToolkit
+namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
     internal static class AnimationCurveEditorUtility
     {
-        public static float GetOutWeight(this Keyframe keyframe)
+        public static Vector2 GetStartVel(this Keyframe keyframe)
         {
-            return keyframe.weightedMode is WeightedMode.Out or WeightedMode.Both ? keyframe.outWeight : 1f / 3f;
+            float weight = keyframe.weightedMode is WeightedMode.Out or WeightedMode.Both ? keyframe.outWeight : 1f / 3f;
+            var tangent = new Vector2(1, keyframe.outTangent);
+            if (weight == 0f && float.IsInfinity(tangent.y)) return tangent;
+            return weight * tangent;
         }
 
-        public static float GetInWeight(this Keyframe keyframe)
+        public static Vector2 GetEndVel(this Keyframe keyframe)
         {
-            return keyframe.weightedMode is WeightedMode.In or WeightedMode.Both ? keyframe.inWeight : 1f / 3f;
+            float weight = keyframe.weightedMode is WeightedMode.In or WeightedMode.Both ? keyframe.inWeight : 1f / 3f;
+            var tangent = new Vector2(1, keyframe.inTangent);
+            if (weight == 0f && float.IsInfinity(tangent.y)) return tangent;
+            return weight * tangent;
+        }
+
+        public static Vector2 GetPosition(this Keyframe keyframe)
+        {
+            return new Vector2(keyframe.time, keyframe.value);
+        }
+
+        public static WeightedMode GetWeightedMode(this ControlPoint controlPoint)
+        {
+            if (controlPoint.InTangentMode == TangentMode.Weighted)
+            {
+                return controlPoint.OutTangentMode == TangentMode.Weighted ? WeightedMode.Both : WeightedMode.In;
+            }
+            return controlPoint.OutTangentMode == TangentMode.Weighted ? WeightedMode.Out : WeightedMode.None;
         }
         
-        public static AnimationCurveEditorControlPoint.TangentMode GetTangentMode(this Keyframe keyframe)
+        public static PointMode GetPointMode(this Keyframe keyframe)
         {
-             if (keyframe is { inTangent: 0f, outTangent: 0f }) return AnimationCurveEditorControlPoint.TangentMode.Flat;
-             if (Mathf.Approximately(keyframe.inTangent, keyframe.outTangent)) return AnimationCurveEditorControlPoint.TangentMode.Smooth;
-             return AnimationCurveEditorControlPoint.TangentMode.Broken;
+             if (keyframe is { inTangent: 0f, outTangent: 0f }) return PointMode.Flat;
+             if (Mathf.Approximately(keyframe.inTangent, keyframe.outTangent)) return PointMode.Smooth;
+             return PointMode.Broken;
         }
         
-        public static void SetTangentMode(ref Keyframe keyframe, AnimationCurveEditorControlPoint.TangentMode mode)
+        public static void SetPointMode(ref Keyframe keyframe, PointMode mode)
         {
             switch (mode)
             {
-                case AnimationCurveEditorControlPoint.TangentMode.Smooth:
+                case PointMode.Smooth:
                     keyframe.inTangent = keyframe.outTangent;
                     break;
-                case AnimationCurveEditorControlPoint.TangentMode.Flat:
+                case PointMode.Flat:
                     keyframe.inTangent = 0f;
                     keyframe.outTangent = 0f;
                     break;
             }
         }
-        
-        public static float GetDegreeFromTangent(float tangent)
+
+        public static TangentMode GetInTangentMode(this AnimationCurve curve, int index)
         {
-            return Mathf.Atan(tangent) * Mathf.Rad2Deg;
+            var key = curve[index];
+            if (key.weightedMode is WeightedMode.In or WeightedMode.Both) return TangentMode.Weighted;
+            
+            if (float.IsPositiveInfinity(curve[index].inTangent)) return TangentMode.Constant;
+            if (index > 0)
+            {
+                var prevKey = curve[index - 1];
+
+                float tangentToPrevKey = (key.value - prevKey.value) / (key.time - prevKey.time);
+                if (Mathf.Approximately(tangentToPrevKey, key.inTangent)) return TangentMode.Linear;
+            }
+            
+            return TangentMode.Free;            
+        }
+
+        public static TangentMode GetOutTangentMode(this AnimationCurve curve, int index)
+        {
+            var key = curve[index];
+            if (key.weightedMode is WeightedMode.Out or WeightedMode.Both) return TangentMode.Weighted;
+            
+            if (float.IsPositiveInfinity(curve[index].outTangent)) return TangentMode.Constant;
+            if (index < curve.length - 1)
+            {
+                var nextKey = curve[index + 1];
+                float tangentToNextKey = (nextKey.value - key.value) / (nextKey.time - key.time);
+                if (Mathf.Approximately(tangentToNextKey, key.outTangent)) return TangentMode.Linear;
+            } 
+            
+            return TangentMode.Free;
         }
         
+
         public static float GetTangentFromDegree(float degree)
         {
             return degree switch
@@ -50,31 +100,57 @@ namespace RosettaUI.UIToolkit
             };
         }
         
-        public static bool GetKey(KeyCode key)
+        public static float GetDegreeFromTangent(float tangent)
         {
-#if UNITY_INPUT_SYSTEM_ENABLED
-        return Keyboard.current != null && Keyboard.current[(Key)key].isPressed;
-#else
-            return Input.GetKey(key);
-#endif
+            return tangent switch
+            {
+                float.NegativeInfinity => -90f,
+                float.PositiveInfinity => 90f,
+                _ => Mathf.Atan(tangent) * Mathf.Rad2Deg
+            };
         }
 
-        public static bool GetKeyDown(KeyCode key)
+        public static void ApplyTangentMode(ref AnimationCurve curve, IEnumerable<ControlPoint> controlPoints)
         {
-#if UNITY_INPUT_SYSTEM_ENABLED
-        return Keyboard.current != null && Keyboard.current[(Key)key].wasPressedThisFrame;
-#else
-            return Input.GetKeyDown(key);
-#endif
-        }
+            int i = 0;
+            foreach (var controlPoint in controlPoints)
+            {
+                var key = curve.keys[i];
+                switch (controlPoint.InTangentMode)
+                {
+                    case TangentMode.Linear:
+                        // Set the tangent to the slope between the previous key and this key
+                        if (i > 0)
+                        {
+                            var prevKey = curve.keys[i - 1];
+                            key.inTangent = (key.value - prevKey.value) / (key.time - prevKey.time);
+                        }
+                        controlPoint.SetPointMode(PointMode.Broken);
+                        break;
+                    case TangentMode.Constant:
+                        key.inTangent = float.PositiveInfinity;
+                        break;
+                }
+                switch (controlPoint.OutTangentMode)
+                {
+                    case TangentMode.Linear:
+                        // Set the tangent to the slope between this key and the next key
+                        if (i < curve.keys.Length - 1)
+                        {
+                            var nextKey = curve.keys[i + 1];
+                            key.outTangent = (nextKey.value - key.value) / (nextKey.time - key.time);
+                        }
+                        controlPoint.SetPointMode(PointMode.Broken);
+                        break;
+                    case TangentMode.Constant:
+                        key.outTangent = float.PositiveInfinity;
+                        break;
+                }
 
-        public static bool GetKeyUp(KeyCode key)
-        {
-#if UNITY_INPUT_SYSTEM_ENABLED
-        return Keyboard.current != null && Keyboard.current[(Key)key].wasReleasedThisFrame;
-#else
-            return Input.GetKeyUp(key);
-#endif
+                key.weightedMode = controlPoint.GetWeightedMode();
+                curve.MoveKey(i, key);
+                i++;
+            }
         }
     }
 }

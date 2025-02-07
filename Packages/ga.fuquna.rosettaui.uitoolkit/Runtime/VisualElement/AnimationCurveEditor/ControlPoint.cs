@@ -35,10 +35,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private VisualElement _controlPoint;
         private ControlPointHandle _leftHandle;
         private ControlPointHandle _rightHandle;
+        private ControlPointPopupMenuController _popupMenuController;
 
         private Keyframe _keyframeCopy;
         
-        private Dictionary<PointMode, MenuItem> _pointModeMenuItems = new Dictionary<PointMode, MenuItem>();
         
         public delegate void OnPointAction(ControlPoint controlPoint);
         public delegate int OnPointMoved(Keyframe keyframe);
@@ -95,28 +95,23 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             // Control point container
             AddToClassList("rosettaui-animation-curve-editor__control-point-container");
             RegisterCallback<MouseDownEvent>(OnMouseDown);
-            this.AddManipulator(new PopupMenuManipulator(() => new []
-            {
-                new MenuItem("Delete Key", () => _onPointRemoved(this)),
-                MenuItem.Separator, 
-                _pointModeMenuItems[PointMode.Smooth],
-                _pointModeMenuItems[PointMode.Flat],
-                _pointModeMenuItems[PointMode.Broken]
-            }));
             
             // Control point
             _controlPoint = new VisualElement { name = "AnimationCurveEditorControlPoint" };
             _controlPoint.AddToClassList("rosettaui-animation-curve-editor__control-point");
-            _pointModeMenuItems[PointMode.Smooth] = new MenuItem("Smooth", () => SetPointModeAndUpdateView(PointMode.Smooth));
-            _pointModeMenuItems[PointMode.Flat] = new MenuItem("Flat", () => SetPointModeAndUpdateView(PointMode.Flat));
-            _pointModeMenuItems[PointMode.Broken] = new MenuItem("Broken", () => SetPointModeAndUpdateView(PointMode.Broken));
             Add(_controlPoint);
+            
+            // Popup menu controller
+            _popupMenuController = new ControlPointPopupMenuController(
+                () => _onPointRemoved(this),
+                SetPointModeAndUpdateView,
+                SetTangentModeAndUpdateView
+            );
             
             return;
             
             void SetPointModeAndUpdateView(PointMode mode)
             {
-                _onPointSelected(this);
                 SetPointMode(mode);
                 switch (mode)
                 {
@@ -130,6 +125,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                         _keyframeCopy.inTangent = _keyframeCopy.outTangent;
                         break;
                 }
+                _onPointMoved(_keyframeCopy);
+            }
+            
+            void SetTangentModeAndUpdateView(TangentMode? inTangentMode, TangentMode? outTangentMode)
+            {
+                SetTangentMode(inTangentMode, outTangentMode);
                 _onPointMoved(_keyframeCopy);
             }
         }
@@ -153,10 +154,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public void SetPointMode(PointMode mode)
         {
             PointMode = mode;
-            foreach (var item in _pointModeMenuItems)
-            {
-                item.Value.isChecked = item.Key == mode;
-            }
+            _popupMenuController.SetPointMode(mode);
 
             if (mode != PointMode.Broken)
             {
@@ -169,6 +167,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             InTangentMode = inTangentMode ?? InTangentMode;
             OutTangentMode = outTangentMode ?? OutTangentMode;
             _keyframeCopy.weightedMode = this.GetWeightedMode();
+            _popupMenuController.SetTangentMode(InTangentMode, OutTangentMode);
         }
         
         /// <summary>
@@ -210,15 +209,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void OnMouseDown(MouseDownEvent evt)
         {
-            if (evt.button != 0) return;
-            RegisterCallback<MouseMoveEvent>(OnMouseMove);
-            RegisterCallback<MouseLeaveEvent>(OnMouseLeave);
-            RegisterCallback<MouseUpEvent>(OnMouseUp);
             _mouseDownPosition = evt.mousePosition;
             _elementPositionOnDown = new Vector2(style.left.value.value, style.top.value.value);
             _onPointSelected?.Invoke(this);
-            evt.StopPropagation();
-            this.CaptureMouse();
+            if (evt.button == 0)
+            {
+                RegisterCallback<MouseMoveEvent>(OnMouseMove);
+                RegisterCallback<MouseLeaveEvent>(OnMouseLeave);
+                RegisterCallback<MouseUpEvent>(OnMouseUp);
+                evt.StopPropagation();
+                this.CaptureMouse();
+            }
+            else if (evt.button == 1)
+            {
+                _popupMenuController.Show(_mouseDownPosition, this);
+            }
         }
         
         private void OnMouseMove(MouseMoveEvent evt)

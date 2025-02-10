@@ -6,16 +6,7 @@
 }
 
 .rosettaui-animation-curve-editor .unity-base-field__label {
-    min-width: 100px; /* デフォルトは150px だがGradientEditor内ではもっと詰めたい */
-}
-
-.rosettaui-animation-curve-editor > #mode-enum > .unity-label {
-    width: 150px;
-}
-
-.rosettaui-animation-curve-editor__alpha-cursor-container,
-.rosettaui-animation-curve-editor__color-cursor-container {
-    height: 30px;
+    min-width: 100px;
 }
 
 .rosettaui-animation-curve-editor__curve-group {
@@ -38,6 +29,42 @@
     overflow: hidden;
 }
 
+.rosettaui-animation-curve-editor__horizontal-scroller-container {
+    flex-direction: row;
+}
+
+.rosettaui-animation-curve-editor__horizontal-scroller-container > Scroller {
+    flex-grow: 1;
+}
+
+.rosettaui-animation-curve-editor__horizontal-scroller-container > VisualElement {
+    width: 12px;
+}
+
+.rosettaui-animation-curve-editor__vertical-axis-label-container
+{
+    position: absolute;
+    width: 50px;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.rosettaui-animation-curve-editor__horizontal-axis-label-container
+{
+    position: absolute;
+    width: 100%;
+    height: 20px;
+    bottom: 0;
+    left: 0;
+}
+.rosettaui-animation-curve-editor__vertical-axis-label-container > Label,
+.rosettaui-animation-curve-editor__horizontal-axis-label-container > Label
+{
+    position: absolute;
+    color: gray;
+}
+
 .rosettaui-animation-curve-editor__field-row {
     width: 100%;
     height: 22px;
@@ -45,28 +72,6 @@
     flex-grow: 1;
     padding: 0;
     margin: 0 4px 0 0;
-}
-
-.rosettaui-animation-curve-editor__cursor {
-    position: absolute;
-    width: 8px;
-    height: 14px;
-    margin: 0 0 0 -4px;
-    border-width: 0;
-    background-image: resource("gradient_cursor");
-}
-
-.rosettaui-animation-curve-editor__cursor:focus {
-    background-image: resource("gradient_cursor_focus");
-}
-
-.rosettaui-animation-curve-editor__cursor-alpha {
-    top: 8px;
-}
-
-.rosettaui-animation-curve-editor__cursor-color {
-    bottom: 8px;
-    scale: -1;
 }
 
 /********************************************************************************

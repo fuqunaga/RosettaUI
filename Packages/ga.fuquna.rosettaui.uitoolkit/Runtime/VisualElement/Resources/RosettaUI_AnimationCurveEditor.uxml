@@ -2,10 +2,16 @@
     <ui:VisualElement name="fixed-size-area" class="rosettaui-animation-curve-editor-fixed-size-area" style="flex-grow: 1;">
         <ui:GroupBox name="curve-group" class="rosettaui-animation-curve-editor__curve-group">
             <ui:VisualElement name="preview-container" style="flex-grow: 1; flex-direction: row;">
-                <ui:VisualElement name="preview-front" class="rosettaui-animation-curve-editor__preview-front" />
-                <ui:Scroller high-value="100" direction="Vertical" value="42" name="vertical-scroller" />
+                <ui:VisualElement name="preview-front" class="rosettaui-animation-curve-editor__preview-front" >
+                    <ui:VisualElement name="vertical-axis-label-container" class="rosettaui-animation-curve-editor__vertical-axis-label-container"/>
+                    <ui:VisualElement name="horizontal-axis-label-container" class="rosettaui-animation-curve-editor__horizontal-axis-label-container"/>
+                </ui:VisualElement>
+                <ui:Scroller low-value="0" high-value="1" direction="Vertical" name="vertical-scroller" />
             </ui:VisualElement>
-            <ui:Scroller high-value="100" direction="Horizontal" value="42" name="horizontal-scroller" />
+            <ui:VisualElement class="rosettaui-animation-curve-editor__horizontal-scroller-container">
+                <ui:Scroller low-value="0" high-value="1" direction="Horizontal" name="horizontal-scroller" />
+                <ui:VisualElement />
+            </ui:VisualElement>
         </ui:GroupBox>
         <ui:VisualElement name="property-group" style="background-color: rgba(0, 0, 0, 0); margin-top: 8px; margin-right: 4px; margin-bottom: 8px; margin-left: 4px;">
             <ui:FloatField name="time-field" label="Time" style="flex-grow: 1;" />

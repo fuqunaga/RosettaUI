@@ -15,29 +15,30 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         public struct CurvePreviewViewInfo
         {
-            public Vector4 resolution;
-            public Vector4 offsetZoom;
-            public RenderTexture outputTexture;
+            public Vector4 Resolution;
+            public Vector4 OffsetZoom;
+            public Vector4 GridUnit;
+            public RenderTexture OutputTexture;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("ReSharper", "NotAccessedField.Local")]
         private struct SplineSegmentData
         {
-            public Vector2 startPos;
-            public Vector2 startVel;
+            public Vector2 StartPos;
+            public Vector2 StartVel;
 
-            public Vector2 endPos;
-            public Vector2 endVel;
+            public Vector2 EndPos;
+            public Vector2 EndVel;
         }
 
         public void UpdateData(CommandBuffer cmdBuf, AnimationCurve animationCurve)
         {
             var segments = animationCurve.keys.Zip(animationCurve.keys.Skip(1), ValueTuple.Create);
             var splineData = segments.Select(seg => new SplineSegmentData {
-                startPos = new Vector2(seg.Item1.time, seg.Item1.value),
-                endPos = new Vector2(seg.Item2.time, seg.Item2.value),
-                startVel = (seg.Item2.time - seg.Item1.time) * seg.Item1.GetStartVel(),
-                endVel = (seg.Item2.time - seg.Item1.time) * seg.Item2.GetEndVel()
+                StartPos = new Vector2(seg.Item1.time, seg.Item1.value),
+                EndPos = new Vector2(seg.Item2.time, seg.Item2.value),
+                StartVel = (seg.Item2.time - seg.Item1.time) * seg.Item1.GetStartVel(),
+                EndVel = (seg.Item2.time - seg.Item1.time) * seg.Item2.GetEndVel()
             }).ToArray();
 
             _numActiveSegments = splineData.Length;
@@ -63,10 +64,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _commandBuffer.Clear();
             UpdateData(_commandBuffer, animationCurve);
 
-            _commandBuffer.SetGlobalVector("_Resolution", viewInfo.resolution);
-            _commandBuffer.SetGlobalVector("_OffsetZoom", viewInfo.offsetZoom);
+            _commandBuffer.SetGlobalVector("_Resolution", viewInfo.Resolution);
+            _commandBuffer.SetGlobalVector("_OffsetZoom", viewInfo.OffsetZoom);
+            _commandBuffer.SetGlobalVector("_GridUnit", viewInfo.GridUnit);
 
-            DrawCurve(_commandBuffer, viewInfo.outputTexture);
+            DrawCurve(_commandBuffer, viewInfo.OutputTexture);
 
             Graphics.ExecuteCommandBuffer(_commandBuffer);
         }

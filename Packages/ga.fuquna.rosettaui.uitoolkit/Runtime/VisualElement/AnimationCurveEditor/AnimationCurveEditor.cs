@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -93,6 +94,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private VisualElement _curvePreviewElement;
         private ScrollerController _scrollerController;
+        private AxisLabelController _axisLabelController;
         private List<ControlPoint> _controlPoints = new List<ControlPoint>();
         private FloatField _timeField;
         private FloatField _valueField;
@@ -165,7 +167,26 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             _curvePreviewElement.RegisterCallback<MouseDownEvent>(OnMouseDown);
             
-            _scrollerController = new ScrollerController(this, "vertical-scroller", "horizontal-scroller", () => _curve);
+            _axisLabelController = new AxisLabelController(this);
+            _scrollerController = new ScrollerController(this,
+                yCenter =>
+                {
+                    _offset.y = yCenter - 0.5f / _zoom;
+                    UpdateControlPoints();
+                    UpdateCurvePreview();
+                    var rect = GetViewRectInCurve();
+                    _axisLabelController.UpdateAxisLabel(rect);
+                },
+                xCenter =>
+                {
+                    _offset.x = xCenter - 0.5f / _zoom;
+                    UpdateControlPoints();
+                    UpdateCurvePreview();
+                    var rect = GetViewRectInCurve();
+                    _axisLabelController.UpdateAxisLabel(rect);
+                }
+            );
+            
             _propertyField = this.Q("property-group");
             
             // Tangent Field
@@ -331,7 +352,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             UpdateControlPoints();
             UpdateCurvePreview();
-            _scrollerController.UpdateScroller(GetViewRectInCurve());
+            var rect = GetViewRectInCurve();
+            _scrollerController.UpdateScroller(rect, _curve.ComputeCurveRange());
+            _axisLabelController.UpdateAxisLabel(rect);
         }
 
         private void UpdateControlPoints()
@@ -356,11 +379,16 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 PreviewTexture?.Release();
                 PreviewTexture = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32);
             }
+            
+            var rect = GetViewRectInCurve();
+            int xOrder = (int)Mathf.Log10(rect.width);
+            int yOrder = (int)Mathf.Log10(rect.height);
 
             _curvePreview.Render(_curve, new CurvePreview.CurvePreviewViewInfo {
-                resolution = new Vector4(width, height, 1f / width, 1f / height),
-                offsetZoom = new Vector4(_offset.x, _offset.y, _zoom, 0f),
-                outputTexture = PreviewTexture,
+                Resolution = new Vector4(width, height, 1f / width, 1f / height),
+                OffsetZoom = new Vector4(_offset.x, _offset.y, _zoom, 0f),
+                GridUnit = new Vector4(Mathf.Pow(10f, xOrder - 1), Mathf.Pow(10f, yOrder - 1), Mathf.Pow(10f, xOrder), Mathf.Pow(10f, yOrder)),
+                OutputTexture = PreviewTexture,
             });
         }
         
@@ -462,11 +490,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void OnMouseDown(MouseDownEvent evt)
         {
             _mouseButton = evt.button;
-            if (_mouseButton == 2)
+            if (_mouseButton == 2 || (_mouseButton == 0 && evt.ctrlKey))
             {
+                _curvePreviewElement.CaptureMouse();
                 _curvePreviewElement.RegisterCallback<MouseMoveEvent>(OnMouseMove);
                 _curvePreviewElement.RegisterCallback<MouseUpEvent>(OnMouseUp);
-                _curvePreviewElement.RegisterCallback<MouseLeaveEvent>(OnMouseLeave);
                 _mouseDownPosition = evt.localMousePosition;
                 _initialOffset = _offset;
 
@@ -488,7 +516,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void OnMouseMove(MouseMoveEvent evt)
         {
-            if (_mouseButton == 2)
+            if (_mouseButton == 2 || (_mouseButton == 0 && evt.ctrlKey))
             {
                 _offset = _initialOffset + (evt.localMousePosition - _mouseDownPosition) / new Vector2(-_curvePreviewElement.resolvedStyle.width, _curvePreviewElement.resolvedStyle.height) / _zoom;
                 UpdateView();
@@ -498,13 +526,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void OnMouseUp(MouseUpEvent evt)
         {
-            _curvePreviewElement.UnregisterCallback<MouseMoveEvent>(OnMouseMove);
-            _curvePreviewElement.UnregisterCallback<MouseUpEvent>(OnMouseUp);
-            evt.StopPropagation();
-        }
-        
-        private void OnMouseLeave(MouseLeaveEvent evt)
-        {
+            _curvePreviewElement.ReleaseMouse();
             _curvePreviewElement.UnregisterCallback<MouseMoveEvent>(OnMouseMove);
             _curvePreviewElement.UnregisterCallback<MouseUpEvent>(OnMouseUp);
             evt.StopPropagation();

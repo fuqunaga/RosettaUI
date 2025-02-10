@@ -11,9 +11,7 @@
             #pragma fragment Frag
 
             #include "UnityCG.cginc"
-            #include "SdfBezierSpline.cginc"
-            #define LINE_WIDTH_PX 2.0f
-
+            #include "SdfBezierSpline.hlsl"
 
             struct appdata
             {
@@ -30,6 +28,7 @@
             StructuredBuffer<float4> _Keyframes;
             float4 _Resolution;
             float4 _OffsetZoom;
+            float4 _GridUnit;
 
             struct spline_segment
             {
@@ -41,6 +40,10 @@
 
             StructuredBuffer<spline_segment> _Spline;
             int _SegmentCount;
+
+            static const float LineWidth = 2.0f;
+            static const float4 GridColor = float4(0.4, 0.4, 0.4, 0.5);
+            static const float4 LineColor = float4(0, 1, 0, 1);
 
             v2f Vert(appdata v)
             {
@@ -88,8 +91,8 @@
                         const float2 mid = isStartPosInf || isEndPosInf
                                                ? float2(pEnd.x, pStart.y)
                                                : float2(pStart.x, pEnd.y);
-                        dist = min(dist, sdSegment(p, pStart, mid));
-                        dist = min(dist, sdSegment(p, mid, pEnd));
+                        dist = min(dist, SdSegment(p, pStart, mid));
+                        dist = min(dist, SdSegment(p, mid, pEnd));
                     }
                     else
                     {
@@ -102,20 +105,17 @@
                 }
 
                 float4 col = 0;
+                
+                // Grid
+                float2 gridThickness = _Resolution.zw / (_GridUnit.zw * _OffsetZoom.z);
+                float2 subGridThickness = _Resolution.zw / (_GridUnit.xy * _OffsetZoom.z);
+                bool isBoldGrid = any(abs(frac(uv / _GridUnit.zw - 0.5) - 0.5) < gridThickness * 2.0);
+                bool isGrid = any(abs(frac(uv / _GridUnit.xy - 0.5) - 0.5) < subGridThickness);
+                col = (isBoldGrid || isGrid) ? GridColor : col;
 
-                // Grid (Temp)
-                if (abs(frac(uv.x - 0.5) - 0.5) < _Resolution.z * 2.0 / _OffsetZoom.z || abs(frac(uv.y - 0.5) - 0.5) < _Resolution.w * 2.0 / _OffsetZoom.z)
-                {
-                    col = float4(0.4, 0.4, 0.4, 0.5);
-                }
-                else if (abs(frac(uv.x * 10.0 - 0.5) - 0.5) < _Resolution.z * 10.0 / _OffsetZoom.z || abs(frac(uv.y * 10.0 - 0.5) - 0.5) < _Resolution.w * 10.0 / _OffsetZoom.z)
-                {
-                    col = float4(0.4, 0.4, 0.4, 0.5);
-                }
-
-                const float radius = LINE_WIDTH_PX * 0.5f;
-                dist -= radius;
-                col = lerp(float4(0, 1, 0, 1), col, smoothstep(-.5f, .5f, dist));
+                // Line
+                dist -= LineWidth * 0.5f;
+                col = lerp(LineColor, col, smoothstep(-.5f, .5f, dist));
 
                 return col;
             }

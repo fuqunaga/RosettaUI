@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
@@ -25,15 +26,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             return new Vector2(keyframe.time, keyframe.value);
         }
-
-        public static WeightedMode GetWeightedMode(this ControlPoint controlPoint)
-        {
-            if (controlPoint.InTangentMode == TangentMode.Weighted)
-            {
-                return controlPoint.OutTangentMode == TangentMode.Weighted ? WeightedMode.Both : WeightedMode.In;
-            }
-            return controlPoint.OutTangentMode == TangentMode.Weighted ? WeightedMode.Out : WeightedMode.None;
-        }
         
         public static PointMode GetPointMode(this Keyframe keyframe)
         {
@@ -59,7 +51,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public static TangentMode GetInTangentMode(this AnimationCurve curve, int index)
         {
             var key = curve[index];
-            if (key.weightedMode is WeightedMode.In or WeightedMode.Both) return TangentMode.Weighted;
             
             if (float.IsPositiveInfinity(curve[index].inTangent)) return TangentMode.Constant;
             if (index > 0)
@@ -76,7 +67,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public static TangentMode GetOutTangentMode(this AnimationCurve curve, int index)
         {
             var key = curve[index];
-            if (key.weightedMode is WeightedMode.Out or WeightedMode.Both) return TangentMode.Weighted;
             
             if (float.IsPositiveInfinity(curve[index].outTangent)) return TangentMode.Constant;
             if (index < curve.length - 1)
@@ -88,8 +78,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             return TangentMode.Free;
         }
-        
 
+        public static void SetWeightedFrag(this ref Keyframe key, WeightedMode mode, bool value)
+        {
+            uint current = (uint) key.weightedMode;
+            uint mask = (uint) mode;
+            if (value) current |= mask;
+            else current &= ~mask;
+            key.weightedMode = (WeightedMode) current;
+        }
+        
+        public static void ToggleWeightedFrag(this ref Keyframe key, WeightedMode mode)
+        {
+            key.SetWeightedFrag(mode, !key.weightedMode.HasFlag(mode));
+        }
+        
         public static float GetTangentFromDegree(float degree)
         {
             return degree switch
@@ -146,8 +149,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                         key.outTangent = float.PositiveInfinity;
                         break;
                 }
-
-                key.weightedMode = controlPoint.GetWeightedMode();
+                
                 curve.MoveKey(i, key);
                 i++;
             }

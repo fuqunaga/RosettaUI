@@ -166,10 +166,10 @@
 .rosettaui-animation-curve-editor__control-point-handle__handle
 {
     position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 8px;
-    height: 8px;
+    top: 7px;
+    right: 7px;
+    width: 6px;
+    height: 6px;
     background-color: whitesmoke;
     rotate: 45deg;
 }

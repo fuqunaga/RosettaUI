@@ -28,7 +28,7 @@
             StructuredBuffer<float4> _Keyframes;
             float4 _Resolution;
             float4 _OffsetZoom;
-            float4 _GridUnit;
+            float4 _GridParams;
 
             struct spline_segment
             {
@@ -56,14 +56,19 @@
             float4 Frag(v2f i) : SV_Target
             {
                 float2 uv = i.uv;
-                uv = uv / _OffsetZoom.z + _OffsetZoom.xy;
+                uv = uv / _OffsetZoom.zw + _OffsetZoom.xy;
 
                 // Curve
                 float2x3 CurveUvToViewUv = {
                     1, 0, -_OffsetZoom.x,
                     0, 1, -_OffsetZoom.y,
                 };
-                CurveUvToViewUv *= _OffsetZoom.z;
+                float2x2 scaleMatrix = {
+                    _OffsetZoom.z, 0,
+                    0, _OffsetZoom.w
+                };
+                CurveUvToViewUv = mul(scaleMatrix, CurveUvToViewUv);
+                
                 float2 ViewUvToPx = _Resolution.xy;
 
                 float dist = INITIALLY_FAR;
@@ -107,12 +112,21 @@
                 float4 col = 0;
                 
                 // Grid
-                float2 gridThickness = _Resolution.zw / (_GridUnit.zw * _OffsetZoom.z);
-                float2 subGridThickness = _Resolution.zw / (_GridUnit.xy * _OffsetZoom.z);
-                bool isBoldGrid = any(abs(frac(uv / _GridUnit.zw - 0.5) - 0.5) < gridThickness * 2.0);
-                bool isGrid = any(abs(frac(uv / _GridUnit.xy - 0.5) - 0.5) < subGridThickness);
-                col = (isBoldGrid || isGrid) ? GridColor : col;
-
+                float2 main = _GridParams.zw;
+                float2 grid = _GridParams.zw * (_GridParams.xy < 0 ? 0.1 : 1);
+                float2 sub = _GridParams.zw * (_GridParams.xy < 0 ? 0.01 : 0.1);
+                float2 mainGridThickness = _Resolution.zw / (main * _OffsetZoom.zw) * 2.0;
+                float2 gridThickness = _Resolution.zw / (grid * _OffsetZoom.zw) * 1.0;
+                float2 subThickness = _Resolution.zw / (sub * _OffsetZoom.zw) * 1.0;
+                bool isMainGrid = any(abs(frac(uv / main - 0.5) - 0.5) < mainGridThickness);
+                bool isGrid = any(abs(frac(uv / grid - 0.5) - 0.5) < gridThickness);
+                bool2 isSubGrid = abs(frac(uv / sub - 0.5) - 0.5) < subThickness;
+                
+                col = isSubGrid.x ? float4(GridColor.rgb, 1.0 - frac(_GridParams.x)) : col;
+                col = isSubGrid.y ? float4(GridColor.rgb, 1.0 - frac(_GridParams.y)) : col;
+                col = isGrid ? GridColor : col;
+                col = isMainGrid ? GridColor : col;
+                
                 // Line
                 dist -= LineWidth * 0.5f;
                 col = lerp(LineColor, col, smoothstep(-.5f, .5f, dist));

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -101,13 +102,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private EnumField _pointModeField;
         private Slider _inTangentSlider;
         private EnumField _inTangentModeField;
+        private ToggleButton _inWeightedButton;
         private Slider _outTangentSlider;
         private EnumField _outTangentModeField;
+        private ToggleButton _outWeightedButton;
         private VisualElement _propertyField;
         private ToggleButton _snapXButton;
         private ToggleButton _snapYButton;
 
-        private float _zoom = 1.0f;
+        private Vector2 _zoom = Vector2.one;
         private Vector2 _offset = Vector2.zero;
         private int _selectedControlPointIndex = -1;
         
@@ -122,6 +125,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private RenderTexture _curveEditorTexture = null;
 
         private CurvePreview _curvePreview;
+        
+        private static readonly Vector2 ZoomRange = new Vector2(0.001f, 1000f);
 
         private AnimationCurveEditor()
         {
@@ -165,9 +170,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     case KeyCode.LeftCommand:
                     case KeyCode.RightControl:
                     case KeyCode.RightCommand:
-                        _prevSnapX = _snapXButton.IsToggled;
-                        _prevSnapY = _snapYButton.IsToggled;
-                        Debug.Log("Key Down" + _prevSnapX);
+                        _prevSnapX = _snapXButton.value;
+                        _prevSnapY = _snapYButton.value;
                         _snapXButton.SetValueWithoutNotify(true);
                         _snapYButton.SetValueWithoutNotify(true);
                         break;
@@ -212,19 +216,27 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 var mouseUv = new Vector2(evt.localMousePosition.x / _curvePreviewElement.resolvedStyle.width, 1f - evt.localMousePosition.y / _curvePreviewElement.resolvedStyle.height);
                 mouseUv = GetCurvePosFromScreenUv(mouseUv);
                 
-                float amount = 1f + Mathf.Clamp(evt.delta.y, -0.1f, 0.1f);
+                Vector2 amount = Vector2.one * (1f + Mathf.Clamp(evt.delta.y, -0.1f, 0.1f));
+                
+                if (evt.ctrlKey) amount.y = 1f;
+                else if (evt.shiftKey) amount.x = 1f;
+                
+                var zoom = _zoom / amount;
+                if (zoom.x < ZoomRange.x || zoom.y < ZoomRange.x || zoom.x > ZoomRange.y || zoom.y > ZoomRange.y) return;
+                
                 _zoom /= amount;
                 _offset = mouseUv - (mouseUv - _offset) * amount;
+
                 UpdateView();
             });
             
-            _curvePreviewElement.RegisterCallback<MouseDownEvent>(OnMouseDown);
+            _curvePreviewElement.RegisterCallback<PointerDownEvent>(OnPointerDown);
             
             _axisLabelController = new AxisLabelController(this);
             _scrollerController = new ScrollerController(this,
                 yCenter =>
                 {
-                    _offset.y = yCenter - 0.5f / _zoom;
+                    _offset.y = yCenter - 0.5f / _zoom.y;
                     UpdateControlPoints();
                     UpdateCurvePreview();
                     var rect = GetViewRectInCurve();
@@ -232,7 +244,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 },
                 xCenter =>
                 {
-                    _offset.x = xCenter - 0.5f / _zoom;
+                    _offset.x = xCenter - 0.5f / _zoom.x;
                     UpdateControlPoints();
                     UpdateCurvePreview();
                     var rect = GetViewRectInCurve();
@@ -261,11 +273,20 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 var cp = _controlPoints[_selectedControlPointIndex];
                 var key = _curve.keys[_selectedControlPointIndex];
                 cp.SetTangentMode((TangentMode)evt.newValue, null);
-                key.weightedMode = cp.GetWeightedMode(); 
                 MoveKey(key);
                 UpdateView();
                 onCurveChanged?.Invoke(_curve);
             });
+            _inWeightedButton = this.Q<ToggleButton>("in-weighted-toggle");
+            _inWeightedButton.toggledStateChanged += val =>
+            {
+                if (_curve == null || _selectedControlPointIndex < 0) return;
+                var key = _curve.keys[_selectedControlPointIndex];
+                key.SetWeightedFrag(WeightedMode.In, val);
+                MoveKey(key);
+                UpdateView();
+                onCurveChanged?.Invoke(_curve);
+            };
             _outTangentSlider = this.Q<Slider>("out-tangent-slider");
             _outTangentSlider.RegisterValueChangedCallback(evt =>
             {
@@ -284,11 +305,20 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 var cp = _controlPoints[_selectedControlPointIndex];
                 var key = _curve.keys[_selectedControlPointIndex];
                 cp.SetTangentMode(null, (TangentMode)evt.newValue);
-                key.weightedMode = cp.GetWeightedMode();
                 MoveKey(key);
                 UpdateView();
                 onCurveChanged?.Invoke(_curve);
             });
+            _outWeightedButton = this.Q<ToggleButton>("out-weighted-toggle");
+            _outWeightedButton.toggledStateChanged += val =>
+            {
+                if (_curve == null || _selectedControlPointIndex < 0) return;
+                var key = _curve.keys[_selectedControlPointIndex];
+                key.SetWeightedFrag(WeightedMode.Out, val);
+                MoveKey(key);
+                UpdateView();
+                onCurveChanged?.Invoke(_curve);
+            };            
             _pointModeField = this.Q<EnumField>("point-mode-field");
             _pointModeField.Init(PointMode.Smooth);
             _pointModeField.RegisterValueChangedCallback(evt =>
@@ -373,21 +403,16 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var rect = GetViewRectInCurve();
             float xUnit = Mathf.Pow(10f, (int)Mathf.Log10(rect.width)) * 0.05f;
             float yUnit = Mathf.Pow(10f, (int)Mathf.Log10(rect.height)) * 0.05f;
-            if (_snapXButton.IsToggled) key.time = Mathf.Round(key.time / xUnit) * xUnit;
-            if (_snapYButton.IsToggled) key.value = Mathf.Round(key.value / yUnit) * yUnit;
+            if (_snapXButton.value) key.time = Mathf.Round(key.time / xUnit) * xUnit;
+            if (_snapYButton.value) key.value = Mathf.Round(key.value / yUnit) * yUnit;
+
+            for (var i = 0; i < _curve.keys.Length; i++)
+            {
+                if (i == _selectedControlPointIndex) continue;
+                if (_curve.keys[i].time == key.time) return;
+            }
             
             int newIdx = _curve.MoveKey(_selectedControlPointIndex, key);
-            
-            if (_curve.keys.Length < _controlPoints.Count)
-            {
-                // todo: ここの処理を適切にする必要がある
-                _controlPoints.RemoveAt(_selectedControlPointIndex);
-                _curvePreviewElement.Remove(_controlPoints[_selectedControlPointIndex]);
-                _selectedControlPointIndex = -1;
-                return;
-            }
-            if (newIdx < 0) return;
-
             if (newIdx != _selectedControlPointIndex)
             {
                 var temp = _controlPoints[_selectedControlPointIndex];
@@ -414,6 +439,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 controlPoint.SetKeyframe(_curve, i);
                 controlPoint.SetPointMode(key.GetPointMode());
                 controlPoint.SetTangentMode(_curve.GetInTangentMode(i), _curve.GetOutTangentMode(i));
+                controlPoint.SetWeightedMode(key.weightedMode);
             }
         }
         
@@ -422,7 +448,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             if (_curve == null) return;
             var rect = _curve.GetCurveRect();
             _offset = rect.min;
-            _zoom = Mathf.Min(1f / rect.width, 1f / rect.height);
+            _zoom = new Vector2(1f / rect.width, 1f / rect.height);
             UpdateView();
         }
 
@@ -460,13 +486,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
             
             var rect = GetViewRectInCurve();
-            int xOrder = (int)Mathf.Log10(rect.width);
-            int yOrder = (int)Mathf.Log10(rect.height);
+            float xOrder = Mathf.Log10(rect.width);
+            float yOrder = Mathf.Log10(rect.height);
 
             _curvePreview.Render(_curve, new CurvePreview.CurvePreviewViewInfo {
                 Resolution = new Vector4(width, height, 1f / width, 1f / height),
-                OffsetZoom = new Vector4(_offset.x, _offset.y, _zoom, 0f),
-                GridUnit = new Vector4(Mathf.Pow(10f, xOrder - 1), Mathf.Pow(10f, yOrder - 1), Mathf.Pow(10f, xOrder), Mathf.Pow(10f, yOrder)),
+                OffsetZoom = new Vector4(_offset.x, _offset.y, _zoom.x, _zoom.y),
+                GridParams = new Vector4(xOrder, yOrder, Mathf.Pow(10f, (int)xOrder), Mathf.Pow(10f, (int)yOrder)),
                 OutputTexture = PreviewTexture,
             });
         }
@@ -481,8 +507,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 _pointModeField.SetValueWithoutNotify(PointMode.Smooth);
                 _inTangentSlider.SetValueWithoutNotify(0f);
                 _inTangentModeField.SetValueWithoutNotify(TangentMode.Free);
+                _inWeightedButton.SetValueWithoutNotify(false);
                 _outTangentSlider.SetValueWithoutNotify(0f);
                 _outTangentModeField.SetValueWithoutNotify(TangentMode.Free);
+                _outWeightedButton.SetValueWithoutNotify(false);
 
                 return;
             }
@@ -492,8 +520,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _pointModeField.SetValueWithoutNotify(_controlPoints[_selectedControlPointIndex].PointMode);
             _inTangentSlider.SetValueWithoutNotify(Mathf.Atan(_curve.keys[_selectedControlPointIndex].inTangent) * Mathf.Rad2Deg);
             _inTangentModeField.SetValueWithoutNotify(_controlPoints[_selectedControlPointIndex].InTangentMode);
+            _inWeightedButton.SetValueWithoutNotify(_curve.keys[_selectedControlPointIndex].weightedMode is WeightedMode.In or WeightedMode.Both);
             _outTangentSlider.SetValueWithoutNotify(Mathf.Atan(_curve.keys[_selectedControlPointIndex].outTangent) * Mathf.Rad2Deg);
             _outTangentModeField.SetValueWithoutNotify(_controlPoints[_selectedControlPointIndex].OutTangentMode);
+            _outWeightedButton.SetValueWithoutNotify(_curve.keys[_selectedControlPointIndex].weightedMode is WeightedMode.Out or WeightedMode.Both);
         }
         
         #endregion
@@ -565,16 +595,16 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         #endregion
         
-        #region Mouse Events
-        private void OnMouseDown(MouseDownEvent evt)
+        #region Pointer Events
+        private void OnPointerDown(PointerDownEvent evt)
         {
             _mouseButton = evt.button;
             if (_mouseButton == 2 || (_mouseButton == 0 && evt.ctrlKey))
             {
                 _curvePreviewElement.CaptureMouse();
-                _curvePreviewElement.RegisterCallback<MouseMoveEvent>(OnMouseMove);
-                _curvePreviewElement.RegisterCallback<MouseUpEvent>(OnMouseUp);
-                _mouseDownPosition = evt.localMousePosition;
+                _curvePreviewElement.RegisterCallback<PointerMoveEvent>(OnPointerMove);
+                _curvePreviewElement.RegisterCallback<PointerUpEvent>(OnPointerUp);
+                _mouseDownPosition = evt.localPosition;
                 _initialOffset = _offset;
 
                 evt.StopPropagation();
@@ -586,28 +616,43 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 // Add control point if double click
                 if (DateTime.Now.Ticks - _lastMouseDownTime < 5000000)
                 {
-                    AddControlPoint(this.GetCurvePosFromScreenPos(evt.localMousePosition));
+                    AddControlPoint(this.GetCurvePosFromScreenPos(evt.localPosition));
                     _lastMouseDownTime = DateTime.Now.Ticks;
                 }
                 _lastMouseDownTime = DateTime.Now.Ticks;
             }
+            else if (_mouseButton == 1)
+            {
+                UnselectAllControlPoint();
+                
+                var pos = this.GetCurvePosFromScreenPos(evt.localPosition);
+                PopupMenuUtility.Show(
+                new []{
+                    new MenuItem("Add Key", () =>
+                    {
+                        AddControlPoint(pos);
+                    })
+                }, evt.position, this);
+                
+                evt.StopPropagation();
+            }
         }
         
-        private void OnMouseMove(MouseMoveEvent evt)
+        private void OnPointerMove(PointerMoveEvent evt)
         {
             if (_mouseButton == 2 || (_mouseButton == 0 && evt.ctrlKey))
             {
-                _offset = _initialOffset + (evt.localMousePosition - _mouseDownPosition) / new Vector2(-_curvePreviewElement.resolvedStyle.width, _curvePreviewElement.resolvedStyle.height) / _zoom;
+                _offset = _initialOffset + ((Vector2)evt.localPosition - _mouseDownPosition) / new Vector2(-_curvePreviewElement.resolvedStyle.width, _curvePreviewElement.resolvedStyle.height) / _zoom;
                 UpdateView();
                 evt.StopPropagation();
             }
         }
         
-        private void OnMouseUp(MouseUpEvent evt)
+        private void OnPointerUp(PointerUpEvent evt)
         {
             _curvePreviewElement.ReleaseMouse();
-            _curvePreviewElement.UnregisterCallback<MouseMoveEvent>(OnMouseMove);
-            _curvePreviewElement.UnregisterCallback<MouseUpEvent>(OnMouseUp);
+            _curvePreviewElement.UnregisterCallback<PointerMoveEvent>(OnPointerMove);
+            _curvePreviewElement.UnregisterCallback<PointerUpEvent>(OnPointerUp);
             evt.StopPropagation();
         }
         

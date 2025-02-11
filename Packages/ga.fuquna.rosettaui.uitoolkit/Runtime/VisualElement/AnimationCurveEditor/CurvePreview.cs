@@ -17,7 +17,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             public Vector4 Resolution;
             public Vector4 OffsetZoom;
-            public Vector4 GridUnit;
+            public Vector4 GridParams;
             public RenderTexture OutputTexture;
         }
 
@@ -66,7 +66,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
             _commandBuffer.SetGlobalVector("_Resolution", viewInfo.Resolution);
             _commandBuffer.SetGlobalVector("_OffsetZoom", viewInfo.OffsetZoom);
-            _commandBuffer.SetGlobalVector("_GridUnit", viewInfo.GridUnit);
+            _commandBuffer.SetGlobalVector("_GridParams", viewInfo.GridParams);
 
             DrawCurve(_commandBuffer, viewInfo.OutputTexture);
 

@@ -11,7 +11,6 @@
     {
         Free,
         Linear,
-        Constant,
-        Weighted
+        Constant
     }
 }

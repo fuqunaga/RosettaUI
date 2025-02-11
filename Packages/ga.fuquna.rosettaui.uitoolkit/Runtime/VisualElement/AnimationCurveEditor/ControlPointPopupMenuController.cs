@@ -10,18 +10,23 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private Action _onPointRemoved;
         private Action<PointMode> _onPointModeChanged;
         private Action<TangentMode?, TangentMode?> _onTangentModeChanged;
+        private Action<WeightedMode> _onWeightedModeChanged;
 
         private Dictionary<PointMode, MenuItem> _pointModeMenuItems = new Dictionary<PointMode, MenuItem>();
         private Dictionary<TangentMode, MenuItem> _inTangentModeMenuItems = new Dictionary<TangentMode, MenuItem>();
         private Dictionary<TangentMode, MenuItem> _outTangentModeMenuItems = new Dictionary<TangentMode, MenuItem>();
         private Dictionary<TangentMode, MenuItem> _bothTangentModeMenuItems = new Dictionary<TangentMode, MenuItem>();
+        private MenuItem _inWeightedModeMenuItem;
+        private MenuItem _outWeightedModeMenuItem;
+        private MenuItem _bothWeightedModeMenuItem;
 
 
-        public ControlPointPopupMenuController(Action onPointRemoved, Action<PointMode> onPointModeChanged, Action<TangentMode?, TangentMode?> onTangentModeChanged)
+        public ControlPointPopupMenuController(Action onPointRemoved, Action<PointMode> onPointModeChanged, Action<TangentMode?, TangentMode?> onTangentModeChanged, Action<WeightedMode> onWeightedModeChanged)
         {
             _onPointRemoved = onPointRemoved;
             _onPointModeChanged = onPointModeChanged;
             _onTangentModeChanged = onTangentModeChanged;
+            _onWeightedModeChanged = onWeightedModeChanged;
 
             _pointModeMenuItems[PointMode.Smooth] = new MenuItem("Smooth", () => _onPointModeChanged(PointMode.Smooth));
             _pointModeMenuItems[PointMode.Flat] = new MenuItem("Flat", () => _onPointModeChanged(PointMode.Flat));
@@ -30,17 +35,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _inTangentModeMenuItems[TangentMode.Free] = new MenuItem("Free", () => _onTangentModeChanged(TangentMode.Free, null));
             _inTangentModeMenuItems[TangentMode.Linear] = new MenuItem("Linear", () => _onTangentModeChanged(TangentMode.Linear, null));
             _inTangentModeMenuItems[TangentMode.Constant] = new MenuItem("Constant", () => _onTangentModeChanged(TangentMode.Constant, null));
-            _inTangentModeMenuItems[TangentMode.Weighted] = new MenuItem("Weighted", () => _onTangentModeChanged(TangentMode.Weighted, null));
+            _inWeightedModeMenuItem = new MenuItem("Weighted", () => _onWeightedModeChanged(WeightedMode.In));
             
             _outTangentModeMenuItems[TangentMode.Free] = new MenuItem("Free", () => _onTangentModeChanged(null, TangentMode.Free));
             _outTangentModeMenuItems[TangentMode.Linear] = new MenuItem("Linear", () => _onTangentModeChanged(null, TangentMode.Linear));
             _outTangentModeMenuItems[TangentMode.Constant] = new MenuItem("Constant", () => _onTangentModeChanged(null, TangentMode.Constant));
-            _outTangentModeMenuItems[TangentMode.Weighted] = new MenuItem("Weighted", () => _onTangentModeChanged(null, TangentMode.Weighted));
+            _outWeightedModeMenuItem = new MenuItem("Weighted", () => _onWeightedModeChanged(WeightedMode.Out));
             
             _bothTangentModeMenuItems[TangentMode.Free] = new MenuItem("Free", () => _onTangentModeChanged(TangentMode.Free, TangentMode.Free));
             _bothTangentModeMenuItems[TangentMode.Linear] = new MenuItem("Linear", () => _onTangentModeChanged(TangentMode.Linear, TangentMode.Linear));
             _bothTangentModeMenuItems[TangentMode.Constant] = new MenuItem("Constant", () => _onTangentModeChanged(TangentMode.Constant, TangentMode.Constant));
-            _bothTangentModeMenuItems[TangentMode.Weighted] = new MenuItem("Weighted", () => _onTangentModeChanged(TangentMode.Weighted, TangentMode.Weighted));
+            _bothWeightedModeMenuItem = new MenuItem("Weighted", () => _onWeightedModeChanged(WeightedMode.Both));
         }
 
         public void Show(Vector2 position, VisualElement targetElement)
@@ -62,7 +67,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                             _inTangentModeMenuItems[TangentMode.Free],
                             _inTangentModeMenuItems[TangentMode.Linear],
                             _inTangentModeMenuItems[TangentMode.Constant],
-                            _inTangentModeMenuItems[TangentMode.Weighted],
+                            MenuItem.Separator,
+                            _inWeightedModeMenuItem,
                             MenuItem.Separator,
                             new MenuItem("Back", () => Show(position, targetElement))
                         },
@@ -77,7 +83,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                             _outTangentModeMenuItems[TangentMode.Free],
                             _outTangentModeMenuItems[TangentMode.Linear],
                             _outTangentModeMenuItems[TangentMode.Constant],
-                            _outTangentModeMenuItems[TangentMode.Weighted],
+                            MenuItem.Separator,
+                            _outWeightedModeMenuItem,
                             MenuItem.Separator,
                             new MenuItem("Back", () => Show(position, targetElement))
                         },
@@ -92,7 +99,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                             _bothTangentModeMenuItems[TangentMode.Free],
                             _bothTangentModeMenuItems[TangentMode.Linear],
                             _bothTangentModeMenuItems[TangentMode.Constant],
-                            _bothTangentModeMenuItems[TangentMode.Weighted],
+                            MenuItem.Separator,
+                            _bothWeightedModeMenuItem,
                             MenuItem.Separator,
                             new MenuItem("Back", () => Show(position, targetElement))
                         },
@@ -137,6 +145,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
             _inTangentModeMenuItems[inTangentMode].isChecked = true;
             _outTangentModeMenuItems[outTangentMode].isChecked = true;
+        }
+        
+        public void SetWeightedMode(WeightedMode weightedMode)
+        {
+            _inWeightedModeMenuItem.isChecked = weightedMode is WeightedMode.In or WeightedMode.Both;
+            _outWeightedModeMenuItem.isChecked = weightedMode is WeightedMode.Out or WeightedMode.Both;
+            _bothWeightedModeMenuItem.isChecked = weightedMode == WeightedMode.Both;
         }
     }
 }

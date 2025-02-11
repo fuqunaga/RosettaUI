@@ -39,6 +39,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private Keyframe _keyframeCopy;
         
+        private bool _isAltPressed = false;
         
         public delegate void OnPointAction(ControlPoint controlPoint);
         public delegate int OnPointMoved(Keyframe keyframe);
@@ -51,14 +52,24 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _onPointMoved = onPointMoved;
             _onPointRemoved = onPointRemoved;
             
+            focusable = true;
+            RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if (evt.keyCode is KeyCode.LeftAlt or KeyCode.RightAlt) _isAltPressed = true;
+            });
+            RegisterCallback<KeyUpEvent>(evt =>
+            {
+                if (evt.keyCode is KeyCode.LeftAlt or KeyCode.RightAlt) _isAltPressed = false;
+            });
+            
             // Handles
             _leftHandle = new ControlPointHandle(_coordinateConverter, 180f, 
                 () => _onPointSelected(this),
                 (tangent, weight) =>
                 {
                     _keyframeCopy.inTangent = tangent;
-                    _keyframeCopy.inWeight = InTangentMode == TangentMode.Weighted ? weight : 0.333333f;
-                    if (!InputUtility.GetKey(KeyCode.LeftAlt) && !InputUtility.GetKey(KeyCode.RightAlt))
+                    _keyframeCopy.inWeight = _keyframeCopy.weightedMode is WeightedMode.In or WeightedMode.Both ? weight : 0.333333f;
+                    if (!_isAltPressed)
                     {
                         if (PointMode == PointMode.Flat) PointMode = PointMode.Smooth;
                         if (PointMode == PointMode.Smooth)
@@ -66,6 +77,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                             if (float.IsInfinity(_keyframeCopy.inTangent)) _keyframeCopy.outTangent = -_keyframeCopy.inTangent;
                             _keyframeCopy.outTangent = _keyframeCopy.inTangent;
                         }
+                    }
+                    else
+                    {
+                        SetPointMode(PointMode.Broken);
                     }
                     _onPointMoved(_keyframeCopy);
                 }
@@ -77,8 +92,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 (tangent, weight) =>
                 {
                     _keyframeCopy.outTangent = tangent;
-                    _keyframeCopy.outWeight = OutTangentMode == TangentMode.Weighted ? weight : 0.333333f;
-                    if (!InputUtility.GetKey(KeyCode.LeftAlt) && !InputUtility.GetKey(KeyCode.RightAlt))
+                    _keyframeCopy.outWeight = _keyframeCopy.weightedMode is WeightedMode.Out or WeightedMode.Both ? weight : 0.333333f;
+                    if (!_isAltPressed)
                     {
                         if (PointMode == PointMode.Flat) PointMode = PointMode.Smooth;
                         if (PointMode == PointMode.Smooth)
@@ -87,6 +102,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                             _keyframeCopy.inTangent = _keyframeCopy.outTangent;
                         }
                     }
+                    else
+                    {
+                        SetPointMode(PointMode.Broken);
+                    }
                     _onPointMoved(_keyframeCopy);
                 }
             );
@@ -94,7 +113,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             // Control point container
             AddToClassList("rosettaui-animation-curve-editor__control-point-container");
-            RegisterCallback<MouseDownEvent>(OnMouseDown);
+            RegisterCallback<PointerDownEvent>(OnMouseDown);
             
             // Control point
             _controlPoint = new VisualElement { name = "AnimationCurveEditorControlPoint" };
@@ -105,7 +124,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _popupMenuController = new ControlPointPopupMenuController(
                 () => _onPointRemoved(this),
                 SetPointModeAndUpdateView,
-                SetTangentModeAndUpdateView
+                SetTangentModeAndUpdateView,
+                ToggleWeightedModeAndUpdateView
             );
             
             return;
@@ -116,7 +136,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 switch (mode)
                 {
                     case PointMode.Broken:
-                        return;
+                        break;
                     case PointMode.Flat:
                         _keyframeCopy.inTangent = 0f;
                         _keyframeCopy.outTangent = 0f;
@@ -131,6 +151,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             void SetTangentModeAndUpdateView(TangentMode? inTangentMode, TangentMode? outTangentMode)
             {
                 SetTangentMode(inTangentMode, outTangentMode);
+                _onPointMoved(_keyframeCopy);
+            }
+            
+            void ToggleWeightedModeAndUpdateView(WeightedMode mode)
+            {
+                _keyframeCopy.ToggleWeightedFrag(mode);
                 _onPointMoved(_keyframeCopy);
             }
         }
@@ -166,8 +192,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             InTangentMode = inTangentMode ?? InTangentMode;
             OutTangentMode = outTangentMode ?? OutTangentMode;
-            _keyframeCopy.weightedMode = this.GetWeightedMode();
             _popupMenuController.SetTangentMode(InTangentMode, OutTangentMode);
+        }
+        
+        public void SetWeightedMode(WeightedMode mode)
+        {
+            _keyframeCopy.weightedMode = mode;
+            _popupMenuController.SetWeightedMode(mode);
         }
         
         /// <summary>
@@ -198,51 +229,52 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
         
-        private void SetMousePosition(Vector2 mousePosition)
+        private void SetPointerPosition(Vector2 pointerPosition)
         {
-            Vector2 screenPosition = new Vector2(_elementPositionOnDown.x + (mousePosition.x - _mouseDownPosition.x), _elementPositionOnDown.y + (mousePosition.y - _mouseDownPosition.y));
+            Vector2 screenPosition = new Vector2(_elementPositionOnDown.x + (pointerPosition.x - _mouseDownPosition.x), _elementPositionOnDown.y + (pointerPosition.y - _mouseDownPosition.y));
             style.left = screenPosition.x;
             style.top = screenPosition.y;
             PositionInCurve = _coordinateConverter.GetCurvePosFromScreenPos(screenPosition);
             _onPointMoved(_keyframeCopy);
         }
         
-        private void OnMouseDown(MouseDownEvent evt)
+        private void OnMouseDown(PointerDownEvent evt)
         {
-            _mouseDownPosition = evt.mousePosition;
+            _mouseDownPosition = evt.position;
             _elementPositionOnDown = new Vector2(style.left.value.value, style.top.value.value);
             _onPointSelected?.Invoke(this);
             if (evt.button == 0)
             {
-                RegisterCallback<MouseMoveEvent>(OnMouseMove);
-                RegisterCallback<MouseLeaveEvent>(OnMouseLeave);
-                RegisterCallback<MouseUpEvent>(OnMouseUp);
+                RegisterCallback<PointerMoveEvent>(OnPointerMove);
+                RegisterCallback<PointerLeaveEvent>(OnPointerLeave);
+                RegisterCallback<PointerUpEvent>(OnPointerUp);
                 evt.StopPropagation();
                 this.CaptureMouse();
             }
             else if (evt.button == 1)
             {
                 _popupMenuController.Show(_mouseDownPosition, this);
+                evt.StopPropagation();
             }
         }
         
-        private void OnMouseMove(MouseMoveEvent evt)
+        private void OnPointerMove(PointerMoveEvent evt)
         {
-            SetMousePosition(evt.mousePosition);
+            SetPointerPosition(evt.position);
         }
         
-        private void OnMouseLeave(MouseLeaveEvent evt)
+        private void OnPointerLeave(PointerLeaveEvent evt)
         {
-            SetMousePosition(evt.mousePosition);
+            SetPointerPosition(evt.position);
         }
         
-        private void OnMouseUp(MouseUpEvent evt)
+        private void OnPointerUp(PointerUpEvent evt)
         {
             if (evt.button == 0)
             {
-                UnregisterCallback<MouseMoveEvent>(OnMouseMove);
-                UnregisterCallback<MouseLeaveEvent>(OnMouseLeave);
-                UnregisterCallback<MouseUpEvent>(OnMouseUp);
+                UnregisterCallback<PointerMoveEvent>(OnPointerMove);
+                UnregisterCallback<PointerLeaveEvent>(OnPointerLeave);
+                UnregisterCallback<PointerUpEvent>(OnPointerUp);
                 evt.StopPropagation();
                 this.ReleaseMouse();
             }

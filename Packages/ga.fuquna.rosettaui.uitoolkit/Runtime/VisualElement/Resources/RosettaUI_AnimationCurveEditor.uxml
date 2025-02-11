@@ -19,16 +19,20 @@
             </ui:VisualElement>
         </ui:GroupBox>
         <ui:VisualElement name="property-group" style="background-color: rgba(0, 0, 0, 0); margin-top: 8px; margin-right: 4px; margin-bottom: 8px; margin-left: 4px;">
-            <ui:FloatField name="time-field" label="Time" style="flex-grow: 1;" />
-            <ui:FloatField name="value-field" label="Value" style="flex-grow: 1;" />
-            <ui:EnumField name="point-mode-field" label="Point Mode" />
+            <ui:VisualElement style="flex-direction: row; flex-wrap: wrap;">
+                <ui:FloatField name="time-field" label="Time" style="flex-grow: 1;" />
+                <ui:FloatField name="value-field" label="Value" style="flex-grow: 1;" />
+                <ui:EnumField name="point-mode-field" label="Point Mode" />
+            </ui:VisualElement>
             <ui:VisualElement name="in-tangent-field-row" class="rosettaui-animation-curve-editor__field-row">
                 <ui:Slider name="in-tangent-slider" style="flex-grow: 1;" label="In Tangent" low-value = "-90" high-value="90" show-input-field="true" />
                 <ui:EnumField name="in-tangent-mode-field" />
+                <RosettaUI.UIToolkit.ToggleButton name="in-weighted-toggle" text="Weighted" />
             </ui:VisualElement>
             <ui:VisualElement name="out-tangent-field-row" class="rosettaui-animation-curve-editor__field-row">
                 <ui:Slider name="out-tangent-slider" style="flex-grow: 1;" label="Out Tangent" low-value = "-90" high-value="90" show-input-field="true" />
                 <ui:EnumField name="out-tangent-mode-field" />
+                <RosettaUI.UIToolkit.ToggleButton name="out-weighted-toggle" text="Weighted" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

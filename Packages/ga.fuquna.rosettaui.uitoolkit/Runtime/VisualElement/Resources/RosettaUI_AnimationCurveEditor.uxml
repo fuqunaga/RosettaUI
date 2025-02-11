@@ -5,6 +5,11 @@
                 <ui:VisualElement name="preview-front" class="rosettaui-animation-curve-editor__preview-front" >
                     <ui:VisualElement name="vertical-axis-label-container" class="rosettaui-animation-curve-editor__vertical-axis-label-container"/>
                     <ui:VisualElement name="horizontal-axis-label-container" class="rosettaui-animation-curve-editor__horizontal-axis-label-container"/>
+                    <ui:VisualElement name="control-buttons" class="rosettaui-animation-curve-editor__control-buttons-container">
+                        <RosettaUI.UIToolkit.ToggleButton name="time-snapping-button" class="rosettaui-animation-curve-editor__snap-x-button" />
+                        <RosettaUI.UIToolkit.ToggleButton name="value-snapping-button" class="rosettaui-animation-curve-editor__snap-y-button" />
+                        <ui:Button name="fit-curve-button" class="rosettaui-animation-curve-editor__fit-button" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:Scroller low-value="0" high-value="1" direction="Vertical" name="vertical-scroller" />
             </ui:VisualElement>

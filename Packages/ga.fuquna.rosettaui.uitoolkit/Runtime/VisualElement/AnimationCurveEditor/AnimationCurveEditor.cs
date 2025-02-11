@@ -104,6 +104,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private Slider _outTangentSlider;
         private EnumField _outTangentModeField;
         private VisualElement _propertyField;
+        private ToggleButton _snapXButton;
+        private ToggleButton _snapYButton;
 
         private float _zoom = 1.0f;
         private Vector2 _offset = Vector2.zero;
@@ -113,6 +115,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private Vector2 _mouseDownPosition;
         private long _lastMouseDownTime;
         private Vector2 _initialOffset;
+        private bool _prevSnapX = false;
+        private bool _prevSnapY = false;
+
         private AnimationCurve _curve;
         private RenderTexture _curveEditorTexture = null;
 
@@ -146,6 +151,54 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void InitUI()
         {
             style.flexGrow = 1;
+            
+            focusable = true;
+            // Key Bind
+            bool isKeyPressed = false;
+            RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if (isKeyPressed) return;
+                isKeyPressed = true;
+                switch (evt.keyCode)
+                {
+                    case KeyCode.LeftControl:
+                    case KeyCode.LeftCommand:
+                    case KeyCode.RightControl:
+                    case KeyCode.RightCommand:
+                        _prevSnapX = _snapXButton.IsToggled;
+                        _prevSnapY = _snapYButton.IsToggled;
+                        Debug.Log("Key Down" + _prevSnapX);
+                        _snapXButton.SetValueWithoutNotify(true);
+                        _snapYButton.SetValueWithoutNotify(true);
+                        break;
+                }
+            });
+            RegisterCallback<KeyUpEvent>(evt =>
+            {
+                isKeyPressed = false;
+                switch (evt.keyCode)
+                {
+                    case KeyCode.LeftControl:
+                    case KeyCode.LeftCommand:
+                    case KeyCode.RightControl:
+                    case KeyCode.RightCommand:
+                        _snapXButton.SetValueWithoutNotify(_prevSnapX);
+                        _snapYButton.SetValueWithoutNotify(_prevSnapY);
+                        break;
+                    case KeyCode.A:
+                        FitViewToCurve();
+                        break;
+                    case KeyCode.Delete when _selectedControlPointIndex >= 0:
+                        RemoveControlPoint(_controlPoints[_selectedControlPointIndex]);
+                        break;
+                }
+            });
+            
+            // Buttons
+            var fitButton = this.Q<Button>("fit-curve-button");
+            fitButton.clicked += FitViewToCurve;
+            _snapXButton = this.Q<ToggleButton>("time-snapping-button");
+            _snapYButton = this.Q<ToggleButton>("value-snapping-button");
             
             // Curve Preview
             _curvePreviewElement = this.Q("preview-front");
@@ -316,7 +369,24 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void MoveKey(Keyframe key)
         {
+            if (_curve == null || _selectedControlPointIndex < 0) return;
+            var rect = GetViewRectInCurve();
+            float xUnit = Mathf.Pow(10f, (int)Mathf.Log10(rect.width)) * 0.05f;
+            float yUnit = Mathf.Pow(10f, (int)Mathf.Log10(rect.height)) * 0.05f;
+            if (_snapXButton.IsToggled) key.time = Mathf.Round(key.time / xUnit) * xUnit;
+            if (_snapYButton.IsToggled) key.value = Mathf.Round(key.value / yUnit) * yUnit;
+            
             int newIdx = _curve.MoveKey(_selectedControlPointIndex, key);
+            
+            if (_curve.keys.Length < _controlPoints.Count)
+            {
+                // todo: ここの処理を適切にする必要がある
+                _controlPoints.RemoveAt(_selectedControlPointIndex);
+                _curvePreviewElement.Remove(_controlPoints[_selectedControlPointIndex]);
+                _selectedControlPointIndex = -1;
+                return;
+            }
+            if (newIdx < 0) return;
 
             if (newIdx != _selectedControlPointIndex)
             {
@@ -346,6 +416,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 controlPoint.SetTangentMode(_curve.GetInTangentMode(i), _curve.GetOutTangentMode(i));
             }
         }
+        
+        private void FitViewToCurve()
+        {
+            if (_curve == null) return;
+            var rect = _curve.GetCurveRect();
+            _offset = rect.min;
+            _zoom = Mathf.Min(1f / rect.width, 1f / rect.height);
+            UpdateView();
+        }
 
         #region View Update
         private void UpdateView()
@@ -353,7 +432,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             UpdateControlPoints();
             UpdateCurvePreview();
             var rect = GetViewRectInCurve();
-            _scrollerController.UpdateScroller(rect, _curve.ComputeCurveRange());
+            _scrollerController.UpdateScroller(rect, _curve.GetCurveRect());
             _axisLabelController.UpdateAxisLabel(rect);
         }
 

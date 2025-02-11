@@ -437,3 +437,15 @@
 {
     flex-grow: 1;
 }
+
+/********************************************************************************
+* ToggleButton
+********************************************************************************/
+.rosettaui-toggle-button__toggled,
+.rosettaui-toggle-button__toggled:focus,
+.rosettaui-toggle-button__toggled:hover,
+.rosettaui-toggle-button__toggled:enabled:focus,
+.rosettaui-toggle-button__toggled:enabled:hover
+{
+    background-color: var(--rosettaui-highlight-dark-blue);
+}

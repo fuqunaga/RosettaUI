@@ -58,11 +58,46 @@
     bottom: 0;
     left: 0;
 }
+
 .rosettaui-animation-curve-editor__vertical-axis-label-container > Label,
 .rosettaui-animation-curve-editor__horizontal-axis-label-container > Label
 {
     position: absolute;
     color: gray;
+}
+
+.rosettaui-animation-curve-editor__control-buttons-container
+{
+    position: absolute;
+    height: 26px;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 4px;
+    flex-direction: row-reverse;
+    opacity: 0.6;
+}
+
+.rosettaui-animation-curve-editor__control-buttons-container > *
+{
+    width: 26px;
+    height: 26px;
+    margin: 0 0 0 4px;
+}
+
+.rosettaui-animation-curve-editor__fit-button
+{
+    background-image: resource("animation-curve_fit");
+}
+
+.rosettaui-animation-curve-editor__snap-x-button
+{
+    background-image: resource("animation-curve_snap-x");
+}
+
+.rosettaui-animation-curve-editor__snap-y-button
+{
+    background-image: resource("animation-curve_snap-y");
 }
 
 .rosettaui-animation-curve-editor__field-row {
@@ -74,16 +109,23 @@
     margin: 0 4px 0 0;
 }
 
+.rosettaui-animation-curve-editor__field-row > EnumField {
+    width: 120px;
+}
+
 /********************************************************************************
 * Control Point
 ********************************************************************************/
 .rosettaui-animation-curve-editor__control-point-container {
     position: absolute;
     margin: 0;
-    padding: 5px 0 0 5px;
     width: 20px;
     height: 20px;
     translate: -10px -10px;
+}
+
+.rosettaui-animation-curve-editor__control-point-container > * {
+    translate: 5px 5px;
 }
 
 .rosettaui-animation-curve-editor__control-point {
@@ -93,7 +135,9 @@
     width: 10px;
     height: 10px;
     background-color: #00ff00;
-    border-radius: 5px;
+    rotate: 45deg;
+    border-width: 1.5px;
+    border-color: black;
 }
 
 .rosettaui-animation-curve-editor__control-point-handle__line
@@ -110,13 +154,22 @@
     opacity: 0.5;
 }
 
+.rosettaui-animation-curve-editor__control-point-handle__handle-container
+{
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 20px;
+    height: 20px;
+}
+
 .rosettaui-animation-curve-editor__control-point-handle__handle
 {
     position: absolute;
-    right: -4px;
-    top: -4px;
+    top: 6px;
+    right: 6px;
     width: 8px;
     height: 8px;
     background-color: whitesmoke;
-    border-radius: 4px;
+    rotate: 45deg;
 }

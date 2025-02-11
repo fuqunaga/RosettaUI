@@ -11,7 +11,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public delegate void OnTangentChanged(float tangent, float weight);
         
         private VisualElement _lineElement;
-        private VisualElement _handleElement;
+        private VisualElement _handleContainerElement;
         private ICoordinateConverter _coordinateConverter;
         
         private Vector2 _mouseDownPosition;
@@ -40,10 +40,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _lineElement.AddToClassList("rosettaui-animation-curve-editor__control-point-handle__line");
             Add(_lineElement);
             
-            _handleElement = new VisualElement();
-            _handleElement.AddToClassList("rosettaui-animation-curve-editor__control-point-handle__handle");
-            _lineElement.Add(_handleElement);
-            _handleElement.RegisterCallback<PointerDownEvent>(OnPointerDown);
+            _handleContainerElement = new VisualElement();
+            _handleContainerElement.AddToClassList("rosettaui-animation-curve-editor__control-point-handle__handle-container");
+            _lineElement.Add(_handleContainerElement);
+            _handleContainerElement.RegisterCallback<PointerDownEvent>(OnPointerDown);
+            var handleElement = new VisualElement();
+            handleElement.AddToClassList("rosettaui-animation-curve-editor__control-point-handle__handle");
+            _handleContainerElement.Add(handleElement);
         }
 
         /// <summary>
@@ -75,9 +78,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             if (evt.button != 0) return;
             _onHandleSelected?.Invoke();
-            _handleElement.CaptureMouse();
-            _handleElement.RegisterCallback<PointerMoveEvent>(OnPointerMove);
-            _handleElement.RegisterCallback<PointerUpEvent>(OnPointerUp);
+            _handleContainerElement.CaptureMouse();
+            _handleContainerElement.RegisterCallback<PointerMoveEvent>(OnPointerMove);
+            _handleContainerElement.RegisterCallback<PointerUpEvent>(OnPointerUp);
             evt.StopPropagation();
         }
         
@@ -103,8 +106,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void OnPointerUp(PointerUpEvent evt)
         {
-            _handleElement.ReleaseMouse();
-            _handleElement.UnregisterCallback<PointerMoveEvent>(OnPointerMove);
+            _handleContainerElement.ReleaseMouse();
+            _handleContainerElement.UnregisterCallback<PointerMoveEvent>(OnPointerMove);
             evt.StopPropagation();
         }
     }

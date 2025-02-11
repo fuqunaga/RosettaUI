@@ -21,22 +21,21 @@ namespace RosettaUI.Builder
             dst.preWrapMode = src.preWrapMode;
         }
         
-        public static (Vector2 xRange, Vector2 yRange) ComputeCurveRange(this AnimationCurve curve, int stepNum = 64)
+        public static Rect GetCurveRect(this AnimationCurve curve, int stepNum = 64)
         {
-            var xRange = new Vector2(float.MaxValue, float.MinValue);
-            var yRange = new Vector2(float.MaxValue, float.MinValue);
+            var rect = new Rect();
             foreach (var keyframe in curve.keys)
             {
-                xRange.x = Mathf.Min(xRange.x, keyframe.time);
-                xRange.y = Mathf.Max(xRange.y, keyframe.time);
+                rect.xMin = Mathf.Min(rect.xMin, keyframe.time);
+                rect.xMax = Mathf.Max(rect.xMax, keyframe.time);
             }
             for (int i = 0; i < stepNum; i++)
             {
                 float y = curve.Evaluate(i / (stepNum - 1f));
-                yRange.x = Mathf.Min(yRange.x, y);
-                yRange.y = Mathf.Max(yRange.y, y);
+                rect.yMin = Mathf.Min(rect.yMin, y);
+                rect.yMax = Mathf.Max(rect.yMax, y);
             }
-            return (xRange, yRange);
+            return rect;
         }
         
         public static void UpdateAnimationCurvePreviewToBackgroundImage(AnimationCurve curve, VisualElement visualElement)
@@ -58,12 +57,11 @@ namespace RosettaUI.Builder
                 texture = null;
             }
             
-            var range = curve.ComputeCurveRange();
-            
+            var curveRect = curve.GetCurveRect();
             var colorArray = ArrayPool<Color>.Shared.Rent(width * height);
             for (int i = 0; i < width; i++)
             {
-                int targetHeight = (int)((curve.Evaluate(range.xRange.x + i / (width - 1f) * (range.xRange.y - range.xRange.x)) - range.yRange.x) / (range.yRange.y - range.yRange.x) * height);
+                int targetHeight = (int)((curve.Evaluate(curveRect.xMin + i / (width - 1f) * curveRect.width) - curveRect.yMin) / curveRect.height * height);
                 for (int j = 0; j < height; j++)
                 {
                     colorArray[j * width + i] = j == targetHeight ? Color.green : new Color(0.3372549f, 0.3372549f, 0.3372549f);

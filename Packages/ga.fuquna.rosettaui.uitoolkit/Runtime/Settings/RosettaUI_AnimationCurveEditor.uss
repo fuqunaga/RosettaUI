@@ -183,7 +183,7 @@
     height: 2px;
     background-color: whitesmoke;
     border-width: 0.5px;
-    border-color: black;
+    border-color: gray;
     transform-origin: 0 50%;
     opacity: 0.5;
 }
@@ -203,5 +203,7 @@
     width: 6px;
     height: 6px;
     background-color: whitesmoke;
+    border-width: 0.5px;
+    border-color: gray;
     rotate: 45deg;
 }

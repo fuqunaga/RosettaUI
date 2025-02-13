@@ -12,7 +12,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private VisualElement _handleContainerElement;
         private ICoordinateConverter _coordinateConverter;
         
-        private Vector2 _mouseDownPosition;
         private Action _onHandleSelected;
         private OnTangentChanged _onTangentChanged;
         
@@ -90,7 +89,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             float tangent = (-mousePoint.y + centerPoint.y) / Clamp(mousePoint.x - centerPoint.x);
             if (!float.IsNaN(tangent))
             {
-                tangent =  _coordinateConverter.GetCurveTangentFromScreenTangent(tangent);
+                tangent = _coordinateConverter.GetCurveTangentFromScreenTangent(tangent);
+                if (evt.ctrlKey || evt.commandKey) tangent = Snap(tangent);
                 float weight = Mathf.Clamp01(Mathf.Abs(mousePoint.x - centerPoint.x) / Mathf.Abs(_xDistToNeighborInScreen));
                 _onTangentChanged?.Invoke(tangent, weight);
             }
@@ -100,6 +100,22 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             float Clamp(float xDiff)
             {
                 return Mathf.Max(0f, xDiff * _sign) * _sign;
+            }
+
+            float Snap(float tangent)
+            {
+                if (float.IsInfinity(tangent)) return tangent;
+
+                if (Mathf.Abs(tangent) > Mathf.Tan(67.5f))
+                {
+                    return Mathf.Sign(tangent) * Mathf.Infinity;
+                }
+                else if (Mathf.Abs(tangent) > Mathf.Tan(22.5f))
+                {
+                    return Mathf.Sign(tangent);
+                }
+
+                return 0f;
             }
         }
         

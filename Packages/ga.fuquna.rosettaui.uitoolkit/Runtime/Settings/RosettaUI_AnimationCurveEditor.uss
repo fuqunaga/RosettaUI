@@ -108,10 +108,10 @@
 {
     flex-direction: row;
     flex-wrap: wrap;
-    flex-basis: 33%;
 }
 
-.rosettaui-animation-curve-editor__time-value-row > FloatField {
+.rosettaui-animation-curve-editor__time-value-row > FloatField
+{
     flex-basis: 100px;
 }
 
@@ -120,7 +120,8 @@
     min-width: 50px;
 }
 
-.rosettaui-animation-curve-editor__time-value-row > EnumField {
+.rosettaui-animation-curve-editor__time-value-row > EnumField
+{
     min-width: 189.5px;
     max-width: 100%;
 }

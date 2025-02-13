@@ -24,14 +24,29 @@ namespace RosettaUI.Builder
         public static Rect GetCurveRect(this AnimationCurve curve, int stepNum = 64)
         {
             var rect = new Rect();
-            foreach (var keyframe in curve.keys)
+            if (curve.keys.Length <= 0) return rect;
+            for (var i = 0; i < curve.keys.Length; i++)
             {
+                var keyframe = curve.keys[i];
+                if (i == 0)
+                {
+                    rect.xMin = keyframe.time;
+                    rect.xMax = keyframe.time;
+                    continue;
+                }
                 rect.xMin = Mathf.Min(rect.xMin, keyframe.time);
                 rect.xMax = Mathf.Max(rect.xMax, keyframe.time);
             }
+            
             for (int i = 0; i < stepNum; i++)
             {
-                float y = curve.Evaluate(i / (stepNum - 1f));
+                float y = curve.Evaluate(rect.xMin + i / (stepNum - 1f) * rect.width);
+                if (i == 0)
+                {
+                    rect.yMin = y;
+                    rect.yMax = y;
+                    continue;
+                }
                 rect.yMin = Mathf.Min(rect.yMin, y);
                 rect.yMax = Mathf.Max(rect.yMax, y);
             }

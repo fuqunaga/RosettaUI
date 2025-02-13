@@ -419,7 +419,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 var key = _curve.keys[i];
                 var controlPoint = new ControlPoint(this, OnControlPointSelected, OnControlPointMoved, RemoveControlPoint);
                 _controlPoints.Add(controlPoint);
-                _curvePreviewElement.Add(controlPoint);
+                _curvePreviewElement.Insert(0, controlPoint);
                 controlPoint.SetKeyframe(_curve, i);
                 controlPoint.SetPointMode(key.GetPointMode());
                 controlPoint.SetTangentMode(_curve.GetInTangentMode(i), _curve.GetOutTangentMode(i));

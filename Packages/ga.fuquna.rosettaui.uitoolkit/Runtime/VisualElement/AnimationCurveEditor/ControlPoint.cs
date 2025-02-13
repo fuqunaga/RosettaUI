@@ -222,14 +222,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             float? inWeight = _keyframeCopy.weightedMode is WeightedMode.In or WeightedMode.Both ? _keyframeCopy.inWeight : null;
             float? outWeight = _keyframeCopy.weightedMode is WeightedMode.Out or WeightedMode.Both ? _keyframeCopy.outWeight : null;
-            _leftHandle.SetWeight(inWeight, GetXDistInScreen(curve, idx, idx - 1));
-            _rightHandle.SetWeight(outWeight, GetXDistInScreen(curve, idx + 1, idx));
+            _leftHandle.SetWeight(inWeight, GetXDistInScreen(curve, idx - 1, idx));
+            _rightHandle.SetWeight(outWeight, GetXDistInScreen(curve, idx, idx + 1));
             return;
             
             float GetXDistInScreen(in AnimationCurve curve, int leftIdx, int rightIdx)
             {
-                if (rightIdx <= 0 || curve.length <= leftIdx) return 0f;
-                return _coordinateConverter.GetScreenPosFromCurvePos(curve[leftIdx].GetPosition()).x - _coordinateConverter.GetScreenPosFromCurvePos(curve[rightIdx].GetPosition()).x;
+                if (leftIdx < 0 || curve.length <= rightIdx) return 0f;
+                return _coordinateConverter.GetScreenPosFromCurvePos(curve[rightIdx].GetPosition()).x - _coordinateConverter.GetScreenPosFromCurvePos(curve[leftIdx].GetPosition()).x;
             }
         }
         

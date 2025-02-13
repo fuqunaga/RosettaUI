@@ -122,8 +122,8 @@
                 bool2 isSubGrid = IsGrid(uv, _GridParams.zw * 0.1, 1.0) && frac(_GridParams) > 0.0;
                 bool isGrid = any(IsGrid(uv, _GridParams.zw, 1.0));
                 bool2 isMainGrid = IsGrid(uv, _GridParams.zw, 2.0 * cos(frac(_GridParams - EPSILON) * UNITY_PI * 0.5));
-                col = isSubGrid.x ? float4(GridColor.rgb, 1.0 - frac(_GridParams.x - EPSILON)) : col;
-                col = isSubGrid.y ? float4(GridColor.rgb, 1.0 - frac(_GridParams.y - EPSILON)) : col;
+                col = isSubGrid.x ? float4(GridColor.rgb, 1.0 - frac(_GridParams.x)) : col;
+                col = isSubGrid.y ? float4(GridColor.rgb, 1.0 - frac(_GridParams.y)) : col;
                 col = isGrid ? GridColor : col;
                 col = isMainGrid.x ? MainGridColor : col;
                 col = isMainGrid.y ? MainGridColor : col;

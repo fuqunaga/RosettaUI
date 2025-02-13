@@ -29,30 +29,26 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void UpdateAxisLabel(in Rect viewRectInGraph)
         {
-            float horizontalUnit = GetUnit(viewRectInGraph.width);
-            float verticalUnit = GetUnit(viewRectInGraph.height);
-            float horizontalStart = Mathf.Ceil(viewRectInGraph.min.x / horizontalUnit) * horizontalUnit;
-            float verticalStart = Mathf.Ceil(viewRectInGraph.min.y / verticalUnit) * verticalUnit;
-            string horizontalFormat = horizontalUnit < 1f ? $"F{Mathf.CeilToInt(-Mathf.Log10(horizontalUnit))}" : "F0";
-            string verticalFormat = verticalUnit < 1f ? $"F{Mathf.CeilToInt(-Mathf.Log10(verticalUnit))}" : "F0";
+            var gridViewport = new GridViewport(viewRectInGraph.width, viewRectInGraph.height);
+            float xTick = gridViewport.XTick;
+            float yTick = gridViewport.YTick;
+            float xUnit = viewRectInGraph.width / xTick > 5f ? xTick : xTick * 0.5f;
+            float yUnit = viewRectInGraph.height / yTick > 5f ? yTick : yTick * 0.5f;
+                
+            float horizontalStart = Mathf.Ceil(viewRectInGraph.min.x / xUnit) * xUnit;
+            float verticalStart = Mathf.Ceil(viewRectInGraph.min.y / yUnit) * yUnit;
+            string horizontalFormat = xUnit < 1f ? $"F{Mathf.CeilToInt(-Mathf.Log10(xUnit))}" : "F0";
+            string verticalFormat = yUnit < 1f ? $"F{Mathf.CeilToInt(-Mathf.Log10(yUnit))}" : "F0";
             
             for (int i = 0; i < 10; i++)
             {
-                float x = horizontalStart + horizontalUnit * i;
-                float y = verticalStart + verticalUnit * i;
+                float x = horizontalStart + xUnit * i;
+                float y = verticalStart + yUnit * i;
                 _horizontalAxisLabels[i].text = x.ToString(horizontalFormat);
                 _horizontalAxisLabels[i].style.right = new StyleLength(Length.Percent(100f - (x - viewRectInGraph.min.x) / viewRectInGraph.width * 100f));
                 _verticalAxisLabels[i].text = y.ToString(verticalFormat);
                 _verticalAxisLabels[i].style.bottom = new StyleLength(Length.Percent((y - viewRectInGraph.min.y) / viewRectInGraph.height * 100f));
             }
-        }
-
-        private static float GetUnit(float size)
-        {
-            int order = Mathf.CeilToInt(Mathf.Log10(size));
-            float u1 = Mathf.Pow(10f, order - 1);
-            float u2 = u1 * 0.5f;
-            return size / u1 > 5f ? u1 : u2;
         }
     }
 }

@@ -5,6 +5,14 @@
     flex-shrink: 0;
 }
 
+.rosettaui-animation-curve-editor {
+    flex-grow: 1;
+}
+
+.rosettaui-animation-curve-editor EnumField:disabled {
+    opacity: 0.5;
+}
+
 .rosettaui-animation-curve-editor .unity-base-field__label {
     min-width: 100px;
 }
@@ -41,8 +49,7 @@
     width: 12px;
 }
 
-.rosettaui-animation-curve-editor__vertical-axis-label-container
-{
+.rosettaui-animation-curve-editor__vertical-axis-label-container {
     position: absolute;
     width: 50px;
     height: 100%;
@@ -50,8 +57,7 @@
     left: 0;
 }
 
-.rosettaui-animation-curve-editor__horizontal-axis-label-container
-{
+.rosettaui-animation-curve-editor__horizontal-axis-label-container {
     position: absolute;
     width: 100%;
     height: 20px;
@@ -60,14 +66,12 @@
 }
 
 .rosettaui-animation-curve-editor__vertical-axis-label-container > Label,
-.rosettaui-animation-curve-editor__horizontal-axis-label-container > Label
-{
+.rosettaui-animation-curve-editor__horizontal-axis-label-container > Label {
     position: absolute;
     color: gray;
 }
 
-.rosettaui-animation-curve-editor__control-buttons-container
-{
+.rosettaui-animation-curve-editor__control-buttons-container {
     position: absolute;
     height: 26px;
     top: 0;
@@ -78,26 +82,47 @@
     opacity: 0.6;
 }
 
-.rosettaui-animation-curve-editor__control-buttons-container > *
-{
+.rosettaui-animation-curve-editor__control-buttons-container > * {
     width: 26px;
     height: 26px;
     margin: 0 0 0 4px;
 }
 
-.rosettaui-animation-curve-editor__fit-button
-{
+.rosettaui-animation-curve-editor__fit-button {
     background-image: resource("animation-curve_fit");
 }
 
-.rosettaui-animation-curve-editor__snap-x-button
-{
+.rosettaui-animation-curve-editor__snap-x-button {
     background-image: resource("animation-curve_snap-x");
 }
 
-.rosettaui-animation-curve-editor__snap-y-button
-{
+.rosettaui-animation-curve-editor__snap-y-button {
     background-image: resource("animation-curve_snap-y");
+}
+
+.rosettaui-animation-curve-editor__property-group {
+    margin: 8px 4px 8px 4px;
+}
+
+.rosettaui-animation-curve-editor__time-value-row
+{
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-basis: 33%;
+}
+
+.rosettaui-animation-curve-editor__time-value-row > FloatField {
+    flex-basis: 100px;
+}
+
+.rosettaui-animation-curve-editor__time-value-row .unity-base-field__label
+{
+    min-width: 50px;
+}
+
+.rosettaui-animation-curve-editor__time-value-row > EnumField {
+    min-width: 189.5px;
+    max-width: 100%;
 }
 
 .rosettaui-animation-curve-editor__field-row {
@@ -111,6 +136,10 @@
 
 .rosettaui-animation-curve-editor__field-row > EnumField {
     width: 120px;
+}
+
+.rosettaui-animation-curve-editor__field-row > ToggleButton {
+    margin-right: 4px;
 }
 
 /********************************************************************************
@@ -140,8 +169,12 @@
     border-color: black;
 }
 
-.rosettaui-animation-curve-editor__control-point-handle__line
-{
+.rosettaui-animation-curve-editor__control-point--active {
+    border-color: whitesmoke;
+    border-width: 2px;
+}
+
+.rosettaui-animation-curve-editor__control-point-handle__line {
     position: absolute;
     left: 5px;
     top: 4px;
@@ -154,8 +187,7 @@
     opacity: 0.5;
 }
 
-.rosettaui-animation-curve-editor__control-point-handle__handle-container
-{
+.rosettaui-animation-curve-editor__control-point-handle__handle-container {
     position: absolute;
     top: -10px;
     right: -10px;
@@ -163,8 +195,7 @@
     height: 20px;
 }
 
-.rosettaui-animation-curve-editor__control-point-handle__handle
-{
+.rosettaui-animation-curve-editor__control-point-handle__handle {
     position: absolute;
     top: 7px;
     right: 7px;

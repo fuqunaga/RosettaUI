@@ -41,6 +41,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private bool _isAltPressed = false;
         
+        private const string ContainerClassName = "rosettaui-animation-curve-editor__control-point-container";
+        private const string ControlPointClassName = "rosettaui-animation-curve-editor__control-point";
+        private const string ActiveControlPointClassName = "rosettaui-animation-curve-editor__control-point--active";
+        
         public delegate void OnPointAction(ControlPoint controlPoint);
         public delegate int OnPointMoved(Keyframe keyframe);
         
@@ -63,7 +67,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             });
             
             // Handles
-            _leftHandle = new ControlPointHandle(_coordinateConverter, 180f, 
+            _leftHandle = new ControlPointHandle(_coordinateConverter, -1f, 
                 () => _onPointSelected(this),
                 (tangent, weight) =>
                 {
@@ -87,7 +91,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             );
             Add(_leftHandle);
             
-            _rightHandle = new ControlPointHandle(_coordinateConverter, 0f, 
+            _rightHandle = new ControlPointHandle(_coordinateConverter, 1f, 
                 () => _onPointSelected(this),
                 (tangent, weight) =>
                 {
@@ -112,12 +116,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             Add(_rightHandle);
             
             // Control point container
-            AddToClassList("rosettaui-animation-curve-editor__control-point-container");
+            AddToClassList(ContainerClassName);
             RegisterCallback<PointerDownEvent>(OnMouseDown);
             
             // Control point
             _controlPoint = new VisualElement { name = "AnimationCurveEditorControlPoint" };
-            _controlPoint.AddToClassList("rosettaui-animation-curve-editor__control-point");
+            _controlPoint.AddToClassList(ControlPointClassName);
             Add(_controlPoint);
             
             // Popup menu controller
@@ -165,13 +169,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             if (active)
             {
-                _controlPoint.style.backgroundColor = new StyleColor(Color.white);
+                _controlPoint.AddToClassList(ActiveControlPointClassName);
                 _leftHandle.style.visibility = Visibility.Visible;
                 _rightHandle.style.visibility = Visibility.Visible;
             }
             else
             {
-                _controlPoint.style.backgroundColor = new StyleColor(Color.green);
+                _controlPoint.RemoveFromClassList(ActiveControlPointClassName);
                 _leftHandle.style.visibility = Visibility.Hidden;
                 _rightHandle.style.visibility = Visibility.Hidden;
             }

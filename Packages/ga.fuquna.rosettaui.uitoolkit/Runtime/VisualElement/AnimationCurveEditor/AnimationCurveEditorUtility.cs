@@ -34,7 +34,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
              return PointMode.Broken;
         }
         
-        public static void SetPointMode(ref Keyframe keyframe, PointMode mode)
+        public static void SetPointMode(this ref Keyframe keyframe, PointMode mode)
         {
             switch (mode)
             {
@@ -103,14 +103,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             };
         }
         
-        public static float GetDegreeFromTangent(float tangent)
+        public static float GetDegreeFromTangent2(float y, float x)
         {
-            return tangent switch
-            {
-                float.NegativeInfinity => -90f,
-                float.PositiveInfinity => 90f,
-                _ => Mathf.Atan(tangent) * Mathf.Rad2Deg
-            };
+            return Mathf.Atan2(y, x) * Mathf.Rad2Deg;
         }
 
         public static void ApplyTangentMode(ref AnimationCurve curve, IEnumerable<ControlPoint> controlPoints)
@@ -154,5 +149,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 i++;
             }
         }
+        
     }
 }

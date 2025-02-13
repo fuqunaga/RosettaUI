@@ -56,18 +56,30 @@ namespace RosettaUI.Builder
                 Object.DestroyImmediate(texture);
                 texture = null;
             }
-            
+
             var curveRect = curve.GetCurveRect();
             var colorArray = ArrayPool<Color>.Shared.Rent(width * height);
+
+            // Fill the texture with a gray color
+            for (int j = 0; j < width * height; j++)
+                colorArray[j] = new Color(0.3372549f, 0.3372549f, 0.3372549f, 0.5f);
+
+            int prevHeight = -1;
             for (int i = 0; i < width; i++)
             {
-                int targetHeight = (int)((curve.Evaluate(curveRect.xMin + i / (width - 1f) * curveRect.width) - curveRect.yMin) / curveRect.height * height);
-                for (int j = 0; j < height; j++)
+                float t = curveRect.xMin + i / (width - 1f) * curveRect.width;
+                int targetHeight = (int)((curve.Evaluate(t) - curveRect.yMin) / curveRect.height * height);
+
+                if (prevHeight >= 0)
                 {
-                    colorArray[j * width + i] = j == targetHeight ? Color.green : new Color(0.3372549f, 0.3372549f, 0.3372549f);
+                    for (int j = Mathf.Min(prevHeight, targetHeight); j <= Mathf.Max(prevHeight, targetHeight); j++)
+                    {
+                        if (j >= 0 && j < height) colorArray[j * width + i] = Color.green;
+                    }
                 }
+                prevHeight = targetHeight;
             }
-            
+
             texture ??= new Texture2D(width, height)
             {
                 wrapMode = TextureWrapMode.Clamp,
@@ -75,10 +87,11 @@ namespace RosettaUI.Builder
             };
             texture.SetPixels(0, 0, width, height, colorArray);
             texture.Apply();
-            
+
             ArrayPool<Color>.Shared.Return(colorArray);
-            
+
             return texture;
         }
+
     }
 }

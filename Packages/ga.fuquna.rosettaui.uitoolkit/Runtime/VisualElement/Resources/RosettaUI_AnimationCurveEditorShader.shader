@@ -12,6 +12,7 @@
 
             #include "UnityCG.cginc"
             #include "SdfBezierSpline.hlsl"
+            #define EPSILON 0.00000001
 
             struct appdata
             {
@@ -42,8 +43,14 @@
             int _SegmentCount;
 
             static const float LineWidth = 2.0f;
+            static const float4 MainGridColor = float4(0.6, 0.6, 0.6, 0.5);
             static const float4 GridColor = float4(0.4, 0.4, 0.4, 0.5);
             static const float4 LineColor = float4(0, 1, 0, 1);
+
+            inline bool2 IsGrid(float2 uv, float2 gridUnit, float2 thickness)
+            {
+                return abs(frac(uv / gridUnit - 0.5) - 0.5) < _Resolution.zw / (gridUnit * _OffsetZoom.zw) * thickness;
+            }
 
             v2f Vert(appdata v)
             {
@@ -112,20 +119,14 @@
                 float4 col = 0;
                 
                 // Grid
-                float2 main = _GridParams.zw;
-                float2 grid = _GridParams.zw * (_GridParams.xy < 0 ? 0.1 : 1);
-                float2 sub = _GridParams.zw * (_GridParams.xy < 0 ? 0.01 : 0.1);
-                float2 mainGridThickness = _Resolution.zw / (main * _OffsetZoom.zw) * 2.0;
-                float2 gridThickness = _Resolution.zw / (grid * _OffsetZoom.zw) * 1.0;
-                float2 subThickness = _Resolution.zw / (sub * _OffsetZoom.zw) * 1.0;
-                bool isMainGrid = any(abs(frac(uv / main - 0.5) - 0.5) < mainGridThickness);
-                bool isGrid = any(abs(frac(uv / grid - 0.5) - 0.5) < gridThickness);
-                bool2 isSubGrid = abs(frac(uv / sub - 0.5) - 0.5) < subThickness;
-                
-                col = isSubGrid.x ? float4(GridColor.rgb, 1.0 - frac(_GridParams.x)) : col;
-                col = isSubGrid.y ? float4(GridColor.rgb, 1.0 - frac(_GridParams.y)) : col;
+                bool2 isSubGrid = IsGrid(uv, _GridParams.zw * 0.1, 1.0) && frac(_GridParams) > 0.0;
+                bool isGrid = any(IsGrid(uv, _GridParams.zw, 1.0));
+                bool2 isMainGrid = IsGrid(uv, _GridParams.zw, 2.0 * cos(frac(_GridParams - EPSILON) * UNITY_PI * 0.5));
+                col = isSubGrid.x ? float4(GridColor.rgb, 1.0 - frac(_GridParams.x - EPSILON)) : col;
+                col = isSubGrid.y ? float4(GridColor.rgb, 1.0 - frac(_GridParams.y - EPSILON)) : col;
                 col = isGrid ? GridColor : col;
-                col = isMainGrid ? GridColor : col;
+                col = isMainGrid.x ? MainGridColor : col;
+                col = isMainGrid.y ? MainGridColor : col;
                 
                 // Line
                 dist -= LineWidth * 0.5f;

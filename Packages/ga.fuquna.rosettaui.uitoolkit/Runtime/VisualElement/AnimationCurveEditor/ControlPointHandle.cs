@@ -6,8 +6,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
     public class ControlPointHandle : VisualElement
     {
-        private bool IsLeft => _angleOffset > 90f;
-
         public delegate void OnTangentChanged(float tangent, float weight);
         
         private VisualElement _lineElement;
@@ -17,35 +15,40 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private Vector2 _mouseDownPosition;
         private Action _onHandleSelected;
         private OnTangentChanged _onTangentChanged;
-        private float _angleOffset;
+        
         private float _angle;
+        private float _sign;
         private float _xDistToNeighborInScreen;
         
         private const float DefaultLineLength = 50f;
+        private const string HandleRootClassName = "rosettaui-animation-curve-editor__control-point-handle";
+        private const string HandleLineClassName = "rosettaui-animation-curve-editor__control-point-handle__line";
+        private const string HandleContainerClassName = "rosettaui-animation-curve-editor__control-point-handle__handle-container";
+        private const string HandleClassName = "rosettaui-animation-curve-editor__control-point-handle__handle";
         
-        public ControlPointHandle(ICoordinateConverter coordinateConverter, float angleOffset, Action onHandleSelected, OnTangentChanged onTangentChanged)
+        public ControlPointHandle(ICoordinateConverter coordinateConverter, float sign, Action onHandleSelected, OnTangentChanged onTangentChanged)
         {
             _coordinateConverter = coordinateConverter;
-            _angleOffset = angleOffset;
+            _sign = sign;
             _onHandleSelected = onHandleSelected;
             _onTangentChanged = onTangentChanged;
-            AddToClassList("rosettaui-animation-curve-editor__control-point-handle");
+            AddToClassList(HandleRootClassName);
             InitUI();
-            SetAngle(0f);
+            SetTangent(0f);
         }
 
         private void InitUI()
         {
             _lineElement = new VisualElement();
-            _lineElement.AddToClassList("rosettaui-animation-curve-editor__control-point-handle__line");
+            _lineElement.AddToClassList(HandleLineClassName);
             Add(_lineElement);
             
             _handleContainerElement = new VisualElement();
-            _handleContainerElement.AddToClassList("rosettaui-animation-curve-editor__control-point-handle__handle-container");
+            _handleContainerElement.AddToClassList(HandleContainerClassName);
             _lineElement.Add(_handleContainerElement);
             _handleContainerElement.RegisterCallback<PointerDownEvent>(OnPointerDown);
             var handleElement = new VisualElement();
-            handleElement.AddToClassList("rosettaui-animation-curve-editor__control-point-handle__handle");
+            handleElement.AddToClassList(HandleClassName);
             _handleContainerElement.Add(handleElement);
         }
 
@@ -55,7 +58,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         /// <param name="tangent">Tangent in curve coordinate</param>
         public void SetTangent(float tangent)
         {
-            SetAngle(AnimationCurveEditorUtility.GetDegreeFromTangent(_coordinateConverter.GetScreenTangentFromCurveTangent(tangent)));
+            float angle = AnimationCurveEditorUtility.GetDegreeFromTangent2(_coordinateConverter.GetScreenTangentFromCurveTangent(tangent) * _sign, _sign);
+            if (float.IsNaN(angle)) return;
+            
+            _lineElement.transform.rotation = Quaternion.AngleAxis(angle, Vector3.back);
+            _angle = angle;
         }
         
         public void SetWeight(float? weight, float xDistToNeighborInScreen)
@@ -65,15 +72,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 ? DefaultLineLength
                 : Mathf.Max(10f, (float)weight * Mathf.Abs(xDistToNeighborInScreen / Mathf.Cos(_angle * Mathf.Deg2Rad)));
         }
-        
-        private void SetAngle(float angle)
-        {
-            if (float.IsNaN(angle)) return;
-            angle += _angleOffset;
-            _lineElement.transform.rotation = Quaternion.AngleAxis(angle, Vector3.back);
-            _angle = angle;
-        }
-        
+
         private void OnPointerDown(PointerDownEvent evt)
         {
             if (evt.button != 0) return;
@@ -100,7 +99,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
             float Clamp(float xDiff)
             {
-                return IsLeft ? Mathf.Min(0f, xDiff) : Mathf.Max(0f, xDiff);
+                return Mathf.Max(0f, xDiff * _sign) * _sign;
             }
         }
         

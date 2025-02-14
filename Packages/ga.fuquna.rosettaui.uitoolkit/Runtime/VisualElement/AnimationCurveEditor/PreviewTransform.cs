@@ -7,13 +7,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     {
         public Vector2 Zoom => _zoom;
         public Vector2 Offset => _offset;
-        public Vector4 OffsetZoom => new Vector4(_offset.x, _offset.y, _zoom.x, _zoom.y);
+        public Vector4 OffsetZoom => new(_offset.x, _offset.y, _zoom.x, _zoom.y);
 
         private Vector2 _zoom = Vector2.one;
         private Vector2 _offset = Vector2.zero;
 
-        private Func<float> _getPreviewWidth;
-        private Func<float> _getPreviewHeight;
+        private readonly Func<float> _getPreviewWidth;
+        private readonly Func<float> _getPreviewHeight;
 
         public PreviewTransform(Func<float> getPreviewWidth, Func<float> getPreviewHeight)
         {

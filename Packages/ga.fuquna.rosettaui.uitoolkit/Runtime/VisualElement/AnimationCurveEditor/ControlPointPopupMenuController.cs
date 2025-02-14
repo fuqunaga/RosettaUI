@@ -7,18 +7,18 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
     public class ControlPointPopupMenuController
     {
-        private Action _onPointRemoved;
-        private Action<PointMode> _onPointModeChanged;
-        private Action<TangentMode?, TangentMode?> _onTangentModeChanged;
-        private Action<WeightedMode> _onWeightedModeChanged;
+        private readonly Action _onPointRemoved;
+        private readonly Action<PointMode> _onPointModeChanged;
+        private readonly Action<TangentMode?, TangentMode?> _onTangentModeChanged;
+        private readonly Action<WeightedMode> _onWeightedModeChanged;
 
-        private Dictionary<PointMode, MenuItem> _pointModeMenuItems = new Dictionary<PointMode, MenuItem>();
-        private Dictionary<TangentMode, MenuItem> _inTangentModeMenuItems = new Dictionary<TangentMode, MenuItem>();
-        private Dictionary<TangentMode, MenuItem> _outTangentModeMenuItems = new Dictionary<TangentMode, MenuItem>();
-        private Dictionary<TangentMode, MenuItem> _bothTangentModeMenuItems = new Dictionary<TangentMode, MenuItem>();
-        private MenuItem _inWeightedModeMenuItem;
-        private MenuItem _outWeightedModeMenuItem;
-        private MenuItem _bothWeightedModeMenuItem;
+        private readonly Dictionary<PointMode, MenuItem> _pointModeMenuItems = new Dictionary<PointMode, MenuItem>();
+        private readonly Dictionary<TangentMode, MenuItem> _inTangentModeMenuItems = new Dictionary<TangentMode, MenuItem>();
+        private readonly Dictionary<TangentMode, MenuItem> _outTangentModeMenuItems = new Dictionary<TangentMode, MenuItem>();
+        private readonly Dictionary<TangentMode, MenuItem> _bothTangentModeMenuItems = new Dictionary<TangentMode, MenuItem>();
+        private readonly MenuItem _inWeightedModeMenuItem;
+        private readonly MenuItem _outWeightedModeMenuItem;
+        private readonly MenuItem _bothWeightedModeMenuItem;
 
 
         public ControlPointPopupMenuController(Action onPointRemoved, Action<PointMode> onPointModeChanged, Action<TangentMode?, TangentMode?> onTangentModeChanged, Action<WeightedMode> onWeightedModeChanged)

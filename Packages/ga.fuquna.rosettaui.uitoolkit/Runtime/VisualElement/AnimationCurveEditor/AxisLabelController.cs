@@ -11,17 +11,20 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private List<Label> _verticalAxisLabels = new List<Label>();
         private List<Label> _horizontalAxisLabels = new List<Label>();
         
+        private const string VerticalAxisLabelContainerName = "vertical-axis-label-container";  
+        private const string HorizontalAxisLabelContainerName = "horizontal-axis-label-container";
+        
         public AxisLabelController(VisualElement parent)
         {
-            _verticalAxisLabelContainer = parent.Q("vertical-axis-label-container");
-            _horizontalAxisLabelContainer = parent.Q("horizontal-axis-label-container");
+            _verticalAxisLabelContainer = parent.Q(VerticalAxisLabelContainerName);
+            _horizontalAxisLabelContainer = parent.Q(HorizontalAxisLabelContainerName);
             for (int i = 0; i < 10; i++)
             {
-                var verticalLabel = new Label();
+                var verticalLabel = new Label { pickingMode = PickingMode.Ignore };
                 _verticalAxisLabels.Add(verticalLabel);
                 _verticalAxisLabelContainer.Add(verticalLabel);
                 
-                var horizontalLabel = new Label();
+                var horizontalLabel = new Label { pickingMode = PickingMode.Ignore };
                 _horizontalAxisLabels.Add(horizontalLabel);
                 _horizontalAxisLabelContainer.Add(horizontalLabel);
             }

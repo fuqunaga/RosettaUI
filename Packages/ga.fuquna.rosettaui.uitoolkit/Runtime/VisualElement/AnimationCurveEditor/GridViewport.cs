@@ -17,5 +17,19 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _width = width;
             _height = height;
         }
+
+        public GridViewport(in Rect rect) : this(rect.width, rect.height) { }
+        
+        public float RoundX(float x, float tickMultiplier = 1)
+        {
+            float tick = XTick * tickMultiplier;
+            return Mathf.Round(x / tick) * tick;
+        }
+        
+        public float RoundY(float y, float tickMultiplier = 1)
+        {
+            float tick = YTick * tickMultiplier;
+            return Mathf.Round(y / tick) * tick;
+        }
     }
 }

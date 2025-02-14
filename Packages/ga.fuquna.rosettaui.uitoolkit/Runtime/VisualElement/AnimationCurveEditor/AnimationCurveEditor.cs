@@ -11,23 +11,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// </summary>
     public class AnimationCurveEditor : VisualElement, IDisposable
     {
-        #region static 
-
+        #region Static Window Management
         private static ModalWindow _window;
         private static AnimationCurveEditor _animationCurveEditorInstance;
-
-        private static VisualTreeAsset _visualTreeAsset;
         
         static AnimationCurveEditor()
         {
-            StaticResourceUtility.AddResetStaticResourceCallback(() =>
+            StaticResourceUtility.AddResetStaticResourceCallback(ReleaseStaticResource);
+            
+            void ReleaseStaticResource()
             {
                 _window?.Hide();
                 _window = null;
                 _animationCurveEditorInstance?.Dispose();
                 _animationCurveEditorInstance = null;
-                _visualTreeAsset = null;
-            });
+            }
         }
 
         public static void Show(Vector2 position, VisualElement target, AnimationCurve initialCurve,
@@ -35,14 +33,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             if (_window == null)
             {
-                _window = new ModalWindow(true)
-                {
-                    style = {
-                        width = 800,
-                        height = 500,
-                        minWidth = 500
-                    }
-                };
+                _window = new ModalWindow(true) { style = { width = 800, height = 500, minWidth = 500 } };
                 _animationCurveEditorInstance = new AnimationCurveEditor();
                 _window.Add(_animationCurveEditorInstance);
 
@@ -56,52 +47,43 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
             _window.Show(position, target);
 
-
             // Preventing Overflow
             if (!float.IsNaN(_window.resolvedStyle.width) && !float.IsNaN(_window.resolvedStyle.height))
             {
                 VisualElementExtension.CheckOutOfScreen(position, _window);
             }
-            
+
             // Panel is not set before Show(), so callback registration and other operations are performed after Show().
             _animationCurveEditorInstance.SetCurve(initialCurve);
-            _animationCurveEditorInstance.onCurveChanged += onCurveChanged;
+            _animationCurveEditorInstance.OnCurveChanged += onCurveChanged;
             _animationCurveEditorInstance.RegisterCallback<DetachFromPanelEvent>(OnDetach);
             return;
 
             void OnDetach(DetachFromPanelEvent _)
             {
-                _animationCurveEditorInstance.onCurveChanged -= onCurveChanged;
+                _animationCurveEditorInstance.OnCurveChanged -= onCurveChanged;
                 _animationCurveEditorInstance.UnregisterCallback<DetachFromPanelEvent>(OnDetach);
 
                 target?.Focus();
             }
         }
-        
+
         #endregion
         
-        public event Action<AnimationCurve> onCurveChanged;
+        public event Action<AnimationCurve> OnCurveChanged;
         
-        private RenderTexture PreviewTexture
-        {
-            get => _curveEditorTexture;
-            set
-            {
-                _curveEditorTexture = value;
-                _curvePreviewElement.style.backgroundImage = new StyleBackground(Background.FromRenderTexture(value));
-            }
-        }
+        private CurvePointContainer _curvePointContainer;
         
-        private AnimationCurve _curve;
+        private CurvePreview _curvePreview;
         private RenderTexture _curveEditorTexture = null;
 
         private VisualElement _curvePreviewElement;
-        private List<ControlPoint> _controlPoints = new List<ControlPoint>();
+        private VisualElementKeyEventHelper _keyEventHelper;
         private ToggleButton _snapXButton;
         private ToggleButton _snapYButton;
         private ScrollerController _scrollerController;
         private AxisLabelController _axisLabelController;
-        private CurvePreview _curvePreview;
+        private PropertyFieldController _propertyFieldController;
 
         private PreviewTransform _previewTransform;
         private int _selectedControlPointIndex = -1;
@@ -112,20 +94,29 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private bool _prevSnapX = false;
         private bool _prevSnapY = false;
         
-        private Action _updatePropertyFields;
-
         private static readonly string USSClassName = "rosettaui-animation-curve-editor";
-        private static readonly Vector2 ZoomRange = new Vector2(0.0001f, 10000f);
+        private static readonly Vector2 ZoomRange = new(0.0001f, 10000f);
+        private static readonly float FitViewPadding = 0.05f;
 
-        private AnimationCurveEditor()
+        public AnimationCurveEditor()
         {
-            _curvePreview = new CurvePreview();
-
+            var visualTreeAsset = Resources.Load<VisualTreeAsset>("RosettaUI_AnimationCurveEditor");
+            visualTreeAsset.CloneTree(this);
             AddToClassList(USSClassName);
-            _visualTreeAsset ??= Resources.Load<VisualTreeAsset>("RosettaUI_AnimationCurveEditor");
-            _visualTreeAsset.CloneTree(this);
             
             InitUI();
+            _curvePointContainer = new CurvePointContainer(_curvePreviewElement, () => new ControlPoint(_previewTransform, OnControlPointSelected, OnControlPointMoved, RemoveControlPoint));
+        }
+        
+        /// <summary>
+        /// Set the curve to be edited.
+        /// </summary>
+        public void SetCurve(AnimationCurve curve)
+        {
+            _curvePointContainer.SetCurve(curve);
+            FitViewToCurve();
+            UpdateView();
+            UnselectAllControlPoint();
         }
         
         public void Dispose()
@@ -135,94 +126,55 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 _curvePreview.Dispose();
                 _curvePreview = null;
             }
-            if (PreviewTexture != null)
+            if (_curveEditorTexture != null)
             {
-                UnityEngine.Object.DestroyImmediate(PreviewTexture);
-                PreviewTexture = null;
+                UnityEngine.Object.DestroyImmediate(_curveEditorTexture);
+                _curveEditorTexture = null;
             }
         }
-        
-        /// <summary>
-        /// Set the curve to be edited.
-        /// </summary>
-        public void SetCurve(AnimationCurve curve)
-        {
-            _curve = curve;
-            InitControlPoints();
-            FitViewToCurve();
-            UpdateView();
-            UnselectAllControlPoint();
-        }
-
         
         private void MoveKey(Keyframe key)
         {
-            if (_curve == null || _selectedControlPointIndex < 0) return;
-            var rect = _previewTransform.GetPreviewRect();
-            float xUnit = Mathf.Pow(10f, (int)Mathf.Log10(rect.width)) * 0.05f;
-            float yUnit = Mathf.Pow(10f, (int)Mathf.Log10(rect.height)) * 0.05f;
-            if (_snapXButton.value) key.time = Mathf.Round(key.time / xUnit) * xUnit;
-            if (_snapYButton.value) key.value = Mathf.Round(key.value / yUnit) * yUnit;
+            if (_curvePointContainer.IsEmpty || _selectedControlPointIndex < 0) return;
+            var gridViewport = new GridViewport(_previewTransform.GetPreviewRect());
+            if (_snapXButton.value) { key.time = gridViewport.RoundX(key.time, 0.05f); }
+            if (_snapYButton.value) { key.value = gridViewport.RoundY(key.value, 0.05f); }
 
-            for (var i = 0; i < _curve.keys.Length; i++)
-            {
-                if (i == _selectedControlPointIndex) continue;
-                if (_curve.keys[i].time == key.time) return;
-            }
-            
-            int newIdx = _curve.MoveKey(_selectedControlPointIndex, key);
-            if (newIdx != _selectedControlPointIndex)
-            {
-                var temp = _controlPoints[_selectedControlPointIndex];
-                _controlPoints.RemoveAt(_selectedControlPointIndex);
-                _controlPoints.Insert(newIdx, temp);
-                _selectedControlPointIndex = newIdx;
-            }
+            _selectedControlPointIndex = _curvePointContainer.MoveKey(_selectedControlPointIndex, key);
         }
         
         #region Initialization
         private void InitUI()
         {
-            focusable = true;
-            
             // Key Bind
-            bool isKeyPressed = false;
-            RegisterCallback<KeyDownEvent>(evt =>
+            _keyEventHelper = new VisualElementKeyEventHelper(this);
+            _keyEventHelper.RegisterKeyAction(new [] { KeyCode.LeftControl, KeyCode.LeftCommand, KeyCode.RightControl, KeyCode.RightCommand }, evt =>
             {
-                if (isKeyPressed) return;
-                isKeyPressed = true;
-                switch (evt.keyCode)
+                switch (evt)
                 {
-                    case KeyCode.LeftControl:
-                    case KeyCode.LeftCommand:
-                    case KeyCode.RightControl:
-                    case KeyCode.RightCommand:
+                    case KeyEventType.KeyDown:
                         _prevSnapX = _snapXButton.value;
                         _prevSnapY = _snapYButton.value;
                         _snapXButton.SetValueWithoutNotify(true);
                         _snapYButton.SetValueWithoutNotify(true);
                         break;
-                }
-            });
-            RegisterCallback<KeyUpEvent>(evt =>
-            {
-                isKeyPressed = false;
-                switch (evt.keyCode)
-                {
-                    case KeyCode.LeftControl:
-                    case KeyCode.LeftCommand:
-                    case KeyCode.RightControl:
-                    case KeyCode.RightCommand:
+                    case KeyEventType.KeyUp:
                         _snapXButton.SetValueWithoutNotify(_prevSnapX);
                         _snapYButton.SetValueWithoutNotify(_prevSnapY);
                         break;
-                    case KeyCode.A:
-                        FitViewToCurve();
-                        break;
-                    case KeyCode.Delete when _selectedControlPointIndex >= 0:
-                        RemoveControlPoint(_controlPoints[_selectedControlPointIndex]);
+                    case KeyEventType.KeyPress:
+                    default:
                         break;
                 }
+            });
+            _keyEventHelper.RegisterKeyAction(KeyCode.A, evt =>
+            {
+                if (evt == KeyEventType.KeyDown) { FitViewToCurve(); }
+            });
+            _keyEventHelper.RegisterKeyAction(KeyCode.Delete, evt =>
+            {
+                if (evt != KeyEventType.KeyDown || _selectedControlPointIndex < 0) return;
+                RemoveControlPoint(_curvePointContainer.ControlPoints[_selectedControlPointIndex]);
             });
             
             // Buttons
@@ -232,225 +184,69 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _snapYButton = this.Q<ToggleButton>("value-snapping-button");
             
             // Curve Preview
+            _curvePreview = new CurvePreview();
             _curvePreviewElement = this.Q("preview-front");
             _curvePreviewElement.RegisterCallback<PointerDownEvent>(OnPointerDown);
             _curvePreviewElement.RegisterCallback<GeometryChangedEvent>(_ => UpdateView());
-            _curvePreviewElement.RegisterCallback<WheelEvent>(evt =>
-            {
-                var mouseUv = new Vector2(evt.localMousePosition.x / _curvePreviewElement.resolvedStyle.width, 1f - evt.localMousePosition.y / _curvePreviewElement.resolvedStyle.height);
-                mouseUv = _previewTransform.GetCurvePosFromScreenUv(mouseUv);
-                
-                Vector2 amount = Vector2.one * (1f + Mathf.Clamp(evt.delta.y, -0.1f, 0.1f));
-                
-                if (evt.ctrlKey || evt.commandKey) amount.y = 1f;
-                else if (evt.shiftKey) amount.x = 1f;
-                
-                var zoom = _previewTransform.Zoom / amount;
-                if (zoom.x < ZoomRange.x || zoom.y < ZoomRange.x || zoom.x > ZoomRange.y || zoom.y > ZoomRange.y) return;
-                
-                _previewTransform.AdjustZoom(amount, mouseUv);
-                UpdateView();
-            });
+            _curvePreviewElement.RegisterCallback<WheelEvent>(OnWheel);
 
             // Curve Preview Transform
             _previewTransform = new PreviewTransform(() => _curvePreviewElement.resolvedStyle.width, () => _curvePreviewElement.resolvedStyle.height);
             
             // Axis Labels & Scrollers
             _axisLabelController = new AxisLabelController(this);
-            _scrollerController = new ScrollerController(this,
-                yCenter =>
-                {
-                    _previewTransform.SetYCenter(yCenter);
-                    UpdateControlPoints();
-                    UpdateCurvePreview();
-                    _axisLabelController.UpdateAxisLabel(_previewTransform.GetPreviewRect());
-                },
-                xCenter =>
-                {
-                    _previewTransform.SetXCenter(xCenter);
-                    UpdateControlPoints();
-                    UpdateCurvePreview();
-                    _axisLabelController.UpdateAxisLabel(_previewTransform.GetPreviewRect());
-                }
-            );
-            
-            // Property Fields
-            var propertyField = this.Q("property-group");
-            
-            var inTangentSlider = SetupKeyframeField<Slider, float>("in-tangent-slider", (evt, key, cp) =>
+            _scrollerController = new ScrollerController(this, yCenter =>
             {
-                key.inTangent = AnimationCurveEditorUtility.GetTangentFromDegree(evt.newValue);
-                if (cp.PointMode == PointMode.Smooth) key.outTangent = key.inTangent;
-                MoveKey(key);
-                _updatePropertyFields();
+                _previewTransform.SetYCenter(yCenter);
+                _curvePointContainer.UpdateControlPoints();
+                UpdateCurvePreview();
+                _axisLabelController.UpdateAxisLabel(_previewTransform.GetPreviewRect());
+            },
+            xCenter =>
+            {
+                _previewTransform.SetXCenter(xCenter);
+                _curvePointContainer.UpdateControlPoints();
+                UpdateCurvePreview();
+                _axisLabelController.UpdateAxisLabel(_previewTransform.GetPreviewRect());
             });
-            var inTangentModeField = SetupKeyframeEnumField<TangentMode>("in-tangent-mode-field", (evt, key, cp) =>
+            
+            // Property Field
+            _propertyFieldController = new PropertyFieldController(this, () =>
             {
-                cp.SetTangentMode((TangentMode)evt.newValue, null);
-                MoveKey(key);
-            });
-            var inWeightedButton = this.Q<ToggleButton>("in-weighted-toggle");
-            inWeightedButton.toggledStateChanged += val =>
+                if (_selectedControlPointIndex < 0) return default;
+                return _curvePointContainer[_selectedControlPointIndex];
+            }, 
+            key =>
             {
-                if (_curve == null || _selectedControlPointIndex < 0) return;
-                var key = _curve.keys[_selectedControlPointIndex];
-                key.SetWeightedFrag(WeightedMode.In, val);
                 MoveKey(key);
                 UpdateView();
-                onCurveChanged?.Invoke(_curve);
-            };
-            var outTangentSlider = SetupKeyframeField<Slider, float>("out-tangent-slider", (evt, key, cp) =>
-            {
-                key.outTangent = AnimationCurveEditorUtility.GetTangentFromDegree(evt.newValue);
-                if (cp.PointMode == PointMode.Smooth) key.inTangent = key.outTangent;
-                MoveKey(key);
-                _updatePropertyFields();
+                OnCurveChanged?.Invoke(_curvePointContainer.Curve);
             });
-            var outTangentModeField = SetupKeyframeEnumField<TangentMode>("out-tangent-mode-field", (evt, key, cp) =>
-            {
-                cp.SetTangentMode(null, (TangentMode)evt.newValue);
-                MoveKey(key);
-            });
-            var outWeightedButton = this.Q<ToggleButton>("out-weighted-toggle");
-            outWeightedButton.toggledStateChanged += val =>
-            {
-                if (_curve == null || _selectedControlPointIndex < 0) return;
-                var key = _curve.keys[_selectedControlPointIndex];
-                key.SetWeightedFrag(WeightedMode.Out, val);
-                MoveKey(key);
-                UpdateView();
-                onCurveChanged?.Invoke(_curve);
-            };
-            var pointModeField = SetupKeyframeEnumField<PointMode>("point-mode-field", (evt, key, cp) =>
-            {
-                PointMode mode = (PointMode)evt.newValue;
-                key.SetPointMode(mode);
-                cp.SetPointMode(mode);
-                MoveKey(key);
-                _updatePropertyFields();
-            });
-            
-            var timeField = SetupKeyframeField<FloatField, float>("time-field", (evt, key, _) =>
-            {
-                key.time = evt.newValue;
-                MoveKey(key);
-            });
-            var valueField = SetupKeyframeField<FloatField, float>("value-field", (evt, key, _) =>
-            {
-                key.value = evt.newValue;
-                MoveKey(key);
-            });
-
-            _updatePropertyFields = () =>
-            {
-                if (_selectedControlPointIndex < 0)
-                {
-                    propertyField.SetEnabled(false);
-                    timeField.SetValueWithoutNotify(0f);
-                    valueField.SetValueWithoutNotify(0f);
-                    pointModeField.SetValueWithoutNotify(PointMode.Smooth);
-                    inTangentSlider.SetValueWithoutNotify(0f);
-                    inTangentModeField.SetValueWithoutNotify(TangentMode.Free);
-                    inWeightedButton.SetValueWithoutNotify(false);
-                    outTangentSlider.SetValueWithoutNotify(0f);
-                    outTangentModeField.SetValueWithoutNotify(TangentMode.Free);
-                    outWeightedButton.SetValueWithoutNotify(false);
-                    return;
-                }
-                propertyField.SetEnabled(true);
-                timeField.SetValueWithoutNotify(_curve.keys[_selectedControlPointIndex].time);
-                valueField.SetValueWithoutNotify(_curve.keys[_selectedControlPointIndex].value);
-                pointModeField.SetValueWithoutNotify(_controlPoints[_selectedControlPointIndex].PointMode);
-                inTangentSlider.SetValueWithoutNotify(Mathf.Atan(_curve.keys[_selectedControlPointIndex].inTangent) * Mathf.Rad2Deg);
-                inTangentModeField.SetValueWithoutNotify(_controlPoints[_selectedControlPointIndex].InTangentMode);
-                inWeightedButton.SetValueWithoutNotify(_curve.keys[_selectedControlPointIndex].weightedMode is WeightedMode.In or WeightedMode.Both);
-                outTangentSlider.SetValueWithoutNotify(Mathf.Atan(_curve.keys[_selectedControlPointIndex].outTangent) * Mathf.Rad2Deg);
-                outTangentModeField.SetValueWithoutNotify(_controlPoints[_selectedControlPointIndex].OutTangentMode);
-                outWeightedButton.SetValueWithoutNotify(_curve.keys[_selectedControlPointIndex].weightedMode is WeightedMode.Out or WeightedMode.Both);
-
-            };
-            
-            _updatePropertyFields();
-            return;
-
-            TField SetupKeyframeField<TField, T>(string elementName, Action<ChangeEvent<T>, Keyframe, ControlPoint> updateKey)
-                where TField : BaseField<T>
-            {
-                var field = this.Q<TField>(elementName);
-                field.RegisterValueChangedCallback(evt =>
-                {
-                    if (_curve == null || _selectedControlPointIndex < 0) return;
-                    updateKey(evt, _curve.keys[_selectedControlPointIndex], _controlPoints[_selectedControlPointIndex]);
-                    UpdateView();
-                    onCurveChanged?.Invoke(_curve);
-                });
-                return field;
-            }
-            
-            EnumField SetupKeyframeEnumField<TEnum>(string elementName, Action<ChangeEvent<Enum>, Keyframe, ControlPoint> updateKey)
-                where TEnum : Enum
-            {
-                var field = this.Q<EnumField>(elementName);
-                field.Init(default(TEnum));
-                field.RegisterValueChangedCallback(evt =>
-                {
-                    if (_curve == null || _selectedControlPointIndex < 0) return;
-                    updateKey(evt, _curve.keys[_selectedControlPointIndex], _controlPoints[_selectedControlPointIndex]);
-                    UpdateView();
-                    onCurveChanged?.Invoke(_curve);
-                });
-                return field;
-            }
         }
         
-        private void InitControlPoints()
-        {
-            if (_curve == null) return;
-            foreach (var cp in _controlPoints)
-            {
-                _curvePreviewElement.Remove(cp);
-            }
-            _controlPoints.Clear();
-            for (var i = 0; i < _curve.keys.Length; i++)
-            {
-                var key = _curve.keys[i];
-                var controlPoint = new ControlPoint(_previewTransform, OnControlPointSelected, OnControlPointMoved, RemoveControlPoint);
-                _controlPoints.Add(controlPoint);
-                _curvePreviewElement.Insert(0, controlPoint);
-                controlPoint.SetKeyframe(_curve, i);
-                controlPoint.SetPointMode(key.GetPointMode());
-                controlPoint.SetTangentMode(_curve.GetInTangentMode(i), _curve.GetOutTangentMode(i));
-                controlPoint.SetWeightedMode(key.weightedMode);
-            }
-        }
         #endregion
         
         #region View Update
         private void FitViewToCurve()
         {
-            if (_curve == null) return;
-            _previewTransform.FitToRect(_curve.GetCurveRect());
+            if (_curvePointContainer.IsEmpty) return;
+            var rect = _curvePointContainer.Curve.GetCurveRect();
+            var padding = rect.size * FitViewPadding;
+            rect.xMin -= padding.x;
+            rect.xMax += padding.x;
+            rect.yMin -= padding.y;
+            rect.yMax += padding.y;
+            _previewTransform.FitToRect(rect);
             UpdateView();
         }
         
         private void UpdateView()
         {
-            UpdateControlPoints();
+            _curvePointContainer.UpdateControlPoints();
             UpdateCurvePreview();
             var rect = _previewTransform.GetPreviewRect();
-            _scrollerController.UpdateScroller(rect, _curve.GetCurveRect());
+            _scrollerController.UpdateScroller(rect, _curvePointContainer.Curve.GetCurveRect());
             _axisLabelController.UpdateAxisLabel(rect);
-        }
-
-        private void UpdateControlPoints()
-        {
-            if (_curve == null) return;
-            
-            AnimationCurveEditorUtility.ApplyTangentMode(ref _curve, _controlPoints);
-            for (var i = 0; i < _curve.keys.Length; i++)
-            {
-                _controlPoints[i].SetKeyframe(_curve, i);
-            }
         }
         
         private void UpdateCurvePreview()
@@ -459,19 +255,20 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             int height = (int)_curvePreviewElement.resolvedStyle.height;
             if (width <= 0 || height <= 0) return;
             
-            if (PreviewTexture == null || PreviewTexture.width != width || PreviewTexture.height != height)
+            if (_curveEditorTexture == null || _curveEditorTexture.width != width || _curveEditorTexture.height != height)
             {
-                PreviewTexture?.Release();
-                PreviewTexture = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32);
+                _curveEditorTexture?.Release();
+                _curveEditorTexture = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32);
+                _curvePreviewElement.style.backgroundImage = new StyleBackground(Background.FromRenderTexture(_curveEditorTexture));
             }
             
             var rect = _previewTransform.GetPreviewRect();
             var gridViewport = new GridViewport(rect.width, rect.height);
-            _curvePreview.Render(_curve, new CurvePreview.CurvePreviewViewInfo {
+            _curvePreview.Render(_curvePointContainer.Curve, new CurvePreview.CurvePreviewViewInfo {
                 Resolution = new Vector4(width, height, 1f / width, 1f / height),
                 OffsetZoom = _previewTransform.OffsetZoom,
                 GridParams = new Vector4(gridViewport.XOrder, gridViewport.YOrder, gridViewport.XTick, gridViewport.YTick),
-                OutputTexture = PreviewTexture,
+                OutputTexture = _curveEditorTexture,
             });
         }
         
@@ -481,34 +278,30 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void OnControlPointSelected(ControlPoint controlPoint)
         {
-            _selectedControlPointIndex = _controlPoints.IndexOf(controlPoint);
-            _updatePropertyFields();
-            foreach (var c in _controlPoints)
-            {
-                c.SetActive(c == controlPoint);
-            }
+            _selectedControlPointIndex = _curvePointContainer.ControlPoints.IndexOf(controlPoint);
+            _propertyFieldController.UpdatePropertyFields();
+            _curvePointContainer.SelectControlPoint(_selectedControlPointIndex);
         }
         
         private int OnControlPointMoved(Keyframe keyframe)
         {
             MoveKey(keyframe);
             UpdateView();
-            _updatePropertyFields();
-            onCurveChanged?.Invoke(_curve);
+            _propertyFieldController.UpdatePropertyFields();
+            OnCurveChanged?.Invoke(_curvePointContainer.Curve);
             return _selectedControlPointIndex;
         }
         
-        private void RemoveControlPoint(ControlPoint controlPoint)
+        private void RemoveControlPoint(ControlPoint cp)
         {
-            int targetIndex = _controlPoints.IndexOf(controlPoint);
+            if (cp == null) return;
+            int targetIndex = _curvePointContainer.ControlPoints.IndexOf(cp);
             if (targetIndex < 0) return;
-            _curve.RemoveKey(targetIndex);
-            _controlPoints.RemoveAt(targetIndex);
-            _curvePreviewElement.Remove(controlPoint);
+            _curvePointContainer.RemoveKey(targetIndex);
             _selectedControlPointIndex = -1;
             UpdateView();
-            _updatePropertyFields();
-            onCurveChanged?.Invoke(_curve);
+            _propertyFieldController.UpdatePropertyFields();
+            OnCurveChanged?.Invoke(_curvePointContainer.Curve);
         }
         
         private void AddControlPoint(Vector2 positionInCurve)
@@ -517,29 +310,19 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             // Add key
             var key = new Keyframe(positionInCurve.x, positionInCurve.y);
-            int idx = _curve.AddKey(key);
-            
-            // Add control point
-            var controlPoint = new ControlPoint(_previewTransform, OnControlPointSelected, OnControlPointMoved, RemoveControlPoint);
-            _curvePreviewElement.Add(controlPoint);
-            controlPoint.SetKeyframe(_curve, idx);
-            controlPoint.SetActive(true);
-            _controlPoints.Insert(idx, controlPoint);
-            
+            int idx = _curvePointContainer.AddKey(key);
             _selectedControlPointIndex = idx;
+            
             UpdateView();
-            _updatePropertyFields();
-            onCurveChanged?.Invoke(_curve);
+            _propertyFieldController.UpdatePropertyFields();
+            OnCurveChanged?.Invoke(_curvePointContainer.Curve);
         }
         
         private void UnselectAllControlPoint()
         {
             _selectedControlPointIndex = -1;
-            _updatePropertyFields();
-            foreach (var c in _controlPoints)
-            {
-                c.SetActive(false);
-            }
+            _propertyFieldController.UpdatePropertyFields();
+            _curvePointContainer.UnselectAllControlPoints();
         }
         
         #endregion
@@ -548,7 +331,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void OnPointerDown(PointerDownEvent evt)
         {
             _mouseButton = evt.button;
-            if (_mouseButton == 2 || (_mouseButton == 0 && (evt.ctrlKey || evt.commandKey)))
+            if (_mouseButton == 2 || (_mouseButton == 0 && (evt.ctrlKey || evt.commandKey || evt.altKey)))
             {
                 _curvePreviewElement.CaptureMouse();
                 _curvePreviewElement.RegisterCallback<PointerMoveEvent>(OnPointerMove);
@@ -588,7 +371,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void OnPointerMove(PointerMoveEvent evt)
         {
-            if (_mouseButton == 2 || (_mouseButton == 0 && (evt.ctrlKey || evt.commandKey)))
+            if (_mouseButton == 2 || (_mouseButton == 0 && (evt.ctrlKey || evt.commandKey || evt.altKey)))
             {
                 _previewTransform.AdjustOffsetByScreenDelta((Vector2)evt.localPosition - _prevPointerPosition);
                 UpdateView();
@@ -603,6 +386,23 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _curvePreviewElement.UnregisterCallback<PointerMoveEvent>(OnPointerMove);
             _curvePreviewElement.UnregisterCallback<PointerUpEvent>(OnPointerUp);
             evt.StopPropagation();
+        }
+        
+        private void OnWheel(WheelEvent evt)
+        {
+            var mouseUv = new Vector2(evt.localMousePosition.x / _curvePreviewElement.resolvedStyle.width, 1f - evt.localMousePosition.y / _curvePreviewElement.resolvedStyle.height);
+            mouseUv = _previewTransform.GetCurvePosFromScreenUv(mouseUv);
+                
+            Vector2 amount = Vector2.one * (1f + Mathf.Clamp(evt.delta.y, -0.1f, 0.1f));
+                
+            if (evt.ctrlKey || evt.commandKey) { amount.y = 1f; }
+            else if (evt.shiftKey) { amount.x = 1f; }
+                
+            var zoom = _previewTransform.Zoom / amount;
+            if (zoom.x < ZoomRange.x || zoom.y < ZoomRange.x || zoom.x > ZoomRange.y || zoom.y > ZoomRange.y) return;
+                
+            _previewTransform.AdjustZoom(amount, mouseUv);
+            UpdateView();
         }
         
         #endregion

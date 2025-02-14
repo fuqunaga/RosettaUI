@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
@@ -45,6 +43,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     keyframe.inTangent = 0f;
                     keyframe.outTangent = 0f;
                     break;
+                case PointMode.Broken:
+                default:
+                    break;
             }
         }
 
@@ -83,9 +84,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             uint current = (uint) key.weightedMode;
             uint mask = (uint) mode;
-            if (value) current |= mask;
+            if (value) { current |= mask; }
             else current &= ~mask;
-            key.weightedMode = (WeightedMode) current;
+            key.weightedMode = (WeightedMode)current;
         }
         
         public static void ToggleWeightedFrag(this ref Keyframe key, WeightedMode mode)
@@ -108,44 +109,50 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             return Mathf.Atan2(y, x) * Mathf.Rad2Deg;
         }
 
-        public static void ApplyTangentMode(ref AnimationCurve curve, IEnumerable<ControlPoint> controlPoints)
+        public static void ApplyTangentMode(CurvePointContainer container)
         {
             int i = 0;
-            foreach (var controlPoint in controlPoints)
+            foreach (var keyPoint in container)
             {
-                var key = curve.keys[i];
-                switch (controlPoint.InTangentMode)
+                var key = keyPoint.key;
+                switch (keyPoint.point.InTangentMode)
                 {
                     case TangentMode.Linear:
                         // Set the tangent to the slope between the previous key and this key
                         if (i > 0)
                         {
-                            var prevKey = curve.keys[i - 1];
+                            var prevKey = container[i - 1].key;
                             key.inTangent = (key.value - prevKey.value) / (key.time - prevKey.time);
                         }
-                        controlPoint.SetPointMode(PointMode.Broken);
+                        keyPoint.point.SetPointMode(PointMode.Broken);
                         break;
                     case TangentMode.Constant:
                         key.inTangent = float.PositiveInfinity;
                         break;
+                    case TangentMode.Free:
+                    default:
+                        break;
                 }
-                switch (controlPoint.OutTangentMode)
+                switch (keyPoint.point.OutTangentMode)
                 {
                     case TangentMode.Linear:
                         // Set the tangent to the slope between this key and the next key
-                        if (i < curve.keys.Length - 1)
+                        if (i < container.Count - 1)
                         {
-                            var nextKey = curve.keys[i + 1];
+                            var nextKey = container[i + 1].key;
                             key.outTangent = (nextKey.value - key.value) / (nextKey.time - key.time);
                         }
-                        controlPoint.SetPointMode(PointMode.Broken);
+                        keyPoint.point.SetPointMode(PointMode.Broken);
                         break;
                     case TangentMode.Constant:
                         key.outTangent = float.PositiveInfinity;
                         break;
+                    case TangentMode.Free:
+                    default:
+                        break;
                 }
                 
-                curve.MoveKey(i, key);
+                container.MoveKey(i, key);
                 i++;
             }
         }

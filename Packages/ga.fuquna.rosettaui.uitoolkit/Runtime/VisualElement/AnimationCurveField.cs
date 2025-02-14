@@ -11,7 +11,7 @@ namespace RosettaUI.UIToolkit
         public new static readonly string labelUssClassName = ussClassName + "__label";
         public new static readonly string inputUssClassName = ussClassName + "__input";
 
-        public event Action<Vector2, AnimationCurveField> showAnimationCurveEditorFunc;
+        public event Action<Vector2, AnimationCurveField> showAnimationCurveEditorFunc= delegate { };
 
         private bool _valueNull;
         private readonly Background _defaultBackground = new();
@@ -49,12 +49,12 @@ namespace RosettaUI.UIToolkit
 
         private void ShowAnimationCurveEditor(Vector2 position)
         {
-            showAnimationCurveEditorFunc?.Invoke(position, this);
+            showAnimationCurveEditorFunc.Invoke(position, this);
         }
 
         private void UpdateAnimationCurveTexture()
         {
-            var preview = _curveInput.preview;
+            var preview = _curveInput.Preview;
 
             if (_valueNull || showMixedValue)
             {
@@ -117,8 +117,8 @@ namespace RosettaUI.UIToolkit
         {
             if (showMixedValue)
             {
-                _curveInput.preview.style.backgroundImage = _defaultBackground;
-                _curveInput.preview.Add(mixedValueLabel);
+                _curveInput.Preview.style.backgroundImage = _defaultBackground;
+                _curveInput.Preview.Add(mixedValueLabel);
             }
             else
             {
@@ -129,11 +129,11 @@ namespace RosettaUI.UIToolkit
 
         public class AnimationCurveInput : VisualElement
         {
-            public readonly VisualElement preview;
+            public readonly VisualElement Preview;
 
             public AnimationCurveInput()
             {
-                preview = new VisualElement()
+                Preview = new VisualElement()
                 {
                     style =
                     {
@@ -142,7 +142,7 @@ namespace RosettaUI.UIToolkit
                     }
                 };
 
-                Add(preview);
+                Add(Preview);
             }
         }
     }

@@ -24,22 +24,22 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
 
-        private OnPointAction _onPointSelected;
-        private OnPointMoved _onPointMoved;
-        private OnPointAction _onPointRemoved;
+        private readonly OnPointAction _onPointSelected;
+        private readonly OnPointMoved _onPointMoved;
+        private readonly OnPointAction _onPointRemoved;
         
         private Vector2 _elementPositionOnDown;
         private Vector2 _mouseDownPosition;
         
-        private ICoordinateConverter _coordinateConverter;
-        private VisualElement _controlPoint;
-        private ControlPointHandle _leftHandle;
-        private ControlPointHandle _rightHandle;
-        private ControlPointPopupMenuController _popupMenuController;
+        private readonly ICoordinateConverter _coordinateConverter;
+        private readonly VisualElement _controlPoint;
+        private readonly ControlPointHandle _leftHandle;
+        private readonly ControlPointHandle _rightHandle;
+        private readonly ControlPointPopupMenuController _popupMenuController;
 
         private Keyframe _keyframeCopy;
         
-        private bool _isAltPressed = false;
+        private readonly VisualElementKeyEventHelper _keyEventHelper;
         
         private const string ContainerClassName = "rosettaui-animation-curve-editor__control-point-container";
         private const string ControlPointClassName = "rosettaui-animation-curve-editor__control-point";
@@ -56,14 +56,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _onPointMoved = onPointMoved;
             _onPointRemoved = onPointRemoved;
             
-            focusable = true;
-            RegisterCallback<KeyDownEvent>(evt =>
+            _keyEventHelper = new VisualElementKeyEventHelper(this);
+            _keyEventHelper.RegisterKeyAction(new[] { KeyCode.LeftAlt, KeyCode.RightAlt }, type =>
             {
-                if (evt.keyCode is KeyCode.LeftAlt or KeyCode.RightAlt) _isAltPressed = true;
-            });
-            RegisterCallback<KeyUpEvent>(evt =>
-            {
-                if (evt.keyCode is KeyCode.LeftAlt or KeyCode.RightAlt) _isAltPressed = false;
+                if (type != KeyEventType.KeyDown) return;
+                SetPointMode(PointMode.Broken);
             });
             
             // Handles
@@ -73,18 +70,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 {
                     _keyframeCopy.inTangent = tangent;
                     _keyframeCopy.inWeight = _keyframeCopy.weightedMode is WeightedMode.In or WeightedMode.Both ? weight : 0.333333f;
-                    if (!_isAltPressed)
+                    if (PointMode == PointMode.Flat) { PointMode = PointMode.Smooth; }
+                    if (PointMode == PointMode.Smooth)
                     {
-                        if (PointMode == PointMode.Flat) PointMode = PointMode.Smooth;
-                        if (PointMode == PointMode.Smooth)
-                        {
-                            if (float.IsInfinity(_keyframeCopy.inTangent)) _keyframeCopy.outTangent = -_keyframeCopy.inTangent;
-                            _keyframeCopy.outTangent = _keyframeCopy.inTangent;
-                        }
-                    }
-                    else
-                    {
-                        SetPointMode(PointMode.Broken);
+                        if (float.IsInfinity(_keyframeCopy.inTangent)) _keyframeCopy.outTangent = -_keyframeCopy.inTangent;
+                        _keyframeCopy.outTangent = _keyframeCopy.inTangent;
                     }
                     _onPointMoved(_keyframeCopy);
                 }
@@ -97,18 +87,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 {
                     _keyframeCopy.outTangent = tangent;
                     _keyframeCopy.outWeight = _keyframeCopy.weightedMode is WeightedMode.Out or WeightedMode.Both ? weight : 0.333333f;
-                    if (!_isAltPressed)
+                    if (PointMode == PointMode.Flat) { PointMode = PointMode.Smooth; }
+                    if (PointMode == PointMode.Smooth)
                     {
-                        if (PointMode == PointMode.Flat) PointMode = PointMode.Smooth;
-                        if (PointMode == PointMode.Smooth)
-                        {
-                            if (float.IsInfinity(_keyframeCopy.outTangent)) _keyframeCopy.inTangent = -_keyframeCopy.outTangent;
-                            _keyframeCopy.inTangent = _keyframeCopy.outTangent;
-                        }
-                    }
-                    else
-                    {
-                        SetPointMode(PointMode.Broken);
+                        if (float.IsInfinity(_keyframeCopy.outTangent)) _keyframeCopy.inTangent = -_keyframeCopy.outTangent;
+                        _keyframeCopy.inTangent = _keyframeCopy.outTangent;
                     }
                     _onPointMoved(_keyframeCopy);
                 }
@@ -162,6 +145,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             {
                 _keyframeCopy.ToggleWeightedFrag(mode);
                 _onPointMoved(_keyframeCopy);
+                _popupMenuController.SetWeightedMode(_keyframeCopy.weightedMode);
             }
         }
         
@@ -250,7 +234,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             if (evt.button == 0)
             {
                 RegisterCallback<PointerMoveEvent>(OnPointerMove);
-                RegisterCallback<PointerLeaveEvent>(OnPointerLeave);
                 RegisterCallback<PointerUpEvent>(OnPointerUp);
                 evt.StopPropagation();
                 this.CaptureMouse();
@@ -266,18 +249,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             SetPointerPosition(evt.position);
         }
-        
-        private void OnPointerLeave(PointerLeaveEvent evt)
-        {
-            SetPointerPosition(evt.position);
-        }
-        
+
         private void OnPointerUp(PointerUpEvent evt)
         {
             if (evt.button == 0)
             {
                 UnregisterCallback<PointerMoveEvent>(OnPointerMove);
-                UnregisterCallback<PointerLeaveEvent>(OnPointerLeave);
                 UnregisterCallback<PointerUpEvent>(OnPointerUp);
                 evt.StopPropagation();
                 this.ReleaseMouse();

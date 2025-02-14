@@ -8,19 +8,23 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
     public class ScrollerController
     {
-        private Scroller _verticalScroller;
-        private Scroller _horizontalScroller;
-        private VisualElement _verticalDragger;
-        private VisualElement _horizontalDragger;
-        private Action<float> _onUpdateVerticalPosition;
-        private Action<float> _onUpdateHorizontalPosition;
+        private readonly Scroller _verticalScroller;
+        private readonly Scroller _horizontalScroller;
+        private readonly VisualElement _verticalDragger;
+        private readonly VisualElement _horizontalDragger;
+        private readonly Action<float> _onUpdateVerticalPosition;
+        private readonly Action<float> _onUpdateHorizontalPosition;
+        
+        private const string VerticalScrollerName = "vertical-scroller";
+        private const string HorizontalScrollerName = "horizontal-scroller";
+        private const string DraggerName = "unity-dragger";
         
         public ScrollerController(VisualElement parent, Action<float> onUpdateVerticalPosition, Action<float> onUpdateHorizontalPosition)
         {
-            _verticalScroller = parent.Q<Scroller>("vertical-scroller");
-            _horizontalScroller = parent.Q<Scroller>("horizontal-scroller");
-            _verticalDragger = _verticalScroller.Q("unity-dragger");
-            _horizontalDragger = _horizontalScroller.Q("unity-dragger");
+            _verticalScroller = parent.Q<Scroller>(VerticalScrollerName);
+            _horizontalScroller = parent.Q<Scroller>(HorizontalScrollerName);
+            _verticalDragger = _verticalScroller.Q(DraggerName);
+            _horizontalDragger = _horizontalScroller.Q(DraggerName);
             _onUpdateVerticalPosition = onUpdateVerticalPosition;
             _onUpdateHorizontalPosition = onUpdateHorizontalPosition;
             _verticalScroller.valueChanged += OnVerticalScrollerValueChanged;

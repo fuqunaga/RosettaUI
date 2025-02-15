@@ -313,6 +313,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             int idx = _curvePointContainer.AddKey(key);
             _selectedControlPointIndex = idx;
             
+            // Match the tangent mode to neighborhood point one
+            var cp = _curvePointContainer.ControlPoints[_selectedControlPointIndex];
+            if (0 < idx)
+            {
+                cp.SetTangentMode(_curvePointContainer.ControlPoints[_selectedControlPointIndex - 1].OutTangentMode, null);
+            }
+            if (idx < _curvePointContainer.Count - 1)
+            {
+                cp.SetTangentMode(null, _curvePointContainer.ControlPoints[_selectedControlPointIndex + 1].InTangentMode);
+            }
+            
             UpdateView();
             _propertyFieldController.UpdatePropertyFields();
             OnCurveChanged?.Invoke(_curvePointContainer.Curve);

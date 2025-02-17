@@ -3,9 +3,17 @@ using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
+#if UNITY_2023_2_OR_NEWER
     [UxmlElement]
+#endif
     public partial class ToggleButton : Button, INotifyValueChanged<bool>
     {
+#if !UNITY_2023_2_OR_NEWER
+        public new class UxmlFactory : UxmlFactory<ToggleButton, UxmlTraits>
+        {
+        }
+#endif
+        
         public bool value
         {
             get => _isToggled;

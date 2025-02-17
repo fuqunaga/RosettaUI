@@ -106,6 +106,7 @@
 
 .rosettaui-animation-curve-editor__time-value-row
 {
+    height: 22px;
     flex-direction: row;
     flex-wrap: wrap;
 }

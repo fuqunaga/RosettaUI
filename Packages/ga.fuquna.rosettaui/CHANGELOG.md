@@ -1,3 +1,19 @@
+# [ga.fuquna.rosettaui-v1.9.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.8.0...ga.fuquna.rosettaui-v1.9.0) (2025-02-17)
+
+
+### Bug Fixes
+
+* change cb.SetGlobal to mat.Set, tiny bug, code format ([d7b41bc](https://github.com/fuqunaga/RosettaUI/commit/d7b41bcf56b132117c3eb0ab539556b2a04878d5))
+
+
+### Features
+
+* animation curve copy and paste support ([e4883a7](https://github.com/fuqunaga/RosettaUI/commit/e4883a772d90e4d32c8020f54d46efa32d5b9115))
+* fit curve, snap points ([eb645c6](https://github.com/fuqunaga/RosettaUI/commit/eb645c65ce0306f474ca944d24bbbe45565fbad4))
+* point mode, tangent mode ([84ba70f](https://github.com/fuqunaga/RosettaUI/commit/84ba70f687114730512c32c965164c2f55aee315))
+* render graph in curve editor ([d1f4d06](https://github.com/fuqunaga/RosettaUI/commit/d1f4d0630af1aaa7bcfacffff10f9b0b69589811))
+* zoom each axis ([2bc13e7](https://github.com/fuqunaga/RosettaUI/commit/2bc13e7b672ecef48e605e42498167068aaca7f3))
+
 # [ga.fuquna.rosettaui-v1.8.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.7.4...ga.fuquna.rosettaui-v1.8.0) (2024-09-11)
 
 

@@ -83,7 +83,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void RemoveKey(int index)
         {
-            if (IsEmpty || index < 0 || index >= _curve.keys.Length) return;
+            if (IsEmpty || index < 0 || index >= _curve.keys.Length || _curve.keys.Length <= 1) return;
             _curve.RemoveKey(index);
             var controlPoint = _controlPoints[index];
             _controlPoints.RemoveAt(index);

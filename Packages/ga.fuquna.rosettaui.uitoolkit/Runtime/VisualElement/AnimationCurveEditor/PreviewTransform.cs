@@ -77,14 +77,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         public float GetCurveTangentFromScreenTangent(float tangent)
         {
-            float aspect = _getPreviewWidth() /_getPreviewHeight();
+            float aspect = _getPreviewWidth() / _getPreviewHeight() * _zoom.x / _zoom.y;
             tangent *= aspect;
             return tangent;
         }
         
         public float GetScreenTangentFromCurveTangent(float tangent)
         {
-            float aspect = _getPreviewWidth() /_getPreviewHeight();
+            float aspect = _getPreviewWidth() / _getPreviewHeight() * _zoom.x / _zoom.y;
             tangent /= aspect;
             return tangent;
         }

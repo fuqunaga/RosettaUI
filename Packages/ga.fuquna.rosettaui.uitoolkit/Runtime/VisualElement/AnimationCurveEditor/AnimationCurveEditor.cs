@@ -169,11 +169,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             });
             _keyEventHelper.RegisterKeyAction(KeyCode.A, evt =>
             {
-                if (evt == KeyEventType.KeyDown) { FitViewToCurve(); }
+                if (evt == KeyEventType.KeyUp) { FitViewToCurve(); }
             });
             _keyEventHelper.RegisterKeyAction(KeyCode.Delete, evt =>
             {
-                if (evt != KeyEventType.KeyDown || _selectedControlPointIndex < 0) return;
+                if (evt != KeyEventType.KeyUp || _selectedControlPointIndex < 0) return;
                 RemoveControlPoint(_curvePointContainer.ControlPoints[_selectedControlPointIndex]);
             });
             
@@ -230,7 +230,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void FitViewToCurve()
         {
             if (_curvePointContainer.IsEmpty) return;
-            var rect = _curvePointContainer.Curve.GetCurveRect();
+            var rect = _curvePointContainer.Curve.GetCurveRect(true, true);
             var padding = rect.size * FitViewPadding;
             rect.xMin -= padding.x;
             rect.xMax += padding.x;
@@ -245,7 +245,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _curvePointContainer.UpdateControlPoints();
             UpdateCurvePreview();
             var rect = _previewTransform.GetPreviewRect();
-            _scrollerController.UpdateScroller(rect, _curvePointContainer.Curve.GetCurveRect());
+            _scrollerController.UpdateScroller(rect, _curvePointContainer.Curve.GetCurveRect(true, true));
             _axisLabelController.UpdateAxisLabel(rect);
         }
         
@@ -296,7 +296,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             if (cp == null) return;
             int targetIndex = _curvePointContainer.ControlPoints.IndexOf(cp);
-            if (targetIndex < 0) return;
+            if (targetIndex < 0 || _curvePointContainer.Count <= 1) return;
             _curvePointContainer.RemoveKey(targetIndex);
             _selectedControlPointIndex = -1;
             UpdateView();

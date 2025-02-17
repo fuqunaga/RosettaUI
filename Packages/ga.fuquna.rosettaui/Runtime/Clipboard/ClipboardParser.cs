@@ -317,10 +317,10 @@ namespace RosettaUI
         // インスペクタはCustomPrefix付きでEditorJsonUtilityでシリアライズしている
         // https://github.com/Unity-Technologies/UnityCsReference/blob/5406f17521a16bb37880960352990229987aa676/Editor/Mono/Clipboard/ClipboardParser.cs#L353
         //
-        // さらにGradientWrapperでかぶせている
+        // さらにAnimationCurveWrapperでかぶせている
         public static string SerializeAnimationCurve(AnimationCurve curve)
         {
-            var wrapper = new AnimationCurveWrapper() { curve = curve};
+            var wrapper = new AnimationCurveWrapper() { curve = curve };
             return $"{PrefixAnimationCurve}{JsonUtility.ToJson(wrapper)}";
         }
         

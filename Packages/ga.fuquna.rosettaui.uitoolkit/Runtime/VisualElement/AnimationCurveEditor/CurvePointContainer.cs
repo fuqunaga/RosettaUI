@@ -46,6 +46,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             if (IsEmpty) return -1;
             int idx = _curve.AddKey(key);
+            if (idx < 0) return idx;
             
             // Add control point
             var controlPoint = _getNewControlPoint();

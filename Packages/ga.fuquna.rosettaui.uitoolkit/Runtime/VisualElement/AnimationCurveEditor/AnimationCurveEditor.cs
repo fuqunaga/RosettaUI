@@ -311,6 +311,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             // Add key
             var key = new Keyframe(positionInCurve.x, positionInCurve.y);
             int idx = _curvePointContainer.AddKey(key);
+            if (idx < 0) return;
             _selectedControlPointIndex = idx;
             
             // Match the tangent mode to neighborhood point one

@@ -54,8 +54,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         public void DrawCurve(CommandBuffer cmdBuf, RenderTexture outputTexture)
         {
-            cmdBuf.SetGlobalBuffer("_Spline", _curveDataBuffer);
-            cmdBuf.SetGlobalInt("_SegmentCount", _numActiveSegments);
+            _curveDrawMaterial.SetBuffer("_Spline", _curveDataBuffer);
+            _curveDrawMaterial.SetInt("_SegmentCount", _numActiveSegments);
             cmdBuf.Blit(null, outputTexture, _curveDrawMaterial);
         }
 
@@ -64,9 +64,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _commandBuffer.Clear();
             UpdateData(_commandBuffer, animationCurve);
 
-            _commandBuffer.SetGlobalVector("_Resolution", viewInfo.Resolution);
-            _commandBuffer.SetGlobalVector("_OffsetZoom", viewInfo.OffsetZoom);
-            _commandBuffer.SetGlobalVector("_GridParams", viewInfo.GridParams);
+            _curveDrawMaterial.SetVector("_Resolution", viewInfo.Resolution);
+            _curveDrawMaterial.SetVector("_OffsetZoom", viewInfo.OffsetZoom);
+            _curveDrawMaterial.SetVector("_GridParams", viewInfo.GridParams);
 
             DrawCurve(_commandBuffer, viewInfo.OutputTexture);
 

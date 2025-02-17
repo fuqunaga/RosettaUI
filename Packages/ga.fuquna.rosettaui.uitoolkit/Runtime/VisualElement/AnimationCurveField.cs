@@ -11,7 +11,7 @@ namespace RosettaUI.UIToolkit
         public new static readonly string labelUssClassName = ussClassName + "__label";
         public new static readonly string inputUssClassName = ussClassName + "__input";
 
-        public event Action<Vector2, AnimationCurveField> showAnimationCurveEditorFunc= delegate { };
+        public event Action<Vector2, AnimationCurveField> showAnimationCurveEditorFunc = delegate { };
 
         private bool _valueNull;
         private readonly Background _defaultBackground = new();

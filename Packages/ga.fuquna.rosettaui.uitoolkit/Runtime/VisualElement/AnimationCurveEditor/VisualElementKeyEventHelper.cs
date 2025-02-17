@@ -97,10 +97,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 foreach (var keyCode in _targetKeyCodes)
                 {
                     if (!_helper._keyActions.TryGetValue(keyCode, out var actions)) continue;
-                    if (actions.Contains(_targetAction))
-                    {
-                        actions.Remove(_targetAction);
-                    }
+                    actions.Remove(_targetAction); 
                 }
             }
         }

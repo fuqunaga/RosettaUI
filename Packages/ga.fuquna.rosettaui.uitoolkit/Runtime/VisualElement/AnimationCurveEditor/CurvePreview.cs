@@ -46,7 +46,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             if (_curveDataBuffer == null || _curveDataBuffer.count < _numActiveSegments)
             {
                 _curveDataBuffer?.Dispose();
-                _curveDataBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, _numActiveSegments, Marshal.SizeOf<SplineSegmentData>());
+                _curveDataBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, Mathf.Max(1, _numActiveSegments), Marshal.SizeOf<SplineSegmentData>());
             }
 
             cmdBuf.SetBufferData(_curveDataBuffer, splineData);

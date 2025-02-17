@@ -20,6 +20,7 @@ namespace RosettaUI
     {
         public const string PrefixEnum = "Enum:";
         public const string PrefixGradient = nameof(UnityEditor) + ".GradientWrapperJSON:";
+        public const string PrefixAnimationCurve = nameof(UnityEditor) + ".AnimationCurveWrapperJSON:";
         public const string PrefixGeneric = "GenericPropertyJSON:";
 
         private delegate bool DeserializeFunc<T>(string text, out T value);
@@ -47,6 +48,8 @@ namespace RosettaUI
                 nameof(Quaternion) => SerializeQuaternion(To<Quaternion>(ref value)),
                 nameof(Color) => SerializeColor(To<Color>(ref value)),
                 nameof(Gradient) => SerializeGradient(To<Gradient>(ref value)),
+                nameof(AnimationCurve) => SerializeAnimationCurve(To<AnimationCurve>(ref value)),
+                
                 _ when type.IsEnum => SerializeEnum(value),
                 _ => SerializeGeneric(in value)
             };
@@ -77,6 +80,7 @@ namespace RosettaUI
                 nameof(Quaternion) => (DeserializeQuaternion(text, out var v), From(ref v)),
                 nameof(Color) => (DeserializeColor(text, out var v), From(ref v)),
                 nameof(Gradient) => (DeserializeGradient(text, out var v), From(ref v)),
+                nameof(AnimationCurve) => (DeserializeAnimationCurve(text, out var v), From(ref v)),
                 _ when type.IsEnum => (DeserializeEnum<T>(text, out var v), v),
                 _ => (DeserializeGeneric<T>(text, out var v), v)
             };
@@ -309,6 +313,17 @@ namespace RosettaUI
             return $"{PrefixGradient}{JsonUtility.ToJson(wrapper)}";
         }
         
+        //　Gradient
+        // インスペクタはCustomPrefix付きでEditorJsonUtilityでシリアライズしている
+        // https://github.com/Unity-Technologies/UnityCsReference/blob/5406f17521a16bb37880960352990229987aa676/Editor/Mono/Clipboard/ClipboardParser.cs#L353
+        //
+        // さらにAnimationCurveWrapperでかぶせている
+        public static string SerializeAnimationCurve(AnimationCurve curve)
+        {
+            var wrapper = new AnimationCurveWrapper() { curve = curve };
+            return $"{PrefixAnimationCurve}{JsonUtility.ToJson(wrapper)}";
+        }
+        
         public static bool DeserializeGradient(string text, out Gradient gradient)
         {
             gradient = new Gradient();
@@ -331,12 +346,40 @@ namespace RosettaUI
 
             return true;
         }
+        
+        public static bool DeserializeAnimationCurve(string text, out AnimationCurve curve)
+        {
+            curve = new AnimationCurve();
+            if (string.IsNullOrEmpty(text)) return false;
+
+            if (!text.StartsWith(PrefixAnimationCurve, StringComparison.OrdinalIgnoreCase)) return false;
+
+            try
+            {
+                var wrapper = new AnimationCurveWrapper();
+                JsonUtility.FromJsonOverwrite(text.Remove(0, PrefixAnimationCurve.Length), wrapper);
+                curve = wrapper.curve;
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                return false;
+            }
+
+            return true;
+        }
 
 
         [Serializable]
         private class GradientWrapper
         {
             public Gradient gradient;
+        }
+        
+        [Serializable]
+        private class AnimationCurveWrapper
+        {
+            public AnimationCurve curve;
         }
         
         

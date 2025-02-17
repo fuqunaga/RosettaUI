@@ -1,0 +1,39 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="fixed-size-area" class="rosettaui-animation-curve-editor-fixed-size-area" style="flex-grow: 1;">
+        <ui:GroupBox name="curve-group" class="rosettaui-animation-curve-editor__curve-group">
+            <ui:VisualElement name="preview-container" style="flex-grow: 1; flex-direction: row;">
+                <ui:VisualElement name="preview-front" class="rosettaui-animation-curve-editor__preview-front" >
+                    <ui:VisualElement name="vertical-axis-label-container" pickingMode="Ignore" class="rosettaui-animation-curve-editor__vertical-axis-label-container"/>
+                    <ui:VisualElement name="horizontal-axis-label-container" pickingMode="Ignore" class="rosettaui-animation-curve-editor__horizontal-axis-label-container"/>
+                    <ui:VisualElement name="control-buttons" pickingMode="Ignore" class="rosettaui-animation-curve-editor__control-buttons-container">
+                        <RosettaUI.UIToolkit.ToggleButton name="time-snapping-button" pickingMode="Position" class="rosettaui-animation-curve-editor__snap-x-button" />
+                        <RosettaUI.UIToolkit.ToggleButton name="value-snapping-button" pickingMode="Position" class="rosettaui-animation-curve-editor__snap-y-button" />
+                        <ui:Button name="fit-curve-button" pickingMode="Position" class="rosettaui-animation-curve-editor__fit-button" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Scroller low-value="0" high-value="1" direction="Vertical" name="vertical-scroller" />
+            </ui:VisualElement>
+            <ui:VisualElement class="rosettaui-animation-curve-editor__horizontal-scroller-container">
+                <ui:Scroller low-value="0" high-value="1" direction="Horizontal" name="horizontal-scroller" />
+                <ui:VisualElement />
+            </ui:VisualElement>
+        </ui:GroupBox>
+        <ui:VisualElement name="property-group" class="rosettaui-animation-curve-editor__property-group">
+            <ui:VisualElement class="rosettaui-animation-curve-editor__time-value-row">
+                <ui:FloatField name="time-field" label="Time" style="flex-grow: 1;" />
+                <ui:FloatField name="value-field" label="Value" style="flex-grow: 1;" />
+                <ui:EnumField name="point-mode-field" />
+            </ui:VisualElement>
+            <ui:VisualElement name="in-tangent-field-row" class="rosettaui-animation-curve-editor__field-row">
+                <ui:Slider name="in-tangent-slider" style="flex-grow: 1;" label="In Tangent" low-value = "-90" high-value="90" show-input-field="true" />
+                <ui:EnumField name="in-tangent-mode-field" />
+                <RosettaUI.UIToolkit.ToggleButton name="in-weighted-toggle" text="Weighted" />
+            </ui:VisualElement>
+            <ui:VisualElement name="out-tangent-field-row" class="rosettaui-animation-curve-editor__field-row">
+                <ui:Slider name="out-tangent-slider" style="flex-grow: 1;" label="Out Tangent" low-value = "-90" high-value="90" show-input-field="true" />
+                <ui:EnumField name="out-tangent-mode-field" />
+                <RosettaUI.UIToolkit.ToggleButton name="out-weighted-toggle" text="Weighted" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

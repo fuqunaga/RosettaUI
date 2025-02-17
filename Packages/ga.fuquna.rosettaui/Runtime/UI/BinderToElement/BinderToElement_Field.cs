@@ -36,6 +36,7 @@ namespace RosettaUI
                 IBinder<bool> ib => new ToggleElement(label, ib).AddClipboardMenu(ib, option),
                 IBinder<Color> ib => new ColorFieldElement(label, ib).AddClipboardMenu(ib, option),
                 IBinder<Gradient> ib => UI.NullGuard(label, ib, () => new GradientFieldElement(label, ib)).AddClipboardMenu(ib, option),
+                IBinder<AnimationCurve> ib => UI.NullGuard(label, ib, () => new AnimationCurveElement(label, ib)).AddClipboardMenu(ib, option),
                 _ when valueType.IsEnum => CreateEnumElement(label, binder).AddClipboardMenu(binder, option),
                 _ when TypeUtility.IsNullable(valueType) => CreateNullableFieldElement(label, binder, option),
                 _ when typeof(IElementCreator).IsAssignableFrom(valueType) => CreateElementCreatorElement(label, binder),

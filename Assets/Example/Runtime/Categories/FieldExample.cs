@@ -36,6 +36,7 @@ namespace RosettaUI.Example
         public MyEnum enumValue;
         public Color colorValue;
         public Gradient gradientValue;
+        public AnimationCurve animationCurve;
         public Vector2 vector2Value;
         public Vector3 vector3Value;
         public Vector4 vector4Value;
@@ -72,6 +73,7 @@ namespace RosettaUI.Example
                     UI.Field(() => enumValue),
                     UI.Field(() => colorValue),
                     UI.Field(() => gradientValue),
+                    UI.Field(() => animationCurve),
                     UI.Field(() => vector2Value),
                     UI.Field(() => vector3Value),
                     UI.Field(() => vector4Value),
@@ -96,6 +98,7 @@ namespace RosettaUI.Example
                     UI.FieldReadOnly(() => enumValue),
                     UI.FieldReadOnly(() => colorValue),
                     UI.FieldReadOnly(() => gradientValue),
+                    UI.FieldReadOnly(() => animationCurve),
                     UI.FieldReadOnly(() => vector2Value),
                     UI.FieldReadOnly(() => vector3Value),
                     UI.FieldReadOnly(() => vector4Value),

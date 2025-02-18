@@ -1,3 +1,36 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.8.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.7.3...ga.fuquna.rosettaui.uitoolkit-v1.8.0) (2025-02-17)
+
+
+### Bug Fixes
+
+* AnimactionCurveEditor error when there is no key on the animation curve. ([487fb73](https://github.com/fuqunaga/RosettaUI/commit/487fb7331531cf60cb67bdb6ece5a474b0e962e5))
+* AnimationCurveEditor design at Unity2022 ([9b12747](https://github.com/fuqunaga/RosettaUI/commit/9b12747566715608c4fe486551094a2c1e9476b6))
+* change cb.SetGlobal to mat.Set, tiny bug, code format ([d7b41bc](https://github.com/fuqunaga/RosettaUI/commit/d7b41bcf56b132117c3eb0ab539556b2a04878d5))
+* Unity2022 compile error ([b1c2e6a](https://github.com/fuqunaga/RosettaUI/commit/b1c2e6a364bc73e60074ea794b78204753909f03))
+
+
+### Features
+
+* add blur to line edge ([1a2f93f](https://github.com/fuqunaga/RosettaUI/commit/1a2f93f9d807d77c461b99c69ada6977f870c6d9))
+* add new render path using SDFs ([b846911](https://github.com/fuqunaga/RosettaUI/commit/b84691131f7b0599f81a612624325e66178f0fd1))
+* add reordering of the control points ([a4e4727](https://github.com/fuqunaga/RosettaUI/commit/a4e47270cf6d2c67d475366e0a57701fecfa85e8))
+* add/remove control point ([63be723](https://github.com/fuqunaga/RosettaUI/commit/63be7233c58b2617ce54125889818fc152e24159))
+* angle Snapping, clean: add previewTransform to manage preview position and scale ([72f41e3](https://github.com/fuqunaga/RosettaUI/commit/72f41e308d8e887d8fa26ad7c779eae3fa979737))
+* animation curve copy and paste support ([e4883a7](https://github.com/fuqunaga/RosettaUI/commit/e4883a772d90e4d32c8020f54d46efa32d5b9115))
+* animation curve handle ([c82c587](https://github.com/fuqunaga/RosettaUI/commit/c82c58730afff7bd4c40603ae82c8563cf7f3329))
+* axis label ([8fbf111](https://github.com/fuqunaga/RosettaUI/commit/8fbf111c99620826425b1073f8bfed72a7b7aa64))
+* fit curve, snap points ([eb645c6](https://github.com/fuqunaga/RosettaUI/commit/eb645c65ce0306f474ca944d24bbbe45565fbad4))
+* matching the tangent mode of new control point to neighbor one ([6bdf0f0](https://github.com/fuqunaga/RosettaUI/commit/6bdf0f0a73ed9d818650f02dd022abdf9935be24))
+* point mode, tangent mode ([84ba70f](https://github.com/fuqunaga/RosettaUI/commit/84ba70f687114730512c32c965164c2f55aee315))
+* popupMenu of ControlPoint ([a135ebb](https://github.com/fuqunaga/RosettaUI/commit/a135ebb59bb46af65515d58ba31171f2df3bd28e))
+* render curve handle ([c77b78c](https://github.com/fuqunaga/RosettaUI/commit/c77b78c7f85435eddaff51b1d65fe32fe855cc4c))
+* render graph in curve editor ([d1f4d06](https://github.com/fuqunaga/RosettaUI/commit/d1f4d0630af1aaa7bcfacffff10f9b0b69589811))
+* show control points ([9aefcc5](https://github.com/fuqunaga/RosettaUI/commit/9aefcc5ccff74fba5e5a6c7a28ea1f7acdcee69a))
+* switch to new render path ([4db0115](https://github.com/fuqunaga/RosettaUI/commit/4db0115ed85da369d8e4217562efe113faf437fe))
+* tangent field ui ([da1ca37](https://github.com/fuqunaga/RosettaUI/commit/da1ca37d76940b2f04ad5470748a89973ff92731))
+* time and value field ([db2da90](https://github.com/fuqunaga/RosettaUI/commit/db2da903697093ba81f3fb2516cecec8680913e6))
+* zoom each axis ([2bc13e7](https://github.com/fuqunaga/RosettaUI/commit/2bc13e7b672ecef48e605e42498167068aaca7f3))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.7.3](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.7.2...ga.fuquna.rosettaui.uitoolkit-v1.7.3) (2024-11-29)
 
 

@@ -21,13 +21,15 @@ namespace RosettaUI.Builder
             dst.preWrapMode = src.preWrapMode;
         }
         
-        public static Rect GetCurveRect(this AnimationCurve curve, int stepNum = 64)
+        public static Rect GetCurveRect(this AnimationCurve curve, bool clamp = false, bool adjustForVisibility = false, int stepNum = 64)
         {
             var rect = new Rect();
             if (curve.keys.Length <= 0) return rect;
+            bool isWithin01 = true;
             for (var i = 0; i < curve.keys.Length; i++)
             {
                 var keyframe = curve.keys[i];
+                isWithin01 &= keyframe.time is >= 0f and <= 1f;
                 if (i == 0)
                 {
                     rect.xMin = keyframe.time;
@@ -49,6 +51,32 @@ namespace RosettaUI.Builder
                 }
                 rect.yMin = Mathf.Min(rect.yMin, y);
                 rect.yMax = Mathf.Max(rect.yMax, y);
+            }
+
+            if (adjustForVisibility)
+            {
+                if (isWithin01)
+                {
+                    rect.xMin = 0f;
+                    rect.xMax = 1f;
+                }
+
+                if (rect.yMin is > 0f and <= 1f) { rect.yMin = 0f; }
+                if (rect.yMax is < 1f and >= 0f) { rect.yMax = 1f; }
+            }
+            
+            if (clamp)
+            {
+                if (rect.width <= 0f)
+                {
+                    rect.width = 1f;
+                    rect.xMin -= 1f;
+                }
+                if (rect.height <= 0f)
+                {
+                    rect.height = 1f;
+                    rect.yMin -= 1f;
+                }
             }
             return rect;
         }
@@ -72,7 +100,7 @@ namespace RosettaUI.Builder
                 texture = null;
             }
 
-            var curveRect = curve.GetCurveRect();
+            var curveRect = curve.GetCurveRect(true);
             var colorArray = ArrayPool<Color>.Shared.Rent(width * height);
 
             // Fill the texture with a gray color

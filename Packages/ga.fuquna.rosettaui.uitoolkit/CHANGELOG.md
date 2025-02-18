@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.8.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.8.0...ga.fuquna.rosettaui.uitoolkit-v1.8.1) (2025-02-18)
+
+
+### Bug Fixes
+
+* view fix bug etc. ([cfb9f48](https://github.com/fuqunaga/RosettaUI/commit/cfb9f4808c5d5e2a50066dac0331ecaadda91e33))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.8.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.7.3...ga.fuquna.rosettaui.uitoolkit-v1.8.0) (2025-02-17)
 
 

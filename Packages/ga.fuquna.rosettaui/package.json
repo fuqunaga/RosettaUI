@@ -1,6 +1,6 @@
 {
   "name": "ga.fuquna.rosettaui",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "displayName": "RosettaUI",
   "description": "Code-based GUI library for development menus for Unity",
   "unity": "2022.3",

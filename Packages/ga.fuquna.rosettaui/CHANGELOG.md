@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.9.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.9.1...ga.fuquna.rosettaui-v1.9.2) (2025-03-03)
+
+
+### Bug Fixes
+
+* Add keywords to package.json to get hits in npmjs search ([31e8ead](https://github.com/fuqunaga/RosettaUI/commit/31e8ead43ba3fd52be865345cf5c4dd339c49aa5))
+
 # [ga.fuquna.rosettaui-v1.9.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.9.0...ga.fuquna.rosettaui-v1.9.1) (2025-02-18)
 
 

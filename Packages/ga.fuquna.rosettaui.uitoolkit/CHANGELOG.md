@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.8.3](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.8.2...ga.fuquna.rosettaui.uitoolkit-v1.8.3) (2025-03-03)
+
+
+### Bug Fixes
+
+* typo ([8837f3c](https://github.com/fuqunaga/RosettaUI/commit/8837f3cd8ba874dd4c891daa4586ad4780c1f1f9))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.8.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.8.1...ga.fuquna.rosettaui.uitoolkit-v1.8.2) (2025-03-03)
 
 

@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.9.3](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.9.2...ga.fuquna.rosettaui-v1.9.3) (2025-03-03)
+
+
+### Bug Fixes
+
+* typo ([251aea7](https://github.com/fuqunaga/RosettaUI/commit/251aea7474e19272a0967288ac08c048f896ec17))
+
 # [ga.fuquna.rosettaui-v1.9.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.9.1...ga.fuquna.rosettaui-v1.9.2) (2025-03-03)
 
 

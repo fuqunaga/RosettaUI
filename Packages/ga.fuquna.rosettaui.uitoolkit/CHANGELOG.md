@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.8.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.8.1...ga.fuquna.rosettaui.uitoolkit-v1.8.2) (2025-03-03)
+
+
+### Bug Fixes
+
+* Add keywords to package.json to get hits in npmjs search ([2515946](https://github.com/fuqunaga/RosettaUI/commit/25159468c4597d511f3fa3dfe7eca35702091be6))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.8.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.8.0...ga.fuquna.rosettaui.uitoolkit-v1.8.1) (2025-02-18)
 
 

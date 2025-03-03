@@ -1,5 +1,8 @@
 # RosettaUI
 
+[![npm version](https://badge.fury.io/js/ga.fuquna.rosettaui.svg)](https://badge.fury.io/js/ga.fuquna.rosettaui)
+[![openupm](https://img.shields.io/npm/v/ga.fuquna.rosettaui?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/ga.fuquna.rosettaui/)
+
 Code-based UI library for development menu for Unity
 
 ![](Documentation~/2023-01-25-15-48-22.png)

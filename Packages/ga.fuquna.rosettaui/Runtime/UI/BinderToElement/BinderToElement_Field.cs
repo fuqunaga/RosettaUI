@@ -131,23 +131,29 @@ namespace RosettaUI
                 var fieldBinder = PropertyOrFieldBinder.Create(binder, fieldName);
                 var fieldLabel = UICustom.ModifyPropertyOrFieldLabel(valueType, fieldName);
 
-                Element targetElement;
+                Element targetElement = null;
 
                 // 属性によるElementの変更
-                var rangeAttr = TypeUtility.GetRange(valueType, fieldName);
-                if (rangeAttr is not null)
+                var propertyAttributes = TypeUtility.GetPropertyAttributes(valueType, fieldName).ToArray();
+                foreach (var attr in propertyAttributes)
                 {
-                    var (minGetter, maxGetter) = RangeUtility.CreateGetterMinMax(rangeAttr, fieldBinder.ValueType);
-                    targetElement = UI.Slider(fieldLabel, fieldBinder, minGetter, maxGetter);
+                    if (attr is RangeAttribute rangeAttr)
+                    {
+                        var (minGetter, maxGetter) = RangeUtility.CreateGetterMinMax(rangeAttr, fieldBinder.ValueType);
+                        targetElement = UI.Slider(fieldLabel, fieldBinder, minGetter, maxGetter);
+                        break;
+                    }
+                    if (UICustom.GetElementOverrideAttribute(attr.GetType(), fieldBinder.ValueType) is { } overrideFunc)
+                    {
+                        targetElement = overrideFunc(attr, null, fieldLabel, fieldBinder);
+                        break;
+                    }
                 }
-                else
-                {
-                    targetElement = UI.Field(fieldLabel, fieldBinder, option);
-                }
-                
+                targetElement ??= UI.Field(fieldLabel, fieldBinder, option);
+
                 // 属性によるElementの付加, Propertyの変更
                 List<Element> innerElements = new();
-                foreach (var attr in TypeUtility.GetPropertyAttributes(valueType, fieldName))
+                foreach (var attr in propertyAttributes)
                 {
                     switch (attr)
                     {
@@ -163,6 +169,12 @@ namespace RosettaUI
                             if (textField != null)
                             {
                                 textField.IsMultiLine = true;
+                            }
+                            break;
+                        default:
+                            if (UICustom.GetElementModifyAttribute(attr.GetType(), fieldBinder.ValueType) is { } modifyFunc)
+                            {
+                                targetElement = modifyFunc(attr, targetElement, fieldLabel, fieldBinder);
                             }
                             break;
                     }

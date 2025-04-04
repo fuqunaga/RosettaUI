@@ -80,7 +80,7 @@ namespace RosettaUI
             return GetMemberData(type, propertyOrFieldName, false)?.memberInfo;
         }
         
-        public static IEnumerable<PropertyAttribute> GetPropertyAttributes(Type type, string propertyOrFieldName)
+        public static IReadOnlyList<PropertyAttribute> GetPropertyAttributes(Type type, string propertyOrFieldName)
         {
             return GetMemberData(type, propertyOrFieldName).propertyAttributes;
         }
@@ -225,7 +225,7 @@ namespace RosettaUI
                         {
                             type = pair.Item2,
                             memberInfo = pair.Item1,
-                            propertyAttributes = pair.Item1.GetCustomAttributes<PropertyAttribute>().OrderBy(attr => attr.order).ToArray(),
+                            propertyAttributes = pair.Item1.GetCustomAttributes<PropertyAttribute>().OrderBy(attr => attr.order).ToList(),
                             range = pair.Item1.GetCustomAttribute<RangeAttribute>(),
                             isReorderable = pair.Item1.GetCustomAttribute<NonReorderableAttribute>() == null,
                         }
@@ -247,7 +247,7 @@ namespace RosettaUI
                 public Type type;
                 public MemberInfo memberInfo;
                 public RangeAttribute range;
-                public IEnumerable<PropertyAttribute> propertyAttributes;
+                public IReadOnlyList<PropertyAttribute> propertyAttributes;
                 public bool isReorderable;
             }
         }

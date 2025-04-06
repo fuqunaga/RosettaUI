@@ -112,12 +112,12 @@ namespace RosettaUI
         #endregion
 
         #region ElementModifyAttribute
-        public static void RegisterElementModifyAttribute<TAttribute>(Func<TAttribute, Element, Element> overrideFunc)
+        public static void RegisterElementModifyAttribute<TAttribute>(Func<TAttribute, Element, Element> modifyFunc)
             where TAttribute : PropertyAttribute
         {
             RegisterElementOverrideAttribute(typeof(TAttribute), null, new OverrideFunc(true, (attribute, originalElement, _, _) =>
                 {
-                    return overrideFunc((TAttribute)attribute, originalElement);
+                    return modifyFunc((TAttribute)attribute, originalElement);
                 },
                 true
             ));
@@ -126,11 +126,11 @@ namespace RosettaUI
         #region Scope
         public readonly ref struct ElementModifyAttributeScope
         {
-            public static ElementModifyAttributeScope Create<T>(Func<T, Element, Element> modifierFunc)
+            public static ElementModifyAttributeScope Create<T>(Func<T, Element, Element> modifyFunc)
                 where T : PropertyAttribute
             {
                 var ret = new ElementModifyAttributeScope(typeof(T));
-                RegisterElementModifyAttribute(modifierFunc);
+                RegisterElementModifyAttribute(modifyFunc);
                 return ret;
             }
 

@@ -89,7 +89,20 @@ namespace RosettaUI
             element.Style.FlexShrink = flexShrink;
             return element;
         }
-        
+
+        public static T SetFlexBasis<T>(this T element, float? flexBasis)
+            where T : Element
+        {
+            element.Style.FlexBasis = flexBasis;
+            return element;
+        }
+
+        public static T SetFlexWrap<T>(this T element, bool? flexWrap)
+            where T : Element
+        {
+            element.Style.FlexWrap = flexWrap;
+            return element;
+        }
         public static T RegisterValueChangeCallback<T>(this T element, Action onValueChanged)
             where T : Element
         {

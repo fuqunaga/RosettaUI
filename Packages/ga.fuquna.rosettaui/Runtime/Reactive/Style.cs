@@ -18,6 +18,8 @@ namespace RosettaUI
         private Color? _backgroundColor;
         private float? _flexGrow;
         private float? _flexShrink;
+        private float? _flexBasis;
+        private bool? _flexWrap;
 
         public float? Width
         {
@@ -77,7 +79,18 @@ namespace RosettaUI
             get => _flexShrink;
             set => SetValue(ref _flexShrink, value);
         }
-        
+
+        public float? FlexBasis
+        {
+            get => _flexBasis;
+            set => SetValue(ref _flexBasis, value);
+        }
+
+        public bool? FlexWrap
+        {
+            get => _flexWrap;
+            set => SetValue(ref _flexWrap, value);
+        }
         #endregion
 
         private void SetValue<T>(ref T current, T newValue)

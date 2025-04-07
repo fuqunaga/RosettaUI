@@ -28,6 +28,7 @@ namespace RosettaUI.Example
                     UI.Field(() => intValue).SetInteractable(false)),
                 ("UI.Button(\"Width\").SetWidth(300f);", UI.Button("Width").SetWidth(300f)),
                 ("UI.Button(\"Height\").SetHeight(100f);", UI.Button("Height").SetHeight(100f)),
+                ("UI.Row(\n    UI.Button(\"Flex\").SetFlexBasis(100f).SetFlexGrow(2f),\n    UI.Button(\"FlexFlex\").SetFlexBasis(50f).SetFlexGrow(1f),\n    UI.Button(\"Flex\").SetFlexBasis(50f).SetFlexGrow(1f)\n).SetFlexWrap(true);", UI.Row(UI.Button("Flex").SetFlexBasis(100f).SetFlexGrow(2f), UI.Button("FlexFlex").SetFlexBasis(50f).SetFlexGrow(1f), UI.Button("Flex").SetFlexBasis(50f).SetFlexGrow(1f)).SetFlexWrap(true)),
                 ("UI.Button(\"Color\").SetColor(Color.red);", UI.Button("Color").SetColor(Color.red)),
                 ("UI.Button(\"BackgroundColor\").SetBackgroundColor(Color.blue);",
                     UI.Button("BackgroundColor").SetBackgroundColor(Color.blue))

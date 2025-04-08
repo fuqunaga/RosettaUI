@@ -1,6 +1,7 @@
 ﻿
 
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace RosettaUI
@@ -19,9 +20,11 @@ namespace RosettaUI
         {
             RegisterPropertyAttributeFunc<RangeAttribute>(RangeAttributeFunc);
             RegisterPropertyAttributeFunc<HeaderAttribute>(HeaderAttributeFunc);
+            RegisterPropertyAttributeFunc<SpaceAttribute>(SpaceAttributeFunc);
+            RegisterPropertyAttributeFunc<MultilineAttribute>(MultilineAttributeFunc);
         }
-
         
+
         #region PropertyAttributeFunc
         
         private static Element RangeAttributeFunc(RangeAttribute rangeAttribute, LabelElement label, IBinder binder)
@@ -30,10 +33,27 @@ namespace RosettaUI
             return UI.Slider(label, binder, minGetter, maxGetter);
         }
         
-        private static IEnumerable<Element> HeaderAttributeFunc(HeaderAttribute headerAttribute, Element originalElement)
+        private static IEnumerable<Element> HeaderAttributeFunc(HeaderAttribute headerAttribute, Element _)
         {
             yield return UI.Space().SetHeight(18f);
             yield return UI.Label($"<b>{headerAttribute.header}</b>");
+        }
+        
+        
+        private static IEnumerable<Element> SpaceAttributeFunc(SpaceAttribute spaceAttribute, Element _)
+        {
+            yield return UI.Space().SetHeight(spaceAttribute.height);
+        }
+
+        private static Element MultilineAttributeFunc(MultilineAttribute _, Element originalElement)
+        {
+            var textField = originalElement.Query<TextFieldElement>().FirstOrDefault();
+            if (textField != null)
+            {
+                textField.IsMultiLine = true;
+            }
+
+            return originalElement;
         }
         
         #endregion

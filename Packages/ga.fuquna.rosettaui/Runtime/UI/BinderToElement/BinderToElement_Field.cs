@@ -138,7 +138,7 @@ namespace RosettaUI
                 var propertyAttributes = TypeUtility.GetPropertyAttributes(valueType, fieldName);
                 var attrAndOverriderFunc = propertyAttributes
                     .Select(attr => (attr, func: UICustom.GetPropertyAttributeOverrideFunc(attr.GetType())))
-                    .FirstOrDefault(attrAndFunc => attrAndFunc.func != null);
+                    .LastOrDefault(attrAndFunc => attrAndFunc.func != null);
                 
                 targetElement = attrAndOverriderFunc.func?.Invoke(attrAndOverriderFunc.attr, fieldLabel, fieldBinder);
                 targetElement ??= UI.Field(fieldLabel, fieldBinder, option);
@@ -146,14 +146,10 @@ namespace RosettaUI
 
                 // 属性によるElementの付加, Propertyの変更
                 List<Element> innerElements = new();
-                foreach (var attr in propertyAttributes)
+                foreach (var attr in propertyAttributes.Reverse())
                 {
                     switch (attr)
                     {
-                        case HeaderAttribute headerAttr:
-                            innerElements.Add(UI.Space().SetHeight(18f));
-                            innerElements.Add(UI.Label($"<b>{headerAttr.header}</b>"));
-                            break;
                         case SpaceAttribute spaceAttr:
                             innerElements.Add(UI.Space().SetHeight(spaceAttr.height));
                             break;
@@ -165,7 +161,12 @@ namespace RosettaUI
                             }
                             break;
                         default:
-                            if (UICustom.GetPropertyAttributeModificationFunc(attr.GetType()) is { } modifyFunc)
+                            var attributeType = attr.GetType();
+                            if(UICustom.GetPropertyAttributeAddTopFunc(attributeType) is { } addTopFunc)
+                            {
+                                innerElements.AddRange(addTopFunc(attr, targetElement));
+                            }
+                            else if (UICustom.GetPropertyAttributeModificationFunc(attr.GetType()) is { } modifyFunc)
                             {
                                 targetElement = modifyFunc(attr, targetElement);
                             }

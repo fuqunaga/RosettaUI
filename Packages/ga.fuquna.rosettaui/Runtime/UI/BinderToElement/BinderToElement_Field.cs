@@ -147,7 +147,7 @@ namespace RosettaUI
 
                 // 属性によるElementの付加, Propertyの変更
                 using var pool = ListPool<Element>.Get(out var topElements);
-                foreach (var attr in propertyAttributes.Reverse())
+                foreach (var attr in propertyAttributes)
                 {
                     var attributeType = attr.GetType();
                     if (UICustom.GetPropertyAttributeAddTopFunc(attributeType) is { } addTopFunc)

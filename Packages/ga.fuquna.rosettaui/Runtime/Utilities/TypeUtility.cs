@@ -80,14 +80,21 @@ namespace RosettaUI
             return GetMemberData(type, propertyOrFieldName, false)?.memberInfo;
         }
         
-        public static IEnumerable<PropertyAttribute> GetPropertyAttributes(Type type, string propertyOrFieldName)
+        /// <summary>
+        /// PropertyAttributeの取得
+        /// PropertyAttribute.orderでソートされている
+        /// </summary>
+        public static IReadOnlyList<PropertyAttribute> GetPropertyAttributes(Type type, string propertyOrFieldName)
         {
             return GetMemberData(type, propertyOrFieldName).propertyAttributes;
         }
 
         public static RangeAttribute GetRange(Type type, string propertyOrFieldName)
         {
-            return GetMemberData(type, propertyOrFieldName).range;
+            return GetMemberData(type, propertyOrFieldName)
+                .propertyAttributes
+                .OfType<RangeAttribute>()
+                .LastOrDefault();
         }
 
         public static bool IsReorderable(Type type, string propertyOrFieldName)
@@ -163,11 +170,6 @@ namespace RosettaUI
 
         public static bool IsSingleLine(Type valueType)
         {
-            static bool IsSimpleType(Type t)
-            {
-                return t.IsPrimitive || t == typeof(string) || t.IsEnum;
-            }
-
             if (!SingleLineDic.TryGetValue(valueType, out var ret))
             {
                 if (typeof(IElementCreator).IsAssignableFrom(valueType) || typeof(IList).IsAssignableFrom(valueType))
@@ -189,13 +191,18 @@ namespace RosettaUI
                     ret = fieldTypes.Count <= oneLinerMaxCount
                           && fieldTypes.All(IsSimpleType)
                           && fieldNames.All(name => name.Length <= nameMaxLength
-                                                    && GetRange(valueType, name) == null);
+                                                    && GetRange(valueType, name) == null); //　厳密にはUICustom.RegisterPropertyAttributeFunc()でRangeAttributeのUIが変えられるのでこのかぎりではない
                 }
 
                 SingleLineDic[valueType] = ret;
             }
 
             return ret;
+
+            static bool IsSimpleType(Type t)
+            {
+                return t.IsPrimitive || t == typeof(string) || t.IsEnum;
+            }
         }
         
         #endregion
@@ -225,8 +232,7 @@ namespace RosettaUI
                         {
                             type = pair.Item2,
                             memberInfo = pair.Item1,
-                            propertyAttributes = pair.Item1.GetCustomAttributes<PropertyAttribute>().OrderBy(attr => attr.order).ToArray(),
-                            range = pair.Item1.GetCustomAttribute<RangeAttribute>(),
+                            propertyAttributes = pair.Item1.GetCustomAttributes<PropertyAttribute>().OrderBy(attr => attr.order).ToList(),
                             isReorderable = pair.Item1.GetCustomAttribute<NonReorderableAttribute>() == null,
                         }
                     );
@@ -246,8 +252,7 @@ namespace RosettaUI
             {
                 public Type type;
                 public MemberInfo memberInfo;
-                public RangeAttribute range;
-                public IEnumerable<PropertyAttribute> propertyAttributes;
+                public IReadOnlyList<PropertyAttribute> propertyAttributes;
                 public bool isReorderable;
             }
         }

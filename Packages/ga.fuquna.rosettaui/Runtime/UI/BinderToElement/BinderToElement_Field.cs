@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
 namespace RosettaUI
@@ -131,51 +132,41 @@ namespace RosettaUI
                 var fieldBinder = PropertyOrFieldBinder.Create(binder, fieldName);
                 var fieldLabel = UICustom.ModifyPropertyOrFieldLabel(valueType, fieldName);
 
-                Element targetElement;
+                Element targetElement = null;
 
                 // 属性によるElementの変更
-                var rangeAttr = TypeUtility.GetRange(valueType, fieldName);
-                if (rangeAttr is not null)
-                {
-                    var (minGetter, maxGetter) = RangeUtility.CreateGetterMinMax(rangeAttr, fieldBinder.ValueType);
-                    targetElement = UI.Slider(fieldLabel, fieldBinder, minGetter, maxGetter);
-                }
-                else
-                {
-                    targetElement = UI.Field(fieldLabel, fieldBinder, option);
-                }
+                // 最後のPropertyAttributeのみ適用
+                var propertyAttributes = TypeUtility.GetPropertyAttributes(valueType, fieldName);
+                var attrAndOverriderFunc = propertyAttributes
+                    .Select(attr => (attr, func: UICustom.GetPropertyAttributeOverrideFunc(attr.GetType())))
+                    .LastOrDefault(attrAndFunc => attrAndFunc.func != null);
                 
+                targetElement = attrAndOverriderFunc.func?.Invoke(attrAndOverriderFunc.attr, fieldLabel, fieldBinder);
+                targetElement ??= UI.Field(fieldLabel, fieldBinder, option);
+                
+
                 // 属性によるElementの付加, Propertyの変更
-                List<Element> innerElements = new();
-                foreach (var attr in TypeUtility.GetPropertyAttributes(valueType, fieldName))
+                using var pool = ListPool<Element>.Get(out var topElements);
+                foreach (var attr in propertyAttributes)
                 {
-                    switch (attr)
+                    var attributeType = attr.GetType();
+                    if (UICustom.GetPropertyAttributeAddTopFunc(attributeType) is { } addTopFunc)
                     {
-                        case HeaderAttribute headerAttr:
-                            innerElements.Add(UI.Space().SetHeight(18f));
-                            innerElements.Add(UI.Label($"<b>{headerAttr.header}</b>"));
-                            break;
-                        case SpaceAttribute spaceAttr:
-                            innerElements.Add(UI.Space().SetHeight(spaceAttr.height));
-                            break;
-                        case MultilineAttribute _:
-                            var textField = targetElement.Query<TextFieldElement>().FirstOrDefault();
-                            if (textField != null)
-                            {
-                                textField.IsMultiLine = true;
-                            }
-                            break;
+                        topElements.AddRange(addTopFunc(attr, targetElement));
+                    }
+                    else if (UICustom.GetPropertyAttributeModificationFunc(attr.GetType()) is { } modifyFunc)
+                    {
+                        targetElement = modifyFunc(attr, targetElement);
                     }
                 }
                 
-                if (innerElements.Count == 0)
+                if (topElements.Any())
                 {
-                    return targetElement;
+                    topElements.Add(targetElement);
+                    return UI.Column(topElements);
                 }
                 
-                innerElements.Add(targetElement);
-
-                return UI.Column(innerElements);
+                return targetElement;
             });
 
 

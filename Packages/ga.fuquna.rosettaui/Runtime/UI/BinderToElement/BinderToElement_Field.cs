@@ -134,22 +134,15 @@ namespace RosettaUI
                 Element targetElement = null;
 
                 // 属性によるElementの変更
+                // 最後のPropertyAttributeのみ適用
                 var propertyAttributes = TypeUtility.GetPropertyAttributes(valueType, fieldName);
-                foreach (var attr in propertyAttributes)
-                {
-                    if (attr is RangeAttribute rangeAttr)
-                    {
-                        var (minGetter, maxGetter) = RangeUtility.CreateGetterMinMax(rangeAttr, fieldBinder.ValueType);
-                        targetElement = UI.Slider(fieldLabel, fieldBinder, minGetter, maxGetter);
-                        break;
-                    }
-                    if (UICustom.GetPropertyAttributeOverrideFunc(attr.GetType()) is { } overrideFunc)
-                    {
-                        targetElement = overrideFunc(attr, fieldLabel, fieldBinder);
-                        break;
-                    }
-                }
+                var attrAndOverriderFunc = propertyAttributes
+                    .Select(attr => (attr, func: UICustom.GetPropertyAttributeOverrideFunc(attr.GetType())))
+                    .FirstOrDefault(attrAndFunc => attrAndFunc.func != null);
+                
+                targetElement = attrAndOverriderFunc.func?.Invoke(attrAndOverriderFunc.attr, fieldLabel, fieldBinder);
                 targetElement ??= UI.Field(fieldLabel, fieldBinder, option);
+                
 
                 // 属性によるElementの付加, Propertyの変更
                 List<Element> innerElements = new();

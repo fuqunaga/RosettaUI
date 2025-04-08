@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using UnityEngine;
@@ -148,6 +149,8 @@ namespace RosettaUI
 
         #region Core
 
+        private static readonly Dictionary<Type, Func<object, string>> ListItemLabelGetterCache = new();
+
         public static Element List(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, in ListViewOption? optionNullable = null)
         {
             var option = optionNullable ?? ListViewOption.Default;
@@ -207,8 +210,31 @@ namespace RosettaUI
                     optionCaptured)
             ).SetFlexShrink(1f);
         }
-        
-        public static Element ListItemDefault(IBinder binder, int index) => Field($"Item {index}", binder);
+
+        public static Element ListItemDefault(IBinder binder, int index)
+        {
+            var valueType = binder.ValueType;
+            if (valueType is { IsClass: true } or { IsValueType: true, IsPrimitive: false, IsEnum: false } && valueType != typeof(string))
+            {
+                // クラス/構造体型の一番最初のFieldがString型のときはその値をラベルにする
+                var firstField = valueType.GetFields().FirstOrDefault();
+                if (firstField != null && firstField.FieldType == typeof(string))
+                {
+                    if (!ListItemLabelGetterCache.TryGetValue(valueType, out var getter))
+                    {
+                        // Expression Tree: object obj => ((valueType) obj).firstField
+                        var inputParam = Expression.Parameter(typeof(object), "obj");   // object obj
+                        var getFieldExp = Expression.Field(Expression.Convert(inputParam, valueType), firstField);  // ((valueType) obj).firstField
+                        getter = Expression.Lambda<Func<object, string>>(getFieldExp, inputParam).Compile();    // obj => getFieldExp
+                        ListItemLabelGetterCache[valueType] = getter;
+                    }
+
+                    return Field(Label(() => getter(binder.GetObject())), binder);
+                }
+            }
+
+            return Field($"Item {index}", binder);
+        }
 
         private static ListViewOption? CalcDefaultOptionOf(LambdaExpression expression)
             => ExpressionUtility.GetAttribute<NonReorderableAttribute>(expression) != null

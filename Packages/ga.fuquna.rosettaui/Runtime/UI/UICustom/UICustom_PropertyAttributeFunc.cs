@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using OverrideFunc = System.Func<UnityEngine.PropertyAttribute, RosettaUI.LabelElement, RosettaUI.IBinder, RosettaUI.Element>;
 using ModificationFunc = System.Func<UnityEngine.PropertyAttribute, RosettaUI.Element, RosettaUI.Element>;
-using AddTopFunc = System.Func<UnityEngine.PropertyAttribute, RosettaUI.Element, System.Collections.Generic.IEnumerable<RosettaUI.Element>>;
+using CreateTopElementFunc = System.Func<UnityEngine.PropertyAttribute, RosettaUI.Element, System.Collections.Generic.IEnumerable<RosettaUI.Element>>;
 
 
 namespace RosettaUI
@@ -80,11 +80,11 @@ namespace RosettaUI
             }));
         }
         
-        public static void RegisterPropertyAttributeFunc<TPropertyAttribute>(Func<TPropertyAttribute, Element, IEnumerable<Element>> addTopFunc)
+        public static void RegisterPropertyAttributeCreateTopElementFunc<TPropertyAttribute>(Func<TPropertyAttribute, Element, IEnumerable<Element>> createTopElementFunc)
         {
-            Debug.Assert(addTopFunc != null, "addTopFunc is null");
+            Debug.Assert(createTopElementFunc != null, "createTopElementFunc is null");
             
-            RegisterPropertyAttributeFunc(typeof(TPropertyAttribute), (AddTopFunc)((attribute, element) =>
+            RegisterPropertyAttributeFunc(typeof(TPropertyAttribute), (CreateTopElementFunc)((attribute, element) =>
             {
                 if (attribute is not TPropertyAttribute typedAttribute)
                 {
@@ -92,7 +92,7 @@ namespace RosettaUI
                     return null;
                 }
 
-                return addTopFunc(typedAttribute, element);
+                return createTopElementFunc(typedAttribute, element);
             }));
         }
 
@@ -147,11 +147,11 @@ namespace RosettaUI
                 return ret;
             }
 
-            public static PropertyAttributeFuncScope Create<TPropertyAttribute>(Func<TPropertyAttribute, Element, IEnumerable<Element>> addTopFunc)
+            public static PropertyAttributeFuncScope Create<TPropertyAttribute>(Func<TPropertyAttribute, Element, IEnumerable<Element>> createTopElementFunc)
                 where TPropertyAttribute : PropertyAttribute
             {
                 var ret = new PropertyAttributeFuncScope(typeof(TPropertyAttribute));
-                RegisterPropertyAttributeFunc(addTopFunc);
+                RegisterPropertyAttributeCreateTopElementFunc(createTopElementFunc);
                 return ret;
             }
             
@@ -187,7 +187,7 @@ namespace RosettaUI
             return GetPropertyAttributeFunc(attributeType);
         }
 
-        public static AddTopFunc GetPropertyAttributeAddTopFunc(Type attributeType)
+        public static CreateTopElementFunc GetPropertyAttributeAddTopFunc(Type attributeType)
         {
             return GetPropertyAttributeFunc(attributeType);
         }
@@ -205,7 +205,7 @@ namespace RosettaUI
         {
             private readonly OverrideFunc _overrideFuncDictionary;
             private readonly ModificationFunc _modificationFunc;
-            private readonly AddTopFunc _addTopFunc;
+            private readonly CreateTopElementFunc _createTopElementFunc;
             
             private PropertyAttributeFunc(OverrideFunc overrideFunc)
             {
@@ -217,9 +217,9 @@ namespace RosettaUI
                 _modificationFunc = modificationFunc;
             }
             
-            private PropertyAttributeFunc(AddTopFunc addTopFunc)
+            private PropertyAttributeFunc(CreateTopElementFunc createTopElementFunc)
             {
-                _addTopFunc = addTopFunc;
+                _createTopElementFunc = createTopElementFunc;
             }
 
             public static implicit operator PropertyAttributeFunc(ModificationFunc modificationFunc)
@@ -232,9 +232,9 @@ namespace RosettaUI
                 return new PropertyAttributeFunc(overrideFunc);
             }
             
-            public static implicit operator PropertyAttributeFunc(AddTopFunc addTopFunc)
+            public static implicit operator PropertyAttributeFunc(CreateTopElementFunc createTopElementFunc)
             {
-                return new PropertyAttributeFunc(addTopFunc);
+                return new PropertyAttributeFunc(createTopElementFunc);
             }
             
             public static implicit operator OverrideFunc(PropertyAttributeFunc propertyAttributeFunc)
@@ -247,9 +247,9 @@ namespace RosettaUI
                 return propertyAttributeFunc?._modificationFunc;
             }
             
-            public static implicit operator AddTopFunc(PropertyAttributeFunc propertyAttributeFunc)
+            public static implicit operator CreateTopElementFunc(PropertyAttributeFunc propertyAttributeFunc)
             {
-                return propertyAttributeFunc?._addTopFunc;
+                return propertyAttributeFunc?._createTopElementFunc;
             }
         }
     }

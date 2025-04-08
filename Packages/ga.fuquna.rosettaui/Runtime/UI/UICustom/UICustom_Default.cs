@@ -19,8 +19,8 @@ namespace RosettaUI
         private static void RegisterDefaultPropertyAttributeFunc()
         {
             RegisterPropertyAttributeFunc<RangeAttribute>(RangeAttributeFunc);
-            RegisterPropertyAttributeFunc<HeaderAttribute>(HeaderAttributeFunc);
-            RegisterPropertyAttributeFunc<SpaceAttribute>(SpaceAttributeFunc);
+            RegisterPropertyAttributeCreateTopElementFunc<HeaderAttribute>(HeaderAttributeFunc);
+            RegisterPropertyAttributeCreateTopElementFunc<SpaceAttribute>(SpaceAttributeFunc);
             RegisterPropertyAttributeFunc<MultilineAttribute>(MultilineAttributeFunc);
         }
         

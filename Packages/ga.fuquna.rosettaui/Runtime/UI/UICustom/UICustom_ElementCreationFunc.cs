@@ -8,7 +8,6 @@ namespace RosettaUI
     /// </summary>
     public static partial class UICustom
     {
-
         private static readonly Dictionary<Type, CreationFunc> CreationFuncTable = new();
 
         // exclude parent type

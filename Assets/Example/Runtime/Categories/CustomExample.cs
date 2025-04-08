@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -30,15 +31,24 @@ namespace RosettaUI.Example
             public string suffix;
         }
 
-        public class MyDropDownAttribute : PropertyAttribute { }
+        public class MyDropDownAttribute : PropertyAttribute
+        {
+            public readonly string[] options;
+            
+            public MyDropDownAttribute(params string[] options)
+            {
+                this.options = options;
+            }
+        }
 
         [Serializable]
         public class MyAttributeClass
         {
-            public float value;
-            [MySuffix(suffix = "suffix")] public float suffixValue;
-            public string stringValue;
-            [MyDropDown] public string myDropDownStringValue = "A";
+            [MySuffix(suffix = "suffix")] 
+            public float suffixValue;
+
+            [MyDropDown("A", "B", "C")] 
+            public string myDropDownStringValue = "A";
         }
 
         public MyFloat myFloatValue;
@@ -172,44 +182,55 @@ UI.Field(() => vector2Value);
 
         private (string, Element) CreateTabPropertyAttributeFunc()
         {
-            using var modifyScope = UICustom.PropertyAttributeFuncScope.Create<MySuffixAttribute>((attribute, element) =>
+            UICustom.RegisterPropertyAttributeFunc<MySuffixAttribute>((attribute, originalElement) =>
             {
-                return UI.Row(element, UI.Label(attribute.suffix), UI.Space().SetWidth(4f));
+                return UI.Row(originalElement, UI.Label(attribute.suffix), UI.Space().SetWidth(4f));
+            });
+            
+            UICustom.RegisterPropertyAttributeFunc<MyDropDownAttribute, string>((attribute, label, binder) =>
+            {
+                return UI.Dropdown(label, binder, attribute.options);
             });
 
-            using var overrideScope = UICustom.PropertyAttributeFuncScope.Create<MyDropDownAttribute, string>((attribute, label, readValue, writeValue) =>
-            {
-                return UI.Dropdown(label, readValue, writeValue, new[] { "A", "B", "C" });
-            });
-
-            return ExampleTemplate.CodeElementSetsWithDescriptionTab("PropertyAttribute",
+            return ExampleTemplate.CodeElementSetsWithDescriptionTab("PropertyAttributeFunc",
                 "Default field UI can be overridden / modified by custom element.",
                 (@"public class MySuffixAttribute : PropertyAttribute
 {
     public string suffix;
 }
 
-public class MyDropDownAttribute : PropertyAttribute { }
+public class MyDropDownAttribute : PropertyAttribute
+{
+    public readonly string[] options;
+    
+    public MyDropDownAttribute(params string[] options)
+    {
+        this.options = options;
+    }
+}
 
-[Serializable]
+
 public class MyAttributeClass
 {
-    public float value;
-    [MySuffix(suffix = ""suffix"")] public float suffixValue;
-    public string stringValue;
-    [MyDropDown] public string myDropDownStringValue = ""A"";
+    [MySuffix(suffix = ""suffix"")] 
+    public float suffixValue;
+
+    [MyDropDown(""A"", ""B"", ""C"")] 
+    public string myDropDownStringValue = ""A"";
 }
+
 
 public MyAttributeClass myAttributeClass;
 
-using var modifyScope = UICustom.PropertyAttributeFuncScope.Create<MySuffixAttribute>((attribute, element) =>
+
+UICustom.RegisterPropertyAttributeFunc<MySuffixAttribute>((attribute, originalElement) =>
 {
-    return UI.Row(element, UI.Label(attribute.suffix), UI.Space().SetWidth(4f));
+    return UI.Row(originalElement, UI.Label(attribute.suffix), UI.Space().SetWidth(4f));
 });
 
-using var overrideScope = UICustom.PropertyAttributeFuncScope.Create<MyDropDownAttribute, string>((attribute, label, readValue, writeValue) =>
+UICustom.RegisterPropertyAttributeFunc<MyDropDownAttribute, string>((attribute, label, binder) =>
 {
-    return UI.Dropdown(label, readValue, writeValue, new[] { ""A"", ""B"", ""C"" });
+    return UI.Dropdown(label, binder, attribute.options);
 });
 
 UI.Field(() => myAttributeClass);

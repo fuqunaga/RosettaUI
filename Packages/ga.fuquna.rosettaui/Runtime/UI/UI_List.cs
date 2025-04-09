@@ -213,6 +213,7 @@ namespace RosettaUI
 
         public static Element ListItemDefault(IBinder binder, int index)
         {
+#if !ENABLE_IL2CPP
             var valueType = binder.ValueType;
             if (valueType is { IsClass: true } or { IsValueType: true, IsPrimitive: false, IsEnum: false } && valueType != typeof(string))
             {
@@ -232,7 +233,7 @@ namespace RosettaUI
                     return Field(Label(() => getter(binder.GetObject())), binder);
                 }
             }
-
+#endif
             return Field($"Item {index}", binder);
         }
 

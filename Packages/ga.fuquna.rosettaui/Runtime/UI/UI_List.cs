@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using UnityEngine;
 
 namespace RosettaUI
@@ -217,21 +218,36 @@ namespace RosettaUI
             var valueType = binder.ValueType;
             if (valueType is { IsClass: true } or { IsValueType: true, IsPrimitive: false, IsEnum: false } && valueType != typeof(string))
             {
-                // クラス/構造体型の一番最初のFieldがString型のときはその値をラベルにする
-                var firstField = valueType.GetFields().FirstOrDefault();
-                if (firstField != null && firstField.FieldType == typeof(string))
+                // The first field of the class/struct type is string, use that value as the label
+                if (!ListItemLabelGetterCache.TryGetValue(valueType, out var getter))
                 {
-                    if (!ListItemLabelGetterCache.TryGetValue(valueType, out var getter))
+                    // Search for the first field of string
+                    var firstField = TypeUtility.GetUITargetFieldNames(valueType)
+                        .Select(n => TypeUtility.GetMemberInfo(valueType, n))
+                        .OfType<FieldInfo>()
+                        .OrderBy(fi => fi.MetadataToken)
+                        .FirstOrDefault();
+
+                    if (firstField != null && firstField.FieldType == typeof(string))
                     {
                         // Expression Tree: object obj => ((valueType) obj).firstField
                         var inputParam = Expression.Parameter(typeof(object), "obj");   // object obj
                         var getFieldExp = Expression.Field(Expression.Convert(inputParam, valueType), firstField);  // ((valueType) obj).firstField
                         getter = Expression.Lambda<Func<object, string>>(getFieldExp, inputParam).Compile();    // obj => getFieldExp
-                        ListItemLabelGetterCache[valueType] = getter;
                     }
-
-                    return Field(Label(() => getter(binder.GetObject())), binder);
+                    else
+                    {
+                        getter = _ => null;
+                    }
+                    ListItemLabelGetterCache[valueType] = getter;
                 }
+
+                return Field(Label(() =>
+                {
+                    object obj = binder.GetObject();
+                    string label = obj == null ? string.Empty : getter(obj);
+                    return string.IsNullOrEmpty(label) ? $"Item {index}" : label;
+                }), binder);
             }
 #endif
             return Field($"Item {index}", binder);

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace RosettaUI.Example
@@ -24,21 +26,51 @@ namespace RosettaUI.Example
             public float PropertyValue { get; set; }
         }
 
+        public class MySuffixAttribute : PropertyAttribute
+        {
+            public string suffix;
+        }
+
+        public class MyDropDownAttribute : PropertyAttribute
+        {
+            public readonly string[] options;
+            
+            public MyDropDownAttribute(params string[] options)
+            {
+                this.options = options;
+            }
+        }
+
+        [Serializable]
+        public class MyAttributeClass
+        {
+            [MySuffix(suffix = "suffix")] 
+            public float suffixValue;
+
+            [MyDropDown("A", "B", "C")] 
+            public string myDropDownStringValue = "A";
+        }
+
         public MyFloat myFloatValue;
         public int intValue;
         public MyClass myClass;
         public Vector2 vector2Value;
-
+        public MyAttributeClass myAttributeClass;
 
         public Element CreateElement(LabelElement _)
         {
             SyntaxHighlighter.AddPattern("type", nameof(MyFloat));
             SyntaxHighlighter.AddPattern("type", nameof(MyClass));
+            SyntaxHighlighter.AddPattern("type", nameof(MyAttributeClass));
+            SyntaxHighlighter.AddPattern("type", nameof(PropertyAttribute));
+            SyntaxHighlighter.AddPattern("type", nameof(MySuffixAttribute));
+            SyntaxHighlighter.AddPattern("type", nameof(MyDropDownAttribute));
 
             return UI.Tabs(
                     CreateTabIElementCreator(),
                     CreateTabCreationFunc(),
-                    CreateTabPropertyField()
+                    CreateTabPropertyField(),
+                    CreateTabPropertyAttributeFunc()
                 );
         }
 
@@ -101,7 +133,7 @@ UI.Field(() => intValue);
                 "publicValueNonSerialized",
                 "PropertyValue"
             );
-      
+
             using var labelModifierScope = new UICustom.PropertyOrFieldLabelModifierScope<Vector2>(
                 ("x", "horizontal"),
                 ("y", "vertical")
@@ -146,6 +178,66 @@ UI.Field(() => vector2Value);
                         )
                     )
                 );
+        }
+
+        private (string, Element) CreateTabPropertyAttributeFunc()
+        {
+            UICustom.RegisterPropertyAttributeFunc<MySuffixAttribute>((attribute, originalElement) =>
+            {
+                return UI.Row(originalElement, UI.Label(attribute.suffix), UI.Space().SetWidth(4f));
+            });
+            
+            UICustom.RegisterPropertyAttributeFunc<MyDropDownAttribute, string>((attribute, label, binder) =>
+            {
+                return UI.Dropdown(label, binder, attribute.options);
+            });
+
+            return ExampleTemplate.CodeElementSetsWithDescriptionTab("PropertyAttributeFunc",
+                "Default field UI can be overridden / modified by custom element.",
+                (@"public class MySuffixAttribute : PropertyAttribute
+{
+    public string suffix;
+}
+
+public class MyDropDownAttribute : PropertyAttribute
+{
+    public readonly string[] options;
+    
+    public MyDropDownAttribute(params string[] options)
+    {
+        this.options = options;
+    }
+}
+
+
+public class MyAttributeClass
+{
+    [MySuffix(suffix = ""suffix"")] 
+    public float suffixValue;
+
+    [MyDropDown(""A"", ""B"", ""C"")] 
+    public string myDropDownStringValue = ""A"";
+}
+
+
+public MyAttributeClass myAttributeClass;
+
+
+UICustom.RegisterPropertyAttributeFunc<MySuffixAttribute>((attribute, originalElement) =>
+{
+    return UI.Row(originalElement, UI.Label(attribute.suffix), UI.Space().SetWidth(4f));
+});
+
+UICustom.RegisterPropertyAttributeFunc<MyDropDownAttribute, string>((attribute, label, binder) =>
+{
+    return UI.Dropdown(label, binder, attribute.options);
+});
+
+UI.Field(() => myAttributeClass);
+",
+                    UI.Field(() => myAttributeClass).Open()
+                )
+            );
         }
     }
 }

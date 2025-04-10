@@ -184,6 +184,8 @@ namespace RosettaUI.UIToolkit.Builder
             {
                 veStyle.flexGrow = ToStyleFloat(style.FlexGrow);
                 veStyle.flexShrink = ToStyleFloat(style.FlexShrink);
+                veStyle.flexBasis = ToStyleLength(style.FlexBasis);
+                veStyle.flexWrap = style.FlexWrap == true ? Wrap.Wrap : Wrap.NoWrap;
             }
             
             return;

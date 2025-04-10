@@ -11,12 +11,12 @@ namespace RosettaUI.Example
         {
             [Header("Header")]
             public int headerInt;
-
-            [Range(0f,100f)]
-            public float rangeFloat;
-
+            
             [Space(24f)]
             public uint spaceUint;
+            
+            [Range(0f,100f)]
+            public float rangeFloat;
 
             [Multiline]
             public string multiLineString;
@@ -137,11 +137,11 @@ namespace RosettaUI.Example
     [Header(""Header"")]
     public int headerInt;
 
-    [Range(0f,100f)]
-    public float rangeFloat;
-
     [Space(24f)]
     public uint spaceUint;
+
+    [Range(0f,100f)]
+    public float rangeFloat;
 
     [Multiline]
     public string multiLineString;

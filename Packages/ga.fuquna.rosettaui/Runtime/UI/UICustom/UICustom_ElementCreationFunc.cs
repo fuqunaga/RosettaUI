@@ -8,16 +8,6 @@ namespace RosettaUI
     /// </summary>
     public static partial class UICustom
     {
-        private class CreationFunc
-        {
-            public readonly Func<LabelElement, IBinder, Element> func;
-            public readonly bool includeParentTypes;
-
-            public CreationFunc(Func<LabelElement, IBinder, Element> func, bool includeParentTypes = false) =>
-                (this.func, this.includeParentTypes) = (func, includeParentTypes);
-        }
-        
-        
         private static readonly Dictionary<Type, CreationFunc> CreationFuncTable = new();
 
         // exclude parent type
@@ -156,5 +146,15 @@ namespace RosettaUI
         }
         
         #endregion
+        
+        
+        private class CreationFunc
+        {
+            public readonly Func<LabelElement, IBinder, Element> func;
+            public readonly bool includeParentTypes;
+
+            public CreationFunc(Func<LabelElement, IBinder, Element> func, bool includeParentTypes = false) =>
+                (this.func, this.includeParentTypes) = (func, includeParentTypes);
+        }
     }
 }

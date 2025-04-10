@@ -225,7 +225,6 @@ namespace RosettaUI
                     var firstField = TypeUtility.GetUITargetFieldNames(valueType)
                         .Select(n => TypeUtility.GetMemberInfo(valueType, n))
                         .OfType<FieldInfo>()
-                        .OrderBy(fi => fi.MetadataToken)
                         .FirstOrDefault();
 
                     if (firstField != null && firstField.FieldType == typeof(string))

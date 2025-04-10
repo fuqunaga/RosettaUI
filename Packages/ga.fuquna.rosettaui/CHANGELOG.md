@@ -1,3 +1,13 @@
+# [ga.fuquna.rosettaui-v1.10.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.9.3...ga.fuquna.rosettaui-v1.10.0) (2025-04-10)
+
+
+### Features
+
+* added UICustom.RegisterPropertyAttributeFunc() ([1d4749c](https://github.com/fuqunaga/RosettaUI/commit/1d4749cd0c055c6e737dd80b77acc33abe92fd66))
+* added UICustom.RegisterPropertyAttributeFunc() ([c83364a](https://github.com/fuqunaga/RosettaUI/commit/c83364a350e7d83430d7dbf06661d1d6c719f333))
+* change default list item label to first string of class ([#39](https://github.com/fuqunaga/RosettaUI/issues/39)) ([6901462](https://github.com/fuqunaga/RosettaUI/commit/6901462069d6f841be0a5da6ea79c0dce2301321))
+* SetFlexBasis, SetFlexWrap ([ad64e40](https://github.com/fuqunaga/RosettaUI/commit/ad64e4078c6200dfd2f67817c69a4ebfa513eab7))
+
 # [ga.fuquna.rosettaui-v1.9.3](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.9.2...ga.fuquna.rosettaui-v1.9.3) (2025-03-03)
 
 

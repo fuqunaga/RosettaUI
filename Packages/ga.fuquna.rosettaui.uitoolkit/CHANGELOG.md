@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.9.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.8.3...ga.fuquna.rosettaui.uitoolkit-v1.9.0) (2025-04-10)
+
+
+### Features
+
+* SetFlexBasis, SetFlexWrap ([ad64e40](https://github.com/fuqunaga/RosettaUI/commit/ad64e4078c6200dfd2f67817c69a4ebfa513eab7))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.8.3](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.8.2...ga.fuquna.rosettaui.uitoolkit-v1.8.3) (2025-03-03)
 
 

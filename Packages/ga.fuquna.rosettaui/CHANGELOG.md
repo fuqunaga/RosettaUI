@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui-v1.11.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.10.0...ga.fuquna.rosettaui-v1.11.0) (2025-04-16)
+
+
+### Features
+
+* Update UI.ScrollView to treat received size as MaxWidth/MaxHeight ([b392fc7](https://github.com/fuqunaga/RosettaUI/commit/b392fc79eff694787e998ffb990f3c1e7acfd57d))
+
 # [ga.fuquna.rosettaui-v1.10.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.9.3...ga.fuquna.rosettaui-v1.10.0) (2025-04-10)
 
 

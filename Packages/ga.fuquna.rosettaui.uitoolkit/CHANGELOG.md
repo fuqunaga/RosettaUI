@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.9.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.9.0...ga.fuquna.rosettaui.uitoolkit-v1.9.1) (2025-04-16)
+
+
+### Bug Fixes
+
+* Invalid Min/MaxHeight when Width is set and vice versa ([b9793d8](https://github.com/fuqunaga/RosettaUI/commit/b9793d8b42c89c93b93c0547be3aa9a16372d2f3))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.9.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.8.3...ga.fuquna.rosettaui.uitoolkit-v1.9.0) (2025-04-10)
 
 

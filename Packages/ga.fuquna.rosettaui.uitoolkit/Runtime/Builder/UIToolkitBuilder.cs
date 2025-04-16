@@ -169,16 +169,26 @@ namespace RosettaUI.UIToolkit.Builder
             veStyle.backgroundColor = ToStyleColor(style.BackgroundColor);
    
             // width or height has value
-            var isFixedSize = (veStyle.width.keyword == StyleKeyword.Undefined ||
-                               veStyle.height.keyword == StyleKeyword.Undefined);
-            if (isFixedSize)
+            // WidthかHeightが定義されていた場合はその値になるように、Min,MaxとFlexの値をAutoにする
+            var isFixedWidth = (veStyle.width.keyword == StyleKeyword.Undefined);
+            var isFixedHeight = (veStyle.height.keyword == StyleKeyword.Undefined);
+
+            if (isFixedWidth)
             {
-                 veStyle.flexGrow = 0;
-                 veStyle.flexShrink = 0;
-                 veStyle.minWidth = StyleKeyword.Auto;
-                 veStyle.maxWidth = StyleKeyword.Auto;
-                 veStyle.minHeight = StyleKeyword.Auto;
-                 veStyle.maxHeight = StyleKeyword.Auto;
+                veStyle.minWidth = StyleKeyword.Auto;
+                veStyle.maxWidth = StyleKeyword.Auto;
+            }
+            
+            if (isFixedHeight)
+            {
+                veStyle.minHeight = StyleKeyword.Auto;
+                veStyle.maxHeight = StyleKeyword.Auto;
+            }
+            
+            if(isFixedWidth || isFixedHeight)
+            {
+                veStyle.flexGrow = 0;
+                veStyle.flexShrink = 0;
             }
             else
             {

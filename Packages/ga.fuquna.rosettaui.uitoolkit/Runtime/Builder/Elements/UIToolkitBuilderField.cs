@@ -56,9 +56,9 @@ namespace RosettaUI.UIToolkit.Builder
         public bool Bind_Field<TValue, TField>(Element element, VisualElement visualElement)
             where TField : BaseField<TValue>, new()
         {
-            if (element is not FieldBaseElement<TValue> fieldBaseElement || visualElement is not TField field) return false;
-            
-            Bind_Field(fieldBaseElement, field, true);
+            if (element is not FieldBaseElement<TValue> fieldBaseElement ||  visualElement.GetType() != typeof(TField)) return false;
+
+            Bind_Field(fieldBaseElement, (TField)visualElement, true);
 
             return true;
         }

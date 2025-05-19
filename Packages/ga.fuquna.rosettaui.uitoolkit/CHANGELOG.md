@@ -1,3 +1,10 @@
+# [ga.fuquna.rosettaui.uitoolkit-v1.9.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.9.1...ga.fuquna.rosettaui.uitoolkit-v1.9.2) (2025-05-19)
+
+
+### Bug Fixes
+
+* unintended ui being displayed when using DynamicElement ([5534d83](https://github.com/fuqunaga/RosettaUI/commit/5534d83340e7f4a131313d6f819b3f36c48872a8))
+
 # [ga.fuquna.rosettaui.uitoolkit-v1.9.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.9.0...ga.fuquna.rosettaui.uitoolkit-v1.9.1) (2025-04-16)
 
 

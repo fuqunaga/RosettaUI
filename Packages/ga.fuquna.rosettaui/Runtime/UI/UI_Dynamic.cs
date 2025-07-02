@@ -76,7 +76,7 @@ namespace RosettaUI
                     if (time - lastCheckTime > interval)
                     {
                         lastCheckTime = time;
-                        if (!targets.Any() || supportMultiple)
+                        if ((targets.Count == 0) || supportMultiple)
                         {
                             targets.Clear();
                             targets.AddRange(
@@ -88,8 +88,15 @@ namespace RosettaUI
                     }
                     
                     targets.RemoveAll(t => t == null || (!includeInactive && t is Behaviour {isActiveAndEnabled: false}));
+
+                    // GCAllocを気にしてLinqを使わない
+                    // var hash = targets.Aggregate(0, (hash, t) => hash ^ t.GetHashCode());
+                    var hash = 0;
+                    foreach(var target in targets)
+                    {
+                        hash ^= target?.GetHashCode() ?? 0;
+                    }
                     
-                    var hash =  targets.Aggregate(0, (hash, t) => hash ^ t.GetHashCode());
                     return hash;
                 },
                 build: _ => buildFunc()

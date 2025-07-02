@@ -1,46 +1,55 @@
-# [ga.fuquna.rosettaui.uitoolkit-v1.9.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.9.1...ga.fuquna.rosettaui.uitoolkit-v1.9.2) (2025-05-19)
+# Changelog
+
+## [1.9.3](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.9.2...ga.fuquna.rosettaui.uitoolkit-v1.9.3) (2025-07-02)
+
+
+### Bug Fixes
+
+* UI.Fold() does not display Field when left side of header is Label and right side is Field. (PopupMenu flex-shrink: 0) ([3580c0d](https://github.com/fuqunaga/RosettaUI/commit/3580c0d96321a4bc0615fe323bf0cab328b312c1))
+
+## [ga.fuquna.rosettaui.uitoolkit-v1.9.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.9.1...ga.fuquna.rosettaui.uitoolkit-v1.9.2) (2025-05-19)
 
 
 ### Bug Fixes
 
 * unintended ui being displayed when using DynamicElement ([5534d83](https://github.com/fuqunaga/RosettaUI/commit/5534d83340e7f4a131313d6f819b3f36c48872a8))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.9.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.9.0...ga.fuquna.rosettaui.uitoolkit-v1.9.1) (2025-04-16)
+## [ga.fuquna.rosettaui.uitoolkit-v1.9.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.9.0...ga.fuquna.rosettaui.uitoolkit-v1.9.1) (2025-04-16)
 
 
 ### Bug Fixes
 
 * Invalid Min/MaxHeight when Width is set and vice versa ([b9793d8](https://github.com/fuqunaga/RosettaUI/commit/b9793d8b42c89c93b93c0547be3aa9a16372d2f3))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.9.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.8.3...ga.fuquna.rosettaui.uitoolkit-v1.9.0) (2025-04-10)
+## [ga.fuquna.rosettaui.uitoolkit-v1.9.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.8.3...ga.fuquna.rosettaui.uitoolkit-v1.9.0) (2025-04-10)
 
 
 ### Features
 
 * SetFlexBasis, SetFlexWrap ([ad64e40](https://github.com/fuqunaga/RosettaUI/commit/ad64e4078c6200dfd2f67817c69a4ebfa513eab7))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.8.3](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.8.2...ga.fuquna.rosettaui.uitoolkit-v1.8.3) (2025-03-03)
+## [ga.fuquna.rosettaui.uitoolkit-v1.8.3](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.8.2...ga.fuquna.rosettaui.uitoolkit-v1.8.3) (2025-03-03)
 
 
 ### Bug Fixes
 
 * typo ([8837f3c](https://github.com/fuqunaga/RosettaUI/commit/8837f3cd8ba874dd4c891daa4586ad4780c1f1f9))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.8.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.8.1...ga.fuquna.rosettaui.uitoolkit-v1.8.2) (2025-03-03)
+## [ga.fuquna.rosettaui.uitoolkit-v1.8.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.8.1...ga.fuquna.rosettaui.uitoolkit-v1.8.2) (2025-03-03)
 
 
 ### Bug Fixes
 
 * Add keywords to package.json to get hits in npmjs search ([2515946](https://github.com/fuqunaga/RosettaUI/commit/25159468c4597d511f3fa3dfe7eca35702091be6))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.8.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.8.0...ga.fuquna.rosettaui.uitoolkit-v1.8.1) (2025-02-18)
+## [ga.fuquna.rosettaui.uitoolkit-v1.8.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.8.0...ga.fuquna.rosettaui.uitoolkit-v1.8.1) (2025-02-18)
 
 
 ### Bug Fixes
 
 * view fix bug etc. ([cfb9f48](https://github.com/fuqunaga/RosettaUI/commit/cfb9f4808c5d5e2a50066dac0331ecaadda91e33))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.8.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.7.3...ga.fuquna.rosettaui.uitoolkit-v1.8.0) (2025-02-17)
+## [ga.fuquna.rosettaui.uitoolkit-v1.8.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.7.3...ga.fuquna.rosettaui.uitoolkit-v1.8.0) (2025-02-17)
 
 
 ### Bug Fixes
@@ -73,21 +82,21 @@
 * time and value field ([db2da90](https://github.com/fuqunaga/RosettaUI/commit/db2da903697093ba81f3fb2516cecec8680913e6))
 * zoom each axis ([2bc13e7](https://github.com/fuqunaga/RosettaUI/commit/2bc13e7b672ecef48e605e42498167068aaca7f3))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.7.3](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.7.2...ga.fuquna.rosettaui.uitoolkit-v1.7.3) (2024-11-29)
+## [ga.fuquna.rosettaui.uitoolkit-v1.7.3](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.7.2...ga.fuquna.rosettaui.uitoolkit-v1.7.3) (2024-11-29)
 
 
 ### Bug Fixes
 
 * [#31](https://github.com/fuqunaga/RosettaUI/issues/31) remove UnityInternalAccess ([b63ce8b](https://github.com/fuqunaga/RosettaUI/commit/b63ce8b90e64132be2cb74b32d37c28927cfe78c))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.7.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.7.1...ga.fuquna.rosettaui.uitoolkit-v1.7.2) (2024-10-11)
+## [ga.fuquna.rosettaui.uitoolkit-v1.7.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.7.1...ga.fuquna.rosettaui.uitoolkit-v1.7.2) (2024-10-11)
 
 
 ### Bug Fixes
 
 * Build error when updating from 1.7.0 or earlier to 1.7.1 ([c66955f](https://github.com/fuqunaga/RosettaUI/commit/c66955f9777c21dfef2e96660da200739c9564b4))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.7.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.7.0...ga.fuquna.rosettaui.uitoolkit-v1.7.1) (2024-10-10)
+## [ga.fuquna.rosettaui.uitoolkit-v1.7.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.7.0...ga.fuquna.rosettaui.uitoolkit-v1.7.1) (2024-10-10)
 
 
 ### Bug Fixes
@@ -95,7 +104,7 @@
 * Incorrect size of check mark in dropdown in Unity2022 ([b46b738](https://github.com/fuqunaga/RosettaUI/commit/b46b7388c927e7eb47b8c2682cbabf2376552f90))
 * Unnatural scrollbar in dropdown menu at Unity6. ([4871a3b](https://github.com/fuqunaga/RosettaUI/commit/4871a3ba85c023155600436f20e63a2c2062af25))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.7.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.6.1...ga.fuquna.rosettaui.uitoolkit-v1.7.0) (2024-09-11)
+## [ga.fuquna.rosettaui.uitoolkit-v1.7.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.6.1...ga.fuquna.rosettaui.uitoolkit-v1.7.0) (2024-09-11)
 
 
 ### Features
@@ -110,14 +119,14 @@
 
 * Fold content is not generated until the first time it is displayed. [#14](https://github.com/fuqunaga/RosettaUI/issues/14) ([3c38327](https://github.com/fuqunaga/RosettaUI/commit/3c38327ffb8a42a500c14fa391a510894369beb5))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.6.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.6.0...ga.fuquna.rosettaui.uitoolkit-v1.6.1) (2024-08-27)
+## [ga.fuquna.rosettaui.uitoolkit-v1.6.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.6.0...ga.fuquna.rosettaui.uitoolkit-v1.6.1) (2024-08-27)
 
 
 ### Bug Fixes
 
 * style changed ([a5f89c6](https://github.com/fuqunaga/RosettaUI/commit/a5f89c61b7364fd148df8c20baf12821561c238a))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.6.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.5.1...ga.fuquna.rosettaui.uitoolkit-v1.6.0) (2024-08-22)
+## [ga.fuquna.rosettaui.uitoolkit-v1.6.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.5.1...ga.fuquna.rosettaui.uitoolkit-v1.6.0) (2024-08-22)
 
 
 ### Features
@@ -128,7 +137,7 @@
 * change Default Reference DPI 144 to 96 at RosettaUI_DefaultPanelSettings.  
 If you set the size specified by SetWidth() and similar functions to 2/3, it will be the same size as before.
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.5.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.5.0...ga.fuquna.rosettaui.uitoolkit-v1.5.1) (2024-02-26)
+## [ga.fuquna.rosettaui.uitoolkit-v1.5.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.5.0...ga.fuquna.rosettaui.uitoolkit-v1.5.1) (2024-02-26)
 
 
 ### Bug Fixes
@@ -138,7 +147,7 @@ If you set the size specified by SetWidth() and similar functions to 2/3, it wil
 * S changes when V is edited in the color picker [#27](https://github.com/fuqunaga/RosettaUI/issues/27) ([30f7053](https://github.com/fuqunaga/RosettaUI/commit/30f705363b1c4a5a7ff715549a7824eab13efe71))
 * target unity version 2021.3 > 2022.3 ([2231b41](https://github.com/fuqunaga/RosettaUI/commit/2231b4170f04cf8ef1fa6e9673307a3781fc2b8d))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.5.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.4.1...ga.fuquna.rosettaui.uitoolkit-v1.5.0) (2024-02-22)
+## [ga.fuquna.rosettaui.uitoolkit-v1.5.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.4.1...ga.fuquna.rosettaui.uitoolkit-v1.5.0) (2024-02-22)
 
 
 ### Bug Fixes
@@ -150,14 +159,14 @@ If you set the size specified by SetWidth() and similar functions to 2/3, it wil
 
 * Support for Gradient class ([6c50d69](https://github.com/fuqunaga/RosettaUI/commit/6c50d6962297f582abff3f08e1cb24386b6dcd88))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.4.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.4.0...ga.fuquna.rosettaui.uitoolkit-v1.4.1) (2023-06-13)
+## [ga.fuquna.rosettaui.uitoolkit-v1.4.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.4.0...ga.fuquna.rosettaui.uitoolkit-v1.4.1) (2023-06-13)
 
 
 ### Bug Fixes
 
 * a bug that caused Elements in DynamicElement, etc. to shrink. ([5a4d374](https://github.com/fuqunaga/RosettaUI/commit/5a4d37497cbb7a5653b90c69ad3b5658de96f0c3))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.4.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.3.1...ga.fuquna.rosettaui.uitoolkit-v1.4.0) (2023-05-24)
+## [ga.fuquna.rosettaui.uitoolkit-v1.4.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.3.1...ga.fuquna.rosettaui.uitoolkit-v1.4.0) (2023-05-24)
 
 
 ### Bug Fixes
@@ -170,21 +179,21 @@ If you set the size specified by SetWidth() and similar functions to 2/3, it wil
 
 * **design:** Now highlights when a button is pressed ([61ce7ef](https://github.com/fuqunaga/RosettaUI/commit/61ce7efbc4979236981d58462b07e7429f8cb7eb))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.3.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.3.0...ga.fuquna.rosettaui.uitoolkit-v1.3.1) (2023-05-19)
+## [ga.fuquna.rosettaui.uitoolkit-v1.3.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.3.0...ga.fuquna.rosettaui.uitoolkit-v1.3.1) (2023-05-19)
 
 
 ### Bug Fixes
 
 * **dependency:** RosettaUI 1.3.1 ([fb64287](https://github.com/fuqunaga/RosettaUI/commit/fb642874fa51b9c6a23d00e47ea388f940960a59))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.3.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.2.2...ga.fuquna.rosettaui.uitoolkit-v1.3.0) (2023-05-16)
+## [ga.fuquna.rosettaui.uitoolkit-v1.3.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.2.2...ga.fuquna.rosettaui.uitoolkit-v1.3.0) (2023-05-16)
 
 
 ### Features
 
 * **UIToolkit:** depends RosettaUI 1.3.0 ([380b105](https://github.com/fuqunaga/RosettaUI/commit/380b1057b83ee83563fa5eaacd82d1d563d44dd0))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.2.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.2.1...ga.fuquna.rosettaui.uitoolkit-v1.2.2) (2023-03-14)
+## [ga.fuquna.rosettaui.uitoolkit-v1.2.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.2.1...ga.fuquna.rosettaui.uitoolkit-v1.2.2) (2023-03-14)
 
 
 ### Bug Fixes
@@ -194,14 +203,14 @@ If you set the size specified by SetWidth() and similar functions to 2/3, it wil
 * When adding an element to an empty list in UI.List(), the field only shows a label ([cde3f7e](https://github.com/fuqunaga/RosettaUI/commit/cde3f7e41135954a2e251a66bb7e8c717f70b9b2))
 * Window's Close button remains when hidden from RosettaUIRoot ([cafe974](https://github.com/fuqunaga/RosettaUI/commit/cafe97479bc907e5ee3237cb501de903d374ec71))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.2.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.2.0...ga.fuquna.rosettaui.uitoolkit-v1.2.1) (2023-03-13)
+## [ga.fuquna.rosettaui.uitoolkit-v1.2.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.2.0...ga.fuquna.rosettaui.uitoolkit-v1.2.1) (2023-03-13)
 
 
 ### Bug Fixes
 
 * Infinite width of PrefixLabel when closing and reopening a Window in Unity2022. ([230d510](https://github.com/fuqunaga/RosettaUI/commit/230d510e18af45f68f8adf3623036858e6544791))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.2.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.1.1...ga.fuquna.rosettaui.uitoolkit-v1.2.0) (2023-02-27)
+## [ga.fuquna.rosettaui.uitoolkit-v1.2.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.1.1...ga.fuquna.rosettaui.uitoolkit-v1.2.0) (2023-02-27)
 
 
 ### Bug Fixes
@@ -213,14 +222,14 @@ If you set the size specified by SetWidth() and similar functions to 2/3, it wil
 
 * add UI.Clickable() ([12459b6](https://github.com/fuqunaga/RosettaUI/commit/12459b698fe7faf9a8ac97a592a54fa417a916ca))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.1.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.1.0...ga.fuquna.rosettaui.uitoolkit-v1.1.1) (2023-02-06)
+## [ga.fuquna.rosettaui.uitoolkit-v1.1.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.1.0...ga.fuquna.rosettaui.uitoolkit-v1.1.1) (2023-02-06)
 
 
 ### Bug Fixes
 
 * Window width could not be reduced after toggling Fold On/Off. ([2786049](https://github.com/fuqunaga/RosettaUI/commit/27860491c0a2f6f651b6868ef6bc337eff50b8a8))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.1.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.0.2...ga.fuquna.rosettaui.uitoolkit-v1.1.0) (2023-01-24)
+## [ga.fuquna.rosettaui.uitoolkit-v1.1.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.0.2...ga.fuquna.rosettaui.uitoolkit-v1.1.0) (2023-01-24)
 
 
 ### Bug Fixes
@@ -234,14 +243,14 @@ If you set the size specified by SetWidth() and similar functions to 2/3, it wil
 * [#6](https://github.com/fuqunaga/RosettaUI/issues/6) FieldOption.delayInput. This can delay updating the value in UI.Field(). ([508862f](https://github.com/fuqunaga/RosettaUI/commit/508862f5f3446b11e7f33de1d15f860b743b1ac2))
 * WindowElement.SetClosable() ([82971ec](https://github.com/fuqunaga/RosettaUI/commit/82971ecf70246cdae12c7016d02d329acd236e85))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.0.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.0.1...ga.fuquna.rosettaui.uitoolkit-v1.0.2) (2022-11-22)
+## [ga.fuquna.rosettaui.uitoolkit-v1.0.2](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.0.1...ga.fuquna.rosettaui.uitoolkit-v1.0.2) (2022-11-22)
 
 
 ### Bug Fixes
 
 * follow Rosettaui 1.0.2 ([d92f6a3](https://github.com/fuqunaga/RosettaUI/commit/d92f6a33b7137f51e3abe43b3b2fed3380d664fd))
 
-# [ga.fuquna.rosettaui.uitoolkit-v1.0.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.0.0...ga.fuquna.rosettaui.uitoolkit-v1.0.1) (2022-11-22)
+## [ga.fuquna.rosettaui.uitoolkit-v1.0.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui.uitoolkit-v1.0.0...ga.fuquna.rosettaui.uitoolkit-v1.0.1) (2022-11-22)
 
 
 ### Bug Fixes

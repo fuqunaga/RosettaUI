@@ -54,7 +54,18 @@ namespace RosettaUI
                     foreach(var e in elements) e.CheckAndRebuild();
                 }
                 
-                var windowHasContents = elements.Any(dynamicElement => dynamicElement.Contents.Any());
+                // var windowHasContents = elements.Any(dynamicElement => dynamicElement.Contents.Any());
+                var windowHasContents = false;
+                foreach(var dynamicElement in elements)
+                {
+                    // ReSharper disable once UseMethodAny.0
+                    // for no allocation
+                    if (dynamicElement.Contents.Count() > 0)
+                    {
+                        windowHasContents = true;
+                        break;
+                    }
+                }
                 launcher.Enable = windowHasContents;
                 
                 if (!windowHasContents && window.IsOpen)

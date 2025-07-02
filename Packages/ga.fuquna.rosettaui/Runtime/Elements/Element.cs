@@ -13,8 +13,8 @@ namespace RosettaUI
     /// </summary>
     public abstract class Element
     {
-        private readonly LinkedList<Element> _children = new();
-        public IEnumerable<Element> Children => _children;
+        private readonly List<Element> _children = new();
+        public IReadOnlyList<Element> Children => _children;
 
         public readonly ReactiveProperty<bool> enableRx = new(true);
         public readonly ReactiveProperty<bool> interactableRx = new(true);
@@ -69,7 +69,7 @@ namespace RosettaUI
 
         protected void AddChild(Element element)
         {
-            _children.AddLast(element);
+            _children.Add(element);
             element.SetParent(this);
         }
 
@@ -106,12 +106,9 @@ namespace RosettaUI
 
         private void DetachViewChildren()
         {
-            var node = _children.First;
-            while(node != null)
+            foreach(var child in _children)
             {
-                var next = node.Next;
-                node.Value.DetachView(false);
-                node = next;
+                child.DetachView(false);
             }
         }
 

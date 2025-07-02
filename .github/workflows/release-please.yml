@@ -1,0 +1,57 @@
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+name: release-please
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      # releases_created と paths_released を後続のジョブから参照できるようにする
+      releases_created: ${{ steps.release.outputs.releases_created }}
+      paths_released: ${{ steps.release.outputs.paths_released }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+      
+  # リリースされたパッケージをnpm publishするジョブ
+  publish:
+    # release-pleaseジョブが完了してから実行
+    needs: release-please
+    runs-on: ubuntu-latest
+    # release-pleaseジョブでリリースが作成された場合にのみ実行
+    if: ${{ needs.release-please.outputs.releases_created == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # `release-please`の出力からリリースされたパッケージを特定し、npm publishを実行
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+        run: |
+          # paths_released をパースして、リリースされたパッケージをループ処理
+          PACKAGES_TO_PUBLISH=$(echo '${{ needs.release-please.outputs.paths_released }}' | jq -r '.[]')
+
+          if [ -z "$PACKAGES_TO_PUBLISH" ]; then
+            echo "No packages were released, skipping npm publish."
+            exit 0
+          fi
+
+          echo "Packages to publish: $PACKAGES_TO_PUBLISH"
+
+          for package_path in $PACKAGES_TO_PUBLISH; do
+            echo "Publishing $package_path..."
+            cd "$package_path"
+            npm publish
+            cd - # 元のディレクトリに戻る
+          done

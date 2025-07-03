@@ -45,8 +45,10 @@ namespace RosettaUI.UIToolkit
         
             container.RegisterCallback<PointerDownEvent>(OnPointerDownOnContainer);
             PointerDrag.RegisterCallback(container, OnPointerMoveOnContainer, OnPointerupOnContainer);
+            
+            container.RegisterCallback<KeyDownEvent>(OnKeyDownOnContainer);
         }
-        
+
         public void Initialize(Gradient gradient, IEnumerable<GradientKeysSwatch> showedSwatches)
         {
             _gradient = gradient;
@@ -76,16 +78,18 @@ namespace RosettaUI.UIToolkit
                 swatch = CreateSwatch(localPos.x);
                 if (swatch != null)
                 {
-                    ShowSwatch(swatch);
-                    OnAddSwatch(swatch);
+                    AddSwatch(swatch);
+                    swatch.visualElement.schedule.Execute(() =>
+                    {
+                        // 追加直後にフォーカスを当てる
+                        SelectSwatch(swatch);
+                    });
                 }
             }
-
             // セレクト
-            if (swatch != null)
+            else
             {
                 SelectSwatch(swatch);
-                OnSelectedSwatchChanged();
             }
 
             evt.StopPropagation();
@@ -106,7 +110,8 @@ namespace RosettaUI.UIToolkit
                 // なかったら復活
                 if (!_showedSwatches.Contains(_selectedSwatch))
                 {
-                    ShowSwatch(_selectedSwatch);
+                    AttachSwatch(_selectedSwatch);
+                    SelectSwatch(_selectedSwatch);
                 }
                 
                 updateTime = true;   
@@ -118,7 +123,7 @@ namespace RosettaUI.UIToolkit
             {
                 if ( _showedSwatches.Count > 1)
                 {
-                    HideSwatch(_selectedSwatch);
+                    DetachSwatch(_selectedSwatch);
                 }
                 else
                 {
@@ -135,36 +140,50 @@ namespace RosettaUI.UIToolkit
             evt.StopPropagation();
         }
         
-        
         private void OnPointerupOnContainer(PointerUpEvent evt)
         {
             if (_selectedSwatch == null) return;
 
             // 非表示状態でドラッグ終了したら削除
-            if (!_showedSwatches.Contains(_selectedSwatch))
+            if (!IsAttachedSwatch(_selectedSwatch))
             {
-                var swatch = _selectedSwatch;
-                UnselectSwatch();
-                OnRemoveSwatch(swatch);
+                RemoveSwatch(_selectedSwatch);
             }
 
             evt.StopPropagation();
         }
 
+        private void OnKeyDownOnContainer(KeyDownEvent evt)
+        {
+            // Deleteキーで選択中のスウォッチを削除
+            if(evt.keyCode == KeyCode.Delete)
+            {
+                if (_showedSwatches.Count > 1 
+                    && _selectedSwatch != null
+                    // ドラッグ中で一時的に消えている場合はDeleteキーは無視
+                    && IsAttachedSwatch(_selectedSwatch))
+                {
+                    RemoveSwatch(_selectedSwatch);
+                }
 
-        private void ShowSwatch(GradientKeysSwatch swatch)
+                evt.StopPropagation();
+            }
+        }
+
+
+        private void AttachSwatch(GradientKeysSwatch swatch)
         {
             _showedSwatches.Add(swatch);
             _container.Add(swatch.visualElement);
         }
         
-        private void HideSwatch(GradientKeysSwatch swatch)
+        private void DetachSwatch(GradientKeysSwatch swatch)
         {
             _showedSwatches.Remove(swatch);
             swatch.visualElement.RemoveFromHierarchy();
         }
 
-        private bool IsShowedSwatch(GradientKeysSwatch swatch) => _showedSwatches.Contains(swatch);
+        private bool IsAttachedSwatch(GradientKeysSwatch swatch) => _showedSwatches.Contains(swatch);
 
         private GradientKeysSwatch CreateSwatch(float localPosX)
         {
@@ -191,48 +210,53 @@ namespace RosettaUI.UIToolkit
                 newSwatch.Color = color;
             }
             
-            
             return newSwatch;
         }
 
         private void SelectSwatch(GradientKeysSwatch swatch)
         {
-            UnselectSwatch();
+            UnselectSwatchWithoutNotify();
 
             _selectedSwatch = swatch;
             _selectedSwatch.visualElement.Focus();
             _selectedSwatch.visualElement.BringToFront();
+            
+            _onSelectedSwatchChanged?.Invoke(_selectedSwatch);
         }
         
-        private void UnselectSwatch()
+        private void UnselectSwatchWithoutNotify()
         {
-            if (_selectedSwatch == null)
-                return;
+            if (_selectedSwatch == null) return;
 
             _selectedSwatch.visualElement.Blur();
             _selectedSwatch = null;
         }
         
-        
-        private void OnAddSwatch(GradientKeysSwatch swatch)
+        private void AddSwatch(GradientKeysSwatch swatch)
         {
+            if (swatch == null) return;
+
+            AttachSwatch(swatch);
             _onAddSwatch?.Invoke(swatch);
         }
         
-        private void OnRemoveSwatch(GradientKeysSwatch swatch)
+        private void RemoveSwatch(GradientKeysSwatch swatch)
         {
+            if (swatch == null) return;
+
+            if (swatch == _selectedSwatch)
+            {
+                UnselectSwatchWithoutNotify();
+            }
+            
+            DetachSwatch(swatch);
             _onRemoveSwatch?.Invoke(swatch);
-        }
-        
-        private void OnSelectedSwatchChanged()
-        {
-            _onSelectedSwatchChanged?.Invoke(_selectedSwatch);
         }
 
         private void OnSwatchValueChanged()
         {
             // 非表示中の値の変化は通知しない
-            if ( IsShowedSwatch(_selectedSwatch))
+            if ( IsAttachedSwatch(_selectedSwatch))
             {
                 _onSwatchValueChanged?.Invoke(_selectedSwatch);
             }

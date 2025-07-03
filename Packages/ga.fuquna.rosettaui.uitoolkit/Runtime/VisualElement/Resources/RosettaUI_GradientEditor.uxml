@@ -15,7 +15,7 @@
                 </ui:Slider>
             </ui:VisualElement>
             <ui:Slider picking-mode="Ignore" label="Location" value="0" high-value="100" name="location-slider" show-input-field="true">
-                <ui:Label text="%" display-tooltip-when-elided="true" name="location-per-label" style="align-items: stretch;" />
+                <ui:Label text="%" display-tooltip-when-elided="true" name="location-per-label" style="align-items: stretch; -unity-text-align: middle-left;" />
             </ui:Slider>
         </ui:VisualElement>
     </ui:VisualElement>

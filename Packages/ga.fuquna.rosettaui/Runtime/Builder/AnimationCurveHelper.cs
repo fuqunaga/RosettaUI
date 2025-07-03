@@ -83,9 +83,9 @@ namespace RosettaUI.Builder
         
         public static void UpdateAnimationCurvePreviewToBackgroundImage(AnimationCurve curve, VisualElement visualElement)
         {
-            int width = (int)visualElement.resolvedStyle.width;
-            int height = (int)visualElement.resolvedStyle.height;
-            if (width <= 0f || height <= 0f) return;
+            var width = (int)visualElement.resolvedStyle.width;
+            var height = (int)visualElement.resolvedStyle.height;
+            if (width <= 0 || height <= 0) return;
             
             var style = visualElement.style;
             var texture = style.backgroundImage.value.texture;

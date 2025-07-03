@@ -8,8 +8,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
     public class CurvePreview : IDisposable
     {
-        private CommandBuffer _commandBuffer;
-        private Material _curveDrawMaterial;
+        private CommandBuffer _commandBuffer = new() { name = "AnimationCurvePreview" };
+        private Material _curveDrawMaterial = new(Resources.Load<Shader>("RosettaUI_AnimationCurveEditorShader"));
         private GraphicsBuffer _curveDataBuffer;
         private int _numActiveSegments;
 
@@ -71,12 +71,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             DrawCurve(_commandBuffer, viewInfo.OutputTexture);
 
             Graphics.ExecuteCommandBuffer(_commandBuffer);
-        }
-
-        public CurvePreview()
-        {
-            _curveDrawMaterial = new Material(Resources.Load<Shader>("RosettaUI_AnimationCurveEditorShader"));
-            _commandBuffer = new CommandBuffer() { name = "AnimationCurvePreview" };
         }
 
         public void Dispose()

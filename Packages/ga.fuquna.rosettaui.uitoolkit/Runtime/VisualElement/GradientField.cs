@@ -73,7 +73,7 @@ namespace RosettaUI.UIToolkit
             }
             else
             {
-                GradientHelper.UpdateGradientPreviewToBackgroundImage(value, preview);
+                GradientHelper.UpdateGradientPreviewToBackgroundImage(rawValue, preview);
             }
         }
 
@@ -108,19 +108,6 @@ namespace RosettaUI.UIToolkit
             base.SetValueWithoutNotify(newValue);
 
             _valueNull = newValue == null;
-            if (newValue != null)
-            {
-                value.colorKeys = newValue.colorKeys;
-                value.alphaKeys = newValue.alphaKeys;
-                value.mode = newValue.mode;
-            }
-            else // restore the internal gradient to the default state.
-            {
-                value.colorKeys = new[] { k_WhiteKeyBegin, k_WhiteKeyEnd };
-                value.alphaKeys = new[] { k_AlphaKeyBegin, k_AlphaKeyEnd };
-                value.mode = GradientMode.Blend;
-            }
-
             UpdateGradientTexture();
         }
 

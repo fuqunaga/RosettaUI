@@ -62,7 +62,7 @@ namespace RosettaUI.UIToolkit
             }
             else
             {
-                AnimationCurveHelper.UpdateAnimationCurvePreviewToBackgroundImage(value, preview);
+                AnimationCurveHelper.UpdateAnimationCurvePreviewToBackgroundImage(rawValue, preview);
             }
         }
 
@@ -97,19 +97,6 @@ namespace RosettaUI.UIToolkit
             base.SetValueWithoutNotify(newValue);
 
             _valueNull = newValue == null;
-            if (newValue != null)
-            {
-                value.keys = newValue.keys;
-                value.postWrapMode = newValue.postWrapMode;
-                value.preWrapMode = newValue.preWrapMode;
-            }
-            else // restore the internal gradient to the default state.
-            {
-                value.keys = new Keyframe[] { new Keyframe(0f, 0f), new Keyframe(1f, 1f) };
-                value.postWrapMode = WrapMode.Clamp;
-                value.preWrapMode = WrapMode.Clamp;
-            }
-
             UpdateAnimationCurveTexture();
         }
 

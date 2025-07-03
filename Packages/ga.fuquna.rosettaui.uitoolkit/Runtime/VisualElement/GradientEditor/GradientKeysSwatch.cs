@@ -9,6 +9,8 @@ namespace RosettaUI.UIToolkit
         public static readonly string AlphaCursorUSSClassName = $"{GradientEditor.USSClassName}__cursor-alpha";
         public static readonly string ColorCursorUSSClassName = $"{GradientEditor.USSClassName}__cursor-color";
      
+        public static readonly string CursorOutlineUSSClassName = $"{GradientEditor.USSClassName}__cursor_outline";
+        
         public static int TextDigit { get; set; } = 3;
         
         private static float Round(float value, int digit)
@@ -80,6 +82,11 @@ namespace RosettaUI.UIToolkit
             var cursor = new VisualElement();
             cursor.AddToClassList(CursorUSSClassName);
             cursor.focusable = true;
+
+            var outline = new VisualElement();
+            outline.AddToClassList(CursorOutlineUSSClassName);
+            cursor.Add(outline);
+                
             return cursor;
         }
     }

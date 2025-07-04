@@ -74,7 +74,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private CurvePointContainer _curvePointContainer;
         
-        private CurvePreview _curvePreview;
+        private AnimationCurvePreview _animationCurvePreview;
         private RenderTexture _curveEditorTexture = null;
 
         private VisualElement _curvePreviewElement;
@@ -121,10 +121,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void Dispose()
         {
-            if (_curvePreview != null)
+            if (_animationCurvePreview != null)
             {
-                _curvePreview.Dispose();
-                _curvePreview = null;
+                _animationCurvePreview.Dispose();
+                _animationCurvePreview = null;
             }
             if (_curveEditorTexture != null)
             {
@@ -184,7 +184,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _snapYButton = this.Q<ToggleButton>("value-snapping-button");
             
             // Curve Preview
-            _curvePreview = new CurvePreview();
+            _animationCurvePreview = new AnimationCurvePreview();
             _curvePreviewElement = this.Q("preview-front");
             _curvePreviewElement.RegisterCallback<PointerDownEvent>(OnPointerDown);
             _curvePreviewElement.RegisterCallback<GeometryChangedEvent>(_ => UpdateView());
@@ -264,11 +264,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             var rect = _previewTransform.GetPreviewRect();
             var gridViewport = new GridViewport(rect.width, rect.height);
-            _curvePreview.Render(_curvePointContainer.Curve, new CurvePreview.CurvePreviewViewInfo {
-                Resolution = new Vector4(width, height, 1f / width, 1f / height),
-                OffsetZoom = _previewTransform.OffsetZoom,
-                GridParams = new Vector4(gridViewport.XOrder, gridViewport.YOrder, gridViewport.XTick, gridViewport.YTick),
-                OutputTexture = _curveEditorTexture,
+            _animationCurvePreview.Render(_curvePointContainer.Curve, new AnimationCurvePreview.CurvePreviewViewInfo {
+                resolution = new Vector2(width, height),
+                offsetZoom = _previewTransform.OffsetZoom,
+                gridParams = new Vector4(gridViewport.XOrder, gridViewport.YOrder, gridViewport.XTick, gridViewport.YTick),
+                outputTexture = _curveEditorTexture,
             });
         }
         

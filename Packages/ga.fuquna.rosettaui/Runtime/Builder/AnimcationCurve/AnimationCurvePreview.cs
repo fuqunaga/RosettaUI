@@ -4,23 +4,22 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Rendering;
-using Object = UnityEngine.Object;
 
 namespace RosettaUI.Builder
 {
-    public class CurvePreview : IDisposable
+    public class AnimationCurvePreview : IDisposable
     {
+        private Material _curveDrawMaterial = new(Resources.Load<Shader>("RosettaUI_AnimationCurve"));
         private CommandBuffer _commandBuffer = new() { name = "AnimationCurvePreview" };
-        private Material _curveDrawMaterial = new(Resources.Load<Shader>("RosettaUI_AnimationCurveEditorShader"));
         private GraphicsBuffer _curveDataBuffer;
         private int _numActiveSegments;
 
         public struct CurvePreviewViewInfo
         {
-            public Vector4 Resolution;
-            public Vector4 OffsetZoom;
-            public Vector4 GridParams;
-            public RenderTexture OutputTexture;
+            public Vector2 resolution;
+            public Vector4 offsetZoom;
+            public Vector4 gridParams;
+            public RenderTexture outputTexture;
         }
 
         [SuppressMessage("ReSharper", "NotAccessedField.Local")]
@@ -66,11 +65,18 @@ namespace RosettaUI.Builder
             _commandBuffer.Clear();
             UpdateData(_commandBuffer, animationCurve);
 
-            _curveDrawMaterial.SetVector("_Resolution", viewInfo.Resolution);
-            _curveDrawMaterial.SetVector("_OffsetZoom", viewInfo.OffsetZoom);
-            _curveDrawMaterial.SetVector("_GridParams", viewInfo.GridParams);
+            var resolution = new Vector4(
+                viewInfo.resolution.x,
+                viewInfo.resolution.y,
+                1f / viewInfo.resolution.x,
+                1f / viewInfo.resolution.y
+            );
+              
+            _curveDrawMaterial.SetVector("_Resolution", resolution);
+            _curveDrawMaterial.SetVector("_OffsetZoom", viewInfo.offsetZoom);
+            _curveDrawMaterial.SetVector("_GridParams", viewInfo.gridParams);
 
-            DrawCurve(_commandBuffer, viewInfo.OutputTexture);
+            DrawCurve(_commandBuffer, viewInfo.outputTexture);
 
             Graphics.ExecuteCommandBuffer(_commandBuffer);
         }
@@ -79,10 +85,10 @@ namespace RosettaUI.Builder
         {
             if (_curveDrawMaterial != null)
             {
-                Object.DestroyImmediate(_curveDrawMaterial);
+                UnityEngine.Object.Destroy(_curveDrawMaterial);
                 _curveDrawMaterial = null;
             }
-
+            
             _commandBuffer?.Dispose();
             _commandBuffer = null;
 

@@ -20,13 +20,6 @@ namespace RosettaUI.Builder
             dst.mode = src.mode;
             dst.colorSpace = src.colorSpace;
         }
-
-        public static void UpdateGradientPreviewToBackgroundImage(Gradient gradient, VisualElement visualElement)
-        {
-            var style = visualElement.style;
-            var texture = style.backgroundImage.value.texture;
-            style.backgroundImage = GenerateGradientPreview(gradient, texture);
-        }
         
         public static Texture2D GenerateGradientPreview(Gradient gradient, Texture2D texture)
         {

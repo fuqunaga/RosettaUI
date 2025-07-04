@@ -23,7 +23,7 @@ namespace RosettaUI.UIToolkit
             set
             {
                 GradientHelper.Copy(value, _gradient);
-                GradientHelper.UpdateGradientPreviewToBackgroundImage(_gradient, _gradientElement);
+                GradientVisualElementHelper.UpdateGradientPreviewToBackgroundImage(_gradient, _gradientElement);
             } 
         }
 

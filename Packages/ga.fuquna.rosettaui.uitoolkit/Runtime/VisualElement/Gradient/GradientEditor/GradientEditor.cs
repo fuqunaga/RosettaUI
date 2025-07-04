@@ -250,7 +250,7 @@ namespace RosettaUI.UIToolkit
         
         private void UpdateGradientPreview()
         {
-            GradientHelper.UpdateGradientPreviewToBackgroundImage(_gradient, _gradientPreview);
+            GradientVisualElementHelper.UpdateGradientPreviewToBackgroundImage(_gradient, _gradientPreview);
         }
 
         

@@ -73,7 +73,7 @@ namespace RosettaUI.UIToolkit
             }
             else
             {
-                GradientHelper.UpdateGradientPreviewToBackgroundImage(rawValue, preview);
+                GradientVisualElementHelper.UpdateGradientPreviewToBackgroundImage(rawValue, preview);
             }
         }
 

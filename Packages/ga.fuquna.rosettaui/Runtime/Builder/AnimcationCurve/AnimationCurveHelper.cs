@@ -7,6 +7,9 @@ namespace RosettaUI.Builder
 {
     public static class AnimationCurveHelper 
     {
+        private static AnimationCurvePreviewRenderer _animationCurvePreviewRenderer;
+        
+        
         public static AnimationCurve Clone(AnimationCurve src)
         {
             var dst = new AnimationCurve();
@@ -81,60 +84,31 @@ namespace RosettaUI.Builder
             return rect;
         }
         
-        public static void UpdateAnimationCurvePreviewToBackgroundImage(AnimationCurve curve, VisualElement visualElement)
-        {
-            var width = (int)visualElement.resolvedStyle.width;
-            var height = (int)visualElement.resolvedStyle.height;
-            if (width <= 0 || height <= 0) return;
-            
-            var style = visualElement.style;
-            var texture = style.backgroundImage.value.texture;
-            style.backgroundImage = GenerateAnimationCurvePreview(curve, texture, width, height);
-        }
-        
-        public static Texture2D GenerateAnimationCurvePreview(AnimationCurve curve, Texture2D texture, int width = 256, int height = 32)
+        public static RenderTexture GenerateAnimationCurvePreview(AnimationCurve curve, RenderTexture texture, int width, int height)
         {
             if (texture != null && (texture.width != width || texture.height != height))
             {
                 Object.DestroyImmediate(texture);
                 texture = null;
             }
-
-            var curveRect = curve.GetCurveRect(true);
-            var colorArray = ArrayPool<Color>.Shared.Rent(width * height);
-
-            // Fill the texture with a gray color
-            for (int j = 0; j < width * height; j++)
-                colorArray[j] = new Color(0.3372549f, 0.3372549f, 0.3372549f, 0.5f);
-
-            int prevHeight = -1;
-            for (int i = 0; i < width; i++)
+            
+            texture ??= new RenderTexture(width, height, 0)
             {
-                float t = curveRect.xMin + i / (width - 1f) * curveRect.width;
-                int targetHeight = (int)((curve.Evaluate(t) - curveRect.yMin) / curveRect.height * height);
-
-                if (prevHeight >= 0)
-                {
-                    for (int j = Mathf.Min(prevHeight, targetHeight); j <= Mathf.Max(prevHeight, targetHeight); j++)
-                    {
-                        if (j >= 0 && j < height) colorArray[j * width + i] = Color.green;
-                    }
-                }
-                prevHeight = targetHeight;
-            }
-
-            texture ??= new Texture2D(width, height)
-            {
+                name = "AnimationCurvePreview",
                 wrapMode = TextureWrapMode.Clamp,
                 filterMode = FilterMode.Bilinear
             };
-            texture.SetPixels(0, 0, width, height, colorArray);
-            texture.Apply();
-
-            ArrayPool<Color>.Shared.Return(colorArray);
-
+ 
+            _animationCurvePreviewRenderer ??= new AnimationCurvePreviewRenderer();
+            _animationCurvePreviewRenderer.Render(curve, new AnimationCurvePreviewRenderer.CurvePreviewViewInfo
+            {
+                outputTexture = texture,
+                resolution = new Vector2(width, height),
+                offsetZoom = new Vector4(0f, 0f, 1f, 1f),
+                gridParams = new Vector4(0.001f, 0.001f, 0.5f, 0.5f)
+            });
+            
             return texture;
         }
-
     }
 }

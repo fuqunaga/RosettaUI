@@ -7,7 +7,7 @@ using UnityEngine.Rendering;
 
 namespace RosettaUI.Builder
 {
-    public class AnimationCurvePreview : IDisposable
+    public class AnimationCurvePreviewRenderer : IDisposable
     {
         private Material _curveDrawMaterial = new(Resources.Load<Shader>("RosettaUI_AnimationCurve"));
         private CommandBuffer _commandBuffer = new() { name = "AnimationCurvePreview" };

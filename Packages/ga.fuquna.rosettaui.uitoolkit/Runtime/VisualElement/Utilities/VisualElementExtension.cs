@@ -73,5 +73,30 @@ namespace RosettaUI.UIToolkit
 
             return isChanged;
         }
+        
+        /// <summary>
+        /// UIToolkitのWidthはPanelのスケールなどがかかっているのでスクリーン上のピクセル数は計算で求める
+        /// </summary>
+        public static float CalcWidthPixelOnScreen(this VisualElement ve)
+        {
+            if ( ve.panel == null )
+            {
+                return 0f;
+            }
+            
+            return ve.resolvedStyle.width * ve.panel.scaledPixelsPerPoint;
+        }
+        /// <summary>
+        /// UIToolkitのHeightはPanelのスケールなどがかかっているのでスクリーン上のピクセル数は計算で求める
+        /// </summary>
+        public static float CalcHeightPixelOnScreen(this VisualElement ve)
+        {
+            if ( ve.panel == null )
+            {
+                return 0f;
+            }
+            
+            return ve.resolvedStyle.height * ve.panel.scaledPixelsPerPoint;
+        }
     }
 }

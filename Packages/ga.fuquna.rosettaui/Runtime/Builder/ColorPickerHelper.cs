@@ -17,7 +17,7 @@ namespace RosettaUI.Builder
         
         
         public static float defaultHueCircleThicknessRate = 0.1f;
-        public static string svDiskMaterialPath = "SvDisk";
+        public static string svDiskShaderPath = "RosettaUI_SvDisk";
 
         private static readonly Dictionary<float, Texture2D> HueCircleTextureDic = new();
         private static Material _svDiskMaterial;
@@ -121,8 +121,7 @@ namespace RosettaUI.Builder
         /// </summary>
         public static void UpdateSvDiskTexture(RenderTexture rt, float hue)
         {
-            // リソースを書き換えないようにコピー
-            _svDiskMaterial ??= new Material(Resources.Load<Material>(svDiskMaterialPath));
+            _svDiskMaterial ??= new Material(Resources.Load<Shader>(svDiskShaderPath));
 
             _svDiskMaterial.SetVector(SvCircleShaderParam.TargetSize, new Vector2(rt.width, rt.height));
             _svDiskMaterial.SetFloat(SvCircleShaderParam.BlendWidthNormalized, 2f / rt.width);

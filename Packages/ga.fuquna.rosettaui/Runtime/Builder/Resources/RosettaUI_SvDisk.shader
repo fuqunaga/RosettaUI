@@ -1,4 +1,4 @@
-﻿Shader "Rosettaui/ColorPicker/SvDisk"
+﻿Shader "Hidden/RosettaUI/ColorPicker/SvDisk"
 {
 	Properties
 	{

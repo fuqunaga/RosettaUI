@@ -1,4 +1,4 @@
-﻿Shader "Hidden/RosettaUI_AnimationCurveEditorShader"
+﻿Shader "Hidden/RosettaUI_AnimationCurve"
 {
     SubShader
     {
@@ -9,6 +9,7 @@
             HLSLPROGRAM
             #pragma vertex Vert
             #pragma fragment Frag
+            //#pragma enable_d3d11_debug_symbols
 
             #include "UnityCG.cginc"
             #include "SdfBezierSpline.hlsl"

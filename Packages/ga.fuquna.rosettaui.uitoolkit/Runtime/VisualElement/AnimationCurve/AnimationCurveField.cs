@@ -62,18 +62,7 @@ namespace RosettaUI.UIToolkit
             }
             else
             {
-                var width = Mathf.CeilToInt(preview.CalcWidthPixelOnScreen());
-                var height = Mathf.CeilToInt(preview.CalcHeightPixelOnScreen());
-                
-                if (width <= 0 || height <= 0)
-                {
-                    return;
-                }
-
-                var texture = preview.style.backgroundImage.value.renderTexture;
-                texture = AnimationCurveHelper.GenerateAnimationCurvePreview(rawValue, texture, width, height);
-
-                preview.style.backgroundImage = Background.FromRenderTexture(texture);
+                AnimationCurveVisualElementHelper.UpdateGradientPreviewToBackgroundImage(rawValue, preview);
             }
         }
 

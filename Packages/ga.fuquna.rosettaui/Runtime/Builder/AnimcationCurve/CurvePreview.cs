@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Rendering;
+using Object = UnityEngine.Object;
 
-namespace RosettaUI.UIToolkit.AnimationCurveEditor
+namespace RosettaUI.Builder
 {
     public class CurvePreview : IDisposable
     {
@@ -21,7 +23,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             public RenderTexture OutputTexture;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("ReSharper", "NotAccessedField.Local")]
+        [SuppressMessage("ReSharper", "NotAccessedField.Local")]
         private struct SplineSegmentData
         {
             public Vector2 StartPos;
@@ -77,7 +79,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             if (_curveDrawMaterial != null)
             {
-                UnityEngine.Object.DestroyImmediate(_curveDrawMaterial);
+                Object.DestroyImmediate(_curveDrawMaterial);
                 _curveDrawMaterial = null;
             }
 

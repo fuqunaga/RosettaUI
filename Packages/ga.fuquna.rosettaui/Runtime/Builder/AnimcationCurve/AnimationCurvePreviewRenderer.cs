@@ -7,12 +7,11 @@ using UnityEngine.Rendering;
 
 namespace RosettaUI.Builder
 {
-    public class AnimationCurvePreviewRenderer : IDisposable
+    public static class AnimationCurvePreviewRenderer
     {
-        private Material _curveDrawMaterial = new(Resources.Load<Shader>("RosettaUI_AnimationCurve"));
-        private CommandBuffer _commandBuffer = new() { name = "AnimationCurvePreview" };
-        private GraphicsBuffer _curveDataBuffer;
-        private int _numActiveSegments;
+        private static readonly CommandBuffer CommandBuffer = new() { name = "AnimationCurvePreview" };
+        private static Material _curveDrawMaterial;
+        private static GraphicsBuffer _curveDataBuffer;
 
         public struct CurvePreviewViewInfo
         {
@@ -32,7 +31,7 @@ namespace RosettaUI.Builder
             public Vector2 EndVel;
         }
 
-        public void UpdateData(CommandBuffer cmdBuf, AnimationCurve animationCurve)
+        private static int UpdateData(CommandBuffer cmdBuf, AnimationCurve animationCurve)
         {
             var segments = animationCurve.keys.Zip(animationCurve.keys.Skip(1), ValueTuple.Create);
             var splineData = segments.Select(seg => new SplineSegmentData {
@@ -42,28 +41,28 @@ namespace RosettaUI.Builder
                 EndVel = (seg.Item2.time - seg.Item1.time) * seg.Item2.GetEndVel()
             }).ToArray();
 
-            _numActiveSegments = splineData.Length;
+            var numActiveSegments = splineData.Length;
 
-            if (_curveDataBuffer == null || _curveDataBuffer.count < _numActiveSegments)
+            if (_curveDataBuffer == null || _curveDataBuffer.count < numActiveSegments)
             {
                 _curveDataBuffer?.Dispose();
-                _curveDataBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, Mathf.Max(1, _numActiveSegments), Marshal.SizeOf<SplineSegmentData>());
+                _curveDataBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, Mathf.Max(1, numActiveSegments), Marshal.SizeOf<SplineSegmentData>());
             }
 
             cmdBuf.SetBufferData(_curveDataBuffer, splineData);
+            
+            return numActiveSegments;
         }
-
-        public void DrawCurve(CommandBuffer cmdBuf, RenderTexture outputTexture)
+        
+        public static void Render(AnimationCurve animationCurve, CurvePreviewViewInfo viewInfo)
         {
-            _curveDrawMaterial.SetBuffer("_Spline", _curveDataBuffer);
-            _curveDrawMaterial.SetInt("_SegmentCount", _numActiveSegments);
-            cmdBuf.Blit(null, outputTexture, _curveDrawMaterial);
-        }
-
-        public void Render(AnimationCurve animationCurve, CurvePreviewViewInfo viewInfo)
-        {
-            _commandBuffer.Clear();
-            UpdateData(_commandBuffer, animationCurve);
+            if (_curveDrawMaterial == null)
+            {
+                _curveDrawMaterial = new Material(Resources.Load<Shader>("RosettaUI_AnimationCurve"));
+            }
+            
+            CommandBuffer.Clear();
+            var numActiveSegments = UpdateData(CommandBuffer, animationCurve);
 
             var resolution = new Vector4(
                 viewInfo.resolution.x,
@@ -76,24 +75,12 @@ namespace RosettaUI.Builder
             _curveDrawMaterial.SetVector("_OffsetZoom", viewInfo.offsetZoom);
             _curveDrawMaterial.SetVector("_GridParams", viewInfo.gridParams);
 
-            DrawCurve(_commandBuffer, viewInfo.outputTexture);
-
-            Graphics.ExecuteCommandBuffer(_commandBuffer);
-        }
-
-        public void Dispose()
-        {
-            if (_curveDrawMaterial != null)
-            {
-                UnityEngine.Object.Destroy(_curveDrawMaterial);
-                _curveDrawMaterial = null;
-            }
+            _curveDrawMaterial.SetBuffer("_Spline", _curveDataBuffer);
+            _curveDrawMaterial.SetInt("_SegmentCount", numActiveSegments);
             
-            _commandBuffer?.Dispose();
-            _commandBuffer = null;
-
-            _curveDataBuffer?.Dispose();
-            _curveDataBuffer = null;
+            CommandBuffer.Blit(null, viewInfo.outputTexture, _curveDrawMaterial);
+            
+            Graphics.ExecuteCommandBuffer(CommandBuffer);
         }
     }
 }

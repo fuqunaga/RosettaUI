@@ -1,14 +1,13 @@
-using System.Buffers;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace RosettaUI.Builder
 {
     public static class AnimationCurveHelper 
     {
-        private static AnimationCurvePreviewRenderer _animationCurvePreviewRenderer;
-        
+        private static readonly Dictionary<RenderTexture, int> RenderTextureToHashCode = new();
         
         public static AnimationCurve Clone(AnimationCurve src)
         {
@@ -88,19 +87,47 @@ namespace RosettaUI.Builder
         {
             if (texture != null && (texture.width != width || texture.height != height))
             {
+                RenderTextureToHashCode.Remove(texture);
                 Object.DestroyImmediate(texture);
                 texture = null;
             }
-            
-            texture ??= new RenderTexture(width, height, 0)
+
+            if (texture == null)
             {
-                name = "AnimationCurvePreview",
-                wrapMode = TextureWrapMode.Clamp,
-                filterMode = FilterMode.Bilinear
-            };
+                texture = new RenderTexture(width, height, 0)
+                {
+                    name = "AnimationCurvePreview",
+                    wrapMode = TextureWrapMode.Clamp,
+                    filterMode = FilterMode.Bilinear
+                };
+                texture.Create();
+            }
+
+
+            // No need to re-render if the texture is already up-to-date
+            if (RenderTextureToHashCode.TryGetValue(texture, out var hashCode) && hashCode == curve.GetHashCode())
+            {
+                return texture;
+            }
+
+            var i = 0;
+            while (i < RenderTextureToHashCode.Count)
+            {
+                var key = RenderTextureToHashCode.ElementAt(i).Key;
+                if (key == null )
+                {
+                    RenderTextureToHashCode.Remove(key);
+                }
+                else
+                {
+                    i++;    
+                }
+            }
+            
+            RenderTextureToHashCode[texture] = curve.GetHashCode();
  
-            _animationCurvePreviewRenderer ??= new AnimationCurvePreviewRenderer();
-            _animationCurvePreviewRenderer.Render(curve, new AnimationCurvePreviewRenderer.CurvePreviewViewInfo
+            
+            AnimationCurvePreviewRenderer.Render(curve, new AnimationCurvePreviewRenderer.CurvePreviewViewInfo
             {
                 outputTexture = texture,
                 resolution = new Vector2(width, height),

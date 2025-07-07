@@ -298,6 +298,10 @@
 /********************************************************************************
 * AnimationCurveField
 ********************************************************************************/
+.rosettaui-animation-curve-field__input {
+    background-color: #565656;
+}
+
 .rosettaui-animation-curve-field__input:hover {
     border-color: var(--unity-colors-input_field-border-hover);
 }

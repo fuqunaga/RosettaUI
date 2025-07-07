@@ -9,6 +9,12 @@ namespace RosettaUI.Builder
 {
     public static class AnimationCurvePreviewRenderer
     {
+        private static class ShaderParam
+        {
+            public const string GridOnKeyword = "_GRID_ON";
+        }
+        
+        
         private static readonly CommandBuffer CommandBuffer = new() { name = "AnimationCurvePreview" };
         private static Material _curveDrawMaterial;
         private static GraphicsBuffer _curveDataBuffer;
@@ -17,6 +23,7 @@ namespace RosettaUI.Builder
         {
             public Vector2 resolution;
             public Vector4 offsetZoom;
+            public bool gridEnabled;
             public Vector4 gridParams;
             public RenderTexture outputTexture;
         }
@@ -70,13 +77,21 @@ namespace RosettaUI.Builder
                 1f / viewInfo.resolution.x,
                 1f / viewInfo.resolution.y
             );
-              
+            
             _curveDrawMaterial.SetVector("_Resolution", resolution);
             _curveDrawMaterial.SetVector("_OffsetZoom", viewInfo.offsetZoom);
-            _curveDrawMaterial.SetVector("_GridParams", viewInfo.gridParams);
-
             _curveDrawMaterial.SetBuffer("_Spline", _curveDataBuffer);
             _curveDrawMaterial.SetInt("_SegmentCount", numActiveSegments);
+
+            if (viewInfo.gridEnabled)
+            {
+                _curveDrawMaterial.EnableKeyword(ShaderParam.GridOnKeyword);
+                _curveDrawMaterial.SetVector("_GridParams", viewInfo.gridParams);
+            }
+            else
+            {
+                _curveDrawMaterial.DisableKeyword(ShaderParam.GridOnKeyword);
+            }
             
             CommandBuffer.Blit(null, viewInfo.outputTexture, _curveDrawMaterial);
             

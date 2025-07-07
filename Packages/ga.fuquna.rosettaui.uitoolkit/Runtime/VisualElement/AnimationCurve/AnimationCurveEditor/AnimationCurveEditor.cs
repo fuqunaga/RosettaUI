@@ -260,6 +260,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             AnimationCurvePreviewRenderer.Render(_curvePointContainer.Curve, new AnimationCurvePreviewRenderer.CurvePreviewViewInfo {
                 resolution = new Vector2(width, height),
                 offsetZoom = _previewTransform.OffsetZoom,
+                gridEnabled = true,
                 gridParams = new Vector4(gridViewport.XOrder, gridViewport.YOrder, gridViewport.XTick, gridViewport.YTick),
                 outputTexture = _curveEditorTexture,
             });

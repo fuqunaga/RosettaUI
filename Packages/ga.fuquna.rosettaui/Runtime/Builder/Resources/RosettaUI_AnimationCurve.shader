@@ -1,5 +1,10 @@
 ﻿Shader "Hidden/RosettaUI_AnimationCurve"
 {
+    Properties
+    {
+        [Toggle] _GRID("Grid", Integer) = 1
+    }
+    
     SubShader
     {
         Cull Off ZWrite Off ZTest Always
@@ -7,7 +12,8 @@
         Pass
         {
             HLSLPROGRAM
-            #pragma vertex Vert
+            #pragma multi_compile _ _GRID_ON
+            #pragma vertex vert_img
             #pragma fragment Frag
             //#pragma enable_d3d11_debug_symbols
 
@@ -15,18 +21,7 @@
             #include "SdfBezierSpline.hlsl"
             #define EPSILON 0.00000001
 
-            struct appdata
-            {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-            };
-
-            struct v2f
-            {
-                float2 uv : TEXCOORD0;
-                float4 vertex : SV_POSITION;
-            };
-
+            
             StructuredBuffer<float4> _Keyframes;
             float4 _Resolution;
             float4 _OffsetZoom;
@@ -44,27 +39,24 @@
             int _SegmentCount;
 
             static const float LineWidth = 2.0f;
+            static const float4 LineColor = float4(0, 1, 0, 1);
+
+            #ifdef _GRID_ON
             static const float4 MainGridColor = float4(0.6, 0.6, 0.6, 0.5);
             static const float4 GridColor = float4(0.4, 0.4, 0.4, 0.5);
-            static const float4 LineColor = float4(0, 1, 0, 1);
+
 
             inline bool2 IsGrid(float2 uv, float2 gridUnit, float2 thickness)
             {
                 return abs(frac(uv / gridUnit - 0.5) - 0.5) < _Resolution.zw / (gridUnit * _OffsetZoom.zw) * thickness;
             }
+            #endif
 
-            v2f Vert(appdata v)
-            {
-                v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = v.uv;
-                return o;
-            }
 
-            float4 Frag(v2f i) : SV_Target
+            float4 Frag(v2f_img i) : SV_Target
             {
                 float2 uv = i.uv;
-                uv = uv / _OffsetZoom.zw + _OffsetZoom.xy;
+                
 
                 // Curve
                 float2x3 CurveUvToViewUv = {
@@ -118,8 +110,12 @@
                 }
 
                 float4 col = 0;
+
                 
+                #ifdef _GRID_ON
                 // Grid
+                uv = uv / _OffsetZoom.zw + _OffsetZoom.xy;
+                
                 bool2 isSubGrid = IsGrid(uv, _GridParams.zw * 0.1, 1.0) && frac(_GridParams) > 0.0;
                 bool isGrid = any(IsGrid(uv, _GridParams.zw, 1.0));
                 bool2 isMainGrid = IsGrid(uv, _GridParams.zw, 2.0 * cos(frac(_GridParams - EPSILON) * UNITY_PI * 0.5));
@@ -128,7 +124,8 @@
                 col = isGrid ? GridColor : col;
                 col = isMainGrid.x ? MainGridColor : col;
                 col = isMainGrid.y ? MainGridColor : col;
-                
+                #endif
+
                 // Line
                 dist -= LineWidth * 0.5f;
                 col = lerp(LineColor, col, smoothstep(-.5f, .5f, dist));

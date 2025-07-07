@@ -18,23 +18,6 @@ namespace RosettaUI.UIToolkit.Builder
 
             return true;
         }
-
-        private bool Bind_GradientField(Element element, VisualElement visualElement)
-        {
-            if(element is not FieldBaseElement<Gradient> gradientElement || visualElement is not GradientField gradientField) return false;
-            
-            Bind_Field(gradientElement, gradientField, true);
-            
-            gradientField.showGradientPickerFunc += ShowGradientPicker;
-            element.GetViewBridge().onUnsubscribe += () => gradientField.showGradientPickerFunc -= ShowGradientPicker;
-            
-            return true;
-            
-            void ShowGradientPicker(Vector2 pos, GradientField target)
-            {
-                GradientEditor.Show(pos, target, gradientField.value, gradient => gradientField.value = gradient);
-            }
-        }
         
         private bool Bind_AnimationCurveField(Element element, VisualElement visualElement)
         {

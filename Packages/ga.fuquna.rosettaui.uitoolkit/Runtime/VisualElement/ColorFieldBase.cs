@@ -1,19 +1,18 @@
-using System;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    public class ColorFieldBase : BaseField<Color>
+    public class ColorFieldBase : PreviewBaseField<Color>
     {
+        // ReSharper disable once InconsistentNaming
+        // ReSharper disable once MemberCanBeProtected.Global
+        // ReSharper disable once ConvertToConstant.Global
         public new static readonly string ussClassName = "rosettaui-color-field";
-        public new static readonly string labelUssClassName = ussClassName + "__label";
-        public new static readonly string inputUssClassName = ussClassName + "__input";
 
         protected ColorInput colorInput;
 
-        public event Action<Vector2, ColorFieldBase> showColorPickerFunc;
-        
         public bool EnableAlpha
         {
             get => colorInput.DisplayAlpha;
@@ -28,12 +27,6 @@ namespace RosettaUI.UIToolkit
         public ColorFieldBase(string label) : base(label, new ColorInput())
         {
             colorInput = this.Q<ColorInput>();
-            AddToClassList(ussClassName);
-            labelElement.AddToClassList(labelUssClassName);
-            
-            colorInput.AddToClassList(inputUssClassName);
-            colorInput.RegisterCallback<ClickEvent>(OnClickInput);
-            RegisterCallback<NavigationSubmitEvent>(OnNavigationSubmit);
         }
 
         public override void SetValueWithoutNotify(Color color)
@@ -42,43 +35,20 @@ namespace RosettaUI.UIToolkit
             colorInput.SetColor(color);
         }
 
-        private void OnClickInput(ClickEvent evt)
+        protected override void ShowEditor(Vector3 position)
         {
-            ShowColorPicker(evt.position);
-            
-            evt.StopPropagation();
-        }
-        
-        private void OnNavigationSubmit(NavigationSubmitEvent evt)
-        {
-            var mousePosition = Input.mousePosition;
-            var position = new Vector2(
-                mousePosition.x,
-                Screen.height - mousePosition.y
-            );
-
-            var screenRect = new Rect(0f, 0f, Screen.width, Screen.height);
-            if (!screenRect.Contains(position))
-            {
-                position = worldBound.center;
-            }
-            
-            ShowColorPicker(position);
-            
-            evt.StopPropagation();
+            ColorPicker.Show(position, this, value, color => value = color, EnableAlpha);
         }
 
-        private void ShowColorPicker(Vector2 position)
-        {
-            showColorPickerFunc?.Invoke(position, this);
-        }
-        
 
+        // ReSharper disable once MemberCanBeProtected.Global
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         public class ColorInput : VisualElement
         {
-            static readonly string ussFieldInputRGB = ussClassName + "__input-rgb";
-            static readonly string ussFieldInputAlpha = ussClassName + "__input-alpha";
-            static readonly string ussFieldInputAlphaContainer = ussClassName + "__input-alpha-container";
+            public static readonly string ussFieldInputRGB = ussClassName + "__input-rgb";
+            public static readonly string ussFieldInputAlpha = ussClassName + "__input-alpha";
+            public static readonly string ussFieldInputAlphaContainer = ussClassName + "__input-alpha-container";
 
             public readonly VisualElement rgbField;
             public readonly VisualElement alphaField;

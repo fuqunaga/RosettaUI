@@ -51,7 +51,7 @@ namespace RosettaUI.UIToolkit.Builder
                 [typeof(UIntFieldElement)] = BuildBindFunc<UnsignedIntegerField>.Create(Bind_Field<uint, UnsignedIntegerField>),
                 [typeof(TextFieldElement)] =  BuildBindFunc<TextField>.Create(Bind_TextField),
                 [typeof(ColorFieldElement)] = BuildBindFunc<ColorField>.Create(Bind_Field<Color, ColorField>),
-                [typeof(GradientFieldElement)] = BuildBindFunc<GradientField>.Create(Bind_GradientField),
+                [typeof(GradientFieldElement)] = BuildBindFunc<GradientField>.Create(Bind_Field<Gradient, GradientField>),
                 [typeof(AnimationCurveElement)] = BuildBindFunc<AnimationCurveField>.Create(Bind_AnimationCurveField),
 
                 [typeof(IntSliderElement)] = BuildBindFunc<ClampFreeSliderInteger>.Create(Bind_Slider<int, ClampFreeSliderInteger>),

@@ -221,22 +221,6 @@
 /********************************************************************************
 * ColorField
 ********************************************************************************/
-/*.rosettaui-color-field__input:hover {*/
-/*    border-color: var(--unity-colors-input_field-border-hover);*/
-/*}*/
-
-/*.rosettaui-color-field:focus > .rosettaui-color-field__input {*/
-/*    border-color: var(--unity-colors-input_field-border-focus);*/
-/*}*/
-
-/*.rosettaui-color-field__input,*/
-/*.rosettaui-color-field__input:disabled*/
-/*{*/
-/*    padding: 0;*/
-/*    border-color: var(--unity-colors-input_field-border);*/
-/*    width: 124px;*/
-/*}*/
-
 .rosettaui-color-field__input-rgb {
     flex-grow: 1;
     width: 100%;
@@ -272,6 +256,7 @@
     color: #101010;
 }
 
+
 /********************************************************************************
 * AnimationCurveField
 ********************************************************************************/
@@ -279,21 +264,6 @@
     background-color: #565656;
 }
 
-.rosettaui-animation-curve-field__input:hover {
-    border-color: var(--unity-colors-input_field-border-hover);
-}
-
-.rosettaui-animation-curve-field:focus > .rosettaui-animation-curve-field__input {
-    border-color: var(--unity-colors-input_field-border-focus);
-}
-
-.rosettaui-animation-curve-field__input,
-.rosettaui-animation-curve-field__input:disabled
-{
-    padding: 0;
-    border-color: var(--unity-colors-input_field-border);
-    width: 124px;
-}
 
 /********************************************************************************
 * SliderInField

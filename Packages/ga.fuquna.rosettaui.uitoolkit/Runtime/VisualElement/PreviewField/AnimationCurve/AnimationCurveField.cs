@@ -1,64 +1,47 @@
-using System;
 using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    public class AnimationCurveField : BaseField<AnimationCurve>
+    public class AnimationCurveField : PreviewBaseFieldOfClass<AnimationCurve, AnimationCurveField.AnimationCurveInput>
     {
+        // ReSharper disable once InconsistentNaming
+        // ReSharper disable once MemberCanBeProtected.Global
+        // ReSharper disable once ConvertToConstant.Global
         public new static readonly string ussClassName = "rosettaui-animation-curve-field";
-        public new static readonly string labelUssClassName = ussClassName + "__label";
-        public new static readonly string inputUssClassName = ussClassName + "__input";
-
-        public event Action<Vector2, AnimationCurveField> showAnimationCurveEditorFunc = delegate { };
-
-        private bool _valueNull;
-        private readonly Background _defaultBackground = new();
-        private readonly AnimationCurveInput _curveInput;
-
-        public override AnimationCurve value
-        {
-            get => _valueNull ? null : AnimationCurveHelper.Clone(rawValue);
-            set
-            {
-                if (value != null || !_valueNull)
-                {
-                    using var evt = ChangeEvent<AnimationCurve>.GetPooled(rawValue, value);
-                    evt.target = this;
-                    SetValueWithoutNotify(value);
-                    SendEvent(evt);
-                }
-            }
-        }
-
+        
         public AnimationCurveField() : this(null)
         {
         }
 
+        
         public AnimationCurveField(string label) : base(label, new AnimationCurveInput())
         {
-            _curveInput = this.Q<AnimationCurveInput>();
-            AddToClassList(ussClassName);
-            labelElement.AddToClassList(labelUssClassName);
-
-            _curveInput.AddToClassList(inputUssClassName);
-            _curveInput.RegisterCallback<ClickEvent>(OnClickInput);
-            RegisterCallback<NavigationSubmitEvent>(OnNavigationSubmit);
         }
 
-        private void ShowAnimationCurveEditor(Vector2 position)
+        protected override AnimationCurve Clone(AnimationCurve curve) => AnimationCurveHelper.Clone(curve); 
+        
+
+        protected override void ShowEditor(Vector3 position)
         {
-            showAnimationCurveEditorFunc.Invoke(position, this);
+            AnimationCurveEditor.AnimationCurveEditor.Show(position, this, rawValue, curve => value = curve);
         }
 
+        public override void SetValueWithoutNotify(AnimationCurve newValue)
+        {
+            base.SetValueWithoutNotify(newValue);
+            UpdateAnimationCurveTexture();
+        }
+
+        
         private void UpdateAnimationCurveTexture()
         {
-            var preview = _curveInput.Preview;
-
-            if (_valueNull || showMixedValue)
+            var preview = inputField.preview;
+            
+            if (rawValue == null)
             {
-                preview.style.backgroundImage = _defaultBackground;
+                preview.style.backgroundImage = StyleKeyword.Undefined;
             }
             else
             {
@@ -66,61 +49,19 @@ namespace RosettaUI.UIToolkit
             }
         }
 
-        private void OnClickInput(ClickEvent evt)
-        {
-            ShowAnimationCurveEditor(evt.position);
-
-            evt.StopPropagation();
-        }
-
-        private void OnNavigationSubmit(NavigationSubmitEvent evt)
-        {
-            var mousePosition = Input.mousePosition;
-            var position = new Vector2(
-                mousePosition.x,
-                Screen.height - mousePosition.y
-            );
-
-            var screenRect = new Rect(0f, 0f, Screen.width, Screen.height);
-            if (!screenRect.Contains(position))
-            {
-                position = worldBound.center;
-            }
-
-            ShowAnimationCurveEditor(position);
-
-            evt.StopPropagation();
-        }
-
-        public override void SetValueWithoutNotify(AnimationCurve newValue)
-        {
-            base.SetValueWithoutNotify(newValue);
-
-            _valueNull = newValue == null;
-            UpdateAnimationCurveTexture();
-        }
-
-        protected override void UpdateMixedValueContent()
-        {
-            if (showMixedValue)
-            {
-                _curveInput.Preview.style.backgroundImage = _defaultBackground;
-                _curveInput.Preview.Add(mixedValueLabel);
-            }
-            else
-            {
-                UpdateAnimationCurveTexture();
-                mixedValueLabel.RemoveFromHierarchy();
-            }
-        }
 
         public class AnimationCurveInput : VisualElement
         {
-            public readonly VisualElement Preview;
+            // ReSharper disable once InconsistentNaming
+            public static readonly string ussFieldInput = ussClassName + "__input";
+            
+            public readonly VisualElement preview;
 
             public AnimationCurveInput()
             {
-                Preview = new VisualElement()
+                AddToClassList(ussFieldInput);
+                
+                preview = new VisualElement()
                 {
                     style =
                     {
@@ -129,7 +70,7 @@ namespace RosettaUI.UIToolkit
                     }
                 };
 
-                Add(Preview);
+                Add(preview);
             }
         }
     }

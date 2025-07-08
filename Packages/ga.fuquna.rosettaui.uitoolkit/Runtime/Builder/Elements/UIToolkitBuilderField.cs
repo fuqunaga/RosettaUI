@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using UnityEngine.UIElements;
+﻿using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.Builder
 {
@@ -17,23 +16,6 @@ namespace RosettaUI.UIToolkit.Builder
             }
 
             return true;
-        }
-        
-        private bool Bind_AnimationCurveField(Element element, VisualElement visualElement)
-        {
-            if(element is not FieldBaseElement<AnimationCurve> animationCurveElement || visualElement is not AnimationCurveField animationCurveField) return false;
-            
-            Bind_Field(animationCurveElement, animationCurveField, true);
-            
-            animationCurveField.showAnimationCurveEditorFunc += ShowAnimationCurveEditor;
-            element.GetViewBridge().onUnsubscribe += () => animationCurveField.showAnimationCurveEditorFunc -= ShowAnimationCurveEditor;
-            
-            return true;
-            
-            void ShowAnimationCurveEditor(Vector2 pos, AnimationCurveField target)
-            {
-                AnimationCurveEditor.AnimationCurveEditor.Show(pos, target, animationCurveField.value, gradient => animationCurveField.value = gradient);
-            }
         }
         
         public bool Bind_Field<TValue, TField>(Element element, VisualElement visualElement)

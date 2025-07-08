@@ -20,7 +20,7 @@ namespace RosettaUI.UIToolkit
             OverlapTextElement = new TextElement();
             OverlapTextElement.AddToClassList(OverlapTextUssClassName);
             
-            colorInput.Add(OverlapTextElement);
+            inputField.Add(OverlapTextElement);
 
             UpdateOverlapText();
         }

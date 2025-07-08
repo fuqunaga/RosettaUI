@@ -4,26 +4,23 @@ using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    public class ColorFieldBase : PreviewBaseField<Color>
+    public class ColorFieldBase : PreviewBaseField<Color, ColorFieldBase.ColorInput>
     {
         // ReSharper disable once InconsistentNaming
         // ReSharper disable once MemberCanBeProtected.Global
         // ReSharper disable once ConvertToConstant.Global
         public new static readonly string ussClassName = "rosettaui-color-field";
 
-        protected readonly ColorInput colorInput;
-
         public bool EnableAlpha
         {
-            get => colorInput.DisplayAlpha;
-            set => colorInput.DisplayAlpha = value;
+            get => inputField.DisplayAlpha;
+            set => inputField.DisplayAlpha = value;
         }
         
         public ColorFieldBase() : this(null) { }
 
         public ColorFieldBase(string label) : base(label, new ColorInput())
         {
-            colorInput = this.Q<ColorInput>();
         }
 
         protected override void ShowEditor(Vector3 position)
@@ -34,7 +31,7 @@ namespace RosettaUI.UIToolkit
         public override void SetValueWithoutNotify(Color color)
         {
             base.SetValueWithoutNotify(color);
-            colorInput.SetColor(color);
+            inputField.SetColor(color);
         }
 
 

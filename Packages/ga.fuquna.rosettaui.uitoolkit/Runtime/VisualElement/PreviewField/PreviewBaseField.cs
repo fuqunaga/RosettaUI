@@ -10,14 +10,17 @@ namespace RosettaUI.UIToolkit
     [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public abstract class PreviewBaseField<T> : BaseField<T>
+    public abstract class PreviewBaseField<T, TInput> : BaseField<T>
+        where TInput : VisualElement
     {
         // ReSharper disable once ConvertToConstant.Global
         public new static readonly string ussClassName = "rosettaui-preview-base-field";
         public new static readonly string labelUssClassName = ussClassName + "__label";
         public new static readonly string inputUssClassName = ussClassName + "__input";
 
-        protected PreviewBaseField(string label, VisualElement visualInput) : base(label, visualInput)
+        protected readonly TInput inputField;
+        
+        protected PreviewBaseField(string label, TInput visualInput) : base(label, visualInput)
         {
             AddToClassList(ussClassName);
             labelElement.AddToClassList(labelUssClassName);
@@ -25,6 +28,8 @@ namespace RosettaUI.UIToolkit
             
             visualInput.RegisterCallback<ClickEvent>(OnClickInput);
             RegisterCallback<NavigationSubmitEvent>(OnNavigationSubmit);
+            
+            inputField = visualInput;
         }
 
         private void OnClickInput(ClickEvent evt)

@@ -11,7 +11,7 @@ namespace RosettaUI.UIToolkit
         // ReSharper disable once ConvertToConstant.Global
         public new static readonly string ussClassName = "rosettaui-color-field";
 
-        protected ColorInput colorInput;
+        protected readonly ColorInput colorInput;
 
         public bool EnableAlpha
         {
@@ -19,9 +19,6 @@ namespace RosettaUI.UIToolkit
             set => colorInput.DisplayAlpha = value;
         }
         
-        /// <summary>
-        /// Constructor.
-        /// </summary>
         public ColorFieldBase() : this(null) { }
 
         public ColorFieldBase(string label) : base(label, new ColorInput())
@@ -29,15 +26,15 @@ namespace RosettaUI.UIToolkit
             colorInput = this.Q<ColorInput>();
         }
 
+        protected override void ShowEditor(Vector3 position)
+        {
+            ColorPicker.Show(position, this, value, color => value = color, EnableAlpha);
+        }
+
         public override void SetValueWithoutNotify(Color color)
         {
             base.SetValueWithoutNotify(color);
             colorInput.SetColor(color);
-        }
-
-        protected override void ShowEditor(Vector3 position)
-        {
-            ColorPicker.Show(position, this, value, color => value = color, EnableAlpha);
         }
 
 

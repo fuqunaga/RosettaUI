@@ -1,15 +1,17 @@
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class ColorField : ColorFieldBase
     {
         public static readonly string OverlapTextUssClassName = ussClassName + "__overlap-text";
         public static readonly string OverlapTextLightUssClassName = OverlapTextUssClassName + "--light";
         public static readonly string OverlapTextDarkUssClassName = OverlapTextUssClassName + "--dark";
 
-        public TextElement OverlapTextElement { get; protected set; }
+        public TextElement OverlapTextElement { get; }
         
         public ColorField() : this(null) { }
         
@@ -30,7 +32,7 @@ namespace RosettaUI.UIToolkit
         }
 
 
-        void UpdateOverlapText()
+        private void UpdateOverlapText()
         {
             var color = value;
             

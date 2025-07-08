@@ -26,17 +26,11 @@ namespace RosettaUI.UIToolkit
                 SendEvent(evt);
             }
         }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+        
         public GradientField() : this(null)
         {
         }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+        
         public GradientField(string label) : base(label, new GradientInput())
         {
             _gradientInput = this.Q<GradientInput>();
@@ -45,6 +39,12 @@ namespace RosettaUI.UIToolkit
         protected override void ShowEditor(Vector3 position)
         {
             GradientEditor.Show(position, this, rawValue, gradient => value = gradient);
+        }
+
+        public override void SetValueWithoutNotify(Gradient newValue)
+        {
+            base.SetValueWithoutNotify(newValue);
+            UpdateGradientTexture();
         }
 
         private void UpdateGradientTexture()
@@ -61,11 +61,6 @@ namespace RosettaUI.UIToolkit
             }
         }
 
-        public override void SetValueWithoutNotify(Gradient newValue)
-        {
-            base.SetValueWithoutNotify(newValue);
-            UpdateGradientTexture();
-        }
 
  
         public class GradientInput : VisualElement

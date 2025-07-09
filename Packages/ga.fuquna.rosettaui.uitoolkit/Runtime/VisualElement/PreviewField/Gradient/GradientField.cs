@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    public class GradientField : PreviewBaseFieldOfClass<Gradient, GradientField.GradientInput>
+    public class GradientField : PreviewBaseField<Gradient, GradientField.GradientInput>
     {
         public GradientField() : this(null)
         {
@@ -13,8 +13,6 @@ namespace RosettaUI.UIToolkit
         public GradientField(string label) : base(label, new GradientInput())
         {
         }
-
-        protected override Gradient Clone(Gradient gradient) => GradientHelper.Clone(gradient);
 
         protected override void ShowEditor(Vector3 position)
         {
@@ -30,14 +28,14 @@ namespace RosettaUI.UIToolkit
         private void UpdateGradientTexture()
         {
             var preview = inputField.preview;
-            
-            if (rawValue == null )
+
+            if (value == null)
             {
                 preview.style.backgroundImage = StyleKeyword.Undefined;
             }
             else
             {
-                GradientVisualElementHelper.UpdateGradientPreviewToBackgroundImage(rawValue, preview);
+                GradientVisualElementHelper.UpdateGradientPreviewToBackgroundImage(value, preview);
             }
         }
 

@@ -1,15 +1,13 @@
-using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    public class AnimationCurveField : PreviewBaseFieldOfClass<AnimationCurve, AnimationCurveField.AnimationCurveInput>
+    public class AnimationCurveField : PreviewBaseField<AnimationCurve, AnimationCurveField.AnimationCurveInput>
     {
         // ReSharper disable once InconsistentNaming
-        // ReSharper disable once MemberCanBeProtected.Global
-        // ReSharper disable once ConvertToConstant.Global
-        public new static readonly string ussClassName = "rosettaui-animation-curve-field";
+        // ReSharper disable once MemberCanBePrivate.Global
+        public new const string ussClassName = "rosettaui-animation-curve-field";
         
         public AnimationCurveField() : this(null)
         {
@@ -20,12 +18,9 @@ namespace RosettaUI.UIToolkit
         {
         }
 
-        protected override AnimationCurve Clone(AnimationCurve curve) => AnimationCurveHelper.Clone(curve); 
-        
-
         protected override void ShowEditor(Vector3 position)
         {
-            AnimationCurveEditor.AnimationCurveEditor.Show(position, this, rawValue, curve => value = curve);
+            AnimationCurveEditor.AnimationCurveEditor.Show(position, this, value, curve => value = curve);
         }
 
         public override void SetValueWithoutNotify(AnimationCurve newValue)

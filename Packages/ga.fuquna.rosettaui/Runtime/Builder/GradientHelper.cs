@@ -1,12 +1,20 @@
+using System;
 using System.Buffers;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.Assertions;
 using Object = UnityEngine.Object;
 
 namespace RosettaUI.Builder
 {
-    public static class GradientHelper 
+    public static class GradientHelper
     {
+        private delegate IntPtr GradientBindingsMarshallerConvertToNative(Gradient gradient);
+        private delegate bool GradientInternalEquals(Gradient gradient, IntPtr other);
+
+        private static GradientBindingsMarshallerConvertToNative _convertToNativeFunc;
+        private static GradientInternalEquals _internalEqualsFunc;
+        
+        
         public static Gradient Clone(Gradient src)
         {
             var dst = new Gradient();
@@ -19,6 +27,35 @@ namespace RosettaUI.Builder
             dst.SetKeys(src.colorKeys, src.alphaKeys);
             dst.mode = src.mode;
             dst.colorSpace = src.colorSpace;
+        }
+        
+        /// <summary>
+        /// アロケーション無しで値での比較
+        /// 以下の操作はアロケーションが発生するので、Gradient内部の比較メソッドを利用する
+        /// - Gradient.colorKeys
+        /// - Gradient.Equals()
+        /// </summary>
+        public static bool EqualsByValue(Gradient gradient, Gradient other)
+        {
+            if (ReferenceEquals(gradient, other)) return true;
+            if (gradient is null || other is null) return false;
+
+            if (_convertToNativeFunc == null)
+            {
+                var marshallerType = typeof(Gradient).GetNestedType("BindingsMarshaller", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+                var method = marshallerType.GetMethod("ConvertToNative", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                Assert.IsNotNull(method, "Gradient.BindingsMarshaller.ConvertToNative method not found.");
+                _convertToNativeFunc = (GradientBindingsMarshallerConvertToNative)Delegate.CreateDelegate(typeof(GradientBindingsMarshallerConvertToNative), method);
+            }
+            
+            if (_internalEqualsFunc == null)
+            {
+                var method = typeof(Gradient).GetMethod("Internal_Equals", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                Assert.IsNotNull(method, "Gradient.Internal_Equals method not found.");
+                _internalEqualsFunc = (GradientInternalEquals)Delegate.CreateDelegate(typeof(GradientInternalEquals), method);
+            }
+            
+            return _internalEqualsFunc(gradient, _convertToNativeFunc(other));
         }
         
         public static Texture2D GenerateGradientPreview(Gradient gradient, Texture2D texture)

@@ -6,6 +6,8 @@ namespace RosettaUI.UIToolkit
 {
     public class GradientField : PreviewBaseField<Gradient, GradientField.GradientInput>
     {
+        private Gradient _lastAppliedGradient;
+        
         public GradientField() : this(null)
         {
         }
@@ -21,8 +23,16 @@ namespace RosettaUI.UIToolkit
 
         public override void SetValueWithoutNotify(Gradient newValue)
         {
+            if (GradientHelper.EqualsByValue(_lastAppliedGradient, newValue))
+            {
+                return;
+            }
+            
             base.SetValueWithoutNotify(newValue);
             UpdateGradientTexture();
+
+            _lastAppliedGradient ??= new Gradient();
+            GradientHelper.Copy(newValue, _lastAppliedGradient);
         }
 
         private void UpdateGradientTexture()
@@ -42,8 +52,6 @@ namespace RosettaUI.UIToolkit
         
         public class GradientInput : VisualElement
         {
-            private static Texture2D _checkerBoardTexture;
-
             public readonly VisualElement checkerBoard;
             public readonly VisualElement preview;
             

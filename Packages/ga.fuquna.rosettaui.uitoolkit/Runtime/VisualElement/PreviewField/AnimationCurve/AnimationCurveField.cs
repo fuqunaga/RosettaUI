@@ -8,6 +8,8 @@ namespace RosettaUI.UIToolkit
         // ReSharper disable once InconsistentNaming
         // ReSharper disable once MemberCanBePrivate.Global
         public new const string ussClassName = "rosettaui-animation-curve-field";
+     
+        private int _lastAppliedHashCode = 0;
         
         public AnimationCurveField() : this(null)
         {
@@ -25,8 +27,16 @@ namespace RosettaUI.UIToolkit
 
         public override void SetValueWithoutNotify(AnimationCurve newValue)
         {
+            var newHashCode = newValue?.GetHashCode() ?? 0;
+            if (_lastAppliedHashCode == newHashCode)
+            {
+                return;
+            }
+            
             base.SetValueWithoutNotify(newValue);
             UpdateAnimationCurveTexture();
+            
+            _lastAppliedHashCode = newHashCode;
         }
 
         

@@ -18,6 +18,7 @@ namespace RosettaUI.UIToolkit
         
         public AnimationCurveField(string label) : base(label, new AnimationCurveInput())
         {
+            RegisterCallback<GeometryChangedEvent>(_ => UpdateAnimationCurveTexture());
         }
 
         protected override void ShowEditor(Vector3 position)

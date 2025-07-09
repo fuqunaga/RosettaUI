@@ -7,8 +7,6 @@ namespace RosettaUI.Builder
 {
     public static class AnimationCurveHelper 
     {
-        private static readonly Dictionary<RenderTexture, int> RenderTextureToHashCode = new();
-        
         public static AnimationCurve Clone(AnimationCurve src)
         {
             var dst = new AnimationCurve();
@@ -83,11 +81,11 @@ namespace RosettaUI.Builder
             return rect;
         }
         
-        public static RenderTexture GenerateAnimationCurvePreview(AnimationCurve curve, RenderTexture texture, int width, int height)
+        public static RenderTexture GenerateOrUpdatePreviewTexture(AnimationCurve curve, RenderTexture texture, int width, int height)
         {
-            if (texture != null && (texture.width != width || texture.height != height))
+            if (texture!= null && (texture.width != width || texture.height != height))
             {
-                RenderTextureToHashCode.Remove(texture);
+                texture.Release();
                 Object.DestroyImmediate(texture);
                 texture = null;
             }
@@ -100,32 +98,7 @@ namespace RosettaUI.Builder
                     wrapMode = TextureWrapMode.Clamp,
                     filterMode = FilterMode.Bilinear
                 };
-                texture.Create();
             }
-
-
-            // No need to re-render if the texture is already up-to-date
-            if (RenderTextureToHashCode.TryGetValue(texture, out var hashCode) && hashCode == curve.GetHashCode())
-            {
-                return texture;
-            }
-
-            var i = 0;
-            while (i < RenderTextureToHashCode.Count)
-            {
-                var key = RenderTextureToHashCode.ElementAt(i).Key;
-                if (key == null )
-                {
-                    RenderTextureToHashCode.Remove(key);
-                }
-                else
-                {
-                    i++;    
-                }
-            }
-            
-            RenderTextureToHashCode[texture] = curve.GetHashCode();
- 
             
             AnimationCurvePreviewRenderer.Render(curve, new AnimationCurvePreviewRenderer.CurvePreviewViewInfo
             {

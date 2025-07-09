@@ -44,13 +44,13 @@ namespace RosettaUI.UIToolkit
         {
             var preview = inputField.preview;
             
-            if (rawValue == null)
+            if (value == null)
             {
                 preview.style.backgroundImage = StyleKeyword.Undefined;
             }
             else
             {
-                AnimationCurveVisualElementHelper.UpdateGradientPreviewToBackgroundImage(rawValue, preview);
+                AnimationCurveVisualElementHelper.UpdateGradientPreviewToBackgroundImage(value, preview);
             }
         }
 
@@ -58,8 +58,9 @@ namespace RosettaUI.UIToolkit
         public class AnimationCurveInput : VisualElement
         {
             // ReSharper disable once InconsistentNaming
-            public static readonly string ussFieldInput = ussClassName + "__input";
-            
+            // ReSharper disable once MemberCanBePrivate.Global
+            public const string ussFieldInput = ussClassName + "__input";
+
             public readonly VisualElement preview;
 
             public AnimationCurveInput()

@@ -64,7 +64,7 @@ namespace RosettaUI.Builder
             const int height = 1;
             if (texture != null && (texture.width != width || texture.height != height))
             {
-                Object.Destroy(texture);
+                Object.DestroyImmediate(texture);
             }
             
             var  colorArray = ArrayPool<Color>.Shared.Rent(width);

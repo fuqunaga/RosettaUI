@@ -10,7 +10,7 @@ namespace RosettaUI.UIToolkit
         {
             var style = visualElement.style;
             var texture = style.backgroundImage.value.texture;
-            style.backgroundImage = GradientHelper.GenerateGradientPreview(gradient, texture);
+            style.backgroundImage = GradientHelper.GenerateOrUpdatePreviewTexture(gradient, texture);
         }
     }
 }

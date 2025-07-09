@@ -58,7 +58,7 @@ namespace RosettaUI.Builder
             return _internalEqualsFunc(gradient, _convertToNativeFunc(other));
         }
         
-        public static Texture2D GenerateGradientPreview(Gradient gradient, Texture2D texture)
+        public static Texture2D GenerateOrUpdatePreviewTexture(Gradient gradient, Texture2D texture)
         {
             const int width = 256;
             const int height = 1;

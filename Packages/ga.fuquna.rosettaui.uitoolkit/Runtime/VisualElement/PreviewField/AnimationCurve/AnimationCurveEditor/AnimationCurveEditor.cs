@@ -18,7 +18,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         static AnimationCurveEditor()
         {
             StaticResourceUtility.AddResetStaticResourceCallback(ReleaseStaticResource);
-            
+            return;
+
             void ReleaseStaticResource()
             {
                 _window?.Hide();
@@ -28,8 +29,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
 
-        public static void Show(Vector2 position, VisualElement target, AnimationCurve initialCurve,
-            Action<AnimationCurve> onCurveChanged)
+        public static void Show(Vector2 position, VisualElement target, AnimationCurve initialCurve, Action<AnimationCurve> onCurveChanged)
         {
             if (_window == null)
             {

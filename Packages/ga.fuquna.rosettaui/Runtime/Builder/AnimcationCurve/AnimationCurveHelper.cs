@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -20,47 +18,45 @@ namespace RosettaUI.Builder
             dst.postWrapMode = src.postWrapMode;
             dst.preWrapMode = src.preWrapMode;
         }
-        
-        public static Rect GetCurveRect(this AnimationCurve curve, bool clamp = false, bool adjustForVisibility = false, int stepNum = 64)
+
+        public static Rect GetCurveRect(this AnimationCurve curve, int stepNum = 64)
         {
-            var rect = new Rect();
-            if (curve.keys.Length <= 0) return rect;
-            bool isWithin01 = true;
-            for (var i = 0; i < curve.keys.Length; i++)
+            var keys = curve.keys;
+            if (keys.Length <= 0)
             {
-                var keyframe = curve.keys[i];
-                isWithin01 &= keyframe.time is >= 0f and <= 1f;
-                if (i == 0)
-                {
-                    rect.xMin = keyframe.time;
-                    rect.xMax = keyframe.time;
-                    continue;
-                }
+                return default;
+            }
+
+            var firstKey = keys[0];
+            var rect = new Rect(firstKey.time, firstKey.value, 0f, 0f);
+            
+            for (var i = 1; i < keys.Length; i++)
+            {
+                var keyframe = keys[i];
                 rect.xMin = Mathf.Min(rect.xMin, keyframe.time);
                 rect.xMax = Mathf.Max(rect.xMax, keyframe.time);
+                rect.yMin = Mathf.Min(rect.yMin, keyframe.value);
+                rect.yMax = Mathf.Max(rect.yMax, keyframe.value);
             }
             
-            for (int i = 0; i < stepNum; i++)
+            for (var i = 0; i < stepNum; i++)
             {
-                float y = curve.Evaluate(rect.xMin + i / (stepNum - 1f) * rect.width);
-                if (i == 0)
-                {
-                    rect.yMin = y;
-                    rect.yMax = y;
-                    continue;
-                }
+                var y = curve.Evaluate(rect.xMin + i / (stepNum - 1f) * rect.width);
                 rect.yMin = Mathf.Min(rect.yMin, y);
                 rect.yMax = Mathf.Max(rect.yMax, y);
             }
 
+            return rect;
+        }
+        
+        public static Rect GetCurveRect(this AnimationCurve curve, bool clamp, bool adjustForVisibility, int stepNum = 64)
+        {
+            var rect = curve.GetCurveRect(stepNum);
+
             if (adjustForVisibility)
             {
-                if (isWithin01)
-                {
-                    rect.xMin = 0f;
-                    rect.xMax = 1f;
-                }
-
+                if (rect.xMin is > 0f and <= 1f) { rect.xMin = 0f; }
+                if (rect.xMax is < 1f and >= 0f) { rect.xMax = 1f; }
                 if (rect.yMin is > 0f and <= 1f) { rect.yMin = 0f; }
                 if (rect.yMax is < 1f and >= 0f) { rect.yMax = 1f; }
             }
@@ -79,6 +75,29 @@ namespace RosettaUI.Builder
                 }
             }
             return rect;
+        }
+
+
+        /// <summary>
+        /// インスペクターやUIToolkit標準のCurveFieldのようにカーブを表示する矩形の高さを再計算する
+        /// 1.0未満で徐々にカーブの上下に余白を非線形に追加していく
+        /// 正確な模倣ではない
+        /// </summary>
+        private static Rect AdjustCurveRectHeightLikeInspector(in Rect rect)
+        {
+            var height = rect.height;
+            if (Mathf.Abs(height) >= 1f)
+            {
+                return rect;
+            }
+            
+            const float powFactor = 10f;
+            var padding = (Mathf.Pow(1f - height, powFactor)) * 0.5f;
+
+            var ret = rect;
+            ret.yMin -= padding;
+            ret.yMax += padding;
+            return ret;
         }
         
         public static RenderTexture GenerateOrUpdatePreviewTexture(AnimationCurve curve, RenderTexture texture, int width, int height)
@@ -100,15 +119,20 @@ namespace RosettaUI.Builder
                 };
             }
             
+            var rect = curve.GetCurveRect();
+            rect = AdjustCurveRectHeightLikeInspector(rect); 
+            
+            
             AnimationCurvePreviewRenderer.Render(curve, new AnimationCurvePreviewRenderer.CurvePreviewViewInfo
             {
                 outputTexture = texture,
                 resolution = new Vector2(width, height),
-                offsetZoom = new Vector4(0f, 0f, 1f, 1f),
-                gridParams = new Vector4(0.001f, 0.001f, 0.5f, 0.5f)
+                offsetZoom = new Vector4(rect.min.x, rect.min.y, 1f / rect.width, 1f / rect.height),
             });
             
             return texture;
         }
+
+
     }
 }

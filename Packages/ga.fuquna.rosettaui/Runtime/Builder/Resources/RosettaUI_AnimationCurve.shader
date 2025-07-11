@@ -40,6 +40,7 @@
 
             static const float LineWidth = 2.0f;
             static const float4 LineColor = float4(0, 1, 0, 1);
+            static const float4 YZeroLineColor = float4(0, 0, 0, 1);
 
             #ifdef _GRID_ON
             static const float4 MainGridColor = float4(0.6, 0.6, 0.6, 0.5);
@@ -70,6 +71,8 @@
                 CurveUvToViewUv = mul(scaleMatrix, CurveUvToViewUv);
                 
                 float2 ViewUvToPx = _Resolution.xy;
+                
+                const float2 currentPx = ViewUvToPx * uv;
 
                 float dist = INITIALLY_FAR;
                 for (int idx = 0; idx < _SegmentCount; idx++)
@@ -79,8 +82,7 @@
                      * else draw curve
                      */
                     spline_segment seg = _Spline[idx];
-
-                    const float2 p = ViewUvToPx * i.uv;
+                    
                     const float2 pStart = ViewUvToPx * mul(CurveUvToViewUv, float3(seg.startPos, 1));
                     const float2 vStart = ViewUvToPx * mul(CurveUvToViewUv, float3(seg.startVel, 0));
                     const float2 pEnd = ViewUvToPx * mul(CurveUvToViewUv, float3(seg.endPos, 1));
@@ -96,8 +98,8 @@
                         const float2 mid = isStartPosInf || isEndPosInf
                                                ? float2(pEnd.x, pStart.y)
                                                : float2(pStart.x, pEnd.y);
-                        dist = min(dist, SdSegment(p, pStart, mid));
-                        dist = min(dist, SdSegment(p, mid, pEnd));
+                        dist = min(dist, SdSegment(currentPx, pStart, mid));
+                        dist = min(dist, SdSegment(currentPx, mid, pEnd));
                     }
                     else
                     {
@@ -105,12 +107,16 @@
                         const float2 p1 = pStart + vStart; // Hermite curve 1/3 factor rolled into tangent value
                         const float2 p2 = pEnd - vEnd;
                         const float2 p3 = pEnd;
-                        dist = min(dist, CubicBezierSegmentSdfL2(p, p0, p1, p2, p3));
+                        dist = min(dist, CubicBezierSegmentSdfL2(currentPx, p0, p1, p2, p3));
                     }
                 }
 
                 float4 col = 0;
 
+                // Y=0 black line
+                float yZeroPx = ViewUvToPx.y * mul(CurveUvToViewUv, float3(0, 0, 1)).y;
+                float distFromYZero = abs(currentPx.y - yZeroPx);
+                col = lerp(YZeroLineColor, col, smoothstep(0.0, LineWidth * 0.5, distFromYZero));
                 
                 #ifdef _GRID_ON
                 // Grid

@@ -7,7 +7,7 @@ using UnityEditor;
 namespace RosettaUI
 {
     /// <summary>
-    /// static なリソースのリセットが必要なタイミングでコールバックを呼び足すサービス
+    /// static なリソースのリセットが必要なタイミングでコールバックを呼び出すサービス
     /// 現状、PlayModeを抜けた際にDomainReloadがなくてもテクスチャなどは解放されるっぽい
     /// </summary>
     public static class StaticResourceUtility

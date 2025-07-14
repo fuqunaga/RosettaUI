@@ -73,6 +73,32 @@ namespace RosettaUI.UIToolkit
 
             return isChanged;
         }
+
+        
+#if UNITY_6000_0_OR_NEWER
+        
+        private static float GetScaledPixelsPerPoint(this VisualElement ve) => ve.scaledPixelsPerPoint;
+        
+#else
+
+        private delegate float ScaledPixelsPerPointPropertyGetFunc(VisualElement ve);
+        private static ScaledPixelsPerPointPropertyGetFunc _getScaledPixelsPerPointPropertyGetFunc;
+        private static float GetScaledPixelsPerPoint(this VisualElement ve)
+        {
+            if (_getScaledPixelsPerPointPropertyGetFunc == null)
+            {
+                var type = typeof(VisualElement);
+                var property = type.GetProperty("scaledPixelsPerPoint", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                if (property != null)
+                {
+                    _getScaledPixelsPerPointPropertyGetFunc = (ScaledPixelsPerPointPropertyGetFunc)Delegate.CreateDelegate(typeof(ScaledPixelsPerPointPropertyGetFunc), property.GetGetMethod(true));
+                }
+            }
+
+            return _getScaledPixelsPerPointPropertyGetFunc?.Invoke(ve) ?? 1f;
+        }
+        
+#endif
         
         /// <summary>
         /// UIToolkitのWidthはPanelのスケールなどがかかっているのでスクリーン上のピクセル数は計算で求める
@@ -84,7 +110,7 @@ namespace RosettaUI.UIToolkit
                 return 0f;
             }
             
-            return ve.resolvedStyle.width * ve.panel.scaledPixelsPerPoint;
+            return ve.resolvedStyle.width * ve.GetScaledPixelsPerPoint();
         }
         /// <summary>
         /// UIToolkitのHeightはPanelのスケールなどがかかっているのでスクリーン上のピクセル数は計算で求める
@@ -96,7 +122,7 @@ namespace RosettaUI.UIToolkit
                 return 0f;
             }
             
-            return ve.resolvedStyle.height * ve.panel.scaledPixelsPerPoint;
+            return ve.resolvedStyle.height * ve.GetScaledPixelsPerPoint();
         }
     }
 }

@@ -1,18 +1,17 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using RosettaUI.Builder;
+using RosettaUI.UIToolkit.EditorModalWindow;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    public partial class ColorPicker : VisualElement
+    public partial class ColorPicker : ModalEditor<Color>
     {
         #region static
 
-        private static ModalWindow _window;
-        private static ColorPicker _colorPickerInstance;
-        
+        private static ColorPicker _instance;
         private static VisualTreeAsset _visualTreeAsset;
         private static RenderTexture _svTexture;
 
@@ -23,9 +22,7 @@ namespace RosettaUI.UIToolkit
         {
             StaticResourceUtility.AddResetStaticResourceCallback(() =>
             {
-                _window?.Hide();
-                _window = null;
-                _colorPickerInstance = null;
+                _instance = null;
                 _visualTreeAsset = null;
                 _svTexture = null;
             });
@@ -34,47 +31,18 @@ namespace RosettaUI.UIToolkit
         public static void Show(Vector2 position, VisualElement target, Color initialColor,
             Action<Color> onColorChanged, bool enableAlpha = true)
         {
-            if (_window == null)
-            {
-                _window = new ModalWindow();
-                _colorPickerInstance = new ColorPicker();
-                _window.Add(_colorPickerInstance);
+            _instance ??= new ColorPicker();
+  
+            _instance.PrevColor = initialColor;
+            _instance.EnableAlpha = enableAlpha;
 
-                _window.RegisterCallback<NavigationSubmitEvent>(_ => _window.Hide());
-                _window.RegisterCallback<NavigationCancelEvent>(_ =>
-                {
-                    onColorChanged?.Invoke(initialColor);
-                    _window.Hide();
-                });
-            }
-
-            _window.Show(position, target);
-
-            // はみ出し抑制
-            VisualElementExtension.CheckOutOfScreen(position, _window);
-            
-            // Show()前はPanelが設定されていないのでコールバック系はShow()後
-            _colorPickerInstance.PrevColor = initialColor;
-            _colorPickerInstance.EnableAlpha = enableAlpha;
-            _colorPickerInstance.onColorChanged += onColorChanged;
-            _colorPickerInstance.RegisterCallback<DetachFromPanelEvent>(OnDetach);
-            
-            return;
-
-            void OnDetach(DetachFromPanelEvent _)
-            {
-                _colorPickerInstance.onColorChanged -= onColorChanged;
-                _colorPickerInstance.UnregisterCallback<DetachFromPanelEvent>(OnDetach);
-                
-                target?.Focus();
-            }
+            _instance.Show(position, target, onColorChanged, () => onColorChanged?.Invoke(initialColor));
         }
-
-        
         
         #endregion
+        
 
-        public event Action<Color> onColorChanged;
+        // public event Action<Color> onValueChanged;
 
         private VisualElement _previewPrev;
         private VisualElement _previewCurr;
@@ -161,7 +129,7 @@ namespace RosettaUI.UIToolkit
             }
         }
 
-        private ColorPicker()
+        public ColorPicker()
         {
             _visualTreeAsset ??= Resources.Load<VisualTreeAsset>("RosettaUI_ColorPicker");
             _visualTreeAsset.CloneTree(this);
@@ -199,7 +167,6 @@ namespace RosettaUI.UIToolkit
             
             this.ScheduleToUseResolvedLayoutBeforeRendering(() =>
             {
-                
                 // Hue Circle
                 var hueCircleSize = _hueHandler.resolvedStyle.width;
                 (_hueHandler.style.backgroundImage, _hueCircleThickness) = ColorPickerHelper.GetHueCircleTextureAndThickness(hueCircleSize);
@@ -221,9 +188,6 @@ namespace RosettaUI.UIToolkit
                 UpdateSvDisk();
                 UpdateHueCursor(Hsv.x);
                 UpdateSvCursor(Hsv.y, Hsv.z);
-                    
-                // はみ出し抑制
-                VisualElementExtension.CheckOutOfScreen(_window.Position, _window);
             });
         }
 
@@ -338,7 +302,7 @@ namespace RosettaUI.UIToolkit
             _previewCurr.style.backgroundColor = Color;
             UpdateHex();
             _swatchSet.SetValue(Color);
-            onColorChanged?.Invoke(Color);
+            NotifyEditorValueChanged(Color);
         }
 
 

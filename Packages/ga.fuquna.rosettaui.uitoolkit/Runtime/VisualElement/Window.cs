@@ -34,16 +34,16 @@ namespace RosettaUI.UIToolkit
         private const string UssClassNameTitleBarContainerLeft = UssClassNameTitleBarContainer + "__left";
         private const string UssClassNameTitleBarContainerRight = UssClassNameTitleBarContainer + "__right";
         private const string UssClassNameContentContainer = UssClassName + "__content-container";
-
-        public static KeyCode closeKey = KeyCode.Escape;
-        public static EventModifiers closeKeyModifiers = EventModifiers.None;
-
+        
+        
         public static Vector2 minSize = Vector2.one * 30f;
 
+        
         public readonly bool resizable;
 
         public event Action onShow;
         public event Action onHide;
+        public event Action onCancel;
 
         protected VisualElement dragRoot;
 
@@ -129,7 +129,7 @@ namespace RosettaUI.UIToolkit
 
                 if (_closable)
                 {
-                    RegisterCallback<KeyDownEvent>(OnKeyDown);
+                    RegisterCallback<NavigationCancelEvent>(OnNavigationCancel);
 
                     if (CloseButton == null)
                     {
@@ -140,11 +140,11 @@ namespace RosettaUI.UIToolkit
                         CloseButton.clicked += Hide;
                     }
 
-                    CloseButton.style.display = DisplayStyle.Flex;;
+                    CloseButton.style.display = DisplayStyle.Flex;
                 }
                 else
                 {
-                    UnregisterCallback<KeyDownEvent>(OnKeyDown);
+                    UnregisterCallback<NavigationCancelEvent>(OnNavigationCancel);
 
                     if (CloseButton != null)
                     {
@@ -158,10 +158,12 @@ namespace RosettaUI.UIToolkit
         {
         }
 
+        // ReSharper disable once MemberCanBeProtected.Global
         public Window(bool resizable, bool closable)
         {
             this.resizable = resizable;
 
+            // ReSharper disable once VirtualMemberCallInConstructor
             focusable = true;
             pickingMode = PickingMode.Position;
             tabIndex = -1;
@@ -256,12 +258,12 @@ namespace RosettaUI.UIToolkit
 
         #region Event
 
-        private void OnPointerDownTrickleDown(PointerDownEvent evt)
+        protected virtual void OnPointerDownTrickleDown(PointerDownEvent evt)
         {
             BringToFront();
         }
 
-        private void OnPointerDown(PointerDownEvent evt)
+        protected virtual void OnPointerDown(PointerDownEvent evt)
         {
             if (evt.button != 0) return;
 
@@ -277,33 +279,29 @@ namespace RosettaUI.UIToolkit
             }
         }
 
-        private void OnPointerMove(PointerMoveEvent evt)
+        protected virtual void OnPointerMove(PointerMoveEvent evt)
         {
             if (_dragMode != DragMode.None) return;
 
             UpdateResizeEdgeAndCursor(evt.localPosition);
         }
 
-        private void OnKeyDown(KeyDownEvent evt)
+        protected virtual void OnNavigationCancel(NavigationCancelEvent evt)
         {
-            if (!IsFocused || closeKey == KeyCode.None) return;
-
-            if (evt.keyCode == closeKey && evt.modifiers == closeKeyModifiers)
-            {
-                Hide();
-            }
+            onCancel?.Invoke();
+            Hide();
         }
 
         // Focusは短時間で複数回変わるケースがあるので様子を見る
         // ・Window内の要素同士でのフォーカスの移動
         // ・PopupFieldをクリックすると一度WindowがFocusになったあとDropdownMenuにフォーカスが移る
-        private void OnFocus(FocusEvent evt)
+        protected virtual void OnFocus(FocusEvent evt)
         {
             _focusTask?.Pause();
             _focusTask = schedule.Execute(() => IsFocused = true);
         }
 
-        private void OnBlur(BlurEvent evt)
+        protected virtual void OnBlur(BlurEvent evt)
         {
             var relatedTarget = evt.relatedTarget;
             
@@ -323,6 +321,8 @@ namespace RosettaUI.UIToolkit
                     IsFocused = false;
                 }
             });
+            
+            return;
 
             static bool IsInWindow(VisualElement visualElement)
             {
@@ -621,35 +621,5 @@ namespace RosettaUI.UIToolkit
 
             dragRoot.Add(SelfRoot);
         }
-
-
-#if false
-        public void EnsureVisibilityInParent()
-        {
-            var root = panel?.visualTree;
-            if (root != null && !float.IsNaN(layout.width) && !float.IsNaN(layout.height))
-            {
-                //if (m_DesiredRect == Rect.zero)
-                {
-                    var posX = Mathf.Min(layout.x, root.layout.width - layout.width);
-                    var posY = Mathf.Min(layout.y, Mathf.Max(0, root.layout.height - layout.height));
-
-                    style.left = posX;
-                    style.top = posY;
-                }
-
-                style.height = Mathf.Min(
-                    root.layout.height - root.layout.y - layout.y,
-                    layout.height + resolvedStyle.borderBottomWidth + resolvedStyle.borderTopWidth);
-
-                /*
-                if (m_DesiredRect != Rect.zero)
-                {
-                    m_OuterContainer.style.width = m_DesiredRect.width;
-                }
-                */
-            }
-        }
-#endif
     }
 }

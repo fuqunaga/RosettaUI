@@ -6,24 +6,20 @@ using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    public class GradientEditor : VisualElement
+    public class GradientEditor : ModalEditor<Gradient>
     {
-        public static readonly string USSClassName = "rosettaui-gradient-editor";
-        
+        public const string USSClassName = "rosettaui-gradient-editor";
+
         #region static 
-
-        private static ModalWindow _window;
-        private static GradientEditor _gradientEditorInstance;
-
+        
+        private static GradientEditor _instance;
         private static VisualTreeAsset _visualTreeAsset;
         
         static GradientEditor()
         {
             StaticResourceUtility.AddResetStaticResourceCallback(() =>
             {
-                _window?.Hide();
-                _window = null;
-                _gradientEditorInstance = null;
+                _instance = null;
                 _visualTreeAsset = null;
             });
         }
@@ -31,49 +27,16 @@ namespace RosettaUI.UIToolkit
         public static void Show(Vector2 position, VisualElement target, Gradient initialGradient,
             Action<Gradient> onGradientChanged)
         {
-            if (_window == null)
-            {
-                _window = new ModalWindow(true);
-                _gradientEditorInstance = new GradientEditor();
-                _window.Add(_gradientEditorInstance);
-
-                _window.RegisterCallback<NavigationSubmitEvent>(_ => _window.Hide());
-                _window.RegisterCallback<NavigationCancelEvent>(_ =>
-                {
-                    onGradientChanged?.Invoke(initialGradient);
-                    _window.Hide();
-                });
-            }
-
-            _window.Show(position, target);
-
-
-            // はみ出し抑制
-            if(!float.IsNaN(_window.resolvedStyle.width) && !float.IsNaN(_window.resolvedStyle.height))
-            {
-                VisualElementExtension.CheckOutOfScreen(position, _window);
-            }
+            _instance ??= new GradientEditor();
+            _instance.Show(position, target, onGradientChanged);
             
-            // Show()前はPanelが設定されていないのでコールバック系はShow()後
-            _gradientEditorInstance.SetGradient(initialGradient);
-            _gradientEditorInstance.onGradientChanged += onGradientChanged;
-            _gradientEditorInstance.RegisterCallback<DetachFromPanelEvent>(OnDetach);
-            return;
-
-            void OnDetach(DetachFromPanelEvent _)
-            {
-                _gradientEditorInstance.onGradientChanged -= onGradientChanged;
-                _gradientEditorInstance.UnregisterCallback<DetachFromPanelEvent>(OnDetach);
-
-                target?.Focus();
-            }
+            
+            _instance.SetGradient(initialGradient);
         }
         
         #endregion
 
         
-        public event Action<Gradient> onGradientChanged;
-
         private Gradient _gradient;
         private GradientKeysEditor _alphaKeysEditor;
         private GradientKeysEditor _colorKeysEditor;
@@ -160,15 +123,9 @@ namespace RosettaUI.UIToolkit
             _presetSet = new GradientEditorPresetSet(gradient =>
             {
                 SetGradient(gradient);
-                onGradientChanged?.Invoke(_gradient);
+                NotifyEditorValueChanged(_gradient);
             });
             Add(_presetSet);
-            
-            this.ScheduleToUseResolvedLayoutBeforeRendering(() =>
-            {
-                // はみ出し抑制
-                VisualElementExtension.CheckOutOfScreen(_window.Position, _window);
-            });
         }
 
         // GradientEditor外部から値をセットする
@@ -231,7 +188,7 @@ namespace RosettaUI.UIToolkit
         {
             UpdateGradientPreview();
             _presetSet.SetValue(_gradient);
-            onGradientChanged?.Invoke(_gradient);
+            NotifyEditorValueChanged(_gradient);
         }
         
         private void UpdateGradient()

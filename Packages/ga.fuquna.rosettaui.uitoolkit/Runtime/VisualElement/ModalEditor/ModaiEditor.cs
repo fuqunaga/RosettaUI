@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace RosettaUI.UIToolkit.EditorModalWindow
+namespace RosettaUI.UIToolkit
 {
     /// <summary>
     /// ColorPicker,GradientEditor, AnimationCurveEditorなど他の操作をさせないパラメータエディター

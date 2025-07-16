@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using RosettaUI.Builder;
-using RosettaUI.UIToolkit.EditorModalWindow;
 using UnityEngine;
 using UnityEngine.UIElements;
 

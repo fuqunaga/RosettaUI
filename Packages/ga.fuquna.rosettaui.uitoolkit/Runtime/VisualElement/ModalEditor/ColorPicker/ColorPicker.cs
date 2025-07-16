@@ -8,7 +8,12 @@ namespace RosettaUI.UIToolkit
 {
     public partial class ColorPicker : ModalEditor<Color>
     {
-        #region static
+        // ReSharper disable once MemberCanBePrivate.Global
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
+        // ReSharper disable once ConvertToConstant.Global
+        public static string visualTreeAssetName = "RosettaUI_ColorPicker";
+        
+        #region Static Window Management
 
         private static ColorPicker _instance;
         private static VisualTreeAsset _visualTreeAsset;
@@ -128,9 +133,10 @@ namespace RosettaUI.UIToolkit
             }
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public ColorPicker()
         {
-            _visualTreeAsset ??= Resources.Load<VisualTreeAsset>("RosettaUI_ColorPicker");
+            _visualTreeAsset ??= Resources.Load<VisualTreeAsset>(visualTreeAssetName);
             _visualTreeAsset.CloneTree(this);
 
             InitPreview();

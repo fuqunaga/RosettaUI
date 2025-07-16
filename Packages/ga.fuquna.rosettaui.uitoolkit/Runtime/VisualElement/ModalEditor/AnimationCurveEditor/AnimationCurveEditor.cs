@@ -9,11 +9,16 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// <summary>
     /// A visual element that allows you to edit an <see cref="AnimationCurve"/>.
     /// </summary>
-    public class AnimationCurveEditor : VisualElement, IDisposable
+    public class AnimationCurveEditor : ModalEditor<AnimationCurve>, IDisposable
     {
+        private const string USSClassName = "rosettaui-animation-curve-editor";
+        private static readonly Vector2 ZoomRange = new(0.0001f, 10000f);
+        private static readonly float FitViewPadding = 0.05f;
+        
         #region Static Window Management
-        private static ModalWindow _window;
-        private static AnimationCurveEditor _animationCurveEditorInstance;
+        
+        private static AnimationCurveEditor _instance;
+        private static VisualTreeAsset _visualTreeAsset;
         
         static AnimationCurveEditor()
         {
@@ -22,55 +27,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
             void ReleaseStaticResource()
             {
-                _window?.Hide();
-                _window = null;
-                _animationCurveEditorInstance?.Dispose();
-                _animationCurveEditorInstance = null;
+                _instance?.Dispose();
+                _instance = null;
+                _visualTreeAsset = null;
             }
         }
 
         public static void Show(Vector2 position, VisualElement target, AnimationCurve initialCurve, Action<AnimationCurve> onCurveChanged)
         {
-            if (_window == null)
-            {
-                _window = new ModalWindow(true) { style = { width = 800, height = 500, minWidth = 500 } };
-                _animationCurveEditorInstance = new AnimationCurveEditor();
-                _window.Add(_animationCurveEditorInstance);
-
-                _window.RegisterCallback<NavigationSubmitEvent>(_ => _window.Hide());
-                _window.RegisterCallback<NavigationCancelEvent>(_ =>
-                {
-                    onCurveChanged?.Invoke(initialCurve);
-                    _window.Hide();
-                });
-            }
-
-            _window.Show(position, target);
-
-            // Preventing Overflow
-            if (!float.IsNaN(_window.resolvedStyle.width) && !float.IsNaN(_window.resolvedStyle.height))
-            {
-                VisualElementExtension.CheckOutOfScreen(position, _window);
-            }
-
-            // Panel is not set before Show(), so callback registration and other operations are performed after Show().
-            _animationCurveEditorInstance.SetCurve(initialCurve);
-            _animationCurveEditorInstance.OnCurveChanged += onCurveChanged;
-            _animationCurveEditorInstance.RegisterCallback<DetachFromPanelEvent>(OnDetach);
-            return;
-
-            void OnDetach(DetachFromPanelEvent _)
-            {
-                _animationCurveEditorInstance.OnCurveChanged -= onCurveChanged;
-                _animationCurveEditorInstance.UnregisterCallback<DetachFromPanelEvent>(OnDetach);
-
-                target?.Focus();
-            }
+            _instance ??= new AnimationCurveEditor();
+            _instance.Show(position, target, onCurveChanged);
+            
+            _instance.SetCurve(initialCurve);
         }
 
         #endregion
-        
-        public event Action<AnimationCurve> OnCurveChanged;
         
         private CurvePointContainer _curvePointContainer;
         
@@ -93,14 +64,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private bool _prevSnapX = false;
         private bool _prevSnapY = false;
         
-        private static readonly string USSClassName = "rosettaui-animation-curve-editor";
-        private static readonly Vector2 ZoomRange = new(0.0001f, 10000f);
-        private static readonly float FitViewPadding = 0.05f;
+ 
 
         public AnimationCurveEditor()
         {
-            var visualTreeAsset = Resources.Load<VisualTreeAsset>("RosettaUI_AnimationCurveEditor");
-            visualTreeAsset.CloneTree(this);
+            _visualTreeAsset ??= Resources.Load<VisualTreeAsset>("RosettaUI_AnimationCurveEditor");
+            _visualTreeAsset.CloneTree(this);
+            
             AddToClassList(USSClassName);
             
             InitUI();
@@ -138,6 +108,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         }
         
         #region Initialization
+        
         private void InitUI()
         {
             // Key Bind
@@ -186,35 +157,35 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             // Curve Preview Transform
             _previewTransform = new PreviewTransform(() => _curvePreviewElement.resolvedStyle.width, () => _curvePreviewElement.resolvedStyle.height);
             
-            // Axis Labels & Scrollers
+            // Axis Labels & Scroller
             _axisLabelController = new AxisLabelController(this);
-            _scrollerController = new ScrollerController(this, yCenter =>
-            {
-                _previewTransform.SetYCenter(yCenter);
-                _curvePointContainer.UpdateControlPoints();
-                UpdateCurvePreview();
-                _axisLabelController.UpdateAxisLabel(_previewTransform.GetPreviewRect());
-            },
-            xCenter =>
-            {
-                _previewTransform.SetXCenter(xCenter);
-                _curvePointContainer.UpdateControlPoints();
-                UpdateCurvePreview();
-                _axisLabelController.UpdateAxisLabel(_previewTransform.GetPreviewRect());
-            });
-            
+            _scrollerController = new ScrollerController(this,
+                yCenter =>
+                {
+                    _previewTransform.SetYCenter(yCenter);
+                    _curvePointContainer.UpdateControlPoints();
+                    UpdateCurvePreview();
+                    _axisLabelController.UpdateAxisLabel(_previewTransform.GetPreviewRect());
+                },
+                xCenter =>
+                {
+                    _previewTransform.SetXCenter(xCenter);
+                    _curvePointContainer.UpdateControlPoints();
+                    UpdateCurvePreview();
+                    _axisLabelController.UpdateAxisLabel(_previewTransform.GetPreviewRect());
+                }
+            );
+
             // Property Field
-            _propertyFieldController = new PropertyFieldController(this, () =>
-            {
-                if (_selectedControlPointIndex < 0) return default;
-                return _curvePointContainer[_selectedControlPointIndex];
-            }, 
-            key =>
-            {
-                MoveKey(key);
-                UpdateView();
-                OnCurveChanged?.Invoke(_curvePointContainer.Curve);
-            });
+            _propertyFieldController = new PropertyFieldController(this,
+                () => _selectedControlPointIndex < 0 ? default : _curvePointContainer[_selectedControlPointIndex],
+                key =>
+                {
+                    MoveKey(key);
+                    UpdateView();
+                    NotifyEditorValueChanged(_curvePointContainer.Curve);
+                }
+            );
         }
         
         #endregion
@@ -282,20 +253,20 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             MoveKey(keyframe);
             UpdateView();
             _propertyFieldController.UpdatePropertyFields();
-            OnCurveChanged?.Invoke(_curvePointContainer.Curve);
+            NotifyEditorValueChanged(_curvePointContainer.Curve);
             return _selectedControlPointIndex;
         }
         
         private void RemoveControlPoint(ControlPoint cp)
         {
             if (cp == null) return;
-            int targetIndex = _curvePointContainer.ControlPoints.IndexOf(cp);
+            var targetIndex = _curvePointContainer.ControlPoints.IndexOf(cp);
             if (targetIndex < 0 || _curvePointContainer.Count <= 1) return;
             _curvePointContainer.RemoveKey(targetIndex);
             _selectedControlPointIndex = -1;
             UpdateView();
             _propertyFieldController.UpdatePropertyFields();
-            OnCurveChanged?.Invoke(_curvePointContainer.Curve);
+            NotifyEditorValueChanged(_curvePointContainer.Curve);
         }
         
         private void AddControlPoint(Vector2 positionInCurve)
@@ -304,7 +275,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             // Add key
             var key = new Keyframe(positionInCurve.x, positionInCurve.y);
-            int idx = _curvePointContainer.AddKey(key);
+            var idx = _curvePointContainer.AddKey(key);
             if (idx < 0) return;
             _selectedControlPointIndex = idx;
             
@@ -321,7 +292,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             UpdateView();
             _propertyFieldController.UpdatePropertyFields();
-            OnCurveChanged?.Invoke(_curvePointContainer.Curve);
+            NotifyEditorValueChanged(_curvePointContainer.Curve);
         }
         
         private void UnselectAllControlPoint()

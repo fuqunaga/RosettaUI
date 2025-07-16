@@ -23,7 +23,7 @@ namespace RosettaUI.UIToolkit
 
         public override void SetValueWithoutNotify(Gradient newValue)
         {
-            if (GradientHelper.EqualsByValue(_lastAppliedGradient, newValue))
+            if (GradientHelper.EqualsWithoutAlloc(_lastAppliedGradient, newValue))
             {
                 return;
             }

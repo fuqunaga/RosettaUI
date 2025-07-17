@@ -19,9 +19,20 @@ namespace RosettaUI
         {
             EditorApplication.playModeStateChanged += state =>
             {
-                if (state != PlayModeStateChange.ExitingPlayMode) return;
+                switch (state)
+                {
+                    case PlayModeStateChange.ExitingEditMode:
+                    case PlayModeStateChange.ExitingPlayMode:
+                        onResetStaticResource?.Invoke();
+                        break;
+                    
+                    case PlayModeStateChange.EnteredEditMode:
+                    case PlayModeStateChange.EnteredPlayMode:
+                        break;
 
-                onResetStaticResource?.Invoke();
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(state), state, null);
+                }
             };
         }
 #endif

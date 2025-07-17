@@ -105,7 +105,7 @@ namespace RosettaUI.Builder
             return segmentCount;
         }
         
-        public static void Render(AnimationCurve animationCurve, RenderTexture targetTexture, CurvePreviewViewInfo viewInfo)
+        public static void Render(AnimationCurve animationCurve, RenderTexture targetTexture, in CurvePreviewViewInfo viewInfo)
         {
             _commandBuffer ??= new CommandBuffer { name = CommandBufferName };
             _commandBuffer.Clear();

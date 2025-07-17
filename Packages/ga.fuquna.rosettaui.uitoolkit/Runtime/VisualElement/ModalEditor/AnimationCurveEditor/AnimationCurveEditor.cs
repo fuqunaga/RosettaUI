@@ -215,24 +215,16 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void UpdateCurvePreview()
         {
-            int width = (int)_curvePreviewElement.resolvedStyle.width;
-            int height = (int)_curvePreviewElement.resolvedStyle.height;
-            if (width <= 0 || height <= 0) return;
-            
-            if (_curveEditorTexture == null || _curveEditorTexture.width != width || _curveEditorTexture.height != height)
-            {
-                _curveEditorTexture?.Release();
-                _curveEditorTexture = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32);
-                _curvePreviewElement.style.backgroundImage = new StyleBackground(Background.FromRenderTexture(_curveEditorTexture));
-            }
-            
             var rect = _previewTransform.GetPreviewRect();
             var gridViewport = new GridViewport(rect.width, rect.height);
-            AnimationCurvePreviewRenderer.Render(_curvePointContainer.Curve, _curveEditorTexture, new AnimationCurvePreviewRenderer.CurvePreviewViewInfo {
+            var viewInfo = new AnimationCurvePreviewRenderer.CurvePreviewViewInfo()
+            {
                 offsetZoom = _previewTransform.OffsetZoom,
                 gridEnabled = true,
                 gridParams = new Vector4(gridViewport.XOrder, gridViewport.YOrder, gridViewport.XTick, gridViewport.YTick),
-            });
+            };
+            
+            AnimationCurveVisualElementHelper.UpdatePreviewToBackgroundImage(_curvePointContainer.Curve, _curvePreviewElement, viewInfo);
         }
         
         #endregion

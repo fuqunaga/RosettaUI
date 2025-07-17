@@ -83,7 +83,7 @@ namespace RosettaUI.Builder
         /// 1.0未満で徐々にカーブの上下に余白を非線形に追加していく
         /// 正確な模倣ではない
         /// </summary>
-        private static Rect AdjustCurveRectHeightLikeInspector(in Rect rect)
+        public static Rect AdjustCurveRectHeightLikeInspector(in Rect rect)
         {
             var height = rect.height;
             if (Mathf.Abs(height) >= 1f)
@@ -100,25 +100,36 @@ namespace RosettaUI.Builder
             return ret;
         }
         
-        public static RenderTexture GenerateOrUpdatePreviewTexture(AnimationCurve curve, RenderTexture texture, int width, int height)
+        /// <summary>
+        /// カーブのプレビュー用のテクスチャを生成または更新する
+        /// </summary>
+        /// <returns>生成された場合はtrue、更新された場合はfalse</returns>
+        public static bool GenerateOrUpdatePreviewTexture(
+            AnimationCurve curve, 
+            ref RenderTexture texture,
+            int width, int height, 
+            in AnimationCurvePreviewRenderer.CurvePreviewViewInfo viewInfo)
         {
-            if (TextureUtility.EnsureTextureSize(ref texture, width, height))
+            var textureGenerated = TextureUtility.EnsureTextureSize(ref texture, width, height);
+            if (textureGenerated)
             {
                 texture.name = "AnimationCurvePreview";
                 texture.wrapMode = TextureWrapMode.Clamp;
                 texture.filterMode = FilterMode.Bilinear;
             }
             
-            var rect = curve.GetCurveRect();
-            rect = AdjustCurveRectHeightLikeInspector(rect); 
+            AnimationCurvePreviewRenderer.Render(curve, texture, viewInfo);
             
-            
-            AnimationCurvePreviewRenderer.Render(curve, texture, new AnimationCurvePreviewRenderer.CurvePreviewViewInfo
-            {
-                offsetZoom = new Vector4(rect.min.x, rect.min.y, 1f / rect.width, 1f / rect.height),
-            });
-            
-            return texture;
+            // var rect = curve.GetCurveRect();
+            // rect = AdjustCurveRectHeightLikeInspector(rect); 
+            //
+            //
+            // AnimationCurvePreviewRenderer.Render(curve, texture, new AnimationCurvePreviewRenderer.CurvePreviewViewInfo
+            // {
+            //     offsetZoom = new Vector4(rect.min.x, rect.min.y, 1f / rect.width, 1f / rect.height),
+            // });
+
+            return textureGenerated;
         }
 
 

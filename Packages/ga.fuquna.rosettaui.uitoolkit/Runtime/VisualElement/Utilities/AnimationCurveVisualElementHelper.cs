@@ -8,8 +8,12 @@ namespace RosettaUI.UIToolkit
     public static class AnimationCurveVisualElementHelper
     {
         private static readonly HashSet<VisualElement> TextureAttachedElements = new();
-        
-        public static void UpdatePreviewToBackgroundImage(AnimationCurve curve, VisualElement visualElement)
+
+        public static void UpdatePreviewToBackgroundImage(
+            AnimationCurve curve,
+            VisualElement visualElement,
+            AnimationCurvePreviewRenderer.CurvePreviewViewInfo? viewInfoOrNull = null
+        )
         {
             var width = Mathf.CeilToInt(visualElement.CalcWidthPixelOnScreen());
             var height = Mathf.CeilToInt(visualElement.CalcHeightPixelOnScreen());
@@ -19,16 +23,33 @@ namespace RosettaUI.UIToolkit
                 return;
             }
 
-            var renderTexture = visualElement.resolvedStyle.backgroundImage.renderTexture;
-            var newRenderTexture = AnimationCurveHelper.GenerateOrUpdatePreviewTexture(curve, renderTexture, width, height);
-
-            visualElement.style.backgroundImage = Background.FromRenderTexture(newRenderTexture);
-            
-            // 新しいテクスチャをアタッチしたらパネルからのデタッチ時にテクスチャを解放する
-            if (!TextureAttachedElements.Contains(visualElement) && newRenderTexture != null && renderTexture != newRenderTexture)
+            if (viewInfoOrNull is not {} viewInfo)
             {
-                TextureAttachedElements.Add(visualElement);
-                visualElement.RegisterCallback<DetachFromPanelEvent>(_ => ReleaseAttachedTexture(visualElement));
+                var rect = curve.GetCurveRect();
+                rect = AnimationCurveHelper.AdjustCurveRectHeightLikeInspector(rect);
+
+                viewInfo = new AnimationCurvePreviewRenderer.CurvePreviewViewInfo
+                {
+                    offsetZoom = new Vector4(rect.xMin, rect.yMin, 1f / rect.width, 1f / rect.height)
+                };
+            }
+
+
+            var renderTexture = visualElement.resolvedStyle.backgroundImage.renderTexture;
+            
+            var textureGenerated = AnimationCurveHelper.GenerateOrUpdatePreviewTexture(curve, ref renderTexture, width, height, viewInfo);
+            
+            // 新しいテクスチャを設定
+            if (textureGenerated)
+            {
+                visualElement.style.backgroundImage = Background.FromRenderTexture(renderTexture);
+
+                // 新しいテクスチャをアタッチしたらパネルからのデタッチ時にテクスチャを解放する
+                if (!TextureAttachedElements.Contains(visualElement) && renderTexture != null)
+                {
+                    TextureAttachedElements.Add(visualElement);
+                    visualElement.RegisterCallback<DetachFromPanelEvent>(_ => ReleaseAttachedTexture(visualElement));
+                }
             }
 
             return;

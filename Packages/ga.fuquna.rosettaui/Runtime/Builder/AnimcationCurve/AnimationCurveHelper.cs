@@ -113,10 +113,8 @@ namespace RosettaUI.Builder
             rect = AdjustCurveRectHeightLikeInspector(rect); 
             
             
-            AnimationCurvePreviewRenderer.Render(curve, new AnimationCurvePreviewRenderer.CurvePreviewViewInfo
+            AnimationCurvePreviewRenderer.Render(curve, texture, new AnimationCurvePreviewRenderer.CurvePreviewViewInfo
             {
-                outputTexture = texture,
-                resolution = new Vector2(width, height),
                 offsetZoom = new Vector4(rect.min.x, rect.min.y, 1f / rect.width, 1f / rect.height),
             });
             

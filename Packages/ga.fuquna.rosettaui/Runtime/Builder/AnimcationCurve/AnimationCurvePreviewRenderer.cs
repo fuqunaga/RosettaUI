@@ -33,11 +33,9 @@ namespace RosettaUI.Builder
 
         public struct CurvePreviewViewInfo
         {
-            public Vector2 resolution;
             public Vector4 offsetZoom;
             public bool gridEnabled;
             public Vector4 gridParams;
-            public RenderTexture outputTexture;
         }
 
         /// <summary>
@@ -107,18 +105,21 @@ namespace RosettaUI.Builder
             return segmentCount;
         }
         
-        public static void Render(AnimationCurve animationCurve, CurvePreviewViewInfo viewInfo)
+        public static void Render(AnimationCurve animationCurve, RenderTexture targetTexture, CurvePreviewViewInfo viewInfo)
         {
             _commandBuffer ??= new CommandBuffer { name = CommandBufferName };
             _commandBuffer.Clear();
             
             var segmentCount = UpdateData(_commandBuffer, animationCurve);
 
+            var width = targetTexture.width;
+            var height = targetTexture.height;
+            
             var resolution = new Vector4(
-                viewInfo.resolution.x,
-                viewInfo.resolution.y,
-                1f / viewInfo.resolution.x,
-                1f / viewInfo.resolution.y
+                width,
+                height,
+                1f / width,
+                1f / height
             );
             
             _curveDrawMaterial ??= new Material(Resources.Load<Shader>(ShaderName));
@@ -137,7 +138,7 @@ namespace RosettaUI.Builder
                 _curveDrawMaterial.DisableKeyword(ShaderParam.GridOnKeyword);
             }
             
-            _commandBuffer.Blit(null, viewInfo.outputTexture, _curveDrawMaterial);
+            _commandBuffer.Blit(null, targetTexture, _curveDrawMaterial);
             
             Graphics.ExecuteCommandBuffer(_commandBuffer);
         }

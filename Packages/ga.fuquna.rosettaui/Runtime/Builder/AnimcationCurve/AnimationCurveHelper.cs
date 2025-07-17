@@ -102,21 +102,11 @@ namespace RosettaUI.Builder
         
         public static RenderTexture GenerateOrUpdatePreviewTexture(AnimationCurve curve, RenderTexture texture, int width, int height)
         {
-            if (texture!= null && (texture.width != width || texture.height != height))
+            if (TextureUtility.EnsureTextureSize(ref texture, width, height))
             {
-                texture.Release();
-                Object.DestroyImmediate(texture);
-                texture = null;
-            }
-
-            if (texture == null)
-            {
-                texture = new RenderTexture(width, height, 0)
-                {
-                    name = "AnimationCurvePreview",
-                    wrapMode = TextureWrapMode.Clamp,
-                    filterMode = FilterMode.Bilinear
-                };
+                texture.name = "AnimationCurvePreview";
+                texture.wrapMode = TextureWrapMode.Clamp;
+                texture.filterMode = FilterMode.Bilinear;
             }
             
             var rect = curve.GetCurveRect();

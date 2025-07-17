@@ -86,9 +86,11 @@ namespace RosettaUI.Builder
         {
             const int width = 256;
             const int height = 1;
-            if (texture != null && (texture.width != width || texture.height != height))
+            
+            if (TextureUtility.EnsureTextureSize(ref texture, width, height))
             {
-                Object.DestroyImmediate(texture);
+                texture.wrapMode = TextureWrapMode.Clamp;
+                texture.filterMode = FilterMode.Bilinear;
             }
             
             var  colorArray = ArrayPool<Color>.Shared.Rent(width);
@@ -96,12 +98,7 @@ namespace RosettaUI.Builder
             {
                 colorArray[i] = gradient.Evaluate(i / (float)width);
             }
-            
-            texture ??= new Texture2D(width, height)
-            {
-                wrapMode = TextureWrapMode.Clamp,
-                filterMode = FilterMode.Bilinear
-            };
+      
             texture.SetPixels(0, 0, width, height, colorArray);
             texture.Apply();
             

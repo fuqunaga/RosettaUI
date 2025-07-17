@@ -13,26 +13,41 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     {
         #region Static Window Management
         
+        // ReSharper disable once MemberCanBePrivate.Global
+        public static Vector2Int DefaultWindowSize { get; set; } = new(600, 400);
+        
         private static AnimationCurveEditor _instance;
         
         static AnimationCurveEditor()
         {
-            StaticResourceUtility.AddResetStaticResourceCallback(ReleaseStaticResource);
-            return;
-
-            void ReleaseStaticResource()
+            StaticResourceUtility.AddResetStaticResourceCallback(() =>
             {
                 _instance?.Dispose();
                 _instance = null;
-            }
+            });
         }
 
         public static void Show(Vector2 position, VisualElement target, AnimationCurve initialCurve, Action<AnimationCurve> onCurveChanged)
         {
-            _instance ??= new AnimationCurveEditor();
+            if ( _instance == null)
+            {
+                _instance = new AnimationCurveEditor();
+                
+                var windowStyle = _instance.window.style;
+                windowStyle.width = DefaultWindowSize.x;
+                windowStyle.height = DefaultWindowSize.y;
+            };
+            
             _instance.Show(position, target, onCurveChanged);
             
             _instance.SetCurve(initialCurve);
+            
+            // SetCurve()内のFitViewToCurve()時はまだ表示領域のサイズが確定していないため、
+            // GeometryChangedEventでFitViewToCurve()を呼び出す
+            _instance.RegisterCallbackOnce<GeometryChangedEvent>(_ =>
+            {
+                _instance.FitViewToCurve();
+            });
         }
 
         #endregion
@@ -40,11 +55,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private const string USSClassName = "rosettaui-animation-curve-editor";
         private static readonly Vector2 ZoomRange = new(0.0001f, 10000f);
-        private static readonly float FitViewPadding = 0.05f;
 
         // ReSharper disable once MemberCanBePrivate.Global
         public static string VisualTreeAssetName { get; set; } = "RosettaUI_AnimationCurveEditor";
 
+        // ReSharper disable once MemberCanBePrivate.Global
+        public static RectOffset FitViewPaddingPixel { get; } = new(24, 24, 40, 20);
         
         private CurvePointContainer _curvePointContainer;
         
@@ -83,9 +99,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public void SetCurve(AnimationCurve curve)
         {
             _curvePointContainer.SetCurve(curve);
-            FitViewToCurve();
-            UpdateView();
             UnselectAllControlPoint();
+            FitViewToCurve();
         }
         
         public void Dispose()
@@ -195,12 +210,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             if (_curvePointContainer.IsEmpty) return;
             var rect = _curvePointContainer.Curve.GetCurveRect(true, true);
-            var padding = rect.size * FitViewPadding;
-            rect.xMin -= padding.x;
-            rect.xMax += padding.x;
-            rect.yMin -= padding.y;
-            rect.yMax += padding.y;
-            _previewTransform.FitToRect(rect);
+            _previewTransform.FitToRect(rect, FitViewPaddingPixel);
             UpdateView();
         }
         

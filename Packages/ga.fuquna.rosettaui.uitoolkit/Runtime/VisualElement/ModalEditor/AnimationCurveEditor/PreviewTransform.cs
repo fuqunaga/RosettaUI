@@ -3,6 +3,14 @@ using UnityEngine;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
+    /// <summary>
+    /// Previewの座標変換を行うクラス
+    /// 主に三つの座標系がある
+    /// - Curve座標系: アニメーションカーブの座標系
+    /// - Screen座標系: UI上のピクセル数ベースの座標系
+    /// - ScreenUV座標系: Screen座標系を0~1の範囲に正規化した座標系
+    /// UI座標系はそのまま表示されるピクセル数とは異なり、さらにUIDocument全体にスケーリングがかかる
+    /// </summary>
     public class PreviewTransform : ICoordinateConverter
     {
         public Vector2 Zoom => _zoom;
@@ -47,10 +55,33 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _offset = zoomCenterInCurve - (zoomCenterInCurve - _offset) * amount;
         }
 
-        public void FitToRect(in Rect rect)
+        public void FitToRect(Rect rectOnCurve, RectOffset paddingOnScreen)
         {
-            _offset = rect.min;
-            _zoom = new Vector2(1f / rect.width, 1f / rect.height);
+            var widthOnCurve = rectOnCurve.width;
+            var heightOnCurve = rectOnCurve.height;
+            var widthOnScreen = _getPreviewWidth();
+            var heightOnScreen = _getPreviewHeight();
+
+            rectOnCurve.xMin -= GetCurveLengthFromScreenLength(widthOnCurve, widthOnScreen, paddingOnScreen.left);
+            rectOnCurve.xMax += GetCurveLengthFromScreenLength(widthOnCurve, widthOnScreen, paddingOnScreen.right);
+            rectOnCurve.yMin -= GetCurveLengthFromScreenLength(heightOnCurve, heightOnScreen, paddingOnScreen.bottom);
+            rectOnCurve.yMax += GetCurveLengthFromScreenLength(heightOnCurve, heightOnScreen, paddingOnScreen.top);
+            
+            _offset = rectOnCurve.min;
+            _zoom = new Vector2(1f / rectOnCurve.width, 1f / rectOnCurve.height);
+            
+            return;
+
+
+            float GetCurveLengthFromScreenLength(float rangeOnCurve, float rangeOnScreen, float lengthOnScreen)
+            {
+                // 次の方程式を式変形して
+                // lengthOnCurve / (rangeOnCurve + lengthOnCurve * 2) = lengthOnScreen / rangeOnScreen;  
+                // 次の式を得る
+                // lengthOnCurve = (lengthOnScreen * rangeOnCurve) / (rangeOnScreen - lengthOnScreen * 2);
+                
+                return Mathf.Max(0f, (lengthOnScreen * rangeOnCurve) / (rangeOnScreen - lengthOnScreen * 2));
+            }
         }
 
         #region Coordinate Convertion

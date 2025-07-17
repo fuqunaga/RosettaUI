@@ -60,7 +60,7 @@ namespace RosettaUI.UIToolkit
                 if (renderTexture != null && renderTexture.IsCreated())
                 {
                     renderTexture.Release();
-                    Object.Destroy(renderTexture);
+                    Object.DestroyImmediate(renderTexture);
                 }
                 
                 TextureAttachedElements.Remove(element);

@@ -4,7 +4,6 @@
 .rosettaui-swatchset
 {
     margin-top: 12px;
-    margin-right: 4px;
 }
 
 .rosettaui-swatchset__menu

@@ -126,10 +126,6 @@
 /********************************************************************************
 * Modal Window
 ********************************************************************************/
-.rosettaui-modal-window {
-    padding-left: 4px;
-}
-
 .rosettaui-modal-window-event-blocker {
     position: absolute;
     width: 100%;

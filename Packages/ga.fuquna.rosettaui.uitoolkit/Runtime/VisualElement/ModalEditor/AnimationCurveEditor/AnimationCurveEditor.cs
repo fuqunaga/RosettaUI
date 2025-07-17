@@ -69,7 +69,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
  
 
-        public AnimationCurveEditor() : base(VisualTreeAssetName)
+        public AnimationCurveEditor() : base(VisualTreeAssetName, true)
         {
             AddToClassList(USSClassName);
             

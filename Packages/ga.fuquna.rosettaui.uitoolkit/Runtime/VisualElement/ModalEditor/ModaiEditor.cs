@@ -12,7 +12,7 @@ namespace RosettaUI.UIToolkit
         protected readonly ModalWindow window;
         public event Action<TValue> onEditorValueChanged;
 
-        protected ModalEditor(string visualTreeAssetPath = "")
+        protected ModalEditor(string visualTreeAssetPath = "", bool resizable = false)
         {
             if (!string.IsNullOrEmpty(visualTreeAssetPath))
             {
@@ -27,7 +27,7 @@ namespace RosettaUI.UIToolkit
                 }
             }
 
-            window = new ModalWindow();
+            window = new ModalWindow(resizable);
             window.RegisterCallback<NavigationSubmitEvent>(_ => window?.Hide());
         }
 

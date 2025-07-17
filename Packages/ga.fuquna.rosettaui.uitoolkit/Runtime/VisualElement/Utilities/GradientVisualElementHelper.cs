@@ -6,7 +6,7 @@ namespace RosettaUI.UIToolkit
 {
     public static class GradientVisualElementHelper
     {
-        public static void UpdateGradientPreviewToBackgroundImage(Gradient gradient, VisualElement visualElement)
+        public static void UpdatePreviewToBackgroundImage(Gradient gradient, VisualElement visualElement)
         {
             var style = visualElement.style;
             var texture = style.backgroundImage.value.texture;

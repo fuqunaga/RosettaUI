@@ -51,7 +51,7 @@ namespace RosettaUI.UIToolkit
             }
             else
             {
-                AnimationCurveVisualElementHelper.UpdateGradientPreviewToBackgroundImage(value, preview);
+                AnimationCurveVisualElementHelper.UpdatePreviewToBackgroundImage(value, preview);
             }
         }
 

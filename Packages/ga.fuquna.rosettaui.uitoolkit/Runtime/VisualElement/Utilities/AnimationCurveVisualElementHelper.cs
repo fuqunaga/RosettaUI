@@ -9,7 +9,7 @@ namespace RosettaUI.UIToolkit
     {
         private static readonly HashSet<VisualElement> TextureAttachedElements = new();
         
-        public static void UpdateGradientPreviewToBackgroundImage(AnimationCurve curve, VisualElement visualElement)
+        public static void UpdatePreviewToBackgroundImage(AnimationCurve curve, VisualElement visualElement)
         {
             var width = Mathf.CeilToInt(visualElement.CalcWidthPixelOnScreen());
             var height = Mathf.CeilToInt(visualElement.CalcHeightPixelOnScreen());

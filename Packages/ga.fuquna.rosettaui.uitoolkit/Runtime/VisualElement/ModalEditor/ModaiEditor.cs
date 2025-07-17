@@ -12,8 +12,21 @@ namespace RosettaUI.UIToolkit
         protected readonly ModalWindow window;
         public event Action<TValue> onEditorValueChanged;
 
-        protected ModalEditor()
+        protected ModalEditor(string visualTreeAssetPath = "")
         {
+            if (!string.IsNullOrEmpty(visualTreeAssetPath))
+            {
+                var visualTree = Resources.Load<VisualTreeAsset>(visualTreeAssetPath);
+                if (visualTree != null)
+                {
+                    visualTree.CloneTree(this);
+                }
+                else
+                {
+                    Debug.LogError($"Visual tree asset not found: {visualTreeAssetPath}");
+                }
+            }
+
             window = new ModalWindow();
             window.RegisterCallback<NavigationSubmitEvent>(_ => window?.Hide());
         }

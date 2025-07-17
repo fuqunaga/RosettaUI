@@ -8,24 +8,15 @@ namespace RosettaUI.UIToolkit
 {
     public class GradientEditor : ModalEditor<Gradient>
     {
-        public const string USSClassName = "rosettaui-gradient-editor";
-        
-        // ReSharper disable once MemberCanBePrivate.Global
-        // ReSharper disable once FieldCanBeMadeReadOnly.Global
-        // ReSharper disable once ConvertToConstant.Global
-        public static string visualTreeAssetName = "RosettaUI_GradientEditor";
-
         #region Static Window Management 
         
         private static GradientEditor _instance;
-        private static VisualTreeAsset _visualTreeAsset;
         
         static GradientEditor()
         {
             StaticResourceUtility.AddResetStaticResourceCallback(() =>
             {
                 _instance = null;
-                _visualTreeAsset = null;
             });
         }
 
@@ -40,7 +31,13 @@ namespace RosettaUI.UIToolkit
         }
         
         #endregion
-
+        
+        
+        public const string USSClassName = "rosettaui-gradient-editor";
+        
+        // ReSharper disable once MemberCanBePrivate.Global
+        public static string VisualTreeAssetName { get; set; } = "RosettaUI_GradientEditor";
+        
         
         private Gradient _gradient;
         private GradientKeysEditor _alphaKeysEditor;
@@ -62,11 +59,8 @@ namespace RosettaUI.UIToolkit
         
 
         // ReSharper disable once MemberCanBePrivate.Global
-        public GradientEditor()
+        public GradientEditor() : base(VisualTreeAssetName)
         {
-            _visualTreeAsset ??= Resources.Load<VisualTreeAsset>(visualTreeAssetName);
-            _visualTreeAsset.CloneTree(this);
-            
             AddToClassList(USSClassName);
 
             InitUI();

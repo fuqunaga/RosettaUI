@@ -12,21 +12,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// </summary>
     public class CurvePointContainer : IEnumerable<(Keyframe key, ControlPoint point)>
     {
-        public AnimationCurve Curve => _curve;
-        public List<ControlPoint> ControlPoints => _controlPoints;
-        public bool IsEmpty => _curve == null || _curve.keys.Length == 0;
-        public int Count => _curve?.keys.Length ?? 0;
+        public AnimationCurve Curve { get; private set; }
+
+        public List<ControlPoint> ControlPoints { get; } = new();
+
+        public bool IsEmpty => Curve == null || Curve.keys.Length == 0;
+        public int Count => Curve?.keys.Length ?? 0;
+        
         public (Keyframe key, ControlPoint point) this [int index] 
         {
             get {
-                if (_curve == null || index < 0 || index >= _curve.keys.Length) return (default, default);
-                return (_curve.keys[index], _controlPoints[index]);
+                if (Curve == null || index < 0 || index >= Curve.keys.Length) return (default, default);
+                return (Curve.keys[index], ControlPoints[index]);
             }
         }
-        
-        private AnimationCurve _curve;
-        private readonly List<ControlPoint> _controlPoints = new();
-        
+
         private readonly VisualElement _parent;
         private readonly Func<ControlPoint> _getNewControlPoint;
         
@@ -38,22 +38,22 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void SetCurve(AnimationCurve curve)
         {
-            _curve = curve;
+            Curve = curve;
             ResetControlPoints();
         }
 
         public int AddKey(Keyframe key)
         {
             if (IsEmpty) return -1;
-            int idx = _curve.AddKey(key);
+            var idx = Curve.AddKey(key);
             if (idx < 0) return idx;
             
             // Add control point
             var controlPoint = _getNewControlPoint();
             _parent.Add(controlPoint);
-            controlPoint.SetKeyframe(_curve, idx);
+            controlPoint.SetKeyframe(Curve, idx);
             controlPoint.SetActive(true);
-            _controlPoints.Insert(idx, controlPoint);
+            ControlPoints.Insert(idx, controlPoint);
             
             return idx;
         }
@@ -62,19 +62,19 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             if (IsEmpty || index < 0) return index;
 
-            for (var i = 0; i < _curve.keys.Length; i++)
+            for (var i = 0; i < Curve.keys.Length; i++)
             {
                 if (i == index) continue;
-                if (_curve.keys[i].time == key.time) return index;
+                if (Curve.keys[i].time == key.time) return index;
             }
             
-            int newIdx = _curve.MoveKey(index, key);
+            var newIdx = Curve.MoveKey(index, key);
             if (newIdx != index)
             {
                 // Swap control points
-                var temp = _controlPoints[index];
-                _controlPoints.RemoveAt(index);
-                _controlPoints.Insert(newIdx, temp);
+                var temp = ControlPoints[index];
+                ControlPoints.RemoveAt(index);
+                ControlPoints.Insert(newIdx, temp);
                 index = newIdx;
             }
             
@@ -83,10 +83,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void RemoveKey(int index)
         {
-            if (IsEmpty || index < 0 || index >= _curve.keys.Length || _curve.keys.Length <= 1) return;
-            _curve.RemoveKey(index);
-            var controlPoint = _controlPoints[index];
-            _controlPoints.RemoveAt(index);
+            if (IsEmpty || index < 0 || index >= Curve.keys.Length || Curve.keys.Length <= 1) return;
+            Curve.RemoveKey(index);
+            var controlPoint = ControlPoints[index];
+            ControlPoints.RemoveAt(index);
             _parent.Remove(controlPoint);
         }
         
@@ -94,24 +94,24 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             if (IsEmpty) return;
             AnimationCurveEditorUtility.ApplyTangentMode(this);
-            for (var i = 0; i < _curve.keys.Length; i++)
+            for (var i = 0; i < Curve.keys.Length; i++)
             {
-                _controlPoints[i].SetKeyframe(_curve, i);
+                ControlPoints[i].SetKeyframe(Curve, i);
             }
         }
         
         public void SelectControlPoint(int index)
         {
-            if (index < 0 || index >= _controlPoints.Count) return;
-            for (var i = 0; i < _controlPoints.Count; i++)
+            if (index < 0 || index >= ControlPoints.Count) return;
+            for (var i = 0; i < ControlPoints.Count; i++)
             {
-                _controlPoints[i].SetActive(i == index);
+                ControlPoints[i].SetActive(i == index);
             }
         }
         
         public void UnselectAllControlPoints()
         {
-            foreach (var cp in _controlPoints)
+            foreach (var cp in ControlPoints)
             {
                 cp.SetActive(false);
             }
@@ -119,7 +119,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public IEnumerator<(Keyframe key, ControlPoint point)> GetEnumerator()
         {
-            return _curve.keys.Select((t, i) => (t, _controlPoints[i])).GetEnumerator();
+            return Curve.keys.Select((t, i) => (t, ControlPoints[i])).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -129,21 +129,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void ResetControlPoints()
         {
-            if (_curve == null) return;
-            foreach (var cp in _controlPoints)
+            if (Curve == null) return;
+            foreach (var cp in ControlPoints)
             {
                 _parent.Remove(cp);
             }
-            _controlPoints.Clear();
-            for (var i = 0; i < _curve.keys.Length; i++)
+            ControlPoints.Clear();
+            for (var i = 0; i < Curve.keys.Length; i++)
             {
-                var key = _curve.keys[i];
+                var key = Curve.keys[i];
                 var controlPoint = _getNewControlPoint();
-                _controlPoints.Add(controlPoint);
+                ControlPoints.Add(controlPoint);
                 _parent.Insert(0, controlPoint);
-                controlPoint.SetKeyframe(_curve, i);
+                controlPoint.SetKeyframe(Curve, i);
                 controlPoint.SetPointMode(key.GetPointMode());
-                controlPoint.SetTangentMode(_curve.GetInTangentMode(i), _curve.GetOutTangentMode(i));
+                controlPoint.SetTangentMode(Curve.GetInTangentMode(i), Curve.GetOutTangentMode(i));
                 controlPoint.SetWeightedMode(key.weightedMode);
             }
         }

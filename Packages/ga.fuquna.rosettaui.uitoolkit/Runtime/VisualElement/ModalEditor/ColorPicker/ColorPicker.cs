@@ -8,15 +8,9 @@ namespace RosettaUI.UIToolkit
 {
     public partial class ColorPicker : ModalEditor<Color>
     {
-        // ReSharper disable once MemberCanBePrivate.Global
-        // ReSharper disable once FieldCanBeMadeReadOnly.Global
-        // ReSharper disable once ConvertToConstant.Global
-        public static string visualTreeAssetName = "RosettaUI_ColorPicker";
-        
         #region Static Window Management
 
         private static ColorPicker _instance;
-        private static VisualTreeAsset _visualTreeAsset;
         private static RenderTexture _svTexture;
 
         public static int TextDigit { get; set; } = 3;
@@ -27,7 +21,6 @@ namespace RosettaUI.UIToolkit
             StaticResourceUtility.AddResetStaticResourceCallback(() =>
             {
                 _instance = null;
-                _visualTreeAsset = null;
                 _svTexture = null;
             });
         }
@@ -45,8 +38,10 @@ namespace RosettaUI.UIToolkit
         
         #endregion
         
-
-        // public event Action<Color> onValueChanged;
+        
+        // ReSharper disable once MemberCanBePrivate.Global
+        public static string VisualTreeAssetName { get; set; } = "RosettaUI_ColorPicker";
+        
 
         private VisualElement _previewPrev;
         private VisualElement _previewCurr;
@@ -134,11 +129,8 @@ namespace RosettaUI.UIToolkit
         }
 
         // ReSharper disable once MemberCanBePrivate.Global
-        public ColorPicker()
+        public ColorPicker() : base(VisualTreeAssetName)
         {
-            _visualTreeAsset ??= Resources.Load<VisualTreeAsset>(visualTreeAssetName);
-            _visualTreeAsset.CloneTree(this);
-
             InitPreview();
             InitHsvHandlers();
             _sliderSet = new SliderSet(this);

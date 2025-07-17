@@ -11,14 +11,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// </summary>
     public class AnimationCurveEditor : ModalEditor<AnimationCurve>, IDisposable
     {
-        private const string USSClassName = "rosettaui-animation-curve-editor";
-        private static readonly Vector2 ZoomRange = new(0.0001f, 10000f);
-        private static readonly float FitViewPadding = 0.05f;
-        
         #region Static Window Management
         
         private static AnimationCurveEditor _instance;
-        private static VisualTreeAsset _visualTreeAsset;
         
         static AnimationCurveEditor()
         {
@@ -29,7 +24,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             {
                 _instance?.Dispose();
                 _instance = null;
-                _visualTreeAsset = null;
             }
         }
 
@@ -42,6 +36,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         }
 
         #endregion
+        
+        
+        private const string USSClassName = "rosettaui-animation-curve-editor";
+        private static readonly Vector2 ZoomRange = new(0.0001f, 10000f);
+        private static readonly float FitViewPadding = 0.05f;
+
+        // ReSharper disable once MemberCanBePrivate.Global
+        public static string VisualTreeAssetName { get; set; } = "RosettaUI_AnimationCurveEditor";
+
         
         private CurvePointContainer _curvePointContainer;
         
@@ -66,11 +69,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
  
 
-        public AnimationCurveEditor()
+        public AnimationCurveEditor() : base(VisualTreeAssetName)
         {
-            _visualTreeAsset ??= Resources.Load<VisualTreeAsset>("RosettaUI_AnimationCurveEditor");
-            _visualTreeAsset.CloneTree(this);
-            
             AddToClassList(USSClassName);
             
             InitUI();

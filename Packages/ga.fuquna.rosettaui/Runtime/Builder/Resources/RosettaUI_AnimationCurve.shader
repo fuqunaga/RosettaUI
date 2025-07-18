@@ -19,14 +19,11 @@
 
             #include "UnityCG.cginc"
             #include "SdfBezierSpline.hlsl"
-            #define EPSILON 0.00000001
 
             
-            StructuredBuffer<float4> _Keyframes;
-            float4 _Resolution;
-            float4 _OffsetZoom;
-            float4 _GridParams;
-
+            float2 _Resolution; // x: width, y: height
+            float4 _OffsetZoom; // xy: offset.xy, zw: zoom.xy
+            
             struct spline_segment
             {
                 float2 startPos;
@@ -42,38 +39,76 @@
             static const float4 LineColor = float4(0, 1, 0, 1);
             static const float4 YZeroLineColor = float4(0, 0, 0, 1);
 
+            
             #ifdef _GRID_ON
-            static const float4 MainGridColor = float4(0.6, 0.6, 0.6, 0.5);
-            static const float4 GridColor = float4(0.4, 0.4, 0.4, 0.5);
+            
+            float4 _GridParams; // xy: order of grid（range=10^order), zw: grid unit size
+            
+            static const float4 GridColor = float4(0.4, 0.4, 0.4, 1);
+            static const float GridWidth = 1;
 
-
-            inline bool2 IsGrid(float2 uv, float2 gridUnit, float2 thickness)
+            inline float2 CalcDistanceFromGridOnPx(float2 positionOnCurve, float2 gridUnit, float2x3 curveToPx)
             {
-                return abs(frac(uv / gridUnit - 0.5) - 0.5) < _Resolution.zw / (gridUnit * _OffsetZoom.zw) * thickness;
+                float2 distanceRate = abs(frac(positionOnCurve / gridUnit - 0.5) - 0.5); // 0: on grid, 0.5: far from grid by 0.5 grid unit
+                float2 distanceOnCurve = distanceRate * gridUnit;
+                return mul(curveToPx, float3(distanceOnCurve, 0)).xy; // convert to pixel distance
             }
+
+            inline bool2 IsInGrid(float2 positionOnCurve, float2 gridUnit, float2x3 curveToPx)
+            {
+                float2 distanceFromGrid = CalcDistanceFromGridOnPx(positionOnCurve, gridUnit, curveToPx);
+                return distanceFromGrid <= GridWidth;
+            }
+            
+            inline float CalcGridAlphaRate(float2 positionOnCurve, float2x3 curveToPx)
+            {
+                const float2 gridOrder = _GridParams.xy; // range = 10^order
+                const float2 gridUnit = _GridParams.zw;
+
+                const float2 currentOrderRate = (1).xx - frac(gridOrder); // 0なら現在のgridOrder、１に近いとほぼ次の桁
+                const float subGridAlphaRate = 0.5f;
+
+                bool2 isInSubGrid = IsInGrid(positionOnCurve, gridUnit * 0.1, curveToPx);
+                bool2 isInGrid = IsInGrid(positionOnCurve, gridUnit, curveToPx);
+                
+                float2 subGridAlphaRateXy = isInSubGrid * currentOrderRate * subGridAlphaRate;
+                //　currentOrderRateが0と１付近でSubGridと入れ替わるのでSubGridと同じ値になるように補間
+                // 0.5で最大値1、0と1で最小値0
+                float2 gridAlphaPeakRateXy = 1.0 - pow(2.0 * abs(currentOrderRate - 0.5), 3.0);
+                float2 gridAlphaRateXy = isInGrid * lerp(subGridAlphaRate, 1,  gridAlphaPeakRateXy);  
+                
+                return max(max(subGridAlphaRateXy.x, subGridAlphaRateXy.y), max(gridAlphaRateXy.x, gridAlphaRateXy.y));
+            }
+            
             #endif
 
 
+            // 座標系が３つある
+            // - uv: 0-1
+            // - px: pixel
+            // - curve: x(time), y(value)
             float4 Frag(v2f_img i) : SV_Target
             {
-                float2 uv = i.uv;
+                const float2 uv = i.uv;
                 
-
                 // Curve
-                float2x3 CurveUvToViewUv = {
+                const float2x3 offsetMatrix = {
                     1, 0, -_OffsetZoom.x,
                     0, 1, -_OffsetZoom.y,
                 };
-                float2x2 scaleMatrix = {
+                const float2x2 scaleMatrix = {
                     _OffsetZoom.z, 0,
                     0, _OffsetZoom.w
                 };
-                CurveUvToViewUv = mul(scaleMatrix, CurveUvToViewUv);
+                const float2x2 uvToPxMatrix = {
+                    _Resolution.x, 0,
+                    0, _Resolution.y
+                };
+                const float2x3 curveToPx = mul(uvToPxMatrix, mul(scaleMatrix, offsetMatrix));
                 
-                float2 ViewUvToPx = _Resolution.xy;
-                
-                const float2 currentPx = ViewUvToPx * uv;
+                const float2 currentPx = mul(uvToPxMatrix, uv);
 
+                
                 float dist = INITIALLY_FAR;
                 for (int idx = 0; idx < _SegmentCount; idx++)
                 {
@@ -83,10 +118,10 @@
                      */
                     spline_segment seg = _Spline[idx];
                     
-                    const float2 pStart = ViewUvToPx * mul(CurveUvToViewUv, float3(seg.startPos, 1));
-                    const float2 vStart = ViewUvToPx * mul(CurveUvToViewUv, float3(seg.startVel, 0));
-                    const float2 pEnd = ViewUvToPx * mul(CurveUvToViewUv, float3(seg.endPos, 1));
-                    const float2 vEnd = ViewUvToPx * mul(CurveUvToViewUv, float3(seg.endVel, 0));
+                    const float2 pStart = mul(curveToPx, float3(seg.startPos, 1));
+                    const float2 vStart = mul(curveToPx, float3(seg.startVel, 0));
+                    const float2 pEnd = mul(curveToPx, float3(seg.endPos, 1));
+                    const float2 vEnd = mul(curveToPx, float3(seg.endVel, 0));
 
                     const bool isStartPosInf = any(isinf(seg.startVel) && seg.startVel > 0);
                     const bool isStartNegInf = any(isinf(seg.startVel) && seg.startVel < 0);
@@ -114,25 +149,23 @@
                 float4 col = 0;
 
                 // Y=0 black line
-                float yZeroPx = ViewUvToPx.y * mul(CurveUvToViewUv, float3(0, 0, 1)).y;
+                float yZeroPx = mul(curveToPx, float3(0, 0, 1)).y;
                 float distFromYZero = abs(currentPx.y - yZeroPx);
                 col = lerp(YZeroLineColor, col, smoothstep(0.0, LineWidth * 0.5, distFromYZero));
+
                 
-                #ifdef _GRID_ON
                 // Grid
-                uv = uv / _OffsetZoom.zw + _OffsetZoom.xy;
+                #ifdef _GRID_ON
                 
-                bool2 isSubGrid = IsGrid(uv, _GridParams.zw * 0.1, 1.0) && frac(_GridParams) > 0.0;
-                bool isGrid = any(IsGrid(uv, _GridParams.zw, 1.0));
-                bool2 isMainGrid = IsGrid(uv, _GridParams.zw, 2.0 * cos(frac(_GridParams - EPSILON) * UNITY_PI * 0.5));
-                col = isSubGrid.x ? float4(GridColor.rgb, 1.0 - frac(_GridParams.x)) : col;
-                col = isSubGrid.y ? float4(GridColor.rgb, 1.0 - frac(_GridParams.y)) : col;
-                col = isGrid ? GridColor : col;
-                col = isMainGrid.x ? MainGridColor : col;
-                col = isMainGrid.y ? MainGridColor : col;
+                const float2 currentOnCurve = uv / _OffsetZoom.zw + _OffsetZoom.xy;
+
+                float gridAlphaRate = CalcGridAlphaRate(currentOnCurve, curveToPx);
+                col = gridAlphaRate > 0 ? float4(GridColor.rgb, GridColor.a * gridAlphaRate) : col;
+                
                 #endif
 
-                // Line
+                
+                // CurveLine
                 dist -= LineWidth * 0.5f;
                 col = lerp(LineColor, col, smoothstep(-.5f, .5f, dist));
 

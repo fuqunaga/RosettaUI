@@ -33,9 +33,9 @@ namespace RosettaUI.Builder
 
         public struct CurvePreviewViewInfo
         {
-            public Vector4 offsetZoom;
+            public Vector4 offsetZoom; // xy: offset.xy, zw: zoom.xy
             public bool gridEnabled;
-            public Vector4 gridParams;
+            public Vector4 gridParams; // xy: order of grid（range=10^order), zw: grid unit size
         }
 
         /// <summary>
@@ -112,18 +112,8 @@ namespace RosettaUI.Builder
             
             var segmentCount = UpdateData(_commandBuffer, animationCurve);
 
-            var width = targetTexture.width;
-            var height = targetTexture.height;
-            
-            var resolution = new Vector4(
-                width,
-                height,
-                1f / width,
-                1f / height
-            );
-            
             _curveDrawMaterial ??= new Material(Resources.Load<Shader>(ShaderName));
-            _curveDrawMaterial.SetVector(ShaderParam.ResolutionId, resolution);
+            _curveDrawMaterial.SetVector(ShaderParam.ResolutionId, new Vector2(targetTexture.width, targetTexture.height));
             _curveDrawMaterial.SetVector(ShaderParam.OffsetZoomId, viewInfo.offsetZoom);
             _curveDrawMaterial.SetBuffer(ShaderParam.SplineBufferId, _curveDataBuffer);
             _curveDrawMaterial.SetInt(ShaderParam.SegmentCountId, segmentCount);

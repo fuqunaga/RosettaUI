@@ -162,8 +162,8 @@
     position: absolute;
     margin: 0;
     padding: 0;
-    width: 10px;
-    height: 10px;
+    width: 7px;
+    height: 7px;
     background-color: #00ff00;
     rotate: 45deg;
     border-width: 1.5px;
@@ -180,12 +180,9 @@
     left: 5px;
     top: 4px;
     width: 50px;
-    height: 2px;
-    background-color: whitesmoke;
-    border-width: 0.5px;
-    border-color: gray;
-    transform-origin: 0 50%;
-    opacity: 0.5;
+    height: 1.5px;
+    background-color: rgba(245, 245, 245, 0.3); /* whitesmoke with transparency */
+    transform-origin: left center;
 }
 
 .rosettaui-animation-curve-editor__control-point-handle__handle-container {
@@ -198,12 +195,11 @@
 
 .rosettaui-animation-curve-editor__control-point-handle__handle {
     position: absolute;
-    top: 7px;
-    right: 7px;
+    top: 7.5px;
+    left: 10px;
     width: 6px;
     height: 6px;
-    background-color: whitesmoke;
-    border-width: 0.5px;
+    border-width: 1px;
     border-color: gray;
     rotate: 45deg;
 }

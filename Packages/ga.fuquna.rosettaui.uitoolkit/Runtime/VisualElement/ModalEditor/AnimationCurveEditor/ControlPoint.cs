@@ -33,6 +33,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private Vector2 _mouseDownPosition;
         
         private readonly ICoordinateConverter _coordinateConverter;
+        private readonly ParameterPopup _parameterPopup;
         private readonly VisualElement _controlPoint;
         private readonly ControlPointHandle _leftHandle;
         private readonly ControlPointHandle _rightHandle;
@@ -49,10 +50,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public delegate void OnPointAction(ControlPoint controlPoint);
         public delegate int OnPointMoved(Keyframe keyframe);
         
-        public ControlPoint(ICoordinateConverter coordinateConverter, 
+        public ControlPoint(ICoordinateConverter coordinateConverter, ParameterPopup parameterPopup,
             OnPointAction onPointSelected, OnPointMoved onPointMoved, OnPointAction onPointRemoved)
         {
             _coordinateConverter = coordinateConverter;
+            _parameterPopup = parameterPopup;
             _onPointSelected = onPointSelected;
             _onPointMoved = onPointMoved;
             _onPointRemoved = onPointRemoved;
@@ -220,11 +222,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void SetPointerPosition(Vector2 pointerPosition)
         {
-            Vector2 screenPosition = new Vector2(_elementPositionOnDown.x + (pointerPosition.x - _mouseDownPosition.x), _elementPositionOnDown.y + (pointerPosition.y - _mouseDownPosition.y));
+            var screenPosition = new Vector2(_elementPositionOnDown.x + (pointerPosition.x - _mouseDownPosition.x), _elementPositionOnDown.y + (pointerPosition.y - _mouseDownPosition.y));
             style.left = screenPosition.x;
             style.top = screenPosition.y;
             PositionInCurve = _coordinateConverter.GetCurvePosFromScreenPos(screenPosition);
             _onPointMoved(_keyframeCopy);
+            
+            _parameterPopup.SetKeyframe(_keyframeCopy);
+            _parameterPopup.SetPosition(screenPosition);
         }
         
         private void OnMouseDown(PointerDownEvent evt)
@@ -232,17 +237,22 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _mouseDownPosition = evt.position;
             _elementPositionOnDown = new Vector2(style.left.value.value, style.top.value.value);
             _onPointSelected?.Invoke(this);
-            if (evt.button == 0)
+            
+            switch (evt.button)
             {
-                RegisterCallback<PointerMoveEvent>(OnPointerMove);
-                RegisterCallback<PointerUpEvent>(OnPointerUp);
-                evt.StopPropagation();
-                this.CaptureMouse();
-            }
-            else if (evt.button == 1)
-            {
-                _popupMenuController.Show(_mouseDownPosition, this);
-                evt.StopPropagation();
+                case 0:
+                    RegisterCallback<PointerMoveEvent>(OnPointerMove);
+                    RegisterCallback<PointerUpEvent>(OnPointerUp);
+                    evt.StopPropagation();
+                    this.CaptureMouse();
+                    
+                    _parameterPopup.Show();
+                    _parameterPopup.SetKeyframe(_keyframeCopy);
+                    break;
+                case 1:
+                    _popupMenuController.Show(_mouseDownPosition, this);
+                    evt.StopPropagation();
+                    break;
             }
         }
         
@@ -259,6 +269,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 UnregisterCallback<PointerUpEvent>(OnPointerUp);
                 evt.StopPropagation();
                 this.ReleaseMouse();
+                
+                _parameterPopup.Hide();
             }
         }
         

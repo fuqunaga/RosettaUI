@@ -99,6 +99,15 @@
     background-image: resource("animation-curve_snap-y");
 }
 
+.rosettaui-animation-curve-editor__parameter-popup {
+    position: absolute;
+    margin: 0;
+    padding: 0 2px;
+    background-color: black;
+    translate: 0 -100%;
+    min-height: auto;
+}
+
 .rosettaui-animation-curve-editor__property-group {
     margin: 8px 4px 8px 4px;
 }

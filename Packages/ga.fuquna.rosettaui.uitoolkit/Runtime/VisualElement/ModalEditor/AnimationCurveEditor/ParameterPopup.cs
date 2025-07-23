@@ -1,0 +1,55 @@
+﻿using UnityEngine;
+using UnityEngine.UIElements;
+
+namespace RosettaUI.UIToolkit.AnimationCurveEditor
+{
+    /// <summary>
+    /// Parameter display popup shown when moving a ControlPoint
+    /// </summary>
+    public class ParameterPopup : Label
+    {
+        private const string ParameterPopupClassName = "rosettaui-animation-curve-editor__parameter-popup";
+        
+        public Vector2 positionOffset = new(2f, -2f);
+        private readonly PreviewTransform _previewTransform;
+
+
+        public ParameterPopup(PreviewTransform previewTransform)
+        {
+            _previewTransform = previewTransform;
+            
+            AddToClassList(ParameterPopupClassName);
+            Hide();
+        }
+        
+        public void Show()
+        {
+            style.display = DisplayStyle.Flex;
+        }
+        
+        public void Hide()
+        {
+            style.display = DisplayStyle.None;
+        }
+
+        public void SetKeyframe(Keyframe keyframe)
+        {
+            const int maxPrecision = 4;
+            var gridViewport = _previewTransform.PreviewGridViewport;
+            var orderX = Mathf.Max(0, maxPrecision - Mathf.CeilToInt(gridViewport.XOrder));
+            var orderY = Mathf.Max(0, maxPrecision - Mathf.CeilToInt(gridViewport.YOrder));
+            
+            var timeString = keyframe.time.ToString($"N{orderX}");
+            var valueString = keyframe.value.ToString($"N{orderY}");
+            
+            text = $"{timeString}, {valueString}";
+        }
+        
+        public void SetPosition(Vector2 position)
+        {
+            var positionWithOffset = position + positionOffset;
+            style.left = positionWithOffset.x;
+            style.top = positionWithOffset.y;
+        }
+    }
+}

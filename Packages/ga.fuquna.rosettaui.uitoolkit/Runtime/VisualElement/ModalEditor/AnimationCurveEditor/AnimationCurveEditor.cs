@@ -64,6 +64,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private readonly CurvePointContainer _curvePointContainer;
         
+        
         private RenderTexture _curveEditorTexture = null;
 
         private VisualElement _curvePreviewElement;
@@ -72,6 +73,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private ToggleButton _snapYButton;
         private ScrollerController _scrollerController;
         private AxisLabelController _axisLabelController;
+        private ParameterPopup _parameterPopup;
         private PropertyFieldController _propertyFieldController;
 
         private PreviewTransform _previewTransform;
@@ -90,7 +92,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             AddToClassList(USSClassName);
             
             InitUI();
-            _curvePointContainer = new CurvePointContainer(_curvePreviewElement, () => new ControlPoint(_previewTransform, OnControlPointSelected, OnControlPointMoved, RemoveControlPoint));
+            _curvePointContainer = new CurvePointContainer(_curvePreviewElement, () => new ControlPoint(_previewTransform, _parameterPopup, OnControlPointSelected, OnControlPointMoved, RemoveControlPoint));
         }
         
         /// <summary>
@@ -190,7 +192,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     _axisLabelController.UpdateAxisLabel(_previewTransform.PreviewRect);
                 }
             );
-
+            
+            // Parameter Popup
+            var curveGroup = this.Q("curve-group");
+            _parameterPopup = new ParameterPopup(_previewTransform);
+            curveGroup.Add(_parameterPopup);
+            
             // Property Field
             _propertyFieldController = new PropertyFieldController(this,
                 () => _selectedControlPointIndex < 0 ? default : _curvePointContainer[_selectedControlPointIndex],

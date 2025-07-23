@@ -130,6 +130,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             return rect;
         }
 
+        public GridViewport PreviewGridViewport
+        {
+            get
+            {
+                var rect = GetPreviewRect();
+                return new GridViewport(rect);
+            }
+        }
+
         #endregion
 
     }

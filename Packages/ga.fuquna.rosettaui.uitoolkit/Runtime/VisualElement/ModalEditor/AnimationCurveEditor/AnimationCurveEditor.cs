@@ -115,7 +115,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void MoveKey(Keyframe key)
         {
             if (_curvePointContainer.IsEmpty || _selectedControlPointIndex < 0) return;
-            var gridViewport = new GridViewport(_previewTransform.GetPreviewRect());
+            var gridViewport = _previewTransform.PreviewGridViewport;
             if (_snapXButton.value) { key.time = gridViewport.RoundX(key.time, 0.05f); }
             if (_snapYButton.value) { key.value = gridViewport.RoundY(key.value, 0.05f); }
 
@@ -225,8 +225,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void UpdateCurvePreview()
         {
-            var rect = _previewTransform.GetPreviewRect();
-            var gridViewport = new GridViewport(rect.width, rect.height);
+            var gridViewport = _previewTransform.PreviewGridViewport;
             var viewInfo = new AnimationCurvePreviewRenderer.CurvePreviewViewInfo()
             {
                 offsetZoom = _previewTransform.OffsetZoom,

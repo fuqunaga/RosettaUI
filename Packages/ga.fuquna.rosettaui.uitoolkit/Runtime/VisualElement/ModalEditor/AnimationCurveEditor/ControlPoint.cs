@@ -29,8 +29,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly OnPointMoved _onPointMoved;
         private readonly OnPointAction _onPointRemoved;
         
-        private Vector2 _elementPositionOnDown;
-        private Vector2 _mouseDownPosition;
+        private Vector2 _mouseDownPositionToElementOffset;
         
         private readonly ICoordinateConverter _coordinateConverter;
         private readonly ParameterPopup _parameterPopup;
@@ -220,22 +219,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
         
-        private void SetPointerPosition(Vector2 pointerPosition)
-        {
-            var screenPosition = new Vector2(_elementPositionOnDown.x + (pointerPosition.x - _mouseDownPosition.x), _elementPositionOnDown.y + (pointerPosition.y - _mouseDownPosition.y));
-            style.left = screenPosition.x;
-            style.top = screenPosition.y;
-            PositionInCurve = _coordinateConverter.GetCurvePosFromScreenPos(screenPosition);
-            _onPointMoved(_keyframeCopy);
-            
-            _parameterPopup.SetKeyframe(_keyframeCopy);
-            _parameterPopup.SetPosition(screenPosition);
-        }
         
         private void OnMouseDown(PointerDownEvent evt)
         {
-            _mouseDownPosition = evt.position;
-            _elementPositionOnDown = new Vector2(style.left.value.value, style.top.value.value);
+            // _mouseDownPosition = evt.position;
+            // _elementPositionOnDown = new Vector2(style.left.value.value, style.top.value.value);
+            var elementPosition = new Vector2(resolvedStyle.left, resolvedStyle.top);
+            _mouseDownPositionToElementOffset = elementPosition - (Vector2)evt.position; 
             _onPointSelected?.Invoke(this);
             
             switch (evt.button)
@@ -247,18 +237,24 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     this.CaptureMouse();
                     
                     _parameterPopup.Show();
-                    _parameterPopup.SetKeyframe(_keyframeCopy);
+                    _parameterPopup.Update(elementPosition, _keyframeCopy);
                     break;
                 case 1:
-                    _popupMenuController.Show(_mouseDownPosition, this);
+                    _popupMenuController.Show(evt.position, this);
                     evt.StopPropagation();
                     break;
             }
         }
-        
+
         private void OnPointerMove(PointerMoveEvent evt)
         {
-            SetPointerPosition(evt.position);
+            var screenPosition = (Vector2)evt.position + _mouseDownPositionToElementOffset;
+            style.left = screenPosition.x;
+            style.top = screenPosition.y;
+            PositionInCurve = _coordinateConverter.GetCurvePosFromScreenPos(screenPosition);
+            _onPointMoved(_keyframeCopy);
+
+            _parameterPopup.Update(screenPosition, _keyframeCopy);
         }
 
         private void OnPointerUp(PointerUpEvent evt)

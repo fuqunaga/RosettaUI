@@ -31,6 +31,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             style.display = DisplayStyle.None;
         }
+        
+        public void Update(Vector2 positionLeftTop, Keyframe keyframe)
+        {
+            SetKeyframe(keyframe);
+            SetPosition(positionLeftTop);
+        }
 
         public void SetKeyframe(Keyframe keyframe)
         {

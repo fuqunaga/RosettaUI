@@ -50,7 +50,7 @@ namespace RosettaUI.UIToolkit
             // 画面からはみ出さないように補正する
             window.RegisterCallbackOnce<GeometryChangedEvent>(_ =>
             {
-                VisualElementExtension.CheckOutOfScreen(position, window);
+                VisualElementExtension.ClampPositionToScreen(position, window);
             });
         }
 

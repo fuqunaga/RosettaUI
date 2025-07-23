@@ -45,11 +45,16 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             text = $"{timeString}, {valueString}";
         }
         
-        public void SetPosition(Vector2 position)
+        public void SetPosition(Vector2 positionLeftTop)
         {
-            var positionWithOffset = position + positionOffset;
+            var positionWithOffset = positionLeftTop + positionOffset;
             style.left = positionWithOffset.x;
             style.top = positionWithOffset.y;
+
+            RegisterCallbackOnce<GeometryChangedEvent>(_ =>
+            {
+                this.ClampElementToParent();
+            });
         }
     }
 }

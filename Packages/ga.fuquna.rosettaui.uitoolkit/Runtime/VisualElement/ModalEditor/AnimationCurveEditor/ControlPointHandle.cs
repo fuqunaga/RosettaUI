@@ -12,8 +12,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private VisualElement _handleContainerElement;
         private ICoordinateConverter _coordinateConverter;
         
-        private Action _onHandleSelected;
-        private OnTangentChanged _onTangentChanged;
+        private readonly Action _onHandleSelected;
+        private readonly OnTangentChanged _onTangentChanged;
         
         private float _angle;
         private float _sign;
@@ -23,7 +23,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private const string HandleRootClassName = "rosettaui-animation-curve-editor__control-point-handle";
         private const string HandleLineClassName = "rosettaui-animation-curve-editor__control-point-handle__line";
         private const string HandleContainerClassName = "rosettaui-animation-curve-editor__control-point-handle__handle-container";
+        private const string HandleContainerWeightClassName = "rosettaui-animation-curve-editor__control-point-handle__handle-container-weight";
         private const string HandleClassName = "rosettaui-animation-curve-editor__control-point-handle__handle";
+        
         
         public ControlPointHandle(ICoordinateConverter coordinateConverter, float sign, Action onHandleSelected, OnTangentChanged onTangentChanged)
         {
@@ -70,6 +72,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _lineElement.style.width = weight == null || Mathf.Approximately(_angle, -90f) || Mathf.Approximately(_angle, 90f) || Mathf.Approximately(_angle, 270f)
                 ? DefaultLineLength
                 : Mathf.Max(10f, (float)weight * Mathf.Abs(xDistToNeighborInScreen / Mathf.Cos(_angle * Mathf.Deg2Rad)));
+
+            if (weight.HasValue)
+            {
+                _handleContainerElement.AddToClassList(HandleContainerWeightClassName);
+            }
+            else
+            {
+                _handleContainerElement.RemoveFromClassList(HandleContainerWeightClassName);
+            }
         }
 
         private void OnPointerDown(PointerDownEvent evt)

@@ -152,18 +152,15 @@
     width: 20px;
     height: 20px;
     translate: -10px -10px;
-}
-
-.rosettaui-animation-curve-editor__control-point-container > * {
-    translate: 5px 5px;
+    justify-content: center;
+    align-items: center;
 }
 
 .rosettaui-animation-curve-editor__control-point {
-    position: absolute;
     margin: 0;
     padding: 0;
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
     background-color: #00ff00;
     rotate: 45deg;
     border-width: 1.5px;
@@ -177,8 +174,7 @@
 
 .rosettaui-animation-curve-editor__control-point-handle__line {
     position: absolute;
-    left: 5px;
-    top: 4px;
+    top: 3px;
     width: 50px;
     height: 1.5px;
     background-color: rgba(245, 245, 245, 0.3); /* whitesmoke with transparency */
@@ -187,19 +183,25 @@
 
 .rosettaui-animation-curve-editor__control-point-handle__handle-container {
     position: absolute;
-    top: -10px;
-    right: -10px;
+    top: -9.5px;
+    right: -9.5px;
     width: 20px;
     height: 20px;
+    justify-content: center;
+    align-items: center;
 }
 
 .rosettaui-animation-curve-editor__control-point-handle__handle {
-    position: absolute;
-    top: 7.5px;
-    left: 10px;
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
+    background-color: #1d1d1d;
     border-width: 1px;
     border-color: gray;
     rotate: 45deg;
+}
+
+.rosettaui-animation-curve-editor__control-point-handle__handle-container-weight > .rosettaui-animation-curve-editor__control-point-handle__handle {
+    width: 7px;
+    height: 7px;
+    rotate: 0;
 }

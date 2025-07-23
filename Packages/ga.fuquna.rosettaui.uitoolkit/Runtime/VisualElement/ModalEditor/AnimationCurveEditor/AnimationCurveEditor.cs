@@ -62,7 +62,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         // ReSharper disable once MemberCanBePrivate.Global
         public static RectOffset FitViewPaddingPixel { get; } = new(24, 24, 40, 20);
         
-        private CurvePointContainer _curvePointContainer;
+        private readonly CurvePointContainer _curvePointContainer;
         
         private RenderTexture _curveEditorTexture = null;
 

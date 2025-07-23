@@ -119,25 +119,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             tangent /= aspect;
             return tangent;
         }
-        
-        public Rect GetPreviewRect()
-        {
-            var rect = new Rect
-            {
-                min = GetCurvePosFromScreenUv(Vector2.zero),
-                max = GetCurvePosFromScreenUv(Vector2.one)
-            };
-            return rect;
-        }
 
-        public GridViewport PreviewGridViewport
+        public Rect PreviewRect
         {
             get
             {
-                var rect = GetPreviewRect();
-                return new GridViewport(rect);
+                var rect = new Rect
+                {
+                    min = GetCurvePosFromScreenUv(Vector2.zero),
+                    max = GetCurvePosFromScreenUv(Vector2.one)
+                };
+                return rect;
             }
         }
+
+        public GridViewport PreviewGridViewport => new(PreviewRect);
 
         #endregion
 

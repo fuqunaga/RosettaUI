@@ -180,14 +180,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     _previewTransform.SetYCenter(yCenter);
                     _curvePointContainer.UpdateControlPoints();
                     UpdateCurvePreview();
-                    _axisLabelController.UpdateAxisLabel(_previewTransform.GetPreviewRect());
+                    _axisLabelController.UpdateAxisLabel(_previewTransform.PreviewRect);
                 },
                 xCenter =>
                 {
                     _previewTransform.SetXCenter(xCenter);
                     _curvePointContainer.UpdateControlPoints();
                     UpdateCurvePreview();
-                    _axisLabelController.UpdateAxisLabel(_previewTransform.GetPreviewRect());
+                    _axisLabelController.UpdateAxisLabel(_previewTransform.PreviewRect);
                 }
             );
 
@@ -218,7 +218,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             _curvePointContainer.UpdateControlPoints();
             UpdateCurvePreview();
-            var rect = _previewTransform.GetPreviewRect();
+            var rect = _previewTransform.PreviewRect;
             _scrollerController.UpdateScroller(rect, _curvePointContainer.Curve.GetCurveRect(true, true));
             _axisLabelController.UpdateAxisLabel(rect);
         }

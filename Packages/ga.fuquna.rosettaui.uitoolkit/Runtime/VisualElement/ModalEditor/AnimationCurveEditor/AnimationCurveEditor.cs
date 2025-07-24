@@ -306,6 +306,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _selectedControlPointIndex = -1;
             _propertyFieldController.UpdatePropertyFields();
             _curvePointContainer.UnselectAllControlPoints();
+            _parameterPopup.Hide();
         }
         
         #endregion

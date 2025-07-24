@@ -131,6 +131,8 @@ namespace RosettaUI.UIToolkit
         // ReSharper disable once MemberCanBePrivate.Global
         public ColorPicker() : base(VisualTreeAssetName)
         {
+            window.RegisterCallback<NavigationSubmitEvent>(_ => window?.Hide()); // Enterキーで閉じる
+            
             InitPreview();
             InitHsvHandlers();
             _sliderSet = new SliderSet(this);

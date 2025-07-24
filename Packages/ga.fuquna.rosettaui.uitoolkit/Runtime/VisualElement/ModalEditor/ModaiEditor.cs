@@ -28,7 +28,6 @@ namespace RosettaUI.UIToolkit
             }
 
             window = new ModalWindow(resizable);
-            window.RegisterCallback<NavigationSubmitEvent>(_ => window?.Hide());
         }
 
         protected void Show(Vector2 position, VisualElement target, Action<TValue> onValueChanged, Action onCancel = null)

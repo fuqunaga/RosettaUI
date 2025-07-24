@@ -20,7 +20,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly MenuItem _outWeightedModeMenuItem;
         private readonly MenuItem _bothWeightedModeMenuItem;
 
-
         public ControlPointPopupMenuController(Action onPointRemoved, Action<PointMode> onPointModeChanged, Action<TangentMode?, TangentMode?> onTangentModeChanged, Action<WeightedMode> onWeightedModeChanged)
         {
             _onPointRemoved = onPointRemoved;
@@ -48,12 +47,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _bothWeightedModeMenuItem = new MenuItem("Weighted", () => _onWeightedModeChanged(WeightedMode.Both));
         }
 
-        public void Show(Vector2 position, VisualElement targetElement)
+        public void Show(Vector2 position, ControlPoint controlPoint)
         {
             PopupMenuUtility.Show(
                 new[]
                 {
                     new MenuItem("Delete Key", () => _onPointRemoved()),
+                    new MenuItem("Edit Key...", () => controlPoint.ShowEditKeyPopup()),
                     MenuItem.Separator,
                     _pointModeMenuItems[PointMode.Smooth],
                     _pointModeMenuItems[PointMode.Flat],
@@ -70,10 +70,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                             MenuItem.Separator,
                             _inWeightedModeMenuItem,
                             MenuItem.Separator,
-                            new MenuItem("Back", () => Show(position, targetElement))
+                            new MenuItem("Back", () => Show(position, controlPoint))
                         },
                         position,
-                        targetElement)
+                        controlPoint)
                     ),
                     new MenuItem("Right Tangent", () => PopupMenuUtility.Show(
                         new[]
@@ -86,10 +86,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                             MenuItem.Separator,
                             _outWeightedModeMenuItem,
                             MenuItem.Separator,
-                            new MenuItem("Back", () => Show(position, targetElement))
+                            new MenuItem("Back", () => Show(position, controlPoint))
                         },
                         position,
-                        targetElement)
+                        controlPoint)
                     ),
                     new MenuItem("Both Tangent", () => PopupMenuUtility.Show(
                         new[]
@@ -102,14 +102,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                             MenuItem.Separator,
                             _bothWeightedModeMenuItem,
                             MenuItem.Separator,
-                            new MenuItem("Back", () => Show(position, targetElement))
+                            new MenuItem("Back", () => Show(position, controlPoint))
                         },
                         position,
-                        targetElement)
+                        controlPoint)
                     )
                 },
                 position,
-                targetElement
+                controlPoint
             );
         }
         

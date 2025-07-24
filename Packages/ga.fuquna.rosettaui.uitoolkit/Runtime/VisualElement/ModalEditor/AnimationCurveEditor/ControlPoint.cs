@@ -33,6 +33,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private readonly ICoordinateConverter _coordinateConverter;
         private readonly ParameterPopup _parameterPopup;
+        private readonly EditKeyPopup _editKeyPopup;
         private readonly VisualElement _controlPoint;
         private readonly ControlPointHandle _leftHandle;
         private readonly ControlPointHandle _rightHandle;
@@ -48,12 +49,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public delegate void OnPointAction(ControlPoint controlPoint);
         public delegate int OnPointMoved(Keyframe keyframe);
+
+        public Keyframe Keyframe => _keyframeCopy;
         
-        public ControlPoint(ICoordinateConverter coordinateConverter, ParameterPopup parameterPopup,
+        public ControlPoint(ICoordinateConverter coordinateConverter, ParameterPopup parameterPopup, EditKeyPopup editKeyPopup,
             OnPointAction onPointSelected, OnPointMoved onPointMoved, OnPointAction onPointRemoved)
         {
             _coordinateConverter = coordinateConverter;
             _parameterPopup = parameterPopup;
+            _editKeyPopup = editKeyPopup;
             _onPointSelected = onPointSelected;
             _onPointMoved = onPointMoved;
             _onPointRemoved = onPointRemoved;
@@ -269,6 +273,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 _parameterPopup.Hide();
             }
         }
-        
+
+        public void ShowEditKeyPopup()
+        {
+            _editKeyPopup.Show(this);
+        }
     }
 }

@@ -74,6 +74,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private ScrollerController _scrollerController;
         private AxisLabelController _axisLabelController;
         private ParameterPopup _parameterPopup;
+        private EditKeyPopup _editKeyPopup;
         private PropertyFieldController _propertyFieldController;
 
         private PreviewTransform _previewTransform;
@@ -92,7 +93,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             AddToClassList(USSClassName);
             
             InitUI();
-            _curvePointContainer = new CurvePointContainer(_curvePreviewElement, () => new ControlPoint(_previewTransform, _parameterPopup, OnControlPointSelected, OnControlPointMoved, RemoveControlPoint));
+            _curvePointContainer = new CurvePointContainer(_curvePreviewElement, () => new ControlPoint(_previewTransform, _parameterPopup, _editKeyPopup, OnControlPointSelected, OnControlPointMoved, RemoveControlPoint));
         }
         
         /// <summary>
@@ -114,14 +115,28 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
         
-        private void MoveKey(Keyframe key)
+        private void MoveKey(Keyframe key, bool enableSnapping = true)
         {
             if (_curvePointContainer.IsEmpty || _selectedControlPointIndex < 0) return;
-            var gridViewport = _previewTransform.PreviewGridViewport;
-            if (_snapXButton.value) { key.time = gridViewport.RoundX(key.time, 0.05f); }
-            if (_snapYButton.value) { key.value = gridViewport.RoundY(key.value, 0.05f); }
+
+            if (enableSnapping)
+            {
+                var gridViewport = _previewTransform.PreviewGridViewport;
+                if (_snapXButton.value)
+                {
+                    key.time = gridViewport.RoundX(key.time, 0.05f);
+                }
+
+                if (_snapYButton.value)
+                {
+                    key.value = gridViewport.RoundY(key.value, 0.05f);
+                }
+            }
 
             _selectedControlPointIndex = _curvePointContainer.MoveKey(_selectedControlPointIndex, key);
+            
+            UpdateView();
+            NotifyEditorValueChanged(_curvePointContainer.Curve);
         }
         
         #region Initialization
@@ -151,11 +166,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             });
             _keyEventHelper.RegisterKeyAction(KeyCode.A, evt =>
             {
-                if (evt == KeyEventType.KeyUp) { FitViewToCurve(); }
+                if (evt == KeyEventType.KeyDown) { FitViewToCurve(); }
             });
             _keyEventHelper.RegisterKeyAction(KeyCode.Delete, evt =>
             {
-                if (evt != KeyEventType.KeyUp || _selectedControlPointIndex < 0) return;
+                if (evt != KeyEventType.KeyDown || _selectedControlPointIndex < 0) return;
                 RemoveControlPoint(_curvePointContainer.ControlPoints[_selectedControlPointIndex]);
             });
             
@@ -198,16 +213,18 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _parameterPopup = new ParameterPopup(_previewTransform);
             curveGroup.Add(_parameterPopup);
             
+            // Edit Key Popup
+            _editKeyPopup = new EditKeyPopup(keyframe =>
+            {
+                MoveKey(keyframe, false);
+                _propertyFieldController.UpdatePropertyFields();
+            });
+            curveGroup.Add(_editKeyPopup);
+            
             // Property Field
             _propertyFieldController = new PropertyFieldController(this,
                 () => _selectedControlPointIndex < 0 ? default : _curvePointContainer[_selectedControlPointIndex],
-                key =>
-                {
-                    MoveKey(key);
-                    UpdateView();
-                    NotifyEditorValueChanged(_curvePointContainer.Curve);
-                }
-            );
+                key => MoveKey(key));
         }
         
         #endregion
@@ -257,9 +274,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private int OnControlPointMoved(Keyframe keyframe)
         {
             MoveKey(keyframe);
-            UpdateView();
             _propertyFieldController.UpdatePropertyFields();
-            NotifyEditorValueChanged(_curvePointContainer.Curve);
             return _selectedControlPointIndex;
         }
         
@@ -307,6 +322,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _propertyFieldController.UpdatePropertyFields();
             _curvePointContainer.UnselectAllControlPoints();
             _parameterPopup.Hide();
+            _editKeyPopup.Hide();
         }
         
         #endregion

@@ -5,9 +5,9 @@ namespace RosettaUI.UIToolkit
     /// <summary>
     /// Referring to UIElement's Popup.
     /// </summary>
+    // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
     public class ModalWindow : Window
     {
-        private const string USSClassNameEventBlocker = "rosettaui-modal-window-event-blocker";
         private const string USSClassName = "rosettaui-modal-window";
 
         private readonly VisualElement _eventBlockerElement;
@@ -16,8 +16,7 @@ namespace RosettaUI.UIToolkit
 
         public ModalWindow(bool resizable = false) : base(resizable, true)
         {
-            _eventBlockerElement = new VisualElement();
-            _eventBlockerElement.AddToClassList(USSClassNameEventBlocker);
+            _eventBlockerElement = new EventBlocker();
             _eventBlockerElement.Add(this);
 
             AddToClassList(USSClassName);
@@ -42,7 +41,7 @@ namespace RosettaUI.UIToolkit
             _eventBlockerElement.RegisterCallback<PointerDownEvent>(OnPointerDownOnBlocker);
         }
 
-        protected virtual  void OnDetachFromPanel(DetachFromPanelEvent evt)
+        protected virtual void OnDetachFromPanel(DetachFromPanelEvent evt)
         {
             if (evt.originPanel == null)
                 return;
@@ -50,7 +49,7 @@ namespace RosettaUI.UIToolkit
             _eventBlockerElement.UnregisterCallback<PointerDownEvent>(OnPointerDownOnBlocker);
         }
 
-        protected virtual  void OnPointerDownOnBlocker(PointerDownEvent evt)
+        protected virtual void OnPointerDownOnBlocker(PointerDownEvent evt)
         {
             if (worldBound.Contains(evt.position)) return;
             Hide();

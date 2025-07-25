@@ -21,6 +21,11 @@ namespace RosettaUI.Builder
 
         public static Rect GetCurveRect(this AnimationCurve curve, int stepNum = 64)
         {
+            if (curve == null)
+            {
+                return default;
+            }
+            
             var keys = curve.keys;
             if (keys.Length <= 0)
             {

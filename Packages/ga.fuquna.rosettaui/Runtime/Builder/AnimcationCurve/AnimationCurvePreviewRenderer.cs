@@ -66,6 +66,11 @@ namespace RosettaUI.Builder
         
         private static int UpdateData(CommandBuffer cmdBuf, AnimationCurve animationCurve)
         {
+            if (animationCurve == null)
+            {
+                return 0;
+            }
+            
             var keys = animationCurve.keys;
             if (keys.Length < 2)
             {

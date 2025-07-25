@@ -78,7 +78,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private PropertyFieldController _propertyFieldController;
 
         private PreviewTransform _previewTransform;
-        private int _selectedControlPointIndex = -1;
         
         private int _mouseButton;
         private Vector2 _prevPointerPosition;
@@ -91,8 +90,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public AnimationCurveEditor() : base(VisualTreeAssetName, true)
         {
             AddToClassList(USSClassName);
-            
             InitUI();
+            
             _controlPointHolder = new ControlPointHolder(_curvePreviewElement, () => new ControlPoint(_previewTransform, _parameterPopup, _editKeyPopup, OnControlPointSelected, OnControlPointMoved));
             _controlPointHolder.onCurveChanged += () =>
             {
@@ -199,7 +198,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             // Property Field
             _propertyFieldController = new PropertyFieldController(this,
-                () => _selectedControlPointIndex < 0 ? default : _controlPointHolder[_selectedControlPointIndex],
+                // () => _selectedControlPointIndex < 0 ? default : _controlPointHolder[_selectedControlPointIndex],
+                () =>
+                {
+                    var controlPoint = _controlPointHolder?.SelectedControlPoint;
+                    return controlPoint == null ? default : (controlPoint.Keyframe, controlPoint);
+                },
                 key => { }); // TODO
         }
         
@@ -242,9 +246,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void OnControlPointSelected(ControlPoint controlPoint)
         {
-            _selectedControlPointIndex = _controlPointHolder.ControlPoints.IndexOf(controlPoint);
+            _controlPointHolder.SelectControlPoint(controlPoint);
             _propertyFieldController.UpdatePropertyFields();
-            _controlPointHolder.SelectControlPoint(_selectedControlPointIndex);
         }
         
         private void OnControlPointMoved(ControlPoint controlPoint, Vector2 desireKeyframePosition)
@@ -261,35 +264,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _propertyFieldController.UpdatePropertyFields();
         }
         
-        private void AddControlPoint(Vector2 positionInCurve)
+        private void AddControlPoint(Vector2 keyFramePosition)
         {
             UnselectAllControlPoint();
-            
-            // Add key
-            var key = new Keyframe(positionInCurve.x, positionInCurve.y);
-            var idx = _controlPointHolder.AddKey(key);
-            if (idx < 0) return;
-            _selectedControlPointIndex = idx;
-            
-            // Match the tangent mode to neighborhood point one
-            var cp = _controlPointHolder.ControlPoints[_selectedControlPointIndex];
-            if (0 < idx)
-            {
-                cp.SetTangentMode(_controlPointHolder.ControlPoints[_selectedControlPointIndex - 1].OutTangentMode, null);
-            }
-            if (idx < _controlPointHolder.Count - 1)
-            {
-                cp.SetTangentMode(null, _controlPointHolder.ControlPoints[_selectedControlPointIndex + 1].InTangentMode);
-            }
-            
-            UpdateView();
-            _propertyFieldController.UpdatePropertyFields();
-            NotifyEditorValueChanged(_controlPointHolder.Curve);
+            _controlPointHolder.AddKey(keyFramePosition);
         }
         
         private void UnselectAllControlPoint()
         {
-            _selectedControlPointIndex = -1;
             _propertyFieldController.UpdatePropertyFields();
             _controlPointHolder.UnselectAllControlPoints();
             _parameterPopup.Hide();

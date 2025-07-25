@@ -46,20 +46,26 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             ResetControlPoints();
         }
 
-        public int AddKey(Keyframe key)
+        public int AddKey(Vector2 keyFramePosition)
         {
-            if (IsEmpty) return -1;
-            var idx = Curve.AddKey(key);
-            if (idx < 0) return idx;
+            var key = new Keyframe(keyFramePosition.x, keyFramePosition.y);
+            
+            var index = Curve.AddKey(key);
+            if (index < 0) return index;
             
             // Add control point
-            var controlPoint = CreateControlPoint(Curve, idx);
+            var controlPoint = CreateControlPoint(Curve, index);
             controlPoint.IsActive = true;
-            ControlPoints.Insert(idx, controlPoint);
+            ControlPoints.Insert(index, controlPoint);
+            
+            // // Match the tangent mode to neighborhood point one
+            TangentMode? leftTangentMode = index > 0 ? ControlPoints[index - 1].OutTangentMode : null;
+            TangentMode? rightTangentMode = index < ControlPoints.Count - 1 ? ControlPoints[index + 1].InTangentMode : null;
+            controlPoint.SetTangentMode(leftTangentMode, rightTangentMode);
             
             onCurveChanged?.Invoke();
             
-            return idx;
+            return index;
         }
 
         
@@ -89,13 +95,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
         
-        public void SelectControlPoint(int index)
+        public void SelectControlPoint(ControlPoint controlPoint)
         {
-            if (index < 0 || index >= ControlPoints.Count) return;
-            for (var i = 0; i < ControlPoints.Count; i++)
-            {
-                ControlPoints[i].IsActive = (i == index);
-            }
+            if ( !ControlPoints.Contains(controlPoint) ) return;
+            
+            UnselectAllControlPoints();
+            controlPoint.IsActive = true;
         }
         
         public void UnselectAllControlPoints()

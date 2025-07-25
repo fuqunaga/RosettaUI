@@ -15,7 +15,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private readonly OnPointAction _onPointSelected;
         private readonly Action<ControlPoint, Vector2> _onPointMoved;
-        private readonly OnPointAction _onPointRemoved;
         
         private readonly ICoordinateConverter _coordinateConverter;
         private readonly ParameterPopup _parameterPopup;
@@ -79,17 +78,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
         
-        
-        
         public ControlPoint(ICoordinateConverter coordinateConverter, ParameterPopup parameterPopup, EditKeyPopup editKeyPopup,
-            OnPointAction onPointSelected, Action<ControlPoint, Vector2> onPointMoved, OnPointAction onPointRemoved)
+            OnPointAction onPointSelected, Action<ControlPoint, Vector2> onPointMoved)
         {
             _coordinateConverter = coordinateConverter;
             _parameterPopup = parameterPopup;
             _editKeyPopup = editKeyPopup;
             _onPointSelected = onPointSelected;
             _onPointMoved = onPointMoved;
-            _onPointRemoved = onPointRemoved;
             
             _keyEventHelper = new VisualElementKeyEventHelper(this);
             _keyEventHelper.RegisterKeyAction(new[] { KeyCode.LeftAlt, KeyCode.RightAlt }, type =>
@@ -144,7 +140,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             // Popup menu controller
             _popupMenuController = new ControlPointPopupMenuController(
-                () => _onPointRemoved(this),
+                // () => _onPointRemoved(this),
+                () => throw new NotImplementedException("onPointRemoved is not implemented in ControlPoint"),
                 SetPointModeAndUpdateView,
                 SetTangentModeAndUpdateView,
                 ToggleWeightedModeAndUpdateView

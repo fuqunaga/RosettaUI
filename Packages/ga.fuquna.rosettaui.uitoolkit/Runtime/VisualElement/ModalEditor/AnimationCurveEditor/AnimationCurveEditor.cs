@@ -93,7 +93,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             AddToClassList(USSClassName);
             
             InitUI();
-            _controlPointHolder = new ControlPointHolder(_curvePreviewElement, () => new ControlPoint(_previewTransform, _parameterPopup, _editKeyPopup, OnControlPointSelected, OnControlPointMoved, RemoveControlPoint));
+            _controlPointHolder = new ControlPointHolder(_curvePreviewElement, () => new ControlPoint(_previewTransform, _parameterPopup, _editKeyPopup, OnControlPointSelected, OnControlPointMoved));
             _controlPointHolder.onCurveChanged += () =>
             {
                 UpdateView();
@@ -151,8 +151,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             });
             _keyEventHelper.RegisterKeyAction(KeyCode.Delete, evt =>
             {
-                if (evt != KeyEventType.KeyDown || _selectedControlPointIndex < 0) return;
-                RemoveControlPoint(_controlPointHolder.ControlPoints[_selectedControlPointIndex]);
+                _controlPointHolder.RemoveSelectedControlPoint();
             });
             
             // Buttons
@@ -260,18 +259,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             controlPoint.KeyframePosition = position;
             
             _propertyFieldController.UpdatePropertyFields();
-        }
-        
-        private void RemoveControlPoint(ControlPoint cp)
-        {
-            if (cp == null) return;
-            var targetIndex = _controlPointHolder.ControlPoints.IndexOf(cp);
-            if (targetIndex < 0 || _controlPointHolder.Count <= 1) return;
-            _controlPointHolder.RemoveKey(targetIndex);
-            _selectedControlPointIndex = -1;
-            UpdateView();
-            _propertyFieldController.UpdatePropertyFields();
-            NotifyEditorValueChanged(_controlPointHolder.Curve);
         }
         
         private void AddControlPoint(Vector2 positionInCurve)

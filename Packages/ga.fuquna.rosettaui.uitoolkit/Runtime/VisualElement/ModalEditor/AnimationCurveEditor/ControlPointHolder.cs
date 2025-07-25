@@ -61,14 +61,20 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             return idx;
         }
+
         
-        public void RemoveKey(int index)
+        public void RemoveSelectedControlPoint()
         {
-            if (IsEmpty || index < 0 || index >= Curve.keys.Length || Curve.keys.Length <= 1) return;
+            if (ControlPoints.Count <= 1) return;
+            
+            var controlPoint = SelectedControlPoint;
+            if (controlPoint == null) return;
+            
+            controlPoint.RemoveFromHierarchy();
+            
+            var index = ControlPoints.IndexOf(controlPoint);
             Curve.RemoveKey(index);
-            var controlPoint = ControlPoints[index];
             ControlPoints.RemoveAt(index);
-            _parent.Remove(controlPoint);
             
             onCurveChanged?.Invoke();
         }

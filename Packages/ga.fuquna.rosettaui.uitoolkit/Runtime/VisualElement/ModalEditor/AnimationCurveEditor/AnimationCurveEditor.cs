@@ -213,18 +213,19 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void FitViewToCurve()
         {
             if (_controlPointHolder.IsEmpty) return;
-            var rect = _controlPointHolder.Curve.GetCurveRect(true, true);
+            var rect = _controlPointHolder.Curve.GetCurveRect();
             _previewTransform.FitToRect(rect, FitViewPaddingPixel);
             UpdateView();
         }
         
         private void UpdateView()
         {
+            var rect = _previewTransform.PreviewRect;
+            _scrollerController.UpdateScroller(rect, _controlPointHolder.Curve.GetCurveRect());
+            _axisLabelController.UpdateAxisLabel(rect);
+            
             _controlPointHolder.UpdateView();
             UpdateCurvePreview();
-            var rect = _previewTransform.PreviewRect;
-            _scrollerController.UpdateScroller(rect, _controlPointHolder.Curve.GetCurveRect(true, true));
-            _axisLabelController.UpdateAxisLabel(rect);
         }
         
         private void UpdateCurvePreview()

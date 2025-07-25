@@ -54,35 +54,7 @@ namespace RosettaUI.Builder
             return rect;
         }
         
-        public static Rect GetCurveRect(this AnimationCurve curve, bool clamp, bool adjustForVisibility, int stepNum = 64)
-        {
-            var rect = curve.GetCurveRect(stepNum);
-
-            if (adjustForVisibility)
-            {
-                if (rect.xMin is > 0f and <= 1f) { rect.xMin = 0f; }
-                if (rect.xMax is < 1f and >= 0f) { rect.xMax = 1f; }
-                if (rect.yMin is > 0f and <= 1f) { rect.yMin = 0f; }
-                if (rect.yMax is < 1f and >= 0f) { rect.yMax = 1f; }
-            }
-            
-            if (clamp)
-            {
-                if (rect.width <= 0f)
-                {
-                    rect.width = 1f;
-                    rect.xMin -= 1f;
-                }
-                if (rect.height <= 0f)
-                {
-                    rect.height = 1f;
-                    rect.yMin -= 1f;
-                }
-            }
-            return rect;
-        }
-
-
+      
         /// <summary>
         /// インスペクターやUIToolkit標準のCurveFieldのようにカーブを表示する矩形の高さを再計算する
         /// 1.0未満で徐々にカーブの上下に余白を非線形に追加していく

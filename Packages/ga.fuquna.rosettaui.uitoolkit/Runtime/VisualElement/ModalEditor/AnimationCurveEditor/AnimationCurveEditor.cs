@@ -62,7 +62,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         // ReSharper disable once MemberCanBePrivate.Global
         public static RectOffset FitViewPaddingPixel { get; } = new(24, 24, 40, 20);
         
-        private readonly CurvePointContainer _curvePointContainer;
+        private readonly ControlPointHolder _controlPointHolder;
         
         
         private RenderTexture _curveEditorTexture = null;
@@ -93,7 +93,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             AddToClassList(USSClassName);
             
             InitUI();
-            _curvePointContainer = new CurvePointContainer(_curvePreviewElement, () => new ControlPoint(_previewTransform, _parameterPopup, _editKeyPopup, OnControlPointSelected, OnControlPointMoved, RemoveControlPoint));
+            _controlPointHolder = new ControlPointHolder(_curvePreviewElement, () => new ControlPoint(_previewTransform, _parameterPopup, _editKeyPopup, OnControlPointSelected, OnControlPointMoved, RemoveControlPoint));
         }
         
         /// <summary>
@@ -101,7 +101,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         /// </summary>
         public void SetCurve(AnimationCurve curve)
         {
-            _curvePointContainer.SetCurve(curve);
+            _controlPointHolder.SetCurve(curve);
             UnselectAllControlPoint();
             FitViewToCurve();
         }
@@ -117,7 +117,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void MoveKey(Keyframe key, bool enableSnapping = true)
         {
-            if (_curvePointContainer.IsEmpty || _selectedControlPointIndex < 0) return;
+            if (_controlPointHolder.IsEmpty || _selectedControlPointIndex < 0) return;
 
             if (enableSnapping)
             {
@@ -132,11 +132,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     key.value = gridViewport.RoundY(key.value, 0.05f);
                 }
             }
-
-            _selectedControlPointIndex = _curvePointContainer.MoveKey(_selectedControlPointIndex, key);
+            
+            _selectedControlPointIndex = _controlPointHolder.MoveKey(_selectedControlPointIndex, key);
             
             UpdateView();
-            NotifyEditorValueChanged(_curvePointContainer.Curve);
+            NotifyEditorValueChanged(_controlPointHolder.Curve);
         }
         
         #region Initialization
@@ -171,7 +171,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _keyEventHelper.RegisterKeyAction(KeyCode.Delete, evt =>
             {
                 if (evt != KeyEventType.KeyDown || _selectedControlPointIndex < 0) return;
-                RemoveControlPoint(_curvePointContainer.ControlPoints[_selectedControlPointIndex]);
+                RemoveControlPoint(_controlPointHolder.ControlPoints[_selectedControlPointIndex]);
             });
             
             // Buttons
@@ -195,14 +195,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 yCenter =>
                 {
                     _previewTransform.SetYCenter(yCenter);
-                    _curvePointContainer.UpdateControlPoints();
+                    _controlPointHolder.UpdateControlPoints();
                     UpdateCurvePreview();
                     _axisLabelController.UpdateAxisLabel(_previewTransform.PreviewRect);
                 },
                 xCenter =>
                 {
                     _previewTransform.SetXCenter(xCenter);
-                    _curvePointContainer.UpdateControlPoints();
+                    _controlPointHolder.UpdateControlPoints();
                     UpdateCurvePreview();
                     _axisLabelController.UpdateAxisLabel(_previewTransform.PreviewRect);
                 }
@@ -223,7 +223,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             // Property Field
             _propertyFieldController = new PropertyFieldController(this,
-                () => _selectedControlPointIndex < 0 ? default : _curvePointContainer[_selectedControlPointIndex],
+                () => _selectedControlPointIndex < 0 ? default : _controlPointHolder[_selectedControlPointIndex],
                 key => MoveKey(key));
         }
         
@@ -232,18 +232,18 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         #region View Update
         private void FitViewToCurve()
         {
-            if (_curvePointContainer.IsEmpty) return;
-            var rect = _curvePointContainer.Curve.GetCurveRect(true, true);
+            if (_controlPointHolder.IsEmpty) return;
+            var rect = _controlPointHolder.Curve.GetCurveRect(true, true);
             _previewTransform.FitToRect(rect, FitViewPaddingPixel);
             UpdateView();
         }
         
         private void UpdateView()
         {
-            _curvePointContainer.UpdateControlPoints();
+            _controlPointHolder.UpdateControlPoints();
             UpdateCurvePreview();
             var rect = _previewTransform.PreviewRect;
-            _scrollerController.UpdateScroller(rect, _curvePointContainer.Curve.GetCurveRect(true, true));
+            _scrollerController.UpdateScroller(rect, _controlPointHolder.Curve.GetCurveRect(true, true));
             _axisLabelController.UpdateAxisLabel(rect);
         }
         
@@ -257,7 +257,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 gridParams = new Vector4(gridViewport.XOrder, gridViewport.YOrder, gridViewport.XTick, gridViewport.YTick),
             };
             
-            AnimationCurveVisualElementHelper.UpdatePreviewToBackgroundImage(_curvePointContainer.Curve, _curvePreviewElement, viewInfo);
+            AnimationCurveVisualElementHelper.UpdatePreviewToBackgroundImage(_controlPointHolder.Curve, _curvePreviewElement, viewInfo);
         }
         
         #endregion
@@ -266,9 +266,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void OnControlPointSelected(ControlPoint controlPoint)
         {
-            _selectedControlPointIndex = _curvePointContainer.ControlPoints.IndexOf(controlPoint);
+            _selectedControlPointIndex = _controlPointHolder.ControlPoints.IndexOf(controlPoint);
             _propertyFieldController.UpdatePropertyFields();
-            _curvePointContainer.SelectControlPoint(_selectedControlPointIndex);
+            _controlPointHolder.SelectControlPoint(_selectedControlPointIndex);
         }
         
         private void OnControlPointMoved(Keyframe keyframe)
@@ -280,13 +280,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void RemoveControlPoint(ControlPoint cp)
         {
             if (cp == null) return;
-            var targetIndex = _curvePointContainer.ControlPoints.IndexOf(cp);
-            if (targetIndex < 0 || _curvePointContainer.Count <= 1) return;
-            _curvePointContainer.RemoveKey(targetIndex);
+            var targetIndex = _controlPointHolder.ControlPoints.IndexOf(cp);
+            if (targetIndex < 0 || _controlPointHolder.Count <= 1) return;
+            _controlPointHolder.RemoveKey(targetIndex);
             _selectedControlPointIndex = -1;
             UpdateView();
             _propertyFieldController.UpdatePropertyFields();
-            NotifyEditorValueChanged(_curvePointContainer.Curve);
+            NotifyEditorValueChanged(_controlPointHolder.Curve);
         }
         
         private void AddControlPoint(Vector2 positionInCurve)
@@ -295,31 +295,31 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             // Add key
             var key = new Keyframe(positionInCurve.x, positionInCurve.y);
-            var idx = _curvePointContainer.AddKey(key);
+            var idx = _controlPointHolder.AddKey(key);
             if (idx < 0) return;
             _selectedControlPointIndex = idx;
             
             // Match the tangent mode to neighborhood point one
-            var cp = _curvePointContainer.ControlPoints[_selectedControlPointIndex];
+            var cp = _controlPointHolder.ControlPoints[_selectedControlPointIndex];
             if (0 < idx)
             {
-                cp.SetTangentMode(_curvePointContainer.ControlPoints[_selectedControlPointIndex - 1].OutTangentMode, null);
+                cp.SetTangentMode(_controlPointHolder.ControlPoints[_selectedControlPointIndex - 1].OutTangentMode, null);
             }
-            if (idx < _curvePointContainer.Count - 1)
+            if (idx < _controlPointHolder.Count - 1)
             {
-                cp.SetTangentMode(null, _curvePointContainer.ControlPoints[_selectedControlPointIndex + 1].InTangentMode);
+                cp.SetTangentMode(null, _controlPointHolder.ControlPoints[_selectedControlPointIndex + 1].InTangentMode);
             }
             
             UpdateView();
             _propertyFieldController.UpdatePropertyFields();
-            NotifyEditorValueChanged(_curvePointContainer.Curve);
+            NotifyEditorValueChanged(_controlPointHolder.Curve);
         }
         
         private void UnselectAllControlPoint()
         {
             _selectedControlPointIndex = -1;
             _propertyFieldController.UpdatePropertyFields();
-            _curvePointContainer.UnselectAllControlPoints();
+            _controlPointHolder.UnselectAllControlPoints();
             _parameterPopup.Hide();
             _editKeyPopup.Hide();
         }

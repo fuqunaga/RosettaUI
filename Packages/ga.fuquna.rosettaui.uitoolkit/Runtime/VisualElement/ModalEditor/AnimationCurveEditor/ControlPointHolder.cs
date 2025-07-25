@@ -10,7 +10,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// <summary>
     /// Manage AnimationCurve and ControlPoints
     /// </summary>
-    public class CurvePointContainer : IEnumerable<(Keyframe key, ControlPoint point)>
+    public class ControlPointHolder : IEnumerable<(Keyframe key, ControlPoint point)>
     {
         public AnimationCurve Curve { get; private set; }
 
@@ -26,11 +26,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 return (Curve.keys[index], ControlPoints[index]);
             }
         }
+        
+        public ControlPoint SelectedControlPoint => ControlPoints.FirstOrDefault(t => t.IsActive);
 
         private readonly VisualElement _parent;
         private readonly Func<ControlPoint> _getNewControlPoint;
         
-        public CurvePointContainer(VisualElement parent, Func<ControlPoint> getNewControlPoint)
+        public ControlPointHolder(VisualElement parent, Func<ControlPoint> getNewControlPoint)
         {
             _parent = parent;
             _getNewControlPoint = getNewControlPoint;
@@ -52,7 +54,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var controlPoint = _getNewControlPoint();
             _parent.Add(controlPoint);
             controlPoint.SetKeyframe(Curve, idx);
-            controlPoint.SetActive(true);
+            controlPoint.IsActive = true;
             ControlPoints.Insert(idx, controlPoint);
             
             return idx;
@@ -105,7 +107,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             if (index < 0 || index >= ControlPoints.Count) return;
             for (var i = 0; i < ControlPoints.Count; i++)
             {
-                ControlPoints[i].SetActive(i == index);
+                ControlPoints[i].IsActive = (i == index);
             }
         }
         
@@ -113,7 +115,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             foreach (var cp in ControlPoints)
             {
-                cp.SetActive(false);
+                cp.IsActive = false;
             }
         }
         

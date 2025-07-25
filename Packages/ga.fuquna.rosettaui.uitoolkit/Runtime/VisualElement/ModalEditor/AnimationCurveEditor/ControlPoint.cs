@@ -11,20 +11,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// </summary>
     public class ControlPoint : VisualElement
     {
-        public PointMode PointMode { get; private set; } = PointMode.Smooth;
-        public TangentMode InTangentMode { get; private set; } = TangentMode.Free;
-        public TangentMode OutTangentMode { get; private set; } = TangentMode.Free;
-        
-        private Vector2 PositionInCurve
-        {
-            get => new Vector2(_keyframeCopy.time, _keyframeCopy.value);
-            set
-            {
-                _keyframeCopy.time = value.x;
-                _keyframeCopy.value = value.y;
-            }
-        }
-
         private readonly OnPointAction _onPointSelected;
         private readonly OnPointMoved _onPointMoved;
         private readonly OnPointAction _onPointRemoved;
@@ -50,7 +36,43 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public delegate void OnPointAction(ControlPoint controlPoint);
         public delegate void OnPointMoved(Keyframe keyframe);
 
+        
+        public PointMode PointMode { get; private set; } = PointMode.Smooth;
+        public TangentMode InTangentMode { get; private set; } = TangentMode.Free;
+        public TangentMode OutTangentMode { get; private set; } = TangentMode.Free;
+
+        public bool IsActive
+        {
+            get => _controlPoint.ClassListContains(ActiveControlPointClassName);
+            set{
+                if (value)
+                {
+                    _controlPoint.AddToClassList(ActiveControlPointClassName);
+                    _leftHandle.style.visibility = Visibility.Visible;
+                    _rightHandle.style.visibility = Visibility.Visible;
+                }
+                else
+                {
+                    _controlPoint.RemoveFromClassList(ActiveControlPointClassName);
+                    _leftHandle.style.visibility = Visibility.Hidden;
+                    _rightHandle.style.visibility = Visibility.Hidden;
+                }
+            }
+        }
+        
         public Keyframe Keyframe => _keyframeCopy;
+        
+        private Vector2 PositionInCurve
+        {
+            get => new Vector2(_keyframeCopy.time, _keyframeCopy.value);
+            set
+            {
+                _keyframeCopy.time = value.x;
+                _keyframeCopy.value = value.y;
+            }
+        }
+        
+        
         
         public ControlPoint(ICoordinateConverter coordinateConverter, ParameterPopup parameterPopup, EditKeyPopup editKeyPopup,
             OnPointAction onPointSelected, OnPointMoved onPointMoved, OnPointAction onPointRemoved)
@@ -152,22 +174,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 _keyframeCopy.ToggleWeightedFrag(mode);
                 _onPointMoved(_keyframeCopy);
                 _popupMenuController.SetWeightedMode(_keyframeCopy.weightedMode);
-            }
-        }
-        
-        public void SetActive(bool active)
-        {
-            if (active)
-            {
-                _controlPoint.AddToClassList(ActiveControlPointClassName);
-                _leftHandle.style.visibility = Visibility.Visible;
-                _rightHandle.style.visibility = Visibility.Visible;
-            }
-            else
-            {
-                _controlPoint.RemoveFromClassList(ActiveControlPointClassName);
-                _leftHandle.style.visibility = Visibility.Hidden;
-                _rightHandle.style.visibility = Visibility.Hidden;
             }
         }
         

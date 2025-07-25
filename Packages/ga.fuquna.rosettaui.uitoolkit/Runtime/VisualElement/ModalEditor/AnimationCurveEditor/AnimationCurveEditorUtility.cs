@@ -88,10 +88,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             return Mathf.Atan2(y, x) * Mathf.Rad2Deg;
         }
 
-        public static void ApplyTangentMode(CurvePointContainer container)
+        public static void ApplyTangentMode(ControlPointHolder holder)
         {
             var i = 0;
-            foreach (var keyPoint in container)
+            foreach (var keyPoint in holder)
             {
                 var key = keyPoint.key;
                 switch (keyPoint.point.InTangentMode)
@@ -100,7 +100,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                         // Set the tangent to the slope between the previous key and this key
                         if (i > 0)
                         {
-                            var prevKey = container[i - 1].key;
+                            var prevKey = holder[i - 1].key;
                             key.inTangent = (key.value - prevKey.value) / (key.time - prevKey.time);
                         }
                         keyPoint.point.SetPointMode(PointMode.Broken);
@@ -116,9 +116,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 {
                     case TangentMode.Linear:
                         // Set the tangent to the slope between this key and the next key
-                        if (i < container.Count - 1)
+                        if (i < holder.Count - 1)
                         {
-                            var nextKey = container[i + 1].key;
+                            var nextKey = holder[i + 1].key;
                             key.outTangent = (nextKey.value - key.value) / (nextKey.time - key.time);
                         }
                         keyPoint.point.SetPointMode(PointMode.Broken);
@@ -131,7 +131,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                         break;
                 }
                 
-                container.MoveKey(i, key);
+                // holder.MoveKey(i, key);
                 i++;
             }
         }

@@ -1,5 +1,4 @@
-﻿using RosettaUI.Builder;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {

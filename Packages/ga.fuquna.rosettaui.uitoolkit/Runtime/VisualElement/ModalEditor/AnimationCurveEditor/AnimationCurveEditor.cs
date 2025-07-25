@@ -271,11 +271,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _curvePointContainer.SelectControlPoint(_selectedControlPointIndex);
         }
         
-        private int OnControlPointMoved(Keyframe keyframe)
+        private void OnControlPointMoved(Keyframe keyframe)
         {
             MoveKey(keyframe);
             _propertyFieldController.UpdatePropertyFields();
-            return _selectedControlPointIndex;
         }
         
         private void RemoveControlPoint(ControlPoint cp)

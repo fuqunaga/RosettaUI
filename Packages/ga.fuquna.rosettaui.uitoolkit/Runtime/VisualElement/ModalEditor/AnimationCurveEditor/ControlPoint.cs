@@ -48,7 +48,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private const string ActiveControlPointClassName = "rosettaui-animation-curve-editor__control-point--active";
         
         public delegate void OnPointAction(ControlPoint controlPoint);
-        public delegate int OnPointMoved(Keyframe keyframe);
+        public delegate void OnPointMoved(Keyframe keyframe);
 
         public Keyframe Keyframe => _keyframeCopy;
         

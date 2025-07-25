@@ -94,6 +94,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             InitUI();
             _controlPointHolder = new ControlPointHolder(_curvePreviewElement, () => new ControlPoint(_previewTransform, _parameterPopup, _editKeyPopup, OnControlPointSelected, OnControlPointMoved, RemoveControlPoint));
+            _controlPointHolder.onCurveChanged += () =>
+            {
+                UpdateView();
+                NotifyEditorValueChanged(_controlPointHolder.Curve);
+            };
         }
         
         /// <summary>
@@ -113,30 +118,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 Object.DestroyImmediate(_curveEditorTexture);
                 _curveEditorTexture = null;
             }
-        }
-        
-        private void MoveKey(Keyframe key, bool enableSnapping = true)
-        {
-            if (_controlPointHolder.IsEmpty || _selectedControlPointIndex < 0) return;
-
-            if (enableSnapping)
-            {
-                var gridViewport = _previewTransform.PreviewGridViewport;
-                if (_snapXButton.value)
-                {
-                    key.time = gridViewport.RoundX(key.time, 0.05f);
-                }
-
-                if (_snapYButton.value)
-                {
-                    key.value = gridViewport.RoundY(key.value, 0.05f);
-                }
-            }
-            
-            _selectedControlPointIndex = _controlPointHolder.MoveKey(_selectedControlPointIndex, key);
-            
-            UpdateView();
-            NotifyEditorValueChanged(_controlPointHolder.Curve);
         }
         
         #region Initialization
@@ -195,14 +176,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 yCenter =>
                 {
                     _previewTransform.SetYCenter(yCenter);
-                    _controlPointHolder.UpdateControlPoints();
+                    _controlPointHolder.UpdateView();
                     UpdateCurvePreview();
                     _axisLabelController.UpdateAxisLabel(_previewTransform.PreviewRect);
                 },
                 xCenter =>
                 {
                     _previewTransform.SetXCenter(xCenter);
-                    _controlPointHolder.UpdateControlPoints();
+                    _controlPointHolder.UpdateView();
                     UpdateCurvePreview();
                     _axisLabelController.UpdateAxisLabel(_previewTransform.PreviewRect);
                 }
@@ -214,17 +195,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             curveGroup.Add(_parameterPopup);
             
             // Edit Key Popup
-            _editKeyPopup = new EditKeyPopup(keyframe =>
-            {
-                MoveKey(keyframe, false);
-                _propertyFieldController.UpdatePropertyFields();
-            });
+            _editKeyPopup = new EditKeyPopup();
             curveGroup.Add(_editKeyPopup);
             
             // Property Field
             _propertyFieldController = new PropertyFieldController(this,
                 () => _selectedControlPointIndex < 0 ? default : _controlPointHolder[_selectedControlPointIndex],
-                key => MoveKey(key));
+                key => { }); // TODO
         }
         
         #endregion
@@ -240,7 +217,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void UpdateView()
         {
-            _controlPointHolder.UpdateControlPoints();
+            _controlPointHolder.UpdateView();
             UpdateCurvePreview();
             var rect = _previewTransform.PreviewRect;
             _scrollerController.UpdateScroller(rect, _controlPointHolder.Curve.GetCurveRect(true, true));
@@ -271,9 +248,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _controlPointHolder.SelectControlPoint(_selectedControlPointIndex);
         }
         
-        private void OnControlPointMoved(Keyframe keyframe)
+        private void OnControlPointMoved(ControlPoint controlPoint, Vector2 desireKeyframePosition)
         {
-            MoveKey(keyframe);
+            var gridViewport = _previewTransform.PreviewGridViewport;
+
+            var position = new Vector2(
+                _snapXButton.value ? gridViewport.RoundX(desireKeyframePosition.x, 0.05f) : desireKeyframePosition.x,
+                _snapYButton.value ? gridViewport.RoundY(desireKeyframePosition.y, 0.05f) : desireKeyframePosition.y
+            );
+
+            controlPoint.KeyframePosition = position;
+            
             _propertyFieldController.UpdatePropertyFields();
         }
         

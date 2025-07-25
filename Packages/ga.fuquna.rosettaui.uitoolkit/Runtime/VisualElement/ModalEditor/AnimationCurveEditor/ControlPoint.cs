@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -11,11 +11,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// </summary>
     public class ControlPoint : VisualElement
     {
-        private readonly OnPointAction _onPointSelected;
-        private readonly OnPointMoved _onPointMoved;
-        private readonly OnPointAction _onPointRemoved;
+        public event Action<ControlPoint> onKeyframeChanged;
         
-        private Vector2 _mouseDownPositionToElementOffset;
+        private readonly OnPointAction _onPointSelected;
+        private readonly Action<ControlPoint, Vector2> _onPointMoved;
+        private readonly OnPointAction _onPointRemoved;
         
         private readonly ICoordinateConverter _coordinateConverter;
         private readonly ParameterPopup _parameterPopup;
@@ -25,6 +25,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly ControlPointHandle _rightHandle;
         private readonly ControlPointPopupMenuController _popupMenuController;
 
+
+        private Vector2 _mouseDownPositionToElementOffset;
         private Keyframe _keyframeCopy;
         
         private readonly VisualElementKeyEventHelper _keyEventHelper;
@@ -34,8 +36,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private const string ActiveControlPointClassName = "rosettaui-animation-curve-editor__control-point--active";
         
         public delegate void OnPointAction(ControlPoint controlPoint);
-        public delegate void OnPointMoved(Keyframe keyframe);
-
+        
         
         public PointMode PointMode { get; private set; } = PointMode.Smooth;
         public TangentMode InTangentMode { get; private set; } = TangentMode.Free;
@@ -62,20 +63,26 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public Keyframe Keyframe => _keyframeCopy;
         
-        private Vector2 PositionInCurve
+        public Vector2 KeyframePosition
         {
-            get => new Vector2(_keyframeCopy.time, _keyframeCopy.value);
+            get => new(_keyframeCopy.time, _keyframeCopy.value);
+            
+            [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
             set
             {
+                if ( _keyframeCopy.time == value.x && _keyframeCopy.value == value.y) return;
+                
                 _keyframeCopy.time = value.x;
                 _keyframeCopy.value = value.y;
+                
+                onKeyframeChanged?.Invoke(this);
             }
         }
         
         
         
         public ControlPoint(ICoordinateConverter coordinateConverter, ParameterPopup parameterPopup, EditKeyPopup editKeyPopup,
-            OnPointAction onPointSelected, OnPointMoved onPointMoved, OnPointAction onPointRemoved)
+            OnPointAction onPointSelected, Action<ControlPoint, Vector2> onPointMoved, OnPointAction onPointRemoved)
         {
             _coordinateConverter = coordinateConverter;
             _parameterPopup = parameterPopup;
@@ -104,7 +111,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                         if (float.IsInfinity(_keyframeCopy.inTangent)) _keyframeCopy.outTangent = -_keyframeCopy.inTangent;
                         _keyframeCopy.outTangent = _keyframeCopy.inTangent;
                     }
-                    _onPointMoved(_keyframeCopy);
+                    // _onPointMoved(_keyframeCopy);
                 }
             );
             Add(_leftHandle);
@@ -121,7 +128,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                         if (float.IsInfinity(_keyframeCopy.outTangent)) _keyframeCopy.inTangent = -_keyframeCopy.outTangent;
                         _keyframeCopy.inTangent = _keyframeCopy.outTangent;
                     }
-                    _onPointMoved(_keyframeCopy);
+                    // _onPointMoved(_keyframeCopy);
                 }
             );
             Add(_rightHandle);
@@ -160,19 +167,19 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                         _keyframeCopy.inTangent = _keyframeCopy.outTangent;
                         break;
                 }
-                _onPointMoved(_keyframeCopy);
+                // _onPointMoved(_keyframeCopy);
             }
             
             void SetTangentModeAndUpdateView(TangentMode? inTangentMode, TangentMode? outTangentMode)
             {
                 SetTangentMode(inTangentMode, outTangentMode);
-                _onPointMoved(_keyframeCopy);
+                // _onPointMoved(_keyframeCopy);
             }
             
             void ToggleWeightedModeAndUpdateView(WeightedMode mode)
             {
                 _keyframeCopy.ToggleWeightedFrag(mode);
-                _onPointMoved(_keyframeCopy);
+                // _onPointMoved(_keyframeCopy);
                 _popupMenuController.SetWeightedMode(_keyframeCopy.weightedMode);
             }
         }
@@ -208,11 +215,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public void SetKeyframe(in AnimationCurve curve, int idx)
         {
             _keyframeCopy = curve[idx];
+            UpdateView();
             
-            // Set Position
-            var screenPosition = _coordinateConverter.GetScreenPosFromCurvePos(PositionInCurve);
-            style.left = screenPosition.x;
-            style.top = screenPosition.y;
             _leftHandle.SetTangent(_keyframeCopy.inTangent);
             _rightHandle.SetTangent(_keyframeCopy.outTangent);
             
@@ -228,12 +232,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 return _coordinateConverter.GetScreenPosFromCurvePos(curve[rightIdx].GetPosition()).x - _coordinateConverter.GetScreenPosFromCurvePos(curve[leftIdx].GetPosition()).x;
             }
         }
-        
+
+
+        public void UpdateView()
+        {
+            var uiPosition = _coordinateConverter.GetScreenPosFromCurvePos(KeyframePosition);
+            style.left = uiPosition.x;
+            style.top = uiPosition.y;
+        }
         
         private void OnMouseDown(PointerDownEvent evt)
         {
-            // _mouseDownPosition = evt.position;
-            // _elementPositionOnDown = new Vector2(style.left.value.value, style.top.value.value);
             var elementPosition = new Vector2(resolvedStyle.left, resolvedStyle.top);
             _mouseDownPositionToElementOffset = elementPosition - (Vector2)evt.position; 
             _onPointSelected?.Invoke(this);
@@ -259,12 +268,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void OnPointerMove(PointerMoveEvent evt)
         {
             var screenPosition = (Vector2)evt.position + _mouseDownPositionToElementOffset;
-            style.left = screenPosition.x;
-            style.top = screenPosition.y;
-            PositionInCurve = _coordinateConverter.GetCurvePosFromScreenPos(screenPosition);
-            _onPointMoved(_keyframeCopy);
+            
+            // Snap to gridモードがあるのでポインターの移動量がそのまま反映されないことがある
+            // _onPointMovedに値の更新は任せる
+            var desireKeyframePosition = _coordinateConverter.GetCurvePosFromScreenPos(screenPosition);
+            _onPointMoved(this, desireKeyframePosition);
 
-            _parameterPopup.Update(screenPosition, _keyframeCopy);
+            _parameterPopup.Update(screenPosition, Keyframe);
         }
 
         private void OnPointerUp(PointerUpEvent evt)

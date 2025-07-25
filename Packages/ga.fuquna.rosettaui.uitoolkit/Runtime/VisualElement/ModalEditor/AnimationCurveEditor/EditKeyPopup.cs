@@ -11,15 +11,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     {
         public static string VisualTreeAssetName { get; set; } = "RosettaUI_AnimationCurve_EditKeyPopup";
 
+        private ControlPoint _controlPoint;
+        
         private VisualElement _editKeyPopupRoot;
         private FloatField _timeField;
         private FloatField _valueField;
 
-        private Action<Keyframe> _onSubmit;
-        
-        public EditKeyPopup(Action<Keyframe> onSubmit)
+        public EditKeyPopup()
         {
-            _onSubmit = onSubmit;
             Hide();
         }
         
@@ -53,7 +52,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 // FloatFieldのイベント後にSubmitを実行
                 schedule.Execute(() =>
                 {
-                    _onSubmit?.Invoke(new Keyframe(_timeField.value, _valueField.value));
+                    if (_controlPoint != null)
+                    {
+                        _controlPoint.KeyframePosition = new Vector2(_timeField.value, _valueField.value);
+                    }
                     Hide();
                 });
             }, TrickleDown.TrickleDown);
@@ -63,7 +65,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             InitializeIfNeeded();
             
-            var keyframe = controlPoint.Keyframe;
+            _controlPoint = controlPoint;
+            
+            var keyframe = _controlPoint.Keyframe;
             _timeField.value = keyframe.time;
             _valueField.value = keyframe.value;
             

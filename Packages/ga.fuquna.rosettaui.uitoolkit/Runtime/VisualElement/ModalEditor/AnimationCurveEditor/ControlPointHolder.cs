@@ -12,6 +12,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// </summary>
     public class ControlPointHolder : IEnumerable<(Keyframe key, ControlPoint point)>
     {
+        public event Action onCurveChanged;
+        
         public AnimationCurve Curve { get; private set; }
 
         public List<ControlPoint> ControlPoints { get; } = new();
@@ -51,36 +53,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             if (idx < 0) return idx;
             
             // Add control point
-            var controlPoint = _getNewControlPoint();
-            _parent.Add(controlPoint);
-            controlPoint.SetKeyframe(Curve, idx);
+            var controlPoint = CreateControlPoint(Curve, idx);
             controlPoint.IsActive = true;
             ControlPoints.Insert(idx, controlPoint);
             
+            onCurveChanged?.Invoke();
+            
             return idx;
-        }
-        
-        public int MoveKey(int index, Keyframe key)
-        {
-            if (IsEmpty || index < 0) return index;
-
-            for (var i = 0; i < Curve.keys.Length; i++)
-            {
-                if (i == index) continue;
-                if (Curve.keys[i].time == key.time) return index;
-            }
-            
-            var newIdx = Curve.MoveKey(index, key);
-            if (newIdx != index)
-            {
-                // Swap control points
-                var temp = ControlPoints[index];
-                ControlPoints.RemoveAt(index);
-                ControlPoints.Insert(newIdx, temp);
-                index = newIdx;
-            }
-            
-            return index;
         }
         
         public void RemoveKey(int index)
@@ -90,15 +69,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var controlPoint = ControlPoints[index];
             ControlPoints.RemoveAt(index);
             _parent.Remove(controlPoint);
+            
+            onCurveChanged?.Invoke();
         }
         
-        public void UpdateControlPoints()
+        public void UpdateView()
         {
             if (IsEmpty) return;
             AnimationCurveEditorUtility.ApplyTangentMode(this);
-            for (var i = 0; i < Curve.keys.Length; i++)
+            foreach(var controlPoint in ControlPoints)
             {
-                ControlPoints[i].SetKeyframe(Curve, i);
+                controlPoint.UpdateView();
             }
         }
         
@@ -132,23 +113,53 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void ResetControlPoints()
         {
             if (Curve == null) return;
+            
             foreach (var cp in ControlPoints)
             {
-                _parent.Remove(cp);
+                cp.RemoveFromHierarchy();
             }
             ControlPoints.Clear();
+            
             for (var i = 0; i < Curve.keys.Length; i++)
             {
                 var key = Curve.keys[i];
-                var controlPoint = _getNewControlPoint();
-                ControlPoints.Add(controlPoint);
-                _parent.Insert(0, controlPoint);
-                controlPoint.SetKeyframe(Curve, i);
+                var controlPoint = CreateControlPoint(Curve, i);
                 controlPoint.SetPointMode(key.GetPointMode());
                 controlPoint.SetTangentMode(Curve.GetInTangentMode(i), Curve.GetOutTangentMode(i));
                 controlPoint.SetWeightedMode(key.weightedMode);
             }
         }
         
+        private ControlPoint CreateControlPoint(AnimationCurve curve, int index)
+        {
+            var controlPoint = _getNewControlPoint();
+            _parent.Add(controlPoint);
+            
+            controlPoint.SetKeyframe(curve, index);
+            controlPoint.onKeyframeChanged += OnControlPointKeyframeChanged;
+            
+            ControlPoints.Add(controlPoint);
+            
+            return controlPoint;
+        }
+
+        /// <summary>
+        /// ControlPointのKeyframeの時間が変更されたらAnimationCurve上のIndexが変わる可能性がある
+        /// Indexが変わるなら追随する
+        /// </summary>
+        private void OnControlPointKeyframeChanged(ControlPoint controlPoint)
+        {
+            var index = ControlPoints.IndexOf(controlPoint);
+            var newIndex = Curve.MoveKey(index, controlPoint.Keyframe);
+            if (newIndex != index)
+            {
+                // Indexが変わったのでControlPointsの順番も入れ替える
+                var temp = ControlPoints[index];
+                ControlPoints.RemoveAt(index);
+                ControlPoints.Insert(newIndex, temp);
+            }
+            
+            onCurveChanged?.Invoke();
+        }
     }
 }

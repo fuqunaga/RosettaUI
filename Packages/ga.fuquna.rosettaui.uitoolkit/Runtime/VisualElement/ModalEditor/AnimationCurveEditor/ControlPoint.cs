@@ -50,15 +50,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 if (value)
                 {
                     _controlPoint.AddToClassList(ActiveControlPointClassName);
-                    _leftHandle.style.visibility = Visibility.Visible;
-                    _rightHandle.style.visibility = Visibility.Visible;
                 }
                 else
                 {
                     _controlPoint.RemoveFromClassList(ActiveControlPointClassName);
-                    _leftHandle.style.visibility = Visibility.Hidden;
-                    _rightHandle.style.visibility = Visibility.Hidden;
                 }
+                
+                UpdateHandleView();
             }
         }
         
@@ -227,12 +225,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             var keyframe = Keyframe;
 
-            var leftHandleEnable = InTangentMode != TangentMode.Linear;
-            var rightHandleEnable = OutTangentMode != TangentMode.Linear;
+            var leftHandleEnable = IsActive && (Left != null) && (InTangentMode != TangentMode.Linear);
+            var rightHandleEnable = IsActive && (Right != null) && (OutTangentMode != TangentMode.Linear);
 
             Update(leftHandleEnable, _leftHandle, keyframe, GetXDistInScreen(Left, this));
             Update(rightHandleEnable, _rightHandle, keyframe, GetXDistInScreen(this, Right));
+            
             return;
+            
             
             static void Update(bool enable, ControlPointHandle handle, Keyframe keyframe, float xDistToNeighborInScreen)
             {

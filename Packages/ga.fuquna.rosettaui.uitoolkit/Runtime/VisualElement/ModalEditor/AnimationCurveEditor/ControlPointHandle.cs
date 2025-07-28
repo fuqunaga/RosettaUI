@@ -14,22 +14,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public delegate void OnTangentChanged(float tangent, float weight);
         
-        private VisualElement _lineElement;
-        private VisualElement _handleContainerElement;
-        private readonly ICoordinateConverter _coordinateConverter;
-        
-        private readonly OnTangentChanged _onTangentChanged;
-
-        private readonly LeftOrRight _leftOrRight;
-        
-        private float _xDistToNeighborInScreen;
-        
         private const float DefaultLineLength = 50f;
         private const string HandleRootClassName = "rosettaui-animation-curve-editor__control-point-handle";
         private const string HandleLineClassName = "rosettaui-animation-curve-editor__control-point-handle__line";
         private const string HandleContainerClassName = "rosettaui-animation-curve-editor__control-point-handle__handle-container";
         private const string HandleContainerWeightClassName = "rosettaui-animation-curve-editor__control-point-handle__handle-container-weight";
         private const string HandleClassName = "rosettaui-animation-curve-editor__control-point-handle__handle";
+
+        private readonly LeftOrRight _leftOrRight;
+        private readonly ICoordinateConverter _coordinateConverter;
+        private readonly OnTangentChanged _onTangentChanged;
+
+        private VisualElement _lineElement;
+        private VisualElement _handleContainerElement;
+        
+        private float _xDistToNeighborInScreen;
         
         private float Sign => (int)_leftOrRight;
         
@@ -70,7 +69,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             float? weight = isWeightEnable
                 ? (_leftOrRight == LeftOrRight.Left ? keyframe.inWeight : keyframe.outWeight)
                 : null;
-            
             
             _xDistToNeighborInScreen = xDistToNeighborInScreen;
             SetWeight(weight, degree);

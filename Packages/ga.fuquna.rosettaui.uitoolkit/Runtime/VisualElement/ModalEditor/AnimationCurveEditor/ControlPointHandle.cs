@@ -50,7 +50,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             handleElement.AddToClassList(HandleClassName);
             _handleContainerElement.Add(handleElement);
         }
-
+        
         /// <summary>
         /// Set the tangent of the handle
         /// </summary>

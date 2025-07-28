@@ -15,11 +15,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// </summary>
     public class ControlPoint : VisualElement
     {
-        public event Action<ControlPoint> onKeyframeChanged;
-        
+        private const string ContainerClassName = "rosettaui-animation-curve-editor__control-point-container";
+        private const string ControlPointClassName = "rosettaui-animation-curve-editor__control-point";
+        private const string ActiveControlPointClassName = "rosettaui-animation-curve-editor__control-point--active";
+
         private readonly OnPointAction _onPointSelected;
         private readonly Action<ControlPoint, Vector2> _onPointMoved;
-        
+
+        private readonly ControlPointHolder _holder;
         private readonly ICoordinateConverter _coordinateConverter;
         private readonly ParameterPopup _parameterPopup;
         private readonly EditKeyPopup _editKeyPopup;
@@ -30,14 +33,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
 
         private Vector2 _pointerDownPositionToElementOffset;
-        private Keyframe _keyframeCopy;
-        
-        private readonly VisualElementKeyEventHelper _keyEventHelper;
-        
-        private const string ContainerClassName = "rosettaui-animation-curve-editor__control-point-container";
-        private const string ControlPointClassName = "rosettaui-animation-curve-editor__control-point";
-        private const string ActiveControlPointClassName = "rosettaui-animation-curve-editor__control-point--active";
-        
+
+
         public delegate void OnPointAction(ControlPoint controlPoint);
         
         
@@ -48,7 +45,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public bool IsActive
         {
             get => _controlPoint.ClassListContains(ActiveControlPointClassName);
-            set{
+            set
+            {
                 if (value)
                 {
                     _controlPoint.AddToClassList(ActiveControlPointClassName);
@@ -64,35 +62,33 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
         
-        public Keyframe Keyframe => _keyframeCopy;
+        public Keyframe Keyframe => _holder.GetKeyframe(this);
         
         public Vector2 KeyframePosition
         {
-            get => new(_keyframeCopy.time, _keyframeCopy.value);
-            
-            [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
-            set
+            get
             {
-                if ( _keyframeCopy.time == value.x && _keyframeCopy.value == value.y) return;
-                
-                _keyframeCopy.time = value.x;
-                _keyframeCopy.value = value.y;
-                
-                onKeyframeChanged?.Invoke(this);
+                var keyframe = Keyframe;
+                return new Vector2(keyframe.time, keyframe.value);
             }
+            set => _holder.UpdateKeyframePosition(this, value);
         }
         
-        public ControlPoint(ICoordinateConverter coordinateConverter, ParameterPopup parameterPopup, EditKeyPopup editKeyPopup,
+        private ControlPoint Left => _holder.GetControlPointLeft(this);
+        private ControlPoint Right => _holder.GetControlPointRight(this);
+
+        public ControlPoint(ControlPointHolder holder, ICoordinateConverter coordinateConverter, ParameterPopup parameterPopup, EditKeyPopup editKeyPopup,
             OnPointAction onPointSelected, Action<ControlPoint, Vector2> onPointMoved)
         {
+            _holder = holder;
             _coordinateConverter = coordinateConverter;
             _parameterPopup = parameterPopup;
             _editKeyPopup = editKeyPopup;
             _onPointSelected = onPointSelected;
             _onPointMoved = onPointMoved;
             
-            _keyEventHelper = new VisualElementKeyEventHelper(this);
-            _keyEventHelper.RegisterKeyAction(new[] { KeyCode.LeftAlt, KeyCode.RightAlt }, type =>
+            var keyEventHelper = new VisualElementKeyEventHelper(this);
+            keyEventHelper.RegisterKeyAction(new[] { KeyCode.LeftAlt, KeyCode.RightAlt }, type =>
             {
                 if (type != KeyEventType.KeyDown) return;
                 SetPointMode(PointMode.Broken);
@@ -102,15 +98,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _leftHandle = new ControlPointHandle(_coordinateConverter, -1f, 
                 (tangent, weight) =>
                 {
-                    _keyframeCopy.inTangent = tangent;
-                    _keyframeCopy.inWeight = _keyframeCopy.weightedMode is WeightedMode.In or WeightedMode.Both ? weight : 0.333333f;
+                    var keyframe = Keyframe;
+                    keyframe.inTangent = tangent;
+                    keyframe.inWeight = keyframe.weightedMode is WeightedMode.In or WeightedMode.Both ? weight : 0.333333f;
                     if (PointMode == PointMode.Flat) { PointMode = PointMode.Smooth; }
                     if (PointMode == PointMode.Smooth)
                     {
-                        if (float.IsInfinity(_keyframeCopy.inTangent)) _keyframeCopy.outTangent = -_keyframeCopy.inTangent;
-                        _keyframeCopy.outTangent = _keyframeCopy.inTangent;
+                        if (float.IsInfinity(keyframe.inTangent)) keyframe.outTangent = -keyframe.inTangent;
+                        keyframe.outTangent = keyframe.inTangent;
                     }
-                    onKeyframeChanged?.Invoke(this);
+                    
+                    _holder.UpdateKeyframe(this, keyframe);
                 }
             );
             Add(_leftHandle);
@@ -118,15 +116,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _rightHandle = new ControlPointHandle(_coordinateConverter, 1f, 
                 (tangent, weight) =>
                 {
-                    _keyframeCopy.outTangent = tangent;
-                    _keyframeCopy.outWeight = _keyframeCopy.weightedMode is WeightedMode.Out or WeightedMode.Both ? weight : 0.333333f;
+                    var keyframe = Keyframe;
+                    keyframe.outTangent = tangent;
+                    keyframe.outWeight = keyframe.weightedMode is WeightedMode.Out or WeightedMode.Both ? weight : 0.333333f;
                     if (PointMode == PointMode.Flat) { PointMode = PointMode.Smooth; }
                     if (PointMode == PointMode.Smooth)
                     {
-                        if (float.IsInfinity(_keyframeCopy.outTangent)) _keyframeCopy.inTangent = -_keyframeCopy.outTangent;
-                        _keyframeCopy.inTangent = _keyframeCopy.outTangent;
+                        if (float.IsInfinity(keyframe.outTangent)) keyframe.inTangent = -keyframe.outTangent;
+                        keyframe.inTangent = keyframe.outTangent;
                     }
-                    onKeyframeChanged?.Invoke(this);
+                    
+                    _holder.UpdateKeyframe(this, keyframe);
                 }
             );
             Add(_rightHandle);
@@ -159,11 +159,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     case PointMode.Broken:
                         break;
                     case PointMode.Flat:
-                        _keyframeCopy.inTangent = 0f;
-                        _keyframeCopy.outTangent = 0f;
+                        // TODO
+                        // _keyframeCopy.inTangent = 0f;
+                        // _keyframeCopy.outTangent = 0f;
                         break;
                     case PointMode.Smooth:
-                        _keyframeCopy.inTangent = _keyframeCopy.outTangent;
+                        // TODO
+                        // _keyframeCopy.inTangent = _keyframeCopy.outTangent;
                         break;
                 }
                 // _onPointMoved(_keyframeCopy);
@@ -177,9 +179,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             void ToggleWeightedModeAndUpdateView(WeightedMode mode)
             {
-                _keyframeCopy.ToggleWeightedFrag(mode);
+                // TODO
+                // _keyframeCopy.ToggleWeightedFrag(mode);
                 // _onPointMoved(_keyframeCopy);
-                _popupMenuController.SetWeightedMode(_keyframeCopy.weightedMode);
+                // _popupMenuController.SetWeightedMode(_keyframeCopy.weightedMode);
             }
         }
         
@@ -203,42 +206,47 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void SetWeightedMode(WeightedMode mode)
         {
-            _keyframeCopy.weightedMode = mode;
+            // TODO
+            // _keyframeCopy.weightedMode = mode;
             _popupMenuController.SetWeightedMode(mode);
         }
         
-        /// <summary>
-        /// Set the keyframe of the control point
-        /// (without applying the point mode or tangent mode)
-        /// </summary>
-        public void SetKeyframe(in AnimationCurve curve, int idx)
+        public void UpdateView()
         {
-            _keyframeCopy = curve[idx];
-            UpdateView();
+            var keyframe = Keyframe;
             
-            _leftHandle.SetTangent(_keyframeCopy.inTangent);
-            _rightHandle.SetTangent(_keyframeCopy.outTangent);
-            
-            float? inWeight = _keyframeCopy.weightedMode is WeightedMode.In or WeightedMode.Both ? _keyframeCopy.inWeight : null;
-            float? outWeight = _keyframeCopy.weightedMode is WeightedMode.Out or WeightedMode.Both ? _keyframeCopy.outWeight : null;
-            _leftHandle.SetWeight(inWeight, GetXDistInScreen(curve, idx - 1, idx));
-            _rightHandle.SetWeight(outWeight, GetXDistInScreen(curve, idx, idx + 1));
-            return;
-            
-            float GetXDistInScreen(in AnimationCurve curve, int leftIdx, int rightIdx)
+            var uiPosition = _coordinateConverter.GetScreenPosFromCurvePos(keyframe.GetPosition());
+            style.left = uiPosition.x;
+            style.top = uiPosition.y;
+
+            if (IsActive)
             {
-                if (leftIdx < 0 || curve.length <= rightIdx) return 0f;
-                return _coordinateConverter.GetScreenPosFromCurvePos(curve[rightIdx].GetPosition()).x - _coordinateConverter.GetScreenPosFromCurvePos(curve[leftIdx].GetPosition()).x;
+                UpdateHandleView();
             }
         }
 
-
-        public void UpdateView()
+        private void UpdateHandleView()
         {
-            var uiPosition = _coordinateConverter.GetScreenPosFromCurvePos(KeyframePosition);
-            style.left = uiPosition.x;
-            style.top = uiPosition.y;
+            var keyframe = Keyframe;
+            
+            _leftHandle.SetTangent(keyframe.inTangent);
+            _rightHandle.SetTangent(keyframe.outTangent);
+            
+            float? inWeight = keyframe.weightedMode is WeightedMode.In or WeightedMode.Both ? keyframe.inWeight : null;
+            float? outWeight = keyframe.weightedMode is WeightedMode.Out or WeightedMode.Both ? keyframe.outWeight : null;
+            _leftHandle.SetWeight(inWeight, GetXDistInScreen(Left, this));
+            _rightHandle.SetWeight(outWeight, GetXDistInScreen(this, Right));
+            return;
+            
+            float GetXDistInScreen(ControlPoint left, ControlPoint right)
+            {
+                if (left == null || right == null) return 0f;
+                var screesPosLeft = _coordinateConverter.GetScreenPosFromCurvePos(left.Keyframe.GetPosition());
+                var screesPosRight = _coordinateConverter.GetScreenPosFromCurvePos(right.Keyframe.GetPosition());
+                return screesPosRight.x - screesPosLeft.x;
+            }
         }
+        
         
         private void OnPointerDown(PointerDownEvent evt)
         {
@@ -255,7 +263,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     this.CaptureMouse();
                     
                     _parameterPopup.Show();
-                    _parameterPopup.Update(elementPosition, _keyframeCopy);
+                    _parameterPopup.Update(elementPosition, Keyframe);
                     break;
                 case 1:
                     _popupMenuController.Show(evt.position, this);

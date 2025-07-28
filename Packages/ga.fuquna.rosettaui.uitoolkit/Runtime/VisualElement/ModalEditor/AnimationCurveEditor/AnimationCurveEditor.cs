@@ -92,7 +92,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             AddToClassList(USSClassName);
             InitUI();
             
-            _controlPointHolder = new ControlPointHolder(_curvePreviewElement, () => new ControlPoint(_previewTransform, _parameterPopup, _editKeyPopup, OnControlPointSelected, OnControlPointMoved));
+            _controlPointHolder = new ControlPointHolder(_curvePreviewElement, (holder) => new ControlPoint(holder, _previewTransform, _parameterPopup, _editKeyPopup, OnControlPointSelected, OnControlPointMoved));
             _controlPointHolder.onCurveChanged += () =>
             {
                 UpdateView();
@@ -260,8 +260,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 _snapYButton.value ? gridViewport.RoundY(desireKeyframePosition.y, 0.05f) : desireKeyframePosition.y
             );
 
-            controlPoint.KeyframePosition = position;
-            
+            _controlPointHolder.UpdateKeyframePosition(controlPoint, position);
             _propertyFieldController.UpdatePropertyFields();
         }
         

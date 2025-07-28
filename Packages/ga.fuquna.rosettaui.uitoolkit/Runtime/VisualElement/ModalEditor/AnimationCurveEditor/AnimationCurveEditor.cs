@@ -148,7 +148,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             {
                 if (evt == KeyEventType.KeyDown) { FitViewToCurve(); }
             });
-            _keyEventHelper.RegisterKeyAction(KeyCode.Delete, evt =>
+            _keyEventHelper.RegisterKeyAction(KeyCode.Delete, _ =>
             {
                 _controlPointHolder.RemoveSelectedControlPoint();
             });

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Builder;
@@ -101,13 +100,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             return index;
         }
-
         
-        public void RemoveSelectedControlPoint()
+        public void RemoveControlPoint(ControlPoint controlPoint)
         {
-            if (ControlPoints.Count <= 1) return;
-            
-            var controlPoint = SelectedControlPoint;
             if (controlPoint == null) return;
             
             controlPoint.RemoveFromHierarchy();
@@ -118,7 +113,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             OnCurveChanged();
         }
-
+        
+        public void RemoveSelectedControlPoint() => RemoveControlPoint(SelectedControlPoint);
         
         public void SelectControlPoint(ControlPoint controlPoint)
         {
@@ -169,8 +165,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             {
                 var key = Curve.keys[i];
                 var controlPoint = CreateControlPoint(i);
-                controlPoint.SetPointMode(key.GetPointMode());
-                controlPoint.SetTangentMode(Curve.GetInTangentMode(i), Curve.GetOutTangentMode(i));
+                controlPoint.SetPointMode(key.GetPointMode(), false);
+                controlPoint.SetTangentMode(Curve.GetInTangentMode(i), Curve.GetOutTangentMode(i), false);
             }
         }
         

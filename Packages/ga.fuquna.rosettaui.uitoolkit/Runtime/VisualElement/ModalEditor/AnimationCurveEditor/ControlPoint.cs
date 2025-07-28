@@ -29,7 +29,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly VisualElement _controlPoint;
         private readonly ControlPointHandle _leftHandle;
         private readonly ControlPointHandle _rightHandle;
-        private readonly ControlPointPopupMenuController _popupMenuController;
+        // private readonly ControlPointPopupMenuController _popupMenuController;
 
 
         private Vector2 _pointerDownPositionToElementOffset;
@@ -37,7 +37,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         public delegate void OnPointAction(ControlPoint controlPoint);
         
-        
+        // インスペクタのアニメーションカーブエディタはPointMode.SmoothかつFlatという状態がある
+        // あまりユーザー体験に影響がなさそうなのでここでは排他的な扱いにしている
         public PointMode PointMode { get; private set; } = PointMode.Smooth;
         public TangentMode InTangentMode { get; private set; } = TangentMode.Free;
         public TangentMode OutTangentMode { get; private set; } = TangentMode.Free;
@@ -64,11 +65,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public Vector2 KeyframePosition
         {
-            get
-            {
-                var keyframe = Keyframe;
-                return new Vector2(keyframe.time, keyframe.value);
-            }
+            get => Keyframe.GetPosition();
             set => _holder.UpdateKeyframePosition(this, value);
         }
         
@@ -147,12 +144,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             Add(_controlPoint);
 
             // Popup menu controller
-            _popupMenuController = new ControlPointPopupMenuController(
-                () => _holder.RemoveSelectedControlPoint(),
-                SetPointModeAndUpdateView,
-                SetTangentModeAndUpdateView,
-                ToggleWeightedModeAndUpdateView
-            );
+            // _popupMenuController = new ControlPointPopupMenuController(
+            //     SetPointModeAndUpdateView,
+            //     SetTangentModeAndUpdateView,
+            //     ToggleWeightedModeAndUpdateView
+            // );
 
             return;
 
@@ -201,24 +197,50 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
         
-        public void SetPointMode(PointMode mode)
+        public void SetPointMode(PointMode mode, bool updateView = true)
         {
+            if (PointMode == mode) return;
+            
             PointMode = mode;
 
             if (mode != PointMode.Broken)
             {
-                SetTangentMode(TangentMode.Free, TangentMode.Free);
+                SetTangentMode(TangentMode.Free, TangentMode.Free, false);
+            }
+
+            if (updateView)
+            {
+                var keyframe = Keyframe;
+                keyframe.SetPointMode(mode);
+                _holder.UpdateKeyframe(this, keyframe);
             }
         }
         
-        public void SetTangentMode(TangentMode? inTangentMode, TangentMode? outTangentMode)
+        public void SetTangentMode(TangentMode? inTangentMode, TangentMode? outTangentMode, bool updateView = true)
         {
-            InTangentMode = inTangentMode ?? InTangentMode;
-            OutTangentMode = outTangentMode ?? OutTangentMode;
+            var changed = false;
+            
+            if (inTangentMode is {} inMode && InTangentMode != inMode)
+            {
+                InTangentMode = inMode;
+                changed = true;
+            }
+            if (outTangentMode is {} outMode && OutTangentMode != outMode)
+            {
+                OutTangentMode = outMode;
+                changed = true;
+            }
+            
+            if (!changed) return;
 
             if (InTangentMode == TangentMode.Constant || OutTangentMode == TangentMode.Constant)
             {
                 PointMode = PointMode.Broken;
+            }
+
+            if (updateView)
+            {
+                UpdateHandleView();
             }
         }
         
@@ -290,7 +312,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     _parameterPopup.Update(elementPosition, Keyframe);
                     break;
                 case 1:
-                    _popupMenuController.Show(evt.position, this);
+                    // _popupMenuController.Show(evt.position, this);
+                    ControlPointPopupMenu.Show(evt.position, this);
                     evt.StopPropagation();
                     break;
             }
@@ -319,6 +342,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 
                 _parameterPopup.Hide();
             }
+        }
+
+        public void Remove()
+        {
+            _holder.RemoveControlPoint(this);
         }
 
         public void ShowEditKeyPopup()

@@ -4,12 +4,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
     internal static class AnimationCurveEditorUtility
     {
-        
         public static PointMode GetPointMode(this Keyframe keyframe)
         {
              if (keyframe is { inTangent: 0f, outTangent: 0f }) return PointMode.Flat;
-             if (Mathf.Approximately(keyframe.inTangent, keyframe.outTangent)) return PointMode.Smooth;
-             return PointMode.Broken;
+             
+             return Mathf.Approximately(keyframe.inTangent, keyframe.outTangent)
+                 ? PointMode.Smooth 
+                 : PointMode.Broken;
         }
         
         public static void SetPointMode(this ref Keyframe keyframe, PointMode mode)

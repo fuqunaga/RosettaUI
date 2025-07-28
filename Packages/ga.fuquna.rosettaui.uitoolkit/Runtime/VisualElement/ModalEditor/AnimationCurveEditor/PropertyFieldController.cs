@@ -59,7 +59,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 var keyPoint = _getSelectedKeyPoint();
                 if (keyPoint.point == null) return;
                 keyPoint.key.SetWeightedFrag(WeightedMode.In, val);
-                keyPoint.point.SetWeightedMode(keyPoint.key.weightedMode);
                 _onModifyKeyAndUpdateView(keyPoint.key);
             };
             var outTangentSlider = SetupKeyframeField<Slider, float>(OutTangentSliderName, (evt, key, cp) =>
@@ -80,7 +79,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 var keyPoint = _getSelectedKeyPoint();
                 if (keyPoint.point == null) return;
                 keyPoint.key.SetWeightedFrag(WeightedMode.Out, val);
-                keyPoint.point.SetWeightedMode(keyPoint.key.weightedMode);
                 _onModifyKeyAndUpdateView(keyPoint.key);
             };
             var pointModeField = SetupKeyframeEnumField<PointMode>(PointModeFieldName, (evt, key, cp) =>

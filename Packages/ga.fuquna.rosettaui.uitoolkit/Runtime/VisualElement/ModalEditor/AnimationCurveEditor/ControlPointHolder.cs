@@ -108,9 +108,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var controlPoint = CreateControlPoint(index);
             controlPoint.IsActive = true;
             
-            // // Match the tangent mode to neighborhood point one
-            TangentMode? inTangentMode = index > 0 ? ControlPoints[index - 1].OutTangentMode : null;
-            TangentMode? outTangentMode = index < ControlPoints.Count - 1 ? ControlPoints[index + 1].InTangentMode : null;
+            // Match the tangent mode to neighborhood point one
+            var inTangentMode = GetControlPointLeft(controlPoint)?.OutTangentMode;
+            var outTangentMode = GetControlPointLeft(controlPoint)?.InTangentMode;
             controlPoint.SetTangentMode(inTangentMode, outTangentMode);
             
             OnCurveChanged();
@@ -194,7 +194,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 var controlPoint = CreateControlPoint(i);
                 controlPoint.SetPointMode(key.GetPointMode());
                 controlPoint.SetTangentMode(Curve.GetInTangentMode(i), Curve.GetOutTangentMode(i));
-                controlPoint.SetWeightedMode(key.weightedMode);
             }
         }
         

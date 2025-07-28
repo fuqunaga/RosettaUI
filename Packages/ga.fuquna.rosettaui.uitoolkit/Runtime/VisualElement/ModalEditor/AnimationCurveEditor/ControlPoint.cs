@@ -75,7 +75,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private ControlPoint Left => _holder.GetControlPointLeft(this);
         private ControlPoint Right => _holder.GetControlPointRight(this);
 
-        public ControlPoint(ControlPointHolder holder, ICoordinateConverter coordinateConverter, ParameterPopup parameterPopup, EditKeyPopup editKeyPopup,
+        public ControlPoint(ControlPointHolder holder, ICoordinateConverter coordinateConverter,
+            ParameterPopup parameterPopup, EditKeyPopup editKeyPopup,
             OnPointAction onPointSelected, Action<ControlPoint, Vector2> onPointMoved)
         {
             _holder = holder;
@@ -84,73 +85,85 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _editKeyPopup = editKeyPopup;
             _onPointSelected = onPointSelected;
             _onPointMoved = onPointMoved;
-            
+
             var keyEventHelper = new VisualElementKeyEventHelper(this);
             keyEventHelper.RegisterKeyAction(new[] { KeyCode.LeftAlt, KeyCode.RightAlt }, type =>
             {
                 if (type != KeyEventType.KeyDown) return;
                 SetPointMode(PointMode.Broken);
             });
-            
+
             // Handles
             _leftHandle = new ControlPointHandle(ControlPointHandle.LeftOrRight.Left,
-                _coordinateConverter, 
+                _coordinateConverter,
                 (tangent, weight) =>
                 {
                     var keyframe = Keyframe;
                     keyframe.inTangent = tangent;
-                    keyframe.inWeight = keyframe.weightedMode is WeightedMode.In or WeightedMode.Both ? weight : 0.333333f;
-                    if (PointMode == PointMode.Flat) { PointMode = PointMode.Smooth; }
+                    keyframe.inWeight = keyframe.weightedMode is WeightedMode.In or WeightedMode.Both
+                        ? weight
+                        : 0.333333f;
+                    if (PointMode == PointMode.Flat)
+                    {
+                        PointMode = PointMode.Smooth;
+                    }
+
                     if (PointMode == PointMode.Smooth)
                     {
                         if (float.IsInfinity(keyframe.inTangent)) keyframe.outTangent = -keyframe.inTangent;
                         keyframe.outTangent = keyframe.inTangent;
                     }
-                    
+
                     _holder.UpdateKeyframe(this, keyframe);
                 }
             );
             Add(_leftHandle);
-            
+
             _rightHandle = new ControlPointHandle(ControlPointHandle.LeftOrRight.Right,
-                _coordinateConverter, 
+                _coordinateConverter,
                 (tangent, weight) =>
                 {
                     var keyframe = Keyframe;
                     keyframe.outTangent = tangent;
-                    keyframe.outWeight = keyframe.weightedMode is WeightedMode.Out or WeightedMode.Both ? weight : 0.333333f;
-                    if (PointMode == PointMode.Flat) { PointMode = PointMode.Smooth; }
+                    keyframe.outWeight = keyframe.weightedMode is WeightedMode.Out or WeightedMode.Both
+                        ? weight
+                        : 0.333333f;
+                    if (PointMode == PointMode.Flat)
+                    {
+                        PointMode = PointMode.Smooth;
+                    }
+
                     if (PointMode == PointMode.Smooth)
                     {
                         if (float.IsInfinity(keyframe.outTangent)) keyframe.inTangent = -keyframe.outTangent;
                         keyframe.inTangent = keyframe.outTangent;
                     }
-                    
+
                     _holder.UpdateKeyframe(this, keyframe);
                 }
             );
             Add(_rightHandle);
-            
+
             // Control point container
             AddToClassList(ContainerClassName);
             RegisterCallback<PointerDownEvent>(OnPointerDown);
-            
+
             // Control point
             _controlPoint = new VisualElement { name = "AnimationCurveEditorControlPoint" };
             _controlPoint.AddToClassList(ControlPointClassName);
             Add(_controlPoint);
-            
+
             // Popup menu controller
             _popupMenuController = new ControlPointPopupMenuController(
-                // () => _onPointRemoved(this),
-                () => throw new NotImplementedException("onPointRemoved is not implemented in ControlPoint"),
+                () => _holder.RemoveSelectedControlPoint(),
                 SetPointModeAndUpdateView,
                 SetTangentModeAndUpdateView,
                 ToggleWeightedModeAndUpdateView
             );
-            
+
             return;
-            
+
+
             void SetPointModeAndUpdateView(PointMode mode)
             {
                 SetPointMode(mode);
@@ -158,31 +171,40 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 {
                     case PointMode.Broken:
                         break;
+
                     case PointMode.Flat:
-                        // TODO
-                        // _keyframeCopy.inTangent = 0f;
-                        // _keyframeCopy.outTangent = 0f;
+                    {
+                        var keyframe = Keyframe;
+                        keyframe.inTangent = 0f;
+                        keyframe.outTangent = 0f;
+                        _holder.UpdateKeyframe(this, keyframe);
+                    }
                         break;
+
                     case PointMode.Smooth:
-                        // TODO
-                        // _keyframeCopy.inTangent = _keyframeCopy.outTangent;
+                    {
+                        var keyframe = Keyframe;
+                        keyframe.inTangent = keyframe.outTangent;
+                        _holder.UpdateKeyframe(this, keyframe);
+                    }
                         break;
+                    
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
                 }
-                // _onPointMoved(_keyframeCopy);
             }
             
             void SetTangentModeAndUpdateView(TangentMode? inTangentMode, TangentMode? outTangentMode)
             {
                 SetTangentMode(inTangentMode, outTangentMode);
-                // _onPointMoved(_keyframeCopy);
+                UpdateHandleView();
             }
             
             void ToggleWeightedModeAndUpdateView(WeightedMode mode)
             {
-                // TODO
-                // _keyframeCopy.ToggleWeightedFrag(mode);
-                // _onPointMoved(_keyframeCopy);
-                // _popupMenuController.SetWeightedMode(_keyframeCopy.weightedMode);
+                var keyframe = Keyframe;
+                keyframe.ToggleWeightedFrag(mode);
+                _holder.UpdateKeyframe(this, keyframe);
             }
         }
         

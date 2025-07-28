@@ -86,13 +86,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _onPointSelected = onPointSelected;
             _onPointMoved = onPointMoved;
 
-            var keyEventHelper = new VisualElementKeyEventHelper(this);
-            keyEventHelper.RegisterKeyAction(new[] { KeyCode.LeftAlt, KeyCode.RightAlt }, type =>
-            {
-                if (type != KeyEventType.KeyDown) return;
-                SetPointMode(PointMode.Broken);
-            });
-
             // Handles
             _leftHandle = new ControlPointHandle(ControlPointHandle.LeftOrRight.Left,
                 _coordinateConverter,

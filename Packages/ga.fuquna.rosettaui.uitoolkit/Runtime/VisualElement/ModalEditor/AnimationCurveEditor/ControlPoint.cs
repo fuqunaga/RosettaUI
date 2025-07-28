@@ -230,27 +230,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var leftHandleEnable = InTangentMode != TangentMode.Linear;
             var rightHandleEnable = OutTangentMode != TangentMode.Linear;
 
-            if (leftHandleEnable)
-            {
-                _leftHandle.style.visibility = Visibility.Visible;
-                _leftHandle.UpdateView(keyframe, () => GetXDistInScreen(Left, this));
-            }
-            else
-            {
-                _leftHandle.style.visibility = Visibility.Hidden;
-            }
-            
-            if (rightHandleEnable)
-            {
-                _rightHandle.style.visibility = Visibility.Visible;
-                _rightHandle.UpdateView(keyframe, () => GetXDistInScreen(this, Right));
-            }
-            else
-            {
-                _rightHandle.style.visibility = Visibility.Hidden;
-            }
-            
+            Update(leftHandleEnable, _leftHandle, keyframe, GetXDistInScreen(Left, this));
+            Update(rightHandleEnable, _rightHandle, keyframe, GetXDistInScreen(this, Right));
             return;
+            
+            static void Update(bool enable, ControlPointHandle handle, Keyframe keyframe, float xDistToNeighborInScreen)
+            {
+                if (!enable)
+                {
+                    handle.style.visibility = Visibility.Hidden;
+                    return;
+                }
+                
+                handle.style.visibility = Visibility.Visible;
+                handle.UpdateView(keyframe, xDistToNeighborInScreen);
+            }
             
             
             float GetXDistInScreen(ControlPoint left, ControlPoint right)

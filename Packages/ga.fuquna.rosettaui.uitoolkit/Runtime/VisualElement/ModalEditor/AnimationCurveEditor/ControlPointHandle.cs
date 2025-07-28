@@ -58,7 +58,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _handleContainerElement.Add(handleElement);
         }
 
-        public void UpdateView(in Keyframe keyframe, Func<float> getXDistToNeighborInScreenFunc)
+        public void UpdateView(in Keyframe keyframe, float xDistToNeighborInScreen)
         {
             var tangent = _leftOrRight == LeftOrRight.Left ? keyframe.inTangent : keyframe.outTangent;
             var degree = SetTangent(tangent);
@@ -71,7 +71,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 ? (_leftOrRight == LeftOrRight.Left ? keyframe.inWeight : keyframe.outWeight)
                 : null;
             
-            SetWeight(weight, degree, getXDistToNeighborInScreenFunc);
+            
+            _xDistToNeighborInScreen = xDistToNeighborInScreen;
+            SetWeight(weight, degree);
         }
         
         /// <summary>
@@ -96,14 +98,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             return radian * Mathf.Rad2Deg;
         }
         
-        private void SetWeight(float? weight, float degree, Func<float> getXDistToNeighborInScreenFunc)
+        private void SetWeight(float? weight, float degree)
         {
-            _xDistToNeighborInScreen = getXDistToNeighborInScreenFunc();
-            
             var width = DefaultLineLength;
-            if (weight is {} w && !Mathf.Approximately(degree % 90, 0f))
+            if (weight is {} w && !Mathf.Approximately((degree+90) % 180, 0f)) // +-90度付近は無視
             {
-                width = Mathf.Max(10f, w * Mathf.Abs(getXDistToNeighborInScreenFunc() / Mathf.Cos(degree * Mathf.Deg2Rad)));
+                width = Mathf.Max(10f, w * Mathf.Abs(_xDistToNeighborInScreen / Mathf.Cos(degree * Mathf.Deg2Rad)));
             }
             
             _lineElement.style.width = width;
@@ -131,12 +131,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             var centerPoint = parent.worldBound.center;
             var mousePoint = evt.position;
-            float tangent = (-mousePoint.y + centerPoint.y) / Clamp(mousePoint.x - centerPoint.x);
+            var tangent = (-mousePoint.y + centerPoint.y) / Clamp(mousePoint.x - centerPoint.x);
             if (!float.IsNaN(tangent))
             {
                 tangent = _coordinateConverter.GetCurveTangentFromScreenTangent(tangent);
                 if (evt.ctrlKey || evt.commandKey) tangent = Snap(tangent);
-                float weight = Mathf.Clamp01(Mathf.Abs(mousePoint.x - centerPoint.x) / Mathf.Abs(_xDistToNeighborInScreen));
+                var weight = Mathf.Clamp01(Mathf.Abs(mousePoint.x - centerPoint.x) / Mathf.Abs(_xDistToNeighborInScreen));
                 _onTangentChanged?.Invoke(tangent, weight);
             }
             evt.StopPropagation();
@@ -147,15 +147,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 return Mathf.Max(0f, xDiff * Sign) * Sign;
             }
 
-            float Snap(float tangent)
+            static float Snap(float tangent)
             {
                 if (float.IsInfinity(tangent)) return tangent;
 
-                if (Mathf.Abs(tangent) > Mathf.Tan(67.5f))
+                if (Mathf.Abs(tangent) > Mathf.Tan(67.5f * Mathf.Deg2Rad))
                 {
                     return Mathf.Sign(tangent) * Mathf.Infinity;
                 }
-                else if (Mathf.Abs(tangent) > Mathf.Tan(22.5f))
+                else if (Mathf.Abs(tangent) > Mathf.Tan(22.5f * Mathf.Deg2Rad))
                 {
                     return Mathf.Sign(tangent);
                 }

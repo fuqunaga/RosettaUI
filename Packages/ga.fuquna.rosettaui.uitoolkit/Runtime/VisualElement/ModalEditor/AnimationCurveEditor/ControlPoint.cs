@@ -8,6 +8,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
     /// <summary>
     /// Control point of the animation curve editor.
+    /// 
+    /// ControlPointはAnimationCurveのKeyframeと1対1対応するが、直接Keyframeを編集はしない
+    /// Keyframeの値を変えると隣り合ったKeyframeの値も変更する必要があることがある（インデックスが変わったり、TangentモードがLinearだとTangentが変わるなど）ので、
+    /// ControlPoint単体でKeyframeを編集せずにAnimationCurve全体での整合性を取るようControlPointHolderなどに変更を依頼する
     /// </summary>
     public class ControlPoint : VisualElement
     {
@@ -25,7 +29,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly ControlPointPopupMenuController _popupMenuController;
 
 
-        private Vector2 _mouseDownPositionToElementOffset;
+        private Vector2 _pointerDownPositionToElementOffset;
         private Keyframe _keyframeCopy;
         
         private readonly VisualElementKeyEventHelper _keyEventHelper;
@@ -106,13 +110,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                         if (float.IsInfinity(_keyframeCopy.inTangent)) _keyframeCopy.outTangent = -_keyframeCopy.inTangent;
                         _keyframeCopy.outTangent = _keyframeCopy.inTangent;
                     }
-                    // _onPointMoved(_keyframeCopy);
+                    onKeyframeChanged?.Invoke(this);
                 }
             );
             Add(_leftHandle);
             
             _rightHandle = new ControlPointHandle(_coordinateConverter, 1f, 
-                () => _onPointSelected(this),
                 (tangent, weight) =>
                 {
                     _keyframeCopy.outTangent = tangent;
@@ -123,14 +126,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                         if (float.IsInfinity(_keyframeCopy.outTangent)) _keyframeCopy.inTangent = -_keyframeCopy.outTangent;
                         _keyframeCopy.inTangent = _keyframeCopy.outTangent;
                     }
-                    // _onPointMoved(_keyframeCopy);
+                    onKeyframeChanged?.Invoke(this);
                 }
             );
             Add(_rightHandle);
             
             // Control point container
             AddToClassList(ContainerClassName);
-            RegisterCallback<PointerDownEvent>(OnMouseDown);
+            RegisterCallback<PointerDownEvent>(OnPointerDown);
             
             // Control point
             _controlPoint = new VisualElement { name = "AnimationCurveEditorControlPoint" };
@@ -237,10 +240,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             style.top = uiPosition.y;
         }
         
-        private void OnMouseDown(PointerDownEvent evt)
+        private void OnPointerDown(PointerDownEvent evt)
         {
             var elementPosition = new Vector2(resolvedStyle.left, resolvedStyle.top);
-            _mouseDownPositionToElementOffset = elementPosition - (Vector2)evt.position; 
+            _pointerDownPositionToElementOffset = elementPosition - (Vector2)evt.position; 
             _onPointSelected?.Invoke(this);
             
             switch (evt.button)
@@ -263,7 +266,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private void OnPointerMove(PointerMoveEvent evt)
         {
-            var screenPosition = (Vector2)evt.position + _mouseDownPositionToElementOffset;
+            var screenPosition = (Vector2)evt.position + _pointerDownPositionToElementOffset;
             
             // Snap to gridモードがあるのでポインターの移動量がそのまま反映されないことがある
             // _onPointMovedに値の更新は任せる

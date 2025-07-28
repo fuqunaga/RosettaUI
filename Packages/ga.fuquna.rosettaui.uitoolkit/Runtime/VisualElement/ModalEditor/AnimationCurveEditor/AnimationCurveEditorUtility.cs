@@ -87,54 +87,5 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             return Mathf.Atan2(y, x) * Mathf.Rad2Deg;
         }
-
-        public static void ApplyTangentMode(ControlPointHolder holder)
-        {
-            var i = 0;
-            foreach (var keyPoint in holder)
-            {
-                var key = keyPoint.key;
-                switch (keyPoint.point.InTangentMode)
-                {
-                    case TangentMode.Linear:
-                        // Set the tangent to the slope between the previous key and this key
-                        if (i > 0)
-                        {
-                            var prevKey = holder[i - 1].key;
-                            key.inTangent = (key.value - prevKey.value) / (key.time - prevKey.time);
-                        }
-                        keyPoint.point.SetPointMode(PointMode.Broken);
-                        break;
-                    case TangentMode.Constant:
-                        key.inTangent = float.PositiveInfinity;
-                        break;
-                    case TangentMode.Free:
-                    default:
-                        break;
-                }
-                switch (keyPoint.point.OutTangentMode)
-                {
-                    case TangentMode.Linear:
-                        // Set the tangent to the slope between this key and the next key
-                        if (i < holder.Count - 1)
-                        {
-                            var nextKey = holder[i + 1].key;
-                            key.outTangent = (nextKey.value - key.value) / (nextKey.time - key.time);
-                        }
-                        keyPoint.point.SetPointMode(PointMode.Broken);
-                        break;
-                    case TangentMode.Constant:
-                        key.outTangent = float.PositiveInfinity;
-                        break;
-                    case TangentMode.Free:
-                    default:
-                        break;
-                }
-                
-                // holder.MoveKey(i, key);
-                i++;
-            }
-        }
-        
-    }
+   }
 }

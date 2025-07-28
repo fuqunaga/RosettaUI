@@ -189,7 +189,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public void SetPointMode(PointMode mode)
         {
             PointMode = mode;
-            // _popupMenuController.SetPointMode(mode);
 
             if (mode != PointMode.Broken)
             {
@@ -201,7 +200,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             InTangentMode = inTangentMode ?? InTangentMode;
             OutTangentMode = outTangentMode ?? OutTangentMode;
-            // _popupMenuController.SetTangentMode(InTangentMode, OutTangentMode);
+
+            if (InTangentMode == TangentMode.Constant || OutTangentMode == TangentMode.Constant)
+            {
+                PointMode = PointMode.Broken;
+            }
         }
         
         public void UpdateView()

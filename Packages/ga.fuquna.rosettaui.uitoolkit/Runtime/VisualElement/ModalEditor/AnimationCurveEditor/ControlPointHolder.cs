@@ -11,19 +11,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// <summary>
     /// Manage AnimationCurve and ControlPoints
     /// </summary>
-    public class ControlPointHolder : IEnumerable<(Keyframe key, ControlPoint point)>
+    public class ControlPointHolder
     {
         public event Action onCurveChanged;
         
-        public AnimationCurve Curve { get; private set; }
+        private readonly VisualElement _parent;
+        private readonly Func<ControlPointHolder, ControlPoint> _getNewControlPoint;
 
-        public List<ControlPoint> ControlPoints { get; } = new();
-
-        public bool IsEmpty => Curve == null || Curve.keys.Length == 0;
-        public int Count => Curve?.keys.Length ?? 0;
+        private Keyframe[] _keyframesCache;
 
         
-        private Keyframe[] _keyframesCache;
+        public AnimationCurve Curve { get; private set; }
+        public ControlPoint SelectedControlPoint => ControlPoints.FirstOrDefault(t => t.IsActive);
+
+
+        private List<ControlPoint> ControlPoints { get; } = new();
 
         private Keyframe[] Keyframes
         {
@@ -39,18 +41,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
         
-        public (Keyframe key, ControlPoint point) this [int index] 
-        {
-            get {
-                if (Curve == null || index < 0 || index >= Curve.keys.Length) return (default, default);
-                return (Curve.keys[index], ControlPoints[index]);
-            }
-        }
-        
-        public ControlPoint SelectedControlPoint => ControlPoints.FirstOrDefault(t => t.IsActive);
-
-        private readonly VisualElement _parent;
-        private readonly Func<ControlPointHolder, ControlPoint> _getNewControlPoint;
         
         public ControlPointHolder(VisualElement parent, Func<ControlPointHolder, ControlPoint> getNewControlPoint)
         {
@@ -73,12 +63,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var index = ControlPoints.IndexOf(controlPoint);
             if (index < 0 || index >= Keyframes.Length) return default;
             return Keyframes[index];
-        }
-        
-        private ControlPoint GetControlPoint(int index)
-        {
-            if (index < 0 || index >= ControlPoints.Count) return null;
-            return ControlPoints[index];
         }
         
         public ControlPoint GetControlPointLeft(ControlPoint controlPoint)
@@ -151,28 +135,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 cp.IsActive = false;
             }
         }
-        
                 
         public void UpdateView()
         {
-            if (IsEmpty) return;
-            AnimationCurveEditorUtility.ApplyTangentMode(this);
             foreach(var controlPoint in ControlPoints)
             {
                 controlPoint.UpdateView();
             }
         }
-        
-        public IEnumerator<(Keyframe key, ControlPoint point)> GetEnumerator()
+                
+        private ControlPoint GetControlPoint(int index)
         {
-            return Curve.keys.Select((t, i) => (t, ControlPoints[i])).GetEnumerator();
+            if (index < 0 || index >= ControlPoints.Count) return null;
+            return ControlPoints[index];
         }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
+ 
         private void RemoveKeyframeCache()
         {
             _keyframesCache = null;
@@ -211,7 +188,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         /// ControlPointのKeyframeの時間が変更されたらAnimationCurve上のIndexが変わる可能性がある
         /// Indexが変わるなら追随する
         /// </summary>
-        public void UpdateKeyframe(ControlPoint controlPoint, in Keyframe keyframe)
+        public void UpdateKeyframe(ControlPoint controlPoint, Keyframe keyframe)
         {
             if (controlPoint == null || Curve == null || ControlPoints.Count == 0)
             {
@@ -248,8 +225,55 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void OnCurveChanged()
         {
+            ApplyTangentModeToKeyframes();
+            
             RemoveKeyframeCache();
             onCurveChanged?.Invoke();
+        }
+
+        
+        /// <summary>
+        /// ControlPointのTangentModeに応じてKeyframeのTangentを計算する
+        /// TangentModeがLinearなら隣接するKeyframeとの傾きを計算して設定する必要があるため、ControlPoint内ではなくて
+        /// ControlPointHolderでまとめて行う
+        /// </summary>
+        private void ApplyTangentModeToKeyframes()
+        {
+            if (Curve == null || ControlPoints.Count == 0) return;
+
+            var keys = Curve.keys;
+            for (var i = 0; i < ControlPoints.Count; i++)
+            {
+                var controlPoint = ControlPoints[i];
+                if (controlPoint == null) continue;
+
+                var keyframe = keys[i];
+                var current = keyframe.GetPosition();
+                if (i > 0 && controlPoint.InTangentMode == TangentMode.Linear)
+                {
+                    // Set the tangent to the slope between the previous key and this key
+                    var prev = keys[i - 1].GetPosition();
+                    keyframe.inTangent = (current.y - prev.y) / (current.x - prev.x);
+                }
+                else if (controlPoint.InTangentMode == TangentMode.Constant)
+                {
+                    keyframe.inTangent = float.PositiveInfinity;
+                }
+
+                if (i < ControlPoints.Count - 1 && controlPoint.OutTangentMode == TangentMode.Linear)
+                {
+                    // Set the tangent to the slope between this key and the next key
+                    var next = keys[i + 1].GetPosition();
+                    keyframe.outTangent = (next.y - current.y) / (next.x - current.x);
+                }
+                else if (controlPoint.OutTangentMode == TangentMode.Constant)
+                {
+                    keyframe.outTangent = float.PositiveInfinity;
+                }
+                
+                Curve.MoveKey(i, keyframe);
+            }
+            
         }
     }
 }

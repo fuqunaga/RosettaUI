@@ -212,7 +212,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         #region View Update
         private void FitViewToCurve()
         {
-            if (_controlPointHolder.IsEmpty) return;
             var rect = _controlPointHolder.Curve.GetCurveRect();
             _previewTransform.FitToRect(rect, FitViewPaddingPixel);
             UpdateView();

@@ -12,7 +12,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private VisualElement _handleContainerElement;
         private ICoordinateConverter _coordinateConverter;
         
-        private readonly Action _onHandleSelected;
         private readonly OnTangentChanged _onTangentChanged;
         
         private float _angle;
@@ -27,11 +26,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private const string HandleClassName = "rosettaui-animation-curve-editor__control-point-handle__handle";
         
         
-        public ControlPointHandle(ICoordinateConverter coordinateConverter, float sign, Action onHandleSelected, OnTangentChanged onTangentChanged)
+        public ControlPointHandle(ICoordinateConverter coordinateConverter, float sign, OnTangentChanged onTangentChanged)
         {
             _coordinateConverter = coordinateConverter;
             _sign = sign;
-            _onHandleSelected = onHandleSelected;
             _onTangentChanged = onTangentChanged;
             AddToClassList(HandleRootClassName);
             InitUI();
@@ -86,7 +84,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void OnPointerDown(PointerDownEvent evt)
         {
             if (evt.button != 0) return;
-            _onHandleSelected?.Invoke();
             _handleContainerElement.CaptureMouse();
             _handleContainerElement.RegisterCallback<PointerMoveEvent>(OnPointerMove);
             _handleContainerElement.RegisterCallback<PointerUpEvent>(OnPointerUp);

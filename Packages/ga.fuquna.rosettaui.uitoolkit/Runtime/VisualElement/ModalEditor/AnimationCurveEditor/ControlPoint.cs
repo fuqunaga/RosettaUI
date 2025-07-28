@@ -96,7 +96,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             // Handles
             _leftHandle = new ControlPointHandle(_coordinateConverter, -1f, 
-                () => _onPointSelected(this),
                 (tangent, weight) =>
                 {
                     _keyframeCopy.inTangent = tangent;

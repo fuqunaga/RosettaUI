@@ -6,16 +6,23 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
     public class ControlPointHandle : VisualElement
     {
+        public enum LeftOrRight
+        {
+            Left = -1,
+            Right = 1
+        }
+        
         public delegate void OnTangentChanged(float tangent, float weight);
         
         private VisualElement _lineElement;
         private VisualElement _handleContainerElement;
-        private ICoordinateConverter _coordinateConverter;
+        private readonly ICoordinateConverter _coordinateConverter;
         
         private readonly OnTangentChanged _onTangentChanged;
+
+        private readonly LeftOrRight _leftOrRight;
         
         private float _angle;
-        private float _sign;
         private float _xDistToNeighborInScreen;
         
         private const float DefaultLineLength = 50f;
@@ -25,11 +32,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private const string HandleContainerWeightClassName = "rosettaui-animation-curve-editor__control-point-handle__handle-container-weight";
         private const string HandleClassName = "rosettaui-animation-curve-editor__control-point-handle__handle";
         
+        private float Sign => (int)_leftOrRight;
         
-        public ControlPointHandle(ICoordinateConverter coordinateConverter, float sign, OnTangentChanged onTangentChanged)
+        public ControlPointHandle(LeftOrRight leftOrRight, ICoordinateConverter coordinateConverter, OnTangentChanged onTangentChanged)
         {
+            _leftOrRight = leftOrRight;
             _coordinateConverter = coordinateConverter;
-            _sign = sign;
             _onTangentChanged = onTangentChanged;
             AddToClassList(HandleRootClassName);
             InitUI();
@@ -50,26 +58,38 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             handleElement.AddToClassList(HandleClassName);
             _handleContainerElement.Add(handleElement);
         }
-        
-        /// <summary>
-        /// Set the tangent of the handle
-        /// </summary>
-        /// <param name="tangent">Tangent in curve coordinate</param>
-        public void SetTangent(float tangent)
+
+        public void UpdateView(in Keyframe keyframe, Func<float> getXDistToNeighborInScreenFunc)
         {
-            float angle = AnimationCurveEditorUtility.GetDegreeFromTangent2(_coordinateConverter.GetScreenTangentFromCurveTangent(tangent) * _sign, _sign);
+            var tangent = _leftOrRight == LeftOrRight.Left ? keyframe.inTangent : keyframe.outTangent;
+            SetTangent(tangent);
+            
+            var isWeightEnable = keyframe.weightedMode == WeightedMode.Both || 
+                (keyframe.weightedMode == WeightedMode.In && _leftOrRight == LeftOrRight.Left) ||
+                (keyframe.weightedMode == WeightedMode.Out && _leftOrRight == LeftOrRight.Right);
+            
+            float? weight = isWeightEnable
+                ? (_leftOrRight == LeftOrRight.Left ? keyframe.inWeight : keyframe.outWeight)
+                : null;
+            
+            SetWeight(weight, getXDistToNeighborInScreenFunc);
+        }
+        
+        private void SetTangent(float tangent)
+        {
+            float angle = AnimationCurveEditorUtility.GetDegreeFromTangent2(_coordinateConverter.GetScreenTangentFromCurveTangent(tangent) * Sign, Sign);
             if (float.IsNaN(angle)) return;
             
             _lineElement.transform.rotation = Quaternion.AngleAxis(angle, Vector3.back);
             _angle = angle;
         }
         
-        public void SetWeight(float? weight, float xDistToNeighborInScreen)
+        private void SetWeight(float? weight, Func<float> getXDistToNeighborInScreenFunc)
         {
-            _xDistToNeighborInScreen = xDistToNeighborInScreen;
+            _xDistToNeighborInScreen = getXDistToNeighborInScreenFunc();
             _lineElement.style.width = weight == null || Mathf.Approximately(_angle, -90f) || Mathf.Approximately(_angle, 90f) || Mathf.Approximately(_angle, 270f)
                 ? DefaultLineLength
-                : Mathf.Max(10f, (float)weight * Mathf.Abs(xDistToNeighborInScreen / Mathf.Cos(_angle * Mathf.Deg2Rad)));
+                : Mathf.Max(10f, (float)weight * Mathf.Abs(getXDistToNeighborInScreenFunc() / Mathf.Cos(_angle * Mathf.Deg2Rad)));
 
             if (weight.HasValue)
             {
@@ -107,7 +127,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
             float Clamp(float xDiff)
             {
-                return Mathf.Max(0f, xDiff * _sign) * _sign;
+                return Mathf.Max(0f, xDiff * Sign) * Sign;
             }
 
             float Snap(float tangent)

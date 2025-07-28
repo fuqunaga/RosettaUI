@@ -95,7 +95,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             });
             
             // Handles
-            _leftHandle = new ControlPointHandle(_coordinateConverter, -1f, 
+            _leftHandle = new ControlPointHandle(ControlPointHandle.LeftOrRight.Left,
+                _coordinateConverter, 
                 (tangent, weight) =>
                 {
                     var keyframe = Keyframe;
@@ -113,7 +114,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             );
             Add(_leftHandle);
             
-            _rightHandle = new ControlPointHandle(_coordinateConverter, 1f, 
+            _rightHandle = new ControlPointHandle(ControlPointHandle.LeftOrRight.Right,
+                _coordinateConverter, 
                 (tangent, weight) =>
                 {
                     var keyframe = Keyframe;
@@ -224,15 +226,32 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void UpdateHandleView()
         {
             var keyframe = Keyframe;
+
+            var leftHandleEnable = InTangentMode != TangentMode.Linear;
+            var rightHandleEnable = OutTangentMode != TangentMode.Linear;
+
+            if (leftHandleEnable)
+            {
+                _leftHandle.style.visibility = Visibility.Visible;
+                _leftHandle.UpdateView(keyframe, () => GetXDistInScreen(Left, this));
+            }
+            else
+            {
+                _leftHandle.style.visibility = Visibility.Hidden;
+            }
             
-            _leftHandle.SetTangent(keyframe.inTangent);
-            _rightHandle.SetTangent(keyframe.outTangent);
+            if (rightHandleEnable)
+            {
+                _rightHandle.style.visibility = Visibility.Visible;
+                _rightHandle.UpdateView(keyframe, () => GetXDistInScreen(this, Right));
+            }
+            else
+            {
+                _rightHandle.style.visibility = Visibility.Hidden;
+            }
             
-            float? inWeight = keyframe.weightedMode is WeightedMode.In or WeightedMode.Both ? keyframe.inWeight : null;
-            float? outWeight = keyframe.weightedMode is WeightedMode.Out or WeightedMode.Both ? keyframe.outWeight : null;
-            _leftHandle.SetWeight(inWeight, GetXDistInScreen(Left, this));
-            _rightHandle.SetWeight(outWeight, GetXDistInScreen(this, Right));
             return;
+            
             
             float GetXDistInScreen(ControlPoint left, ControlPoint right)
             {

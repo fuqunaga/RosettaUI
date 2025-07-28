@@ -22,7 +22,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private readonly LeftOrRight _leftOrRight;
         
-        private float _angle;
         private float _xDistToNeighborInScreen;
         
         private const float DefaultLineLength = 50f;
@@ -62,7 +61,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public void UpdateView(in Keyframe keyframe, Func<float> getXDistToNeighborInScreenFunc)
         {
             var tangent = _leftOrRight == LeftOrRight.Left ? keyframe.inTangent : keyframe.outTangent;
-            SetTangent(tangent);
+            var degree = SetTangent(tangent);
             
             var isWeightEnable = keyframe.weightedMode == WeightedMode.Both || 
                 (keyframe.weightedMode == WeightedMode.In && _leftOrRight == LeftOrRight.Left) ||
@@ -72,25 +71,43 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 ? (_leftOrRight == LeftOrRight.Left ? keyframe.inWeight : keyframe.outWeight)
                 : null;
             
-            SetWeight(weight, getXDistToNeighborInScreenFunc);
+            SetWeight(weight, degree, getXDistToNeighborInScreenFunc);
         }
         
-        private void SetTangent(float tangent)
+        /// <summary>
+        /// Tangentを表示に反映する
+        /// </summary>
+        /// <returns>ラインの角度を返す。USSとは回転方向が異なりX軸＋方向が0度、Y軸が＋90度</returns>
+        private float SetTangent(float tangent)
         {
-            float angle = AnimationCurveEditorUtility.GetDegreeFromTangent2(_coordinateConverter.GetScreenTangentFromCurveTangent(tangent) * Sign, Sign);
-            if (float.IsNaN(angle)) return;
+            var radian = Mathf.Atan(_coordinateConverter.GetScreenTangentFromCurveTangent(tangent));
             
-            _lineElement.transform.rotation = Quaternion.AngleAxis(angle, Vector3.back);
-            _angle = angle;
+            if (!float.IsNaN(radian))
+            {
+                if ( _leftOrRight == LeftOrRight.Left)
+                {
+                    radian += Mathf.PI;
+                }
+                
+                // USSでは時計回りが正方向なので反転する
+                _lineElement.style.rotate = new Rotate(Angle.Radians(-radian));
+            }
+
+            return radian * Mathf.Rad2Deg;
         }
         
-        private void SetWeight(float? weight, Func<float> getXDistToNeighborInScreenFunc)
+        private void SetWeight(float? weight, float degree, Func<float> getXDistToNeighborInScreenFunc)
         {
             _xDistToNeighborInScreen = getXDistToNeighborInScreenFunc();
-            _lineElement.style.width = weight == null || Mathf.Approximately(_angle, -90f) || Mathf.Approximately(_angle, 90f) || Mathf.Approximately(_angle, 270f)
-                ? DefaultLineLength
-                : Mathf.Max(10f, (float)weight * Mathf.Abs(getXDistToNeighborInScreenFunc() / Mathf.Cos(_angle * Mathf.Deg2Rad)));
-
+            
+            var width = DefaultLineLength;
+            if (weight is {} w && !Mathf.Approximately(degree % 90, 0f))
+            {
+                width = Mathf.Max(10f, w * Mathf.Abs(getXDistToNeighborInScreenFunc() / Mathf.Cos(degree * Mathf.Deg2Rad)));
+            }
+            
+            _lineElement.style.width = width;
+            
             if (weight.HasValue)
             {
                 _handleContainerElement.AddToClassList(HandleContainerWeightClassName);

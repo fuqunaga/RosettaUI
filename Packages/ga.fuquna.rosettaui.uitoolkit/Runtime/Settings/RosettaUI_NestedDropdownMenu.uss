@@ -1,0 +1,11 @@
+.nested-dropdown__submenu-item {
+    padding-right: 0;
+}
+
+.nested-dropdown__right-arrow {
+    width: 20px;
+    height: 20px;
+    margin-left: auto;
+    align-self: center;
+    background-image: url("../Images/MaterialSymbols/chevron_right.png");
+}

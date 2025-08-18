@@ -13,8 +13,10 @@ namespace RosettaUI.UIToolkit
             if (menuItems == null) return null;
             
 #if UNITY_2023_1_OR_NEWER
+            var menu = new NestedDropdownMenu();
+            
             // refs: DropdownUtility, EditorDelegateRegistration, GenericOSMenu
-            var menu = new GenericDropdownMenu();
+            // var menu = new GenericDropdownMenu();
 #else
             // refs: BasePopupField
             // https://github.com/Unity-Technologies/UnityCsReference/blob/c84064be69f20dcf21ebe4a7bbc176d48e2f289c/ModuleOverrides/com.unity.ui/Core/Controls/BasePopupField.cs#L206

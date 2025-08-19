@@ -127,6 +127,8 @@ namespace RosettaUI.UIToolkit.NestedDropdownMenuSystem
         private KeyboardNavigationManipulator? _keyboardNavigationManipulator;
 
         private SingleMenu? _parentMenu;
+
+        public VisualElement OuterContainer => _outerContainer;
         
         private bool IsRootMenu { get; set; }
         private bool IsActiveSubMenu => _parentMenu != null;

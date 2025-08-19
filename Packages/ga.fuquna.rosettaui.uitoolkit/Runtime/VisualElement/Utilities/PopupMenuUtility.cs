@@ -50,16 +50,15 @@ namespace RosettaUI.UIToolkit
                 }
             }
 
+            foreach (var singleMenu in menu.SingleMenus)
+            {
+                singleMenu.OuterContainer.AddBoxShadow();
+            }
+
             menu.DropDown(
                 new Rect() { position = position },
                 targetElement
             );
-
-
-            // if (menu is GenericDropdownMenu gdm)
-            // {
-            //     gdm.AddBoxShadow();
-            // }
         }
     }
 }

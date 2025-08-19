@@ -29,6 +29,8 @@ namespace RosettaUI.UIToolkit
                 return menu;
             }
         }
+        
+        public IEnumerable<SingleMenu> SingleMenus => _menuTable.Values;
 
 
         #region IGenericMenu like methods

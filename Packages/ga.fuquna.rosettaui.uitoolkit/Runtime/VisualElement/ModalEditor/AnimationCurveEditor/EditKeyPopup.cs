@@ -67,9 +67,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             _controlPoint = controlPoint;
             
-            var keyframe = _controlPoint.Keyframe;
-            _timeField.value = keyframe.time;
-            _valueField.value = keyframe.value;
+            var position = _controlPoint.KeyframePosition;
+            _timeField.value = position.x;
+            _valueField.value = position.y;
             
             _editKeyPopupRoot.style.left = controlPoint.style.left;
             _editKeyPopupRoot.style.top = controlPoint.style.top;

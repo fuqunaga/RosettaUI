@@ -50,7 +50,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             });
             var inTangentModeField = SetupKeyframeEnumField<TangentMode>(InTangentModeFieldName, (evt, key, cp) =>
             {
-                cp.SetTangentMode((TangentMode)evt.newValue, null);
+                cp.SetInTangentMode((TangentMode)evt.newValue);
                 _onModifyKeyAndUpdateView(key);
             });
             var inWeightedButton = _parent.Q<ToggleButton>(InWeightedToggleName);
@@ -70,7 +70,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             });
             var outTangentModeField = SetupKeyframeEnumField<TangentMode>(OutTangentModeFieldName, (evt, key, cp) =>
             {
-                cp.SetTangentMode(null, (TangentMode)evt.newValue);
+                cp.SetOutTangentMode((TangentMode)evt.newValue);
                 _onModifyKeyAndUpdateView(key);
             });
             var outWeightedButton = _parent.Q<ToggleButton>(OutWeightedToggleName);

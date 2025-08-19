@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+#if false
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
     public class ControlPointPopupMenuController
@@ -156,3 +157,4 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         }
     }
 }
+#endif

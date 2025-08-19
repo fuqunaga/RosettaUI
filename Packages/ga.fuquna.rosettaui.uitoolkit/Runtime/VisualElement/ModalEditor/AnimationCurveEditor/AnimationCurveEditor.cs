@@ -259,7 +259,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 _snapYButton.value ? gridViewport.RoundY(desireKeyframePosition.y, 0.05f) : desireKeyframePosition.y
             );
 
-            _controlPointHolder.UpdateKeyframePosition(controlPoint, position);
+            controlPoint.KeyframePosition = position;
             _propertyFieldController.UpdatePropertyFields();
         }
         

@@ -24,5 +24,11 @@ namespace RosettaUI.Builder
         {
             return new Vector2(keyframe.time, keyframe.value);
         }
+        
+        public static void SetPosition(this ref Keyframe keyframe, Vector2 position)
+        {
+            keyframe.time = position.x;
+            keyframe.value = position.y;
+        }
     }
 }

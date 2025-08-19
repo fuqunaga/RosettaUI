@@ -40,8 +40,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         // インスペクタのアニメーションカーブエディタはPointMode.SmoothかつFlatという状態がある
         // あまりユーザー体験に影響がなさそうなのでここでは排他的な扱いにしている
         public PointMode PointMode { get; private set; } = PointMode.Smooth;
+
         public TangentMode InTangentMode { get; private set; } = TangentMode.Free;
         public TangentMode OutTangentMode { get; private set; } = TangentMode.Free;
+      
 
         public bool IsActive
         {
@@ -60,13 +62,22 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 UpdateHandleView();
             }
         }
-        
-        public Keyframe Keyframe => _holder.GetKeyframe(this);
+
+        public Keyframe Keyframe
+        {
+            get => _holder.GetKeyframe(this);
+            set => _holder.UpdateKeyframe(this, value);
+        }
         
         public Vector2 KeyframePosition
         {
             get => Keyframe.GetPosition();
-            set => _holder.UpdateKeyframePosition(this, value);
+            set
+            {
+                var keyframe = Keyframe;
+                keyframe.SetPosition(value);
+                Keyframe = keyframe;
+            }
         }
         
         private ControlPoint Left => _holder.GetControlPointLeft(this);
@@ -104,7 +115,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                         keyframe.outTangent = keyframe.inTangent;
                     }
 
-                    _holder.UpdateKeyframe(this, keyframe);
+                    Keyframe = keyframe;
                 }
             );
             Add(_leftHandle);
@@ -129,7 +140,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                         keyframe.inTangent = keyframe.outTangent;
                     }
 
-                    _holder.UpdateKeyframe(this, keyframe);
+                    Keyframe = keyframe;
                 }
             );
             Add(_rightHandle);
@@ -166,7 +177,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                         var keyframe = Keyframe;
                         keyframe.inTangent = 0f;
                         keyframe.outTangent = 0f;
-                        _holder.UpdateKeyframe(this, keyframe);
+                        Keyframe = keyframe;
                     }
                         break;
 
@@ -174,7 +185,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     {
                         var keyframe = Keyframe;
                         keyframe.inTangent = keyframe.outTangent;
-                        _holder.UpdateKeyframe(this, keyframe);
+                        Keyframe = keyframe;
                     }
                         break;
                     
@@ -183,17 +194,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 }
             }
             
-            void SetTangentModeAndUpdateView(TangentMode? inTangentMode, TangentMode? outTangentMode)
-            {
-                SetTangentMode(inTangentMode, outTangentMode);
-                UpdateHandleView();
-            }
+            // void SetTangentModeAndUpdateView(TangentMode? inTangentMode, TangentMode? outTangentMode)
+            // {
+            //     SetTangentMode(inTangentMode, outTangentMode);
+            //     UpdateHandleView();
+            // }
             
             void ToggleWeightedModeAndUpdateView(WeightedMode mode)
             {
                 var keyframe = Keyframe;
                 keyframe.ToggleWeightedFrag(mode);
-                _holder.UpdateKeyframe(this, keyframe);
+                Keyframe = keyframe;
             }
         }
         
@@ -205,42 +216,37 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
             if (mode != PointMode.Broken)
             {
-                SetTangentMode(TangentMode.Free, TangentMode.Free, false);
+                InTangentMode = TangentMode.Free;
+                OutTangentMode = TangentMode.Free;
             }
 
             if (updateView)
             {
                 var keyframe = Keyframe;
                 keyframe.SetPointMode(mode);
-                _holder.UpdateKeyframe(this, keyframe);
+                Keyframe = keyframe;
             }
         }
-        
-        public void SetTangentMode(TangentMode? inTangentMode, TangentMode? outTangentMode, bool updateView = true)
-        {
-            var changed = false;
-            
-            if (inTangentMode is {} inMode && InTangentMode != inMode)
-            {
-                InTangentMode = inMode;
-                changed = true;
-            }
-            if (outTangentMode is {} outMode && OutTangentMode != outMode)
-            {
-                OutTangentMode = outMode;
-                changed = true;
-            }
-            
-            if (!changed) return;
 
-            if (InTangentMode == TangentMode.Constant || OutTangentMode == TangentMode.Constant)
-            {
-                PointMode = PointMode.Broken;
-            }
+        public void SetInTangentMode(TangentMode mode, bool updateView = true)
+        {
+            InTangentMode = mode;
+            OnTangentModeChanged(mode, updateView);
+        }
+        
+        public void SetOutTangentMode(TangentMode mode, bool updateView = true)
+        {
+            OutTangentMode = mode;
+            OnTangentModeChanged(mode, updateView);
+        }
+        
+        private void OnTangentModeChanged(TangentMode mode, bool updateView = true)
+        {
+            PointMode = PointMode.Broken;
 
             if (updateView)
             {
-                UpdateHandleView();
+                _holder.OnCurveChanged();
             }
         }
         

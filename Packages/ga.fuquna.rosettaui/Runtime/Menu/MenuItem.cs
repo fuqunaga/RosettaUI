@@ -31,7 +31,7 @@ namespace RosettaUI
     public class MenuItemSeparator : IMenuItem
     {
         public string Name { get; set; }
-        public MenuItemSeparator(string name) => Name = name;
+        public MenuItemSeparator(string name = "") => Name = name;
     }
 
 

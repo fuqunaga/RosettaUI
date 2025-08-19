@@ -51,57 +51,57 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public void Show(Vector2 position, VisualElement targetElement)
         {
             PopupMenuUtility.Show(
-                new[]
+                new IMenuItem[]
                 {
                     new MenuItem("Delete Key", () => _onPointRemoved()),
-                    MenuItem.Separator,
+                    new MenuItemSeparator(),
                     _pointModeMenuItems[PointMode.Smooth],
                     _pointModeMenuItems[PointMode.Flat],
                     _pointModeMenuItems[PointMode.Broken],
-                    MenuItem.Separator,
+                    new MenuItemSeparator(),
                     new MenuItem("Left Tangent", () => PopupMenuUtility.Show(
-                        new[]
+                        new IMenuItem[]
                         {
                             new MenuItem("Left Tangent", null) { isEnable = false },
-                            MenuItem.Separator,
+                            new MenuItemSeparator(),
                             _inTangentModeMenuItems[TangentMode.Free],
                             _inTangentModeMenuItems[TangentMode.Linear],
                             _inTangentModeMenuItems[TangentMode.Constant],
-                            MenuItem.Separator,
+                            new MenuItemSeparator(),
                             _inWeightedModeMenuItem,
-                            MenuItem.Separator,
+                            new MenuItemSeparator(),
                             new MenuItem("Back", () => Show(position, targetElement))
                         },
                         position,
                         targetElement)
                     ),
                     new MenuItem("Right Tangent", () => PopupMenuUtility.Show(
-                        new[]
+                        new IMenuItem[]
                         {
                             new MenuItem("Right Tangent", null) { isEnable = false },
-                            MenuItem.Separator,
+                            new MenuItemSeparator(),
                             _outTangentModeMenuItems[TangentMode.Free],
                             _outTangentModeMenuItems[TangentMode.Linear],
                             _outTangentModeMenuItems[TangentMode.Constant],
-                            MenuItem.Separator,
+                            new MenuItemSeparator(),
                             _outWeightedModeMenuItem,
-                            MenuItem.Separator,
+                            new MenuItemSeparator(),
                             new MenuItem("Back", () => Show(position, targetElement))
                         },
                         position,
                         targetElement)
                     ),
                     new MenuItem("Both Tangent", () => PopupMenuUtility.Show(
-                        new[]
+                        new IMenuItem[]
                         {
                             new MenuItem("Both Tangent", null) { isEnable = false },
-                            MenuItem.Separator,
+                            new MenuItemSeparator(),
                             _bothTangentModeMenuItems[TangentMode.Free],
                             _bothTangentModeMenuItems[TangentMode.Linear],
                             _bothTangentModeMenuItems[TangentMode.Constant],
-                            MenuItem.Separator,
+                            new MenuItemSeparator(),
                             _bothWeightedModeMenuItem,
-                            MenuItem.Separator,
+                            new MenuItemSeparator(),
                             new MenuItem("Back", () => Show(position, targetElement))
                         },
                         position,

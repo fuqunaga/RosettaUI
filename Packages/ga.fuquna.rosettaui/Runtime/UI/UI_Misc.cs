@@ -29,7 +29,7 @@ namespace RosettaUI
         
         #region PopupMenu
 
-        public static PopupMenuElement Popup(Element childElement, Func<IEnumerable<MenuItem>> createMenuItems, MouseButton mouseButton = MouseButton.RightMouse)
+        public static PopupMenuElement Popup(Element childElement, Func<IEnumerable<IMenuItem>> createMenuItems, MouseButton mouseButton = MouseButton.RightMouse)
         {
             return new PopupMenuElement(childElement, createMenuItems, mouseButton);
         }

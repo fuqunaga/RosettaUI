@@ -7,10 +7,10 @@ namespace RosettaUI
 {
     public class PopupMenuElement : ElementGroup
     {
-        public Func<IEnumerable<MenuItem>> CreateMenuItems { get; }
+        public Func<IEnumerable<IMenuItem>> CreateMenuItems { get; }
         public MouseButton MouseButton { get; set; }
 
-        public PopupMenuElement(Element element, Func<IEnumerable<MenuItem>> createMenuItems, MouseButton mouseButton = MouseButton.RightMouse) : base(new[] {element})
+        public PopupMenuElement(Element element, Func<IEnumerable<IMenuItem>> createMenuItems, MouseButton mouseButton = MouseButton.RightMouse) : base(new[] {element})
         {
             CreateMenuItems = createMenuItems;
             MouseButton = mouseButton;

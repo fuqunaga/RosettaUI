@@ -5,7 +5,7 @@ namespace RosettaUI
 {
     public static class ClipboardUtility
     {
-        public static Func<IEnumerable<MenuItem>> GenerateContextMenuItemsFunc<T>(Func<T> getter, Action<T> setter)
+        public static Func<IEnumerable<IMenuItem>> GenerateContextMenuItemsFunc<T>(Func<T> getter, Action<T> setter)
         {
             return () =>
             {

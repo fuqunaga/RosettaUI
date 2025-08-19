@@ -231,6 +231,7 @@ namespace RosettaUI.UIToolkit
 #endif
     }
 
+#if false    
 #if AvoidCompileError
     /// <summary>
     /// Represents an operation that the user is trying to accomplish through a specific input mechanism.
@@ -413,6 +414,8 @@ namespace RosettaUI.UIToolkit
 
             m_Action?.Invoke(operation, evt);
         }
+
     }
-}
 #endif
+#endif
+}

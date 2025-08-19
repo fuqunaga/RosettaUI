@@ -89,7 +89,7 @@ namespace RosettaUI.UIToolkit
         }
         
 
-        private static (string path, string label) ParseItemNameToPathAndLabel(string itemName)
+        public static (string path, string label) ParseItemNameToPathAndLabel(string itemName)
         {
             if (string.IsNullOrEmpty(itemName))
             {

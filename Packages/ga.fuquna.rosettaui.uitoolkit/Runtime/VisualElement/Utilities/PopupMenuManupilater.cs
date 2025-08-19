@@ -73,6 +73,7 @@ namespace RosettaUI.UIToolkit
             // セパレーターがメニューの最初か最後にあるのは避けたいので、ここで重複チェックしセパレーターの必要性を判断する
             using var _0 = ListPool<IMenuItem>.Get(out var menuItems);
             using var _1 = ListPool<IMenuItem>.Get(out var addItems);
+            using var _2 = HashSetPool<string>.Get(out var existingPaths);
 
             foreach (var addItemSet in Enumerable.Reverse(evt.MenuItemSets))
             {
@@ -80,9 +81,17 @@ namespace RosettaUI.UIToolkit
                 addItems.AddRange(addItemSet.Except(menuItems, IMenuItem.NameComparer));
                 if ( addItems.Count <= 0 ) continue;
 
-                if (menuItems.Count > 0)
+                var addItemPaths = addItems
+                    .Select(item => NestedDropdownMenu.ParseItemNameToPathAndLabel(item.Name).path)
+                    .Distinct();
+                
+                foreach(var path in addItemPaths)
                 {
-                    menuItems.Add(MenuItem.Separator);
+                    if (!existingPaths.Add(path))
+                    {
+                        // 既に存在するパスはセパレーターを追加する
+                        menuItems.Add(new MenuItemSeparator($"{path}/"));
+                    }
                 }
 
                 menuItems.AddRange(addItems);

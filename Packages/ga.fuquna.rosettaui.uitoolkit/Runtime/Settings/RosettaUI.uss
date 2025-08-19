@@ -304,7 +304,7 @@
     height: 16px;
     border-width: 1px;
     -unity-background-image-tint-color: darkgray;
-    background-image: resource("open-in-new");
+    background-image: url("../Images/MaterialSymbols/open-in-new.png");
     background-color: transparent;
     border-color: transparent;
 }
@@ -346,7 +346,7 @@
     border-radius: 1px;
     align-self: center;
     background-color: transparent;
-    background-image: resource("more_vert");
+    background-image: url("../Images/MaterialSymbols/more_vert.png");
     -unity-background-image-tint-color: var(--unity-colors-default-text);
 }
 

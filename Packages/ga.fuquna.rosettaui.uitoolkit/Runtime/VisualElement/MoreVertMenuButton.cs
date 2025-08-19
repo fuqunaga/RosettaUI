@@ -10,7 +10,7 @@ namespace RosettaUI.UIToolkit
         public const string UssClassName = "rosettaui-morevert-menu-button";
 
         public int ButtonIndex { get; set; } = 1;
-        public Func<IEnumerable<MenuItem>> CreateMenuItems { get; set; }
+        public Func<IEnumerable<IMenuItem>> CreateMenuItems { get; set; }
 
         public MoreVertMenuButton()
         {

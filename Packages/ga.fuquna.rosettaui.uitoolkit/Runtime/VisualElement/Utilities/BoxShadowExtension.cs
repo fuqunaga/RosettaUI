@@ -22,11 +22,5 @@ namespace RosettaUI.UIToolkit
                 style.marginTop = -(resolvedStyle.borderTopWidth + windowStyle.borderTopWidth) + 1f;
             });
         }
-        
-        public static void AddBoxShadow(this GenericDropdownMenu menu)
-        {
-            var outerContainer = menu.contentContainer.parent.parent.parent.parent;
-            outerContainer.AddBoxShadow();      
-        }
     }
 }

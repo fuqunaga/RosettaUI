@@ -25,7 +25,7 @@ namespace RosettaUI
         
         #region PopupMenuButton
         
-        public static ButtonElement PopupMenuButton(LabelElement label, Func<IEnumerable<MenuItem>> createMenuItems)
+        public static ButtonElement PopupMenuButton(LabelElement label, Func<IEnumerable<IMenuItem>> createMenuItems)
         {
             return Button(label, (buttonElement) =>
             {

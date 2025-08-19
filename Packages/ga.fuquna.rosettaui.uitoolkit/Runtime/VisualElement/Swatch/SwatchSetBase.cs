@@ -183,7 +183,7 @@ namespace RosettaUI.UIToolkit
 
             return;
 
-            IEnumerable<MenuItem> CreateMenuItems()
+            IEnumerable<IMenuItem> CreateMenuItems()
             {
                 yield return new MenuItem("Replace", () => ReplaceSwatchValueToCurrent(swatch));
                 yield return new MenuItem("Delete", () => DeleteSwatch(swatch));

@@ -5,14 +5,14 @@ namespace RosettaUI
 {
     public interface IPopupMenuImplement
     {
-        void Show(IEnumerable<MenuItem> menuItems, Vector2 screenPosition, Element targetElement);
+        void Show(IEnumerable<IMenuItem> menuItems, Vector2 screenPosition, Element targetElement);
     }
     
     public static class PopupMenu
     {
         public static IPopupMenuImplement Implement { get; set; }
         
-        public static void Show(IEnumerable<MenuItem> menuItems, Vector2 position, Element targetElement)
+        public static void Show(IEnumerable<IMenuItem> menuItems, Vector2 position, Element targetElement)
         {
             if ( Implement == null)
             {

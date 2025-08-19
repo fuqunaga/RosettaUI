@@ -14,7 +14,7 @@ namespace RosettaUI.UIToolkit
         
         private readonly PopupMenuManipulator _manipulator;
         
-        public Func<IEnumerable<MenuItem>> CreateMenuItems { get; set; }
+        public Func<IEnumerable<IMenuItem>> CreateMenuItems { get; set; }
 
         public MouseButton MouseButton
         {

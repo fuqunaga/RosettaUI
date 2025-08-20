@@ -17,30 +17,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly VisualElement _parent;
         private readonly Func<ControlPointHolder, ControlPoint> _getNewControlPoint;
 
-        private Keyframe[] _keyframesCache;
-
-        
-        public AnimationCurve Curve { get; private set; }
+        public AnimationCurve Curve { get; private set; } = new();
         public ControlPoint SelectedControlPoint => ControlPoints.FirstOrDefault(t => t.IsActive);
 
 
         private List<ControlPoint> ControlPoints { get; } = new();
 
-        private Keyframe[] Keyframes
-        {
-            get
-            {
-                if (_keyframesCache == null)
-                {
-                    if (Curve == null || Curve.keys.Length == 0) return Array.Empty<Keyframe>();
-                    _keyframesCache = Curve.keys;
-                }
-                
-                return _keyframesCache;
-            }
-        }
-        
-        
         public ControlPointHolder(VisualElement parent, Func<ControlPointHolder, ControlPoint> getNewControlPoint)
         {
             _parent = parent;
@@ -59,8 +41,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             if (controlPoint == null) return default;
             var index = ControlPoints.IndexOf(controlPoint);
-            if (index < 0 || index >= Keyframes.Length) return default;
-            return Keyframes[index];
+            if (index < 0 || index >= Curve.length) return default;
+            return Curve[index];
         }
         
         public ControlPoint GetControlPointLeft(ControlPoint controlPoint)
@@ -151,11 +133,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             if (index < 0 || index >= ControlPoints.Count) return null;
             return ControlPoints[index];
         }
- 
-        private void RemoveKeyframeCache()
-        {
-            _keyframesCache = null;
-        }
         
         private void ResetControlPoints()
         {
@@ -216,7 +193,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             ApplyTangentModeToKeyframes();
             
-            RemoveKeyframeCache();
             onCurveChanged?.Invoke();
         }
 

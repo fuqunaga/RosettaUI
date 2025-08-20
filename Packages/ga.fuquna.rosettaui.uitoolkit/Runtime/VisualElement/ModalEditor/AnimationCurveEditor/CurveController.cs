@@ -232,8 +232,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 {
                     keyframe.outTangent = float.PositiveInfinity;
                 }
-                
+
                 Curve.MoveKey(i, keyframe);
+                
+#if UNITY_EDITOR
+                curve.SetTangentMode(i, controlPoint.InTangentMode, controlPoint.OutTangentMode);
+#endif
             }
         }
     }

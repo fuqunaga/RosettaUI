@@ -39,9 +39,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public Keyframe GetKeyframe(ControlPoint controlPoint)
         {
-            if (controlPoint == null) return default;
             var index = ControlPoints.IndexOf(controlPoint);
-            if (index < 0 || index >= Curve.length) return default;
             return Curve[index];
         }
         
@@ -188,11 +186,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
             OnCurveChanged();
         }
-        
+
         public void OnCurveChanged()
         {
             ApplyTangentModeToKeyframes();
-            
             onCurveChanged?.Invoke();
         }
 
@@ -205,19 +202,18 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void ApplyTangentModeToKeyframes()
         {
             if (Curve == null || ControlPoints.Count == 0) return;
-
-            var keys = Curve.keys;
+            
             for (var i = 0; i < ControlPoints.Count; i++)
             {
                 var controlPoint = ControlPoints[i];
                 if (controlPoint == null) continue;
 
-                var keyframe = keys[i];
+                var keyframe = Curve[i];
                 var current = keyframe.GetPosition();
                 if (i > 0 && controlPoint.InTangentMode == TangentMode.Linear)
                 {
                     // Set the tangent to the slope between the previous key and this key
-                    var prev = keys[i - 1].GetPosition();
+                    var prev = Curve[i - 1].GetPosition();
                     keyframe.inTangent = (current.y - prev.y) / (current.x - prev.x);
                 }
                 else if (controlPoint.InTangentMode == TangentMode.Constant)
@@ -228,7 +224,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 if (i < ControlPoints.Count - 1 && controlPoint.OutTangentMode == TangentMode.Linear)
                 {
                     // Set the tangent to the slope between this key and the next key
-                    var next = keys[i + 1].GetPosition();
+                    var next = Curve[i + 1].GetPosition();
                     keyframe.outTangent = (next.y - current.y) / (next.x - current.x);
                 }
                 else if (controlPoint.OutTangentMode == TangentMode.Constant)
@@ -238,7 +234,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 
                 Curve.MoveKey(i, keyframe);
             }
-            
         }
     }
 }

@@ -1,10 +1,27 @@
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace RosettaUI.Builder
 {
     public static class AnimationCurveHelper 
     {
+        // AnimationCurve.CopyFrom()だと次のエラーになる場合があるので自前コピー
+        // @Unity6000.0.55f1
+        // > vector: assign data may not be data from the vector itself.
+        // > UnityEngine.AnimationCurve:CopyFrom (UnityEngine.AnimationCurve)
+        public static AnimationCurve Clone(AnimationCurve src)
+        {
+            var dst = new AnimationCurve();
+            Copy(src, dst);
+            return dst;
+        }
+        
+        public static void Copy(AnimationCurve src, AnimationCurve dst)
+        {
+            dst.keys = src.keys;
+            dst.postWrapMode = src.postWrapMode;
+            dst.preWrapMode = src.preWrapMode;
+        }
+
         public static Rect GetCurveRect(this AnimationCurve curve, int stepNum = 64)
         {
             if (curve == null)

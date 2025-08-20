@@ -201,19 +201,20 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         /// </summary>
         private void ApplyTangentModeToKeyframes()
         {
-            if (Curve == null || ControlPoints.Count == 0) return;
+            var curve = Curve;
+            if (curve == null || ControlPoints.Count == 0) return;
             
             for (var i = 0; i < ControlPoints.Count; i++)
             {
                 var controlPoint = ControlPoints[i];
                 if (controlPoint == null) continue;
 
-                var keyframe = Curve[i];
+                var keyframe = curve[i];
                 var current = keyframe.GetPosition();
                 if (i > 0 && controlPoint.InTangentMode == TangentMode.Linear)
                 {
                     // Set the tangent to the slope between the previous key and this key
-                    var prev = Curve[i - 1].GetPosition();
+                    var prev = curve[i - 1].GetPosition();
                     keyframe.inTangent = (current.y - prev.y) / (current.x - prev.x);
                 }
                 else if (controlPoint.InTangentMode == TangentMode.Constant)
@@ -224,7 +225,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 if (i < ControlPoints.Count - 1 && controlPoint.OutTangentMode == TangentMode.Linear)
                 {
                     // Set the tangent to the slope between this key and the next key
-                    var next = Curve[i + 1].GetPosition();
+                    var next = curve[i + 1].GetPosition();
                     keyframe.outTangent = (next.y - current.y) / (next.x - current.x);
                 }
                 else if (controlPoint.OutTangentMode == TangentMode.Constant)

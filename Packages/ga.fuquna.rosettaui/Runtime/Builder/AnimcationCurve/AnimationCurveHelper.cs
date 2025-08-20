@@ -5,20 +5,6 @@ namespace RosettaUI.Builder
 {
     public static class AnimationCurveHelper 
     {
-        public static AnimationCurve Clone(AnimationCurve src)
-        {
-            var dst = new AnimationCurve();
-            Copy(src, dst);
-            return dst;
-        }
-        
-        public static void Copy(AnimationCurve src, AnimationCurve dst)
-        {
-            dst.keys = src.keys;
-            dst.postWrapMode = src.postWrapMode;
-            dst.preWrapMode = src.preWrapMode;
-        }
-
         public static Rect GetCurveRect(this AnimationCurve curve, int stepNum = 64)
         {
             if (curve == null)

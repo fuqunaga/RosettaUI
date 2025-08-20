@@ -50,9 +50,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public void SetCurve(AnimationCurve curve)
         {
             // 外部での変更を受けないようにClone
-            Curve = AnimationCurveHelper.Clone(curve);
+            Curve.CopyFrom(curve);
             
-            RemoveKeyframeCache();
             ResetControlPoints();
         }
         

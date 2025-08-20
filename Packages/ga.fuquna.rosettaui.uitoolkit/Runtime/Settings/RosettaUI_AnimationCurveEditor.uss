@@ -99,7 +99,7 @@
     background-image: resource("animation-curve_snap-y");
 }
 
-.rosettaui-animation-curve-editor__parameter-popup {
+.rosettaui-animation-curve-editor__control-point-display-position-popup {
     position: absolute;
     margin: 0;
     padding: 0 2px;

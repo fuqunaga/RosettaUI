@@ -6,15 +6,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// <summary>
     /// Parameter display popup shown when moving a ControlPoint
     /// </summary>
-    public class ParameterPopup : Label
+    public class ControlPointDisplayPositionPopup : Label
     {
-        private const string ParameterPopupClassName = "rosettaui-animation-curve-editor__parameter-popup";
+        private const string ParameterPopupClassName = "rosettaui-animation-curve-editor__control-point-display-position-popup";
         
         public Vector2 positionOffset = new(2f, -2f);
         private readonly PreviewTransform _previewTransform;
 
 
-        public ParameterPopup(PreviewTransform previewTransform)
+        public ControlPointDisplayPositionPopup(PreviewTransform previewTransform)
         {
             _previewTransform = previewTransform;
             

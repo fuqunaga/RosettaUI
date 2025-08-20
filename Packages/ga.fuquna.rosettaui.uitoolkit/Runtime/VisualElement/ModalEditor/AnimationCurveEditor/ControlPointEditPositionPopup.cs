@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
@@ -7,9 +6,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// <summary>
     /// ControlPointの編集用ポップアップ 
     /// </summary>
-    public class EditKeyPopup : EventBlocker
+    public class ControlPointEditPositionPopup : EventBlocker
     {
-        public static string VisualTreeAssetName { get; set; } = "RosettaUI_AnimationCurve_EditKeyPopup";
+        public static string VisualTreeAssetName { get; set; } = "RosettaUI_AnimationCurve_ControlPointEditPositionPopup";
 
         private ControlPoint _controlPoint;
         
@@ -17,7 +16,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private FloatField _timeField;
         private FloatField _valueField;
 
-        public EditKeyPopup()
+        public ControlPointEditPositionPopup()
         {
             Hide();
         }

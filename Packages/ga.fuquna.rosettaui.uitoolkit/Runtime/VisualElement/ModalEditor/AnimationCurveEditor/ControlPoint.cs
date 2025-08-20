@@ -24,8 +24,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private readonly ControlPointHolder _holder;
         private readonly ICoordinateConverter _coordinateConverter;
-        private readonly ParameterPopup _parameterPopup;
-        private readonly EditKeyPopup _editKeyPopup;
+        private readonly ControlPointDisplayPositionPopup _controlPointDisplayPositionPopup;
+        private readonly ControlPointEditPositionPopup _controlPointEditPositionPopup;
         private readonly VisualElement _controlPoint;
         private readonly ControlPointHandle _leftHandle;
         private readonly ControlPointHandle _rightHandle;
@@ -84,13 +84,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private ControlPoint Right => _holder.GetControlPointRight(this);
 
         public ControlPoint(ControlPointHolder holder, ICoordinateConverter coordinateConverter,
-            ParameterPopup parameterPopup, EditKeyPopup editKeyPopup,
+            ControlPointDisplayPositionPopup controlPointDisplayPositionPopup, ControlPointEditPositionPopup controlPointEditPositionPopup,
             OnPointAction onPointSelected, Action<ControlPoint, Vector2> onPointMoved)
         {
             _holder = holder;
             _coordinateConverter = coordinateConverter;
-            _parameterPopup = parameterPopup;
-            _editKeyPopup = editKeyPopup;
+            _controlPointDisplayPositionPopup = controlPointDisplayPositionPopup;
+            _controlPointEditPositionPopup = controlPointEditPositionPopup;
             _onPointSelected = onPointSelected;
             _onPointMoved = onPointMoved;
 
@@ -314,8 +314,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     evt.StopPropagation();
                     this.CaptureMouse();
                     
-                    _parameterPopup.Show();
-                    _parameterPopup.Update(elementPosition, Keyframe);
+                    _controlPointDisplayPositionPopup.Show();
+                    _controlPointDisplayPositionPopup.Update(elementPosition, Keyframe);
                     break;
                 case 1:
                     // _popupMenuController.Show(evt.position, this);
@@ -334,7 +334,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var desireKeyframePosition = _coordinateConverter.GetCurvePosFromScreenPos(screenPosition);
             _onPointMoved(this, desireKeyframePosition);
 
-            _parameterPopup.Update(screenPosition, Keyframe);
+            _controlPointDisplayPositionPopup.Update(screenPosition, Keyframe);
         }
 
         private void OnPointerUp(PointerUpEvent evt)
@@ -346,7 +346,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 evt.StopPropagation();
                 this.ReleaseMouse();
                 
-                _parameterPopup.Hide();
+                _controlPointDisplayPositionPopup.Hide();
             }
         }
 
@@ -357,7 +357,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         public void ShowEditKeyPopup()
         {
-            _editKeyPopup.Show(this);
+            _controlPointEditPositionPopup.Show(this);
         }
     }
 }

@@ -73,8 +73,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private ToggleButton _snapYButton;
         private ScrollerController _scrollerController;
         private AxisLabelController _axisLabelController;
-        private ParameterPopup _parameterPopup;
-        private EditKeyPopup _editKeyPopup;
+        private ControlPointDisplayPositionPopup _controlPointDisplayPositionPopup;
+        private ControlPointEditPositionPopup _controlPointEditPositionPopup;
         private PropertyFieldController _propertyFieldController;
 
         private PreviewTransform _previewTransform;
@@ -92,7 +92,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             AddToClassList(USSClassName);
             InitUI();
             
-            _controlPointHolder = new ControlPointHolder(_curvePreviewElement, (holder) => new ControlPoint(holder, _previewTransform, _parameterPopup, _editKeyPopup, OnControlPointSelected, OnControlPointMoved));
+            _controlPointHolder = new ControlPointHolder(_curvePreviewElement, (holder) => new ControlPoint(holder, _previewTransform, _controlPointDisplayPositionPopup, _controlPointEditPositionPopup, OnControlPointSelected, OnControlPointMoved));
             _controlPointHolder.onCurveChanged += () =>
             {
                 UpdateView();
@@ -189,12 +189,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             // Parameter Popup
             var curveGroup = this.Q("curve-group");
-            _parameterPopup = new ParameterPopup(_previewTransform);
-            curveGroup.Add(_parameterPopup);
+            _controlPointDisplayPositionPopup = new ControlPointDisplayPositionPopup(_previewTransform);
+            curveGroup.Add(_controlPointDisplayPositionPopup);
             
             // Edit Key Popup
-            _editKeyPopup = new EditKeyPopup();
-            curveGroup.Add(_editKeyPopup);
+            _controlPointEditPositionPopup = new ControlPointEditPositionPopup();
+            curveGroup.Add(_controlPointEditPositionPopup);
             
             // Property Field
             _propertyFieldController = new PropertyFieldController(this,
@@ -273,8 +273,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             _propertyFieldController.UpdatePropertyFields();
             _controlPointHolder.UnselectAllControlPoints();
-            _parameterPopup.Hide();
-            _editKeyPopup.Hide();
+            _controlPointDisplayPositionPopup.Hide();
+            _controlPointEditPositionPopup.Hide();
         }
         
         #endregion

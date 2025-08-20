@@ -5,6 +5,13 @@ using UnityEngine;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
+    /// <summary>
+    /// Context menu for control points in the Animation Curve Editor.
+    /// </summary>
+    /// <details>
+    /// refs: Unity CurveMenuManager
+    /// https://github.com/Unity-Technologies/UnityCsReference/blob/4b463aa72c78ec7490b7f03176bd012399881768/Editor/Mono/Animation/AnimationWindow/CurveMenuManager.cs#L72
+    /// </details>
     public static class ControlPointPopupMenu
     {
             public static void Show(Vector2 position, ControlPoint controlPoint)

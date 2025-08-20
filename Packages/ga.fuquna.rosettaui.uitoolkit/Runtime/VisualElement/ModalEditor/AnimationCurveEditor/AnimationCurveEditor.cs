@@ -62,7 +62,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         // ReSharper disable once MemberCanBePrivate.Global
         public static RectOffset FitViewPaddingPixel { get; } = new(24, 24, 40, 20);
         
-        private readonly ControlPointHolder _controlPointHolder;
+        private readonly CurveController _curveController;
         
         
         private RenderTexture _curveEditorTexture = null;
@@ -92,11 +92,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             AddToClassList(USSClassName);
             InitUI();
             
-            _controlPointHolder = new ControlPointHolder(_curvePreviewElement, (holder) => new ControlPoint(holder, _previewTransform, _controlPointDisplayPositionPopup, _controlPointEditPositionPopup, OnControlPointSelected, OnControlPointMoved));
-            _controlPointHolder.onCurveChanged += () =>
+            _curveController = new CurveController(_curvePreviewElement, (holder) => new ControlPoint(holder, _previewTransform, _controlPointDisplayPositionPopup, _controlPointEditPositionPopup, OnControlPointSelected, OnControlPointMoved));
+            _curveController.onCurveChanged += () =>
             {
                 UpdateView();
-                NotifyEditorValueChanged(_controlPointHolder.Curve);
+                NotifyEditorValueChanged(_curveController.Curve);
             };
         }
         
@@ -105,7 +105,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         /// </summary>
         public void SetCurve(AnimationCurve curve)
         {
-            _controlPointHolder.SetCurve(curve);
+            _curveController.SetCurve(curve);
             UnselectAllControlPoint();
             FitViewToCurve();
         }
@@ -150,7 +150,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             });
             _keyEventHelper.RegisterKeyAction(KeyCode.Delete, _ =>
             {
-                _controlPointHolder.RemoveSelectedControlPoint();
+                _curveController.RemoveSelectedControlPoint();
             });
             
             // Buttons
@@ -174,14 +174,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 yCenter =>
                 {
                     _previewTransform.SetYCenter(yCenter);
-                    _controlPointHolder.UpdateView();
+                    _curveController.UpdateView();
                     UpdateCurvePreview();
                     _axisLabelController.UpdateAxisLabel(_previewTransform.PreviewRect);
                 },
                 xCenter =>
                 {
                     _previewTransform.SetXCenter(xCenter);
-                    _controlPointHolder.UpdateView();
+                    _curveController.UpdateView();
                     UpdateCurvePreview();
                     _axisLabelController.UpdateAxisLabel(_previewTransform.PreviewRect);
                 }
@@ -201,7 +201,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 // () => _selectedControlPointIndex < 0 ? default : _controlPointHolder[_selectedControlPointIndex],
                 () =>
                 {
-                    var controlPoint = _controlPointHolder?.SelectedControlPoint;
+                    var controlPoint = _curveController?.SelectedControlPoint;
                     return controlPoint == null ? default : (controlPoint.Keyframe, controlPoint);
                 },
                 key => { }); // TODO
@@ -212,7 +212,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         #region View Update
         private void FitViewToCurve()
         {
-            var rect = _controlPointHolder.Curve.GetCurveRect();
+            var rect = _curveController.Curve.GetCurveRect();
             _previewTransform.FitToRect(rect, FitViewPaddingPixel);
             UpdateView();
         }
@@ -220,10 +220,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void UpdateView()
         {
             var rect = _previewTransform.PreviewRect;
-            _scrollerController.UpdateScroller(rect, _controlPointHolder.Curve.GetCurveRect());
+            _scrollerController.UpdateScroller(rect, _curveController.Curve.GetCurveRect());
             _axisLabelController.UpdateAxisLabel(rect);
             
-            _controlPointHolder.UpdateView();
+            _curveController.UpdateView();
             UpdateCurvePreview();
         }
         
@@ -237,7 +237,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 gridParams = new Vector4(gridViewport.XOrder, gridViewport.YOrder, gridViewport.XTick, gridViewport.YTick),
             };
             
-            AnimationCurveVisualElementHelper.UpdatePreviewToBackgroundImage(_controlPointHolder.Curve, _curvePreviewElement, viewInfo);
+            AnimationCurveVisualElementHelper.UpdatePreviewToBackgroundImage(_curveController.Curve, _curvePreviewElement, viewInfo);
         }
         
         #endregion
@@ -246,7 +246,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void OnControlPointSelected(ControlPoint controlPoint)
         {
-            _controlPointHolder.SelectControlPoint(controlPoint);
+            _curveController.SelectControlPoint(controlPoint);
             _propertyFieldController.UpdatePropertyFields();
         }
         
@@ -266,13 +266,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void AddControlPoint(Vector2 keyFramePosition)
         {
             UnselectAllControlPoint();
-            _controlPointHolder.AddKey(keyFramePosition);
+            _curveController.AddKey(keyFramePosition);
         }
         
         private void UnselectAllControlPoint()
         {
             _propertyFieldController.UpdatePropertyFields();
-            _controlPointHolder.UnselectAllControlPoints();
+            _curveController.UnselectAllControlPoints();
             _controlPointDisplayPositionPopup.Hide();
             _controlPointEditPositionPopup.Hide();
         }

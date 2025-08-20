@@ -10,12 +10,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// <summary>
     /// Manage AnimationCurve and ControlPoints
     /// </summary>
-    public class ControlPointHolder
+    public class CurveController
     {
         public event Action onCurveChanged;
         
         private readonly VisualElement _parent;
-        private readonly Func<ControlPointHolder, ControlPoint> _getNewControlPoint;
+        private readonly Func<CurveController, ControlPoint> _getNewControlPoint;
 
         public AnimationCurve Curve { get; private set; } = new();
         public ControlPoint SelectedControlPoint => ControlPoints.FirstOrDefault(t => t.IsActive);
@@ -23,7 +23,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private List<ControlPoint> ControlPoints { get; } = new();
 
-        public ControlPointHolder(VisualElement parent, Func<ControlPointHolder, ControlPoint> getNewControlPoint)
+        public CurveController(VisualElement parent, Func<CurveController, ControlPoint> getNewControlPoint)
         {
             _parent = parent;
             _getNewControlPoint = getNewControlPoint;

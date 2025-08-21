@@ -14,11 +14,11 @@
         </engine:VisualElement>
     </engine:VisualElement>
     <engine:Button name="slider-type-button" class="rosettaui-colorpicker-slider-type-button" />
-    <engine:VisualElement name="slider-container" class="rosettaui-colorpicker-slider-container">
+    <engine:VisualElement name="slider-container" class="rosettaui-colorpicker-slider-container" style="-unity-text-align: middle-left;">
         <engine:Slider name="slider0" show-input-field="true" />
         <engine:Slider name="slider1" show-input-field="true" />
         <engine:Slider name="slider2" show-input-field="true" />
         <engine:Slider name="slider3" show-input-field="true" />
     </engine:VisualElement>
-    <engine:TextField name="hex" label="Hexadecimal" class="rosettaui-colorpicker__hex" />
+    <engine:TextField name="hex" label="Hexadecimal" class="rosettaui-colorpicker__hex" style="-unity-text-align: middle-left;" />
 </engine:UXML>

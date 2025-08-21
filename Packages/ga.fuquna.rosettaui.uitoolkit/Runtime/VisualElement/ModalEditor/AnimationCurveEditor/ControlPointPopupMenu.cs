@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RosettaUI.Builder;
 using UnityEngine;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
@@ -37,16 +38,39 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private static IEnumerable<IMenuItem> CreateMenuItemsPointMode(ControlPoint controlPoint)
         {
-            yield return Create(PointMode.Smooth);
-            yield return Create(PointMode.Flat);
-            yield return Create(PointMode.Broken);
+            var key = controlPoint.Keyframe;
+            var leftMode = controlPoint.InTangentMode;
+            var rightMode = controlPoint.OutTangentMode;
+
+            var broken = controlPoint.IsKeyBroken;
+            var freeSmooth = !(broken || leftMode != TangentMode.Free || rightMode != TangentMode.Free);
+            var flat = !(broken || leftMode != TangentMode.Free || key.inTangent != 0 || rightMode != TangentMode.Free || key.outTangent != 0);
+
+            
+            yield return Create("Free Smooth", freeSmooth, () =>
+            {
+                controlPoint.SetBothTangentMode(TangentMode.Free, false);
+                controlPoint.SetKeyBroken(false);
+            });
+            yield return Create("Flat", flat, () =>
+            {
+                controlPoint.SetBothTangentMode(TangentMode.Free, false);
+                controlPoint.SetKeyBroken(false);
+                
+                var keyframe = controlPoint.Keyframe;
+                keyframe.inTangent = 0;
+                keyframe.outTangent = 0;
+                controlPoint.Keyframe = keyframe;   
+            });
+            yield return Create("Broken", broken, () => controlPoint.SetKeyBroken(true));
+            
             yield break;
 
-            MenuItem Create(PointMode mode)
+            MenuItem Create(string name, bool isChecked, Action action)
             {
-                return new MenuItem(mode.ToString(), () => controlPoint.SetPointMode(mode))
+                return new MenuItem(name, action)
                 {
-                    isChecked = controlPoint.PointMode == mode
+                    isChecked = isChecked
                 };
             }
         }
@@ -76,7 +100,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             return CreateMenuItemsTangent("Both Tangents",
                 controlPoint,
                 GetTangentMode,
-                SetTangentMode,
+                mode => controlPoint.SetBothTangentMode(mode),
                 WeightedMode.Both
             );
 
@@ -89,12 +113,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     return inTangentMode;
                 }
                 return null;
-            }
-            
-            void SetTangentMode(TangentMode mode)
-            {
-                controlPoint.SetInTangentMode(mode);
-                controlPoint.SetOutTangentMode(mode);
             }
         }
         

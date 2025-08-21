@@ -1,4 +1,5 @@
 ﻿using System;
+using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -44,7 +45,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var inTangentSlider = SetupKeyframeField<Slider, float>(InTangentSliderName, (evt, key, cp) =>
             {
                 key.inTangent = AnimationCurveEditorUtility.GetTangentFromDegree(evt.newValue);
-                if (cp.PointMode == PointMode.Smooth) key.outTangent = key.inTangent;
+                // if (cp.PointMode == PointMode.Smooth) key.outTangent = key.inTangent;
                 _onModifyKeyAndUpdateView(key);
                 _updatePropertyFields();
             });
@@ -64,7 +65,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var outTangentSlider = SetupKeyframeField<Slider, float>(OutTangentSliderName, (evt, key, cp) =>
             {
                 key.outTangent = AnimationCurveEditorUtility.GetTangentFromDegree(evt.newValue);
-                if (cp.PointMode == PointMode.Smooth) key.inTangent = key.outTangent;
+                // if (cp.PointMode == PointMode.Smooth) key.inTangent = key.outTangent;
                 _onModifyKeyAndUpdateView(key);
                 _updatePropertyFields();
             });
@@ -81,14 +82,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 keyPoint.key.SetWeightedFrag(WeightedMode.Out, val);
                 _onModifyKeyAndUpdateView(keyPoint.key);
             };
-            var pointModeField = SetupKeyframeEnumField<PointMode>(PointModeFieldName, (evt, key, cp) =>
-            {
-                PointMode mode = (PointMode)evt.newValue;
-                key.SetPointMode(mode);
-                cp.SetPointMode(mode);
-                _onModifyKeyAndUpdateView(key);
-                _updatePropertyFields();
-            });
+            // var pointModeField = SetupKeyframeEnumField<PointMode>(PointModeFieldName, (evt, key, cp) =>
+            // {
+            //     PointMode mode = (PointMode)evt.newValue;
+            //     key.SetPointMode(mode);
+            //     cp.SetPointMode(mode);
+            //     _onModifyKeyAndUpdateView(key);
+            //     _updatePropertyFields();
+            // });
             
             var timeField = SetupKeyframeField<FloatField, float>(TimeFieldName, (evt, key, _) =>
             {
@@ -109,7 +110,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 propertyField.SetEnabled(isSelectionValid);
                 timeField.SetValueWithoutNotify(isSelectionValid ? keyPoint.key.time : 0f);
                 valueField.SetValueWithoutNotify(isSelectionValid ? keyPoint.key.value : 0f);
-                pointModeField.SetValueWithoutNotify(isSelectionValid ? keyPoint.point.PointMode : PointMode.Smooth);
+                // pointModeField.SetValueWithoutNotify(isSelectionValid ? keyPoint.point.PointMode : PointMode.Smooth);
                 inTangentSlider.SetValueWithoutNotify(isSelectionValid ? Mathf.Atan(keyPoint.key.inTangent) * Mathf.Rad2Deg : 0f);
                 inTangentModeField.SetValueWithoutNotify(isSelectionValid ? keyPoint.point.InTangentMode : TangentMode.Free);
                 inWeightedButton.SetValueWithoutNotify(isSelectionValid && keyPoint.key.weightedMode is WeightedMode.In or WeightedMode.Both);

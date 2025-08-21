@@ -31,9 +31,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void SetCurve(AnimationCurve curve)
         {
-            // 外部での変更を受けないようにClone
-            Curve = AnimationCurveHelper.Clone(curve);
-            
+            Curve = curve;
             ResetControlPoints();
         }
         
@@ -146,7 +144,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             {
                 var key = Curve.keys[i];
                 var controlPoint = CreateControlPoint(i);
-                controlPoint.SetPointMode(key.GetPointMode(), false);
+                controlPoint.SetKeyBroken(Curve.GetKeyBroken(i), false);
                 controlPoint.SetInTangentMode(Curve.GetInTangentMode(i), false);
                 controlPoint.SetOutTangentMode(Curve.GetOutTangentMode(i), false);
             }
@@ -189,7 +187,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         public void OnCurveChanged()
         {
-            ApplyTangentModeToKeyframes();
+            ApplyTangentModeAndKeyBrokenToKeyframes();
             onCurveChanged?.Invoke();
         }
 
@@ -199,7 +197,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         /// TangentModeがLinearなら隣接するKeyframeとの傾きを計算して設定する必要があるため、ControlPoint内ではなくて
         /// ControlPointHolderでまとめて行う
         /// </summary>
-        private void ApplyTangentModeToKeyframes()
+        private void ApplyTangentModeAndKeyBrokenToKeyframes()
         {
             var curve = Curve;
             if (curve == null || ControlPoints.Count == 0) return;
@@ -236,6 +234,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 Curve.MoveKey(i, keyframe);
                 
 #if UNITY_EDITOR
+                curve.SetKeyBroken(i, controlPoint.IsKeyBroken);
                 curve.SetTangentMode(i, controlPoint.InTangentMode, controlPoint.OutTangentMode);
 #endif
             }

@@ -8,6 +8,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
     internal static class AnimationCurveEditorUtility
     {
+        public static bool GetKeyBroken(this AnimationCurve curve, int index)
+        {
+#if UNITY_EDITOR
+            return AnimationUtility.GetKeyBroken(curve, index);
+#else
+            return PredictGetBroken(curve, index);
+#endif
+        }
+
         public static TangentMode GetInTangentMode(this AnimationCurve curve, int index)
         {
 #if UNITY_EDITOR
@@ -27,9 +36,19 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         }
 
 #if UNITY_EDITOR
+
+        /// <summary>
+        /// KeyBrokenを設定する
+        /// Editor中のみ有効。インスペクターと同期をとるために使用する。
+        /// </summary>
+        public static void SetKeyBroken(this AnimationCurve curve, int index, bool broken)
+        {
+            AnimationUtility.SetKeyBroken(curve, index, broken);
+        }
+        
         /// <summary>
         /// TangentModeを設定する
-        /// Editor中のみ有効。おもにインスペクターとTangentModeの同期をとるために使用する。
+        /// Editor中のみ有効。インスペクターと同期をとるために使用する。
         /// </summary>
         public static void SetTangentMode(this AnimationCurve curve, int index, TangentMode leftMode, TangentMode rightMode)
         {
@@ -64,7 +83,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             };
         }
 #endif
-        
+
+        public static bool PredictGetBroken(this AnimationCurve curve, int index)
+        {
+            var keyframe = curve[index];
+            return !Mathf.Approximately(keyframe.inTangent, keyframe.outTangent);
+        }
 
         public static TangentMode PredictLeftTangentMode(this AnimationCurve curve, int index)
         {

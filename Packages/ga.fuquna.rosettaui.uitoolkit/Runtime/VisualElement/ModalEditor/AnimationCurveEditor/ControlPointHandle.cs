@@ -91,6 +91,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 
                 // USSでは時計回りが正方向なので反転する
                 _lineElement.style.rotate = new Rotate(Angle.Radians(-radian));
+
+                _handleContainerElement.style.rotate = new Rotate(Angle.Radians(radian));;
             }
 
             return radian * Mathf.Rad2Deg;

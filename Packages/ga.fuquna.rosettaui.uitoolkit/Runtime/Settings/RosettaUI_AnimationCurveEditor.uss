@@ -201,8 +201,8 @@
 }
 
 .rosettaui-animation-curve-editor__control-point-handle__handle {
-    width: 5px;
-    height: 5px;
+    width: 4px;
+    height: 4px;
     background-color: #1d1d1d;
     border-width: 1px;
     border-color: gray;
@@ -210,7 +210,7 @@
 }
 
 .rosettaui-animation-curve-editor__control-point-handle__handle-container-weight > .rosettaui-animation-curve-editor__control-point-handle__handle {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
     rotate: 0;
 }

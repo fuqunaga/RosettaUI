@@ -268,8 +268,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             var keyframe = Keyframe;
 
-            var leftHandleEnable = IsActive && (Left != null) && (InTangentMode != TangentMode.Linear);
-            var rightHandleEnable = IsActive && (Right != null) && (OutTangentMode != TangentMode.Linear);
+            var leftHandleEnable = IsActive && (Left != null) && (InTangentMode == TangentMode.Free);
+            var rightHandleEnable = IsActive && (Right != null) && (OutTangentMode == TangentMode.Free);
 
             Update(leftHandleEnable, _leftHandle, keyframe, GetXDistInScreen(Left, this));
             Update(rightHandleEnable, _rightHandle, keyframe, GetXDistInScreen(this, Right));

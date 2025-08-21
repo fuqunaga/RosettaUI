@@ -112,15 +112,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             {
                 isChecked = weightedModeFlag
             };
+            
             yield break;
 
+            
             MenuItem TangentModeMenu(TangentMode mode)
             {
                 return new MenuItem($"{menuPath}/{mode.ToString()}", () => setTangentMode?.Invoke(mode))
                 {
                     isChecked = getTangentMode?.Invoke() == mode
                 };
-            };
+            }
 
             void SetWeightedMode(bool flag)
             {

@@ -23,7 +23,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         // https://github.com/Unity-Technologies/UnityCsReference/blob/4b463aa72c78ec7490b7f03176bd012399881768/Editor/Mono/Animation/AnimationWindow/CurveMenuManager.cs#L193
         private const float WeightDefaultValue = 1 / 3f;
         
-        private readonly OnPointAction _onPointSelected;
+        
+        private readonly Action<ControlPoint> _onPointSelected;
         private readonly Action<ControlPoint, Vector2> _onPointMoved;
 
         private readonly CurveController _curveController;
@@ -33,15 +34,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly VisualElement _controlPoint;
         private readonly ControlPointHandle _leftHandle;
         private readonly ControlPointHandle _rightHandle;
-        // private readonly ControlPointPopupMenuController _popupMenuController;
 
 
         private Vector2 _pointerDownPositionToElementOffset;
 
 
-        public delegate void OnPointAction(ControlPoint controlPoint);
-        
-        
         public bool IsKeyBroken { get; private set; }
 
         public TangentMode InTangentMode { get; private set; } = TangentMode.Free;
@@ -88,7 +85,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         public ControlPoint(CurveController curveController, ICoordinateConverter coordinateConverter,
             ControlPointDisplayPositionPopup controlPointDisplayPositionPopup, ControlPointEditPositionPopup controlPointEditPositionPopup,
-            OnPointAction onPointSelected, Action<ControlPoint, Vector2> onPointMoved)
+            Action<ControlPoint> onPointSelected, Action<ControlPoint, Vector2> onPointMoved)
         {
             _curveController = curveController;
             _coordinateConverter = coordinateConverter;
@@ -119,13 +116,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _controlPoint = new VisualElement { name = "AnimationCurveEditorControlPoint" };
             _controlPoint.AddToClassList(ControlPointClassName);
             Add(_controlPoint);
-
-            // Popup menu controller
-            // _popupMenuController = new ControlPointPopupMenuController(
-            //     SetPointModeAndUpdateView,
-            //     SetTangentModeAndUpdateView,
-            //     ToggleWeightedModeAndUpdateView
-            // );
 
             return;
 
@@ -256,7 +246,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     _controlPointDisplayPositionPopup.Update(elementPosition, Keyframe);
                     break;
                 case 1:
-                    // _popupMenuController.Show(evt.position, this);
                     ControlPointPopupMenu.Show(evt.position, this);
                     evt.StopPropagation();
                     break;

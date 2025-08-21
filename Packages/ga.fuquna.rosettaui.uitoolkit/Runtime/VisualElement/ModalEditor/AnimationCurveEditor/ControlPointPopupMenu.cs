@@ -15,7 +15,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// </details>
     public static class ControlPointPopupMenu
     {
-            public static void Show(Vector2 position, ControlPoint controlPoint)
+        public static void Show(Vector2 position, ControlPoint controlPoint)
         {
             PopupMenuUtility.Show(
                 CreateMenuItemsDeleteEdit(controlPoint)

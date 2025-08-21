@@ -40,7 +40,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             _instance.Show(position, target, onCurveChanged);
             
-            _instance.SetCurve(initialCurve);
+            _instance.CopiedValue = initialCurve;
             
             // SetCurve()内のFitViewToCurve()時はまだ表示領域のサイズが確定していないため、
             // GeometryChangedEventでFitViewToCurve()を呼び出す
@@ -85,7 +85,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private bool _prevSnapX = false;
         private bool _prevSnapY = false;
         
- 
+        
+        #region ModalEditor
+
+        protected override AnimationCurve CopiedValue
+        {
+            get => AnimationCurveHelper.Clone(_curveController.Curve);
+            set => SetCurve(AnimationCurveHelper.Clone(value));
+        }
+
+        #endregion
+        
 
         public AnimationCurveEditor() : base(VisualTreeAssetName, true)
         {
@@ -96,7 +106,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _curveController.onCurveChanged += () =>
             {
                 UpdateView();
-                NotifyEditorValueChanged(_curveController.Curve);
+                NotifyEditorValueChanged();
             };
         }
         

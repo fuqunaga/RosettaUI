@@ -27,7 +27,7 @@ namespace RosettaUI.UIToolkit
             _instance.Show(position, target, onGradientChanged);
             
             
-            _instance.SetGradient(initialGradient);
+            _instance.CopiedValue = initialGradient;
         }
         
         #endregion
@@ -57,6 +57,15 @@ namespace RosettaUI.UIToolkit
         private Button _pasteButton;
         private Label _infoLabel;
         
+        #region ModalEditor
+
+        protected override Gradient CopiedValue
+        {
+            get => GradientHelper.Clone(_gradient);
+            set => SetGradient(GradientHelper.Clone(value));
+        }
+
+        #endregion
 
         // ReSharper disable once MemberCanBePrivate.Global
         public GradientEditor() : base(VisualTreeAssetName)
@@ -123,8 +132,8 @@ namespace RosettaUI.UIToolkit
 
             _presetSet = new GradientEditorPresetSet(gradient =>
             {
-                SetGradient(gradient);
-                NotifyEditorValueChanged(_gradient);
+                CopiedValue = gradient;
+                NotifyEditorValueChanged();
             });
             Add(_presetSet);
         }
@@ -132,7 +141,7 @@ namespace RosettaUI.UIToolkit
         // GradientEditor外部から値をセットする
         // - GradientEditorを開いたとき
         // - Presetが選択されたとき
-        public void SetGradient(Gradient gradient)
+        private void SetGradient(Gradient gradient)
         {
             _gradient = gradient;
             _modeEnum.SetValueWithoutNotify(_gradient.mode);
@@ -189,7 +198,7 @@ namespace RosettaUI.UIToolkit
         {
             UpdateGradientPreview();
             _presetSet.SetValue(_gradient);
-            NotifyEditorValueChanged(_gradient);
+            NotifyEditorValueChanged();
         }
         
         private void UpdateGradient()

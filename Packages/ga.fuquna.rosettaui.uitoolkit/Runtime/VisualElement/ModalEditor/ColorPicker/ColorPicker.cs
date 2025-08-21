@@ -30,7 +30,7 @@ namespace RosettaUI.UIToolkit
         {
             _instance ??= new ColorPicker();
   
-            _instance.PrevColor = initialColor;
+            _instance.CopiedValue = initialColor;
             _instance.EnableAlpha = enableAlpha;
 
             _instance.Show(position, target, onColorChanged, () => onColorChanged?.Invoke(initialColor));
@@ -59,6 +59,17 @@ namespace RosettaUI.UIToolkit
 
         private Vector3 _hsv;
         private float _alpha;
+
+        
+        #region ModalEditor
+
+        protected override Color CopiedValue
+        {
+            get => Color;
+            set => PrevColor = value;
+        }
+
+        #endregion
 
         private Color PrevColor
         {
@@ -301,7 +312,7 @@ namespace RosettaUI.UIToolkit
             _previewCurr.style.backgroundColor = Color;
             UpdateHex();
             _swatchSet.SetValue(Color);
-            NotifyEditorValueChanged(Color);
+            NotifyEditorValueChanged();
         }
 
 

@@ -7,7 +7,7 @@ namespace RosettaUI.UIToolkit
     /// <summary>
     /// ColorPicker,GradientEditor, AnimationCurveEditorなど他の操作をさせないパラメータエディター
     /// </summary>
-    public class ModalEditor<TValue> : VisualElement
+    public abstract class ModalEditor<TValue> : VisualElement
     {
         protected readonly ModalWindow window;
         public event Action<TValue> onEditorValueChanged;
@@ -53,9 +53,14 @@ namespace RosettaUI.UIToolkit
             });
         }
 
-        protected void NotifyEditorValueChanged(TValue value)
+        protected virtual void NotifyEditorValueChanged()
         {
-            onEditorValueChanged?.Invoke(value);
+            onEditorValueChanged?.Invoke(CopiedValue);
         }
+
+
+        // TValueがクラスの場合、同じTValueインスタンスを外部で変更されるとまずい場合がある
+        // SetInitialValue()とGetValueForNotification()の実装を強制してTValueをCloneすべきかどうか
+        protected abstract TValue CopiedValue { get; set; }
     }
 }

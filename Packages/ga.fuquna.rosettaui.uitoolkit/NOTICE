@@ -1,2 +1,5 @@
-Portions of this project include 'chevron_right' from Material Symbols, which are licensed under the Apache License, Version 2.0.
-Copyright 2020 Google LLC.
+This product includes icons from Google Material Symbols, licensed under the Apache License 2.0.
+Copyright 2024 Google LLC
+
+The files are located in the following directory:
+- Runtime/Images/MaterialSymbols

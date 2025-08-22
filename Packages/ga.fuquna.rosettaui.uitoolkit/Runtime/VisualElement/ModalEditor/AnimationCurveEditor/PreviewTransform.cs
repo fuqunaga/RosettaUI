@@ -49,10 +49,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _offset.y = yCenter - 0.5f / _zoom.y;
         }
 
-        public void AdjustZoom(Vector2 amount, Vector2 zoomCenterInCurve)
+        public void AdjustZoom(Vector2 amount, Vector2 zoomCenterOnCurve)
         {
             _zoom /= amount;
-            _offset = zoomCenterInCurve - (zoomCenterInCurve - _offset) * amount;
+            _offset = zoomCenterOnCurve - (zoomCenterOnCurve - _offset) * amount;
         }
 
         public void FitToRect(Rect rectOnCurve, RectOffset paddingOnScreen)

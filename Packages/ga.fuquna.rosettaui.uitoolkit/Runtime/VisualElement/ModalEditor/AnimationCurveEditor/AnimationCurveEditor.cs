@@ -52,8 +52,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         
         private const string USSClassName = "rosettaui-animation-curve-editor";
-        private static readonly Vector2 ZoomRange = new(0.0001f, 10000f);
-
+        
         // ReSharper disable once MemberCanBePrivate.Global
         public static string VisualTreeAssetName { get; set; } = "RosettaUI_AnimationCurveEditor";
 
@@ -316,21 +315,33 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _curvePreviewElement.UnregisterCallback<PointerUpEvent>(OnPointerUp);
             evt.StopPropagation();
         }
-        
+
+        // WheelEventのdelta
+        // - shift時はevt.delta.xに値が入る
+        // - また横に動かせるホイールの場合はちゃんとdelta.xに値が入る
+        //
+        // AnimationCurveEditor
+        // - deltaのxyは考慮せず、キー入力との組合せによってズーム軸が決まる
+        //  - no key:       zoom:xy
+        //  - ctrl,command: zoom:x
+        //  - shift:        zoom:y
         private void OnWheel(WheelEvent evt)
         {
-            var mouseUv = new Vector2(evt.localMousePosition.x / _curvePreviewElement.resolvedStyle.width, 1f - evt.localMousePosition.y / _curvePreviewElement.resolvedStyle.height);
-            mouseUv = _previewTransform.GetCurvePosFromScreenUv(mouseUv);
-                
-            Vector2 amount = Vector2.one * (1f + Mathf.Clamp(evt.delta.y, -0.1f, 0.1f));
-                
-            if (evt.ctrlKey || evt.commandKey) { amount.y = 1f; }
-            else if (evt.shiftKey) { amount.x = 1f; }
-                
-            var zoom = _previewTransform.Zoom / amount;
-            if (zoom.x < ZoomRange.x || zoom.y < ZoomRange.x || zoom.x > ZoomRange.y || zoom.y > ZoomRange.y) return;
-                
-            _previewTransform.AdjustZoom(amount, mouseUv);
+            const float deltaMax = 0.1f;
+            
+            var delta = Mathf.Clamp(evt.delta.x + evt.delta.y + evt.delta.z, -deltaMax, deltaMax);
+            var amount = Vector2.one + new Vector2(
+                evt.shiftKey ? 0f :delta,
+                (evt.ctrlKey || evt.commandKey) ? 0f : delta
+            );
+            
+            var mouseUv = new Vector2(
+                evt.localMousePosition.x / _curvePreviewElement.resolvedStyle.width,
+                1f - evt.localMousePosition.y / _curvePreviewElement.resolvedStyle.height
+            );
+            var mousePositionOnCurve = _previewTransform.GetCurvePosFromScreenUv(mouseUv);
+
+            _previewTransform.AdjustZoom(amount, mousePositionOnCurve);
             UpdateView();
         }
         

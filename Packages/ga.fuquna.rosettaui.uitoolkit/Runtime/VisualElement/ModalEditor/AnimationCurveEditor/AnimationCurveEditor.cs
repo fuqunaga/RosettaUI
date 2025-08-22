@@ -75,7 +75,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private AxisLabelController _axisLabelController;
         private ControlPointDisplayPositionPopup _controlPointDisplayPositionPopup;
         private ControlPointEditPositionPopup _controlPointEditPositionPopup;
-        private PropertyFieldController _propertyFieldController;
 
         private PreviewTransform _previewTransform;
         
@@ -205,16 +204,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             // Edit Key Popup
             _controlPointEditPositionPopup = new ControlPointEditPositionPopup();
             curveGroup.Add(_controlPointEditPositionPopup);
-            
-            // Property Field
-            _propertyFieldController = new PropertyFieldController(this,
-                // () => _selectedControlPointIndex < 0 ? default : _controlPointHolder[_selectedControlPointIndex],
-                () =>
-                {
-                    var controlPoint = _curveController?.SelectedControlPoint;
-                    return controlPoint == null ? default : (controlPoint.Keyframe, controlPoint);
-                },
-                key => { }); // TODO
         }
         
         #endregion
@@ -257,7 +246,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void OnControlPointSelected(ControlPoint controlPoint)
         {
             _curveController.SelectControlPoint(controlPoint);
-            _propertyFieldController.UpdatePropertyFields();
         }
         
         private void OnControlPointMoved(ControlPoint controlPoint, Vector2 desireKeyframePosition)
@@ -270,7 +258,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             );
 
             controlPoint.KeyframePosition = position;
-            _propertyFieldController.UpdatePropertyFields();
         }
         
         private void AddControlPoint(Vector2 keyFramePosition)
@@ -281,7 +268,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void UnselectAllControlPoint()
         {
-            _propertyFieldController.UpdatePropertyFields();
             _curveController.UnselectAllControlPoints();
             _controlPointDisplayPositionPopup.Hide();
             _controlPointEditPositionPopup.Hide();

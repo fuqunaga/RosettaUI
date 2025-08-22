@@ -14,7 +14,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         #region Static Window Management
         
         // ReSharper disable once MemberCanBePrivate.Global
-        public static Vector2Int DefaultWindowSize { get; set; } = new(600, 400);
+        public static Vector2Int DefaultWindowSize { get; set; } = new(800, 500);
         
         private static AnimationCurveEditor _instance;
         
@@ -81,8 +81,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private int _mouseButton;
         private Vector2 _prevPointerPosition;
         private long _lastPointerDownTime;
-        private bool _prevSnapX = false;
-        private bool _prevSnapY = false;
+        private bool _prevSnapX;
+        private bool _prevSnapY;
         
         
         #region ModalEditor
@@ -101,7 +101,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             AddToClassList(USSClassName);
             InitUI();
             
-            _curveController = new CurveController(_curvePreviewElement, (holder) => new ControlPoint(holder, _previewTransform, _controlPointDisplayPositionPopup, _controlPointEditPositionPopup, OnControlPointSelected, OnControlPointMoved));
+            _curveController = new CurveController(_curvePreviewElement, (holder) => new ControlPoint(holder, _previewTransform, _controlPointDisplayPositionPopup, _controlPointEditPositionPopup, OnControlPointMoved));
             _curveController.onCurveChanged += () =>
             {
                 UpdateView();
@@ -242,11 +242,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         #endregion
         
         #region Control Point Process
-        
-        private void OnControlPointSelected(ControlPoint controlPoint)
-        {
-            _curveController.SelectControlPoint(controlPoint);
-        }
         
         private void OnControlPointMoved(ControlPoint controlPoint, Vector2 desireKeyframePosition)
         {

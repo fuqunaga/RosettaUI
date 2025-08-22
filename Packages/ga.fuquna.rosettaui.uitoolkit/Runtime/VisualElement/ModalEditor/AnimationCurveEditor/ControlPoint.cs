@@ -24,7 +24,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private const float WeightDefaultValue = 1 / 3f;
         
         
-        private readonly Action<ControlPoint> _onPointSelected;
         private readonly Action<ControlPoint, Vector2> _onPointMoved;
 
         private readonly CurveController _curveController;
@@ -85,13 +84,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         public ControlPoint(CurveController curveController, ICoordinateConverter coordinateConverter,
             ControlPointDisplayPositionPopup controlPointDisplayPositionPopup, ControlPointEditPositionPopup controlPointEditPositionPopup,
-            Action<ControlPoint> onPointSelected, Action<ControlPoint, Vector2> onPointMoved)
+            Action<ControlPoint, Vector2> onPointMoved)
         {
             _curveController = curveController;
             _coordinateConverter = coordinateConverter;
             _controlPointDisplayPositionPopup = controlPointDisplayPositionPopup;
             _controlPointEditPositionPopup = controlPointEditPositionPopup;
-            _onPointSelected = onPointSelected;
             _onPointMoved = onPointMoved;
 
             // Handles
@@ -232,7 +230,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             var elementPosition = new Vector2(resolvedStyle.left, resolvedStyle.top);
             _pointerDownPositionToElementOffset = elementPosition - (Vector2)evt.position; 
-            _onPointSelected?.Invoke(this);
+            _curveController.SelectControlPoint(this);
             
             switch (evt.button)
             {
@@ -258,8 +256,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             // Snap to gridモードがあるのでポインターの移動量がそのまま反映されないことがある
             // _onPointMovedに値の更新は任せる
-            var desireKeyframePosition = _coordinateConverter.GetCurvePosFromScreenPos(screenPosition);
-            _onPointMoved(this, desireKeyframePosition);
+            var desiredKeyframePosition = _coordinateConverter.GetCurvePosFromScreenPos(screenPosition);
+            _onPointMoved(this, desiredKeyframePosition);
 
             _controlPointDisplayPositionPopup.Update(screenPosition, Keyframe);
         }

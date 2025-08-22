@@ -1,3 +1,4 @@
+using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -28,7 +29,7 @@ namespace RosettaUI.UIToolkit
 
         public override void SetValueWithoutNotify(AnimationCurve newValue)
         {
-            var newHashCode = newValue?.GetHashCode() ?? 0;
+            var newHashCode = newValue?.GetHashCodeWithWrapMode() ?? 0;
             if (_lastAppliedHashCode == newHashCode)
             {
                 return;

@@ -33,6 +33,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly VisualElement _controlPoint;
         private readonly ControlPointHandle _leftHandle;
         private readonly ControlPointHandle _rightHandle;
+        private readonly WrapModeButton _wrapModeButton;
 
 
         private Vector2 _pointerDownPositionToElementOffset;
@@ -42,7 +43,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         public TangentMode InTangentMode { get; private set; } = TangentMode.Free;
         public TangentMode OutTangentMode { get; private set; } = TangentMode.Free;
-      
+
+
 
         public bool IsActive
         {
@@ -81,6 +83,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private ControlPoint Left => _curveController.GetControlPointLeft(this);
         private ControlPoint Right => _curveController.GetControlPointRight(this);
+        
+        private bool IsFirst => Left == null;
+        private bool IsLast => Right == null;
 
         public ControlPoint(CurveController curveController, ICoordinateConverter coordinateConverter,
             ControlPointDisplayPositionPopup controlPointDisplayPositionPopup, ControlPointEditPositionPopup controlPointEditPositionPopup,
@@ -92,6 +97,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _controlPointEditPositionPopup = controlPointEditPositionPopup;
             _onPointMoved = onPointMoved;
 
+            // Control point container
+            AddToClassList(ContainerClassName);
+            RegisterCallback<PointerDownEvent>(OnPointerDown);
+            
             // Handles
             _leftHandle = new ControlPointHandle(ControlPointHandle.LeftOrRight.Left,
                 _coordinateConverter,
@@ -106,15 +115,18 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             );
             Add(_rightHandle);
 
-            // Control point container
-            AddToClassList(ContainerClassName);
-            RegisterCallback<PointerDownEvent>(OnPointerDown);
 
             // Control point
             _controlPoint = new VisualElement { name = "AnimationCurveEditorControlPoint" };
             _controlPoint.AddToClassList(ControlPointClassName);
             Add(_controlPoint);
 
+            
+            // Clamp mode button
+            _wrapModeButton = new WrapModeButton();
+            _wrapModeButton.RegisterCallback<PointerDownEvent>(_ => OnWrapModeButtonClicked());
+            Add(_wrapModeButton);
+            
             return;
 
 
@@ -134,6 +146,48 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
 
                 Keyframe = keyframe;
+            }
+            
+            void OnWrapModeButtonClicked()
+            {
+                Action<WrapMode> setWrapMode;
+                WrapMode currentMode;
+                
+                switch (_wrapModeButton.CurrentPreOrPost)  
+                {
+                    case WrapModeButton.PreOrPost.Pre :
+                        setWrapMode = _curveController.SetPreWrapMode;
+                        currentMode = _curveController.Curve.preWrapMode;
+                        break;
+                    case WrapModeButton.PreOrPost.Post:
+                        setWrapMode = _curveController.SetPostWrapMode;
+                        currentMode = _curveController.Curve.postWrapMode;
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                };
+                
+
+                var position = _wrapModeButton.worldBound.position;
+                position.y += 10f;
+
+                PopupMenuUtility.Show(new[]
+                    {
+                        CreateItem("Loop", WrapMode.Loop),
+                        CreateItem("Ping Pong", WrapMode.PingPong),
+                        CreateItem("Clamp", WrapMode.ClampForever),
+                    },
+                    position,
+                    _wrapModeButton
+                );
+
+                return;
+
+                MenuItem CreateItem(string itemName, WrapMode mode)
+                {
+                    return new MenuItem(itemName, () => setWrapMode(mode)){ isChecked = mode == currentMode};
+                }
             }
         }
 
@@ -182,9 +236,27 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             style.left = uiPosition.x;
             style.top = uiPosition.y;
 
+            UpdateWrapModeButton();
+
             if (IsActive)
             {
                 UpdateHandleView();
+            }
+        }
+        
+        private void UpdateWrapModeButton()
+        {
+            if (IsFirst)
+            {
+                _wrapModeButton.Show(WrapModeButton.PreOrPost.Pre);
+            }
+            else if (IsLast)
+            {
+                _wrapModeButton.Show(WrapModeButton.PreOrPost.Post);
+            }
+            else
+            {
+                _wrapModeButton.Hide();
             }
         }
 

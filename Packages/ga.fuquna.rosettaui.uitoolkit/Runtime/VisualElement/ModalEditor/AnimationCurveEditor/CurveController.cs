@@ -164,6 +164,20 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             return controlPoint;
         }
 
+        public void SetPreWrapMode(WrapMode mode)
+        {
+            if (Curve == null) return;
+            Curve.preWrapMode = mode;
+            onCurveChanged?.Invoke();
+        }
+        
+        public void SetPostWrapMode(WrapMode mode)
+        {
+            if (Curve == null) return;
+            Curve.postWrapMode = mode;
+            onCurveChanged?.Invoke();
+        }
+        
         /// <summary>
         /// ControlPointのKeyframeの時間が変更されたらAnimationCurve上のIndexが変わる可能性がある
         /// Indexが変わるなら追随する

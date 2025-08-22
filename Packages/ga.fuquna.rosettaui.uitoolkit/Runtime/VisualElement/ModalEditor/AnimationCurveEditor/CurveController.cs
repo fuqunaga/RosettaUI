@@ -38,6 +38,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public Keyframe GetKeyframe(ControlPoint controlPoint)
         {
             var index = ControlPoints.IndexOf(controlPoint);
+            if (index < 0 || index >= Curve.keys.Length)
+            {
+                return default;
+            }
             return Curve[index];
         }
         
@@ -172,6 +176,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
 
             var index = ControlPoints.IndexOf(controlPoint);
+            if (index < 0 || index >= Curve.keys.Length)
+            {
+                return;
+            }
 
             var newIndex = Curve.MoveKey(index, keyframe);
             if (newIndex != index)

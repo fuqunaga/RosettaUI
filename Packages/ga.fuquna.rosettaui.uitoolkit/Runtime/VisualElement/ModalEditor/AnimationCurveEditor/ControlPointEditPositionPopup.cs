@@ -88,6 +88,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void Hide()
         {
+            _controlPoint = null;
             style.display = DisplayStyle.None;
         }
     }

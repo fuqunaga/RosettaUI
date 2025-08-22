@@ -32,21 +32,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             style.display = DisplayStyle.None;
         }
         
-        public void Update(Vector2 positionLeftTop, Keyframe keyframe)
+        public void Update(Vector2 positionLeftTop, Vector2 keyframePosition)
         {
-            SetKeyframe(keyframe);
+            SetKeyframePosition(keyframePosition);
             SetPosition(positionLeftTop);
         }
 
-        public void SetKeyframe(Keyframe keyframe)
+        public void SetKeyframePosition(Vector2 keyframePosition)
         {
             const int maxPrecision = 4;
             var gridViewport = _previewTransform.PreviewGridViewport;
             var orderX = Mathf.Max(0, maxPrecision - Mathf.CeilToInt(gridViewport.XOrder));
             var orderY = Mathf.Max(0, maxPrecision - Mathf.CeilToInt(gridViewport.YOrder));
             
-            var timeString = keyframe.time.ToString($"N{orderX}");
-            var valueString = keyframe.value.ToString($"N{orderY}");
+            var timeString = keyframePosition.x.ToString($"N{orderX}");
+            var valueString = keyframePosition.y.ToString($"N{orderY}");
             
             text = $"{timeString}, {valueString}";
         }

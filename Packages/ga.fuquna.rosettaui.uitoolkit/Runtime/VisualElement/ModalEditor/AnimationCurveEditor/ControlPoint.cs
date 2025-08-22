@@ -178,9 +178,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void UpdateView()
         {
-            var keyframe = Keyframe;
-            
-            var uiPosition = _coordinateConverter.GetScreenPosFromCurvePos(keyframe.GetPosition());
+            var uiPosition = _coordinateConverter.GetScreenPosFromCurvePos(KeyframePosition);
             style.left = uiPosition.x;
             style.top = uiPosition.y;
 
@@ -241,7 +239,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     this.CaptureMouse();
                     
                     _controlPointDisplayPositionPopup.Show();
-                    _controlPointDisplayPositionPopup.Update(elementPosition, Keyframe);
+                    _controlPointDisplayPositionPopup.Update(elementPosition, KeyframePosition);
                     break;
                 case 1:
                     ControlPointPopupMenu.Show(evt.position, this);
@@ -258,8 +256,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             // _onPointMovedに値の更新は任せる
             var desiredKeyframePosition = _coordinateConverter.GetCurvePosFromScreenPos(screenPosition);
             _onPointMoved(this, desiredKeyframePosition);
-
-            _controlPointDisplayPositionPopup.Update(screenPosition, Keyframe);
+            
+            var pointPosition = _coordinateConverter.GetScreenPosFromCurvePos(KeyframePosition);
+            var popupPosition = pointPosition + _controlPointDisplayPositionPopup.positionOffset;
+            _controlPointDisplayPositionPopup.Update(popupPosition, KeyframePosition);
         }
 
         private void OnPointerUp(PointerUpEvent evt)

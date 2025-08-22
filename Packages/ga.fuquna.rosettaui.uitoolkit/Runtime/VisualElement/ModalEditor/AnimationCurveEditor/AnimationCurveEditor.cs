@@ -2,14 +2,13 @@ using System;
 using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Object = UnityEngine.Object;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
     /// <summary>
     /// A visual element that allows you to edit an <see cref="AnimationCurve"/>.
     /// </summary>
-    public class AnimationCurveEditor : ModalEditor<AnimationCurve>, IDisposable
+    public class AnimationCurveEditor : ModalEditor<AnimationCurve>
     {
         #region Static Window Management
         
@@ -22,7 +21,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             StaticResourceUtility.AddResetStaticResourceCallback(() =>
             {
-                _instance?.Dispose();
                 _instance = null;
             });
         }
@@ -64,9 +62,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private readonly CurveController _curveController;
         
-        
-        private RenderTexture _curveEditorTexture = null;
-
         private VisualElement _curvePreviewElement;
         private VisualElementKeyEventHelper _keyEventHelper;
         private ToggleButton _snapXButton;
@@ -117,15 +112,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _curveController.SetCurve(curve);
             UnselectAllControlPoint();
             FitViewToCurve();
-        }
-        
-        public void Dispose()
-        {
-            if (_curveEditorTexture != null)
-            {
-                Object.DestroyImmediate(_curveEditorTexture);
-                _curveEditorTexture = null;
-            }
         }
         
         #region Initialization

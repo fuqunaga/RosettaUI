@@ -27,15 +27,15 @@
             static const float4 LineColorOnWrap = float4(0.4, 0.4, 0.4, 1);
             static const float4 YZeroLineColor = float4(0, 0, 0, 1);
             
-            struct spline_segment
+            struct CubicBezierData
             {
-                float2 startPos;
-                float2 startVel;
-                float2 endPos;
-                float2 endVel;
+                float2 p0;
+                float2 p1;
+                float2 p2;
+                float2 p3;
             };
 
-            StructuredBuffer<spline_segment> _SegmentBuffer;
+            StructuredBuffer<CubicBezierData> _SegmentBuffer;
             int _SegmentCount;
 
             float2 _Resolution; // x: width, y: height
@@ -106,36 +106,31 @@
                 
                 for (int idx = 0; idx < _SegmentCount; idx++)
                 {
-                    /* if startVel or endVel inf draw HV
-                     * elif startVel or endVel -inf draw VH
-                     * else draw curve
-                     */
-                    spline_segment seg = _SegmentBuffer[idx];
+                    CubicBezierData segment = _SegmentBuffer[idx];
                     
-                    const float2 pStart = mul(curveToPx, float3(seg.startPos, 1));
-                    const float2 vStart = mul(curveToPx, float3(seg.startVel, 0));
-                    const float2 pEnd = mul(curveToPx, float3(seg.endPos, 1));
-                    const float2 vEnd = mul(curveToPx, float3(seg.endVel, 0));
+                    const float2 p0 = mul(curveToPx, float3(segment.p0, 1)); // start pos
+                    const float2 p1 = mul(curveToPx, float3(segment.p1, 1));
+                    const float2 p2 = mul(curveToPx, float3(segment.p2, 1));
+                    const float2 p3 = mul(curveToPx, float3(segment.p3, 1)); // end pos
 
-                    const bool isStartPosInf = any(isinf(seg.startVel) && seg.startVel > 0);
-                    const bool isStartNegInf = any(isinf(seg.startVel) && seg.startVel < 0);
-                    const bool isEndPosInf = any(isinf(seg.endVel) && seg.endVel > 0);
-                    const bool isEndNegInf = any(isinf(seg.endVel) && seg.endVel < 0);
+                    const bool isStartInf = isinf(p1.y);
+                    const bool isEndInf = isinf(p2.y);
 
-                    if (isStartPosInf || isStartNegInf || isEndPosInf || isEndNegInf)
+                    // if p1 or p2 inf draw HV
+                    // elif p1 or p2 -inf draw VH
+                    // else draw curve
+                    if (isStartInf || isEndInf)
                     {
-                        const float2 mid = isStartPosInf || isEndPosInf
-                                               ? float2(pEnd.x, pStart.y)
-                                               : float2(pStart.x, pEnd.y);
-                        dist = min(dist, SdSegment(currentPx, pStart, mid));
-                        dist = min(dist, SdSegment(currentPx, mid, pEnd));
+                        const bool horizontalFirst = (isStartInf && (p1.y > 0)) || (isEndInf && (p2.y > 0));
+                        const float2 mid = horizontalFirst
+                                               ? float2(p3.x, p0.y)
+                                               : float2(p0.x, p3.y);
+                        
+                        dist = min(dist, SdSegment(currentPx, p0, mid));
+                        dist = min(dist, SdSegment(currentPx, mid, p3));
                     }
                     else
                     {
-                        const float2 p0 = pStart;
-                        const float2 p1 = pStart + vStart; // Hermite curve 1/3 factor rolled into tangent value
-                        const float2 p2 = pEnd - vEnd;
-                        const float2 p3 = pEnd;
                         dist = min(dist, CubicBezierSegmentSdfL2(currentPx, p0, p1, p2, p3));
                     }
                 }
@@ -164,8 +159,8 @@
                 float dist = INITIALLY_FAR;
                 float lineWidthHalf = LineWidth * 0.5f;
                 
-                float2 startPx = mul(curveToPx, float3(_SegmentBuffer[0].startPos, 1));
-                float2 endPx = mul(curveToPx, float3(_SegmentBuffer[_SegmentCount - 1].endPos, 1));
+                float2 startPx = mul(curveToPx, float3(_SegmentBuffer[0].p0, 1));
+                float2 endPx = mul(curveToPx, float3(_SegmentBuffer[_SegmentCount - 1].p3, 1));
 
                 // Wrapの範囲はlineWidthHalf分、本来のカーブ側に寄せる
                 // Wrapカーブのラインがその幅分本来のカーブ領域にもはみ出るため
@@ -257,7 +252,6 @@
                 
                 const float2x3 curveToPx = mul(uvToPxMatrix, mul(scaleMatrix, offsetMatrix));
                 const float2 currentPx = mul(uvToPxMatrix, uv);
-
 
 
                 float4 col = 0;

@@ -21,6 +21,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         // Weightの固定値は1/3の模様
         // https://github.com/Unity-Technologies/UnityCsReference/blob/4b463aa72c78ec7490b7f03176bd012399881768/Editor/Mono/Animation/AnimationWindow/CurveMenuManager.cs#L193
+        // Ferguson/Coons曲線をベジエ曲線にするときの係数
+        // https://olj611.hatenablog.com/entry/2023/12/01/150842
         private const float WeightDefaultValue = 1 / 3f;
         
         

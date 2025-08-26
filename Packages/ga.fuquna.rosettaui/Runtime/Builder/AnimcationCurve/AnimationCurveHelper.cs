@@ -33,6 +33,27 @@ namespace RosettaUI.Builder
             return (curve, curve.preWrapMode, curve.postWrapMode).GetHashCode();
         }
 
+        public static CubicBezierData CalcCubicBeziers(Keyframe startKeyframe, Keyframe endKeyframe)
+        {
+            var key0 = startKeyframe;
+            var key1 = endKeyframe;
+
+            var deltaTime = key1.time - key0.time;
+
+            var p0 = key0.GetPosition();
+            var p3 = key1.GetPosition();
+            var p1 = p0 + deltaTime * key0.GetVelocity(KeyframeExtensions.InOrOut.Out);
+            var p2 = p3 - deltaTime * key1.GetVelocity(KeyframeExtensions.InOrOut.In);
+
+            return new CubicBezierData
+            {
+                p0 = p0,
+                p1 = p1,
+                p2 = p2,
+                p3 = p3
+            };
+        }
+
         public static Rect GetCurveRect(this AnimationCurve curve, int stepNum = 64)
         {
             if (curve == null)
@@ -68,7 +89,6 @@ namespace RosettaUI.Builder
             return rect;
         }
         
-      
         /// <summary>
         /// インスペクターやUIToolkit標準のCurveFieldのようにカーブを表示する矩形の高さを再計算する
         /// 1.0未満で徐々にカーブの上下に余白を非線形に追加していく
@@ -110,15 +130,6 @@ namespace RosettaUI.Builder
             }
             
             AnimationCurvePreviewRenderer.Render(curve, texture, viewInfo);
-            
-            // var rect = curve.GetCurveRect();
-            // rect = AdjustCurveRectHeightLikeInspector(rect); 
-            //
-            //
-            // AnimationCurvePreviewRenderer.Render(curve, texture, new AnimationCurvePreviewRenderer.CurvePreviewViewInfo
-            // {
-            //     offsetZoom = new Vector4(rect.min.x, rect.min.y, 1f / rect.width, 1f / rect.height),
-            // });
 
             return textureGenerated;
         }

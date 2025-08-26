@@ -131,37 +131,20 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             var centerPoint = parent.worldBound.center;
             var mousePoint = evt.position;
-            var tangent = (-mousePoint.y + centerPoint.y) / Clamp(mousePoint.x - centerPoint.x);
-            if (!float.IsNaN(tangent))
-            {
-                tangent = _coordinateConverter.GetCurveTangentFromScreenTangent(tangent);
-                if (evt.ctrlKey || evt.commandKey) tangent = Snap(tangent);
-                var weight = Mathf.Clamp01(Mathf.Abs(mousePoint.x - centerPoint.x) / Mathf.Abs(_xDistToNeighborInScreen));
-                _onTangentChanged?.Invoke(tangent, weight);
-            }
+
+            var deltaY = -(mousePoint.y - centerPoint.y);
+            var deltaX = Mathf.Max(0, Sign * (mousePoint.x - centerPoint.x));
+            var tangent = Mathf.Approximately(deltaX, 0f) 
+                ? Mathf.Sign(deltaY) * float.PositiveInfinity
+                : deltaY / deltaX;
+
+            tangent *= Sign;
+            tangent = _coordinateConverter.GetCurveTangentFromScreenTangent(tangent);
+
+            var weight = Mathf.Clamp01(Mathf.Abs(mousePoint.x - centerPoint.x) / Mathf.Abs(_xDistToNeighborInScreen));
+            _onTangentChanged?.Invoke(tangent, weight);
+            
             evt.StopPropagation();
-            return;
-
-            float Clamp(float xDiff)
-            {
-                return Mathf.Max(0f, xDiff * Sign) * Sign;
-            }
-
-            static float Snap(float tangent)
-            {
-                if (float.IsInfinity(tangent)) return tangent;
-
-                if (Mathf.Abs(tangent) > Mathf.Tan(67.5f * Mathf.Deg2Rad))
-                {
-                    return Mathf.Sign(tangent) * Mathf.Infinity;
-                }
-                else if (Mathf.Abs(tangent) > Mathf.Tan(22.5f * Mathf.Deg2Rad))
-                {
-                    return Mathf.Sign(tangent);
-                }
-
-                return 0f;
-            }
         }
         
         private void OnPointerUp(PointerUpEvent evt)

@@ -25,8 +25,6 @@ namespace RosettaUI.Builder
             };
         }
         
-        
-        
         private static class ShaderParam
         {
             public const string GridOnKeyword = "_GRID_ON";
@@ -40,6 +38,7 @@ namespace RosettaUI.Builder
             public static readonly int GridParamsId = Shader.PropertyToID("_GridParams");
         }
         
+        
         private const string ShaderName = "RosettaUI_AnimationCurve";
         private const string CommandBufferName = nameof(AnimationCurvePreviewRenderer);
         private static CommandBuffer _commandBuffer;
@@ -52,18 +51,7 @@ namespace RosettaUI.Builder
             public bool gridEnabled;
             public Vector4 gridParams; // xy: order of grid（range=10^order), zw: grid unit size
         }
-
-        /// <summary>
-        /// RosettaUI_AnimationCurve.shader の spline_segment 構造体と同じデータ構造。
-        /// </summary>
-        private struct SplineSegmentData
-        {
-            public Vector2 startPos;
-            public Vector2 startVel;
-            public Vector2 endPos;
-            public Vector2 endVel;
-        }
-
+        
         static AnimationCurvePreviewRenderer()
         {
             StaticResourceUtility.AddResetStaticResourceCallback(() =>
@@ -94,36 +82,25 @@ namespace RosettaUI.Builder
             
             var segmentCount = keys.Length - 1;
             
-            var splineData = new NativeArray<SplineSegmentData>(
+            var cubicBezierArray = new NativeArray<CubicBezierData>(
                 segmentCount,
                 Allocator.Temp
             );
             
-            for (var i = 0; i < splineData.Length; ++i)
+            for (var i = 0; i < cubicBezierArray.Length; ++i)
             {
-                var startKey = keys[i];
-                var endKey = keys[i+1];
-                var startPos = startKey.GetPosition();
-                var endPos = endKey.GetPosition();
-                var distanceX = endPos.x - startPos.x;
-                
-                splineData[i] = new SplineSegmentData {
-                    startPos = startPos,
-                    endPos = endPos,
-                    startVel = distanceX * startKey.GetStartVel(),
-                    endVel = distanceX * endKey.GetEndVel()
-                };
+                cubicBezierArray[i] = AnimationCurveHelper.CalcCubicBeziers(keys[i], keys[i + 1]);
             }
             
             if (_curveDataBuffer == null || _curveDataBuffer.count < segmentCount)
             {
                 _curveDataBuffer?.Dispose();
-                _curveDataBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, segmentCount, Marshal.SizeOf<SplineSegmentData>());
+                _curveDataBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, segmentCount, Marshal.SizeOf<CubicBezierData>());
             }
 
-            cmdBuf.SetBufferData(_curveDataBuffer, splineData);
+            cmdBuf.SetBufferData(_curveDataBuffer, cubicBezierArray);
             
-            splineData.Dispose();
+            cubicBezierArray.Dispose();
             
             return segmentCount;
         }

@@ -3,6 +3,7 @@
     Properties
     {
         [Toggle] _GRID("Grid", Integer) = 1
+        [Toggle] _Wrap("Wrap", Integer) = 1
     }
     
     SubShader
@@ -13,16 +14,18 @@
         {
             HLSLPROGRAM
             #pragma multi_compile _ _GRID_ON
+            #pragma multi_compile _ _WRAP_ON
             #pragma vertex vert_img
-            #pragma fragment Frag
+            #pragma fragment frag
             //#pragma enable_d3d11_debug_symbols
 
             #include "UnityCG.cginc"
             #include "SdfBezierSpline.hlsl"
-
             
-            float2 _Resolution; // x: width, y: height
-            float4 _OffsetZoom; // xy: offset.xy, zw: zoom.xy
+            static const float LineWidth = 3.5; //[px]
+            static const float4 LineColor = float4(0, 1, 0, 1);
+            static const float4 LineColorOnWrap = float4(0.4, 0.4, 0.4, 1);
+            static const float4 YZeroLineColor = float4(0, 0, 0, 1);
             
             struct spline_segment
             {
@@ -32,19 +35,33 @@
                 float2 endVel;
             };
 
-            StructuredBuffer<spline_segment> _Spline;
+            StructuredBuffer<spline_segment> _SegmentBuffer;
             int _SegmentCount;
 
-            static const float LineWidth = 2.0f;
-            static const float4 LineColor = float4(0, 1, 0, 1);
-            static const float4 YZeroLineColor = float4(0, 0, 0, 1);
+            float2 _Resolution; // x: width, y: height
+            float4 _OffsetZoom; // xy: offset.xy, zw: zoom.xy
+
+            
+            #ifdef _WRAP_ON
+
+            //
+            // enum WrapModeForPreview:
+            //
+            #define WrapMode_Loop (0)
+            #define WrapMode_PingPong (1)
+            #define WrapMode_Clamp (2)
+            
+            int _PreWrapMode; // 0: once, 1: loop, 2: pingpong　
+            int _PostWrapMode; // 0: once, 1: loop, 2: pingpong
+            
+            #endif
 
             
             #ifdef _GRID_ON
             
             float4 _GridParams; // xy: order of grid（range=10^order), zw: grid unit size
             
-            static const float4 GridColor = float4(0.4, 0.4, 0.4, 1);
+            static const float4 GridColor = float4(0.25, 0.25, 0.25, 1);
             static const float GridWidth = 1;
 
             inline float2 CalcDistanceFromGridOnPx(float2 positionOnCurve, float2 gridUnit, float2x3 curveToPx)
@@ -79,44 +96,21 @@
                 
                 return max(max(subGridAlphaRateXy.x, subGridAlphaRateXy.y), max(gridAlphaRateXy.x, gridAlphaRateXy.y));
             }
-            
+
             #endif
 
-
-            // 座標系が３つある
-            // - uv: 0-1
-            // - px: pixel
-            // - curve: x(time), y(value)
-            float4 Frag(v2f_img i) : SV_Target
+            
+            inline float CalcCurveDistance(float2 currentPx, float2x3 curveToPx)
             {
-                const float2 uv = i.uv;
-                
-                // Curve
-                const float2x3 offsetMatrix = {
-                    1, 0, -_OffsetZoom.x,
-                    0, 1, -_OffsetZoom.y,
-                };
-                const float2x2 scaleMatrix = {
-                    _OffsetZoom.z, 0,
-                    0, _OffsetZoom.w
-                };
-                const float2x2 uvToPxMatrix = {
-                    _Resolution.x, 0,
-                    0, _Resolution.y
-                };
-                const float2x3 curveToPx = mul(uvToPxMatrix, mul(scaleMatrix, offsetMatrix));
-                
-                const float2 currentPx = mul(uvToPxMatrix, uv);
-
-                
                 float dist = INITIALLY_FAR;
+                
                 for (int idx = 0; idx < _SegmentCount; idx++)
                 {
                     /* if startVel or endVel inf draw HV
                      * elif startVel or endVel -inf draw VH
                      * else draw curve
                      */
-                    spline_segment seg = _Spline[idx];
+                    spline_segment seg = _SegmentBuffer[idx];
                     
                     const float2 pStart = mul(curveToPx, float3(seg.startPos, 1));
                     const float2 vStart = mul(curveToPx, float3(seg.startVel, 0));
@@ -146,6 +140,126 @@
                     }
                 }
 
+                return dist;
+            }
+
+            #ifdef _WRAP_ON
+
+            inline float RepeatPositionX(float currentX, int wrapMode, float splineWidth, float splineStartX)
+            {
+                float currentPxXFromStart = currentX - splineStartX;
+                int cycleCount = floor(currentPxXFromStart / splineWidth);
+
+                float pxOnWrap = currentPxXFromStart - splineWidth * cycleCount;
+                if ((WrapMode_PingPong == wrapMode) && (cycleCount % 2 != 0))
+                {
+                    pxOnWrap = splineWidth - pxOnWrap;
+                }
+
+                return pxOnWrap + splineStartX;
+            }
+
+            inline float ClacDistanceWithWrap(float2 currentPx, float2x3 curveToPx, out bool isInWrap)
+            {
+                float dist = INITIALLY_FAR;
+                float lineWidthHalf = LineWidth * 0.5f;
+                
+                float2 startPx = mul(curveToPx, float3(_SegmentBuffer[0].startPos, 1));
+                float2 endPx = mul(curveToPx, float3(_SegmentBuffer[_SegmentCount - 1].endPos, 1));
+
+                // Wrapの範囲はlineWidthHalf分、本来のカーブ側に寄せる
+                // Wrapカーブのラインがその幅分本来のカーブ領域にもはみ出るため
+                // 逆に本来のカーブはライン幅分内側では表示されないが、ControlPointで隠れるので現状許容
+                // ライン幅がControlPointより大きくなった場合はマズい
+                bool isInPreWrap = currentPx.x < (startPx.x + lineWidthHalf);
+                bool isInPostWrap = currentPx.x > (endPx.x - lineWidthHalf);
+
+                isInWrap = isInPreWrap || isInPostWrap;
+                
+                if (isInWrap)
+                {
+                    float2 edgePx = isInPreWrap ? startPx : endPx;
+                    int wrapMode = isInPreWrap ? _PreWrapMode : _PostWrapMode;
+
+                    if (WrapMode_Clamp == wrapMode)
+                    {
+                        dist = abs(currentPx.y - edgePx.y);
+                    }
+                    else
+                    {
+                        float curveWidth = endPx.x - startPx.x;
+                        float offsetSign = isInPreWrap ? 1.0f : -1.0f;
+
+                        float startX = startPx.x + offsetSign * lineWidthHalf;
+
+                        currentPx.x = RepeatPositionX(currentPx.x, wrapMode, curveWidth, startX);
+
+                        // LoopではWrapしたカーブとひとつ前のカーブを繋ぐ
+                        if (WrapMode_Loop == wrapMode)
+                        {
+                            float2 edgePxOfNextWrap = edgePx + float2(offsetSign * curveWidth, 0);
+                            float2 oppositeEdgePx = isInPreWrap ? endPx : startPx;
+                            dist = SdSegment(currentPx, oppositeEdgePx, edgePxOfNextWrap);
+                        }
+
+                        dist = min(dist, CalcCurveDistance(currentPx, curveToPx));
+                    }
+                }
+
+                return dist;
+            }
+
+            #endif
+            
+         
+            inline float CalcCurveLineRateAndColor(float2 currentPx, float2x3 curveToPx, out float4 lineColor)
+            {
+                float dist = INITIALLY_FAR;
+                bool isInWrap = false;
+
+                #ifdef _WRAP_ON
+                dist = ClacDistanceWithWrap(currentPx, curveToPx, isInWrap);
+                #endif
+
+                if (!isInWrap)
+                {
+                    dist = min(dist, CalcCurveDistance(currentPx, curveToPx));
+                }
+
+                lineColor = isInWrap ? LineColorOnWrap : LineColor;
+
+                return smoothstep(LineWidth * 0.5f, 0, dist);
+            }
+
+
+            // 座標系が３つある
+            // - uv: 0-1
+            // - px: pixel
+            // - curve: x(time), y(value)
+            float4 frag(v2f_img i) : SV_Target
+            {
+                const float2 uv = i.uv;
+                
+                const float2x3 offsetMatrix = {
+                    1, 0, -_OffsetZoom.x,
+                    0, 1, -_OffsetZoom.y,
+                };
+                
+                const float2x2 scaleMatrix = {
+                    _OffsetZoom.z, 0,
+                    0, _OffsetZoom.w
+                };
+                
+                const float2x2 uvToPxMatrix = {
+                    _Resolution.x, 0,
+                    0, _Resolution.y
+                };
+                
+                const float2x3 curveToPx = mul(uvToPxMatrix, mul(scaleMatrix, offsetMatrix));
+                const float2 currentPx = mul(uvToPxMatrix, uv);
+
+
+
                 float4 col = 0;
 
                 // Y=0 black line
@@ -166,8 +280,9 @@
 
                 
                 // CurveLine
-                dist -= LineWidth * 0.5f;
-                col = lerp(LineColor, col, smoothstep(-.5f, .5f, dist));
+                float4 lineColor;
+                float lineColorRate = CalcCurveLineRateAndColor(currentPx, curveToPx, lineColor);
+                col = lerp(col, lineColor, lineColorRate);
 
                 return col;
             }

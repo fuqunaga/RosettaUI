@@ -104,16 +104,16 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             RegisterCallback<PointerDownEvent>(OnPointerDown);
             
             // Handles
-            _leftHandle = new ControlPointHandle(ControlPointHandle.LeftOrRight.Left,
+            _leftHandle = new ControlPointHandle(InOrOut.In,
                 _coordinateConverter,
-                (tangent, weight) => OnTangentAndWeightChanged(KeyframeExtensions.InOrOut.In, tangent, weight)
+                (tangent, weight) => OnTangentAndWeightChanged(InOrOut.In, tangent, weight)
             
             );
             Add(_leftHandle);
-
-            _rightHandle = new ControlPointHandle(ControlPointHandle.LeftOrRight.Right,
+            
+            _rightHandle = new ControlPointHandle(InOrOut.Out,
                 _coordinateConverter,
-                (tangent, weight) => OnTangentAndWeightChanged(KeyframeExtensions.InOrOut.Out, tangent, weight)
+                (tangent, weight) => OnTangentAndWeightChanged(InOrOut.Out, tangent, weight)
             );
             Add(_rightHandle);
 
@@ -132,7 +132,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             return;
 
 
-            void OnTangentAndWeightChanged(KeyframeExtensions.InOrOut inOrOut, float tangent, float weight)
+            void OnTangentAndWeightChanged(InOrOut inOrOut, float tangent, float weight)
             {
                 var keyframe = Keyframe;
                 

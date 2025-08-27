@@ -42,8 +42,8 @@ namespace RosettaUI.Builder
 
             var p0 = key0.GetPosition();
             var p3 = key1.GetPosition();
-            var p1 = p0 + deltaTime * key0.GetVelocity(KeyframeExtensions.InOrOut.Out);
-            var p2 = p3 - deltaTime * key1.GetVelocity(KeyframeExtensions.InOrOut.In);
+            var p1 = p0 + deltaTime * key0.GetVelocity(InOrOut.Out);
+            var p2 = p3 - deltaTime * key1.GetVelocity(InOrOut.In);
 
             return new CubicBezierData
             {

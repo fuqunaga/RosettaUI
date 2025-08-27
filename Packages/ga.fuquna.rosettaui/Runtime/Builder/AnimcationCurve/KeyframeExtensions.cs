@@ -4,17 +4,6 @@ namespace RosettaUI.Builder
 {
     public static class KeyframeExtensions
     {
-        public enum InOrOut
-        {
-            In,
-            Out
-        }
-        
-        public static InOrOut Opposite(this InOrOut inOrOut)
-        {
-            return inOrOut == InOrOut.In ? InOrOut.Out : InOrOut.In;
-        }
-
         public static Vector2 GetPosition(this Keyframe keyframe)
         {
             return new Vector2(keyframe.time, keyframe.value);
@@ -70,7 +59,7 @@ namespace RosettaUI.Builder
             return key.weightedMode.HasFlag(mode);
         }
         
-        public static void SetWeightedFrag(this Keyframe key, WeightedMode mode, bool value)
+        public static void SetWeightedFrag(this ref Keyframe key, WeightedMode mode, bool value)
         {
             var current = (uint) key.weightedMode;
             var mask = (uint) mode;

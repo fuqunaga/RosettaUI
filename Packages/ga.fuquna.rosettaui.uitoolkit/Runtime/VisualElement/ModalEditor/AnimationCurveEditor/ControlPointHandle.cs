@@ -1,4 +1,5 @@
 ﻿using System;
+using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -6,14 +7,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
     public class ControlPointHandle : VisualElement
     {
-        public enum LeftOrRight
-        {
-            Left = -1,
-            Right = 1
-        }
-        
-        public delegate void OnTangentChanged(float tangent, float weight);
-        
         private const float DefaultLineLength = 50f;
         private const string HandleRootClassName = "rosettaui-animation-curve-editor__control-point-handle";
         private const string HandleLineClassName = "rosettaui-animation-curve-editor__control-point-handle__line";
@@ -21,20 +14,20 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private const string HandleContainerWeightClassName = "rosettaui-animation-curve-editor__control-point-handle__handle-container-weight";
         private const string HandleClassName = "rosettaui-animation-curve-editor__control-point-handle__handle";
 
-        private readonly LeftOrRight _leftOrRight;
+        private readonly InOrOut _inOrOut;
         private readonly ICoordinateConverter _coordinateConverter;
-        private readonly OnTangentChanged _onTangentChanged;
+        private readonly Action<float, float> _onTangentChanged;
 
         private VisualElement _lineElement;
         private VisualElement _handleContainerElement;
         
         private float _xDistToNeighborInScreen;
         
-        private float Sign => (int)_leftOrRight;
+        private float Sign => _inOrOut == InOrOut.In ? -1f : 1f;
         
-        public ControlPointHandle(LeftOrRight leftOrRight, ICoordinateConverter coordinateConverter, OnTangentChanged onTangentChanged)
+        public ControlPointHandle(InOrOut inOrOut, ICoordinateConverter coordinateConverter, Action<float, float> onTangentChanged)
         {
-            _leftOrRight = leftOrRight;
+            _inOrOut = inOrOut;
             _coordinateConverter = coordinateConverter;
             _onTangentChanged = onTangentChanged;
             AddToClassList(HandleRootClassName);
@@ -59,19 +52,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         public void UpdateView(in Keyframe keyframe, float xDistToNeighborInScreen)
         {
-            var tangent = _leftOrRight == LeftOrRight.Left ? keyframe.inTangent : keyframe.outTangent;
-            var degree = SetTangent(tangent);
-            
-            var isWeightEnable = keyframe.weightedMode == WeightedMode.Both || 
-                (keyframe.weightedMode == WeightedMode.In && _leftOrRight == LeftOrRight.Left) ||
-                (keyframe.weightedMode == WeightedMode.Out && _leftOrRight == LeftOrRight.Right);
-            
-            float? weight = isWeightEnable
-                ? (_leftOrRight == LeftOrRight.Left ? keyframe.inWeight : keyframe.outWeight)
+            var radian = SetTangent(keyframe.GetTangent(_inOrOut));
+
+            float? weight = keyframe.IsWeighted(_inOrOut)
+                ? keyframe.GetWeight(_inOrOut)
                 : null;
             
             _xDistToNeighborInScreen = xDistToNeighborInScreen;
-            SetWeight(weight, degree);
+            SetWeight(weight, radian);
         }
         
         /// <summary>
@@ -87,13 +75,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             // これはUnityのAnimationCurveEditorの仕様に合わせている
             if (float.IsInfinity(tangent))
             {
-                radian = tangent > 0 ? Mathf.PI / 2 : -Mathf.PI / 2;
+                radian = Mathf.Sign(tangent) * Mathf.PI * 0.5f;
             }
             else
             {
                 radian = Mathf.Atan(_coordinateConverter.GetScreenTangentFromCurveTangent(tangent));
 
-                if (_leftOrRight == LeftOrRight.Left)
+                if (_inOrOut == InOrOut.In)
                 {
                     radian += Mathf.PI;
                 }
@@ -105,27 +93,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             // ラインの先端のハンドル部分は回転させないよう逆回転しておく
             _handleContainerElement.style.rotate = new Rotate(Angle.Radians(radian));
 
-            return radian * Mathf.Rad2Deg;
+            return radian;
         }
         
-        private void SetWeight(float? weight, float degree)
+        private void SetWeight(float? weight, float radian)
         {
             var width = DefaultLineLength;
-            if (weight is {} w && !Mathf.Approximately((degree+90) % 180, 0f)) // +-90度付近は無視
+            if (weight is {} w
+                && !Mathf.Approximately((radian + Mathf.PI * 0.5f) % Mathf.PI, 0f)) // +-90度付近は無視
             {
-                width = Mathf.Max(10f, w * Mathf.Abs(_xDistToNeighborInScreen / Mathf.Cos(degree * Mathf.Deg2Rad)));
+                width = Mathf.Max(10f, w * Mathf.Abs(_xDistToNeighborInScreen / Mathf.Cos(radian)));
             }
             
             _lineElement.style.width = width;
             
-            if (weight.HasValue)
-            {
-                _handleContainerElement.AddToClassList(HandleContainerWeightClassName);
-            }
-            else
-            {
-                _handleContainerElement.RemoveFromClassList(HandleContainerWeightClassName);
-            }
+            _handleContainerElement.EnableInClassList(HandleContainerWeightClassName, weight.HasValue);
         }
 
         #region Pointer Event

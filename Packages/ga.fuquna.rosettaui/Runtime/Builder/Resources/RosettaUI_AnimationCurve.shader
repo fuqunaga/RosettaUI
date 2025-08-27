@@ -147,7 +147,7 @@
                 int cycleCount = floor(currentPxXFromStart / splineWidth);
 
                 float pxOnWrap = currentPxXFromStart - splineWidth * cycleCount;
-                if ((WrapMode_PingPong == wrapMode) && (cycleCount % 2 != 0))
+                if ((WrapMode_PingPong == wrapMode) && ((uint)abs(cycleCount) % 2 != 0))
                 {
                     pxOnWrap = splineWidth - pxOnWrap;
                 }
@@ -169,14 +169,17 @@
                 {
                     float2 edgePx = isInPreWrap ? startPx : endPx;
                     int wrapMode = isInPreWrap ? _PreWrapMode : _PostWrapMode;
+                    
+                    float curveWidth = endPx.x - startPx.x;
 
-                    if (WrapMode_Clamp == wrapMode)
+                    // Keyframeが一つのときはstartPx==endPx
+                    // UnityのAnimationCurveEditorの挙動を模倣してWrapMode_Clampとして扱う
+                    if (WrapMode_Clamp == wrapMode || curveWidth <= 0)
                     {
                         dist = abs(currentPx.y - edgePx.y);
                     }
                     else
                     {
-                        float curveWidth = endPx.x - startPx.x;
                         float offsetSign = isInPreWrap ? 1.0f : -1.0f;
 
                         float startX = startPx.x + offsetSign * lineWidthHalf;

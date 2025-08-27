@@ -86,9 +86,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private ControlPoint Left => _curveController.GetControlPointLeft(this);
         private ControlPoint Right => _curveController.GetControlPointRight(this);
         
-        private bool IsFirst => Left == null;
-        private bool IsLast => Right == null;
-
+        
         public ControlPoint(CurveController curveController, ICoordinateConverter coordinateConverter,
             ControlPointDisplayPositionPopup controlPointDisplayPositionPopup, ControlPointEditPositionPopup controlPointEditPositionPopup,
             Action<ControlPoint, Vector2> onPointMoved)
@@ -248,17 +246,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void UpdateWrapModeButton()
         {
-            if (IsFirst)
+            var hasLeft = Left != null;
+            var hasRight = Right != null;
+  
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
+            if (!hasLeft && hasRight)
             {
                 _wrapModeButton.Show(WrapModeButton.PreOrPost.Pre);
             }
-            else if (IsLast)
+            else if (hasLeft && !hasRight)
             {
                 _wrapModeButton.Show(WrapModeButton.PreOrPost.Post);
             }
             else
             {
-                _wrapModeButton.Hide();
+                _wrapModeButton.Hide();    
             }
         }
 

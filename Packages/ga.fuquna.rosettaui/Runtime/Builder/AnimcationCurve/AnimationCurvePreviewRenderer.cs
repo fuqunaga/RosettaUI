@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -27,6 +28,7 @@ namespace RosettaUI.Builder
         
         private static class ShaderParam
         {
+            public const string WrapOnKeyword = "_WRAP_ON";
             public const string GridOnKeyword = "_GRID_ON";
 
             public static readonly int ResolutionId = Shader.PropertyToID("_Resolution");
@@ -42,12 +44,13 @@ namespace RosettaUI.Builder
         private const string ShaderName = "RosettaUI_AnimationCurve";
         private const string CommandBufferName = nameof(AnimationCurvePreviewRenderer);
         private static CommandBuffer _commandBuffer;
-        private static GraphicsBuffer _curveDataBuffer;
+        private static GraphicsBuffer _segmentBuffer;
         private static Material _curveDrawMaterial;
 
         public struct CurvePreviewViewInfo
         {
             public Vector4 offsetZoom; // xy: offset.xy, zw: zoom.xy
+            public bool wrapEnabled;
             public bool gridEnabled;
             public Vector4 gridParams; // xy: order of grid（range=10^order), zw: grid unit size
         }
@@ -59,46 +62,52 @@ namespace RosettaUI.Builder
                 _commandBuffer?.Dispose();
                 _commandBuffer = null;
                 
-                _curveDataBuffer?.Dispose();
-                _curveDataBuffer = null;
+                _segmentBuffer?.Dispose();
+                _segmentBuffer = null;
                 
                 Object.DestroyImmediate(_curveDrawMaterial);
                 _curveDrawMaterial = null;
             });
         }
         
-        private static int UpdateData(CommandBuffer cmdBuf, AnimationCurve animationCurve)
+        private static int UpdateSegmentBuffer(AnimationCurve animationCurve)
         {
-            if (animationCurve == null)
+            if (animationCurve is null || animationCurve.length == 0)
             {
                 return 0;
             }
             
-            var keys = animationCurve.keys;
-            if (keys.Length < 2)
-            {
-                return 0;
-            }
-            
-            var segmentCount = keys.Length - 1;
+            var keyframeCount = animationCurve.length;
+
+            // セグメント数はキー数-1
+            // キーフレームが１つのときは同一点でCubicBezierDataを作ってシェーダーに伝える
+            var segmentCount = Mathf.Max(1, keyframeCount - 1);
             
             var cubicBezierArray = new NativeArray<CubicBezierData>(
                 segmentCount,
                 Allocator.Temp
             );
             
-            for (var i = 0; i < cubicBezierArray.Length; ++i)
+            var keys = animationCurve.keys;
+            if (keyframeCount == 1)
             {
-                cubicBezierArray[i] = AnimationCurveHelper.CalcCubicBezierData(keys[i], keys[i + 1]);
+                cubicBezierArray[0] = AnimationCurveHelper.CalcCubicBezierData(keys[0], keys[0]);
             }
-            
-            if (_curveDataBuffer == null || _curveDataBuffer.count < segmentCount)
+            else
             {
-                _curveDataBuffer?.Dispose();
-                _curveDataBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, segmentCount, Marshal.SizeOf<CubicBezierData>());
+                for (var i = 0; i < cubicBezierArray.Length; ++i)
+                {
+                    cubicBezierArray[i] = AnimationCurveHelper.CalcCubicBezierData(keys[i], keys[i + 1]);
+                }
             }
 
-            cmdBuf.SetBufferData(_curveDataBuffer, cubicBezierArray);
+            if (_segmentBuffer == null || _segmentBuffer.count < segmentCount)
+            {
+                _segmentBuffer?.Dispose();
+                _segmentBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, segmentCount, Marshal.SizeOf<CubicBezierData>());
+            }
+
+            _segmentBuffer.SetData(cubicBezierArray);
             
             cubicBezierArray.Dispose();
             
@@ -110,30 +119,42 @@ namespace RosettaUI.Builder
             _commandBuffer ??= new CommandBuffer { name = CommandBufferName };
             _commandBuffer.Clear();
             
-            var segmentCount = UpdateData(_commandBuffer, animationCurve);
+            var segmentCount = UpdateSegmentBuffer(animationCurve);
 
             _curveDrawMaterial ??= new Material(Resources.Load<Shader>(ShaderName));
             _curveDrawMaterial.SetVector(ShaderParam.ResolutionId, new Vector2(targetTexture.width, targetTexture.height));
             _curveDrawMaterial.SetVector(ShaderParam.OffsetZoomId, viewInfo.offsetZoom);
-            _curveDrawMaterial.SetBuffer(ShaderParam.SegmentBufferId, _curveDataBuffer);
+            _curveDrawMaterial.SetBuffer(ShaderParam.SegmentBufferId, _segmentBuffer);
             _curveDrawMaterial.SetInt(ShaderParam.SegmentCountId, segmentCount);
             _curveDrawMaterial.SetInt(ShaderParam.PreWrapModeId, (int)ToWrapModeForPreview(animationCurve.preWrapMode));
             _curveDrawMaterial.SetInt(ShaderParam.PostWrapModeId, (int)ToWrapModeForPreview(animationCurve.postWrapMode));
             
+            SetKeyword(_curveDrawMaterial, ShaderParam.WrapOnKeyword, viewInfo.wrapEnabled);
 
+            SetKeyword(_curveDrawMaterial, ShaderParam.GridOnKeyword, viewInfo.gridEnabled);
             if (viewInfo.gridEnabled)
             {
-                _curveDrawMaterial.EnableKeyword(ShaderParam.GridOnKeyword);
                 _curveDrawMaterial.SetVector(ShaderParam.GridParamsId, viewInfo.gridParams);
-            }
-            else
-            {
-                _curveDrawMaterial.DisableKeyword(ShaderParam.GridOnKeyword);
             }
             
             _commandBuffer.Blit(null, targetTexture, _curveDrawMaterial);
             
             Graphics.ExecuteCommandBuffer(_commandBuffer);
+
+            return;
+            
+
+            static void SetKeyword(Material m, string keyword, bool state)
+            {
+                if (state)
+                {
+                    m.EnableKeyword(keyword);
+                }
+                else
+                {
+                    m.DisableKeyword(keyword);
+                }
+            }
         }
     }
 }

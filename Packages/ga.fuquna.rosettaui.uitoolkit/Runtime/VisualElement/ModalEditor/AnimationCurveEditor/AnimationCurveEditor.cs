@@ -212,15 +212,18 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void UpdateCurvePreview()
         {
+            var curve = _curveController.Curve;
+            
             var gridViewport = _previewTransform.PreviewGridViewport;
             var viewInfo = new AnimationCurvePreviewRenderer.CurvePreviewViewInfo()
             {
                 offsetZoom = _previewTransform.OffsetZoom,
+                wrapEnabled = curve.length > 0,
                 gridEnabled = true,
                 gridParams = new Vector4(gridViewport.XOrder, gridViewport.YOrder, gridViewport.XTick, gridViewport.YTick),
             };
             
-            AnimationCurveVisualElementHelper.UpdatePreviewToBackgroundImage(_curveController.Curve, _curvePreviewElement, viewInfo);
+            AnimationCurveVisualElementHelper.UpdatePreviewToBackgroundImage(curve, _curvePreviewElement, viewInfo);
         }
         
         #endregion

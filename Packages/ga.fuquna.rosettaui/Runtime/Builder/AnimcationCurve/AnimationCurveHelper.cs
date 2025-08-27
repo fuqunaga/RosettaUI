@@ -58,16 +58,22 @@ namespace RosettaUI.Builder
         {
             if (curve == null)
             {
-                return default;
+                return Rect01();
             }
             
             var keys = curve.keys;
             if (keys.Length <= 0)
             {
-                return default;
+                return Rect01();
             }
-
+            
             var firstKey = keys[0];
+            
+            if (keys.Length == 1)
+            {
+                return Rect01WithCenter(firstKey.GetPosition());
+            }
+            
             var rect = new Rect(firstKey.time, firstKey.value, 0f, 0f);
             
             for (var i = 1; i < keys.Length; i++)
@@ -87,6 +93,16 @@ namespace RosettaUI.Builder
             }
 
             return rect;
+            
+            static Rect Rect01()
+            {
+                return new Rect(0f, 0f, 1f, 1f);
+            }
+            
+            static Rect Rect01WithCenter(Vector2 center)
+            {
+                return new Rect(center.x - 0.5f, center.y - 0.5f, 1f, 1f);
+            }
         }
         
         /// <summary>

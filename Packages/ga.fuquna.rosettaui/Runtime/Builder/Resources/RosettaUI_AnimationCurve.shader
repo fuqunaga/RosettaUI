@@ -162,8 +162,6 @@
                 
                 // Wrapの範囲はlineWidthHalf分、本来のカーブ側に寄せる
                 // Wrapカーブのラインがその幅分本来のカーブ領域にもはみ出るため
-                // 逆に本来のカーブはライン幅分内側では表示されないが、ControlPointで隠れるので現状許容
-                // ライン幅がControlPointより大きくなった場合はマズい
                 const bool isInPreWrap = currentPx.x < (startPx.x + lineWidthHalf);
                 const bool isInPostWrap = currentPx.x > (endPx.x - lineWidthHalf);
 
@@ -232,15 +230,18 @@
 
                 float4 col = 0;
 
+                
+                #ifndef _GRID_ON
+                
                 // Y=0 black line
+                // Gridとは排他的
                 float yZeroPx = mul(curveToPx, float3(0, 0, 1)).y;
                 float distFromYZero = abs(currentPx.y - yZeroPx);
                 col = lerp(YZeroLineColor, col, smoothstep(0.0, LineWidth * 0.5, distFromYZero));
-
+                
+                #else
                 
                 // Grid
-                #ifdef _GRID_ON
-                
                 const float2 currentOnCurve = uv / _OffsetZoom.zw + _OffsetZoom.xy;
 
                 float gridAlphaRate = CalcGridAlphaRate(currentOnCurve, curveToPx);

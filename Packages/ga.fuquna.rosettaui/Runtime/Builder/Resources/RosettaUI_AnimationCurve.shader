@@ -147,7 +147,7 @@
                 int cycleCount = floor(currentPxXFromStart / splineWidth);
 
                 float pxOnWrap = currentPxXFromStart - splineWidth * cycleCount;
-                if ((WrapMode_PingPong == wrapMode) && (cycleCount % 2 != 0))
+                if ((WrapMode_PingPong == wrapMode) && ((uint)abs(cycleCount) % 2 != 0))
                 {
                     pxOnWrap = splineWidth - pxOnWrap;
                 }
@@ -162,8 +162,6 @@
                 
                 // Wrapの範囲はlineWidthHalf分、本来のカーブ側に寄せる
                 // Wrapカーブのラインがその幅分本来のカーブ領域にもはみ出るため
-                // 逆に本来のカーブはライン幅分内側では表示されないが、ControlPointで隠れるので現状許容
-                // ライン幅がControlPointより大きくなった場合はマズい
                 const bool isInPreWrap = currentPx.x < (startPx.x + lineWidthHalf);
                 const bool isInPostWrap = currentPx.x > (endPx.x - lineWidthHalf);
 
@@ -171,14 +169,17 @@
                 {
                     float2 edgePx = isInPreWrap ? startPx : endPx;
                     int wrapMode = isInPreWrap ? _PreWrapMode : _PostWrapMode;
+                    
+                    float curveWidth = endPx.x - startPx.x;
 
-                    if (WrapMode_Clamp == wrapMode)
+                    // Keyframeが一つのときはstartPx==endPx
+                    // UnityのAnimationCurveEditorの挙動を模倣してWrapMode_Clampとして扱う
+                    if (WrapMode_Clamp == wrapMode || curveWidth <= 0)
                     {
                         dist = abs(currentPx.y - edgePx.y);
                     }
                     else
                     {
-                        float curveWidth = endPx.x - startPx.x;
                         float offsetSign = isInPreWrap ? 1.0f : -1.0f;
 
                         float startX = startPx.x + offsetSign * lineWidthHalf;
@@ -232,15 +233,18 @@
 
                 float4 col = 0;
 
+                
+                #ifndef _GRID_ON
+                
                 // Y=0 black line
+                // Gridとは排他的
                 float yZeroPx = mul(curveToPx, float3(0, 0, 1)).y;
                 float distFromYZero = abs(currentPx.y - yZeroPx);
                 col = lerp(YZeroLineColor, col, smoothstep(0.0, LineWidth * 0.5, distFromYZero));
-
+                
+                #else
                 
                 // Grid
-                #ifdef _GRID_ON
-                
                 const float2 currentOnCurve = uv / _OffsetZoom.zw + _OffsetZoom.xy;
 
                 float gridAlphaRate = CalcGridAlphaRate(currentOnCurve, curveToPx);

@@ -214,3 +214,23 @@
     height: 6px;
     rotate: 0;
 }
+
+/********************************************************************************
+* Wrap Mode Button
+********************************************************************************/
+.rosettaui-animation-curve-editor__wrap-mode-button {
+    position: absolute;
+    top: 10px;
+    width: 10px;
+    height: 10px;
+    background-image: url("../Images/MaterialSymbols/settings.png");
+    -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
+}
+
+.rosettaui-animation-curve-editor__wrap-mode-button--pre {
+    right: 17px;
+}
+
+.rosettaui-animation-curve-editor__wrap-mode-button--post {
+    left: 17px;
+}

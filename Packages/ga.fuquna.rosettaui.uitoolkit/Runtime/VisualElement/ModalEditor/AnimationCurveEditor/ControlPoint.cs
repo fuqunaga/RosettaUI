@@ -21,6 +21,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         // Weightの固定値は1/3の模様
         // https://github.com/Unity-Technologies/UnityCsReference/blob/4b463aa72c78ec7490b7f03176bd012399881768/Editor/Mono/Animation/AnimationWindow/CurveMenuManager.cs#L193
+        // Ferguson/Coons曲線をベジエ曲線にするときの係数
+        // https://olj611.hatenablog.com/entry/2023/12/01/150842
         private const float WeightDefaultValue = 1 / 3f;
         
         
@@ -33,6 +35,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly VisualElement _controlPoint;
         private readonly ControlPointHandle _leftHandle;
         private readonly ControlPointHandle _rightHandle;
+        private readonly WrapModeButton _wrapModeButton;
 
 
         private Vector2 _pointerDownPositionToElementOffset;
@@ -42,7 +45,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         public TangentMode InTangentMode { get; private set; } = TangentMode.Free;
         public TangentMode OutTangentMode { get; private set; } = TangentMode.Free;
-      
+
+
 
         public bool IsActive
         {
@@ -81,6 +85,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private ControlPoint Left => _curveController.GetControlPointLeft(this);
         private ControlPoint Right => _curveController.GetControlPointRight(this);
+        
+        private bool IsFirst => Left == null;
+        private bool IsLast => Right == null;
 
         public ControlPoint(CurveController curveController, ICoordinateConverter coordinateConverter,
             ControlPointDisplayPositionPopup controlPointDisplayPositionPopup, ControlPointEditPositionPopup controlPointEditPositionPopup,
@@ -92,33 +99,40 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _controlPointEditPositionPopup = controlPointEditPositionPopup;
             _onPointMoved = onPointMoved;
 
-            // Handles
-            _leftHandle = new ControlPointHandle(ControlPointHandle.LeftOrRight.Left,
-                _coordinateConverter,
-                (tangent, weight) => OnTangentAndWeightChanged(KeyframeExtensions.InOrOut.In, tangent, weight)
-            
-            );
-            Add(_leftHandle);
-
-            _rightHandle = new ControlPointHandle(ControlPointHandle.LeftOrRight.Right,
-                _coordinateConverter,
-                (tangent, weight) => OnTangentAndWeightChanged(KeyframeExtensions.InOrOut.Out, tangent, weight)
-            );
-            Add(_rightHandle);
-
             // Control point container
             AddToClassList(ContainerClassName);
             RegisterCallback<PointerDownEvent>(OnPointerDown);
+            
+            // Handles
+            _leftHandle = new ControlPointHandle(InOrOut.In,
+                _coordinateConverter,
+                (tangent, weight) => OnTangentAndWeightChanged(InOrOut.In, tangent, weight)
+            
+            );
+            Add(_leftHandle);
+            
+            _rightHandle = new ControlPointHandle(InOrOut.Out,
+                _coordinateConverter,
+                (tangent, weight) => OnTangentAndWeightChanged(InOrOut.Out, tangent, weight)
+            );
+            Add(_rightHandle);
+
 
             // Control point
             _controlPoint = new VisualElement { name = "AnimationCurveEditorControlPoint" };
             _controlPoint.AddToClassList(ControlPointClassName);
             Add(_controlPoint);
 
+            
+            // Clamp mode button
+            _wrapModeButton = new WrapModeButton();
+            _wrapModeButton.RegisterCallback<PointerDownEvent>(_ => OnWrapModeButtonClicked());
+            Add(_wrapModeButton);
+            
             return;
 
 
-            void OnTangentAndWeightChanged(KeyframeExtensions.InOrOut inOrOut, float tangent, float weight)
+            void OnTangentAndWeightChanged(InOrOut inOrOut, float tangent, float weight)
             {
                 var keyframe = Keyframe;
                 
@@ -134,6 +148,48 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
 
                 Keyframe = keyframe;
+            }
+            
+            void OnWrapModeButtonClicked()
+            {
+                Action<WrapMode> setWrapMode;
+                WrapMode currentMode;
+                
+                switch (_wrapModeButton.CurrentPreOrPost)  
+                {
+                    case WrapModeButton.PreOrPost.Pre :
+                        setWrapMode = _curveController.SetPreWrapMode;
+                        currentMode = _curveController.Curve.preWrapMode;
+                        break;
+                    case WrapModeButton.PreOrPost.Post:
+                        setWrapMode = _curveController.SetPostWrapMode;
+                        currentMode = _curveController.Curve.postWrapMode;
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                };
+                
+
+                var position = _wrapModeButton.worldBound.position;
+                position.y += 10f;
+
+                PopupMenuUtility.Show(new[]
+                    {
+                        CreateItem("Loop", WrapMode.Loop),
+                        CreateItem("Ping Pong", WrapMode.PingPong),
+                        CreateItem("Clamp", WrapMode.ClampForever),
+                    },
+                    position,
+                    _wrapModeButton
+                );
+
+                return;
+
+                MenuItem CreateItem(string itemName, WrapMode mode)
+                {
+                    return new MenuItem(itemName, () => setWrapMode(mode)){ isChecked = mode == currentMode};
+                }
             }
         }
 
@@ -178,15 +234,31 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void UpdateView()
         {
-            var keyframe = Keyframe;
-            
-            var uiPosition = _coordinateConverter.GetScreenPosFromCurvePos(keyframe.GetPosition());
+            var uiPosition = _coordinateConverter.GetScreenPosFromCurvePos(KeyframePosition);
             style.left = uiPosition.x;
             style.top = uiPosition.y;
+
+            UpdateWrapModeButton();
 
             if (IsActive)
             {
                 UpdateHandleView();
+            }
+        }
+        
+        private void UpdateWrapModeButton()
+        {
+            if (IsFirst)
+            {
+                _wrapModeButton.Show(WrapModeButton.PreOrPost.Pre);
+            }
+            else if (IsLast)
+            {
+                _wrapModeButton.Show(WrapModeButton.PreOrPost.Post);
+            }
+            else
+            {
+                _wrapModeButton.Hide();
             }
         }
 
@@ -241,7 +313,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     this.CaptureMouse();
                     
                     _controlPointDisplayPositionPopup.Show();
-                    _controlPointDisplayPositionPopup.Update(elementPosition, Keyframe);
+                    _controlPointDisplayPositionPopup.Update(elementPosition, KeyframePosition);
                     break;
                 case 1:
                     ControlPointPopupMenu.Show(evt.position, this);
@@ -258,8 +330,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             // _onPointMovedに値の更新は任せる
             var desiredKeyframePosition = _coordinateConverter.GetCurvePosFromScreenPos(screenPosition);
             _onPointMoved(this, desiredKeyframePosition);
-
-            _controlPointDisplayPositionPopup.Update(screenPosition, Keyframe);
+            
+            var pointPosition = _coordinateConverter.GetScreenPosFromCurvePos(KeyframePosition);
+            var popupPosition = pointPosition + _controlPointDisplayPositionPopup.positionOffset;
+            _controlPointDisplayPositionPopup.Update(popupPosition, KeyframePosition);
         }
 
         private void OnPointerUp(PointerUpEvent evt)

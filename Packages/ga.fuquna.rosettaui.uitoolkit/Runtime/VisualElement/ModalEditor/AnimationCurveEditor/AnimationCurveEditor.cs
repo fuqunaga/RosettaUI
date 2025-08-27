@@ -74,7 +74,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private int _mouseButton;
         private Vector2 _prevPointerPosition;
-        private long _lastPointerDownTime;
         private bool _prevSnapX;
         private bool _prevSnapY;
         
@@ -273,12 +272,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 UnselectAllControlPoint();
 
                 // Add control point if double click
-                if (DateTime.Now.Ticks - _lastPointerDownTime < 5000000)
+                if (evt.clickCount == 2)
                 {
                     AddControlPoint(_previewTransform.GetCurvePosFromScreenPos(evt.localPosition));
-                    _lastPointerDownTime = DateTime.Now.Ticks;
                 }
-                _lastPointerDownTime = DateTime.Now.Ticks;
             }
             else if (_mouseButton == 1)
             {

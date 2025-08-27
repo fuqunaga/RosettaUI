@@ -3,6 +3,7 @@
     Properties
     {
         [Toggle] _GRID("Grid", Integer) = 1
+        [Toggle] _Wrap("Wrap", Integer) = 1
     }
     
     SubShader
@@ -13,38 +14,54 @@
         {
             HLSLPROGRAM
             #pragma multi_compile _ _GRID_ON
+            #pragma multi_compile _ _WRAP_ON
             #pragma vertex vert_img
-            #pragma fragment Frag
+            #pragma fragment frag
             //#pragma enable_d3d11_debug_symbols
 
             #include "UnityCG.cginc"
             #include "SdfBezierSpline.hlsl"
-
             
-            float2 _Resolution; // x: width, y: height
-            float4 _OffsetZoom; // xy: offset.xy, zw: zoom.xy
+            static const float LineWidth = 3.5; //[px]
+            static const float4 LineColor = float4(0, 1, 0, 1);
+            static const float4 LineColorOnWrap = float4(0.4, 0.4, 0.4, 1);
+            static const float4 YZeroLineColor = float4(0, 0, 0, 1);
             
-            struct spline_segment
+            struct CubicBezierData
             {
-                float2 startPos;
-                float2 startVel;
-                float2 endPos;
-                float2 endVel;
+                float2 p0;
+                float2 p1;
+                float2 p2;
+                float2 p3;
             };
 
-            StructuredBuffer<spline_segment> _Spline;
+            StructuredBuffer<CubicBezierData> _SegmentBuffer;
             int _SegmentCount;
 
-            static const float LineWidth = 2.0f;
-            static const float4 LineColor = float4(0, 1, 0, 1);
-            static const float4 YZeroLineColor = float4(0, 0, 0, 1);
+            float2 _Resolution; // x: width, y: height
+            float4 _OffsetZoom; // xy: offset.xy, zw: zoom.xy
+
+            
+            #ifdef _WRAP_ON
+
+            //
+            // enum WrapModeForPreview:
+            //
+            #define WrapMode_Loop (0)
+            #define WrapMode_PingPong (1)
+            #define WrapMode_Clamp (2)
+            
+            int _PreWrapMode; // 0: once, 1: loop, 2: pingpong　
+            int _PostWrapMode; // 0: once, 1: loop, 2: pingpong
+            
+            #endif
 
             
             #ifdef _GRID_ON
             
             float4 _GridParams; // xy: order of grid（range=10^order), zw: grid unit size
             
-            static const float4 GridColor = float4(0.4, 0.4, 0.4, 1);
+            static const float4 GridColor = float4(0.25, 0.25, 0.25, 1);
             static const float GridWidth = 1;
 
             inline float2 CalcDistanceFromGridOnPx(float2 positionOnCurve, float2 gridUnit, float2x3 curveToPx)
@@ -79,72 +96,139 @@
                 
                 return max(max(subGridAlphaRateXy.x, subGridAlphaRateXy.y), max(gridAlphaRateXy.x, gridAlphaRateXy.y));
             }
-            
+
             #endif
 
+            
+            inline float CalcCurveDistance(float2 currentPx, float2x3 curveToPx)
+            {
+                float dist = INITIALLY_FAR;
+                
+                for (int idx = 0; idx < _SegmentCount; idx++)
+                {
+                    CubicBezierData segment = _SegmentBuffer[idx];
+                    
+                    const float2 p0 = mul(curveToPx, float3(segment.p0, 1)); // start pos
+                    const float2 p1 = mul(curveToPx, float3(segment.p1, 1));
+                    const float2 p2 = mul(curveToPx, float3(segment.p2, 1));
+                    const float2 p3 = mul(curveToPx, float3(segment.p3, 1)); // end pos
+
+                    const bool isStartInf = isinf(p1.y);
+                    const bool isEndInf = isinf(p2.y);
+
+                    // if p1 or p2 inf draw HV
+                    // elif p1 or p2 -inf draw VH
+                    // else draw curve
+                    if (isStartInf || isEndInf)
+                    {
+                        const bool horizontalFirst = (isStartInf && (p1.y > 0)) || (isEndInf && (p2.y < 0));
+                        const float2 mid = horizontalFirst
+                                               ? float2(p3.x, p0.y)
+                                               : float2(p0.x, p3.y);
+                        
+                        dist = min(dist, SdSegment(currentPx, p0, mid));
+                        dist = min(dist, SdSegment(currentPx, mid, p3));
+                    }
+                    else
+                    {
+                        dist = min(dist, CubicBezierSegmentSdfL2(currentPx, p0, p1, p2, p3));
+                    }
+                }
+
+                return dist;
+            }
+
+            
+            #ifdef _WRAP_ON
+
+            inline float RepeatPositionX(float currentX, int wrapMode, float splineWidth, float splineStartX)
+            {
+                float currentPxXFromStart = currentX - splineStartX;
+                int cycleCount = floor(currentPxXFromStart / splineWidth);
+
+                float pxOnWrap = currentPxXFromStart - splineWidth * cycleCount;
+                if ((WrapMode_PingPong == wrapMode) && (cycleCount % 2 != 0))
+                {
+                    pxOnWrap = splineWidth - pxOnWrap;
+                }
+
+                return pxOnWrap + splineStartX;
+            }
+
+            inline float ClacCurveDistanceOfWrap(float2 currentPx, float2x3 curveToPx, float2 startPx, float2 endPx)
+            {
+                float dist = INITIALLY_FAR;
+                float lineWidthHalf = LineWidth * 0.5f;
+                
+                // Wrapの範囲はlineWidthHalf分、本来のカーブ側に寄せる
+                // Wrapカーブのラインがその幅分本来のカーブ領域にもはみ出るため
+                // 逆に本来のカーブはライン幅分内側では表示されないが、ControlPointで隠れるので現状許容
+                // ライン幅がControlPointより大きくなった場合はマズい
+                const bool isInPreWrap = currentPx.x < (startPx.x + lineWidthHalf);
+                const bool isInPostWrap = currentPx.x > (endPx.x - lineWidthHalf);
+
+                if (isInPreWrap || isInPostWrap)
+                {
+                    float2 edgePx = isInPreWrap ? startPx : endPx;
+                    int wrapMode = isInPreWrap ? _PreWrapMode : _PostWrapMode;
+
+                    if (WrapMode_Clamp == wrapMode)
+                    {
+                        dist = abs(currentPx.y - edgePx.y);
+                    }
+                    else
+                    {
+                        float curveWidth = endPx.x - startPx.x;
+                        float offsetSign = isInPreWrap ? 1.0f : -1.0f;
+
+                        float startX = startPx.x + offsetSign * lineWidthHalf;
+
+                        currentPx.x = RepeatPositionX(currentPx.x, wrapMode, curveWidth, startX);
+
+                        // LoopではWrapしたカーブとひとつ前のカーブを繋ぐ
+                        if (WrapMode_Loop == wrapMode)
+                        {
+                            float2 edgePxOfNextWrap = edgePx + float2(offsetSign * curveWidth, 0);
+                            float2 oppositeEdgePx = isInPreWrap ? endPx : startPx;
+                            dist = SdSegment(currentPx, oppositeEdgePx, edgePxOfNextWrap);
+                        }
+
+                        dist = min(dist, CalcCurveDistance(currentPx, curveToPx));
+                    }
+                }
+
+                return dist;
+            }
+
+            #endif
+            
 
             // 座標系が３つある
             // - uv: 0-1
             // - px: pixel
             // - curve: x(time), y(value)
-            float4 Frag(v2f_img i) : SV_Target
+            float4 frag(v2f_img i) : SV_Target
             {
                 const float2 uv = i.uv;
                 
-                // Curve
                 const float2x3 offsetMatrix = {
                     1, 0, -_OffsetZoom.x,
                     0, 1, -_OffsetZoom.y,
                 };
+                
                 const float2x2 scaleMatrix = {
                     _OffsetZoom.z, 0,
                     0, _OffsetZoom.w
                 };
+                
                 const float2x2 uvToPxMatrix = {
                     _Resolution.x, 0,
                     0, _Resolution.y
                 };
-                const float2x3 curveToPx = mul(uvToPxMatrix, mul(scaleMatrix, offsetMatrix));
                 
+                const float2x3 curveToPx = mul(uvToPxMatrix, mul(scaleMatrix, offsetMatrix));
                 const float2 currentPx = mul(uvToPxMatrix, uv);
 
-                
-                float dist = INITIALLY_FAR;
-                for (int idx = 0; idx < _SegmentCount; idx++)
-                {
-                    /* if startVel or endVel inf draw HV
-                     * elif startVel or endVel -inf draw VH
-                     * else draw curve
-                     */
-                    spline_segment seg = _Spline[idx];
-                    
-                    const float2 pStart = mul(curveToPx, float3(seg.startPos, 1));
-                    const float2 vStart = mul(curveToPx, float3(seg.startVel, 0));
-                    const float2 pEnd = mul(curveToPx, float3(seg.endPos, 1));
-                    const float2 vEnd = mul(curveToPx, float3(seg.endVel, 0));
-
-                    const bool isStartPosInf = any(isinf(seg.startVel) && seg.startVel > 0);
-                    const bool isStartNegInf = any(isinf(seg.startVel) && seg.startVel < 0);
-                    const bool isEndPosInf = any(isinf(seg.endVel) && seg.endVel > 0);
-                    const bool isEndNegInf = any(isinf(seg.endVel) && seg.endVel < 0);
-
-                    if (isStartPosInf || isStartNegInf || isEndPosInf || isEndNegInf)
-                    {
-                        const float2 mid = isStartPosInf || isEndPosInf
-                                               ? float2(pEnd.x, pStart.y)
-                                               : float2(pStart.x, pEnd.y);
-                        dist = min(dist, SdSegment(currentPx, pStart, mid));
-                        dist = min(dist, SdSegment(currentPx, mid, pEnd));
-                    }
-                    else
-                    {
-                        const float2 p0 = pStart;
-                        const float2 p1 = pStart + vStart; // Hermite curve 1/3 factor rolled into tangent value
-                        const float2 p2 = pEnd - vEnd;
-                        const float2 p3 = pEnd;
-                        dist = min(dist, CubicBezierSegmentSdfL2(currentPx, p0, p1, p2, p3));
-                    }
-                }
 
                 float4 col = 0;
 
@@ -166,8 +250,22 @@
 
                 
                 // CurveLine
-                dist -= LineWidth * 0.5f;
-                col = lerp(LineColor, col, smoothstep(-.5f, .5f, dist));
+                float2 startPx = mul(curveToPx, float3(_SegmentBuffer[0].p0, 1));
+                float2 endPx = mul(curveToPx, float3(_SegmentBuffer[_SegmentCount - 1].p3, 1));
+
+                #ifdef _WRAP_ON
+                float distanceFromWrap = ClacCurveDistanceOfWrap(currentPx, curveToPx, startPx, endPx);
+                float wrapLineRate = smoothstep(LineWidth * 0.5f, 0, distanceFromWrap);
+                col = lerp(col, LineColorOnWrap, wrapLineRate);
+                #endif
+
+                float lineWidthHalf = LineWidth * 0.5f;
+                if (((startPx.x - lineWidthHalf) <= currentPx.x) && (currentPx.x <= (endPx.x + lineWidthHalf)))
+                {
+                    float distanceFromCurve = CalcCurveDistance(currentPx, curveToPx);
+                    float lineRate = smoothstep(LineWidth * 0.5f, 0, distanceFromCurve);
+                    col = lerp(col, LineColor, lineRate);
+                }
 
                 return col;
             }

@@ -8,22 +8,36 @@ namespace RosettaUI.Builder
 {
     public static class AnimationCurvePreviewRenderer
     {
+        private enum WrapModeForPreview
+        {
+            Loop,
+            PingPong,
+            Clamp,
+        }
+        
+        private static WrapModeForPreview ToWrapModeForPreview(WrapMode wrapMode)
+        {
+            return wrapMode switch
+            {
+                WrapMode.Loop => WrapModeForPreview.Loop,
+                WrapMode.PingPong => WrapModeForPreview.PingPong,
+                _ => WrapModeForPreview.Clamp,
+            };
+        }
+        
         private static class ShaderParam
         {
             public const string GridOnKeyword = "_GRID_ON";
 
-            private const string Resolution = "_Resolution";
-            private const string OffsetZoom = "_OffsetZoom";
-            private const string SplineBuffer = "_Spline";
-            private const string SegmentCount = "_SegmentCount";
-            private const string GridParams = "_GridParams";
-            
-            public static readonly int ResolutionId = Shader.PropertyToID(Resolution);
-            public static readonly int OffsetZoomId = Shader.PropertyToID(OffsetZoom);
-            public static readonly int SplineBufferId = Shader.PropertyToID(SplineBuffer);
-            public static readonly int SegmentCountId = Shader.PropertyToID(SegmentCount);
-            public static readonly int GridParamsId = Shader.PropertyToID(GridParams);
+            public static readonly int ResolutionId = Shader.PropertyToID("_Resolution");
+            public static readonly int OffsetZoomId = Shader.PropertyToID("_OffsetZoom");
+            public static readonly int SegmentBufferId = Shader.PropertyToID("_SegmentBuffer");
+            public static readonly int SegmentCountId = Shader.PropertyToID("_SegmentCount");
+            public static readonly int PreWrapModeId = Shader.PropertyToID("_PreWrapMode");
+            public static readonly int PostWrapModeId = Shader.PropertyToID("_PostWrapMode");
+            public static readonly int GridParamsId = Shader.PropertyToID("_GridParams");
         }
+        
         
         private const string ShaderName = "RosettaUI_AnimationCurve";
         private const string CommandBufferName = nameof(AnimationCurvePreviewRenderer);
@@ -37,18 +51,7 @@ namespace RosettaUI.Builder
             public bool gridEnabled;
             public Vector4 gridParams; // xy: order of grid（range=10^order), zw: grid unit size
         }
-
-        /// <summary>
-        /// RosettaUI_AnimationCurve.shader の spline_segment 構造体と同じデータ構造。
-        /// </summary>
-        private struct SplineSegmentData
-        {
-            public Vector2 startPos;
-            public Vector2 startVel;
-            public Vector2 endPos;
-            public Vector2 endVel;
-        }
-
+        
         static AnimationCurvePreviewRenderer()
         {
             StaticResourceUtility.AddResetStaticResourceCallback(() =>
@@ -79,33 +82,25 @@ namespace RosettaUI.Builder
             
             var segmentCount = keys.Length - 1;
             
-            var splineData = new NativeArray<SplineSegmentData>(
+            var cubicBezierArray = new NativeArray<CubicBezierData>(
                 segmentCount,
                 Allocator.Temp
             );
             
-            for (var i = 0; i < splineData.Length; ++i)
+            for (var i = 0; i < cubicBezierArray.Length; ++i)
             {
-                var startKey = keys[i];
-                var endKey = keys[i+1];
-                
-                splineData[i] = new SplineSegmentData {
-                    startPos = new Vector2(startKey.time, startKey.value),
-                    endPos = new Vector2(endKey.time, endKey.value),
-                    startVel = (endKey.time - startKey.time) * startKey.GetStartVel(),
-                    endVel = (endKey.time - startKey.time) * endKey.GetEndVel()
-                };
+                cubicBezierArray[i] = AnimationCurveHelper.CalcCubicBezierData(keys[i], keys[i + 1]);
             }
             
             if (_curveDataBuffer == null || _curveDataBuffer.count < segmentCount)
             {
                 _curveDataBuffer?.Dispose();
-                _curveDataBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, segmentCount, Marshal.SizeOf<SplineSegmentData>());
+                _curveDataBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, segmentCount, Marshal.SizeOf<CubicBezierData>());
             }
 
-            cmdBuf.SetBufferData(_curveDataBuffer, splineData);
+            cmdBuf.SetBufferData(_curveDataBuffer, cubicBezierArray);
             
-            splineData.Dispose();
+            cubicBezierArray.Dispose();
             
             return segmentCount;
         }
@@ -120,8 +115,11 @@ namespace RosettaUI.Builder
             _curveDrawMaterial ??= new Material(Resources.Load<Shader>(ShaderName));
             _curveDrawMaterial.SetVector(ShaderParam.ResolutionId, new Vector2(targetTexture.width, targetTexture.height));
             _curveDrawMaterial.SetVector(ShaderParam.OffsetZoomId, viewInfo.offsetZoom);
-            _curveDrawMaterial.SetBuffer(ShaderParam.SplineBufferId, _curveDataBuffer);
+            _curveDrawMaterial.SetBuffer(ShaderParam.SegmentBufferId, _curveDataBuffer);
             _curveDrawMaterial.SetInt(ShaderParam.SegmentCountId, segmentCount);
+            _curveDrawMaterial.SetInt(ShaderParam.PreWrapModeId, (int)ToWrapModeForPreview(animationCurve.preWrapMode));
+            _curveDrawMaterial.SetInt(ShaderParam.PostWrapModeId, (int)ToWrapModeForPreview(animationCurve.postWrapMode));
+            
 
             if (viewInfo.gridEnabled)
             {

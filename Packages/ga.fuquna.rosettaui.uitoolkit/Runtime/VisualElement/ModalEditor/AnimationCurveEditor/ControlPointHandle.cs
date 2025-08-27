@@ -80,20 +80,30 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         /// <returns>ラインの角度を返す。USSとは回転方向が異なりX軸＋方向が0度、Y軸が＋90度</returns>
         private float SetTangent(float tangent)
         {
-            var radian = Mathf.Atan(_coordinateConverter.GetScreenTangentFromCurveTangent(tangent));
-            
-            if (!float.IsNaN(radian))
+            float radian;
+
+            // tangentが無限大の場合は+-90度にする
+            // LeftOrRight.Left側ではハンドルを上に上げて行くとtangentが大きい負の値になるが、無限大になると正の無限大に変わる
+            // これはUnityのAnimationCurveEditorの仕様に合わせている
+            if (float.IsInfinity(tangent))
             {
-                if ( _leftOrRight == LeftOrRight.Left)
+                radian = tangent > 0 ? Mathf.PI / 2 : -Mathf.PI / 2;
+            }
+            else
+            {
+                radian = Mathf.Atan(_coordinateConverter.GetScreenTangentFromCurveTangent(tangent));
+
+                if (_leftOrRight == LeftOrRight.Left)
                 {
                     radian += Mathf.PI;
                 }
-                
-                // USSでは時計回りが正方向なので反転する
-                _lineElement.style.rotate = new Rotate(Angle.Radians(-radian));
-
-                _handleContainerElement.style.rotate = new Rotate(Angle.Radians(radian));;
             }
+
+            // USSでは時計回りが正方向なので反転する
+            _lineElement.style.rotate = new Rotate(Angle.Radians(-radian));
+
+            // ラインの先端のハンドル部分は回転させないよう逆回転しておく
+            _handleContainerElement.style.rotate = new Rotate(Angle.Radians(radian));
 
             return radian * Mathf.Rad2Deg;
         }
@@ -118,6 +128,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
 
+        #region Pointer Event
+        
         private void OnPointerDown(PointerDownEvent evt)
         {
             if (evt.button != 0) return;
@@ -133,12 +145,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var mousePoint = evt.position;
 
             var deltaY = -(mousePoint.y - centerPoint.y);
-            var deltaX = Mathf.Max(0, Sign * (mousePoint.x - centerPoint.x));
+            var deltaX = Sign * Mathf.Max(0, Sign * (mousePoint.x - centerPoint.x)); // centerPoint.Xを越えないようにClamp
+            
+            // deltaXが0に近い場合は無限大にする
+            // LeftOrRight.Left側ではハンドルを上に上げて行くとtangentが大きい負の値になるが、無限大になると正の無限大に変わる
+            // これはUnityのAnimationCurveEditorの仕様に合わせている
             var tangent = Mathf.Approximately(deltaX, 0f) 
-                ? Mathf.Sign(deltaY) * float.PositiveInfinity
+                ? Mathf.Sign(deltaY) * float.PositiveInfinity 
                 : deltaY / deltaX;
-
-            tangent *= Sign;
+            
             tangent = _coordinateConverter.GetCurveTangentFromScreenTangent(tangent);
 
             var weight = Mathf.Clamp01(Mathf.Abs(mousePoint.x - centerPoint.x) / Mathf.Abs(_xDistToNeighborInScreen));
@@ -153,5 +168,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _handleContainerElement.UnregisterCallback<PointerMoveEvent>(OnPointerMove);
             evt.StopPropagation();
         }
+        
+        #endregion
     }
 }

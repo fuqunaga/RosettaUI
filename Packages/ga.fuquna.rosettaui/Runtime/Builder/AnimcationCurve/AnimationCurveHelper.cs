@@ -33,7 +33,7 @@ namespace RosettaUI.Builder
             return (curve, curve.preWrapMode, curve.postWrapMode).GetHashCode();
         }
 
-        public static CubicBezierData CalcCubicBeziers(Keyframe startKeyframe, Keyframe endKeyframe)
+        public static CubicBezierData CalcCubicBezierData(Keyframe startKeyframe, Keyframe endKeyframe)
         {
             var key0 = startKeyframe;
             var key1 = endKeyframe;

@@ -89,7 +89,7 @@ namespace RosettaUI.Builder
             
             for (var i = 0; i < cubicBezierArray.Length; ++i)
             {
-                cubicBezierArray[i] = AnimationCurveHelper.CalcCubicBeziers(keys[i], keys[i + 1]);
+                cubicBezierArray[i] = AnimationCurveHelper.CalcCubicBezierData(keys[i], keys[i + 1]);
             }
             
             if (_curveDataBuffer == null || _curveDataBuffer.count < segmentCount)

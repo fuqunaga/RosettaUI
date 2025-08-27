@@ -121,7 +121,7 @@
                     // else draw curve
                     if (isStartInf || isEndInf)
                     {
-                        const bool horizontalFirst = (isStartInf && (p1.y > 0)) || (isEndInf && (p2.y > 0));
+                        const bool horizontalFirst = (isStartInf && (p1.y > 0)) || (isEndInf && (p2.y < 0));
                         const float2 mid = horizontalFirst
                                                ? float2(p3.x, p0.y)
                                                : float2(p0.x, p3.y);
@@ -138,6 +138,7 @@
                 return dist;
             }
 
+            
             #ifdef _WRAP_ON
 
             inline float RepeatPositionX(float currentX, int wrapMode, float splineWidth, float splineStartX)
@@ -154,24 +155,19 @@
                 return pxOnWrap + splineStartX;
             }
 
-            inline float ClacDistanceWithWrap(float2 currentPx, float2x3 curveToPx, out bool isInWrap)
+            inline float ClacCurveDistanceOfWrap(float2 currentPx, float2x3 curveToPx, float2 startPx, float2 endPx)
             {
                 float dist = INITIALLY_FAR;
                 float lineWidthHalf = LineWidth * 0.5f;
                 
-                float2 startPx = mul(curveToPx, float3(_SegmentBuffer[0].p0, 1));
-                float2 endPx = mul(curveToPx, float3(_SegmentBuffer[_SegmentCount - 1].p3, 1));
-
                 // Wrapの範囲はlineWidthHalf分、本来のカーブ側に寄せる
                 // Wrapカーブのラインがその幅分本来のカーブ領域にもはみ出るため
                 // 逆に本来のカーブはライン幅分内側では表示されないが、ControlPointで隠れるので現状許容
                 // ライン幅がControlPointより大きくなった場合はマズい
-                bool isInPreWrap = currentPx.x < (startPx.x + lineWidthHalf);
-                bool isInPostWrap = currentPx.x > (endPx.x - lineWidthHalf);
+                const bool isInPreWrap = currentPx.x < (startPx.x + lineWidthHalf);
+                const bool isInPostWrap = currentPx.x > (endPx.x - lineWidthHalf);
 
-                isInWrap = isInPreWrap || isInPostWrap;
-                
-                if (isInWrap)
+                if (isInPreWrap || isInPostWrap)
                 {
                     float2 edgePx = isInPreWrap ? startPx : endPx;
                     int wrapMode = isInPreWrap ? _PreWrapMode : _PostWrapMode;
@@ -206,26 +202,6 @@
 
             #endif
             
-         
-            inline float CalcCurveLineRateAndColor(float2 currentPx, float2x3 curveToPx, out float4 lineColor)
-            {
-                float dist = INITIALLY_FAR;
-                bool isInWrap = false;
-
-                #ifdef _WRAP_ON
-                dist = ClacDistanceWithWrap(currentPx, curveToPx, isInWrap);
-                #endif
-
-                if (!isInWrap)
-                {
-                    dist = min(dist, CalcCurveDistance(currentPx, curveToPx));
-                }
-
-                lineColor = isInWrap ? LineColorOnWrap : LineColor;
-
-                return smoothstep(LineWidth * 0.5f, 0, dist);
-            }
-
 
             // 座標系が３つある
             // - uv: 0-1
@@ -274,9 +250,22 @@
 
                 
                 // CurveLine
-                float4 lineColor;
-                float lineColorRate = CalcCurveLineRateAndColor(currentPx, curveToPx, lineColor);
-                col = lerp(col, lineColor, lineColorRate);
+                float2 startPx = mul(curveToPx, float3(_SegmentBuffer[0].p0, 1));
+                float2 endPx = mul(curveToPx, float3(_SegmentBuffer[_SegmentCount - 1].p3, 1));
+
+                #ifdef _WRAP_ON
+                float distanceFromWrap = ClacCurveDistanceOfWrap(currentPx, curveToPx, startPx, endPx);
+                float wrapLineRate = smoothstep(LineWidth * 0.5f, 0, distanceFromWrap);
+                col = lerp(col, LineColorOnWrap, wrapLineRate);
+                #endif
+
+                float lineWidthHalf = LineWidth * 0.5f;
+                if (((startPx.x - lineWidthHalf) <= currentPx.x) && (currentPx.x <= (endPx.x + lineWidthHalf)))
+                {
+                    float distanceFromCurve = CalcCurveDistance(currentPx, curveToPx);
+                    float lineRate = smoothstep(LineWidth * 0.5f, 0, distanceFromCurve);
+                    col = lerp(col, LineColor, lineRate);
+                }
 
                 return col;
             }

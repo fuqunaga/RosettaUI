@@ -8,7 +8,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// <summary>
     /// A visual element that allows you to edit an <see cref="AnimationCurve"/>.
     /// </summary>
-    public class AnimationCurveEditor : ModalEditor<AnimationCurve>
+    public partial class AnimationCurveEditor : ModalEditor<AnimationCurve>
     {
         #region Static Window Management
         
@@ -51,7 +51,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         #endregion
         
         
-        private const string USSClassName = "rosettaui-animation-curve-editor";
+        public const string USSClassName = "rosettaui-animation-curve-editor";
         
         // ReSharper disable once MemberCanBePrivate.Global
         public static string VisualTreeAssetName { get; set; } = "RosettaUI_AnimationCurveEditor";
@@ -87,9 +87,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         }
 
         #endregion
-        
 
-        public AnimationCurveEditor() : base(VisualTreeAssetName, true)
+
+        private AnimationCurveEditor() : base(VisualTreeAssetName, true)
         {
             AddToClassList(USSClassName);
             InitUI();
@@ -105,7 +105,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         /// <summary>
         /// Set the curve to be edited.
         /// </summary>
-        public void SetCurve(AnimationCurve curve)
+        private void SetCurve(AnimationCurve curve)
         {
             _curveController.SetCurve(curve);
             UnselectAllControlPoint();
@@ -188,8 +188,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             // Edit Key Popup
             _controlPointEditPositionPopup = new ControlPointEditPositionPopup();
             curveGroup.Add(_controlPointEditPositionPopup);
+
+            InitPresetsUI();
         }
-        
+
         #endregion
         
         #region View Update

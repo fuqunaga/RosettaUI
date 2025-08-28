@@ -33,6 +33,7 @@
     --rosettaui-color-box-background: rgba(100,100,100,0.3);
     --rosettaui-color-list-background: var(--rosettaui-color-box-background);
     --rosettaui-color-tabs-title-inactive-background: rgba(0,0,0,0.4);
+    --rosettaui-color-animation-curve-background: #565656;
 
     --rosettaui-button-background-pressed: var(--rosettaui-highlight-dark-blue);
     
@@ -257,7 +258,7 @@
 * AnimationCurveField
 ********************************************************************************/
 .rosettaui-animation-curve-field__input {
-    background-color: #565656;
+    background-color: var(--rosettaui-color-animation-curve-background);
 }
 
 

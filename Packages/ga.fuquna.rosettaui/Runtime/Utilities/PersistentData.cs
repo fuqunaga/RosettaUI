@@ -12,6 +12,10 @@ namespace RosettaUI
             public T value;
         }
 
+        public static bool HasKey(string key)
+        {
+            return PlayerPrefs.HasKey(key);
+        }
         
         public static T Get<T>(string key)
         {

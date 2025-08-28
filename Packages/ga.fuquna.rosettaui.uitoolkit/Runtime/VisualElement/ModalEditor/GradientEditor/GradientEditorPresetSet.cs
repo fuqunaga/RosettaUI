@@ -7,10 +7,8 @@ namespace RosettaUI.UIToolkit
     {
         public const string KeyPrefix = "RosettaUI-GradientEditorPresetSet";
         
-        public GradientEditorPresetSet(Action<Gradient> applyValueFunc) : base("Presets", applyValueFunc)
+        public GradientEditorPresetSet(Action<Gradient> applyValueFunc) : base("Presets", applyValueFunc, KeyPrefix)
         {
         }
-
-        protected override string DataKeyPrefix => KeyPrefix;
     }
 }

@@ -18,5 +18,6 @@
                 <ui:VisualElement />
             </ui:VisualElement>
         </ui:GroupBox>
+        <ui:ScrollView name="presets-scroll-view" vertical-scroller-visibility="Hidden" />
     </ui:VisualElement>
 </ui:UXML>

@@ -234,3 +234,33 @@
 .rosettaui-animation-curve-editor__wrap-mode-button--post {
     left: 17px;
 }
+
+
+/********************************************************************************
+* Presets
+********************************************************************************/
+.rosettaui-animation-curve-editor__presets-popup-button {
+    width: 12px;
+    height: 12px;
+    background-image: url("../Images/MaterialSymbols/settings.png");
+    -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
+    margin: 4px;
+}
+
+.rosettaui-animation-curve-editor__presets-container {
+    flex-direction: row;
+    align-items: center;
+    margin: 6px 4px 0;
+}
+
+.rosettaui-animation-curve-editor__presets-preview {
+    flex-direction: row;
+}
+
+.rosettaui-animation-curve-editor-preset__tile
+{
+    width: 40px;
+    height: 25px;
+    margin: 1px 2px;
+    background-color: var(--rosettaui-color-animation-curve-background);
+}

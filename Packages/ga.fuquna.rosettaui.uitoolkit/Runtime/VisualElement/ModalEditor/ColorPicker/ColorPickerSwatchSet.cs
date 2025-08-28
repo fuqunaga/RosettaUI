@@ -8,11 +8,9 @@ namespace RosettaUI.UIToolkit
         public new const string UssClassName = "rosettaui-colorpicker-swatchset";
         public const string KeyPrefix = "RosettaUI-ColorPickerSwatchSet";
         
-        public ColorPickerSwatchSet(Action<Color> applyValueFunc) : base("Swatches", applyValueFunc)
+        public ColorPickerSwatchSet(Action<Color> applyValueFunc) : base("Swatches", applyValueFunc, KeyPrefix)
         {
             AddToClassList(UssClassName);
         }
-
-        protected override string DataKeyPrefix => KeyPrefix;
     }
 }

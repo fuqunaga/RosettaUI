@@ -9,7 +9,7 @@ namespace RosettaUI.UIToolkit
     {
         private static readonly HashSet<VisualElement> TextureAttachedElements = new();
 
-        public static void UpdatePreviewToBackgroundImage(
+        public static bool UpdatePreviewToBackgroundImage(
             AnimationCurve curve,
             VisualElement visualElement,
             AnimationCurvePreviewRenderer.CurvePreviewViewInfo? viewInfoOrNull = null
@@ -20,7 +20,7 @@ namespace RosettaUI.UIToolkit
                 
             if (width <= 0 || height <= 0)
             {
-                return;
+                return false;
             }
 
             if (viewInfoOrNull is not {} viewInfo)
@@ -52,7 +52,7 @@ namespace RosettaUI.UIToolkit
                 }
             }
 
-            return;
+            return true;
             
             static void ReleaseAttachedTexture(VisualElement element)
             {

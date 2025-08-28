@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
@@ -24,6 +23,9 @@ namespace RosettaUI.UIToolkit
         
         public const string UssClassName = "rosettaui-swatchset";
         public const string TileScrollViewUssClassName = UssClassName + "__tile-scroll-view";
+
+        private const string PersistantKeyLayout = "Layout";
+        private const string PersistantKeyIsOpen = "IsOpen";
         
         private readonly VisualElement _swatchSetMenu;
         private readonly ScrollView _tileScrollView;
@@ -32,15 +34,12 @@ namespace RosettaUI.UIToolkit
 
         private TileLayout _tileLayout;
         
-        
-        protected abstract string DataKeyPrefix { get; }
-        protected virtual string DataKeyLayout => $"{DataKeyPrefix}-Layout";
-        protected virtual string DataKeyIsOpen => $"{DataKeyPrefix}-IsOpen";
-        protected virtual string DataKeySwatches => $"{DataKeyPrefix}-Swatches";
+        public SwatchPersistentService<TValue> PersistentService { get; }
         
         private bool IsSwatchDisplayLabel => Layout == TileLayout.List;
         private IEnumerable<SwatchBase<TValue>> SwatchesWithCurrent => _tileScrollView.Children().Select(v => v as SwatchBase<TValue>);
         private IEnumerable<SwatchBase<TValue>> Swatches => SwatchesWithCurrent.Where(s => s != _currentSwatch);
+
         
         public TileLayout Layout
         {
@@ -53,18 +52,21 @@ namespace RosettaUI.UIToolkit
                 
                 UpdateSwatchesEnableText();
                 
-                PersistentData.Set(DataKeyLayout, (int)value);
+                PersistentService.Set(PersistantKeyLayout, (int)value);
             }
         }
 
 
-        protected SwatchSetBase(string label, Action<TValue> applyValueFunc)
+        protected SwatchSetBase(string label, Action<TValue> applyValueFunc, string dataKeyPrefix)
         {
             _applyValueFunc = applyValueFunc;
+            
             text = label;
             
             AddToClassList(UssClassName);
 
+            PersistentService = new SwatchPersistentService<TValue>(dataKeyPrefix);
+            
             _swatchSetMenu = CreateSwatchSetMenu();
             var toggle = this.Q<Toggle>();
             toggle.Add(_swatchSetMenu);
@@ -124,10 +126,10 @@ namespace RosettaUI.UIToolkit
         
         private void LoadStatus()
         {
-            var isOpen = PersistentData.Get<bool>(DataKeyIsOpen);
+            var isOpen = PersistentService.Get<bool>(PersistantKeyIsOpen);
             value = isOpen;
             
-            Layout = (TileLayout)PersistentData.Get<int>(DataKeyLayout);
+            Layout = (TileLayout)PersistentService.Get<int>(PersistantKeyLayout);
         }
    
         
@@ -143,21 +145,20 @@ namespace RosettaUI.UIToolkit
             var isOpen = evt.newValue;
             SetMenuVisible(isOpen);
             
-            PersistentData.Set(DataKeyIsOpen, isOpen);
+            PersistentService.Set(PersistantKeyIsOpen, isOpen);
         }
 
 
-    
         private void OnCurrentSwatchPointerDown(PointerDownEvent evt)
         {
             var newSwatch = AddSwatch(_currentSwatch.Value);
             SaveSwatches();
             
-            if ( IsSwatchDisplayLabel )
+            if (IsSwatchDisplayLabel)
             {
                 newSwatch.StartRename(SaveSwatches);
             }
-            
+
             evt.StopPropagation();
         }
         
@@ -209,13 +210,14 @@ namespace RosettaUI.UIToolkit
         }
         
 
-        private SwatchBase<TValue> AddSwatch(TValue swatchValue, string swatchName = null)
+        private TSwatch AddSwatch(TValue swatchValue, string swatchName = null)
         {
-            var swatch = new TSwatch
+            var swatch = new TSwatch()
             {
                 Label = swatchName,
-                Value = swatchValue,
+                Value = swatchValue
             };
+            
             swatch.RegisterCallback<PointerDownEvent>(OnSwatchPointerDown);
             swatch.EnableText = IsSwatchDisplayLabel;
             _tileScrollView.Insert(_tileScrollView.childCount - 1, swatch);
@@ -244,16 +246,16 @@ namespace RosettaUI.UIToolkit
         
         private void SaveSwatches()
         {
-            using var _ = ListPool<NameAndValue>.Get(out var nameAndValues);
-            nameAndValues.AddRange(Swatches.Select(s => new NameAndValue { name = s.Label, value = s.Value }));
-            
-            PersistentData.Set(DataKeySwatches, nameAndValues);
+            PersistentService.SaveSwatches(Swatches);
         }
         
         private void LoadSwatches()
         {
-            var nameAndValues = PersistentData.Get<List<NameAndValue>>(DataKeySwatches);
-            if (nameAndValues == null) return;
+            var nameAndValues = PersistentService.LoadSwatches();
+            if (nameAndValues == null)
+            {
+                return;
+            }
             
             foreach (var nameAndValue in nameAndValues)
             {

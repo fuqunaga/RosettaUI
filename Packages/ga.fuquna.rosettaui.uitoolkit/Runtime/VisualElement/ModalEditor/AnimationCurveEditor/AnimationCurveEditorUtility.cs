@@ -120,20 +120,5 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             return TangentMode.Free;
         }
-        
-        public static float GetTangentFromDegree(float degree)
-        {
-            return degree switch
-            {
-                90f => float.PositiveInfinity,
-                -90f => float.NegativeInfinity,
-                _ => Mathf.Tan(degree * Mathf.Deg2Rad)
-            };
-        }
-        
-        public static float GetDegreeFromTangent2(float y, float x)
-        {
-            return Mathf.Atan2(y, x) * Mathf.Rad2Deg;
-        }
    }
 }

@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 namespace RosettaUI.Builder
@@ -33,27 +34,6 @@ namespace RosettaUI.Builder
             return (curve, curve.preWrapMode, curve.postWrapMode).GetHashCode();
         }
 
-        public static CubicBezierData CalcCubicBezierData(Keyframe startKeyframe, Keyframe endKeyframe)
-        {
-            var key0 = startKeyframe;
-            var key1 = endKeyframe;
-
-            var deltaTime = key1.time - key0.time;
-
-            var p0 = key0.GetPosition();
-            var p3 = key1.GetPosition();
-            var p1 = p0 + deltaTime * key0.GetVelocity(InOrOut.Out);
-            var p2 = p3 - deltaTime * key1.GetVelocity(InOrOut.In);
-
-            return new CubicBezierData
-            {
-                p0 = p0,
-                p1 = p1,
-                p2 = p2,
-                p3 = p3
-            };
-        }
-
         public static Rect GetCurveRect(this AnimationCurve curve, int stepNum = 64)
         {
             if (curve == null)
@@ -67,29 +47,32 @@ namespace RosettaUI.Builder
                 return Rect01();
             }
             
-            var firstKey = keys[0];
-            
-            if (keys.Length == 1)
+            var firstKeyPosition = keys[0].GetPosition();
+            var xMin = firstKeyPosition.x;
+            var xMax = keys.Last().time;
+            var yMin = firstKeyPosition.y;
+            var yMax = firstKeyPosition.y;
+
+            for (var i = 0; i < keys.Length - 1; i++)
             {
-                return Rect01WithCenter(firstKey.GetPosition());
+                var (min, max) = CubicBezier.Create(keys[i], keys[i + 1]).CalcMinMaxY();
+                yMin = Mathf.Min(yMin, min);
+                yMax = Mathf.Max(yMax, max);
             }
             
-            var rect = new Rect(firstKey.time, firstKey.value, 0f, 0f);
+            var rect = Rect.MinMaxRect(xMin, yMin, xMax, yMax);
+
             
-            for (var i = 1; i < keys.Length; i++)
+            if (Mathf.Approximately(rect.width, 0f))
             {
-                var keyframe = keys[i];
-                rect.xMin = Mathf.Min(rect.xMin, keyframe.time);
-                rect.xMax = Mathf.Max(rect.xMax, keyframe.time);
-                rect.yMin = Mathf.Min(rect.yMin, keyframe.value);
-                rect.yMax = Mathf.Max(rect.yMax, keyframe.value);
+                rect.width = 1f;
+                rect.x -= 0.5f;
             }
             
-            for (var i = 0; i < stepNum; i++)
+            if (Mathf.Approximately(rect.height, 0f))
             {
-                var y = curve.Evaluate(rect.xMin + i / (stepNum - 1f) * rect.width);
-                rect.yMin = Mathf.Min(rect.yMin, y);
-                rect.yMax = Mathf.Max(rect.yMax, y);
+                rect.height = 1f;
+                rect.y -= 0.5f;
             }
 
             return rect;
@@ -97,11 +80,6 @@ namespace RosettaUI.Builder
             static Rect Rect01()
             {
                 return new Rect(0f, 0f, 1f, 1f);
-            }
-            
-            static Rect Rect01WithCenter(Vector2 center)
-            {
-                return new Rect(center.x - 0.5f, center.y - 0.5f, 1f, 1f);
             }
         }
         

@@ -91,13 +91,13 @@ namespace RosettaUI.Builder
             var keys = animationCurve.keys;
             if (keyframeCount == 1)
             {
-                cubicBezierArray[0] = AnimationCurveHelper.CalcCubicBezierData(keys[0], keys[0]);
+                cubicBezierArray[0] = CubicBezier.Create(keys[0], keys[0]);
             }
             else
             {
                 for (var i = 0; i < cubicBezierArray.Length; ++i)
                 {
-                    cubicBezierArray[i] = AnimationCurveHelper.CalcCubicBezierData(keys[i], keys[i + 1]);
+                    cubicBezierArray[i] = CubicBezier.Create(keys[i], keys[i + 1]);
                 }
             }
 

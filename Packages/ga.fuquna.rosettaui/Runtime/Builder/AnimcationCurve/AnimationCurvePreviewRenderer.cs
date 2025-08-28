@@ -83,7 +83,7 @@ namespace RosettaUI.Builder
             // キーフレームが１つのときは同一点でCubicBezierDataを作ってシェーダーに伝える
             var segmentCount = Mathf.Max(1, keyframeCount - 1);
             
-            var cubicBezierArray = new NativeArray<CubicBezierData>(
+            var cubicBezierArray = new NativeArray<CubicBezier>(
                 segmentCount,
                 Allocator.Temp
             );
@@ -104,7 +104,7 @@ namespace RosettaUI.Builder
             if (_segmentBuffer == null || _segmentBuffer.count < segmentCount)
             {
                 _segmentBuffer?.Dispose();
-                _segmentBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, segmentCount, Marshal.SizeOf<CubicBezierData>());
+                _segmentBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, segmentCount, Marshal.SizeOf<CubicBezier>());
             }
 
             _segmentBuffer.SetData(cubicBezierArray);

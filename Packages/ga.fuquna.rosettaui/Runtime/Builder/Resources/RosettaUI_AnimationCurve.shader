@@ -2,6 +2,7 @@
 {
     Properties
     {
+        _LineColor("Line Color", Color) = (0,1,0,1)
         [Toggle] _GRID("Grid", Integer) = 1
         [Toggle] _Wrap("Wrap", Integer) = 1
     }
@@ -22,10 +23,9 @@
             #include "UnityCG.cginc"
             #include "SdfBezierSpline.hlsl"
             
-            static const float LineWidth = 3.5; //[px]
-            static const float4 LineColor = float4(0, 1, 0, 1);
             static const float4 LineColorOnWrap = float4(0.4, 0.4, 0.4, 1);
             static const float4 YZeroLineColor = float4(0, 0, 0, 1);
+            static const float LineWidth = 3.5; //[px]
             
             struct CubicBezierData
             {
@@ -41,6 +41,7 @@
             float2 _Resolution; // x: width, y: height
             float4 _OffsetZoom; // xy: offset.xy, zw: zoom.xy
 
+            float4 _LineColor = float4(0, 1, 0, 1);
             
             #ifdef _WRAP_ON
 
@@ -268,7 +269,7 @@
                 {
                     float distanceFromCurve = CalcCurveDistance(currentPx, curveToPx);
                     float lineRate = smoothstep(LineWidth * 0.5f, 0, distanceFromCurve);
-                    col = lerp(col, LineColor, lineRate);
+                    col = lerp(col, _LineColor, lineRate);
                 }
 
                 return col;

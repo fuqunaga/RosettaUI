@@ -24,7 +24,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
                 void UpdatePreviewUntilSuccess(GeometryChangedEvent evt)
                 {
-                    var success = AnimationCurveVisualElementHelper.UpdatePreviewToBackgroundImage(_curve, _curveElement);
+                    var success = AnimationCurveVisualElementHelper.UpdatePreviewToBackgroundImage(_curve, _curveElement, Color.white);
                     if (!success)
                     {
                         RegisterCallbackOnce<GeometryChangedEvent>(UpdatePreviewUntilSuccess);

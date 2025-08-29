@@ -33,6 +33,7 @@ namespace RosettaUI.Builder
 
             public static readonly int ResolutionId = Shader.PropertyToID("_Resolution");
             public static readonly int OffsetZoomId = Shader.PropertyToID("_OffsetZoom");
+            public static readonly int LineColor = Shader.PropertyToID("_LineColor");
             public static readonly int SegmentBufferId = Shader.PropertyToID("_SegmentBuffer");
             public static readonly int SegmentCountId = Shader.PropertyToID("_SegmentCount");
             public static readonly int PreWrapModeId = Shader.PropertyToID("_PreWrapMode");
@@ -50,6 +51,7 @@ namespace RosettaUI.Builder
         public struct CurvePreviewViewInfo
         {
             public Vector4 offsetZoom; // xy: offset.xy, zw: zoom.xy
+            public Color? lineColor;
             public bool wrapEnabled;
             public bool gridEnabled;
             public Vector4 gridParams; // xy: order of grid（range=10^order), zw: grid unit size
@@ -120,10 +122,11 @@ namespace RosettaUI.Builder
             _commandBuffer.Clear();
             
             var segmentCount = UpdateSegmentBuffer(animationCurve);
-
+            
             _curveDrawMaterial ??= new Material(Resources.Load<Shader>(ShaderName));
             _curveDrawMaterial.SetVector(ShaderParam.ResolutionId, new Vector2(targetTexture.width, targetTexture.height));
             _curveDrawMaterial.SetVector(ShaderParam.OffsetZoomId, viewInfo.offsetZoom);
+            _curveDrawMaterial.SetColor(ShaderParam.LineColor, viewInfo.lineColor ?? Color.green);
             _curveDrawMaterial.SetBuffer(ShaderParam.SegmentBufferId, _segmentBuffer);
             _curveDrawMaterial.SetInt(ShaderParam.SegmentCountId, segmentCount);
             _curveDrawMaterial.SetInt(ShaderParam.PreWrapModeId, (int)ToWrapModeForPreview(animationCurve.preWrapMode));

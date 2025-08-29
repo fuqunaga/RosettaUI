@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine.UIElements;
+﻿using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {

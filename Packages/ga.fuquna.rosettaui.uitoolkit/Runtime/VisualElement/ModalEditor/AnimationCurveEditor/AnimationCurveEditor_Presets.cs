@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using RosettaUI.Builder;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
@@ -16,6 +18,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void InitPresetsUI()
         {
+            _presetSet = new AnimationCurveEditorPresetSet(SetCurveFromPreset);
+
+            
             var scrollView = this.Q<ScrollView>("presets-scroll-view");
             var container = new VisualElement();
             container.AddToClassList(PresetsContainerClassName);
@@ -28,39 +33,38 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             container.Add(popupButton);
             
 
+            var persistentService = _presetSet.PersistentService;
             
-            _presetSet = new AnimationCurveEditorPresetSet(curve =>
+            _presetsPreview = new PresetsPreview(persistentService, SetCurveFromPreset);
+            container.Add(_presetsPreview);
+            
+            RegisterCallback<AttachToPanelEvent>(OnAttachToPanel);
+            return;
+
+            
+            void SetCurveFromPreset(AnimationCurve curve)
             {
-                CopiedValue = curve;
+                if (curve.Equals(_curveController.Curve))
+                {
+                    return;
+                }
+                
+                _curveController.SetCurve(curve);
+                UnselectAllControlPoint();
+                UpdateView();
                 NotifyEditorValueChanged();
-            });
-            
-            PlayerPrefs.DeleteKey("RosettaUI-AnimationCurvePresetSet-Swatches");
-            
+            }
+        }
+
+        // 表示時にプリセットがなかったらデフォルトプリセットを保存しておく
+        // 空の状態で保存されているケースとは異なるので注意
+        private void OnAttachToPanel(AttachToPanelEvent evt)
+        {
             var persistentService = _presetSet.PersistentService;
             if (!persistentService.HasSwatches)
             {
-                persistentService.SaveSwatches(new[]
-                {
-                    new SwatchPersistentService<AnimationCurve>.NameAndValue()
-                    {
-                        value = AnimationCurve.Constant(0f, 1f, 0f)
-                    },
-                    new SwatchPersistentService<AnimationCurve>.NameAndValue()
-                    {
-                        value = AnimationCurve.Linear(0f, 0f, 1f, 1f)
-                    },
-                });
-                // Add default presets if there are no saved presets
-                // foreach (var preset in DefaultPresets)
-                // {
-                //     _presetSet.AddSwatch(preset);
-                // }
+                persistentService.SaveSwatches(AnimationCurveHelper.FactoryPresets.Select(curve => new Preset { Value = curve }));
             }
-            
-            _presetsPreview = new PresetsPreview(persistentService);
-            container.Add(_presetsPreview);
-            // scrollView.Add(_presetSet);
         }
     }
 }

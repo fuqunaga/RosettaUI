@@ -5,25 +5,45 @@ using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
+    /// <summary>
+    /// AnimationCurveEditor下部のプリセット表示部分
+    /// </summary>
     public class PresetsPreview : VisualElement
     {
         private static readonly string USSClassName = $"{AnimationCurveEditor.USSClassName}__presets-preview";
         
-        public PresetsPreview(SwatchPersistentService<AnimationCurve> persistentService)
-        {
-            AddToClassList(USSClassName);
-            Reset();
-
-            persistentService.onSaveSwatches += Reset;
-            return;
-
-            void Reset() => ResetPresets(persistentService.LoadSwatches() ?? Array.Empty<SwatchPersistentService<AnimationCurve>.NameAndValue>());
-        }
+        private readonly SwatchPersistentService<AnimationCurve> _persistentService;
+        private readonly Action<AnimationCurve> _applyValueFunc;
         
-        private void ResetPresets(IEnumerable<SwatchPersistentService<AnimationCurve>.NameAndValue> nameAndValues)
+        public PresetsPreview(SwatchPersistentService<AnimationCurve> persistentService, Action<AnimationCurve> applyValueFunc)
+        {
+            _persistentService = persistentService;
+            _applyValueFunc = applyValueFunc;
+            
+            AddToClassList(USSClassName);
+            
+            RegisterCallback<AttachToPanelEvent>(OnAttachToPanel);
+            RegisterCallback<DetachFromPanelEvent>(OnDetachFromPanel);
+        }
+
+        private void OnAttachToPanel(AttachToPanelEvent evt)
+        {
+            ResetView();
+            _persistentService.onSaveSwatches += ResetView;
+        }
+
+
+        private void OnDetachFromPanel(DetachFromPanelEvent evt)
+        {
+            _persistentService.onSaveSwatches -= ResetView;
+        }
+
+        private void ResetView()
         {
             // remove all children
             Clear();
+
+            var nameAndValues = _persistentService.LoadSwatches() ?? Array.Empty<SwatchPersistentService<AnimationCurve>.NameAndValue>();
             
             foreach (var nameAndValue in nameAndValues)
             {
@@ -32,6 +52,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     Value = nameAndValue.value,
                     Label = nameAndValue.name
                 };
+                
+                preset.RegisterCallback<PointerDownEvent>(_ => _applyValueFunc?.Invoke(preset.Value));
                 
                 Add(preset);
             }

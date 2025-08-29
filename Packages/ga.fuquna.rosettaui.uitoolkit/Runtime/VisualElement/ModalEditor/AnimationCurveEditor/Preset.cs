@@ -35,9 +35,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         public Preset()
         {
-            // var tileElement = new VisualElement();
-            // tileElement.AddToClassList(TileClassName);
-            
             _curveElement = new VisualElement();
             _curveElement.AddToClassList(TileClassName);
             

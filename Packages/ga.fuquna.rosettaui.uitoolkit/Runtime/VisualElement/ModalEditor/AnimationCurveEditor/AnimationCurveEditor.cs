@@ -93,6 +93,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             AddToClassList(USSClassName);
             InitUI();
+            InitPresetsUI();
             
             var controlPointContainer = this.Q("control-point-container");
             
@@ -190,8 +191,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             // Edit Key Popup
             _controlPointEditPositionPopup = new ControlPointEditPositionPopup();
             curveGroup.Add(_controlPointEditPositionPopup);
-
-            InitPresetsUI();
         }
 
         #endregion

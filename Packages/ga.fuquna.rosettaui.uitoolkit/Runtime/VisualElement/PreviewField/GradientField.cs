@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    public class GradientField : PreviewBaseField<Gradient, GradientField.GradientInput>
+    public class GradientField : ImagePreviewFieldBase<Gradient, GradientField.GradientInput>
     {
         private Gradient _lastAppliedGradient;
         
@@ -21,45 +21,26 @@ namespace RosettaUI.UIToolkit
             GradientEditor.Show(position, this, rawValue, gradient => value = gradient);
         }
 
-        public override void SetValueWithoutNotify(Gradient newValue)
-        {
-            if (GradientHelper.EqualsWithoutAlloc(_lastAppliedGradient, newValue))
-            {
-                return;
-            }
-            
-            base.SetValueWithoutNotify(newValue);
-            UpdateGradientTexture();
 
-            _lastAppliedGradient ??= new Gradient();
-            GradientHelper.Copy(newValue, _lastAppliedGradient);
-        }
+        protected override bool Equals(Gradient a, Gradient b)
+            => GradientHelper.EqualsWithoutAlloc(a, b);
 
-        private void UpdateGradientTexture()
-        {
-            var preview = inputField.preview;
+        protected override void Copy(Gradient source, Gradient destination)
+            => GradientHelper.Copy(source, destination);
 
-            if (value == null)
-            {
-                preview.style.backgroundImage = StyleKeyword.Undefined;
-            }
-            else
-            {
-                GradientVisualElementHelper.UpdatePreviewToBackgroundImage(value, preview);
-            }
-        }
+        protected override void UpdatePreviewToBackgroundImage(Gradient currentValue, VisualElement element)
+            => GradientVisualElementHelper.UpdatePreviewToBackgroundImage(currentValue, element);
 
-        
-        public class GradientInput : VisualElement
+        public class GradientInput : VisualElement, IPreviewElement
         {
             public readonly VisualElement checkerBoard;
-            public readonly VisualElement preview;
+            public VisualElement Preview { get;  }
             
             public GradientInput()
             {
                 checkerBoard = new Checkerboard(CheckerboardTheme.Dark);
 
-                preview = new VisualElement()
+                Preview = new VisualElement()
                 {
                     style =
                     {
@@ -68,7 +49,7 @@ namespace RosettaUI.UIToolkit
                     }
                 };
                 
-                checkerBoard.Add(preview);
+                checkerBoard.Add(Preview);
                 Add(checkerBoard);
             }
         }

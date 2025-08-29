@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
-    public class ColorFieldBase : PreviewBaseField<Color, ColorFieldBase.ColorInput>
+    public class ColorFieldBase : PreviewFieldBase<Color, ColorFieldBase.ColorInput>
     {
         // ReSharper disable once InconsistentNaming
         // ReSharper disable once MemberCanBeProtected.Global

@@ -23,17 +23,6 @@ namespace RosettaUI.Builder
             dst.preWrapMode = src.preWrapMode;
         }
 
-        /// <summary>
-        /// WrapModeも含めたHashCodeの取得
-        /// 
-        /// 通常のAnimationCurve.GetHashCode()はKeyframeのみ参照してWrapModeを含まない
-        /// https://docs.unity3d.com/ScriptReference/AnimationCurve.GetHashCode.html
-        /// </summary>
-        public static int GetHashCodeWithWrapMode(this AnimationCurve curve)
-        {
-            return (curve, curve.preWrapMode, curve.postWrapMode).GetHashCode();
-        }
-
         public static Rect GetCurveRect(this AnimationCurve curve, int stepNum = 64)
         {
             if (curve == null)

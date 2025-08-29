@@ -10,7 +10,7 @@ namespace RosettaUI.UIToolkit
     [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public abstract class PreviewBaseField<T, TInput> : BaseField<T>
+    public abstract class PreviewFieldBase<TValue, TInput> : BaseField<TValue>
         where TInput : VisualElement
     {
         // ReSharper disable once ConvertToConstant.Global
@@ -20,7 +20,7 @@ namespace RosettaUI.UIToolkit
 
         protected readonly TInput inputField;
         
-        protected PreviewBaseField(string label, TInput visualInput) : base(label, visualInput)
+        protected PreviewFieldBase(string label, TInput visualInput) : base(label, visualInput)
         {
             AddToClassList(ussClassName);
             labelElement.AddToClassList(labelUssClassName);

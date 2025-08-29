@@ -9,7 +9,8 @@ namespace RosettaUI.UIToolkit
     /// Base class for image preview fields using BackgroundImage.
     /// Used in GradientField and AnimationCurveField.
     ///
-    /// 参照型の値は外部で変更出来てしまうのでコピーして保持し、SetValueWithoutNotify()で比較してから更新する
+    /// 参照型の値は外部で変更出来てしまうのでコピーして保持する
+    /// SetValueWithoutNotify()で比較してから更新する
     /// </summary>
     public abstract class ImagePreviewFieldBase<TValue, TInput> : PreviewFieldBase<TValue, TInput>
         where TValue : class, new()
@@ -38,9 +39,10 @@ namespace RosettaUI.UIToolkit
             
             _lastAppliedValue ??= new TValue();
             Copy(newValue, _lastAppliedValue);
-            UpdateTexture();
             
             base.SetValueWithoutNotify(newValue);
+            
+            UpdateTexture();
         }
 
         private void UpdateTexture()

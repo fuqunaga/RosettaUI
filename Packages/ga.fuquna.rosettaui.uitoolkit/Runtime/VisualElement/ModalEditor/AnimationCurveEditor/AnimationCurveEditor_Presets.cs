@@ -13,13 +13,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private const string PresetsContainerClassName = USSClassName + "__presets-container";
         private const string PopupButtonClassName = USSClassName + "__presets-popup-button";
         
-        private AnimationCurveEditorPresetSet _presetSet;
         private PresetsPreview _presetsPreview;
+        private PresetsPopup _presetsPopup;
+        
+        private SwatchPersistentService<AnimationCurve> PersistentService => _presetsPopup.PersistentService;
         
         private void InitPresetsUI()
         {
-            _presetSet = new AnimationCurveEditorPresetSet(SetCurveFromPreset);
-
+            _presetsPopup = new PresetsPopup(SetCurveFromPreset);
+            Add(_presetsPopup);
             
             var scrollView = this.Q<ScrollView>("presets-scroll-view");
             var container = new VisualElement();
@@ -28,19 +30,27 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             var popupButton = new VisualElement();
             popupButton.AddToClassList(PopupButtonClassName);
-            popupButton.RegisterCallback<PointerDownEvent>(evt => Debug.Log("PopupButton clicked"));
+            popupButton.RegisterCallback<PointerDownEvent>(OnPopupButtonPointerDown);
             
             container.Add(popupButton);
             
 
-            var persistentService = _presetSet.PersistentService;
-            
-            _presetsPreview = new PresetsPreview(persistentService, SetCurveFromPreset);
+            _presetsPreview = new PresetsPreview(PersistentService, SetCurveFromPreset);
             container.Add(_presetsPreview);
             
             RegisterCallback<AttachToPanelEvent>(OnAttachToPanel);
             return;
 
+            
+            void OnPopupButtonPointerDown(PointerDownEvent evt)
+            {
+                var rect = popupButton.layout;
+                var popupLeftBottom = new Vector2(rect.xMin, rect.yMax);
+                _presetsPopup.Show(popupLeftBottom);
+                
+                evt.StopPropagation();
+            }
+            
             
             void SetCurveFromPreset(AnimationCurve curve)
             {
@@ -60,7 +70,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         // 空の状態で保存されているケースとは異なるので注意
         private void OnAttachToPanel(AttachToPanelEvent evt)
         {
-            var persistentService = _presetSet.PersistentService;
+            var persistentService = PersistentService;
             if (!persistentService.HasSwatches)
             {
                 persistentService.SaveSwatches(AnimationCurveHelper.FactoryPresets.Select(curve => new Preset { Value = curve }));

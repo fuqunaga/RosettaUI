@@ -94,7 +94,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             AddToClassList(USSClassName);
             InitUI();
             
-            _curveController = new CurveController(_curvePreviewElement, (holder) => new ControlPoint(holder, _previewTransform, _controlPointDisplayPositionPopup, _controlPointEditPositionPopup, OnControlPointMoved));
+            var controlPointContainer = this.Q("control-point-container");
+            
+            _curveController = new CurveController(controlPointContainer, (holder) => new ControlPoint(holder, _previewTransform, _controlPointDisplayPositionPopup, _controlPointEditPositionPopup, OnControlPointMoved));
             _curveController.onCurveChanged += () =>
             {
                 UpdateView();

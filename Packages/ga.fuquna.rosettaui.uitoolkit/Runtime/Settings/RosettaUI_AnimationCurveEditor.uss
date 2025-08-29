@@ -1,67 +1,8 @@
 /********************************************************************************
 * Animation Curve Editor
 ********************************************************************************/
-.rosettaui-animation-curve-editor-fixed-size-area {
-    flex-shrink: 0;
-}
-
 .rosettaui-animation-curve-editor {
     flex-grow: 1;
-}
-
-.rosettaui-animation-curve-editor EnumField:disabled {
-    opacity: 0.5;
-}
-
-.rosettaui-animation-curve-editor .unity-base-field__label {
-    min-width: 100px;
-}
-
-.rosettaui-animation-curve-editor__curve-group {
-    flex-grow: 3;
-    flex-shrink: 1;
-    margin: 4px 8px;
-    padding: 0;
-}
-
-.rosettaui-animation-curve-editor__preview-background {
-    flex-grow: 1;
-    height: 100%;
-    margin-top: -8px;
-}
-
-.rosettaui-animation-curve-editor__preview-front {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-.rosettaui-animation-curve-editor__horizontal-scroller-container {
-    flex-direction: row;
-}
-
-.rosettaui-animation-curve-editor__horizontal-scroller-container > Scroller {
-    flex-grow: 1;
-}
-
-.rosettaui-animation-curve-editor__horizontal-scroller-container > VisualElement {
-    width: 12px;
-}
-
-.rosettaui-animation-curve-editor__vertical-axis-label-container {
-    position: absolute;
-    width: 50px;
-    height: 100%;
-    top: 0;
-    left: 0;
-}
-
-.rosettaui-animation-curve-editor__horizontal-axis-label-container {
-    position: absolute;
-    width: 100%;
-    height: 20px;
-    bottom: 0;
-    left: 0;
 }
 
 .rosettaui-animation-curve-editor__vertical-axis-label-container > Label,
@@ -70,33 +11,11 @@
     color: gray;
 }
 
-.rosettaui-animation-curve-editor__control-buttons-container {
-    position: absolute;
-    height: 26px;
-    top: 0;
-    left: 0;
-    right: 0;
-    margin: 4px;
-    flex-direction: row-reverse;
-    opacity: 0.6;
-}
-
-.rosettaui-animation-curve-editor__control-buttons-container > * {
+.rosettaui-animation-curve-editor__control-button {
     width: 26px;
     height: 26px;
     margin: 0 0 0 4px;
-}
-
-.rosettaui-animation-curve-editor__fit-button {
-    background-image: resource("animation-curve_fit");
-}
-
-.rosettaui-animation-curve-editor__snap-x-button {
-    background-image: resource("animation-curve_snap-x");
-}
-
-.rosettaui-animation-curve-editor__snap-y-button {
-    background-image: resource("animation-curve_snap-y");
+    opacity: 0.6;
 }
 
 .rosettaui-animation-curve-editor__control-point-display-position-popup {
@@ -110,46 +29,6 @@
 
 .rosettaui-animation-curve-editor__property-group {
     margin: 8px 4px 8px 4px;
-}
-
-.rosettaui-animation-curve-editor__time-value-row
-{
-    height: 22px;
-    flex-direction: row;
-    flex-wrap: wrap;
-}
-
-.rosettaui-animation-curve-editor__time-value-row > FloatField
-{
-    flex-basis: 100px;
-}
-
-.rosettaui-animation-curve-editor__time-value-row .unity-base-field__label
-{
-    min-width: 50px;
-}
-
-.rosettaui-animation-curve-editor__time-value-row > EnumField
-{
-    min-width: 189.5px;
-    max-width: 100%;
-}
-
-.rosettaui-animation-curve-editor__field-row {
-    width: 100%;
-    height: 22px;
-    flex-direction: row;
-    flex-grow: 1;
-    padding: 0;
-    margin: 0 4px 0 0;
-}
-
-.rosettaui-animation-curve-editor__field-row > EnumField {
-    width: 120px;
-}
-
-.rosettaui-animation-curve-editor__field-row > ToggleButton {
-    margin-right: 4px;
 }
 
 /********************************************************************************
@@ -239,7 +118,15 @@
 /********************************************************************************
 * Presets
 ********************************************************************************/
+.rosettaui-animation-curve-editor__presets-container {
+    flex-direction: row;
+    flex-shrink: 0;
+    align-items: center;
+    margin: 6px 4px 0;
+}
+
 .rosettaui-animation-curve-editor__presets-popup-button {
+    flex-shrink: 0;
     width: 12px;
     height: 12px;
     background-image: url("../Images/MaterialSymbols/settings.png");
@@ -247,14 +134,9 @@
     margin: 4px;
 }
 
-.rosettaui-animation-curve-editor__presets-container {
-    flex-direction: row;
-    align-items: center;
-    margin: 6px 4px 0;
-}
-
 .rosettaui-animation-curve-editor__presets-preview {
     flex-direction: row;
+    flex-shrink: 0;
 }
 
 .rosettaui-animation-curve-editor-preset__tile

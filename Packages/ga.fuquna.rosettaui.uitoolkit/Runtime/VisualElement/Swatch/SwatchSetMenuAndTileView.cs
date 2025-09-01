@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Swatch;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
@@ -15,7 +16,9 @@ namespace RosettaUI.UIToolkit
     public static class SwatchSet
     {
         public const string UssClassName = "rosettaui-swatchset";
-        public const string TileScrollViewUssClassName = UssClassName + "__tile-scroll-view";
+        public const string TileContainerClassName = UssClassName + "__tile-container";
+        public const string TileContainerGridClassName = TileContainerClassName + "--grid";
+        public const string TileContainerListClassName = TileContainerClassName + "--list";
     }
     
     public class SwatchSetMenuAndTileView<TValue, TSwatch>
@@ -23,11 +26,12 @@ namespace RosettaUI.UIToolkit
     {
         private const string PersistantKeyLayout = "Layout";
         
-        private readonly VisualElement _swatchSetMenu;
+        private readonly VisualElement _menuButton;
         private readonly ScrollView _tileScrollView;
         private readonly SwatchBase<TValue> _currentSwatch;
         private readonly Action<TValue> _applyValueFunc; 
-
+        private readonly Func<IEnumerable<IMenuItem>> _createAdditionalMenuItems;
+        
         private TileLayout _tileLayout;
         
         public SwatchPersistentService<TValue> PersistentService { get; }
@@ -44,7 +48,9 @@ namespace RosettaUI.UIToolkit
             set
             {
                 _tileLayout = value;
-                _tileScrollView.mode = _tileLayout == TileLayout.Grid ? ScrollViewMode.Horizontal : ScrollViewMode.Vertical;
+                _tileScrollView.mode = value == TileLayout.Grid ? ScrollViewMode.Horizontal : ScrollViewMode.Vertical;
+                _tileScrollView.contentContainer.EnableInClassList(SwatchSet.TileContainerGridClassName, value == TileLayout.Grid);
+                _tileScrollView.contentContainer.EnableInClassList(SwatchSet.TileContainerListClassName, value == TileLayout.List);
                 
                 UpdateSwatchesEnableText();
                 
@@ -52,23 +58,32 @@ namespace RosettaUI.UIToolkit
             }
         }
 
+        public SwatchSetMenuAndTileView(VisualElement menuParent, VisualElement tileScrollViewParent,
+            Action<TValue> applyValueFunc, string dataKeyPrefix,
+            Func<IEnumerable<IMenuItem>> createAdditionalMenuItems = null) : this(menuParent, tileScrollViewParent, applyValueFunc, new SwatchPersistentService<TValue>(dataKeyPrefix), createAdditionalMenuItems)
+        {
+        }
 
-        public SwatchSetMenuAndTileView(VisualElement menuParent, VisualElement tileScrollViewParent,  Action<TValue> applyValueFunc, string dataKeyPrefix)
+        public SwatchSetMenuAndTileView(VisualElement menuParent, VisualElement tileScrollViewParent,
+            Action<TValue> applyValueFunc, SwatchPersistentService<TValue> persistentService,
+            Func<IEnumerable<IMenuItem>> createAdditionalMenuItems = null)
         {
             _applyValueFunc = applyValueFunc;
-            PersistentService = new SwatchPersistentService<TValue>(dataKeyPrefix);
+            _createAdditionalMenuItems = createAdditionalMenuItems;
+            PersistentService = persistentService;
             
-            _swatchSetMenu = CreateSwatchSetMenu();
-            SetMenuVisible(false);
+            _menuButton = CreateMenuButton();
+            SetMenuButtonVisible(false);
 
-            menuParent.Add(_swatchSetMenu);
+            menuParent.Add(_menuButton);
             
             _tileScrollView = new ScrollView()
             {
+                mode = ScrollViewMode.Vertical,
                 horizontalScrollerVisibility = ScrollerVisibility.Hidden,
             };
             
-            _tileScrollView.AddToClassList(SwatchSet.TileScrollViewUssClassName);
+            _tileScrollView.contentContainer.AddToClassList(SwatchSet.TileContainerClassName);
             
             
             _currentSwatch = new TSwatch { IsCurrent = true };
@@ -80,27 +95,6 @@ namespace RosettaUI.UIToolkit
             LoadSwatches();
             LoadStatus();
         }
-
-        private VisualElement CreateSwatchSetMenu()
-        {
-            return new MoreVertMenuButton()
-            {
-                ButtonIndex = 0,
-                CreateMenuItems = () => new[]
-                {
-                    CreateTileLayoutItem(TileLayout.Grid),
-                    CreateTileLayoutItem(TileLayout.List)
-                }
-            };
-            
-            MenuItem CreateTileLayoutItem(TileLayout tileLayout)
-            {
-                return new MenuItem(tileLayout.ToString(), () => Layout = tileLayout)
-                {
-                    isChecked = Layout == tileLayout
-                };
-            }
-        }
         
         
         public void LoadStatus()
@@ -111,11 +105,46 @@ namespace RosettaUI.UIToolkit
         
         public void SetValue(TValue currentValue) => _currentSwatch.Value = currentValue;
 
-        public void SetMenuVisible(bool v)
+        public void SetMenuButtonVisible(bool v)
         {
-            _swatchSetMenu.style.display = v ? DisplayStyle.Flex : DisplayStyle.None;
-        } 
+            _menuButton.style.display = v ? DisplayStyle.Flex : DisplayStyle.None;
+        }
 
+        public void ResetView()
+        {
+            _tileScrollView.Clear();
+            LoadSwatches();
+        }
+
+
+        private VisualElement CreateMenuButton()
+        {
+            return new MoreVertMenuButton()
+            {
+                ButtonIndex = 0,
+                CreateMenuItems = CreateMenuItems
+            };
+
+            IEnumerable<IMenuItem> CreateMenuItems()
+            {
+                var menuItems = new[]
+                {
+                    CreateLayoutMenuItem(TileLayout.Grid),
+                    CreateLayoutMenuItem(TileLayout.List)
+                };
+                
+                return menuItems.Concat(_createAdditionalMenuItems?.Invoke() ?? Array.Empty<IMenuItem>());
+            }
+            
+            MenuItem CreateLayoutMenuItem(TileLayout tileLayout)
+            {
+                return new MenuItem(tileLayout.ToString(), () => Layout = tileLayout)
+                {
+                    isChecked = Layout == tileLayout
+                };
+            }
+        }
+        
         private void OnCurrentSwatchPointerDown(PointerDownEvent evt)
         {
             var newSwatch = AddSwatch(_currentSwatch.Value);
@@ -187,7 +216,10 @@ namespace RosettaUI.UIToolkit
             
             swatch.RegisterCallback<PointerDownEvent>(OnSwatchPointerDown);
             swatch.EnableText = IsSwatchDisplayLabel;
-            _tileScrollView.Insert(_tileScrollView.childCount - 1, swatch);
+            
+            // 最後はCurrentSwatchなので、その一つ前に追加
+            var prevLastIndex = Mathf.Max(0, _tileScrollView.childCount - 1);
+            _tileScrollView.Insert(prevLastIndex, swatch);
 
             return swatch;
         }

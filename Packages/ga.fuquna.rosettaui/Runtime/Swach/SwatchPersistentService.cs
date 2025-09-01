@@ -31,7 +31,7 @@ namespace RosettaUI.Swatch
             onSaveSwatches?.Invoke();
         }
         
-        public IEnumerable<NameAndValue<TValue>> LoadSwatches()
+        public virtual IEnumerable<NameAndValue<TValue>> LoadSwatches()
         {
             return PersistentData.Get<List<NameAndValue<TValue>>>(KeySwatches);
         }

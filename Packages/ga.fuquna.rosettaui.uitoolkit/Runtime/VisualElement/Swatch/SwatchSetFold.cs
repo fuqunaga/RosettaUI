@@ -43,7 +43,7 @@ namespace RosettaUI.UIToolkit
 
         public void SetValue(TValue currentValue) => _swatchSetMenuAndTileView.SetValue(currentValue);
 
-        private void SetMenuVisible(bool v) => _swatchSetMenuAndTileView.SetMenuVisible(v);
+        private void SetMenuVisible(bool v) => _swatchSetMenuAndTileView.SetMenuButtonVisible(v);
         
         private void OnValueChanged(ChangeEvent<bool> evt)
         {

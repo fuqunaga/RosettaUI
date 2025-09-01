@@ -139,10 +139,20 @@
     flex-shrink: 0;
 }
 
-.rosettaui-animation-curve-editor-preset__tile
-{
+.rosettaui-animation-curve-editor-preset__tile {
     width: 40px;
     height: 25px;
     margin: 1px 2px;
     background-color: var(--rosettaui-color-animation-curve-background);
+}
+
+.rosettaui-animation-curve-editor__presets-popup {
+    width: 260px;
+    height: 300px;
+    padding: 2px;
+    background-color: var(--rosettaui-color-window-background);
+}
+
+.rosettaui-animation-curve-editor__presets-popup .rosettaui-animation-curve-editor-preset__tile {
+    width: 120px;
 }

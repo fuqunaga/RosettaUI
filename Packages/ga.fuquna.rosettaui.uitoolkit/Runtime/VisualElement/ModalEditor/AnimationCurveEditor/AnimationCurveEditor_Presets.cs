@@ -14,14 +14,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private const string PresetsContainerClassName = USSClassName + "__presets-container";
         private const string PopupButtonClassName = USSClassName + "__presets-popup-button";
         
-        private PresetsPreview _presetsPreview;
         private PresetsPopup _presetsPopup;
+        private PresetsPreview _presetsPreview;
         
-        private SwatchPersistentService<AnimationCurve> PersistentService => _presetsPopup.PersistentService;
         
         private void InitPresetsUI()
         {
             _presetsPopup = new PresetsPopup(SetCurveFromPreset);
+            _presetsPopup.RegisterCallback<AttachToPanelEvent>(_ => _presetsPopup.Hide());
             Add(_presetsPopup);
             
             var scrollView = this.Q<ScrollView>("presets-scroll-view");
@@ -36,10 +36,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             container.Add(popupButton);
             
 
-            _presetsPreview = new PresetsPreview(PersistentService, SetCurveFromPreset);
+            _presetsPreview = new PresetsPreview(_presetsPopup.PersistentService, SetCurveFromPreset);
             container.Add(_presetsPreview);
             
-            RegisterCallback<AttachToPanelEvent>(OnAttachToPanel);
             return;
 
             
@@ -64,17 +63,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 UnselectAllControlPoint();
                 UpdateView();
                 NotifyEditorValueChanged();
-            }
-        }
-
-        // 表示時にプリセットがなかったらデフォルトプリセットを保存しておく
-        // 空の状態で保存されているケースとは異なるので注意
-        private void OnAttachToPanel(AttachToPanelEvent evt)
-        {
-            var persistentService = PersistentService;
-            if (!persistentService.HasSwatches)
-            {
-                persistentService.SaveSwatches(AnimationCurveHelper.FactoryPresets.Select(curve => new NameAndValue<AnimationCurve> { value = curve }));
             }
         }
     }

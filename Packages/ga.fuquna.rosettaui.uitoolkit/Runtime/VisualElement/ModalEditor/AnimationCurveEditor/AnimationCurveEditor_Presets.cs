@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using RosettaUI.Builder;
+using RosettaUI.Swatch;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -73,7 +74,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var persistentService = PersistentService;
             if (!persistentService.HasSwatches)
             {
-                persistentService.SaveSwatches(AnimationCurveHelper.FactoryPresets.Select(curve => new Preset { Value = curve }));
+                persistentService.SaveSwatches(AnimationCurveHelper.FactoryPresets.Select(curve => new NameAndValue<AnimationCurve> { value = curve }));
             }
         }
     }

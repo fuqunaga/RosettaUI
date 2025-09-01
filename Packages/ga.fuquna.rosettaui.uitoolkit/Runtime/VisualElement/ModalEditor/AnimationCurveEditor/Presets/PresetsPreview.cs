@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using RosettaUI.Swatch;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -43,7 +43,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             // remove all children
             Clear();
 
-            var nameAndValues = _persistentService.LoadSwatches() ?? Array.Empty<SwatchPersistentService<AnimationCurve>.NameAndValue>();
+            var nameAndValues = _persistentService.LoadSwatches() ?? Array.Empty<NameAndValue<AnimationCurve>>();
             
             foreach (var nameAndValue in nameAndValues)
             {

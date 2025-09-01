@@ -1,23 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine.Pool;
 
-namespace RosettaUI.UIToolkit
+namespace RosettaUI.Swatch
 {
     /// <summary>
     /// Swatchのセーブロード
     /// </summary>
     public class SwatchPersistentService<TValue>
     {
-        [Serializable]
-        public struct NameAndValue
-        {
-            public string name;
-            public TValue value;
-        }
-
-
         public event Action onSaveSwatches;
         
         private readonly string _keyPrefix;
@@ -29,19 +20,10 @@ namespace RosettaUI.UIToolkit
         
         public SwatchPersistentService(string keyPrefix) => _keyPrefix = keyPrefix;
 
-        
-        public void SaveSwatches(IEnumerable<SwatchBase<TValue>> swatches)
-        {
-            SaveSwatches(swatches.Select(swatch => new NameAndValue()
-            {
-                name = swatch.Label,
-                value = swatch.Value
-            }));
-        }
 
-        public void SaveSwatches(IEnumerable<NameAndValue> nameAndValueEnumerable)
+        public void SaveSwatches(IEnumerable<NameAndValue<TValue>> nameAndValueEnumerable)
         {
-            using var _ = ListPool<NameAndValue>.Get(out var nameAndValues);
+            using var _ = ListPool<NameAndValue<TValue>>.Get(out var nameAndValues);
             nameAndValues.AddRange(nameAndValueEnumerable);
             
             PersistentData.Set(KeySwatches, nameAndValues);
@@ -49,9 +31,9 @@ namespace RosettaUI.UIToolkit
             onSaveSwatches?.Invoke();
         }
         
-        public IEnumerable<NameAndValue> LoadSwatches()
+        public IEnumerable<NameAndValue<TValue>> LoadSwatches()
         {
-            return PersistentData.Get<List<NameAndValue>>(KeySwatches);
+            return PersistentData.Get<List<NameAndValue<TValue>>>(KeySwatches);
         }
         
         /// <summary>

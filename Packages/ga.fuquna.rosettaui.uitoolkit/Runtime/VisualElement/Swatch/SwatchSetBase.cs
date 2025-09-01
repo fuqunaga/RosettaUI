@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RosettaUI.Swatch;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
@@ -13,14 +14,7 @@ namespace RosettaUI.UIToolkit
             Grid,
             List
         }
-        
-        [Serializable]
-        public struct NameAndValue
-        {
-            public string name;
-            public TValue value;
-        }
-        
+
         public const string UssClassName = "rosettaui-swatchset";
         public const string TileScrollViewUssClassName = UssClassName + "__tile-scroll-view";
 
@@ -246,7 +240,11 @@ namespace RosettaUI.UIToolkit
         
         private void SaveSwatches()
         {
-            PersistentService.SaveSwatches(Swatches);
+            PersistentService.SaveSwatches(Swatches.Select(s => new NameAndValue<TValue>
+            {
+                name = s.Label,
+                value = s.Value
+            }));
         }
         
         private void LoadSwatches()

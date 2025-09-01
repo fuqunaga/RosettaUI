@@ -46,7 +46,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             {
                 var rect = popupButton.layout;
                 var popupLeftBottom = new Vector2(rect.xMin, rect.yMax);
-                _presetsPopup.Show(popupLeftBottom);
+                
+                _presetsPopup.Show(popupLeftBottom, _curveController.Curve);
                 
                 evt.StopPropagation();
             }

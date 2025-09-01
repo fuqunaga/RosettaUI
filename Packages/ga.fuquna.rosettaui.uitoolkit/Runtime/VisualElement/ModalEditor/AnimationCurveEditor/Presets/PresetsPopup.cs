@@ -53,8 +53,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
 
-        public void Show(Vector2 leftBottom)
+        public void Show(Vector2 leftBottom, AnimationCurve currentCurve)
         {
+            _swatchSetMenuAndTileView.SetValue(currentCurve);
+            
             var st = _root.style;
             st.left = leftBottom.x;
             st.bottom = leftBottom.y;

@@ -1,5 +1,4 @@
-﻿using System;
-using RosettaUI.Builder;
+﻿using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -19,17 +18,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             set
             {
                 AnimationCurveHelper.Copy(value, _curve);
-                UpdatePreviewUntilSuccess(null);
-                return;
-
-                void UpdatePreviewUntilSuccess(GeometryChangedEvent evt)
-                {
-                    var success = AnimationCurveVisualElementHelper.UpdatePreviewToBackgroundImage(_curve, _curveElement, Color.white);
-                    if (!success)
-                    {
-                        RegisterCallbackOnce<GeometryChangedEvent>(UpdatePreviewUntilSuccess);
-                    }
-                }
+                UpdatePreviewImage();
             } 
         }
 
@@ -39,6 +28,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _curveElement.AddToClassList(TileClassName);
             
             SetTileElement(_curveElement);
+            
+            RegisterCallback<GeometryChangedEvent>(_ => UpdatePreviewImage());
+        }
+
+        private void UpdatePreviewImage()
+        {
+            AnimationCurveVisualElementHelper.UpdatePreviewToBackgroundImage(_curve, _curveElement, Color.white);
         }
     }
 }

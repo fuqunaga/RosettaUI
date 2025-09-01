@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
 namespace RosettaUI.UIToolkit
 {
-    public class ColorPickerSwatchSet : SwatchSetBase<Color, ColorPickerSwatch>
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    public class ColorPickerSwatchSet : SwatchSetFold<Color, ColorPickerSwatch>
     {
-        public new const string UssClassName = "rosettaui-colorpicker-swatchset";
+        public const string UssClassName = "rosettaui-colorpicker-swatchset";
         public const string KeyPrefix = "RosettaUI-ColorPickerSwatchSet";
         
         public ColorPickerSwatchSet(Action<Color> applyValueFunc) : base("Swatches", applyValueFunc, KeyPrefix)

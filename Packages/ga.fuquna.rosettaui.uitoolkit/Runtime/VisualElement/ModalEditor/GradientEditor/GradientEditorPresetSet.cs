@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace RosettaUI.UIToolkit
 {
-    public class GradientEditorPresetSet : SwatchSetBase<Gradient, GradientEditorPreset>
+    public class GradientEditorPresetSet : SwatchSetFold<Gradient, GradientEditorPreset>
     {
         public const string KeyPrefix = "RosettaUI-GradientEditorPresetSet";
         

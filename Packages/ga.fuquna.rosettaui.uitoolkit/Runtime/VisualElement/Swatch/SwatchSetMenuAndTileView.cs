@@ -5,21 +5,23 @@ using RosettaUI.Swatch;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
-{
-    public abstract class SwatchSetBase<TValue, TSwatch> : Foldout
-        where TSwatch : SwatchBase<TValue>, new()
+{  
+    public enum TileLayout
     {
-        public enum TileLayout
-        {
-            Grid,
-            List
-        }
+        Grid,
+        List
+    }
 
+    public static class SwatchSet
+    {
         public const string UssClassName = "rosettaui-swatchset";
         public const string TileScrollViewUssClassName = UssClassName + "__tile-scroll-view";
-
+    }
+    
+    public class SwatchSetMenuAndTileView<TValue, TSwatch>
+        where TSwatch : SwatchBase<TValue>, new()
+    {
         private const string PersistantKeyLayout = "Layout";
-        private const string PersistantKeyIsOpen = "IsOpen";
         
         private readonly VisualElement _swatchSetMenu;
         private readonly ScrollView _tileScrollView;
@@ -51,49 +53,32 @@ namespace RosettaUI.UIToolkit
         }
 
 
-        protected SwatchSetBase(string label, Action<TValue> applyValueFunc, string dataKeyPrefix)
+        public SwatchSetMenuAndTileView(VisualElement menuParent, VisualElement tileScrollViewParent,  Action<TValue> applyValueFunc, string dataKeyPrefix)
         {
             _applyValueFunc = applyValueFunc;
-            
-            text = label;
-            
-            AddToClassList(UssClassName);
-
             PersistentService = new SwatchPersistentService<TValue>(dataKeyPrefix);
             
             _swatchSetMenu = CreateSwatchSetMenu();
-            var toggle = this.Q<Toggle>();
-            toggle.Add(_swatchSetMenu);
-
-            value = false;
             SetMenuVisible(false);
-            this.RegisterValueChangedCallback(OnValueChanged);
 
-
+            menuParent.Add(_swatchSetMenu);
+            
             _tileScrollView = new ScrollView()
             {
                 horizontalScrollerVisibility = ScrollerVisibility.Hidden,
             };
             
-            _tileScrollView.AddToClassList(TileScrollViewUssClassName);
+            _tileScrollView.AddToClassList(SwatchSet.TileScrollViewUssClassName);
             
             
             _currentSwatch = new TSwatch { IsCurrent = true };
             _currentSwatch.RegisterCallback<PointerDownEvent>(OnCurrentSwatchPointerDown);
             
             _tileScrollView.Add(_currentSwatch);
-            Add(_tileScrollView);
-
+            tileScrollViewParent.Add(_tileScrollView);
             
             LoadSwatches();
-            
-            // すぐにLoadStatusしてSwatchSetが
-            // ・Foldがオープン
-            // ・TileLayoutがList
-            // ・Swatchの名前が長い
-            // 場合、自動レイアウトでColorPickerのWindow自体が広がってしまうので
-            // レイアウト確定後にLoadStatusする
-            schedule.Execute(LoadStatus).ExecuteLater(32);
+            LoadStatus();
         }
 
         private VisualElement CreateSwatchSetMenu()
@@ -118,30 +103,18 @@ namespace RosettaUI.UIToolkit
         }
         
         
-        private void LoadStatus()
+        public void LoadStatus()
         {
-            var isOpen = PersistentService.Get<bool>(PersistantKeyIsOpen);
-            value = isOpen;
-            
             Layout = (TileLayout)PersistentService.Get<int>(PersistantKeyLayout);
         }
    
         
         public void SetValue(TValue currentValue) => _currentSwatch.Value = currentValue;
 
-        private void SetMenuVisible(bool v)
+        public void SetMenuVisible(bool v)
         {
             _swatchSetMenu.style.display = v ? DisplayStyle.Flex : DisplayStyle.None;
         } 
-        
-        private void OnValueChanged(ChangeEvent<bool> evt)
-        {
-            var isOpen = evt.newValue;
-            SetMenuVisible(isOpen);
-            
-            PersistentService.Set(PersistantKeyIsOpen, isOpen);
-        }
-
 
         private void OnCurrentSwatchPointerDown(PointerDownEvent evt)
         {
@@ -188,7 +161,7 @@ namespace RosettaUI.UIToolkit
                 }
                 
                 // "Move To First"が途中までしか表示されないのでスペースとダミー文字で文字数を増やす @Unity6000.0.2f1
-                yield return new MenuItem("Move To First <size=0>a</size>", () => MoveToFirstSwatch(swatch));
+                yield return new MenuItem("Move To First", () => MoveToFirstSwatch(swatch));
             }
         }
         

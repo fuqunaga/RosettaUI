@@ -3,14 +3,12 @@ using UnityEngine;
 
 namespace RosettaUI.UIToolkit
 {
-    public class GradientEditorPresetSet : SwatchSetBase<Gradient, GradientEditorPreset>
+    public class GradientEditorPresetSet : SwatchSetFold<Gradient, GradientEditorPreset>
     {
         public const string KeyPrefix = "RosettaUI-GradientEditorPresetSet";
         
-        public GradientEditorPresetSet(Action<Gradient> applyValueFunc) : base("Presets", applyValueFunc)
+        public GradientEditorPresetSet(Action<Gradient> applyValueFunc) : base("Presets", applyValueFunc, KeyPrefix)
         {
         }
-
-        protected override string DataKeyPrefix => KeyPrefix;
     }
 }

@@ -79,6 +79,8 @@ namespace RosettaUI.Builder
                 for (var i = 0; i < 2; ++i)
                 {
                     var t = i == 0 ? t1 : t2;
+                    if (t is < 0 or > 1) continue;
+                    
                     var y = CubicBezierY(p0.y, p1.y, p2.y, p3.y, t);
                     minMaxY.min = Mathf.Min(minMaxY.min, y);
                     minMaxY.max = Mathf.Max(minMaxY.max, y);

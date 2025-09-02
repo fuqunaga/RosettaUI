@@ -146,7 +146,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             for (var i = 0; i < Curve.keys.Length; i++)
             {
-                var key = Curve.keys[i];
                 var controlPoint = CreateControlPoint(i);
                 controlPoint.SetKeyBroken(Curve.GetKeyBroken(i), false);
                 controlPoint.SetInTangentMode(Curve.GetInTangentMode(i), false);

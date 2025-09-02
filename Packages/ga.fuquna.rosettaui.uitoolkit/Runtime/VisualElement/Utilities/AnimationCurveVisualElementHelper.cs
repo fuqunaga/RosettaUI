@@ -9,10 +9,29 @@ namespace RosettaUI.UIToolkit
     {
         private static readonly HashSet<VisualElement> TextureAttachedElements = new();
 
-        public static void UpdatePreviewToBackgroundImage(
+
+        public static bool UpdatePreviewToBackgroundImage(
             AnimationCurve curve,
             VisualElement visualElement,
-            AnimationCurvePreviewRenderer.CurvePreviewViewInfo? viewInfoOrNull = null
+            Color? lineColor = null
+        )
+        {
+            var rect = curve.GetCurveRect();
+            rect = AnimationCurveHelper.AdjustCurveRectHeightLikeInspector(rect);
+
+            var viewInfo = new AnimationCurvePreviewRenderer.CurvePreviewViewInfo
+            {
+                offsetZoom = new Vector4(rect.xMin, rect.yMin, 1f / rect.width, 1f / rect.height),
+                lineColor = lineColor
+            };
+
+            return UpdatePreviewToBackgroundImage(curve, visualElement, viewInfo);
+        }
+        
+        public static bool UpdatePreviewToBackgroundImage(
+            AnimationCurve curve,
+            VisualElement visualElement,
+            in AnimationCurvePreviewRenderer.CurvePreviewViewInfo viewInfo
         )
         {
             var width = Mathf.CeilToInt(visualElement.CalcWidthPixelOnScreen());
@@ -20,20 +39,8 @@ namespace RosettaUI.UIToolkit
                 
             if (width <= 0 || height <= 0)
             {
-                return;
+                return false;
             }
-
-            if (viewInfoOrNull is not {} viewInfo)
-            {
-                var rect = curve.GetCurveRect();
-                rect = AnimationCurveHelper.AdjustCurveRectHeightLikeInspector(rect);
-
-                viewInfo = new AnimationCurvePreviewRenderer.CurvePreviewViewInfo
-                {
-                    offsetZoom = new Vector4(rect.xMin, rect.yMin, 1f / rect.width, 1f / rect.height)
-                };
-            }
-
 
             var renderTexture = visualElement.resolvedStyle.backgroundImage.renderTexture;
             
@@ -52,7 +59,7 @@ namespace RosettaUI.UIToolkit
                 }
             }
 
-            return;
+            return true;
             
             static void ReleaseAttachedTexture(VisualElement element)
             {

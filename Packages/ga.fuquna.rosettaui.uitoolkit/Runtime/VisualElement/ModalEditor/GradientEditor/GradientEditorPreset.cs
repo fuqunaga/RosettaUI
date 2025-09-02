@@ -43,10 +43,9 @@ namespace RosettaUI.UIToolkit
             
             checkerboardElement.Add(_gradientElement);
             coreElement.Add(checkerboardElement);
-            
             tileElement.Add(coreElement);
             
-            SetTileElement(tileElement);
+            SetTileElement(tileElement, "New");
         }
     }
 }

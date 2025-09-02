@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -5,6 +6,24 @@ namespace RosettaUI.Builder
 {
     public static class AnimationCurveHelper 
     {
+        private static List<AnimationCurve> _factoryPresets;
+
+        public static IReadOnlyList<AnimationCurve> FactoryPresets
+        {
+            get
+            {
+                return _factoryPresets ??= new List<AnimationCurve>
+                {
+                    AnimationCurve.Constant(0f, 1f, 1f),
+                    AnimationCurve.Linear(0f, 0f, 1f, 1f),
+                    new(new Keyframe(0f, 0f, 0f, 0f), new Keyframe(1f, 1f, 2f, 0f)),
+                    new(new Keyframe(0f, 0f, 0f, 2f), new Keyframe(1f, 1f, 0f, 0f)),
+                    AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
+                };
+            }
+        }
+
+
         // AnimationCurve.CopyFrom()だと次のエラーになる場合があるので自前コピー
         // @Unity6000.0.55f1
         // > vector: assign data may not be data from the vector itself.
@@ -23,7 +42,7 @@ namespace RosettaUI.Builder
             dst.preWrapMode = src.preWrapMode;
         }
 
-        public static Rect GetCurveRect(this AnimationCurve curve, int stepNum = 64)
+        public static Rect GetCurveRect(this AnimationCurve curve)
         {
             if (curve == null)
             {

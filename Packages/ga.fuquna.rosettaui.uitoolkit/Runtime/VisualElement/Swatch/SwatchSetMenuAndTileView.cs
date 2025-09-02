@@ -1,46 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.Pool;
+using RosettaUI.Swatch;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
-{
-    public abstract class SwatchSetBase<TValue, TSwatch> : Foldout
+{  
+    public enum TileLayout
+    {
+        Grid,
+        List
+    }
+
+    public static class SwatchSet
+    {
+        public const string UssClassName = "rosettaui-swatchset";
+        public const string TileContainerClassName = UssClassName + "__tile-container";
+        public const string TileContainerGridClassName = TileContainerClassName + "--grid";
+        public const string TileContainerListClassName = TileContainerClassName + "--list";
+    }
+    
+    public class SwatchSetMenuAndTileView<TValue, TSwatch>
         where TSwatch : SwatchBase<TValue>, new()
     {
-        public enum TileLayout
-        {
-            Grid,
-            List
-        }
+        private const string PersistantKeyLayout = "Layout";
         
-        [Serializable]
-        public struct NameAndValue
-        {
-            public string name;
-            public TValue value;
-        }
-        
-        public const string UssClassName = "rosettaui-swatchset";
-        public const string TileScrollViewUssClassName = UssClassName + "__tile-scroll-view";
-        
-        private readonly VisualElement _swatchSetMenu;
+        private readonly VisualElement _menuButton;
         private readonly ScrollView _tileScrollView;
         private readonly SwatchBase<TValue> _currentSwatch;
         private readonly Action<TValue> _applyValueFunc; 
-
+        private readonly Func<IEnumerable<IMenuItem>> _createAdditionalMenuItems;
+        
         private TileLayout _tileLayout;
         
-        
-        protected abstract string DataKeyPrefix { get; }
-        protected virtual string DataKeyLayout => $"{DataKeyPrefix}-Layout";
-        protected virtual string DataKeyIsOpen => $"{DataKeyPrefix}-IsOpen";
-        protected virtual string DataKeySwatches => $"{DataKeyPrefix}-Swatches";
+        public SwatchPersistentService<TValue> PersistentService { get; }
         
         private bool IsSwatchDisplayLabel => Layout == TileLayout.List;
         private IEnumerable<SwatchBase<TValue>> SwatchesWithCurrent => _tileScrollView.Children().Select(v => v as SwatchBase<TValue>);
         private IEnumerable<SwatchBase<TValue>> Swatches => SwatchesWithCurrent.Where(s => s != _currentSwatch);
+
         
         public TileLayout Layout
         {
@@ -49,70 +48,86 @@ namespace RosettaUI.UIToolkit
             set
             {
                 _tileLayout = value;
-                _tileScrollView.mode = _tileLayout == TileLayout.Grid ? ScrollViewMode.Horizontal : ScrollViewMode.Vertical;
+                _tileScrollView.mode = value == TileLayout.Grid ? ScrollViewMode.Horizontal : ScrollViewMode.Vertical;
+                _tileScrollView.contentContainer.EnableInClassList(SwatchSet.TileContainerGridClassName, value == TileLayout.Grid);
+                _tileScrollView.contentContainer.EnableInClassList(SwatchSet.TileContainerListClassName, value == TileLayout.List);
                 
                 UpdateSwatchesEnableText();
                 
-                PersistentData.Set(DataKeyLayout, (int)value);
+                PersistentService.Set(PersistantKeyLayout, (int)value);
             }
         }
 
+        public SwatchSetMenuAndTileView(VisualElement menuParent, VisualElement tileScrollViewParent,
+            Action<TValue> applyValueFunc, string dataKeyPrefix,
+            Func<IEnumerable<IMenuItem>> createAdditionalMenuItems = null) : this(menuParent, tileScrollViewParent, applyValueFunc, new SwatchPersistentService<TValue>(dataKeyPrefix), createAdditionalMenuItems)
+        {
+        }
 
-        protected SwatchSetBase(string label, Action<TValue> applyValueFunc)
+        public SwatchSetMenuAndTileView(VisualElement menuParent, VisualElement tileScrollViewParent,
+            Action<TValue> applyValueFunc, SwatchPersistentService<TValue> persistentService,
+            Func<IEnumerable<IMenuItem>> createAdditionalMenuItems = null)
         {
             _applyValueFunc = applyValueFunc;
-            text = label;
+            _createAdditionalMenuItems = createAdditionalMenuItems;
+            PersistentService = persistentService;
             
-            AddToClassList(UssClassName);
+            _menuButton = CreateMenuButton();
+            SetMenuButtonVisible(false);
 
-            _swatchSetMenu = CreateSwatchSetMenu();
-            var toggle = this.Q<Toggle>();
-            toggle.Add(_swatchSetMenu);
-
-            value = false;
-            SetMenuVisible(false);
-            this.RegisterValueChangedCallback(OnValueChanged);
-
-
+            menuParent.Add(_menuButton);
+            
             _tileScrollView = new ScrollView()
             {
+                mode = ScrollViewMode.Vertical,
                 horizontalScrollerVisibility = ScrollerVisibility.Hidden,
             };
             
-            _tileScrollView.AddToClassList(TileScrollViewUssClassName);
+            _tileScrollView.contentContainer.AddToClassList(SwatchSet.TileContainerClassName);
             
             
             _currentSwatch = new TSwatch { IsCurrent = true };
             _currentSwatch.RegisterCallback<PointerDownEvent>(OnCurrentSwatchPointerDown);
             
-            _tileScrollView.Add(_currentSwatch);
-            Add(_tileScrollView);
+            tileScrollViewParent.Add(_tileScrollView);
 
-            
+            LoadStatus();
             LoadSwatches();
-            
-            // すぐにLoadStatusしてSwatchSetが
-            // ・Foldがオープン
-            // ・TileLayoutがList
-            // ・Swatchの名前が長い
-            // 場合、自動レイアウトでColorPickerのWindow自体が広がってしまうので
-            // レイアウト確定後にLoadStatusする
-            schedule.Execute(LoadStatus).ExecuteLater(32);
+        }
+        
+        
+        public void LoadStatus()
+        {
+            Layout = (TileLayout)PersistentService.Get<int>(PersistantKeyLayout);
+        }
+        
+        public void SetValue(TValue currentValue) => _currentSwatch.Value = currentValue;
+
+        public void SetMenuButtonVisible(bool v)
+        {
+            _menuButton.style.display = v ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
-        private VisualElement CreateSwatchSetMenu()
+        private VisualElement CreateMenuButton()
         {
             return new MoreVertMenuButton()
             {
                 ButtonIndex = 0,
-                CreateMenuItems = () => new[]
-                {
-                    CreateTileLayoutItem(TileLayout.Grid),
-                    CreateTileLayoutItem(TileLayout.List)
-                }
+                CreateMenuItems = CreateMenuItems
             };
+
+            IEnumerable<IMenuItem> CreateMenuItems()
+            {
+                var menuItems = new[]
+                {
+                    CreateLayoutMenuItem(TileLayout.Grid),
+                    CreateLayoutMenuItem(TileLayout.List)
+                };
+                
+                return menuItems.Concat(_createAdditionalMenuItems?.Invoke() ?? Array.Empty<IMenuItem>());
+            }
             
-            MenuItem CreateTileLayoutItem(TileLayout tileLayout)
+            MenuItem CreateLayoutMenuItem(TileLayout tileLayout)
             {
                 return new MenuItem(tileLayout.ToString(), () => Layout = tileLayout)
                 {
@@ -121,43 +136,16 @@ namespace RosettaUI.UIToolkit
             }
         }
         
-        
-        private void LoadStatus()
-        {
-            var isOpen = PersistentData.Get<bool>(DataKeyIsOpen);
-            value = isOpen;
-            
-            Layout = (TileLayout)PersistentData.Get<int>(DataKeyLayout);
-        }
-   
-        
-        public void SetValue(TValue currentValue) => _currentSwatch.Value = currentValue;
-
-        private void SetMenuVisible(bool v)
-        {
-            _swatchSetMenu.style.display = v ? DisplayStyle.Flex : DisplayStyle.None;
-        } 
-        
-        private void OnValueChanged(ChangeEvent<bool> evt)
-        {
-            var isOpen = evt.newValue;
-            SetMenuVisible(isOpen);
-            
-            PersistentData.Set(DataKeyIsOpen, isOpen);
-        }
-
-
-    
         private void OnCurrentSwatchPointerDown(PointerDownEvent evt)
         {
             var newSwatch = AddSwatch(_currentSwatch.Value);
             SaveSwatches();
             
-            if ( IsSwatchDisplayLabel )
+            if (IsSwatchDisplayLabel)
             {
                 newSwatch.StartRename(SaveSwatches);
             }
-            
+
             evt.StopPropagation();
         }
         
@@ -193,7 +181,7 @@ namespace RosettaUI.UIToolkit
                 }
                 
                 // "Move To First"が途中までしか表示されないのでスペースとダミー文字で文字数を増やす @Unity6000.0.2f1
-                yield return new MenuItem("Move To First <size=0>a</size>", () => MoveToFirstSwatch(swatch));
+                yield return new MenuItem("Move To First", () => MoveToFirstSwatch(swatch));
             }
         }
         
@@ -209,16 +197,20 @@ namespace RosettaUI.UIToolkit
         }
         
 
-        private SwatchBase<TValue> AddSwatch(TValue swatchValue, string swatchName = null)
+        private TSwatch AddSwatch(TValue swatchValue, string swatchName = null)
         {
-            var swatch = new TSwatch
+            var swatch = new TSwatch()
             {
                 Label = swatchName,
-                Value = swatchValue,
+                Value = swatchValue
             };
+            
             swatch.RegisterCallback<PointerDownEvent>(OnSwatchPointerDown);
             swatch.EnableText = IsSwatchDisplayLabel;
-            _tileScrollView.Insert(_tileScrollView.childCount - 1, swatch);
+            
+            // 最後はCurrentSwatchなので、その一つ前に追加
+            var prevLastIndex = Mathf.Max(0, _tileScrollView.childCount - 1);
+            _tileScrollView.Insert(prevLastIndex, swatch);
 
             return swatch;
         }
@@ -244,16 +236,25 @@ namespace RosettaUI.UIToolkit
         
         private void SaveSwatches()
         {
-            using var _ = ListPool<NameAndValue>.Get(out var nameAndValues);
-            nameAndValues.AddRange(Swatches.Select(s => new NameAndValue { name = s.Label, value = s.Value }));
-            
-            PersistentData.Set(DataKeySwatches, nameAndValues);
+            PersistentService.SaveSwatches(Swatches.Select(s => new NameAndValue<TValue>
+            {
+                name = s.Label,
+                value = s.Value
+            }));
         }
         
-        private void LoadSwatches()
+        public void LoadSwatches()
         {
-            var nameAndValues = PersistentData.Get<List<NameAndValue>>(DataKeySwatches);
-            if (nameAndValues == null) return;
+            _tileScrollView.Clear();
+            // AddSwatch()は_tileScrollViewにすでに_currentScrollViewが追加されていることを前提としているので
+            // Clear()直後に追加しておく
+            _tileScrollView.Add(_currentSwatch);
+            
+            var nameAndValues = PersistentService.LoadSwatches();
+            if (nameAndValues == null)
+            {
+                return;
+            }
             
             foreach (var nameAndValue in nameAndValues)
             {

@@ -106,7 +106,7 @@
 /********************************************************************************
 * ColorPickerSwatchSet
 ********************************************************************************/
-.rosettaui-colorpicker-swatchset .rosettaui-swatchset__tile-scroll-view
+.rosettaui-colorpicker-swatchset .unity-scroll-view
 {
     max-height: 200px;
 }

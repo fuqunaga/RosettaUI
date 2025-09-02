@@ -74,7 +74,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private bool _prevSnapX;
         private bool _prevSnapY;
-        
+
+        private Vector2 _zoomStartPosition;
         
         #region ModalEditor
 
@@ -273,17 +274,25 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var button = evt.button;
             switch (button)
             {
+                // Zoom
+                // Alt + Right button
+                case 1 when evt.altKey:
+                    _zoomStartPosition = evt.localPosition;
+                    StartDrag();
+                    break;
+
                 // Pan
+                // Middle button or Alt + Left button
                 case 2:
                 case 0 when evt.altKey:
-                    _curvePreviewElement.CaptureMouse();
-                    _curvePreviewElement.RegisterCallback<PointerMoveEvent>(OnPointerMove);
-                    _curvePreviewElement.RegisterCallback<PointerUpEvent>(OnPointerUp);
-
-                    evt.StopPropagation();
+                    StartDrag();
                     break;
+            
+                
+                // Left button
+                // single click: Unselect
+                // double click: Add control point
                 case 0:
-                {
                     UnselectAllControlPoint();
 
                     // Add control point if double click
@@ -291,11 +300,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     {
                         AddControlPoint(_previewTransform.GetCurvePosFromScreenPos(evt.localPosition));
                     }
-
                     break;
-                }
+                
                 case 1:
-                {
                     UnselectAllControlPoint();
                 
                     var pos = _previewTransform.GetCurvePosFromScreenPos(evt.localPosition);
@@ -309,20 +316,40 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 
                     evt.StopPropagation();
                     break;
-                }
+            }
+
+            return;
+
+            void StartDrag()
+            {
+                _curvePreviewElement.CaptureMouse();
+                _curvePreviewElement.RegisterCallback<PointerMoveEvent>(OnPointerMove);
+                _curvePreviewElement.RegisterCallback<PointerUpEvent>(OnPointerUp);
+
+                evt.StopPropagation();
             }
         }
         
         private void OnPointerMove(PointerMoveEvent evt)
         {
-            // Pan
             var leftButton = (evt.pressedButtons & (1 << 0)) != 0;
+            var rightButton = (evt.pressedButtons & (1 << 1)) != 0;
             var middleButton = (evt.pressedButtons & (1 << 2)) != 0;
+            
+            // Pan
             if (middleButton || (leftButton && evt.altKey))
             {
                 _previewTransform.AdjustOffsetByScreenDelta(evt.deltaPosition);
                 UpdateView();
                 evt.StopPropagation();
+            }
+            // Zoom
+            else if (rightButton && evt.altKey)
+            {
+                ApplyZoomEvent(_zoomStartPosition,
+                    -evt.deltaPosition,
+                    evt.shiftKey,
+                    evt.ctrlKey || evt.commandKey);
             }
         }
         
@@ -345,17 +372,27 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         //  - shift:        zoom:y
         private void OnWheel(WheelEvent evt)
         {
-            const float deltaMax = 0.1f;
+            ApplyZoomEvent(evt.localMousePosition,
+                evt.delta,
+                evt.shiftKey,
+                evt.ctrlKey || evt.commandKey);
+        }
+
+        private void ApplyZoomEvent(Vector2 localPosition, Vector3 deltaXYZ, bool shiftKey, bool ctrlOrCommandKey)
+        {
+            const float deltaScale = 0.05f;
+            const float deltaMax = 1f;
+            var deltaAmount = (deltaXYZ.x + deltaXYZ.y + deltaXYZ.z) * deltaScale;
             
-            var delta = Mathf.Clamp(evt.delta.x + evt.delta.y + evt.delta.z, -deltaMax, deltaMax);
+            var delta = Mathf.Clamp(deltaAmount, -deltaMax, deltaMax);
             var amount = Vector2.one + new Vector2(
-                evt.shiftKey ? 0f :delta,
-                (evt.ctrlKey || evt.commandKey) ? 0f : delta
+                shiftKey ? 0f :delta,
+                ctrlOrCommandKey ? 0f : delta
             );
             
             var mouseUv = new Vector2(
-                evt.localMousePosition.x / _curvePreviewElement.resolvedStyle.width,
-                1f - evt.localMousePosition.y / _curvePreviewElement.resolvedStyle.height
+                localPosition.x / _curvePreviewElement.resolvedStyle.width,
+                1f - localPosition.y / _curvePreviewElement.resolvedStyle.height
             );
             var mousePositionOnCurve = _previewTransform.GetCurvePosFromScreenUv(mouseUv);
 

@@ -73,7 +73,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void AddFactoryPreset()
         {
             PersistentService.AddFactoryPreset();
-            _swatchSetMenuAndTileView.ResetView();
+            _swatchSetMenuAndTileView.LoadSwatches();
         }
     }
 }

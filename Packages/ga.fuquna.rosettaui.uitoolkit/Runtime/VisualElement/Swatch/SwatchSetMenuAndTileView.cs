@@ -90,10 +90,9 @@ namespace RosettaUI.UIToolkit
             _currentSwatch.RegisterCallback<PointerDownEvent>(OnCurrentSwatchPointerDown);
             
             tileScrollViewParent.Add(_tileScrollView);
-            
-            LoadStatus();
 
-            ResetView();
+            LoadStatus();
+            LoadSwatches();
         }
         
         
@@ -108,14 +107,6 @@ namespace RosettaUI.UIToolkit
         {
             _menuButton.style.display = v ? DisplayStyle.Flex : DisplayStyle.None;
         }
-
-        public void ResetView()
-        {
-            _tileScrollView.Clear();
-            LoadSwatches();
-            _tileScrollView.Add(_currentSwatch);
-        }
-
 
         private VisualElement CreateMenuButton()
         {
@@ -252,8 +243,13 @@ namespace RosettaUI.UIToolkit
             }));
         }
         
-        private void LoadSwatches()
+        public void LoadSwatches()
         {
+            _tileScrollView.Clear();
+            // AddSwatch()は_tileScrollViewにすでに_currentScrollViewが追加されていることを前提としているので
+            // Clear()直後に追加しておく
+            _tileScrollView.Add(_currentSwatch);
+            
             var nameAndValues = PersistentService.LoadSwatches();
             if (nameAndValues == null)
             {

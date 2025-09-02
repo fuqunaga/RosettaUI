@@ -57,7 +57,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             style.left = positionWithOffset.x;
             style.top = positionWithOffset.y;
 
-            RegisterCallbackOnce<GeometryChangedEvent>(_ =>
+            this.RegisterCallbackOnce<GeometryChangedEvent>(_ =>
             {
                 this.ClampElementToParent();
             });

@@ -94,6 +94,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             AddToClassList(USSClassName);
             InitUI();
             InitPresetsUI();
+            SetupKeyBindings();
             
             var controlPointContainer = this.Q("control-point-container");
             
@@ -119,36 +120,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void InitUI()
         {
-            // Key Bind
-            _keyEventHelper = new VisualElementKeyEventHelper(this);
-            _keyEventHelper.RegisterKeyAction(new [] { KeyCode.LeftControl, KeyCode.LeftCommand, KeyCode.RightControl, KeyCode.RightCommand }, evt =>
-            {
-                switch (evt)
-                {
-                    case KeyEventType.KeyDown:
-                        _prevSnapX = _snapXButton.value;
-                        _prevSnapY = _snapYButton.value;
-                        _snapXButton.SetValueWithoutNotify(true);
-                        _snapYButton.SetValueWithoutNotify(true);
-                        break;
-                    case KeyEventType.KeyUp:
-                        _snapXButton.SetValueWithoutNotify(_prevSnapX);
-                        _snapYButton.SetValueWithoutNotify(_prevSnapY);
-                        break;
-                    case KeyEventType.KeyPress:
-                    default:
-                        break;
-                }
-            });
-            _keyEventHelper.RegisterKeyAction(KeyCode.A, evt =>
-            {
-                if (evt == KeyEventType.KeyDown) { FitViewToCurve(); }
-            });
-            _keyEventHelper.RegisterKeyAction(KeyCode.Delete, _ =>
-            {
-                _curveController.RemoveSelectedControlPoint();
-            });
-            
             // Buttons
             var fitButton = this.Q<Button>("fit-curve-button");
             fitButton.clicked += FitViewToCurve;
@@ -191,6 +162,44 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             // Edit Key Popup
             _controlPointEditPositionPopup = new ControlPointEditPositionPopup();
             curveGroup.Add(_controlPointEditPositionPopup);
+        }
+
+        private void SetupKeyBindings()
+        {
+            _keyEventHelper = new VisualElementKeyEventHelper(this);
+            _keyEventHelper.RegisterKeyAction(new [] { KeyCode.LeftControl, KeyCode.LeftCommand, KeyCode.RightControl, KeyCode.RightCommand }, evt =>
+            {
+                switch (evt)
+                {
+                    case KeyEventType.KeyDown:
+                        _prevSnapX = _snapXButton.value;
+                        _prevSnapY = _snapYButton.value;
+                        _snapXButton.SetValueWithoutNotify(true);
+                        _snapYButton.SetValueWithoutNotify(true);
+                        break;
+                    case KeyEventType.KeyUp:
+                        _snapXButton.SetValueWithoutNotify(_prevSnapX);
+                        _snapYButton.SetValueWithoutNotify(_prevSnapY);
+                        break;
+                    case KeyEventType.KeyPress:
+                    default:
+                        break;
+                }
+            });
+            _keyEventHelper.RegisterKeyAction(KeyCode.A, evt =>
+            {
+                if (evt == KeyEventType.KeyDown) { FitViewToCurve(); }
+            });
+            _keyEventHelper.RegisterKeyAction(KeyCode.Delete, _ =>
+            {
+                _curveController.RemoveSelectedControlPoint();
+            });
+
+            _keyEventHelper.RegisterKeyAction(KeyCode.Return, _ =>
+            {
+                _curveController.ShowEditKeyPopupOfSelectedControlPoint();
+            });
+
         }
 
         #endregion

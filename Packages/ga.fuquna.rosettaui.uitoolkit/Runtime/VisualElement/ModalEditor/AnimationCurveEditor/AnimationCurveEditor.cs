@@ -72,8 +72,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private PreviewTransform _previewTransform;
         
-        private int _mouseButton;
-        private Vector2 _prevPointerPosition;
         private bool _prevSnapX;
         private bool _prevSnapY;
         
@@ -272,52 +270,60 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         #region Pointer Events
         private void OnPointerDown(PointerDownEvent evt)
         {
-            _mouseButton = evt.button;
-            if (_mouseButton == 2 || (_mouseButton == 0 && (evt.ctrlKey || evt.commandKey || evt.altKey)))
+            var button = evt.button;
+            switch (button)
             {
-                _curvePreviewElement.CaptureMouse();
-                _curvePreviewElement.RegisterCallback<PointerMoveEvent>(OnPointerMove);
-                _curvePreviewElement.RegisterCallback<PointerUpEvent>(OnPointerUp);
-                _prevPointerPosition = evt.localPosition;
+                // Pan
+                case 2:
+                case 0 when evt.altKey:
+                    _curvePreviewElement.CaptureMouse();
+                    _curvePreviewElement.RegisterCallback<PointerMoveEvent>(OnPointerMove);
+                    _curvePreviewElement.RegisterCallback<PointerUpEvent>(OnPointerUp);
 
-                evt.StopPropagation();
-            }
-            else if (_mouseButton == 0)
-            {
-                UnselectAllControlPoint();
-
-                // Add control point if double click
-                if (evt.clickCount == 2)
+                    evt.StopPropagation();
+                    break;
+                case 0:
                 {
-                    AddControlPoint(_previewTransform.GetCurvePosFromScreenPos(evt.localPosition));
-                }
-            }
-            else if (_mouseButton == 1)
-            {
-                UnselectAllControlPoint();
-                
-                var pos = _previewTransform.GetCurvePosFromScreenPos(evt.localPosition);
-                PopupMenuUtility.Show(
-                new []{
-                    new MenuItem("Add Key", () =>
+                    UnselectAllControlPoint();
+
+                    // Add control point if double click
+                    if (evt.clickCount == 2)
                     {
-                        AddControlPoint(pos);
-                    })
-                }, evt.position, this);
+                        AddControlPoint(_previewTransform.GetCurvePosFromScreenPos(evt.localPosition));
+                    }
+
+                    break;
+                }
+                case 1:
+                {
+                    UnselectAllControlPoint();
                 
-                evt.StopPropagation();
+                    var pos = _previewTransform.GetCurvePosFromScreenPos(evt.localPosition);
+                    PopupMenuUtility.Show(
+                        new []{
+                            new MenuItem("Add Key", () =>
+                            {
+                                AddControlPoint(pos);
+                            })
+                        }, evt.position, this);
+                
+                    evt.StopPropagation();
+                    break;
+                }
             }
         }
         
         private void OnPointerMove(PointerMoveEvent evt)
         {
-            if (_mouseButton == 2 || (_mouseButton == 0 && (evt.ctrlKey || evt.commandKey || evt.altKey)))
+            // Pan
+            var leftButton = (evt.pressedButtons & (1 << 0)) != 0;
+            var middleButton = (evt.pressedButtons & (1 << 2)) != 0;
+            if (middleButton || (leftButton && evt.altKey))
             {
-                _previewTransform.AdjustOffsetByScreenDelta((Vector2)evt.localPosition - _prevPointerPosition);
+                _previewTransform.AdjustOffsetByScreenDelta(evt.deltaPosition);
                 UpdateView();
                 evt.StopPropagation();
             }
-            _prevPointerPosition = evt.localPosition;
         }
         
         private void OnPointerUp(PointerUpEvent evt)

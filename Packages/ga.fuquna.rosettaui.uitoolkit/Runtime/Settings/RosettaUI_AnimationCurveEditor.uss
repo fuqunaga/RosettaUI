@@ -167,7 +167,7 @@
 * Preset Popup
 ********************************************************************************/
 .rosettaui-animation-curve-editor__presets-popup {
-    width: 260px;
+    width: 265px;
     height: 300px;
     padding: 2px;
     background-color: var(--rosettaui-color-window-background);

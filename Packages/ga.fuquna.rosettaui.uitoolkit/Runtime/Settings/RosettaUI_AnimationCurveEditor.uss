@@ -116,7 +116,31 @@
 
 
 /********************************************************************************
-* Presets
+* Preset
+********************************************************************************/
+.rosettaui-animation-curve-editor-preset__tile {
+    width: 40px;
+    height: 25px;
+    margin: 1px 2px;
+    background-color: var(--rosettaui-color-animation-curve-background);
+}
+
+.rosettaui-animation-curve-editor-preset__tile-core
+{
+    width: 100%;
+    height: 100%;
+    /*border-width: 2px;*/
+    /*border-color: #404040;*/
+}
+
+.rosettaui-animation-curve-editor-preset__tile-curve
+{
+    width: 100%;
+    height: 100%;
+}
+
+/********************************************************************************
+* PresetPreview
 ********************************************************************************/
 .rosettaui-animation-curve-editor__presets-container {
     flex-direction: row;
@@ -139,13 +163,9 @@
     flex-shrink: 0;
 }
 
-.rosettaui-animation-curve-editor-preset__tile {
-    width: 40px;
-    height: 25px;
-    margin: 1px 2px;
-    background-color: var(--rosettaui-color-animation-curve-background);
-}
-
+/********************************************************************************
+* Preset Popup
+********************************************************************************/
 .rosettaui-animation-curve-editor__presets-popup {
     width: 260px;
     height: 300px;

@@ -9,6 +9,7 @@ namespace RosettaUI.UIToolkit
         public const string EnableTextUssClassName = UssClassName + "--enable-text";
         public const string CurrentClassName = UssClassName + "--current";
         public const string TileClassName = UssClassName + "__tile";
+        public const string TileOverlapTextClassName = TileClassName + "__overlap-text";
         public const string TextContainerUssClassName = UssClassName + "__text-container";
         public const string TextInputUssClassName = TextContainerUssClassName + "__text-input";
         
@@ -58,7 +59,7 @@ namespace RosettaUI.UIToolkit
             Add(_textContainer);
         }
 
-        protected void SetTileElement(VisualElement tileElement)
+        protected void SetTileElement(VisualElement tileElement, string overlapText = null)
         {
             if (_tileElement != null)
             {
@@ -67,6 +68,14 @@ namespace RosettaUI.UIToolkit
             
             _tileElement = tileElement;
             _tileElement.AddToClassList(TileClassName);
+
+            if (!string.IsNullOrEmpty(overlapText))
+            {
+                var overlapLabel = new TextElement { text = overlapText };
+                overlapLabel.AddToClassList(TileOverlapTextClassName);
+                tileElement.Add(overlapLabel);
+            }
+
             Insert(0, tileElement);
         }
 

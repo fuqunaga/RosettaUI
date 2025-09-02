@@ -17,14 +17,14 @@ float FindQuinticRootNewtonRaphson(float x, float c[6])
 {
     const float tolerance = 1e-7;
     const float epsilon = 1e-14; /* Treshold for infinitly small values. */
-    float deriv = c[4] + x * (2. * c[3] + x * (3. * c[2] + x * (4. * c[1] + x * 5.)));
+    float deriv = c[4] + x * (2. * c[3] + x * (3. * c[2] + x * (4. * c[1] + x * 5. * c[0])));
     bool quit = abs(deriv) <= epsilon;
 
     for (int i = 0; (i < 15) && (quit == false); ++i)
     {
-        float f = (c[5] + x * (c[4] + x * (c[3] + x * (c[2] + x * (c[1] + x)))));
+        float f = (c[5] + x * (c[4] + x * (c[3] + x * (c[2] + x * (c[1] + x * c[0])))));
         x -= f / deriv;
-        deriv = c[4] + x * (2. * c[3] + x * (3. * c[2] + x * (4. * c[1] + x * 5.)));
+        deriv = c[4] + x * (2. * c[3] + x * (3. * c[2] + x * (4. * c[1] + x * 5. * c[0])));
         quit = (abs(f) <= tolerance) || (abs(deriv) <= epsilon);
     }
 
@@ -57,17 +57,6 @@ float CubicBezierSegmentSdfL2(
     };
 
     float min_sq_dist = INITIALLY_FAR;
-
-    /* This divisions lets rewrite
-        ax^5+bx^4+cx^3+dx^2+ex+f = f+x(e+x(d+x(c+x(b+x*a))))
-    as   x^5+Ax^4+Bx^3+Cx^2+Dx+E = E+x(D+x(C+x(B+x(A+x))))      -1 mult op */
-    const float inv_a = 1.0 / coef[0];
-    coef[0] = 1.0;
-    coef[1] *= inv_a;
-    coef[2] *= inv_a;
-    coef[3] *= inv_a;
-    coef[4] *= inv_a;
-    coef[5] *= inv_a;
 
     const float N = 20.0;
     float dt = 1.0 / N;

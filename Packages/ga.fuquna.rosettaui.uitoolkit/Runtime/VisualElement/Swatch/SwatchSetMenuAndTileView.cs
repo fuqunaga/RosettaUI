@@ -89,11 +89,11 @@ namespace RosettaUI.UIToolkit
             _currentSwatch = new TSwatch { IsCurrent = true };
             _currentSwatch.RegisterCallback<PointerDownEvent>(OnCurrentSwatchPointerDown);
             
-            _tileScrollView.Add(_currentSwatch);
             tileScrollViewParent.Add(_tileScrollView);
             
-            LoadSwatches();
             LoadStatus();
+
+            ResetView();
         }
         
         
@@ -101,7 +101,6 @@ namespace RosettaUI.UIToolkit
         {
             Layout = (TileLayout)PersistentService.Get<int>(PersistantKeyLayout);
         }
-   
         
         public void SetValue(TValue currentValue) => _currentSwatch.Value = currentValue;
 
@@ -114,6 +113,7 @@ namespace RosettaUI.UIToolkit
         {
             _tileScrollView.Clear();
             LoadSwatches();
+            _tileScrollView.Add(_currentSwatch);
         }
 
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Builder;
 using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
@@ -93,16 +94,31 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             if (controlPoint == null) return;
             
+            DoRemoveControlPoint(controlPoint);
+            OnCurveChanged();
+        }
+        
+        public void RemoveAllSelectedControlPoints()
+        {
+            using var _ = ListPool<ControlPoint>.Get(out var list);
+            list.AddRange(ControlPoints.Where(cp => cp.IsActive));
+            
+            foreach (var cp in list)
+            {
+                DoRemoveControlPoint(cp);
+            }
+            
+            OnCurveChanged();
+        }
+        
+        private void DoRemoveControlPoint(ControlPoint controlPoint)
+        {
             controlPoint.RemoveFromHierarchy();
             
             var index = ControlPoints.IndexOf(controlPoint);
             Curve.RemoveKey(index);
             ControlPoints.RemoveAt(index);
-            
-            OnCurveChanged();
         }
-        
-        public void RemoveSelectedControlPoint() => RemoveControlPoint(SelectedControlPoint);
         
         public void ShowEditKeyPopupOfSelectedControlPoint()
         {

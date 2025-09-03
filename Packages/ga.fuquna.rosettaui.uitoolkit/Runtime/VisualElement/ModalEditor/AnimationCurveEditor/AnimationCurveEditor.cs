@@ -204,7 +204,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             });
             _keyEventHelper.RegisterKeyAction(KeyCode.Delete, _ =>
             {
-                _curveController.RemoveSelectedControlPoint();
+                _curveController.RemoveAllSelectedControlPoints();
             });
 
             _keyEventHelper.RegisterKeyAction(KeyCode.Return, _ =>

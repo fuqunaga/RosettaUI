@@ -75,20 +75,5 @@ namespace RosettaUI.UIToolkit.NestedDropdownMenuSystem
             var currentStates = element.GetPseudoStates();
             element.SetPseudoStates(currentStates | PseudoStatesHoverFlag);
         }
-
-#if !UNITY_6000_OR_NEWER
-        public static void RegisterCallbackOnce<TEventType>(
-            this VisualElement element,
-            EventCallback<TEventType> callback,
-            TrickleDown useTrickleDown = TrickleDown.NoTrickleDown)
-            where TEventType : EventBase<TEventType>, new()
-        {
-            element.RegisterCallback<TEventType>(evt =>
-            {
-                callback.Invoke(evt);
-                element.UnregisterCallback(callback, useTrickleDown);
-            }, useTrickleDown);
-        }
-#endif
     }
 }

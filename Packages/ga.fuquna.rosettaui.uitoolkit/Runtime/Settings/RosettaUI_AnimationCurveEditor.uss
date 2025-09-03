@@ -32,6 +32,18 @@
 }
 
 /********************************************************************************
+* Selection Rect
+********************************************************************************/
+.rosettaui-animation-curve-editor__selection-rect {
+    position: absolute;
+    border-width: 1px;
+    border-color: rgba(65, 105, 225, 0.5); /* royalblue with transparency */
+    background-color: rgba(100, 149, 237, 0.3); /* cornflowerblue with transparency */
+    opacity: 0.6;
+}
+
+
+/********************************************************************************
 * Control Point
 ********************************************************************************/
 .rosettaui-animation-curve-editor__control-point-container {

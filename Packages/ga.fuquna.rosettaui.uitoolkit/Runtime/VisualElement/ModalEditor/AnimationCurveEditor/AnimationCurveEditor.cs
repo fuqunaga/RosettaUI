@@ -67,6 +67,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private ToggleButton _snapYButton;
         private ScrollerController _scrollerController;
         private AxisLabelController _axisLabelController;
+        private SelectionRect _selectionRect;
         private ControlPointDisplayPositionPopup _controlPointDisplayPositionPopup;
         private ControlPointEditPositionPopup _controlPointEditPositionPopup;
 
@@ -134,7 +135,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _snapYButton = this.Q<ToggleButton>("value-snapping-button");
             
             // Curve Preview
-            _curvePreviewElement = this.Q("preview-front");
+            _curvePreviewElement = this.Q("preview-back");
             _curvePreviewElement.RegisterCallback<PointerDownEvent>(OnPointerDown);
             _curvePreviewElement.RegisterCallback<GeometryChangedEvent>(_ => UpdateView());
             _curvePreviewElement.RegisterCallback<WheelEvent>(OnWheel);
@@ -160,6 +161,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     _axisLabelController.UpdateAxisLabel(_previewTransform.PreviewRect);
                 }
             );
+            
+            // Selectiotn Rect
+            _selectionRect = new SelectionRect();
+            _curvePreviewElement.Add(_selectionRect);
             
             // Parameter Popup
             var curveGroup = this.Q("curve-group");
@@ -295,6 +300,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     if (evt.clickCount == 2)
                     {
                         AddControlPoint(_previewTransform.GetCurvePosFromScreenPos(evt.localPosition));
+                        evt.StopPropagation();
+                    }
+                    else
+                    {
+                        _selectionRect.Show(evt.localPosition);
+                        StartDrag();
                     }
                     break;
                 
@@ -346,11 +357,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     -evt.deltaPosition,
                     evt.shiftKey,
                     evt.ctrlKey || evt.commandKey);
+                
+                evt.StopPropagation();
+            }
+            // Drag
+            else if (leftButton)
+            {
+                _selectionRect.SetMovablePosition(evt.localPosition);
+                evt.StopPropagation();
             }
         }
         
         private void OnPointerUp(PointerUpEvent evt)
         {
+            _selectionRect.Hide();
+            
             _curvePreviewElement.ReleaseMouse();
             _curvePreviewElement.UnregisterCallback<PointerMoveEvent>(OnPointerMove);
             _curvePreviewElement.UnregisterCallback<PointerUpEvent>(OnPointerUp);

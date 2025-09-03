@@ -104,6 +104,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void RemoveSelectedControlPoint() => RemoveControlPoint(SelectedControlPoint);
         
+        public void ShowEditKeyPopupOfSelectedControlPoint()
+        {
+            SelectedControlPoint?.ShowEditKeyPopup();
+        }
+        
         public void SelectControlPoint(ControlPoint controlPoint)
         {
             if ( !ControlPoints.Contains(controlPoint) ) return;

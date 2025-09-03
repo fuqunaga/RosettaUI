@@ -72,11 +72,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private PreviewTransform _previewTransform;
         
-        private int _mouseButton;
-        private Vector2 _prevPointerPosition;
         private bool _prevSnapX;
         private bool _prevSnapY;
-        
+
+        private Vector2 _zoomStartPosition;
         
         #region ModalEditor
 
@@ -94,15 +93,24 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             AddToClassList(USSClassName);
             InitUI();
             InitPresetsUI();
+            SetupKeyBindings();
             
             var controlPointContainer = this.Q("control-point-container");
             
-            _curveController = new CurveController(controlPointContainer, (holder) => new ControlPoint(holder, _previewTransform, _controlPointDisplayPositionPopup, _controlPointEditPositionPopup, OnControlPointMoved));
+            _curveController = new CurveController(controlPointContainer, CreateControlPoint);
             _curveController.onCurveChanged += () =>
             {
                 UpdateView();
                 NotifyEditorValueChanged();
             };
+
+            return;
+            
+            
+            ControlPoint CreateControlPoint(CurveController curveController)
+            {
+                return new ControlPoint(curveController, _previewTransform, _controlPointDisplayPositionPopup, _controlPointEditPositionPopup, () => (_snapXButton.value, _snapYButton.value));
+            }
         }
         
         /// <summary>
@@ -119,36 +127,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void InitUI()
         {
-            // Key Bind
-            _keyEventHelper = new VisualElementKeyEventHelper(this);
-            _keyEventHelper.RegisterKeyAction(new [] { KeyCode.LeftControl, KeyCode.LeftCommand, KeyCode.RightControl, KeyCode.RightCommand }, evt =>
-            {
-                switch (evt)
-                {
-                    case KeyEventType.KeyDown:
-                        _prevSnapX = _snapXButton.value;
-                        _prevSnapY = _snapYButton.value;
-                        _snapXButton.SetValueWithoutNotify(true);
-                        _snapYButton.SetValueWithoutNotify(true);
-                        break;
-                    case KeyEventType.KeyUp:
-                        _snapXButton.SetValueWithoutNotify(_prevSnapX);
-                        _snapYButton.SetValueWithoutNotify(_prevSnapY);
-                        break;
-                    case KeyEventType.KeyPress:
-                    default:
-                        break;
-                }
-            });
-            _keyEventHelper.RegisterKeyAction(KeyCode.A, evt =>
-            {
-                if (evt == KeyEventType.KeyDown) { FitViewToCurve(); }
-            });
-            _keyEventHelper.RegisterKeyAction(KeyCode.Delete, _ =>
-            {
-                _curveController.RemoveSelectedControlPoint();
-            });
-            
             // Buttons
             var fitButton = this.Q<Button>("fit-curve-button");
             fitButton.clicked += FitViewToCurve;
@@ -193,6 +171,44 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             curveGroup.Add(_controlPointEditPositionPopup);
         }
 
+        private void SetupKeyBindings()
+        {
+            _keyEventHelper = new VisualElementKeyEventHelper(this);
+            _keyEventHelper.RegisterKeyAction(new [] { KeyCode.LeftControl, KeyCode.LeftCommand, KeyCode.RightControl, KeyCode.RightCommand }, evt =>
+            {
+                switch (evt)
+                {
+                    case KeyEventType.KeyDown:
+                        _prevSnapX = _snapXButton.value;
+                        _prevSnapY = _snapYButton.value;
+                        _snapXButton.SetValueWithoutNotify(true);
+                        _snapYButton.SetValueWithoutNotify(true);
+                        break;
+                    case KeyEventType.KeyUp:
+                        _snapXButton.SetValueWithoutNotify(_prevSnapX);
+                        _snapYButton.SetValueWithoutNotify(_prevSnapY);
+                        break;
+                    case KeyEventType.KeyPress:
+                    default:
+                        break;
+                }
+            });
+            _keyEventHelper.RegisterKeyAction(KeyCode.A, evt =>
+            {
+                if (evt == KeyEventType.KeyDown) { FitViewToCurve(); }
+            });
+            _keyEventHelper.RegisterKeyAction(KeyCode.Delete, _ =>
+            {
+                _curveController.RemoveSelectedControlPoint();
+            });
+
+            _keyEventHelper.RegisterKeyAction(KeyCode.Return, _ =>
+            {
+                _curveController.ShowEditKeyPopupOfSelectedControlPoint();
+            });
+
+        }
+
         #endregion
         
         #region View Update
@@ -231,20 +247,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         #endregion
         
-        #region Control Point Process
-        
-        private void OnControlPointMoved(ControlPoint controlPoint, Vector2 desireKeyframePosition)
-        {
-            var gridViewport = _previewTransform.PreviewGridViewport;
-
-            var position = new Vector2(
-                _snapXButton.value ? gridViewport.RoundX(desireKeyframePosition.x, 0.05f) : desireKeyframePosition.x,
-                _snapYButton.value ? gridViewport.RoundY(desireKeyframePosition.y, 0.05f) : desireKeyframePosition.y
-            );
-
-            controlPoint.KeyframePosition = position;
-        }
-        
+        #region Control Point
+ 
         private void AddControlPoint(Vector2 keyFramePosition)
         {
             UnselectAllControlPoint();
@@ -263,52 +267,86 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         #region Pointer Events
         private void OnPointerDown(PointerDownEvent evt)
         {
-            _mouseButton = evt.button;
-            if (_mouseButton == 2 || (_mouseButton == 0 && (evt.ctrlKey || evt.commandKey || evt.altKey)))
+            var button = evt.button;
+            switch (button)
+            {
+                // Zoom
+                // Alt + Right button
+                case 1 when evt.altKey:
+                    _zoomStartPosition = evt.localPosition;
+                    StartDrag();
+                    break;
+
+                // Pan
+                // Middle button or Alt + Left button
+                case 2:
+                case 0 when evt.altKey:
+                    StartDrag();
+                    break;
+            
+                
+                // Left button
+                // single click: Unselect
+                // double click: Add control point
+                case 0:
+                    UnselectAllControlPoint();
+
+                    // Add control point if double click
+                    if (evt.clickCount == 2)
+                    {
+                        AddControlPoint(_previewTransform.GetCurvePosFromScreenPos(evt.localPosition));
+                    }
+                    break;
+                
+                case 1:
+                    UnselectAllControlPoint();
+                
+                    var pos = _previewTransform.GetCurvePosFromScreenPos(evt.localPosition);
+                    PopupMenuUtility.Show(
+                        new []{
+                            new MenuItem("Add Key", () =>
+                            {
+                                AddControlPoint(pos);
+                            })
+                        }, evt.position, this);
+                
+                    evt.StopPropagation();
+                    break;
+            }
+
+            return;
+
+            void StartDrag()
             {
                 _curvePreviewElement.CaptureMouse();
                 _curvePreviewElement.RegisterCallback<PointerMoveEvent>(OnPointerMove);
                 _curvePreviewElement.RegisterCallback<PointerUpEvent>(OnPointerUp);
-                _prevPointerPosition = evt.localPosition;
 
-                evt.StopPropagation();
-            }
-            else if (_mouseButton == 0)
-            {
-                UnselectAllControlPoint();
-
-                // Add control point if double click
-                if (evt.clickCount == 2)
-                {
-                    AddControlPoint(_previewTransform.GetCurvePosFromScreenPos(evt.localPosition));
-                }
-            }
-            else if (_mouseButton == 1)
-            {
-                UnselectAllControlPoint();
-                
-                var pos = _previewTransform.GetCurvePosFromScreenPos(evt.localPosition);
-                PopupMenuUtility.Show(
-                new []{
-                    new MenuItem("Add Key", () =>
-                    {
-                        AddControlPoint(pos);
-                    })
-                }, evt.position, this);
-                
                 evt.StopPropagation();
             }
         }
         
         private void OnPointerMove(PointerMoveEvent evt)
         {
-            if (_mouseButton == 2 || (_mouseButton == 0 && (evt.ctrlKey || evt.commandKey || evt.altKey)))
+            var leftButton = (evt.pressedButtons & (1 << 0)) != 0;
+            var rightButton = (evt.pressedButtons & (1 << 1)) != 0;
+            var middleButton = (evt.pressedButtons & (1 << 2)) != 0;
+            
+            // Pan
+            if (middleButton || (leftButton && evt.altKey))
             {
-                _previewTransform.AdjustOffsetByScreenDelta((Vector2)evt.localPosition - _prevPointerPosition);
+                _previewTransform.AdjustOffsetByScreenDelta(evt.deltaPosition);
                 UpdateView();
                 evt.StopPropagation();
             }
-            _prevPointerPosition = evt.localPosition;
+            // Zoom
+            else if (rightButton && evt.altKey)
+            {
+                ApplyZoomEvent(_zoomStartPosition,
+                    -evt.deltaPosition,
+                    evt.shiftKey,
+                    evt.ctrlKey || evt.commandKey);
+            }
         }
         
         private void OnPointerUp(PointerUpEvent evt)
@@ -330,17 +368,27 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         //  - shift:        zoom:y
         private void OnWheel(WheelEvent evt)
         {
-            const float deltaMax = 0.1f;
+            ApplyZoomEvent(evt.localMousePosition,
+                evt.delta,
+                evt.shiftKey,
+                evt.ctrlKey || evt.commandKey);
+        }
+
+        private void ApplyZoomEvent(Vector2 localPosition, Vector3 deltaXYZ, bool shiftKey, bool ctrlOrCommandKey)
+        {
+            const float deltaScale = 0.05f;
+            const float deltaMax = 1f;
+            var deltaAmount = (deltaXYZ.x + deltaXYZ.y + deltaXYZ.z) * deltaScale;
             
-            var delta = Mathf.Clamp(evt.delta.x + evt.delta.y + evt.delta.z, -deltaMax, deltaMax);
+            var delta = Mathf.Clamp(deltaAmount, -deltaMax, deltaMax);
             var amount = Vector2.one + new Vector2(
-                evt.shiftKey ? 0f :delta,
-                (evt.ctrlKey || evt.commandKey) ? 0f : delta
+                shiftKey ? 0f :delta,
+                ctrlOrCommandKey ? 0f : delta
             );
             
             var mouseUv = new Vector2(
-                evt.localMousePosition.x / _curvePreviewElement.resolvedStyle.width,
-                1f - evt.localMousePosition.y / _curvePreviewElement.resolvedStyle.height
+                localPosition.x / _curvePreviewElement.resolvedStyle.width,
+                1f - localPosition.y / _curvePreviewElement.resolvedStyle.height
             );
             var mousePositionOnCurve = _previewTransform.GetCurvePosFromScreenUv(mouseUv);
 

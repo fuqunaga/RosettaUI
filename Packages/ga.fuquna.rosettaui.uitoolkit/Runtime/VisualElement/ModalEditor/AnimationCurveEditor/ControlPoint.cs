@@ -15,6 +15,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// </summary>
     public class ControlPoint : VisualElement
     {
+        private enum MoveAxis
+        {
+            Both,
+            Horizontal,
+            Vertical
+        }
+        
         private const string ContainerClassName = "rosettaui-animation-curve-editor__control-point-container";
         private const string ControlPointClassName = "rosettaui-animation-curve-editor__control-point";
         private const string ActiveControlPointClassName = "rosettaui-animation-curve-editor__control-point--active";
@@ -24,12 +31,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         // Ferguson/Coons曲線をベジエ曲線にするときの係数
         // https://olj611.hatenablog.com/entry/2023/12/01/150842
         private const float WeightDefaultValue = 1 / 3f;
-        
-        
-        private readonly Action<ControlPoint, Vector2> _onPointMoved;
+
+
+        private readonly Func<(bool, bool)> _getSnapXY;
 
         private readonly CurveController _curveController;
-        private readonly ICoordinateConverter _coordinateConverter;
+        private readonly PreviewTransform _previewTransform;
         private readonly ControlPointDisplayPositionPopup _controlPointDisplayPositionPopup;
         private readonly ControlPointEditPositionPopup _controlPointEditPositionPopup;
         private readonly VisualElement _controlPoint;
@@ -39,6 +46,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
 
         private Vector2 _pointerDownPositionToElementOffset;
+        private MoveAxis _pointerMoveAxis = MoveAxis.Both;
+        private Vector2 _keyframePositionOnPointerDown;
 
 
         public bool IsKeyBroken { get; private set; }
@@ -87,15 +96,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private ControlPoint Right => _curveController.GetControlPointRight(this);
         
         
-        public ControlPoint(CurveController curveController, ICoordinateConverter coordinateConverter,
+        public ControlPoint(CurveController curveController, PreviewTransform previewTransform,
             ControlPointDisplayPositionPopup controlPointDisplayPositionPopup, ControlPointEditPositionPopup controlPointEditPositionPopup,
-            Action<ControlPoint, Vector2> onPointMoved)
+            Func<(bool, bool)> getSnapXY)
         {
             _curveController = curveController;
-            _coordinateConverter = coordinateConverter;
+            _previewTransform = previewTransform;
             _controlPointDisplayPositionPopup = controlPointDisplayPositionPopup;
             _controlPointEditPositionPopup = controlPointEditPositionPopup;
-            _onPointMoved = onPointMoved;
+            _getSnapXY = getSnapXY;
 
             // Control point container
             AddToClassList(ContainerClassName);
@@ -103,14 +112,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             // Handles
             _leftHandle = new ControlPointHandle(InOrOut.In,
-                _coordinateConverter,
+                _previewTransform,
                 (tangent, weight) => OnTangentAndWeightChanged(InOrOut.In, tangent, weight)
             
             );
             Add(_leftHandle);
             
             _rightHandle = new ControlPointHandle(InOrOut.Out,
-                _coordinateConverter,
+                _previewTransform,
                 (tangent, weight) => OnTangentAndWeightChanged(InOrOut.Out, tangent, weight)
             );
             Add(_rightHandle);
@@ -232,7 +241,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void UpdateView()
         {
-            var uiPosition = _coordinateConverter.GetScreenPosFromCurvePos(KeyframePosition);
+            var uiPosition = _previewTransform.GetScreenPosFromCurvePos(KeyframePosition);
             style.left = uiPosition.x;
             style.top = uiPosition.y;
 
@@ -293,12 +302,25 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             float GetXDistInScreen(ControlPoint left, ControlPoint right)
             {
                 if (left == null || right == null) return 0f;
-                var screesPosLeft = _coordinateConverter.GetScreenPosFromCurvePos(left.Keyframe.GetPosition());
-                var screesPosRight = _coordinateConverter.GetScreenPosFromCurvePos(right.Keyframe.GetPosition());
+                var screesPosLeft = _previewTransform.GetScreenPosFromCurvePos(left.Keyframe.GetPosition());
+                var screesPosRight = _previewTransform.GetScreenPosFromCurvePos(right.Keyframe.GetPosition());
                 return screesPosRight.x - screesPosLeft.x;
             }
         }
         
+        
+        public void Remove()
+        {
+            _curveController.RemoveControlPoint(this);
+        }
+
+        public void ShowEditKeyPopup()
+        {
+            _controlPointEditPositionPopup.Show(this);
+        }
+        
+        
+        #region Pointer Events
         
         private void OnPointerDown(PointerDownEvent evt)
         {
@@ -309,10 +331,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             switch (evt.button)
             {
                 case 0:
+                    _pointerMoveAxis = MoveAxis.Both;
+                    _keyframePositionOnPointerDown = KeyframePosition;
+                    this.CaptureMouse();
                     RegisterCallback<PointerMoveEvent>(OnPointerMove);
                     RegisterCallback<PointerUpEvent>(OnPointerUp);
                     evt.StopPropagation();
-                    this.CaptureMouse();
+                    
                     
                     _controlPointDisplayPositionPopup.Show();
                     _controlPointDisplayPositionPopup.Update(elementPosition, KeyframePosition);
@@ -326,14 +351,40 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private void OnPointerMove(PointerMoveEvent evt)
         {
+            if (_pointerMoveAxis == MoveAxis.Both && evt.shiftKey)
+            {
+                var delta = evt.deltaPosition;
+                _pointerMoveAxis = Mathf.Abs(delta.x) > Mathf.Abs(delta.y) ? MoveAxis.Horizontal : MoveAxis.Vertical;
+            }
+            
             var screenPosition = (Vector2)evt.position + _pointerDownPositionToElementOffset;
+            var keyframePosition = _previewTransform.GetCurvePosFromScreenPos(screenPosition);
             
-            // Snap to gridモードがあるのでポインターの移動量がそのまま反映されないことがある
-            // _onPointMovedに値の更新は任せる
-            var desiredKeyframePosition = _coordinateConverter.GetCurvePosFromScreenPos(screenPosition);
-            _onPointMoved(this, desiredKeyframePosition);
+            switch (_pointerMoveAxis)
+            {
+                case MoveAxis.Both:
+                    break;
+                case MoveAxis.Horizontal:
+                    keyframePosition.y = _keyframePositionOnPointerDown.y;
+                    break;
+                case MoveAxis.Vertical:
+                    keyframePosition.x = _keyframePositionOnPointerDown.x;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
             
-            var pointPosition = _coordinateConverter.GetScreenPosFromCurvePos(KeyframePosition);
+            var (snapX, snapY) = _getSnapXY();
+            if (snapX || snapY)
+            {
+                var gridViewport = _previewTransform.PreviewGridViewport;
+                if (snapX) keyframePosition.x = gridViewport.RoundX(keyframePosition.x, 0.05f);
+                if (snapY) keyframePosition.y = gridViewport.RoundY(keyframePosition.y, 0.05f);
+            }
+            
+            KeyframePosition = keyframePosition;
+            
+            var pointPosition = _previewTransform.GetScreenPosFromCurvePos(KeyframePosition);
             var popupPosition = pointPosition + _controlPointDisplayPositionPopup.positionOffset;
             _controlPointDisplayPositionPopup.Update(popupPosition, KeyframePosition);
         }
@@ -350,15 +401,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 _controlPointDisplayPositionPopup.Hide();
             }
         }
+        
+        #endregion
 
-        public void Remove()
-        {
-            _curveController.RemoveControlPoint(this);
-        }
-
-        public void ShowEditKeyPopup()
-        {
-            _controlPointEditPositionPopup.Show(this);
-        }
     }
 }

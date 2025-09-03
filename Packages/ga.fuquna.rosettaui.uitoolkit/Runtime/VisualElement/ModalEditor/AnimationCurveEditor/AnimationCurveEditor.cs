@@ -342,28 +342,36 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var leftButton = (evt.pressedButtons & (1 << 0)) != 0;
             var rightButton = (evt.pressedButtons & (1 << 1)) != 0;
             var middleButton = (evt.pressedButtons & (1 << 2)) != 0;
+
+            var eventUsed = false;
             
             // Pan
             if (middleButton || (leftButton && evt.altKey))
             {
                 _previewTransform.AdjustOffsetByScreenDelta(evt.deltaPosition);
                 UpdateView();
-                evt.StopPropagation();
+                eventUsed = true; 
             }
             // Zoom
             else if (rightButton && evt.altKey)
             {
-                ApplyZoomEvent(_zoomStartPosition,
+                ApplyZoomByInputEvent(_zoomStartPosition,
                     -evt.deltaPosition,
                     evt.shiftKey,
                     evt.ctrlKey || evt.commandKey);
-                
-                evt.StopPropagation();
+                eventUsed = true;
             }
             // Drag
             else if (leftButton)
             {
                 _selectionRect.SetMovablePosition(evt.localPosition);
+                eventUsed = true;
+            }
+
+
+            if (eventUsed)
+            {
+                SelectControlPointsInSelectionRectIfVisible();
                 evt.StopPropagation();
             }
         }
@@ -389,13 +397,16 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         //  - shift:        zoom:y
         private void OnWheel(WheelEvent evt)
         {
-            ApplyZoomEvent(evt.localMousePosition,
+            ApplyZoomByInputEvent(evt.localMousePosition,
                 evt.delta,
                 evt.shiftKey,
                 evt.ctrlKey || evt.commandKey);
+            
+            SelectControlPointsInSelectionRectIfVisible();
+            evt.StopPropagation();
         }
 
-        private void ApplyZoomEvent(Vector2 localPosition, Vector3 deltaXYZ, bool shiftKey, bool ctrlOrCommandKey)
+        private void ApplyZoomByInputEvent(Vector2 localPosition, Vector3 deltaXYZ, bool shiftKey, bool ctrlOrCommandKey)
         {
             const float deltaScale = 0.05f;
             const float deltaMax = 1f;
@@ -415,6 +426,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
             _previewTransform.AdjustZoom(amount, mousePositionOnCurve);
             UpdateView();
+        }
+        
+        private void SelectControlPointsInSelectionRectIfVisible()
+        {
+            if (_selectionRect.IsVisible)
+            {
+                _curveController.SelectControlPointsInRect(_selectionRect.Rect);
+            }
         }
         
         #endregion

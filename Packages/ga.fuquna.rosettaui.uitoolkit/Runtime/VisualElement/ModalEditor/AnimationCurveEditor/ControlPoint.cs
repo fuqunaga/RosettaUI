@@ -326,11 +326,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             var elementPosition = new Vector2(resolvedStyle.left, resolvedStyle.top);
             _pointerDownPositionToElementOffset = elementPosition - (Vector2)evt.position; 
-            _curveController.SelectControlPoint(this);
             
             switch (evt.button)
             {
                 case 0:
+                    _curveController.SelectControlPoint(this, unselectOthers: !evt.shiftKey);
                     _pointerMoveAxis = MoveAxis.Both;
                     _keyframePositionOnPointerDown = KeyframePosition;
                     this.CaptureMouse();
@@ -343,6 +343,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     _controlPointDisplayPositionPopup.Update(elementPosition, KeyframePosition);
                     break;
                 case 1:
+                    _curveController.SelectControlPoint(this);
                     ControlPointPopupMenu.Show(evt.position, this);
                     evt.StopPropagation();
                     break;

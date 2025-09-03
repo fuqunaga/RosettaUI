@@ -109,11 +109,29 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             SelectedControlPoint?.ShowEditKeyPopup();
         }
         
-        public void SelectControlPoint(ControlPoint controlPoint)
+        public void SelectControlPointsInRect(Rect selectionRect)
+        {
+            foreach (var controlPoint in ControlPoints)
+            {
+                var resolvedStyle = controlPoint.resolvedStyle;
+                var localPosition = new Vector2(
+                    resolvedStyle.left,
+                    resolvedStyle.top
+                );
+
+                controlPoint.IsActive = selectionRect.Contains(localPosition);
+            }
+        }
+        
+        public void SelectControlPoint(ControlPoint controlPoint, bool unselectOthers = true)
         {
             if ( !ControlPoints.Contains(controlPoint) ) return;
-            
-            UnselectAllControlPoints();
+
+            if (unselectOthers)
+            {
+                UnselectAllControlPoints();
+            }
+
             controlPoint.IsActive = true;
         }
         

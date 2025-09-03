@@ -10,6 +10,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private Vector2 _pinnedPosition;
         private Vector2 _movablePosition;
 
+        public bool IsVisible => style.display == DisplayStyle.Flex;
+        
         public SelectionRect()
         {
             AddToClassList(UssClassName);

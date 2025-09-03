@@ -329,18 +329,38 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             switch (evt.button)
             {
+                // Left click
+                // - IsActive
+                //   - subKey: unselect
+                // - !IsActive:
+                //   - subKey: add select
+                //   - !subKey: select only this. start drag.
                 case 0:
-                    _curveController.SelectControlPoint(this, preserveOtherSelection: evt.shiftKey || evt.ctrlKey || evt.commandKey);
-                    _pointerMoveAxis = MoveAxis.Both;
-                    _keyframePositionOnPointerDown = KeyframePosition;
-                    this.CaptureMouse();
-                    RegisterCallback<PointerMoveEvent>(OnPointerMove);
-                    RegisterCallback<PointerUpEvent>(OnPointerUp);
+                    var subKey = evt.shiftKey || evt.ctrlKey || evt.commandKey;
+
+                    if (IsActive && subKey)
+                    {
+                        _curveController.UnselectControlPoint(this);
+                    }
+                    else if(subKey)
+                    {
+                        _curveController.SelectControlPoint(this, preserveOtherSelection: true);
+                    }
+                    else
+                    {
+                        _curveController.SelectControlPoint(this);
+                        _pointerMoveAxis = MoveAxis.Both;
+                        _keyframePositionOnPointerDown = KeyframePosition;
+                        this.CaptureMouse();
+                        RegisterCallback<PointerMoveEvent>(OnPointerMove);
+                        RegisterCallback<PointerUpEvent>(OnPointerUp);
+
+                        _controlPointDisplayPositionPopup.Show();
+                        _controlPointDisplayPositionPopup.Update(elementPosition, KeyframePosition);
+                    }
+
                     evt.StopPropagation();
                     
-                    
-                    _controlPointDisplayPositionPopup.Show();
-                    _controlPointDisplayPositionPopup.Update(elementPosition, KeyframePosition);
                     break;
                 case 1:
                     _curveController.SelectControlPoint(this);

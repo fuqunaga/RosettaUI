@@ -167,6 +167,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             controlPoint.IsActive = true;
             onControlPointChanged?.Invoke();
         }
+        
+        public void UnselectControlPoint(ControlPoint controlPoint)
+        {
+            if (!ControlPoints.Contains(controlPoint)) return;
+
+            controlPoint.IsActive = false;
+            onControlPointChanged?.Invoke();
+        }
 
         public void UnselectAllControlPoints()
         {

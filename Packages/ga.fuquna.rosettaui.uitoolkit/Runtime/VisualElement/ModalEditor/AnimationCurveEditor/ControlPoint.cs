@@ -330,7 +330,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             switch (evt.button)
             {
                 case 0:
-                    _curveController.SelectControlPoint(this, unselectOthers: !evt.shiftKey);
+                    _curveController.SelectControlPoint(this, preserveOtherSelection: evt.shiftKey || evt.ctrlKey || evt.commandKey);
                     _pointerMoveAxis = MoveAxis.Both;
                     _keyframePositionOnPointerDown = KeyframePosition;
                     this.CaptureMouse();

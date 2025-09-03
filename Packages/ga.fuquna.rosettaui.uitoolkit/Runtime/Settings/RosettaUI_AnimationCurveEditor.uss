@@ -42,6 +42,14 @@
     opacity: 0.6;
 }
 
+/********************************************************************************
+* Selected Control Points Rect
+********************************************************************************/
+.rosettaui-animation-curve-editor__selected-control-points-rect {
+    position: absolute;
+    background-color: white;
+    opacity: 0.1;
+}
 
 /********************************************************************************
 * Control Point

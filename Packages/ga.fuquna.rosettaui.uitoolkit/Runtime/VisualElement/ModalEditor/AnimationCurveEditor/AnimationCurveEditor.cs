@@ -67,6 +67,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private ToggleButton _snapYButton;
         private ScrollerController _scrollerController;
         private AxisLabelController _axisLabelController;
+        private SelectedControlPointsRect _selectedControlPointsRect;
         private SelectionRect _selectionRect;
         private ControlPointDisplayPositionPopup _controlPointDisplayPositionPopup;
         private ControlPointEditPositionPopup _controlPointEditPositionPopup;
@@ -104,6 +105,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 UpdateView();
                 NotifyEditorValueChanged();
             };
+
+            _curveController.onControlPointChanged += () => _selectedControlPointsRect.UpdateView();
 
             return;
             
@@ -162,7 +165,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 }
             );
             
-            // Selectiotn Rect
+            // Selected Control Points Rect
+            _selectedControlPointsRect = new SelectedControlPointsRect(() => _curveController.SelectedControlPoints);
+            _curvePreviewElement.Add(_selectedControlPointsRect);
+            
+            // Selection Rect
             _selectionRect = new SelectionRect();
             _curvePreviewElement.Add(_selectionRect);
             
@@ -291,11 +298,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
                 
                 // Left button
-                // single click: Unselect
+                // single click: Start selection rect
                 // double click: Add control point
                 case 0:
-                    UnselectAllControlPoint();
-
                     // Add control point if double click
                     if (evt.clickCount == 2)
                     {
@@ -304,6 +309,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     }
                     else
                     {
+                        if (!IsPreserveCurrentSelectKey(evt))
+                        {
+                            UnselectAllControlPoint();
+                        }
+
                         _selectionRect.Show(evt.localPosition);
                         StartDrag();
                     }
@@ -371,7 +381,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
             if (eventUsed)
             {
-                SelectControlPointsInSelectionRectIfVisible();
+                SelectControlPointsInSelectionRectIfVisible(IsPreserveCurrentSelectKey(evt));
                 evt.StopPropagation();
             }
         }
@@ -384,6 +394,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _curvePreviewElement.UnregisterCallback<PointerMoveEvent>(OnPointerMove);
             _curvePreviewElement.UnregisterCallback<PointerUpEvent>(OnPointerUp);
             evt.StopPropagation();
+        }
+        
+        private bool IsPreserveCurrentSelectKey(IPointerEvent evt)
+        {
+            return evt.shiftKey || evt.ctrlKey || evt.commandKey;
         }
 
         // WheelEventのdelta
@@ -428,11 +443,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             UpdateView();
         }
         
-        private void SelectControlPointsInSelectionRectIfVisible()
+        private void SelectControlPointsInSelectionRectIfVisible(bool preserveCurrentSelection = false)
         {
             if (_selectionRect.IsVisible)
             {
-                _curveController.SelectControlPointsInRect(_selectionRect.Rect);
+                _curveController.SelectControlPointsInRect(_selectionRect.Rect, preserveCurrentSelection);
             }
         }
         

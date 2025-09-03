@@ -15,11 +15,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     {
         public event Action onCurveChanged;
         
+        // Invoked when control point selection or addition/removal happens
+        public event Action onControlPointChanged;
+        
         private readonly VisualElement _parent;
         private readonly Func<CurveController, ControlPoint> _getNewControlPoint;
 
         public AnimationCurve Curve { get; private set; } = new();
-        public ControlPoint SelectedControlPoint => ControlPoints.FirstOrDefault(t => t.IsActive);
+        public IEnumerable<ControlPoint> SelectedControlPoints => ControlPoints.Where(t => t.IsActive);
 
 
         private List<ControlPoint> ControlPoints { get; } = new();
@@ -86,6 +89,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
             
             OnCurveChanged();
+            onControlPointChanged?.Invoke();
             
             return index;
         }
@@ -96,6 +100,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             DoRemoveControlPoint(controlPoint);
             OnCurveChanged();
+            onControlPointChanged?.Invoke();
         }
         
         public void RemoveAllSelectedControlPoints()
@@ -109,6 +114,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
             
             OnCurveChanged();
+            onControlPointChanged?.Invoke();
         }
         
         private void DoRemoveControlPoint(ControlPoint controlPoint)
@@ -122,11 +128,16 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void ShowEditKeyPopupOfSelectedControlPoint()
         {
-            SelectedControlPoint?.ShowEditKeyPopup();
+            SelectedControlPoints.FirstOrDefault()?.ShowEditKeyPopup();
         }
         
-        public void SelectControlPointsInRect(Rect selectionRect)
+        public void SelectControlPointsInRect(Rect selectionRect, bool preserveOtherSelection = false)
         {
+            if (!preserveOtherSelection)
+            {
+                DoUnselectAllControlPoints();
+            }
+            
             foreach (var controlPoint in ControlPoints)
             {
                 var resolvedStyle = controlPoint.resolvedStyle;
@@ -135,23 +146,35 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     resolvedStyle.top
                 );
 
-                controlPoint.IsActive = selectionRect.Contains(localPosition);
+                if (selectionRect.Contains(localPosition))
+                {
+                    controlPoint.IsActive = true;
+                }
             }
+            
+            onControlPointChanged?.Invoke();
         }
         
-        public void SelectControlPoint(ControlPoint controlPoint, bool unselectOthers = true)
+        public void SelectControlPoint(ControlPoint controlPoint, bool preserveOtherSelection = false)
         {
-            if ( !ControlPoints.Contains(controlPoint) ) return;
+            if (!ControlPoints.Contains(controlPoint)) return;
 
-            if (unselectOthers)
+            if (!preserveOtherSelection)
             {
-                UnselectAllControlPoints();
+                DoUnselectAllControlPoints();
             }
 
             controlPoint.IsActive = true;
+            onControlPointChanged?.Invoke();
+        }
+
+        public void UnselectAllControlPoints()
+        {
+            DoUnselectAllControlPoints();
+            onControlPointChanged?.Invoke();
         }
         
-        public void UnselectAllControlPoints()
+        private void DoUnselectAllControlPoints()
         {
             foreach (var cp in ControlPoints)
             {

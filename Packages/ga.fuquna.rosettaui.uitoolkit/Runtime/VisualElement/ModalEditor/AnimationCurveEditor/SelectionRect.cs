@@ -3,6 +3,9 @@ using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
+    /// <summary>
+    /// 矩形選択範囲
+    /// </summary>
     public class SelectionRect : VisualElement
     {
         private const string UssClassName = "rosettaui-animation-curve-editor__selection-rect";
@@ -14,6 +17,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public SelectionRect()
         {
+            pickingMode = PickingMode.Ignore;
             AddToClassList(UssClassName);
         }
         
@@ -49,17 +53,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             SetPinnedPosition(pinnedPosition);
             UpdateView();
-            Show();
-        }
-        
-        private void Show()
-        {
-            style.display = DisplayStyle.Flex;
-        }
-        
-        public void Hide()
-        {
-            style.display = DisplayStyle.None;
+            this.Show();
         }
     }
 }

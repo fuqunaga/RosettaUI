@@ -324,7 +324,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void OnPointerDown(PointerDownEvent evt)
         {
-            var elementPosition = new Vector2(resolvedStyle.left, resolvedStyle.top);
+            var elementPosition = this.GetLocalPosition();
             _pointerDownPositionToElementOffset = elementPosition - (Vector2)evt.position; 
             
             switch (evt.button)

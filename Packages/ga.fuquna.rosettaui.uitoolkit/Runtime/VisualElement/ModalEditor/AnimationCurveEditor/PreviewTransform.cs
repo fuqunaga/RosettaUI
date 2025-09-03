@@ -13,6 +13,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// </summary>
     public class PreviewTransform : ICoordinateConverter
     {
+        public static float ZoomMin { get; set; } = 1e-10f;
+        public static float ZoomMax { get; set; } = 1e+4f;
+        
         public Vector2 Zoom => _zoom;
         public Vector2 Offset => _offset;
         public Vector4 OffsetZoom => new(_offset.x, _offset.y, _zoom.x, _zoom.y);
@@ -51,7 +54,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         public void AdjustZoom(Vector2 amount, Vector2 zoomCenterOnCurve)
         {
+            var prevZoom = _zoom;
             _zoom /= amount;
+            var zoomIsInRange = _zoom.x >= ZoomMin && _zoom.x <= ZoomMax && _zoom.y >= ZoomMin && _zoom.y <= ZoomMax;
+            if (!zoomIsInRange)
+            {
+                _zoom = prevZoom;
+                return;
+            }
+            
             _offset = zoomCenterOnCurve - (zoomCenterOnCurve - _offset) * amount;
         }
 

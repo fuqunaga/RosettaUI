@@ -97,12 +97,20 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             var controlPointContainer = this.Q("control-point-container");
             
-            _curveController = new CurveController(controlPointContainer, (holder) => new ControlPoint(holder, _previewTransform, _controlPointDisplayPositionPopup, _controlPointEditPositionPopup, OnControlPointMoved));
+            _curveController = new CurveController(controlPointContainer, CreateControlPoint);
             _curveController.onCurveChanged += () =>
             {
                 UpdateView();
                 NotifyEditorValueChanged();
             };
+
+            return;
+            
+            
+            ControlPoint CreateControlPoint(CurveController curveController)
+            {
+                return new ControlPoint(curveController, _previewTransform, _controlPointDisplayPositionPopup, _controlPointEditPositionPopup, () => (_snapXButton.value, _snapYButton.value));
+            }
         }
         
         /// <summary>
@@ -239,20 +247,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         #endregion
         
-        #region Control Point Process
-        
-        private void OnControlPointMoved(ControlPoint controlPoint, Vector2 desireKeyframePosition)
-        {
-            var gridViewport = _previewTransform.PreviewGridViewport;
-
-            var position = new Vector2(
-                _snapXButton.value ? gridViewport.RoundX(desireKeyframePosition.x, 0.05f) : desireKeyframePosition.x,
-                _snapYButton.value ? gridViewport.RoundY(desireKeyframePosition.y, 0.05f) : desireKeyframePosition.y
-            );
-
-            controlPoint.KeyframePosition = position;
-        }
-        
+        #region Control Point
+ 
         private void AddControlPoint(Vector2 keyFramePosition)
         {
             UnselectAllControlPoint();

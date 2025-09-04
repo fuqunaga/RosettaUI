@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Builder;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
@@ -15,54 +16,64 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// </details>
     public static class ControlPointPopupMenu
     {
-        public static void Show(Vector2 position, ControlPoint controlPoint)
+        public static void Show(Vector2 position, SelectedControlPointsEditor controlPointsEditor, VisualElement target)
         {
             PopupMenuUtility.Show(
-                CreateMenuItemsDeleteEdit(controlPoint)
+                CreateMenuItemsDeleteEdit(controlPointsEditor)
                     .Append(new MenuItemSeparator())
-                    .Concat(CreateMenuItemsPointMode(controlPoint))
+                    .Concat(CreateMenuItemsBothTangentMode(controlPointsEditor))
                     .Append(new MenuItemSeparator())
-                    .Concat(CreateMenuItemsTangentLeft(controlPoint))
-                    .Concat(CreateMenuItemsTangentRight(controlPoint))
-                    .Concat(CreateMenuItemsTangentBoth(controlPoint)),
+                    .Concat(CreateMenuItemsTangent(controlPointsEditor)),
                 position,
-                controlPoint
+                target
             );
         }
 
-        private static IEnumerable<IMenuItem> CreateMenuItemsDeleteEdit(ControlPoint controlPoint)
+        private static IEnumerable<IMenuItem> CreateMenuItemsDeleteEdit(SelectedControlPointsEditor controlPointsEditor)
         {
-            yield return new MenuItem("Delete Key", controlPoint.Remove);
-            yield return new MenuItem("Edit Key...", controlPoint.ShowEditKeyPopup);
+            var isMultiSelection = controlPointsEditor.IsMultiSelection;
+            yield return new MenuItem(isMultiSelection ? "Delete Keys" :"Delete Key", controlPointsEditor.RemoveAll);
+            // yield return new MenuItem(isMultiSelection ? "Edit Keys..." :"Edit Key...", curveController.ShowEditKeyPopup);
         }
 
-        private static IEnumerable<IMenuItem> CreateMenuItemsPointMode(ControlPoint controlPoint)
+        private static IEnumerable<IMenuItem> CreateMenuItemsBothTangentMode(SelectedControlPointsEditor controlPointsEditor)
         {
-            var key = controlPoint.Keyframe;
-            var leftMode = controlPoint.InTangentMode;
-            var rightMode = controlPoint.OutTangentMode;
-
-            var broken = controlPoint.IsKeyBroken;
-            var freeSmooth = !(broken || leftMode != TangentMode.Free || rightMode != TangentMode.Free);
-            var flat = !(broken || leftMode != TangentMode.Free || key.inTangent != 0 || rightMode != TangentMode.Free || key.outTangent != 0);
-
+            var anyKeys = !controlPointsEditor.IsEmpty;
+            var allFreeSmooth = anyKeys;
+            var allFlat = anyKeys;
+            var allBroken = anyKeys;
             
-            yield return Create("Free Smooth", freeSmooth, () =>
+            var controlPoints = controlPointsEditor.ControlPoints;
+            foreach (var controlPoint in controlPoints)
             {
-                controlPoint.SetBothTangentMode(TangentMode.Free, false);
-                controlPoint.SetKeyBroken(false);
-            });
-            yield return Create("Flat", flat, () =>
-            {
-                controlPoint.SetBothTangentMode(TangentMode.Free, false);
-                controlPoint.SetKeyBroken(false);
+                var key = controlPoint.Keyframe;
+                var leftMode = controlPoint.InTangentMode;
+                var rightMode = controlPoint.OutTangentMode;
+                var broken = controlPoint.IsKeyBroken;
                 
-                var keyframe = controlPoint.Keyframe;
-                keyframe.inTangent = 0;
-                keyframe.outTangent = 0;
-                controlPoint.Keyframe = keyframe;   
+                if (broken || leftMode != TangentMode.Free || rightMode != TangentMode.Free) allFreeSmooth = false;
+                if (broken || leftMode != TangentMode.Free || key.inTangent != 0 || rightMode != TangentMode.Free || key.outTangent != 0) allFlat = false;
+                if (!broken) allBroken = false;
+            }
+            
+            
+            yield return Create("Free Smooth", allFreeSmooth, () =>
+            {
+                controlPointsEditor.SetBothTangentMode(TangentMode.Free);
+                controlPointsEditor.SetKeyBroken(false);
             });
-            yield return Create("Broken", broken, () => controlPoint.SetKeyBroken(true));
+            yield return Create("Flat", allFlat, () =>
+            {
+                controlPointsEditor.SetBothTangentMode(TangentMode.Free, false);
+                controlPointsEditor.SetKeyBroken(false, false);
+                controlPointsEditor.UpdateKeyframe(keyframe =>
+                {
+                    keyframe.inTangent = 0;
+                    keyframe.outTangent = 0;
+                    return keyframe;
+                });
+            });
+            yield return Create("Broken", allBroken, () => controlPointsEditor.SetKeyBroken(true));
             
             yield break;
 
@@ -75,83 +86,100 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
         
-        private static IEnumerable<IMenuItem> CreateMenuItemsTangentLeft(ControlPoint controlPoint)
+        private static IEnumerable<IMenuItem> CreateMenuItemsTangent(SelectedControlPointsEditor controlPointsEditor)
         {
-            return CreateMenuItemsTangent("Left Tangent",
-                controlPoint,
-                () => controlPoint.InTangentMode,
-                mode => controlPoint.SetInTangentMode(mode),
-                WeightedMode.In
-            );
-        }
-        
-        private static IEnumerable<IMenuItem> CreateMenuItemsTangentRight(ControlPoint controlPoint)
-        {
-            return CreateMenuItemsTangent("Right Tangent",
-                controlPoint,
-                () => controlPoint.OutTangentMode,
-                mode => controlPoint.SetOutTangentMode(mode),
-                WeightedMode.Out
-            );
-        }
-        
-        private static IEnumerable<IMenuItem> CreateMenuItemsTangentBoth(ControlPoint controlPoint)
-        {
-            return CreateMenuItemsTangent("Both Tangents",
-                controlPoint,
-                GetTangentMode,
-                mode => controlPoint.SetBothTangentMode(mode),
-                WeightedMode.Both
-            );
-
-            TangentMode? GetTangentMode()
+            var anyKeys = !controlPointsEditor.IsEmpty;
+            var allLeftWeighted = anyKeys;
+            var allLeftFree = anyKeys;
+            var allLeftLinear = anyKeys;
+            var allLeftConstant = anyKeys;
+            var allRightWeighted = anyKeys;
+            var allRightFree = anyKeys;
+            var allRightLinear = anyKeys;
+            var allRightConstant = anyKeys;
+            
+            var controlPoints = controlPointsEditor.ControlPoints;
+            foreach (var controlPoint in controlPoints)
             {
-                var inTangentMode = controlPoint.InTangentMode;
-                var outTangentMode = controlPoint.OutTangentMode;
-                if (inTangentMode == outTangentMode)
+                var key = controlPoint.Keyframe;
+                var leftMode = controlPoint.InTangentMode;
+                var rightMode = controlPoint.OutTangentMode;
+                var broken = controlPoint.IsKeyBroken;
+                
+                if (!broken || leftMode  != TangentMode.Free) allLeftFree = false;
+                if (!broken || leftMode  != TangentMode.Linear) allLeftLinear = false;
+                if (!broken || leftMode  != TangentMode.Constant) allLeftConstant = false;
+                if (!broken || rightMode != TangentMode.Free) allRightFree = false;
+                if (!broken || rightMode != TangentMode.Linear) allRightLinear = false;
+                if (!broken || rightMode != TangentMode.Constant) allRightConstant = false;
+                
+                if (((int)key.weightedMode & (int)WeightedMode.In) == 0) allLeftWeighted = false;
+                if (((int)key.weightedMode & (int)WeightedMode.Out) == 0) allRightWeighted = false;
+            }
+            
+            
+            var leftItems = CreateMenuItemsTangent("Left Tangent",
+                allLeftFree, allLeftLinear, allLeftConstant, allLeftWeighted,
+                mode => SetTangentMode((true, false), mode),
+                weighted => controlPointsEditor.SetWeightedMode(WeightedMode.In, weighted)
+            );
+            
+            var rightItems = CreateMenuItemsTangent("Right Tangent",
+                allRightFree, allRightLinear, allRightConstant, allRightWeighted,
+                mode => SetTangentMode((false, true), mode),
+                weighted => controlPointsEditor.SetWeightedMode(WeightedMode.Out, weighted)
+            );
+            
+            var bothItems = CreateMenuItemsTangent("Both Tangents",
+                allLeftFree && allRightFree,
+                allLeftLinear && allRightLinear,
+                allLeftConstant && allRightConstant,
+                allLeftWeighted && allRightWeighted,
+                mode => SetTangentMode((true, true), mode),
+                weighted => controlPointsEditor.SetWeightedMode(WeightedMode.Both, weighted)
+            );
+            
+            return leftItems.Concat(rightItems).Concat(bothItems);
+
+            void SetTangentMode((bool inEnable, bool outEnable) enable, TangentMode mode)
+            {
+                if (enable.inEnable)
                 {
-                    return inTangentMode;
+                    controlPointsEditor.SetTangentMode(InOrOut.In, mode);
                 }
-                return null;
+
+                if (enable.outEnable)
+                {
+                    controlPointsEditor.SetTangentMode(InOrOut.Out, mode);
+                }
+                
+                controlPointsEditor.SetKeyBroken(true);
             }
         }
         
         private static IEnumerable<IMenuItem> CreateMenuItemsTangent(string menuPath,
-            ControlPoint controlPoint,
-            Func<TangentMode?> getTangentMode,
+            bool allFree, bool allLinear, bool allConstant, bool allWeighted,
             Action<TangentMode> setTangentMode,
-            WeightedMode weightedMode)
+            Action<bool> setWeightedMode)
         {
-            yield return TangentModeMenu(TangentMode.Free);
-            yield return TangentModeMenu(TangentMode.Linear);
-            yield return TangentModeMenu(TangentMode.Constant);
-            var weightedModeFlag = GetWeightedMode();
-            yield return new MenuItem($"{menuPath}/Weighted", () => SetWeightedMode(!weightedModeFlag))
+            yield return TangentModeMenu(TangentMode.Free, allFree);
+            yield return TangentModeMenu(TangentMode.Linear, allLinear);
+            yield return TangentModeMenu(TangentMode.Constant, allConstant);
+            
+            yield return new MenuItem($"{menuPath}/Weighted", () => setWeightedMode?.Invoke(!allWeighted))
             {
-                isChecked = weightedModeFlag
+                isChecked = allWeighted
             };
             
             yield break;
 
             
-            MenuItem TangentModeMenu(TangentMode mode)
+            MenuItem TangentModeMenu(TangentMode mode, bool isChecked)
             {
                 return new MenuItem($"{menuPath}/{mode.ToString()}", () => setTangentMode?.Invoke(mode))
                 {
-                    isChecked = getTangentMode?.Invoke() == mode
+                    isChecked = isChecked
                 };
-            }
-
-            void SetWeightedMode(bool flag)
-            {
-                var keyframe = controlPoint.Keyframe;
-                keyframe.SetWeightedFrag(weightedMode, flag);
-                controlPoint.Keyframe = keyframe;
-            }
-            
-            bool GetWeightedMode()
-            {
-                return controlPoint.Keyframe.GetWeightedFrag(weightedMode);
             }
         }
     }

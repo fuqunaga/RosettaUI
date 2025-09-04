@@ -81,26 +81,18 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             // Match the tangent mode to neighborhood point one
             if (GetControlPointLeft(controlPoint)?.OutTangentMode is {} inTangentMode)
             {
-                controlPoint.SetInTangentMode(inTangentMode, false);
+                controlPoint.InTangentMode = inTangentMode;
             }
-            if (GetControlPointRight(controlPoint)?.InTangentMode is {} outTangentMode)
+
+            if (GetControlPointRight(controlPoint)?.InTangentMode is { } outTangentMode)
             {
-                controlPoint.SetOutTangentMode(outTangentMode, false);
+                controlPoint.OutTangentMode = outTangentMode;
             }
             
             OnCurveChanged();
             onControlPointChanged?.Invoke();
             
             return index;
-        }
-        
-        public void RemoveControlPoint(ControlPoint controlPoint)
-        {
-            if (controlPoint == null) return;
-            
-            DoRemoveControlPoint(controlPoint);
-            OnCurveChanged();
-            onControlPointChanged?.Invoke();
         }
         
         public void RemoveAllSelectedControlPoints()
@@ -155,11 +147,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             onControlPointChanged?.Invoke();
         }
         
-        public void SelectControlPoint(ControlPoint controlPoint, bool preserveOtherSelection = false)
+        public void SelectControlPoint(ControlPoint controlPoint, bool keepOtherSelection = false)
         {
             if (!ControlPoints.Contains(controlPoint)) return;
 
-            if (!preserveOtherSelection)
+            if (!keepOtherSelection)
             {
                 DoUnselectAllControlPoints();
             }
@@ -217,9 +209,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             for (var i = 0; i < Curve.keys.Length; i++)
             {
                 var controlPoint = CreateControlPoint(i);
-                controlPoint.SetKeyBroken(Curve.GetKeyBroken(i), false);
-                controlPoint.SetInTangentMode(Curve.GetInTangentMode(i), false);
-                controlPoint.SetOutTangentMode(Curve.GetOutTangentMode(i), false);
+                controlPoint.IsKeyBroken = Curve.GetKeyBroken(i);
+                controlPoint.InTangentMode = Curve.GetInTangentMode(i);
+                controlPoint.OutTangentMode = Curve.GetOutTangentMode(i);
             }
         }
         
@@ -251,7 +243,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         /// ControlPointのKeyframeの時間が変更されたらAnimationCurve上のIndexが変わる可能性がある
         /// Indexが変わるなら追随する
         /// </summary>
-        public void UpdateKeyframe(ControlPoint controlPoint, Keyframe keyframe)
+        public void UpdateKeyframe(ControlPoint controlPoint, Keyframe keyframe, bool notifyOnChanged = true)
         {
             if (controlPoint == null || Curve == null || ControlPoints.Count == 0)
             {
@@ -273,7 +265,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 ControlPoints.Insert(newIndex, temp);
             }
 
-            OnCurveChanged();
+            if (notifyOnChanged)
+            {
+                OnCurveChanged();
+            }
         }
 
         public void OnCurveChanged()

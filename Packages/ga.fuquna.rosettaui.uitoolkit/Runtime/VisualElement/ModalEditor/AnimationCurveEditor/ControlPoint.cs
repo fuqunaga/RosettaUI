@@ -50,10 +50,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private Vector2 _keyframePositionOnPointerDown;
 
 
-        public bool IsKeyBroken { get; private set; }
+        /// Needs to call CurveController.OnCurveChanged() after this to reflect the change in the view
+        public bool IsKeyBroken { get; set; }
 
-        public TangentMode InTangentMode { get; private set; } = TangentMode.Free;
-        public TangentMode OutTangentMode { get; private set; } = TangentMode.Free;
+        /// Needs to call CurveController.OnCurveChanged() after this to reflect the change in the view
+        public TangentMode InTangentMode { get; set; } = TangentMode.Free;
+        
+        /// Needs to call CurveController.OnCurveChanged() after this to reflect the change in the view
+        public TangentMode OutTangentMode { get; set; } = TangentMode.Free;
 
 
 
@@ -199,45 +203,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 }
             }
         }
-
-        public void SetKeyBroken(bool isBroken, bool updateView = true)
-        {
-            IsKeyBroken = isBroken;
-
-            if (updateView)
-            {
-                _curveController.OnCurveChanged();
-            }
-        }
-
-        public void SetInTangentMode(TangentMode mode, bool updateView = true)
-        {
-            InTangentMode = mode;
-            OnTangentModeChanged(updateView);
-        }
-        
-        public void SetOutTangentMode(TangentMode mode, bool updateView = true)
-        {
-            OutTangentMode = mode;
-            OnTangentModeChanged(updateView);
-        }
-        
-        public void SetBothTangentMode(TangentMode mode, bool updateView = true)
-        {
-            InTangentMode = mode;
-            OutTangentMode = mode;
-            OnTangentModeChanged(updateView);
-        }
-        
-        private void OnTangentModeChanged(bool updateView = true)
-        {
-            SetKeyBroken(true, false);
-
-            if (updateView)
-            {
-                _curveController.OnCurveChanged();
-            }
-        }
         
         public void UpdateView()
         {
@@ -307,12 +272,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 return screesPosRight.x - screesPosLeft.x;
             }
         }
-        
-        
-        public void Remove()
-        {
-            _curveController.RemoveControlPoint(this);
-        }
 
         public void ShowEditKeyPopup()
         {
@@ -344,7 +303,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     }
                     else if(subKey)
                     {
-                        _curveController.SelectControlPoint(this, preserveOtherSelection: true);
+                        _curveController.SelectControlPoint(this, keepOtherSelection: true);
                     }
                     else
                     {
@@ -362,9 +321,18 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     evt.StopPropagation();
                     
                     break;
+                // Right click
+                //  Show popup menu
                 case 1:
-                    _curveController.SelectControlPoint(this);
-                    ControlPointPopupMenu.Show(evt.position, this);
+                    
+                    // IsActive(=選択中）の場合はそのまま（複数選択のとき複数選択状態をキープ）
+                    // IsActiveでない場合は他の選択を外して自身のみ選択してからメニュー表示
+                    if (!IsActive)
+                    {
+                        _curveController.SelectControlPoint(this, keepOtherSelection: false);
+                    }
+
+                    ControlPointPopupMenu.Show(evt.position, new SelectedControlPointsEditor(_curveController), this);
                     evt.StopPropagation();
                     break;
             }

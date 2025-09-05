@@ -14,14 +14,16 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly CurveController _curveController;
         
         public bool IsEmpty => !_curveController.SelectedControlPoints.Any();
-        public bool IsMultiSelection => _curveController.SelectedControlPoints.Count() > 1;
+        public bool IsMultiSelection => _curveController.SelectedControlPoints.Skip(1).Any();
         
         public IEnumerable<ControlPoint> ControlPoints => _curveController.SelectedControlPoints;
+        
         
         public SelectedControlPointsEditor(CurveController curveController)
         {
             _curveController = curveController;
         }
+        
         
         public void RemoveAll() => _curveController.RemoveAllSelectedControlPoints();
 
@@ -101,7 +103,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 _curveController.UpdateKeyframe(cp, keyframe, false);
             }, notifyOnChanged);
         } 
-    
+        
+        public void UpdateKeyframePosition(float? xOrNull, float? yOrNull, bool notifyOnChanged = true){
+            UpdateKeyframe(keyframe =>
+            {
+                if (xOrNull is { } x) keyframe.time = x;
+                if (yOrNull is { } y) keyframe.value = y;
+                return keyframe;
+            }, notifyOnChanged);
+        }
         
         public void EditControlPoints(Action<ControlPoint> editAction, bool notifyOnChanged = true)
         {

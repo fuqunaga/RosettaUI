@@ -14,12 +14,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// refs: Unity CurveMenuManager
     /// https://github.com/Unity-Technologies/UnityCsReference/blob/4b463aa72c78ec7490b7f03176bd012399881768/Editor/Mono/Animation/AnimationWindow/CurveMenuManager.cs#L72
     /// </details>
-    public static class ControlPointPopupMenu
+    public static class ControlPointsPopupMenu
     {
-        public static void Show(Vector2 position, SelectedControlPointsEditor controlPointsEditor, VisualElement target)
+        public static void Show(Vector2 position, SelectedControlPointsEditor controlPointsEditor, ControlPointsEditPositionPopup editPositionPopup, VisualElement target)
         {
             PopupMenuUtility.Show(
-                CreateMenuItemsDeleteEdit(controlPointsEditor)
+                CreateMenuItemsDeleteEdit(controlPointsEditor, editPositionPopup, target)
                     .Append(new MenuItemSeparator())
                     .Concat(CreateMenuItemsBothTangentMode(controlPointsEditor))
                     .Append(new MenuItemSeparator())
@@ -29,11 +29,19 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             );
         }
 
-        private static IEnumerable<IMenuItem> CreateMenuItemsDeleteEdit(SelectedControlPointsEditor controlPointsEditor)
+        private static IEnumerable<IMenuItem> CreateMenuItemsDeleteEdit(
+            SelectedControlPointsEditor controlPointsEditor, 
+            ControlPointsEditPositionPopup editPositionPopup,
+            VisualElement target)
         {
             var isMultiSelection = controlPointsEditor.IsMultiSelection;
-            yield return new MenuItem(isMultiSelection ? "Delete Keys" :"Delete Key", controlPointsEditor.RemoveAll);
-            // yield return new MenuItem(isMultiSelection ? "Edit Keys..." :"Edit Key...", curveController.ShowEditKeyPopup);
+            yield return new MenuItem(isMultiSelection ? "Delete Keys" : "Delete Key", controlPointsEditor.RemoveAll);
+            yield return new MenuItem(isMultiSelection ? "Edit Keys..." : "Edit Key...", () =>
+            {
+                // editPositionPopupの位置を指定するのに呼び出し元のControlPointの位置を使いたい
+                // targetとして渡されるので流用している
+                editPositionPopup.Show(target.GetLocalPosition(), controlPointsEditor);
+            });
         }
 
         private static IEnumerable<IMenuItem> CreateMenuItemsBothTangentMode(SelectedControlPointsEditor controlPointsEditor)

@@ -31,14 +31,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         // Ferguson/Coons曲線をベジエ曲線にするときの係数
         // https://olj611.hatenablog.com/entry/2023/12/01/150842
         private const float WeightDefaultValue = 1 / 3f;
-
-
+        
+        private readonly Action<Vector2, ControlPoint> _showPopupMenu;
         private readonly Func<(bool, bool)> _getSnapXY;
 
         private readonly CurveController _curveController;
         private readonly PreviewTransform _previewTransform;
         private readonly ControlPointDisplayPositionPopup _controlPointDisplayPositionPopup;
-        private readonly ControlPointEditPositionPopup _controlPointEditPositionPopup;
         private readonly VisualElement _controlPoint;
         private readonly ControlPointHandle _leftHandle;
         private readonly ControlPointHandle _rightHandle;
@@ -101,13 +100,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         
         public ControlPoint(CurveController curveController, PreviewTransform previewTransform,
-            ControlPointDisplayPositionPopup controlPointDisplayPositionPopup, ControlPointEditPositionPopup controlPointEditPositionPopup,
+            ControlPointDisplayPositionPopup controlPointDisplayPositionPopup, 
+            Action<Vector2, ControlPoint> showPopupMenu,
             Func<(bool, bool)> getSnapXY)
         {
             _curveController = curveController;
             _previewTransform = previewTransform;
             _controlPointDisplayPositionPopup = controlPointDisplayPositionPopup;
-            _controlPointEditPositionPopup = controlPointEditPositionPopup;
+            _showPopupMenu = showPopupMenu;
             _getSnapXY = getSnapXY;
 
             // Control point container
@@ -179,8 +179,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
                     default:
                         throw new ArgumentOutOfRangeException();
-                };
-                
+                }
 
                 var position = _wrapModeButton.worldBound.position;
                 position.y += 10f;
@@ -272,12 +271,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 return screesPosRight.x - screesPosLeft.x;
             }
         }
-
-        public void ShowEditKeyPopup()
-        {
-            _controlPointEditPositionPopup.Show(this);
-        }
-        
         
         #region Pointer Events
         
@@ -319,8 +312,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     }
 
                     evt.StopPropagation();
-                    
                     break;
+                
                 // Right click
                 //  Show popup menu
                 case 1:
@@ -332,7 +325,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                         _curveController.SelectControlPoint(this, keepOtherSelection: false);
                     }
 
-                    ControlPointPopupMenu.Show(evt.position, new SelectedControlPointsEditor(_curveController), this);
+                    _showPopupMenu?.Invoke(evt.position, this);
                     evt.StopPropagation();
                     break;
             }

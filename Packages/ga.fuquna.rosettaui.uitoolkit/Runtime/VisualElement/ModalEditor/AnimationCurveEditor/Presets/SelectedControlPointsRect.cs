@@ -16,7 +16,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private readonly Func<IEnumerable<ControlPoint>> _getSelectedControlPoints;
 
-        private Rect Rect
+        public Rect Rect
         {
             get
             {

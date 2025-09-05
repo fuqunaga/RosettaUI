@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -70,7 +71,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private SelectedControlPointsRect _selectedControlPointsRect;
         private SelectionRect _selectionRect;
         private ControlPointDisplayPositionPopup _controlPointDisplayPositionPopup;
-        private ControlPointEditPositionPopup _controlPointEditPositionPopup;
+        private ControlPointsEditPositionPopup _controlPointsEditPositionPopup;
 
         private PreviewTransform _previewTransform;
         
@@ -113,7 +114,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             ControlPoint CreateControlPoint(CurveController curveController)
             {
-                return new ControlPoint(curveController, _previewTransform, _controlPointDisplayPositionPopup, _controlPointEditPositionPopup, () => (_snapXButton.value, _snapYButton.value));
+                return new ControlPoint(curveController, _previewTransform, _controlPointDisplayPositionPopup,
+                    showPopupMenu: (pos, controlPoint) =>
+                    {
+                        ControlPointsPopupMenu.Show(pos, _curveController.SelectedControlPointsEditor, _controlPointsEditPositionPopup, controlPoint);
+                    }, 
+                    () => (_snapXButton.value, _snapYButton.value));
             }
         }
         
@@ -179,8 +185,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             curveGroup.Add(_controlPointDisplayPositionPopup);
             
             // Edit Key Popup
-            _controlPointEditPositionPopup = new ControlPointEditPositionPopup();
-            curveGroup.Add(_controlPointEditPositionPopup);
+            _controlPointsEditPositionPopup = new ControlPointsEditPositionPopup();
+            curveGroup.Add(_controlPointsEditPositionPopup);
         }
 
         private void SetupKeyBindings()
@@ -211,12 +217,22 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             });
             _keyEventHelper.RegisterKeyAction(KeyCode.Delete, _ =>
             {
-                _curveController.RemoveAllSelectedControlPoints();
+                _curveController.SelectedControlPointsEditor.RemoveAll();
             });
 
             _keyEventHelper.RegisterKeyAction(KeyCode.Return, _ =>
             {
-                _curveController.ShowEditKeyPopupOfSelectedControlPoint();
+                var firstControlPoint = _curveController.SelectedControlPoints.FirstOrDefault();
+                if (firstControlPoint != null)
+                {
+                    // 矩形範囲選択（複数選択）してたらその中心
+                    // そうでなければ単数選択なのでControlPointの中心
+                    var pos = _selectedControlPointsRect.IsShown()
+                        ? _selectedControlPointsRect.Rect.center
+                        : firstControlPoint.GetLocalPosition();
+                    
+                    _controlPointsEditPositionPopup.Show(pos, _curveController.SelectedControlPointsEditor);
+                }
             });
 
         }
@@ -271,7 +287,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             _curveController.UnselectAllControlPoints();
             _controlPointDisplayPositionPopup.Hide();
-            _controlPointEditPositionPopup.Hide();
+            _controlPointsEditPositionPopup.Hide();
         }
         
         #endregion

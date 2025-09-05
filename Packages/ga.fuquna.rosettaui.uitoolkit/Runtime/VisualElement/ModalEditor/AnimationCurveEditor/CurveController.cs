@@ -22,6 +22,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly Func<CurveController, ControlPoint> _getNewControlPoint;
 
         public AnimationCurve Curve { get; private set; } = new();
+        
+        public SelectedControlPointsEditor SelectedControlPointsEditor { get; }
+        
         public IEnumerable<ControlPoint> SelectedControlPoints => ControlPoints.Where(t => t.IsActive);
 
 
@@ -31,6 +34,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             _parent = parent;
             _getNewControlPoint = getNewControlPoint;
+            
+            SelectedControlPointsEditor = new SelectedControlPointsEditor(this);
         }
         
         public void SetCurve(AnimationCurve curve)
@@ -117,12 +122,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             Curve.RemoveKey(index);
             ControlPoints.RemoveAt(index);
         }
-        
-        public void ShowEditKeyPopupOfSelectedControlPoint()
-        {
-            SelectedControlPoints.FirstOrDefault()?.ShowEditKeyPopup();
-        }
-        
+
         public void SelectControlPointsInRect(Rect selectionRect, bool preserveOtherSelection = false)
         {
             if (!preserveOtherSelection)

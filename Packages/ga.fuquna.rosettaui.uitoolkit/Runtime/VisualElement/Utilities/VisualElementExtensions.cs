@@ -193,6 +193,11 @@ namespace RosettaUI.UIToolkit
             return new Vector2(style.left, style.top);
         }
         
+        public static bool IsShown(this VisualElement ve)
+        {
+            return ve.style.display != DisplayStyle.None;
+        }
+        
         public static void Show(this VisualElement ve)
         {
             ve.style.display = DisplayStyle.Flex;

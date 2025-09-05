@@ -282,21 +282,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             switch (evt.button)
             {
                 // Left click
-                // - IsActive
-                //   - subKey: unselect
-                // - !IsActive:
-                //   - subKey: add select
-                //   - !subKey: select only this. start drag.
+                // - subKey: select/unselect
+                // - !subKey: select only this. start drag.
                 case 0:
                     var subKey = evt.shiftKey || evt.ctrlKey || evt.commandKey;
 
-                    if (IsActive && subKey)
+                    if (subKey)
                     {
-                        _curveController.UnselectControlPoint(this);
-                    }
-                    else if(subKey)
-                    {
-                        _curveController.SelectControlPoint(this, keepOtherSelection: true);
+                        if (IsActive)
+                        {
+                            _curveController.UnselectControlPoint(this);
+                        }
+                        else
+                        {
+                            _curveController.SelectControlPoint(this, keepOtherSelection: true);
+                        }
                     }
                     else
                     {

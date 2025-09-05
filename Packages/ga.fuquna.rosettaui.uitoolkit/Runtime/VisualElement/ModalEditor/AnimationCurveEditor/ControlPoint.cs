@@ -81,7 +81,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public Keyframe Keyframe
         {
             get => _curveController.GetKeyframe(this);
-            set => _curveController.UpdateKeyframe(this, value);
+            set => _curveController.UpdateKeyframes(new []{(this, value)});
         }
         
         public Vector2 KeyframePosition

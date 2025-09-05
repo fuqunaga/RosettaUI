@@ -243,34 +243,55 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         /// ControlPointのKeyframeの時間が変更されたらAnimationCurve上のIndexが変わる可能性がある
         /// Indexが変わるなら追随する
         /// </summary>
-        public void UpdateKeyframe(ControlPoint controlPoint, Keyframe keyframe, bool notifyOnChanged = true)
+        public void UpdateKeyframes(IEnumerable<(ControlPoint, Keyframe)> controlPointAndNewKeyframes, bool notifyOnChanged = true)
         {
-            if (controlPoint == null || Curve == null || ControlPoints.Count == 0)
+            if (controlPointAndNewKeyframes == null || Curve == null || ControlPoints.Count == 0)
             {
                 return;
             }
-
-            var index = ControlPoints.IndexOf(controlPoint);
-            if (index < 0 || index >= Curve.keys.Length)
+            
+            using var _ = ListPool<(ControlPoint controlPoint, Keyframe keyframe)>.Get(out var list);
+            list.AddRange(controlPointAndNewKeyframes);
+            
+            foreach (var (controlPoint, keyframe) in list)
             {
-                return;
-            }
+                var index = ControlPoints.IndexOf(controlPoint);
+                if (index < 0 || index >= Curve.keys.Length)
+                {
+                    continue;
+                }
 
-            var newIndex = Curve.MoveKey(index, keyframe);
-            if (newIndex != index)
-            {
-                // Indexが変わったのでControlPointsの順番も入れ替える
-                var temp = ControlPoints[index];
-                ControlPoints.RemoveAt(index);
-                ControlPoints.Insert(newIndex, temp);
+                // 既存のKeyframeと同じtimeなら削除して上書き
+                // MoveKey()ではtime変更なしの更新になるので自前で上書きを実装
+                // > AnimationCurve does not support two keys with the same time. If key.time is the same as another keyframe, key is reinserted at the time of the keyframe at index. This cancels the move operation in the time dimension and keeps the modification in the value dimension.
+                // https://docs.unity3d.com/ScriptReference/AnimationCurve.MoveKey.html
+                var existingKeyIndex = Array.FindIndex(Curve.keys, k => Mathf.Approximately(k.time, keyframe.time));
+                if (existingKeyIndex >= 0 && existingKeyIndex != index)
+                {
+                    var existingKeyControlPoint = GetControlPoint(existingKeyIndex);
+                    DoRemoveControlPoint(existingKeyControlPoint);
+                    
+                    // indexが変わっている可能性があるので再取得
+                    index = ControlPoints.IndexOf(controlPoint);
+                }
+
+                var newIndex = Curve.MoveKey(index, keyframe);
+                if (newIndex != index)
+                {
+                    // Indexが変わったのでControlPointsの順番も入れ替える
+                    var temp = ControlPoints[index];
+                    ControlPoints.RemoveAt(index);
+                    ControlPoints.Insert(newIndex, temp);
+                }
             }
 
             if (notifyOnChanged)
             {
                 OnCurveChanged();
+                onControlPointChanged?.Invoke();
             }
         }
-
+  
         public void OnCurveChanged()
         {
             ApplyTangentModeAndKeyBrokenToKeyframes();

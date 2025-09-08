@@ -266,8 +266,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var rect = _previewTransform.PreviewRect;
             _scrollerController.UpdateScroller(rect, _curveController.Curve.GetCurveRect());
             _axisLabelController.UpdateAxisLabel(rect);
-            
             _curveController.UpdateView();
+            _selectedControlPointsRect.UpdateView();
             UpdateCurvePreview();
         }
         

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -15,13 +14,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// </summary>
     public class ControlPoint : VisualElement
     {
-        private enum MoveAxis
-        {
-            Both,
-            Horizontal,
-            Vertical
-        }
-        
         private const string ContainerClassName = "rosettaui-animation-curve-editor__control-point-container";
         private const string ControlPointClassName = "rosettaui-animation-curve-editor__control-point";
         private const string ActiveControlPointClassName = "rosettaui-animation-curve-editor__control-point--active";
@@ -32,12 +24,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         // https://olj611.hatenablog.com/entry/2023/12/01/150842
         private const float WeightDefaultValue = 1 / 3f;
         
-        private readonly Action<Vector2, ControlPoint> _showPopupMenu;
-        private readonly Func<(bool, bool)> _getSnapXY;
-
         private readonly CurveController _curveController;
         private readonly PreviewTransform _previewTransform;
-        private readonly ControlPointDisplayPositionPopup _controlPointDisplayPositionPopup;
         private readonly VisualElement _controlPoint;
         private readonly ControlPointHandle _leftHandle;
         private readonly ControlPointHandle _rightHandle;
@@ -45,7 +33,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
 
         private Vector2 _pointerDownPositionToElementOffset;
-        private MoveAxis _pointerMoveAxis = MoveAxis.Both;
         private Vector2 _keyframePositionOnPointerDown;
 
 
@@ -99,20 +86,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private ControlPoint Right => _curveController.GetControlPointRight(this);
         
         
-        public ControlPoint(CurveController curveController, PreviewTransform previewTransform,
-            ControlPointDisplayPositionPopup controlPointDisplayPositionPopup, 
-            Action<Vector2, ControlPoint> showPopupMenu,
-            Func<(bool, bool)> getSnapXY)
+        public ControlPoint(CurveController curveController, PreviewTransform previewTransform)
         {
             _curveController = curveController;
             _previewTransform = previewTransform;
-            _controlPointDisplayPositionPopup = controlPointDisplayPositionPopup;
-            _showPopupMenu = showPopupMenu;
-            _getSnapXY = getSnapXY;
 
             // Control point container
             AddToClassList(ContainerClassName);
-            RegisterCallback<PointerDownEvent>(OnPointerDown);
             
             // Handles
             _leftHandle = new ControlPointHandle(InOrOut.In,
@@ -271,120 +251,5 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 return screesPosRight.x - screesPosLeft.x;
             }
         }
-        
-        #region Pointer Events
-        
-        private void OnPointerDown(PointerDownEvent evt)
-        {
-            var elementPosition = this.GetLocalPosition();
-            _pointerDownPositionToElementOffset = elementPosition - (Vector2)evt.position; 
-            
-            switch (evt.button)
-            {
-                // Left click
-                // - subKey: select/unselect
-                // - !subKey: select only this. start drag.
-                case 0:
-                    var subKey = evt.shiftKey || evt.ctrlKey || evt.commandKey;
-
-                    if (subKey)
-                    {
-                        if (IsActive)
-                        {
-                            _curveController.UnselectControlPoint(this);
-                        }
-                        else
-                        {
-                            _curveController.SelectControlPoint(this, keepOtherSelection: true);
-                        }
-                    }
-                    else
-                    {
-                        _curveController.SelectControlPoint(this);
-                        _pointerMoveAxis = MoveAxis.Both;
-                        _keyframePositionOnPointerDown = KeyframePosition;
-                        this.CaptureMouse();
-                        RegisterCallback<PointerMoveEvent>(OnPointerMove);
-                        RegisterCallback<PointerUpEvent>(OnPointerUp);
-
-                        _controlPointDisplayPositionPopup.Show();
-                        _controlPointDisplayPositionPopup.Update(elementPosition, KeyframePosition);
-                    }
-
-                    evt.StopPropagation();
-                    break;
-                
-                // Right click
-                //  Show popup menu
-                case 1:
-                    
-                    // IsActive(=選択中）の場合はそのまま（複数選択のとき複数選択状態をキープ）
-                    // IsActiveでない場合は他の選択を外して自身のみ選択してからメニュー表示
-                    if (!IsActive)
-                    {
-                        _curveController.SelectControlPoint(this, keepOtherSelection: false);
-                    }
-
-                    _showPopupMenu?.Invoke(evt.position, this);
-                    evt.StopPropagation();
-                    break;
-            }
-        }
-
-        private void OnPointerMove(PointerMoveEvent evt)
-        {
-            if (_pointerMoveAxis == MoveAxis.Both && evt.shiftKey)
-            {
-                var delta = evt.deltaPosition;
-                _pointerMoveAxis = Mathf.Abs(delta.x) > Mathf.Abs(delta.y) ? MoveAxis.Horizontal : MoveAxis.Vertical;
-            }
-            
-            var screenPosition = (Vector2)evt.position + _pointerDownPositionToElementOffset;
-            var keyframePosition = _previewTransform.GetCurvePosFromScreenPos(screenPosition);
-            
-            switch (_pointerMoveAxis)
-            {
-                case MoveAxis.Both:
-                    break;
-                case MoveAxis.Horizontal:
-                    keyframePosition.y = _keyframePositionOnPointerDown.y;
-                    break;
-                case MoveAxis.Vertical:
-                    keyframePosition.x = _keyframePositionOnPointerDown.x;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-            
-            var (snapX, snapY) = _getSnapXY();
-            if (snapX || snapY)
-            {
-                var gridViewport = _previewTransform.PreviewGridViewport;
-                if (snapX) keyframePosition.x = gridViewport.RoundX(keyframePosition.x, 0.05f);
-                if (snapY) keyframePosition.y = gridViewport.RoundY(keyframePosition.y, 0.05f);
-            }
-            
-            KeyframePosition = keyframePosition;
-            
-            var pointPosition = _previewTransform.GetScreenPosFromCurvePos(KeyframePosition);
-            var popupPosition = pointPosition + _controlPointDisplayPositionPopup.positionOffset;
-            _controlPointDisplayPositionPopup.Update(popupPosition, KeyframePosition);
-        }
-
-        private void OnPointerUp(PointerUpEvent evt)
-        {
-            if (evt.button == 0)
-            {
-                UnregisterCallback<PointerMoveEvent>(OnPointerMove);
-                UnregisterCallback<PointerUpEvent>(OnPointerUp);
-                evt.StopPropagation();
-                this.ReleaseMouse();
-                
-                _controlPointDisplayPositionPopup.Hide();
-            }
-        }
-        
-        #endregion
-
     }
 }

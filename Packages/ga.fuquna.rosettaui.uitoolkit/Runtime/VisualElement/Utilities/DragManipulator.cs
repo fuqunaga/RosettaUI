@@ -1,27 +1,24 @@
 ﻿using System;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
     public class DragManipulator : PointerManipulator
     {
-        public event Action<Vector2> onDragStart;
-        public event Action<Vector2> onDrag;
-        public event Action onDragEnd;
+        public event Func<DragManipulator, PointerDownEvent, bool> onDragStarting;
+        public event Action<DragManipulator, PointerMoveEvent> onDrag;
+        public event Action<DragManipulator, EventBase> onDragEnd;
         
-        private bool _active;
         private int _activePointerId = -1;
-        private Vector2 _pointerStartPos;   // スクリーン座標(Pointer開始時)
         
-        public DragManipulator()
-        {
-            activators.Add(new ManipulatorActivationFilter
-            {
-                button = MouseButton.LeftMouse,
-                modifiers = EventModifiers.None,
-            });
-        }
+        // public DragManipulator()
+        // {
+        //     activators.Add(new ManipulatorActivationFilter
+        //     {
+        //         button = MouseButton.LeftMouse,
+        //         modifiers = EventModifiers.None,
+        //     });
+        // }
         
         protected override void RegisterCallbacksOnTarget()
         {
@@ -29,7 +26,7 @@ namespace RosettaUI.UIToolkit
             target.RegisterCallback<PointerMoveEvent>(OnPointerMove);
             target.RegisterCallback<PointerUpEvent>(OnPointerUp);
             target.RegisterCallback<PointerCancelEvent>(OnPointerCancel);
-            target.RegisterCallback<DetachFromPanelEvent>(_ => CancelDrag());
+            target.RegisterCallback<DetachFromPanelEvent>(CancelDrag);
         }
 
         protected override void UnregisterCallbacksFromTarget()
@@ -42,56 +39,56 @@ namespace RosettaUI.UIToolkit
 
         private void OnPointerDown(PointerDownEvent e)
         {
-            if (_active) return;
+            if (_activePointerId >= 0) return;
 
-            _active = true;
-            _activePointerId = e.pointerId;
-            _pointerStartPos = e.position;
-            target.CapturePointer(e.pointerId);
-            onDragStart?.Invoke(_pointerStartPos);
+            var startDrag = onDragStarting?.Invoke(this, e) ?? true;
+            if (startDrag)
+            {
+                _activePointerId = e.pointerId;
+                target.CapturePointer(e.pointerId);
+            }
+
             e.StopPropagation();
         }
 
         private void OnPointerMove(PointerMoveEvent e)
         {
-            if (!_active || e.pointerId != _activePointerId) return;
+            if (e.pointerId != _activePointerId) return;
             if (!target.HasPointerCapture(_activePointerId)) return;
             
-            var delta = (Vector2)e.position - _pointerStartPos;
-            onDrag?.Invoke(delta);
+            onDrag?.Invoke(this, e);
             e.StopPropagation();
         }
 
         private void OnPointerUp(PointerUpEvent e)
         {
-            if (!_active || e.pointerId != _activePointerId) return;
+            if (e.pointerId != _activePointerId) return;
             
-            Finish();
+            Finish(e);
             e.StopPropagation();
         }
 
         private void OnPointerCancel(PointerCancelEvent e)
         {
-            if (!_active || e.pointerId != _activePointerId) return;
-            Finish();
+            if (e.pointerId != _activePointerId) return;
+            Finish(e);
         }
 
-        private void Finish()
+        private void Finish(EventBase e)
         {
-            if (!_active) return;
-            if (target.HasPointerCapture(_activePointerId))
+            if (_activePointerId >= 0 && target.HasPointerCapture(_activePointerId))
+            {
                 target.ReleasePointer(_activePointerId);
+            }
 
-            _active = false;
             _activePointerId = -1;
             
-            onDragEnd?.Invoke();
+            onDragEnd?.Invoke(this, e);
         }
 
-        private void CancelDrag()
+        private void CancelDrag(EventBase e)
         {
-            if (!_active) return;
-            Finish();
+            Finish(e);
         }
     }
 }

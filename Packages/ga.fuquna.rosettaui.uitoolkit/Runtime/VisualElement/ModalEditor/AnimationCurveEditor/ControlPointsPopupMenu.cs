@@ -74,7 +74,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             {
                 controlPointsEditor.SetBothTangentMode(TangentMode.Free, false);
                 controlPointsEditor.SetKeyBroken(false, false);
-                controlPointsEditor.UpdateKeyframe(keyframe =>
+                controlPointsEditor.UpdateKeyframes(keyframe =>
                 {
                     keyframe.inTangent = 0;
                     keyframe.outTangent = 0;

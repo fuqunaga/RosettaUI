@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Builder;
 using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
@@ -74,6 +76,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private ControlPointsEditPositionPopup _controlPointsEditPositionPopup;
 
         private PreviewTransform _previewTransform;
+        private readonly ControlPointsManipulatorSource _controlPointsManipulatorSource;
         
         private bool _prevSnapX;
         private bool _prevSnapY;
@@ -98,6 +101,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             InitPresetsUI();
             SetupKeyBindings();
             
+      
+            
             var controlPointContainer = this.Q("control-point-container");
             
             _curveController = new CurveController(controlPointContainer, CreateControlPoint);
@@ -109,20 +114,29 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
             _curveController.onControlPointChanged += () => _selectedControlPointsRect.UpdateView();
 
+            
+            _controlPointsManipulatorSource = new ControlPointsManipulatorSource(
+                _curveController,
+                _previewTransform,
+                _controlPointDisplayPositionPopup,
+                _controlPointsEditPositionPopup,
+                () => (_snapXButton.value, _snapYButton.value),
+                (worldPosition) => _curvePreviewElement.WorldToLocal(worldPosition)
+            );
+            
+            _selectedControlPointsRect.AddManipulator(_controlPointsManipulatorSource.CreateManipulator());
+            
             return;
             
             
             ControlPoint CreateControlPoint(CurveController curveController)
             {
-                return new ControlPoint(curveController, _previewTransform, _controlPointDisplayPositionPopup,
-                    showPopupMenu: (pos, controlPoint) =>
-                    {
-                        ControlPointsPopupMenu.Show(pos, _curveController.SelectedControlPointsEditor, _controlPointsEditPositionPopup, controlPoint);
-                    }, 
-                    () => (_snapXButton.value, _snapYButton.value));
+                var controlPoint = new ControlPoint(curveController, _previewTransform);
+                controlPoint.AddManipulator(_controlPointsManipulatorSource.CreateManipulator());
+                return controlPoint;
             }
         }
-        
+
         /// <summary>
         /// Set the curve to be edited.
         /// </summary>
@@ -236,7 +250,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             });
 
         }
-
+        
         #endregion
         
         #region View Update

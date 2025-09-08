@@ -14,11 +14,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly CurveController _curveController;
         
         public bool IsEmpty => !_curveController.SelectedControlPoints.Any();
+
         public bool IsMultiSelection => _curveController.SelectedControlPoints.Skip(1).Any();
         
         public IEnumerable<ControlPoint> ControlPoints => _curveController.SelectedControlPoints;
         
-        
+
+
         public SelectedControlPointsEditor(CurveController curveController)
         {
             _curveController = curveController;
@@ -90,7 +92,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 }, false);
             }
             
-            UpdateKeyframe(keyframe =>
+            UpdateKeyframes(keyframe =>
             {
                 keyframe.SetWeightedFrag(weightedMode, weighted);
                 return keyframe;
@@ -98,7 +100,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         }
         
         public void UpdateKeyframePosition(float? xOrNull, float? yOrNull, bool notifyOnChanged = true){
-            UpdateKeyframe(keyframe =>
+            UpdateKeyframes(keyframe =>
             {
                 if (xOrNull is { } x) keyframe.time = x;
                 if (yOrNull is { } y) keyframe.value = y;
@@ -106,10 +108,18 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }, notifyOnChanged);
         }
         
-        public void UpdateKeyframe(Func<Keyframe, Keyframe> editKeyframeFunc, bool notifyOnChanged = true)
+        public void UpdateKeyframes(Func<Keyframe, Keyframe> editKeyframeFunc, bool notifyOnChanged = true)
+        {
+            UpdateKeyframes(
+                cp => editKeyframeFunc(cp.Keyframe),
+                notifyOnChanged
+            );
+        } 
+        
+        public void UpdateKeyframes(Func<ControlPoint, Keyframe> controlPointToNewKeyframeFunc, bool notifyOnChanged = true)
         {
             _curveController.UpdateKeyframes(
-                ControlPoints.Select(cp => (cp, editKeyframeFunc(cp.Keyframe))),
+                ControlPoints.Select(cp => (cp, controlPointToNewKeyframeFunc(cp))),
                 notifyOnChanged
             );
         } 

@@ -11,15 +11,6 @@ namespace RosettaUI.UIToolkit
         
         private int _activePointerId = -1;
         
-        // public DragManipulator()
-        // {
-        //     activators.Add(new ManipulatorActivationFilter
-        //     {
-        //         button = MouseButton.LeftMouse,
-        //         modifiers = EventModifiers.None,
-        //     });
-        // }
-        
         protected override void RegisterCallbacksOnTarget()
         {
             target.RegisterCallback<PointerDownEvent>(OnPointerDown);
@@ -47,8 +38,6 @@ namespace RosettaUI.UIToolkit
                 _activePointerId = e.pointerId;
                 target.CapturePointer(e.pointerId);
             }
-
-            e.StopPropagation();
         }
 
         private void OnPointerMove(PointerMoveEvent e)
@@ -57,7 +46,6 @@ namespace RosettaUI.UIToolkit
             if (!target.HasPointerCapture(_activePointerId)) return;
             
             onDrag?.Invoke(this, e);
-            e.StopPropagation();
         }
 
         private void OnPointerUp(PointerUpEvent e)
@@ -65,7 +53,6 @@ namespace RosettaUI.UIToolkit
             if (e.pointerId != _activePointerId) return;
             
             Finish(e);
-            e.StopPropagation();
         }
 
         private void OnPointerCancel(PointerCancelEvent e)

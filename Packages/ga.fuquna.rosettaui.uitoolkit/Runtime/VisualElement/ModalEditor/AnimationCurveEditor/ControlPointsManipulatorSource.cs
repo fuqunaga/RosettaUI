@@ -82,6 +82,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                             }
                             
                             // do not start drag
+                            evt.StopPropagation();
                             return false;
                         }
 
@@ -105,6 +106,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
                     _positionPopup.Show();
                     UpdatePositionPopup(evt.position);
+                    
+                    evt.StopPropagation();
 
                     return true;
 
@@ -127,6 +130,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                         // - DropdownMenuが、画面下部にスペースがなく上部にある場合targetエレメントの上にメニューが表示される
                         //   SelectedControlPointsRectの上部に出てしまいカーソルから離れすぎて不自然なので一旦なし
                         ControlPointsPopupMenu.Show(evt.position, SelectedControlPointsEditor, _editPositionPopup, targetCp);
+                        
+                        evt.StopPropagation();
                     }
 
                     break;

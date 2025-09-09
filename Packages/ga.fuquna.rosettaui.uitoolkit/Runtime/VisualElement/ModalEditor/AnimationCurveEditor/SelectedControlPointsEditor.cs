@@ -110,13 +110,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void UpdateKeyframes(Func<Keyframe, Keyframe> editKeyframeFunc, bool notifyOnChanged = true)
         {
-            UpdateKeyframes(
+            UpdateControlPointKeyframes(
                 cp => editKeyframeFunc(cp.Keyframe),
                 notifyOnChanged
             );
         } 
         
-        public void UpdateKeyframes(Func<ControlPoint, Keyframe> controlPointToNewKeyframeFunc, bool notifyOnChanged = true)
+        public void UpdateControlPointKeyframes(Func<ControlPoint, Keyframe> controlPointToNewKeyframeFunc, bool notifyOnChanged = true)
         {
             _curveController.UpdateKeyframes(
                 ControlPoints.Select(cp => (cp, controlPointToNewKeyframeFunc(cp))),

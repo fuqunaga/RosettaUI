@@ -207,5 +207,18 @@ namespace RosettaUI.UIToolkit
         {
             ve.style.display = DisplayStyle.None;
         }
+
+        public static void SetShow(this VisualElement ve, bool flag)
+        {
+            if (flag)
+            {
+                ve.Show();
+            }
+            else
+            {
+                ve.Hide();
+            }
+            
+        }
     }
 }

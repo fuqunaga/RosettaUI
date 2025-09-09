@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RosettaUI.Builder;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -87,7 +88,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var movedCursorPosition = cursorPositionOnCurve - _cursorPositionOnDragStart;
             
             var (snapX, snapY) = _getSnapSettings();
-            SelectedControlPointsEditor.UpdateKeyframes(cp =>
+            SelectedControlPointsEditor.UpdateControlPointKeyframes(cp =>
             {
                 if (!_keyframePositionsOnDragStart.TryGetValue(cp, out var keyframePositionOnDragStart))
                 {
@@ -119,8 +120,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 }
                 
                 var keyframe = cp.Keyframe;
-                keyframe.time = keyframePosition.x;
-                keyframe.value = keyframePosition.y;
+                keyframe.SetPosition(keyframePosition);
                 return keyframe;
             });
             

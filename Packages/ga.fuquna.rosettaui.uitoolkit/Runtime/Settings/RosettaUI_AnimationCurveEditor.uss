@@ -87,8 +87,8 @@
 
 .rosettaui-animation-curve-editor__selected-control-points-rect__handle__center-line {
     background-color: #4368AD; /* capture from Unity Editor */
-    min-width: 2px;
-    min-height: 2px;
+    min-width: 0.7px;
+    min-height: 0.7px;
 }
 
 /********************************************************************************
@@ -97,9 +97,9 @@
 .rosettaui-animation-curve-editor__control-point-container {
     position: absolute;
     margin: 0;
-    width: 20px;
-    height: 20px;
-    translate: -10px -10px;
+    width: 10px;
+    height: 10px;
+    translate: -5px -5px;
     justify-content: center;
     align-items: center;
 }

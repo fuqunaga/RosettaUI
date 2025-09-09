@@ -97,11 +97,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private AnimationCurveEditor() : base(VisualTreeAssetName, true)
         {
             AddToClassList(USSClassName);
-            InitUI();
-            InitPresetsUI();
-            SetupKeyBindings();
-            
-      
             
             var controlPointContainer = this.Q("control-point-container");
             
@@ -112,7 +107,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 NotifyEditorValueChanged();
             };
             _curveController.onControlPointSelectionChanged += () => _selectedControlPointsRect.UpdateView();
-
+            
+            InitUI();
+            InitPresetsUI();
+            SetupKeyBindings();
             
             _controlPointsDragManipulatorSource = new ControlPointsDragManipulatorSource(
                 _curveController,
@@ -188,7 +186,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             );
             
             // Selected Control Points Rect
-            _selectedControlPointsRect = new SelectedControlPointsRect(() => _curveController.SelectedControlPoints);
+            _selectedControlPointsRect = new SelectedControlPointsRect(_curveController.SelectedControlPointsEditor, _previewTransform);
             _curvePreviewElement.Add(_selectedControlPointsRect);
             
             // Selection Rect
@@ -244,7 +242,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     // 矩形範囲選択（複数選択）してたらその中心
                     // そうでなければ単数選択なのでControlPointの中心
                     var pos = _selectedControlPointsRect.IsShown()
-                        ? _selectedControlPointsRect.Rect.center
+                        ? _selectedControlPointsRect.layout.center
                         : firstControlPoint.GetLocalPosition();
                     
                     _controlPointsEditPositionPopup.Show(pos, _curveController.SelectedControlPointsEditor);

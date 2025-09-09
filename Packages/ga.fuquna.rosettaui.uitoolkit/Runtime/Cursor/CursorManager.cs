@@ -7,7 +7,7 @@ namespace RosettaUI.UIToolkit
     {
         public static void SetCursor(CursorType cursorType)
         {
-            var data = CursorHolder.GetCursor(cursorType);
+            var data = CursorHolder.GetCursorData(cursorType);
 
             if (data == null)
             {

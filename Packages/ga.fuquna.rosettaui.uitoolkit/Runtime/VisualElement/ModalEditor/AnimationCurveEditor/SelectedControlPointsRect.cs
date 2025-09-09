@@ -13,6 +13,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     public class SelectedControlPointsRect : VisualElement
     {
         private const string UssClassName = "rosettaui-animation-curve-editor__selected-control-points-rect";
+        private const string HandleClassName = UssClassName + "__handle";
+        private const string HandleHorizontalClassName = HandleClassName + "--horizontal";
+        private const string HandleVerticalClassName = HandleClassName + "--vertical";
+        private const string HandleTopClassName = HandleClassName + "--top";
+        private const string HandleBottomClassName = HandleClassName + "--bottom";
+        private const string HandleLeftClassName = HandleClassName + "--left";
+        private const string HandleRightClassName = HandleClassName + "--right";
+        private const string HandleLineClassName = HandleClassName + "__center-line";
+        
         
         private readonly Func<IEnumerable<ControlPoint>> _getSelectedControlPoints;
 
@@ -47,6 +56,38 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             _getSelectedControlPoints = getSelectedControlPoints;
             AddToClassList(UssClassName);
+
+          
+            // 4辺のハンドル
+            var topHandle = CreateHandle(HandleTopClassName, HandleHorizontalClassName, CursorType.ResizeVertical);
+            Add(topHandle);
+            
+            var bottomHandle = CreateHandle(HandleBottomClassName, HandleHorizontalClassName, CursorType.ResizeVertical);
+            Add(bottomHandle);
+            
+            var leftHandle = CreateHandle(HandleLeftClassName, HandleVerticalClassName, CursorType.ResizeHorizontal);
+            Add(leftHandle);
+            
+            var rightHandle = CreateHandle(HandleRightClassName, HandleVerticalClassName, CursorType.ResizeHorizontal);
+            Add(rightHandle);
+            
+            return;
+            
+            
+            VisualElement CreateHandle(string classNameDir, string classNameHv, CursorType cursorType)
+            {
+                var handle = new VisualElement();
+                handle.AddToClassList(HandleClassName);
+                handle.AddToClassList(classNameDir);
+                handle.AddToClassList(classNameHv);
+                handle.style.cursor = CursorHolder.Get(cursorType);
+                
+                var line = new VisualElement();
+                line.AddToClassList(HandleLineClassName);
+                handle.Add(line);
+                
+                return handle;
+            }
         }
         
         public void UpdateView()

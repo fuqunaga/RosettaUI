@@ -47,8 +47,48 @@
 ********************************************************************************/
 .rosettaui-animation-curve-editor__selected-control-points-rect {
     position: absolute;
-    background-color: white;
-    opacity: 0.1;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle {
+    position: absolute;
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--horizontal {
+    left: 10%;
+    right: 10%;
+    height: 10px;
+    justify-content: center;
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--vertical {
+    top: 10%;
+    bottom: 10%;
+    width: 10px;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--top {
+    top: -10px;
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--bottom {
+    bottom: -10px;
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--left {
+    left: -10px;
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--right {
+    right: -10px;
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle__center-line {
+    background-color: #4368AD; /* capture from Unity Editor */
+    min-width: 2px;
+    min-height: 2px;
 }
 
 /********************************************************************************

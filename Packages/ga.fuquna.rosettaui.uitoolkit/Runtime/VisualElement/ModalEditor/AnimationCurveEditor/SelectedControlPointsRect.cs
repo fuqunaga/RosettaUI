@@ -28,27 +28,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     return default;
                 }
 
-                var firstPos = GetLocalPosition(list[0]);
+                var firstPos = list[0].LocalPosition;
 
                 var min = firstPos;
                 var max = firstPos;
-                foreach (var pos in list.Skip(1).Select(GetLocalPosition))
+                foreach (var pos in list.Skip(1).Select(cp => cp.LocalPosition))
                 {
                     min = Vector2.Min(min, pos);
                     max = Vector2.Max(max, pos);
                 }
                 
                 return Rect.MinMaxRect(min.x, min.y, max.x, max.y);
-
-
-                // VisualElementExtensions.GetLocalPosition()はresolveStyleを使用するため
-                // レイアウト計算が終わるまで最新の値が反映されない
-                // ControlPointの位置指定はstyle.left/topなのを当て込んでを直接取得する
-                static Vector2 GetLocalPosition(ControlPoint cp)
-                {
-                    var style = cp.style;
-                    return new Vector2(style.left.value.value, style.top.value.value);
-                }
             }
         }
 

@@ -68,20 +68,25 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public Keyframe Keyframe
         {
             get => _curveController.GetKeyframe(this);
-            set => _curveController.UpdateKeyframes(new []{(this, value)});
+            private set => _curveController.UpdateKeyframes(new []{(this, value)});
         }
         
-        public Vector2 KeyframePosition
+        public Vector2 KeyframePosition => Keyframe.GetPosition();
+
+        /// <summary>
+        /// UIToolkitのLocalPosition
+        /// get時、resolveStyleに反映されるのはレイアウト計算後なのでstyle.left/topを直接参照する
+        /// </summary>
+        public Vector2 LocalPosition
         {
-            get => Keyframe.GetPosition();
-            set
+            get => new(style.left.value.value, style.top.value.value);
+            private set
             {
-                var keyframe = Keyframe;
-                keyframe.SetPosition(value);
-                Keyframe = keyframe;
+                style.left = value.x;
+                style.top = value.y;
             }
         }
-        
+
         private ControlPoint Left => _curveController.GetControlPointLeft(this);
         private ControlPoint Right => _curveController.GetControlPointRight(this);
         
@@ -185,10 +190,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void UpdateView()
         {
-            var uiPosition = _previewTransform.GetScreenPosFromCurvePos(KeyframePosition);
-            style.left = uiPosition.x;
-            style.top = uiPosition.y;
-
+            LocalPosition = _previewTransform.GetScreenPosFromCurvePos(KeyframePosition);
+            
             UpdateWrapModeButton();
 
             if (IsActive)
@@ -246,8 +249,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             float GetXDistInScreen(ControlPoint left, ControlPoint right)
             {
                 if (left == null || right == null) return 0f;
-                var screesPosLeft = _previewTransform.GetScreenPosFromCurvePos(left.Keyframe.GetPosition());
-                var screesPosRight = _previewTransform.GetScreenPosFromCurvePos(right.Keyframe.GetPosition());
+                var screesPosLeft = _previewTransform.GetScreenPosFromCurvePos(left.KeyframePosition);
+                var screesPosRight = _previewTransform.GetScreenPosFromCurvePos(right.KeyframePosition);
                 return screesPosRight.x - screesPosLeft.x;
             }
         }

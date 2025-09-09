@@ -112,7 +112,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 NotifyEditorValueChanged();
             };
 
-            _curveController.onControlPointChanged += () => _selectedControlPointsRect.UpdateView();
+            _curveController.onControlPointSelectionChanged += () => _selectedControlPointsRect.UpdateView();
 
             
             _controlPointsManipulatorSource = new ControlPointsManipulatorSource(

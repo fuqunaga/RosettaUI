@@ -23,14 +23,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         // Ferguson/Coons曲線をベジエ曲線にするときの係数
         // https://olj611.hatenablog.com/entry/2023/12/01/150842
         private const float WeightDefaultValue = 1 / 3f;
-        
+
         private readonly CurveController _curveController;
         private readonly PreviewTransform _previewTransform;
-        private readonly VisualElement _controlPoint;
+        private readonly VisualElement _controlPointCore;
         private readonly ControlPointHandle _leftHandle;
         private readonly ControlPointHandle _rightHandle;
         private readonly WrapModeButton _wrapModeButton;
 
+        private readonly Action<Vector2, ControlPoint> _showPopupMenu;
 
         private Vector2 _pointerDownPositionToElementOffset;
         private Vector2 _keyframePositionOnPointerDown;
@@ -41,26 +42,25 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         /// Needs to call CurveController.OnCurveChanged() after this to reflect the change in the view
         public TangentMode InTangentMode { get; set; } = TangentMode.Free;
-        
+
         /// Needs to call CurveController.OnCurveChanged() after this to reflect the change in the view
         public TangentMode OutTangentMode { get; set; } = TangentMode.Free;
 
 
-
         public bool IsActive
         {
-            get => _controlPoint.ClassListContains(ActiveControlPointClassName);
+            get => _controlPointCore.ClassListContains(ActiveControlPointClassName);
             set
             {
                 if (value)
                 {
-                    _controlPoint.AddToClassList(ActiveControlPointClassName);
+                    _controlPointCore.AddToClassList(ActiveControlPointClassName);
                 }
                 else
                 {
-                    _controlPoint.RemoveFromClassList(ActiveControlPointClassName);
+                    _controlPointCore.RemoveFromClassList(ActiveControlPointClassName);
                 }
-                
+
                 UpdateHandleView();
             }
         }
@@ -68,9 +68,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public Keyframe Keyframe
         {
             get => _curveController.GetKeyframe(this);
-            private set => _curveController.UpdateKeyframes(new []{(this, value)});
+            private set => _curveController.UpdateKeyframes(new[] { (this, value) });
         }
-        
+
         public Vector2 KeyframePosition => Keyframe.GetPosition();
 
         /// <summary>
@@ -89,24 +89,26 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private ControlPoint Left => _curveController.GetControlPointLeft(this);
         private ControlPoint Right => _curveController.GetControlPointRight(this);
-        
-        
-        public ControlPoint(CurveController curveController, PreviewTransform previewTransform)
+
+
+        public ControlPoint(CurveController curveController, PreviewTransform previewTransform,
+            Action<Vector2, ControlPoint> showPopupMenu)
         {
             _curveController = curveController;
             _previewTransform = previewTransform;
+            _showPopupMenu = showPopupMenu;
 
             // Control point container
             AddToClassList(ContainerClassName);
-            
+            RegisterCallback<PointerDownEvent>(OnPointerDown);
+
             // Handles
             _leftHandle = new ControlPointHandle(InOrOut.In,
                 _previewTransform,
                 (tangent, weight) => OnTangentAndWeightChanged(InOrOut.In, tangent, weight)
-            
             );
             Add(_leftHandle);
-            
+
             _rightHandle = new ControlPointHandle(InOrOut.Out,
                 _previewTransform,
                 (tangent, weight) => OnTangentAndWeightChanged(InOrOut.Out, tangent, weight)
@@ -115,45 +117,45 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
 
             // Control point
-            _controlPoint = new VisualElement { name = "AnimationCurveEditorControlPoint" };
-            _controlPoint.AddToClassList(ControlPointClassName);
-            Add(_controlPoint);
+            _controlPointCore = new VisualElement { name = "AnimationCurveEditorControlPoint" };
+            _controlPointCore.AddToClassList(ControlPointClassName);
+            Add(_controlPointCore);
 
-            
+
             // Clamp mode button
             _wrapModeButton = new WrapModeButton();
             _wrapModeButton.RegisterCallback<PointerDownEvent>(_ => OnWrapModeButtonClicked());
             Add(_wrapModeButton);
-            
+
             return;
 
 
             void OnTangentAndWeightChanged(InOrOut inOrOut, float tangent, float weight)
             {
                 var keyframe = Keyframe;
-                
+
                 keyframe.SetTangent(inOrOut, tangent);
-                
+
                 if (!IsKeyBroken)
                 {
                     var oppositeTangent = float.IsInfinity(tangent) ? -tangent : tangent;
                     keyframe.SetTangent(inOrOut.Opposite(), oppositeTangent);
                 }
-                
-                keyframe.SetWeight(inOrOut, keyframe.IsWeighted(inOrOut) ? weight : WeightDefaultValue); 
+
+                keyframe.SetWeight(inOrOut, keyframe.IsWeighted(inOrOut) ? weight : WeightDefaultValue);
 
 
                 Keyframe = keyframe;
             }
-            
+
             void OnWrapModeButtonClicked()
             {
                 Action<WrapMode> setWrapMode;
                 WrapMode currentMode;
-                
-                switch (_wrapModeButton.CurrentPreOrPost)  
+
+                switch (_wrapModeButton.CurrentPreOrPost)
                 {
-                    case WrapModeButton.PreOrPost.Pre :
+                    case WrapModeButton.PreOrPost.Pre:
                         setWrapMode = _curveController.SetPreWrapMode;
                         currentMode = _curveController.Curve.preWrapMode;
                         break;
@@ -183,15 +185,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
                 MenuItem CreateItem(string itemName, WrapMode mode)
                 {
-                    return new MenuItem(itemName, () => setWrapMode(mode)){ isChecked = mode == currentMode};
+                    return new MenuItem(itemName, () => setWrapMode(mode)) { isChecked = mode == currentMode };
                 }
             }
         }
-        
+
         public void UpdateView()
         {
             LocalPosition = _previewTransform.GetScreenPosFromCurvePos(KeyframePosition);
-            
+
             UpdateWrapModeButton();
 
             if (IsActive)
@@ -199,12 +201,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 UpdateHandleView();
             }
         }
-        
+
         private void UpdateWrapModeButton()
         {
             var hasLeft = Left != null;
             var hasRight = Right != null;
-  
+
             // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (!hasLeft && hasRight)
             {
@@ -216,7 +218,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
             else
             {
-                _wrapModeButton.Hide();    
+                _wrapModeButton.Hide();
             }
         }
 
@@ -229,10 +231,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
             Update(leftHandleEnable, _leftHandle, keyframe, GetXDistInScreen(Left, this));
             Update(rightHandleEnable, _rightHandle, keyframe, GetXDistInScreen(this, Right));
-            
+
             return;
-            
-            
+
+
             static void Update(bool enable, ControlPointHandle handle, Keyframe keyframe, float xDistToNeighborInScreen)
             {
                 if (!enable)
@@ -240,18 +242,82 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     handle.style.visibility = Visibility.Hidden;
                     return;
                 }
-                
+
                 handle.style.visibility = Visibility.Visible;
                 handle.UpdateView(keyframe, xDistToNeighborInScreen);
             }
-            
-            
+
+
             float GetXDistInScreen(ControlPoint left, ControlPoint right)
             {
                 if (left == null || right == null) return 0f;
                 var screesPosLeft = _previewTransform.GetScreenPosFromCurvePos(left.KeyframePosition);
                 var screesPosRight = _previewTransform.GetScreenPosFromCurvePos(right.KeyframePosition);
                 return screesPosRight.x - screesPosLeft.x;
+            }
+        }
+
+
+        private void OnPointerDown(PointerDownEvent evt)
+        {
+            switch (evt.button)
+            {
+                // Left click
+                // - subKey: select/unselect
+                // - !subKey: select only this. and expect start drag.
+                case 0:
+                    var subKey = evt.shiftKey || evt.ctrlKey || evt.commandKey;
+
+                    if (subKey)
+                    {
+                        if (IsActive)
+                        {
+                            _curveController.UnselectControlPoint(this);
+                        }
+                        else
+                        {
+                            _curveController.SelectControlPoint(this, keepOtherSelection: true);
+                        }
+
+                        evt.StopPropagation();
+                        return;
+                    }
+
+                    // 未選択のコントロールポイントの場合はそれのみ選択する
+                    // すでに選択済みの場合は複数選択のケースもあるのでそのまま
+                    if (!IsActive)
+                    {
+                        _curveController.SelectControlPoint(this);
+                    }
+
+                    // ここでStopPropagationしない
+                    // 別のマニュピレーターでDragされるのを期待する
+                    // evt.StopPropagation();
+                    break;
+
+
+                // Right click
+                //  Show popup menu
+                case 1:
+                    // IsActive(=選択中）の場合はそのまま（複数選択のとき複数選択状態をキープ）
+                    // IsActiveでない場合は他の選択を外して自身のみ選択してからメニュー表示
+                    if (this is { IsActive: false })
+                    {
+                        _curveController.SelectControlPoint(this, keepOtherSelection: false);
+                    }
+
+                    // Show menu
+                    // SelectedControlPointsRectのときでも出して良い気がするが、
+                    // - UnityのAnimationCurveEditorの挙動では出ない
+                    // - DropdownMenuが、画面下部にスペースがなく上部にある場合targetエレメントの上にメニューが表示される
+                    //   SelectedControlPointsRectの上部に出てしまいカーソルから離れすぎて不自然なので一旦なし
+                    // ControlPointsPopupMenu.Show(evt.position, SelectedControlPointsEditor, _editPositionPopup, this);
+                    _showPopupMenu(evt.position, this);
+
+                    evt.StopPropagation();
+
+
+                    break;
             }
         }
     }

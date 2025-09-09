@@ -76,7 +76,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private ControlPointsEditPositionPopup _controlPointsEditPositionPopup;
 
         private PreviewTransform _previewTransform;
-        private readonly ControlPointsManipulatorSource _controlPointsManipulatorSource;
+        private readonly ControlPointsDragManipulatorSource _controlPointsDragManipulatorSource;
         
         private bool _prevSnapX;
         private bool _prevSnapY;
@@ -111,28 +111,30 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 UpdateView();
                 NotifyEditorValueChanged();
             };
-
             _curveController.onControlPointSelectionChanged += () => _selectedControlPointsRect.UpdateView();
 
             
-            _controlPointsManipulatorSource = new ControlPointsManipulatorSource(
+            _controlPointsDragManipulatorSource = new ControlPointsDragManipulatorSource(
                 _curveController,
                 _previewTransform,
                 _controlPointDisplayPositionPopup,
-                _controlPointsEditPositionPopup,
                 () => (_snapXButton.value, _snapYButton.value),
                 (worldPosition) => _curvePreviewElement.WorldToLocal(worldPosition)
             );
             
-            _selectedControlPointsRect.AddManipulator(_controlPointsManipulatorSource.CreateManipulator());
+            _selectedControlPointsRect.AddManipulator(_controlPointsDragManipulatorSource.CreateManipulator());
             
             return;
             
             
             ControlPoint CreateControlPoint(CurveController curveController)
             {
-                var controlPoint = new ControlPoint(curveController, _previewTransform);
-                controlPoint.AddManipulator(_controlPointsManipulatorSource.CreateManipulator());
+                var controlPoint = new ControlPoint(
+                    curveController,
+                    _previewTransform,
+                    showPopupMenu: (position, cp) => ControlPointsPopupMenu.Show(position, _curveController.SelectedControlPointsEditor, _controlPointsEditPositionPopup, cp)
+                );
+                controlPoint.AddManipulator(_controlPointsDragManipulatorSource.CreateManipulator());
                 return controlPoint;
             }
         }

@@ -82,6 +82,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private bool _prevSnapY;
 
         private Vector2 _zoomStartPosition;
+        private float _lastPointerDownTime;
         
         #region ModalEditor
 
@@ -160,8 +161,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             // Curve Preview
             _curvePreviewElement = this.Q("preview-back");
             _curvePreviewElement.RegisterCallback<PointerDownEvent>(OnPointerDown);
-            _curvePreviewElement.RegisterCallback<GeometryChangedEvent>(_ => UpdateView());
             _curvePreviewElement.RegisterCallback<WheelEvent>(OnWheel);
+            _curvePreviewElement.RegisterCallback<GeometryChangedEvent>(_ => UpdateView());
 
             // Curve Preview Transform
             _previewTransform = new PreviewTransform(() => _curvePreviewElement.resolvedStyle.width, () => _curvePreviewElement.resolvedStyle.height);
@@ -332,7 +333,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 // double click: Add control point
                 case 0:
                     // Add control point if double click
-                    if (evt.clickCount == 2)
+                    if (Time.realtimeSinceStartup - _lastPointerDownTime < 0.3f)
                     {
                         AddControlPoint(_previewTransform.GetCurvePosFromScreenPos(evt.localPosition));
                         evt.StopPropagation();
@@ -342,6 +343,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                         if (!IsPreserveCurrentSelectKey(evt))
                         {
                             UnselectAllControlPoint();
+                            _lastPointerDownTime = Time.realtimeSinceStartup;
                         }
 
                         _selectionRect.Show(evt.localPosition);
@@ -369,7 +371,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
             void StartDrag()
             {
-                _curvePreviewElement.CaptureMouse();
+                _curvePreviewElement.CapturePointer(evt.pointerId);
                 _curvePreviewElement.RegisterCallback<PointerMoveEvent>(OnPointerMove);
                 _curvePreviewElement.RegisterCallback<PointerUpEvent>(OnPointerUp);
 
@@ -419,14 +421,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void OnPointerUp(PointerUpEvent evt)
         {
             _selectionRect.Hide();
-            
-            _curvePreviewElement.ReleaseMouse();
+
+            if (_curvePreviewElement.HasPointerCapture(evt.pointerId))
+            {
+                _curvePreviewElement.ReleasePointer(evt.pointerId);
+            }
             _curvePreviewElement.UnregisterCallback<PointerMoveEvent>(OnPointerMove);
             _curvePreviewElement.UnregisterCallback<PointerUpEvent>(OnPointerUp);
             evt.StopPropagation();
         }
         
-        private bool IsPreserveCurrentSelectKey(IPointerEvent evt)
+        private static bool IsPreserveCurrentSelectKey(IPointerEvent evt)
         {
             return evt.shiftKey || evt.ctrlKey || evt.commandKey;
         }

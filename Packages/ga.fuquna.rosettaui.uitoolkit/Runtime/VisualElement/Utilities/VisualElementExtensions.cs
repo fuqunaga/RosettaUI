@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace RosettaUI.UIToolkit
 {
-    public static class VisualElementExtension
+    public static class VisualElementExtensions
     {
         public static void SetValueWithoutNotifyIfNotEqual<T>(this INotifyValueChanged<T> field, T value)
         {
@@ -181,6 +181,44 @@ namespace RosettaUI.UIToolkit
             }
             
             return ve.resolvedStyle.height * ve.GetScaledPixelsPerPoint();
+        }
+        
+        /// <summary>
+        /// 親要素からの相対位置を取得する
+        /// </summary>
+        public static Vector2 GetLocalPosition(this VisualElement ve)
+        {
+            // ve.layout.positionは親のパディングやボーダーを含めた「レイアウト結果」としての位置なので使用しない
+            var style = ve.resolvedStyle;
+            return new Vector2(style.left, style.top);
+        }
+        
+        public static bool IsShown(this VisualElement ve)
+        {
+            return ve.style.display != DisplayStyle.None;
+        }
+        
+        public static void Show(this VisualElement ve)
+        {
+            ve.style.display = DisplayStyle.Flex;
+        }
+        
+        public static void Hide(this VisualElement ve)
+        {
+            ve.style.display = DisplayStyle.None;
+        }
+
+        public static void SetShow(this VisualElement ve, bool flag)
+        {
+            if (flag)
+            {
+                ve.Show();
+            }
+            else
+            {
+                ve.Hide();
+            }
+            
         }
     }
 }

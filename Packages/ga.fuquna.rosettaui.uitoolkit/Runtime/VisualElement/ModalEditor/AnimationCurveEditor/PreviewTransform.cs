@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
@@ -7,8 +8,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// Previewの座標変換を行うクラス
     /// 主に三つの座標系がある
     /// - Curve座標系: アニメーションカーブの座標系
-    /// - Screen座標系: UI上のピクセル数ベースの座標系
+    /// - Screen座標系: PreviewElement上のピクセル数ベースの座標系
     /// - ScreenUV座標系: Screen座標系を0~1の範囲に正規化した座標系
+    /// - UIWorld座標系: UI Document全体の座標系
     /// UI座標系はそのまま表示されるピクセル数とは異なり、さらにUIDocument全体にスケーリングがかかる
     /// </summary>
     public class PreviewTransform : ICoordinateConverter
@@ -16,20 +18,40 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public static float ZoomMin { get; set; } = 1e-10f;
         public static float ZoomMax { get; set; } = 1e+4f;
         
+        
+        private Vector2 _zoom = Vector2.one;
+        private Vector2 _offset = Vector2.zero;
+        
+        private readonly VisualElement _previewElement;
+        private readonly Func<(bool, bool)> _getSnapEnable;
+
+        
         public Vector2 Zoom => _zoom;
         public Vector2 Offset => _offset;
         public Vector4 OffsetZoom => new(_offset.x, _offset.y, _zoom.x, _zoom.y);
-
-        private Vector2 _zoom = Vector2.one;
-        private Vector2 _offset = Vector2.zero;
-
-        private readonly Func<float> _getPreviewWidth;
-        private readonly Func<float> _getPreviewHeight;
-
-        public PreviewTransform(Func<float> getPreviewWidth, Func<float> getPreviewHeight)
+        
+        public Rect PreviewRect => new()
         {
-            _getPreviewWidth = getPreviewWidth;
-            _getPreviewHeight = getPreviewHeight;
+            min = GetCurvePosFromScreenUv(Vector2.zero),
+            max = GetCurvePosFromScreenUv(Vector2.one)
+        };
+
+        public GridViewport PreviewGridViewport => new(PreviewRect);
+
+        private Vector2 PreviewSize
+        {
+            get
+            {
+                var previewStyle = _previewElement.resolvedStyle;
+                return new Vector2(previewStyle.width, previewStyle.height);
+            }
+        }
+
+        
+        public PreviewTransform(VisualElement previewElement, Func<(bool, bool)> getSnapEnable)
+        {
+            _previewElement = previewElement;
+            _getSnapEnable = getSnapEnable;
         }
 
         public void AdjustOffset(Vector2 amount)
@@ -39,7 +61,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         public void AdjustOffsetByScreenDelta(Vector2 screenDelta)
         {
-            AdjustOffset(new Vector2(-screenDelta.x / _getPreviewWidth(), screenDelta.y /_getPreviewHeight()) / _zoom);
+            var previewSize = PreviewSize;
+            AdjustOffset(new Vector2(-screenDelta.x / previewSize.x, screenDelta.y / previewSize.y) / _zoom);
         }
 
         public void SetXCenter(float xCenter)
@@ -70,8 +93,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             var widthOnCurve = rectOnCurve.width;
             var heightOnCurve = rectOnCurve.height;
-            var widthOnScreen = _getPreviewWidth();
-            var heightOnScreen = _getPreviewHeight();
+            
+            var previewSize = PreviewSize;
+            var widthOnScreen = previewSize.x;
+            var heightOnScreen = previewSize.y;
 
             rectOnCurve.xMin -= GetCurveLengthFromScreenLength(widthOnCurve, widthOnScreen, paddingOnScreen.left);
             rectOnCurve.xMax += GetCurveLengthFromScreenLength(widthOnCurve, widthOnScreen, paddingOnScreen.right);
@@ -94,17 +119,28 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 return Mathf.Max(0f, (lengthOnScreen * rangeOnCurve) / (rangeOnScreen - lengthOnScreen * 2));
             }
         }
+        
+        public Vector2 SnapCurvePositionIfEnabled(Vector2 curvePos)
+        {
+            var gridViewport = PreviewGridViewport;
+            var (snapX, snapY) = _getSnapEnable();
+            if (snapX) curvePos.x = gridViewport.RoundX(curvePos.x, 0.05f);
+            if (snapY) curvePos.y = gridViewport.RoundY(curvePos.y, 0.05f);
+            return curvePos;
+        }
 
         #region Coordinate Convertion
 
         public Vector2 GetScreenUvFromScreenPos(Vector2 screenPos)
         {
-            return new Vector2(screenPos.x / _getPreviewWidth(), 1f - screenPos.y /_getPreviewHeight());
+            var previewSize = PreviewSize;
+            return new Vector2(screenPos.x / previewSize.x, 1f - screenPos.y / previewSize.y);
         }
         
         public Vector2 GetScreenPosFromScreenUv(Vector2 screenUv)
         {
-            return new Vector2(screenUv.x * _getPreviewWidth(), (1f - screenUv.y) *_getPreviewHeight());
+            var previewSize = PreviewSize;
+            return new Vector2(screenUv.x * previewSize.x, (1f - screenUv.y) * previewSize.y);
         }
         
         public Vector2 GetCurvePosFromScreenUv(Vector2 screenUv)
@@ -119,34 +155,30 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         public float GetCurveTangentFromScreenTangent(float tangent)
         {
-            float aspect = _getPreviewWidth() / _getPreviewHeight() * _zoom.x / _zoom.y;
+            var previewSize = PreviewSize;
+            var aspect = previewSize.x / previewSize.y * _zoom.x / _zoom.y;
             tangent *= aspect;
             return tangent;
         }
         
         public float GetScreenTangentFromCurveTangent(float tangent)
         {
-            float aspect = _getPreviewWidth() / _getPreviewHeight() * _zoom.x / _zoom.y;
+            var previewSize = PreviewSize;
+            var aspect = previewSize.x / previewSize.y * _zoom.x / _zoom.y;
             tangent /= aspect;
             return tangent;
         }
-
-        public Rect PreviewRect
+        
+        public Vector2 GetScreenPosFromUIWorldPos(Vector2 uiWorldPos)
         {
-            get
-            {
-                var rect = new Rect
-                {
-                    min = GetCurvePosFromScreenUv(Vector2.zero),
-                    max = GetCurvePosFromScreenUv(Vector2.one)
-                };
-                return rect;
-            }
+            return _previewElement.WorldToLocal(uiWorldPos);
         }
-
-        public GridViewport PreviewGridViewport => new(PreviewRect);
-
+        
+        public Vector2 GetUIWorldPosFromScreenPos(Vector2 screenPos)
+        {
+            return _previewElement.LocalToWorld(screenPos);
+        }
+        
         #endregion
-
     }
 }

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
@@ -6,17 +8,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// <summary>
     /// ControlPointの編集用ポップアップ 
     /// </summary>
-    public class ControlPointEditPositionPopup : EventBlocker
+    public class ControlPointsEditPositionPopup : EventBlocker
     {
         public static string VisualTreeAssetName { get; set; } = "RosettaUI_AnimationCurve_ControlPointEditPositionPopup";
 
-        private ControlPoint _controlPoint;
-        
         private VisualElement _editKeyPopupRoot;
         private FloatField _timeField;
         private FloatField _valueField;
 
-        public ControlPointEditPositionPopup()
+        private SelectedControlPointsEditor _controlPointsEditor;
+        
+        public ControlPointsEditPositionPopup()
         {
             Hide();
         }
@@ -51,27 +53,48 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 // FloatFieldのイベント後にSubmitを実行
                 schedule.Execute(() =>
                 {
-                    if (_controlPoint != null)
-                    {
-                        _controlPoint.KeyframePosition = new Vector2(_timeField.value, _valueField.value);
-                    }
+                    _controlPointsEditor?.UpdateKeyframePosition(
+                        _timeField.showMixedValue ? null : _timeField.value,
+                        _valueField.showMixedValue ? null : _valueField.value
+                    );
                     Hide();
                 });
             }, TrickleDown.TrickleDown);
         }
-
-        public void Show(ControlPoint controlPoint)
+        
+        public void Show(Vector2 popupPosition, SelectedControlPointsEditor selectedControlPointsEditor)
         {
+            if (selectedControlPointsEditor.IsEmpty)
+            {
+                return;
+            }
+            
             InitializeIfNeeded();
             
-            _controlPoint = controlPoint;
+            _controlPointsEditor = selectedControlPointsEditor;
+
+            using var _ = ListPool<Vector2>.Get(out var keyframePositions);
+            keyframePositions.AddRange(
+                _controlPointsEditor.ControlPoints.Select(cp => cp.KeyframePosition)
+            );
             
-            var position = _controlPoint.KeyframePosition;
-            _timeField.value = position.x;
-            _valueField.value = position.y;
+            var hasMultipleValueX = keyframePositions.Select(p => p.x).Distinct().Skip(1).Any();
+            var hasMultipleValueY = keyframePositions.Select(p => p.y).Distinct().Skip(1).Any();
+
+            _timeField.showMixedValue = hasMultipleValueX;
+            _valueField.showMixedValue = hasMultipleValueY;
+            if (!hasMultipleValueX)
+            {
+                _timeField.value = keyframePositions[0].x;
+            }
+            if (!hasMultipleValueY)
+            {
+                _valueField.value = keyframePositions[0].y;
+            }
             
-            _editKeyPopupRoot.style.left = controlPoint.style.left;
-            _editKeyPopupRoot.style.top = controlPoint.style.top;
+
+            _editKeyPopupRoot.style.left = popupPosition.x;
+            _editKeyPopupRoot.style.top = popupPosition.y;
             
             style.display = DisplayStyle.Flex;
             
@@ -88,7 +111,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void Hide()
         {
-            _controlPoint = null;
+            _controlPointsEditor = null;
             style.display = DisplayStyle.None;
         }
     }

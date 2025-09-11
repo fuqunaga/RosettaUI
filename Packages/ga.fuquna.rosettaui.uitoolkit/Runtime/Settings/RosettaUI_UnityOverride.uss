@@ -52,6 +52,14 @@
 /*    background-color: var(--unity-colors-highlight-background-inactive);*/
 /*}*/
 
+/* override mixed value color
+   .unity-base-field__label--mixed-value だけの設定だと優先度負けして効かなかった.unity-base-text-field__inputも指定
+ */
+.unity-base-field__label--mixed-value > .unity-base-text-field__input{
+    color: #808080;
+}
+
+
 .unity-base-text-field:hover:enabled > .unity-base-field__input {
     border-color: var(--unity-colors-input_field-border-hover);
 }

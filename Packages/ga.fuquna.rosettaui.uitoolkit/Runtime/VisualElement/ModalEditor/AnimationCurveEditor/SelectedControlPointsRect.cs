@@ -51,6 +51,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private class EdgeMovableRect
         {
             private Rect _originalRect;
+            private float _sideValue;
 
             public RectSide Side { get; private set; }
 
@@ -58,12 +59,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             {
                 Side = side;
                 _originalRect = rect;
+                _sideValue = GetSideValue(rect, side);
             }
 
-            public Rect MoveEdge(float deltaFromOriginal)
+            public Rect MoveEdge(float delta)
             {
-                var sideValue = GetSideValue(_originalRect, Side) + deltaFromOriginal;
-                return SetSideValue(_originalRect, Side, sideValue);
+                _sideValue += delta;
+                return SetSideValue(_originalRect, Side, _sideValue);
             }
         }
 
@@ -91,12 +93,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly VisualElement _bottomHandle;
         private readonly VisualElement _leftHandle;
         private readonly VisualElement _rightHandle;
-
         
-        private Vector2 _pointerPositionOnDragStart;
         
-
-
         private Rect ControlPointsRect
         {
             get
@@ -208,19 +206,32 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             if (evt.button != 0) return false;
             
-            StartDragHandle(side, evt.position);
-            evt.StopPropagation();
+            var rectOnParent = ControlPointsRect;
+            var rectOnCurve = new Rect()
+            {
+                min = _previewTransform.GetCurvePosFromScreenPos(rectOnParent.min),
+                max = _previewTransform.GetCurvePosFromScreenPos(rectOnParent.max)
+            };
             
+            _edgeMovableRect.Setup(side, rectOnCurve);
+            
+            _normalizedPositionsOnDragStart.Clear();
+            foreach (var cp in _selectedControlPointsEditor.ControlPoints)
+            {
+                var normalized = Rect.PointToNormalized(rectOnCurve, cp.KeyframePosition);
+                _normalizedPositionsOnDragStart[cp] = normalized;
+            }
+            
+            evt.StopPropagation();
             return true;
         }
 
-        // ドラッグ中にZoomされてもいいようにRectの記憶はCurve座標系じゃないとダメかも
-        
         // 表示されるRectとは別に論理的にControlPointsのBoundingRectを計算する
         // 表示されるRectは厚みがThicknessMin以下にならないように制限しているが、論理Rectは制限なし
+        // ドラッグ中にZoomされてもいいように論理RectはCurve座標系
         private void OnDrag(PointerMoveEvent evt)
         {
-            var delta = (Vector2)evt.position - _pointerPositionOnDragStart;
+            var delta = _previewTransform.GetCurvePosFromScreenPos(evt.deltaPosition) - _previewTransform.GetCurvePosFromScreenPos(Vector2.zero);
             var deltaValue = _edgeMovableRect.Side is RectSide.Left or RectSide.Right ? delta.x : delta.y;
             
             var rect = _edgeMovableRect.MoveEdge(deltaValue);
@@ -232,10 +243,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     return cp.Keyframe;
                 }
                 
-                var newLocalPosition = Rect.NormalizedToPoint(rect, normalized);
+                var keyframePosition = Rect.NormalizedToPoint(rect, normalized);
                 
-                var keyframePosition = _previewTransform.GetCurvePosFromScreenPos(newLocalPosition);
-
                 var keyframe = cp.Keyframe;
                 keyframe.SetPosition(keyframePosition);
                 return keyframe;
@@ -245,20 +254,5 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         }
         
         #endregion
-
-        private void StartDragHandle(RectSide side, Vector2 pointerPosition)
-        {
-            var rect = ControlPointsRect;
-            
-            _edgeMovableRect.Setup(side, rect);
-            _pointerPositionOnDragStart = pointerPosition;
-            
-            _normalizedPositionsOnDragStart.Clear();
-            foreach (var cp in _selectedControlPointsEditor.ControlPoints)
-            {
-                var normalized = Rect.PointToNormalized(rect, cp.LocalPosition);
-                _normalizedPositionsOnDragStart[cp] = normalized;
-            }
-        }
     }
 }

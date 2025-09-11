@@ -83,24 +83,26 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private const string HandleLeftClassName = HandleClassName + "--left";
         private const string HandleRightClassName = HandleClassName + "--right";
         private const string HandleLineClassName = HandleClassName + "__center-line";
-        
-        private readonly SelectedControlPointsEditor _selectedControlPointsEditor;
+
+        private readonly CurveController _curveController;
         private readonly PreviewTransform _previewTransform;
-        private readonly EdgeMovableRect _edgeMovableRect = new();
+        private readonly CurveSnapshot _curveSnapshot;
         private readonly Dictionary<ControlPoint, Vector2> _normalizedPositionsOnDragStart = new();
+        private readonly EdgeMovableRect _edgeMovableRect = new();
         
         private readonly VisualElement _topHandle;
         private readonly VisualElement _bottomHandle;
         private readonly VisualElement _leftHandle;
         private readonly VisualElement _rightHandle;
         
+        private SelectedControlPointsEditor SelectedControlPointsEditor => _curveController.SelectedControlPointsEditor;
         
         private Rect ControlPointsRect
         {
             get
             {
                 using var _ = ListPool<ControlPoint>.Get(out var list);
-                list.AddRange(_selectedControlPointsEditor.ControlPoints);
+                list.AddRange(SelectedControlPointsEditor.ControlPoints);
                 
                 if (list.Count == 0)
                 {
@@ -121,10 +123,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
 
-        public SelectedControlPointsRect(SelectedControlPointsEditor selectedControlPointsEditor, PreviewTransform previewTransform)
+        public SelectedControlPointsRect(CurveController curveController, PreviewTransform previewTransform)
         {
-            _selectedControlPointsEditor = selectedControlPointsEditor;
+            _curveController = curveController;
             _previewTransform = previewTransform;
+            _curveSnapshot = new CurveSnapshot(curveController);
             
             AddToClassList(UssClassName);
             
@@ -216,11 +219,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _edgeMovableRect.Setup(side, rectOnCurve);
             
             _normalizedPositionsOnDragStart.Clear();
-            foreach (var cp in _selectedControlPointsEditor.ControlPoints)
+            foreach (var cp in SelectedControlPointsEditor.ControlPoints)
             {
                 var normalized = Rect.PointToNormalized(rectOnCurve, cp.KeyframePosition);
                 _normalizedPositionsOnDragStart[cp] = normalized;
             }
+            
+            // 選択されていないKeyframeを保存しておく
+            // ドラッグ中に選択中のKeyframeが同一timeに来ると上書きされて消えるが、
+            // さらにドラッグしてtimeがずれたら復活したい
+            _curveSnapshot.TakeSnapshot();
+            
             
             evt.StopPropagation();
             return true;
@@ -231,12 +240,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         // ドラッグ中にZoomされてもいいように論理RectはCurve座標系
         private void OnDrag(PointerMoveEvent evt)
         {
+            // 未選択Keyframeの追加を試みる
+            // ドラッグ中に選択中のKeyframeが同一timeに来ると上書きされて消えるがさらにドラッグしてtimeがずれたら復活させる
+            // すでに同一timeにKeyframeがある場合はAddKeyframeで無視されるので問題ない
+            _curveSnapshot.ApplySnapshotWithoutSelection();
+            
             var delta = _previewTransform.GetCurvePosFromScreenPos(evt.deltaPosition) - _previewTransform.GetCurvePosFromScreenPos(Vector2.zero);
             var deltaValue = _edgeMovableRect.Side is RectSide.Left or RectSide.Right ? delta.x : delta.y;
             
             var rect = _edgeMovableRect.MoveEdge(deltaValue);
             
-            _selectedControlPointsEditor.UpdateControlPointKeyframes(cp =>
+            SelectedControlPointsEditor.UpdateControlPointKeyframes(cp =>
             {
                 if (!_normalizedPositionsOnDragStart.TryGetValue(cp, out var normalized))
                 {

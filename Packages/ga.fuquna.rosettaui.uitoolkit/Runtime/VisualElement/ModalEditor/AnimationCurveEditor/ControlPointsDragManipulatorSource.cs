@@ -23,9 +23,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly CurveController _curveController;
         private readonly PreviewTransform _previewTransform;
         private readonly ControlPointDisplayPositionPopup _positionPopup;
+        private readonly CurveSnapshot _curveSnapshot;
         private readonly Dictionary<ControlPoint, Vector2> _pointerToKeyframePositionOffsetsOnDragStart = new();
-        private readonly List<Keyframe> _noneSelectedKeyframesOnDragStart = new();
-
+        
         private Manipulator _currentManipulator;
         private Vector2 _pointerPositionOnDragStart;
         private MoveAxis _moveAxis = MoveAxis.Both;
@@ -41,6 +41,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _curveController = curveController;
             _previewTransform = previewTransform;
             _positionPopup = positionPopup;
+            _curveSnapshot = new CurveSnapshot(curveController);
         }
         
         public Manipulator CreateManipulator()
@@ -69,16 +70,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 _pointerToKeyframePositionOffsetsOnDragStart[cp] = cp.KeyframePosition - _pointerPositionOnDragStart;
             }
 
-            // 選択されていないKeyframeを保存しておく
+            // ControlPointとKeyframeのスナップショットを保存
             // ドラッグ中に選択中のKeyframeが同一timeに来ると上書きされて消えるが、
             // さらにドラッグしてtimeがずれたら復活したい
-            _noneSelectedKeyframesOnDragStart.Clear();
-            _noneSelectedKeyframesOnDragStart.AddRange(
-                _curveController.ControlPoints
-                    .Except(SelectedControlPointsEditor.ControlPoints)
-                    .Select(cp => cp.Keyframe)
-            );
-
+            _curveSnapshot.TakeSnapshot();
             
             _moveAxis = MoveAxis.Both;
 
@@ -92,13 +87,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private void OnDrag(DragManipulator _, PointerMoveEvent evt)
         {
-            // 未選択Keyframeの追加を試みる
+            // スナップショットに保存されたKeyframeのうち選択中ではないものを復元
             // ドラッグ中に選択中のKeyframeが同一timeに来ると上書きされて消えるがさらにドラッグしてtimeがずれたら復活させる
             // すでに同一timeにKeyframeがある場合はAddKeyframeで無視されるので問題ない
-            foreach (var keyframe in _noneSelectedKeyframesOnDragStart)
-            {
-                _curveController.AddKeyframe(keyframe);
-            }
+            _curveSnapshot.ApplySnapshotWithoutSelection();
             
             if (_moveAxis == MoveAxis.Both && evt.shiftKey)
             {

@@ -188,7 +188,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             );
             
             // Selected Control Points Rect
-            _selectedControlPointsRect = new SelectedControlPointsRect(_curveController.SelectedControlPointsEditor, _previewTransform);
+            _selectedControlPointsRect = new SelectedControlPointsRect(_curveController, _previewTransform);
             _curvePreviewElement.Add(_selectedControlPointsRect);
             
             // Selection Rect

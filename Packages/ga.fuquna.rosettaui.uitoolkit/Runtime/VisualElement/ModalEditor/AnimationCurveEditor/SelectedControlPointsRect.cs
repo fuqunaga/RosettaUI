@@ -245,6 +245,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 
                 var keyframePosition = Rect.NormalizedToPoint(rect, normalized);
                 
+                keyframePosition = _previewTransform.SnapCurvePositionIfEnabled(keyframePosition);
+                
                 var keyframe = cp.Keyframe;
                 keyframe.SetPosition(keyframePosition);
                 return keyframe;

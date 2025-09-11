@@ -22,7 +22,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly CurveController _curveController;
         private readonly PreviewTransform _previewTransform;
         private readonly ControlPointDisplayPositionPopup _positionPopup;
-        private readonly Func<(bool, bool)> _getSnapSettings;
         private readonly Func<Vector2, Vector2> _worldToLocalPosition;
         private readonly Dictionary<ControlPoint, Vector2> _keyframePositionsOnDragStart = new();
 
@@ -35,13 +34,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             CurveController curveController,
             PreviewTransform previewTransform,
             ControlPointDisplayPositionPopup positionPopup,
-            Func<(bool, bool)> getSnapSettings,
             Func<Vector2, Vector2> worldToLocalPosition)
         {
             _curveController = curveController;
             _previewTransform = previewTransform;
             _positionPopup = positionPopup;
-            _getSnapSettings = getSnapSettings;
             _worldToLocalPosition = worldToLocalPosition;
         }
         
@@ -87,7 +84,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var cursorPositionOnCurve = _previewTransform.GetCurvePosFromScreenPos(evt.position);
             var movedCursorPosition = cursorPositionOnCurve - _cursorPositionOnDragStart;
             
-            var (snapX, snapY) = _getSnapSettings();
             SelectedControlPointsEditor.UpdateControlPointKeyframes(cp =>
             {
                 if (!_keyframePositionsOnDragStart.TryGetValue(cp, out var keyframePositionOnDragStart))
@@ -111,13 +107,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                         throw new ArgumentOutOfRangeException();
                 }
                 
-                
-                if (snapX || snapY)
-                {
-                    var gridViewport = _previewTransform.PreviewGridViewport;
-                    if (snapX) keyframePosition.x = gridViewport.RoundX(keyframePosition.x, 0.05f);
-                    if (snapY) keyframePosition.y = gridViewport.RoundY(keyframePosition.y, 0.05f);
-                }
+                keyframePosition = _previewTransform.SnapCurvePositionIfEnabled(keyframePosition);
                 
                 var keyframe = cp.Keyframe;
                 keyframe.SetPosition(keyframePosition);

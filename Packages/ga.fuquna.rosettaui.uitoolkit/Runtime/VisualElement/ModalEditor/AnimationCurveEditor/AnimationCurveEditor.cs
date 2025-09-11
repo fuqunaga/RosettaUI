@@ -117,7 +117,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 _curveController,
                 _previewTransform,
                 _controlPointDisplayPositionPopup,
-                () => (_snapXButton.value, _snapYButton.value),
                 (worldPosition) => _curvePreviewElement.WorldToLocal(worldPosition)
             );
             
@@ -165,7 +164,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _curvePreviewElement.RegisterCallback<GeometryChangedEvent>(_ => UpdateView());
 
             // Curve Preview Transform
-            _previewTransform = new PreviewTransform(() => _curvePreviewElement.resolvedStyle.width, () => _curvePreviewElement.resolvedStyle.height);
+            _previewTransform = new PreviewTransform(() =>
+                {
+                    var previewStyle = _curvePreviewElement.resolvedStyle;
+                    return new Vector2(previewStyle.width, previewStyle.height);
+                },
+                () => (_snapXButton.value, _snapYButton.value)
+            );
             
             // Axis Labels & Scroller
             _axisLabelController = new AxisLabelController(this);

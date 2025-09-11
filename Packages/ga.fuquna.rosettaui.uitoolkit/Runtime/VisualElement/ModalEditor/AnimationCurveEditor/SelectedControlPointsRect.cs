@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Builder;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     public class SelectedControlPointsRect : VisualElement
     {
         #region RectSide enum and helper methods
-        
+
         private enum RectSide
         {
             Top,
@@ -21,19 +22,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             Left,
             Right
         }
-        
-        private static RectSide OppositeSide(RectSide side)
-        {
-            return side switch
-            {
-                RectSide.Top => RectSide.Bottom,
-                RectSide.Bottom => RectSide.Top,
-                RectSide.Left => RectSide.Right,
-                RectSide.Right => RectSide.Left,
-                _ => throw new ArgumentOutOfRangeException(nameof(side), side, null)
-            };
-        }
-        
+
         private static float GetSideValue(Rect rect, RectSide side)
         {
             return side switch
@@ -45,7 +34,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 _ => throw new ArgumentOutOfRangeException(nameof(side), side, null)
             };
         }
-        
+
         private static Rect SetSideValue(Rect rect, RectSide side, float value)
         {
             return side switch
@@ -57,21 +46,30 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 _ => throw new ArgumentOutOfRangeException(nameof(side), side, null)
             };
         }
-        
-        private static float GetSideThickness(Rect rect, RectSide side)
+
+        // 1辺を移動して形を変えられるRect
+        private class EdgeMovableRect
         {
-            return side switch
+            private Rect _originalRect;
+
+            public RectSide Side { get; private set; }
+
+            public void Setup(RectSide side, Rect rect)
             {
-                RectSide.Top => rect.height,
-                RectSide.Bottom => rect.height,
-                RectSide.Left => rect.width,
-                RectSide.Right => rect.width,
-                _ => throw new ArgumentOutOfRangeException(nameof(side), side, null)
-            };
+                Side = side;
+                _originalRect = rect;
+            }
+
+            public Rect MoveEdge(float deltaFromOriginal)
+            {
+                var sideValue = GetSideValue(_originalRect, Side) + deltaFromOriginal;
+                return SetSideValue(_originalRect, Side, sideValue);
+            }
         }
-        
+
         #endregion
-        
+
+       
         public static float ThicknessMin { get; set; } = 15f;
         
         private const string UssClassName = "rosettaui-animation-curve-editor__selected-control-points-rect";
@@ -86,15 +84,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private readonly SelectedControlPointsEditor _selectedControlPointsEditor;
         private readonly PreviewTransform _previewTransform;
+        private readonly EdgeMovableRect _edgeMovableRect = new();
+        private readonly Dictionary<ControlPoint, Vector2> _normalizedPositionsOnDragStart = new();
         
         private readonly VisualElement _topHandle;
         private readonly VisualElement _bottomHandle;
         private readonly VisualElement _leftHandle;
         private readonly VisualElement _rightHandle;
 
-        private RectSide _draggingRectSide;
+        
         private Vector2 _pointerPositionOnDragStart;
-        private float _rectSideValueOnDragStart;
+        
 
 
         private Rect ControlPointsRect
@@ -208,52 +208,31 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             if (evt.button != 0) return false;
             
-            _draggingRectSide = side;
-            _pointerPositionOnDragStart = evt.position;
-            _rectSideValueOnDragStart = GetSideValue(ControlPointsRect, side);
-
+            StartDragHandle(side, evt.position);
             evt.StopPropagation();
+            
             return true;
         }
+
+        // ドラッグ中にZoomされてもいいようにRectの記憶はCurve座標系じゃないとダメかも
         
+        // 表示されるRectとは別に論理的にControlPointsのBoundingRectを計算する
+        // 表示されるRectは厚みがThicknessMin以下にならないように制限しているが、論理Rectは制限なし
         private void OnDrag(PointerMoveEvent evt)
         {
             var delta = (Vector2)evt.position - _pointerPositionOnDragStart;
-            var deltaValue = _draggingRectSide is RectSide.Left or RectSide.Right ? delta.x : delta.y;
-            var newSideValue = _rectSideValueOnDragStart + deltaValue;
+            var deltaValue = _edgeMovableRect.Side is RectSide.Left or RectSide.Right ? delta.x : delta.y;
             
-            var rect = ControlPointsRect;
-            var newRect = SetSideValue(rect, _draggingRectSide, newSideValue);
-            var newThickness = GetSideThickness(newRect, _draggingRectSide);
-            
-            const float epsilon = 1f;
-
-            switch (newThickness)
-            {
-                // width/heightが-epsilon以下になったら反転
-                // OppositeSideをドラッグしている状態にする
-                // width/heightが負になっていても-epsilonを越えるまでは反転せず下記の厚みepsilon制限を適用
-                case < -epsilon:
-                    _rectSideValueOnDragStart = GetSideValue(newRect, _draggingRectSide);
-                    _pointerPositionOnDragStart = evt.position;
-                    _draggingRectSide = OppositeSide(_draggingRectSide);
-                    break;
-                
-                // 厚みがepsilon以下にならないように制限
-                case < epsilon:
-                {
-                    var sideValue = GetSideValue(rect, _draggingRectSide);
-                    var oppositeSideValue = GetSideValue(rect, OppositeSide(_draggingRectSide));
-                    newSideValue = oppositeSideValue + Mathf.Sign(sideValue - oppositeSideValue) * epsilon;
-                    newRect = SetSideValue(rect, _draggingRectSide, newSideValue);
-                    break;
-                }
-            }
+            var rect = _edgeMovableRect.MoveEdge(deltaValue);
             
             _selectedControlPointsEditor.UpdateControlPointKeyframes(cp =>
             {
-                var normalized = Rect.PointToNormalized(rect, cp.LocalPosition);
-                var newLocalPosition = Rect.NormalizedToPoint(newRect, normalized);
+                if (!_normalizedPositionsOnDragStart.TryGetValue(cp, out var normalized))
+                {
+                    return cp.Keyframe;
+                }
+                
+                var newLocalPosition = Rect.NormalizedToPoint(rect, normalized);
                 
                 var keyframePosition = _previewTransform.GetCurvePosFromScreenPos(newLocalPosition);
 
@@ -266,5 +245,20 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         }
         
         #endregion
+
+        private void StartDragHandle(RectSide side, Vector2 pointerPosition)
+        {
+            var rect = ControlPointsRect;
+            
+            _edgeMovableRect.Setup(side, rect);
+            _pointerPositionOnDragStart = pointerPosition;
+            
+            _normalizedPositionsOnDragStart.Clear();
+            foreach (var cp in _selectedControlPointsEditor.ControlPoints)
+            {
+                var normalized = Rect.PointToNormalized(rect, cp.LocalPosition);
+                _normalizedPositionsOnDragStart[cp] = normalized;
+            }
+        }
     }
 }

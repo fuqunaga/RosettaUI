@@ -27,10 +27,16 @@ namespace RosettaUI.UIToolkit
             target.UnregisterCallback<PointerUpEvent>(OnPointerUp);
             target.UnregisterCallback<PointerCancelEvent>(OnPointerCancel);
         }
+        
+        private bool IsCapturedPointer(int pointerId)
+        {
+            return _activePointerId == pointerId && target.HasPointerCapture(pointerId);
+        }
 
         private void OnPointerDown(PointerDownEvent e)
         {
             if (_activePointerId >= 0) return;
+            
 
             var startDrag = onDragStarting?.Invoke(this, e) ?? true;
             if (startDrag)
@@ -42,25 +48,29 @@ namespace RosettaUI.UIToolkit
 
         private void OnPointerMove(PointerMoveEvent e)
         {
-            if (e.pointerId != _activePointerId) return;
-            if (!target.HasPointerCapture(_activePointerId)) return;
-            
+            if (!IsCapturedPointer(e.pointerId)) return;
             onDrag?.Invoke(this, e);
         }
 
         private void OnPointerUp(PointerUpEvent e)
         {
-            if (e.pointerId != _activePointerId) return;
-            
+            if (!IsCapturedPointer(e.pointerId)) return;
             Finish(e);
         }
 
         private void OnPointerCancel(PointerCancelEvent e)
         {
-            if (e.pointerId != _activePointerId) return;
+            if (!IsCapturedPointer(e.pointerId)) return;
             Finish(e);
         }
 
+        private void CancelDrag(EventBase e)
+        {
+            if (_activePointerId < 0) return;
+            Finish(e);
+        }
+        
+        
         private void Finish(EventBase e)
         {
             if (_activePointerId >= 0 && target.HasPointerCapture(_activePointerId))
@@ -69,13 +79,7 @@ namespace RosettaUI.UIToolkit
             }
 
             _activePointerId = -1;
-            
             onDragEnd?.Invoke(this, e);
-        }
-
-        private void CancelDrag(EventBase e)
-        {
-            Finish(e);
         }
     }
 }

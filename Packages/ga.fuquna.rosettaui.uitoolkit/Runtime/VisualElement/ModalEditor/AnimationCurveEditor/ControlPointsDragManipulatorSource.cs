@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RosettaUI.Builder;
 using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
@@ -21,27 +23,25 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly CurveController _curveController;
         private readonly PreviewTransform _previewTransform;
         private readonly ControlPointDisplayPositionPopup _positionPopup;
-        private readonly Func<(bool, bool)> _getSnapSettings;
-        private readonly Func<Vector2, Vector2> _worldToLocalPosition;
-        private readonly Dictionary<ControlPoint, Vector2> _keyframePositionsOnDragStart = new();
-
-        private Vector2 _cursorPositionOnDragStart;
+        private readonly CurveSnapshot _curveSnapshot;
+        private readonly Dictionary<ControlPoint, Vector2> _pointerToKeyframePositionOffsetsOnDragStart = new();
+        
+        private Manipulator _currentManipulator;
+        private Vector2 _pointerPositionOnDragStart;
         private MoveAxis _moveAxis = MoveAxis.Both;
 
         private SelectedControlPointsEditor SelectedControlPointsEditor => _curveController.SelectedControlPointsEditor;
-        
+
         public ControlPointsDragManipulatorSource(
             CurveController curveController,
             PreviewTransform previewTransform,
-            ControlPointDisplayPositionPopup positionPopup,
-            Func<(bool, bool)> getSnapSettings,
-            Func<Vector2, Vector2> worldToLocalPosition)
+            ControlPointDisplayPositionPopup positionPopup
+        )
         {
             _curveController = curveController;
             _previewTransform = previewTransform;
             _positionPopup = positionPopup;
-            _getSnapSettings = getSnapSettings;
-            _worldToLocalPosition = worldToLocalPosition;
+            _curveSnapshot = new CurveSnapshot(curveController);
         }
         
         public Manipulator CreateManipulator()
@@ -55,16 +55,26 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private bool OnDragStarting(DragManipulator manipulator, PointerDownEvent evt)
         {
+            if(_currentManipulator != null) return false; // すでにドラッグ中
+            _currentManipulator = manipulator;
+            
             if (evt.button != 0) return false; // left button only
             
+            
             // start drag
-            _cursorPositionOnDragStart = _previewTransform.GetCurvePosFromScreenPos(evt.position);
-            _keyframePositionsOnDragStart.Clear();
+            _pointerPositionOnDragStart = _previewTransform.GetCurvePosFromUIWorldPos(evt.position);
+            
+            _pointerToKeyframePositionOffsetsOnDragStart.Clear();
             foreach (var cp in SelectedControlPointsEditor.ControlPoints)
             {
-                _keyframePositionsOnDragStart[cp] = cp.KeyframePosition;
+                _pointerToKeyframePositionOffsetsOnDragStart[cp] = cp.KeyframePosition - _pointerPositionOnDragStart;
             }
 
+            // ControlPointとKeyframeのスナップショットを保存
+            // ドラッグ中に選択中のKeyframeが同一timeに来ると上書きされて消えるが、
+            // さらにドラッグしてtimeがずれたら復活したい
+            _curveSnapshot.TakeSnapshot();
+            
             _moveAxis = MoveAxis.Both;
 
             _positionPopup.Show();
@@ -77,50 +87,46 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private void OnDrag(DragManipulator _, PointerMoveEvent evt)
         {
+            // スナップショットに保存されたKeyframeのうち選択中ではないものを復元
+            // ドラッグ中に選択中のKeyframeが同一timeに来ると上書きされて消えるがさらにドラッグしてtimeがずれたら復活させる
+            // すでに同一timeにKeyframeがある場合はAddKeyframeで無視されるので問題ない
+            _curveSnapshot.ApplySnapshotWithoutSelection();
+            
             if (_moveAxis == MoveAxis.Both && evt.shiftKey)
             {
                 var delta = evt.deltaPosition;
                 _moveAxis = Mathf.Abs(delta.x) > Mathf.Abs(delta.y) ? MoveAxis.Horizontal : MoveAxis.Vertical;
             }
             
-            var cursorPositionOnCurve = _previewTransform.GetCurvePosFromScreenPos(evt.position);
-            var movedCursorPosition = cursorPositionOnCurve - _cursorPositionOnDragStart;
+            var pointerPositionOnCurve = _previewTransform.GetCurvePosFromUIWorldPos(evt.position);
             
-            var (snapX, snapY) = _getSnapSettings();
-            SelectedControlPointsEditor.UpdateKeyframes(cp =>
+            SelectedControlPointsEditor.UpdateControlPointKeyframes(cp =>
             {
-                if (!_keyframePositionsOnDragStart.TryGetValue(cp, out var keyframePositionOnDragStart))
+                if (!_pointerToKeyframePositionOffsetsOnDragStart.TryGetValue(cp, out var pointerToKeyframeOffsetOnDragStart))
                 {
                     return cp.Keyframe;
                 }
 
-                var keyframePosition = keyframePositionOnDragStart + movedCursorPosition;
-                
                 switch (_moveAxis)
                 {
                     case MoveAxis.Both:
                         break;
                     case MoveAxis.Horizontal:
-                        keyframePosition.y = keyframePositionOnDragStart.y;
+                        pointerPositionOnCurve.y = _pointerPositionOnDragStart.y;
                         break;
                     case MoveAxis.Vertical:
-                        keyframePosition.x = keyframePositionOnDragStart.x;
+                        pointerPositionOnCurve.x = _pointerPositionOnDragStart.x;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
                 
+                var keyframePosition = pointerToKeyframeOffsetOnDragStart + pointerPositionOnCurve;
                 
-                if (snapX || snapY)
-                {
-                    var gridViewport = _previewTransform.PreviewGridViewport;
-                    if (snapX) keyframePosition.x = gridViewport.RoundX(keyframePosition.x, 0.05f);
-                    if (snapY) keyframePosition.y = gridViewport.RoundY(keyframePosition.y, 0.05f);
-                }
+                keyframePosition = _previewTransform.SnapCurvePositionIfEnabled(keyframePosition);
                 
                 var keyframe = cp.Keyframe;
-                keyframe.time = keyframePosition.x;
-                keyframe.value = keyframePosition.y;
+                keyframe.SetPosition(keyframePosition);
                 return keyframe;
             });
             
@@ -129,11 +135,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private void OnDragEnd(DragManipulator _, EventBase evt)
         {
+            _currentManipulator = null;
             _positionPopup.Hide();
         }
 
         // cursorPosition: 画面上の座標。PreviewTransformのScreenPosではない(ので注意
-        private void UpdatePositionPopup(Vector2 cursorPosition)
+        private void UpdatePositionPopup(Vector2 pointerPosition)
         {
             Vector2 elementPosition;
             Vector2 keyframePosition;
@@ -141,7 +148,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var isMultiSelection = SelectedControlPointsEditor.IsMultiSelection;
             if (isMultiSelection)
             {
-                elementPosition = _worldToLocalPosition(cursorPosition);
+                elementPosition = _previewTransform.GetScreenPosFromUIWorldPos(pointerPosition);
                 keyframePosition = _previewTransform.GetCurvePosFromScreenPos(elementPosition);
             }
             else

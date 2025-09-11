@@ -116,8 +116,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _controlPointsDragManipulatorSource = new ControlPointsDragManipulatorSource(
                 _curveController,
                 _previewTransform,
-                _controlPointDisplayPositionPopup,
-                (worldPosition) => _curvePreviewElement.WorldToLocal(worldPosition)
+                _controlPointDisplayPositionPopup
             );
             
             _selectedControlPointsRect.AddManipulator(_controlPointsDragManipulatorSource.CreateManipulator());
@@ -164,11 +163,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _curvePreviewElement.RegisterCallback<GeometryChangedEvent>(_ => UpdateView());
 
             // Curve Preview Transform
-            _previewTransform = new PreviewTransform(() =>
-                {
-                    var previewStyle = _curvePreviewElement.resolvedStyle;
-                    return new Vector2(previewStyle.width, previewStyle.height);
-                },
+            _previewTransform = new PreviewTransform(
+                _curvePreviewElement,
                 () => (_snapXButton.value, _snapYButton.value)
             );
             

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
 {
@@ -7,8 +8,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// Previewの座標変換を行うクラス
     /// 主に三つの座標系がある
     /// - Curve座標系: アニメーションカーブの座標系
-    /// - Screen座標系: UI上のピクセル数ベースの座標系
+    /// - Screen座標系: PreviewElement上のピクセル数ベースの座標系
     /// - ScreenUV座標系: Screen座標系を0~1の範囲に正規化した座標系
+    /// - UIWorld座標系: UI Document全体の座標系
     /// UI座標系はそのまま表示されるピクセル数とは異なり、さらにUIDocument全体にスケーリングがかかる
     /// </summary>
     public class PreviewTransform : ICoordinateConverter
@@ -19,23 +21,36 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private Vector2 _zoom = Vector2.one;
         private Vector2 _offset = Vector2.zero;
-
-        private readonly Func<Vector2> _getPreviewSize;
+        
+        private readonly VisualElement _previewElement;
         private readonly Func<(bool, bool)> _getSnapEnable;
 
         
         public Vector2 Zoom => _zoom;
         public Vector2 Offset => _offset;
         public Vector4 OffsetZoom => new(_offset.x, _offset.y, _zoom.x, _zoom.y);
+        
+        public Rect PreviewRect => new()
+        {
+            min = GetCurvePosFromScreenUv(Vector2.zero),
+            max = GetCurvePosFromScreenUv(Vector2.one)
+        };
 
         public GridViewport PreviewGridViewport => new(PreviewRect);
-        
-        private Vector2 PreviewSize => _getPreviewSize();
+
+        private Vector2 PreviewSize
+        {
+            get
+            {
+                var previewStyle = _previewElement.resolvedStyle;
+                return new Vector2(previewStyle.width, previewStyle.height);
+            }
+        }
 
         
-        public PreviewTransform(Func<Vector2> getPreviewSize, Func<(bool, bool)> getSnapEnable)
+        public PreviewTransform(VisualElement previewElement, Func<(bool, bool)> getSnapEnable)
         {
-            _getPreviewSize = getPreviewSize;
+            _previewElement = previewElement;
             _getSnapEnable = getSnapEnable;
         }
 
@@ -153,21 +168,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             tangent /= aspect;
             return tangent;
         }
-
-        public Rect PreviewRect
+        
+        public Vector2 GetScreenPosFromUIWorldPos(Vector2 uiWorldPos)
         {
-            get
-            {
-                var rect = new Rect
-                {
-                    min = GetCurvePosFromScreenUv(Vector2.zero),
-                    max = GetCurvePosFromScreenUv(Vector2.one)
-                };
-                return rect;
-            }
+            return _previewElement.WorldToLocal(uiWorldPos);
         }
-
+        
+        public Vector2 GetUIWorldPosFromScreenPos(Vector2 screenPos)
+        {
+            return _previewElement.LocalToWorld(screenPos);
+        }
+        
         #endregion
-
     }
 }

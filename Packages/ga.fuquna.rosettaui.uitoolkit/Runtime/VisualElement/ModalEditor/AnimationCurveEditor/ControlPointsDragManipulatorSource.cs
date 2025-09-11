@@ -25,7 +25,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly Func<Vector2, Vector2> _worldToLocalPosition;
         private readonly Dictionary<ControlPoint, Vector2> _keyframePositionsOnDragStart = new();
 
-        private Vector2 _cursorPositionOnDragStart;
+        private Vector2 _pointerPositionOnDragStart;
         private MoveAxis _moveAxis = MoveAxis.Both;
 
         private SelectedControlPointsEditor SelectedControlPointsEditor => _curveController.SelectedControlPointsEditor;
@@ -56,7 +56,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             if (evt.button != 0) return false; // left button only
             
             // start drag
-            _cursorPositionOnDragStart = _previewTransform.GetCurvePosFromScreenPos(evt.position);
+            _pointerPositionOnDragStart = _previewTransform.GetCurvePosFromScreenPos(evt.position);
             _keyframePositionsOnDragStart.Clear();
             foreach (var cp in SelectedControlPointsEditor.ControlPoints)
             {
@@ -82,7 +82,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
             
             var cursorPositionOnCurve = _previewTransform.GetCurvePosFromScreenPos(evt.position);
-            var movedCursorPosition = cursorPositionOnCurve - _cursorPositionOnDragStart;
+            var movedCursorPosition = cursorPositionOnCurve - _pointerPositionOnDragStart;
             
             SelectedControlPointsEditor.UpdateControlPointKeyframes(cp =>
             {

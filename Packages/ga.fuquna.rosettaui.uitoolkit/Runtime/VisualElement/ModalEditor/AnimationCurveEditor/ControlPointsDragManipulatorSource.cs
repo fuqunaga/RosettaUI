@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Builder;
 using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
@@ -23,7 +24,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly PreviewTransform _previewTransform;
         private readonly ControlPointDisplayPositionPopup _positionPopup;
         private readonly Dictionary<ControlPoint, Vector2> _pointerToKeyframePositionOffsetsOnDragStart = new();
+        private readonly List<Keyframe> _noneSelectedKeyframesOnDragStart = new();
 
+        private Manipulator _currentManipulator;
         private Vector2 _pointerPositionOnDragStart;
         private MoveAxis _moveAxis = MoveAxis.Both;
 
@@ -51,16 +54,32 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private bool OnDragStarting(DragManipulator manipulator, PointerDownEvent evt)
         {
+            if(_currentManipulator != null) return false; // すでにドラッグ中
+            _currentManipulator = manipulator;
+            
             if (evt.button != 0) return false; // left button only
+            
             
             // start drag
             _pointerPositionOnDragStart = _previewTransform.GetCurvePosFromUIWorldPos(evt.position);
+            
             _pointerToKeyframePositionOffsetsOnDragStart.Clear();
             foreach (var cp in SelectedControlPointsEditor.ControlPoints)
             {
                 _pointerToKeyframePositionOffsetsOnDragStart[cp] = cp.KeyframePosition - _pointerPositionOnDragStart;
             }
 
+            // 選択されていないKeyframeを保存しておく
+            // ドラッグ中に選択中のKeyframeが同一timeに来ると上書きされて消えるが、
+            // さらにドラッグしてtimeがずれたら復活したい
+            _noneSelectedKeyframesOnDragStart.Clear();
+            _noneSelectedKeyframesOnDragStart.AddRange(
+                _curveController.ControlPoints
+                    .Except(SelectedControlPointsEditor.ControlPoints)
+                    .Select(cp => cp.Keyframe)
+            );
+
+            
             _moveAxis = MoveAxis.Both;
 
             _positionPopup.Show();
@@ -73,6 +92,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private void OnDrag(DragManipulator _, PointerMoveEvent evt)
         {
+            // 未選択Keyframeの追加を試みる
+            // ドラッグ中に選択中のKeyframeが同一timeに来ると上書きされて消えるがさらにドラッグしてtimeがずれたら復活させる
+            // すでに同一timeにKeyframeがある場合はAddKeyframeで無視されるので問題ない
+            foreach (var keyframe in _noneSelectedKeyframesOnDragStart)
+            {
+                _curveController.AddKeyframe(keyframe);
+            }
+            
             if (_moveAxis == MoveAxis.Both && evt.shiftKey)
             {
                 var delta = evt.deltaPosition;
@@ -116,6 +143,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private void OnDragEnd(DragManipulator _, EventBase evt)
         {
+            _currentManipulator = null;
             _positionPopup.Hide();
         }
 

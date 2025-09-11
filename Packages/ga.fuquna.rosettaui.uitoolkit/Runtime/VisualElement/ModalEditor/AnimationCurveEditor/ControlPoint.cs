@@ -52,15 +52,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             get => _controlPointCore.ClassListContains(ActiveControlPointClassName);
             set
             {
-                if (value)
-                {
-                    _controlPointCore.AddToClassList(ActiveControlPointClassName);
-                }
-                else
-                {
-                    _controlPointCore.RemoveFromClassList(ActiveControlPointClassName);
-                }
-
+                _controlPointCore.EnableInClassList(ActiveControlPointClassName, value);
                 UpdateHandleView();
             }
         }
@@ -126,7 +118,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _wrapModeButton = new WrapModeButton();
             _wrapModeButton.RegisterCallback<PointerDownEvent>(_ => OnWrapModeButtonClicked());
             Add(_wrapModeButton);
-
+            
+            
+            // hide handles
+            UpdateHandleView();
+            
             return;
 
 

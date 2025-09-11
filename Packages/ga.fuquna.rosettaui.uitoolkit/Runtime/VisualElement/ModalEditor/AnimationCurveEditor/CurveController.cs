@@ -28,7 +28,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public IEnumerable<ControlPoint> SelectedControlPoints => ControlPoints.Where(t => t.IsActive);
 
 
-        private List<ControlPoint> ControlPoints { get; } = new();
+        public List<ControlPoint> ControlPoints { get; } = new();
 
         public CurveController(VisualElement parent, Func<CurveController, ControlPoint> getNewControlPoint)
         {
@@ -80,7 +80,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             if (index < 0) return index;
             
             // Add control point
-            var controlPoint = CreateControlPoint(index);
+            var controlPoint = CreateAndInsertControlPoint(index);
             controlPoint.IsActive = true;
             
             // Match the tangent mode to neighborhood point one
@@ -97,6 +97,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             OnCurveChanged();
             
             return index;
+        }
+
+        public ControlPoint AddKeyframe(Keyframe keyframe)
+        {
+            var index = Curve.AddKey(keyframe);
+            return index < 0 
+                ? null
+                : CreateAndInsertControlPoint(index);
         }
         
         public void RemoveAllSelectedControlPoints()
@@ -204,18 +212,19 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
             ControlPoints.Clear();
             
-            for (var i = 0; i < Curve.keys.Length; i++)
+            for (var i = 0; i < Curve.length; i++)
             {
-                var controlPoint = CreateControlPoint(i);
-                controlPoint.IsKeyBroken = Curve.GetKeyBroken(i);
-                controlPoint.InTangentMode = Curve.GetInTangentMode(i);
-                controlPoint.OutTangentMode = Curve.GetOutTangentMode(i);
+                CreateAndInsertControlPoint(i);
             }
         }
         
-        private ControlPoint CreateControlPoint(int index)
+        private ControlPoint CreateAndInsertControlPoint(int index)
         {
             var controlPoint = _getNewControlPoint(this);
+            controlPoint.IsKeyBroken = Curve.GetKeyBroken(index);
+            controlPoint.InTangentMode = Curve.GetInTangentMode(index);
+            controlPoint.OutTangentMode = Curve.GetOutTangentMode(index);
+            
             _parent.Add(controlPoint);
             
             ControlPoints.Insert(index, controlPoint);

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -42,24 +43,39 @@ namespace RosettaUI.Builder
             dst.preWrapMode = src.preWrapMode;
         }
 
-        public static Rect GetCurveRect(this AnimationCurve curve)
+        
+        public static Rect GetCurveRect(this AnimationCurve curve) => GetCurveRect(curve, ..);
+        public static Rect GetCurveRect(this AnimationCurve curve, Range range)
         {
             if (curve == null)
             {
                 return Rect01();
             }
-            
-            var keys = curve.keys;
-            if (keys.Length <= 0)
+
+            var allKeys = curve.keys.AsSpan();
+            if (allKeys.Length <= 0)
             {
                 return Rect01();
             }
             
+            var keys = allKeys[range];
+  
+            
             var firstKeyPosition = keys[0].GetPosition();
             var xMin = firstKeyPosition.x;
-            var xMax = keys.Last().time;
-            var yMin = firstKeyPosition.y;
-            var yMax = firstKeyPosition.y;
+            var xMax = keys[^1].time;
+
+            var yMin = float.MaxValue;
+            var yMax = float.MinValue;
+            
+            // 高さの幅は一部のrangeしか指定していなくてもカーブ全体のものを適用
+            // UnityのCurveEditorで選択範囲にFキーでフィットさせたときの挙動準拠
+            foreach (var t in allKeys)
+            {
+                var v = t.value;
+                yMin = Mathf.Min(yMin, v);
+                yMax = Mathf.Max(yMax, v);
+            }
 
             for (var i = 0; i < keys.Length - 1; i++)
             {

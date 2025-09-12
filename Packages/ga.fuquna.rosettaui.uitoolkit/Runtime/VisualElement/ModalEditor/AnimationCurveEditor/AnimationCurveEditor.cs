@@ -218,15 +218,25 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             });
             _keyEventHelper.RegisterKeyAction(KeyCode.A, evt =>
             {
-                if (evt == KeyEventType.KeyDown) { FitViewToCurve(); }
+                if (evt != KeyEventType.KeyDown) return;
+                FitViewToCurve();
             });
-            _keyEventHelper.RegisterKeyAction(KeyCode.Delete, _ =>
+            _keyEventHelper.RegisterKeyAction(KeyCode.F, evt =>
             {
+                if (evt != KeyEventType.KeyDown) return;
+                FitViewToSelection();
+            });
+
+            _keyEventHelper.RegisterKeyAction(KeyCode.Delete, evt =>
+            {
+                if (evt != KeyEventType.KeyDown) return;
                 _curveController.SelectedControlPointsEditor.RemoveAll();
             });
 
-            _keyEventHelper.RegisterKeyAction(KeyCode.Return, _ =>
+            _keyEventHelper.RegisterKeyAction(KeyCode.Return, evt =>
             {
+                if (evt != KeyEventType.KeyDown) return;
+                
                 var firstControlPoint = _curveController.SelectedControlPoints.FirstOrDefault();
                 if (firstControlPoint != null)
                 {
@@ -245,11 +255,44 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         #endregion
         
         #region View Update
-        private void FitViewToCurve()
+        
+        private void FitViewToCurve() => FitViewToCurve(..);
+
+        private void FitViewToCurve(Range　range)
         {
-            var rect = _curveController.Curve.GetCurveRect();
+            var rect = _curveController.Curve.GetCurveRect(range);
+            
             _previewTransform.FitToRect(rect, FitViewPaddingPixel);
             UpdateView();
+        }
+        
+        
+        // Fit view to the selected control points
+        // 一つもない場合はFitToCurve
+        // 一つだけの場合は左右のKeyframeを選択範囲にする
+        private void FitViewToSelection()
+        {
+            var controlPoints = _curveController.ControlPoints;
+            var firstIndex = controlPoints.FindIndex(cp => cp.IsActive);
+            var lastIndex = controlPoints.FindLastIndex(cp => cp.IsActive);
+            
+            // no selection
+            if (firstIndex < 0)
+            {
+                FitViewToCurve();
+                return;
+            }
+            
+            // single selection
+            // select both side keyframes if possible
+            if (firstIndex == lastIndex)
+            {
+                firstIndex = Mathf.Max(0, firstIndex - 1);
+                lastIndex = Mathf.Min(controlPoints.Count - 1, lastIndex + 1);
+            }
+
+            var range = firstIndex..(lastIndex + 1);
+            FitViewToCurve(range);
         }
         
         private void UpdateView()

@@ -60,6 +60,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     Hide();
                 });
             }, TrickleDown.TrickleDown);
+            
+            
+            this.AddManipulator(new FocusTrapManipulator());
         }
         
         public void Show(Vector2 popupPosition, SelectedControlPointsEditor selectedControlPointsEditor)

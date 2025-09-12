@@ -44,25 +44,34 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _timeField = this.Q<FloatField>("TimeField");
             _valueField = this.Q<FloatField>("ValueField");
 
-            RegisterCallback<PointerDownEvent>(_ => Hide());
-            
-            // NavigationイベントはFloatFieldが止めてしまうので、TrickleDownで受け取る
-            RegisterCallback<NavigationCancelEvent>(_ => Hide(), TrickleDown.TrickleDown);
-            RegisterCallback<NavigationSubmitEvent>(_ =>
+            RegisterCallback<PointerDownEvent>(HideByEvent);
+            RegisterCallback<KeyDownEvent>(evt =>
             {
-                // FloatFieldのイベント後にSubmitを実行
-                schedule.Execute(() =>
+                switch (evt.keyCode)
                 {
-                    _controlPointsEditor?.UpdateKeyframePosition(
-                        _timeField.showMixedValue ? null : _timeField.value,
-                        _valueField.showMixedValue ? null : _valueField.value
-                    );
-                    Hide();
-                });
+                    case KeyCode.Escape:
+                        HideByEvent(evt);
+                        break;
+                    
+                    case KeyCode.Return or KeyCode.KeypadEnter:
+                        _controlPointsEditor?.UpdateKeyframePosition(
+                            _timeField.showMixedValue ? null : _timeField.value,
+                            _valueField.showMixedValue ? null : _valueField.value
+                        );
+                        HideByEvent(evt);
+                        break;
+                }
             }, TrickleDown.TrickleDown);
-            
-            
+
             this.AddManipulator(new FocusTrapManipulator());
+
+            return;
+            
+            void HideByEvent(EventBase evt)
+            {
+                Hide();
+                evt.StopPropagation();
+            }
         }
         
         public void Show(Vector2 popupPosition, SelectedControlPointsEditor selectedControlPointsEditor)

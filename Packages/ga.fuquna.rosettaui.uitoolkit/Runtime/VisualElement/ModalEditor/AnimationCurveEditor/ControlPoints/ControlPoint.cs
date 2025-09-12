@@ -297,7 +297,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 case 1:
                     // IsActive(=選択中）の場合はそのまま（複数選択のとき複数選択状態をキープ）
                     // IsActiveでない場合は他の選択を外して自身のみ選択してからメニュー表示
-                    if (this is { IsActive: false })
+                    if (!IsActive)
                     {
                         _curveController.SelectControlPoint(this, keepOtherSelection: false);
                     }

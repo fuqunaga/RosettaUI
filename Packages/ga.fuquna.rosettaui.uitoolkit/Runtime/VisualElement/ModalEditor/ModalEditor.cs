@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
@@ -12,6 +13,23 @@ namespace RosettaUI.UIToolkit
         protected readonly ModalWindow window;
         public event Action<TValue> onEditorValueChanged;
 
+        /// <summary>
+        /// persistentSizeKeyでウィンドウサイズを保存・復元するコンストラクタ
+        /// </summary>
+        protected ModalEditor(string persistentSizeKey, Vector2 defaultSize, string visualTreeAssetPath = "") : this(visualTreeAssetPath,
+            true)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(persistentSizeKey), $"{nameof(persistentSizeKey)} is null or empty");
+            
+            if (!PersistentData.TryGet<Vector2>(persistentSizeKey, out var size))
+            {
+                size = defaultSize;
+            }
+            
+            window.SetSize(size);
+            window.onHide += () => PersistentData.Set(persistentSizeKey, window.GetSize());
+        }
+        
         protected ModalEditor(string visualTreeAssetPath = "", bool resizable = false)
         {
             if (!string.IsNullOrEmpty(visualTreeAssetPath))

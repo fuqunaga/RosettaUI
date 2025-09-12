@@ -17,6 +17,18 @@ namespace RosettaUI
             return PlayerPrefs.HasKey(key);
         }
         
+        public static bool TryGet<T>(string key, out T value)
+        {
+            if (HasKey(key))
+            {
+                value = Get<T>(key);
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+        
         public static T Get<T>(string key)
         {
             var type = typeof(T);

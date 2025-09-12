@@ -193,6 +193,18 @@ namespace RosettaUI.UIToolkit
             return new Vector2(style.left, style.top);
         }
         
+        public static Vector2 GetSize(this VisualElement ve)
+        {
+            var style = ve.resolvedStyle;
+            return new Vector2(style.width, style.height);
+        }
+        
+        public static void SetSize(this VisualElement ve, Vector2 size)
+        {
+            ve.style.width = size.x;
+            ve.style.height = size.y;
+        }
+        
         public static bool IsShown(this VisualElement ve)
         {
             return ve.style.display != DisplayStyle.None;

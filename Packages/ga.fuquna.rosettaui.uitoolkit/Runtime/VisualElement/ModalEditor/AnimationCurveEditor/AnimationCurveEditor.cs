@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Builder;
 using UnityEngine;
-using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
@@ -14,9 +12,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     public partial class AnimationCurveEditor : ModalEditor<AnimationCurve>
     {
         #region Static Window Management
-        
-        // ReSharper disable once MemberCanBePrivate.Global
-        public static Vector2Int DefaultWindowSize { get; set; } = new(800, 500);
         
         private static AnimationCurveEditor _instance;
         
@@ -30,14 +25,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         public static void Show(Vector2 position, VisualElement target, AnimationCurve initialCurve, Action<AnimationCurve> onCurveChanged)
         {
-            if ( _instance == null)
-            {
-                _instance = new AnimationCurveEditor();
-                
-                var windowStyle = _instance.window.style;
-                windowStyle.width = DefaultWindowSize.x;
-                windowStyle.height = DefaultWindowSize.y;
-            };
+            _instance ??= new AnimationCurveEditor();;
             
             _instance.Show(position, target, onCurveChanged);
             
@@ -55,12 +43,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         
         public const string USSClassName = "rosettaui-animation-curve-editor";
+        private const string PersistentSizeKey = "RosettaUI_AnimationCurveEditor_Size";
         
-        // ReSharper disable once MemberCanBePrivate.Global
+        // ReSharper disable MemberCanBePrivate.Global
+        public static Vector2 DefaultWindowSize { get; set; } = new(800, 500);
         public static string VisualTreeAssetName { get; set; } = "RosettaUI_AnimationCurveEditor";
-
-        // ReSharper disable once MemberCanBePrivate.Global
         public static RectOffset FitViewPaddingPixel { get; } = new(24, 24, 40, 20);
+        // ReSharper restore MemberCanBePrivate.Global
         
         private readonly CurveController _curveController;
         
@@ -95,7 +84,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         #endregion
 
 
-        private AnimationCurveEditor() : base(VisualTreeAssetName, true)
+        private AnimationCurveEditor() : base(PersistentSizeKey, DefaultWindowSize, VisualTreeAssetName)
         {
             AddToClassList(USSClassName);
             

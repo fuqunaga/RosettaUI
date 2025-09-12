@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.bgtools.playerprefseditor": "https://github.com/Dysman/bgTools-playerPrefsEditor.git#upm",
     "com.unity.ide.rider": "3.0.36",
     "com.unity.ide.visualstudio": "2.0.23",
     "com.unity.inputsystem": "1.14.2",

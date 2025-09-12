@@ -55,11 +55,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private bool OnDragStarting(DragManipulator manipulator, PointerDownEvent evt)
         {
+            if (evt.button != 0) return false; // left button only
             if(_currentManipulator != null) return false; // すでにドラッグ中
             _currentManipulator = manipulator;
-            
-            if (evt.button != 0) return false; // left button only
-            
             
             // start drag
             _pointerPositionOnDragStart = _previewTransform.GetCurvePosFromUIWorldPos(evt.position);

@@ -17,6 +17,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private FloatField _valueField;
 
         private SelectedControlPointsEditor _controlPointsEditor;
+        private VisualElement _focusBackElement;
         
         public ControlPointsEditPositionPopup()
         {
@@ -74,7 +75,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
         
-        public void Show(Vector2 popupPosition, SelectedControlPointsEditor selectedControlPointsEditor)
+        public void Show(Vector2 localPosition, SelectedControlPointsEditor selectedControlPointsEditor, VisualElement focusBackElement)
         {
             if (selectedControlPointsEditor.IsEmpty)
             {
@@ -84,6 +85,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             InitializeIfNeeded();
             
             _controlPointsEditor = selectedControlPointsEditor;
+            _focusBackElement = focusBackElement;
 
             using var _ = ListPool<Vector2>.Get(out var keyframePositions);
             keyframePositions.AddRange(
@@ -105,8 +107,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
             
 
-            _editKeyPopupRoot.style.left = popupPosition.x;
-            _editKeyPopupRoot.style.top = popupPosition.y;
+            _editKeyPopupRoot.style.left = localPosition.x;
+            _editKeyPopupRoot.style.top = localPosition.y;
             
             style.display = DisplayStyle.Flex;
             
@@ -123,7 +125,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void Hide()
         {
+            _focusBackElement?.Focus();
+            
             _controlPointsEditor = null;
+            _focusBackElement = null;
             style.display = DisplayStyle.None;
         }
     }

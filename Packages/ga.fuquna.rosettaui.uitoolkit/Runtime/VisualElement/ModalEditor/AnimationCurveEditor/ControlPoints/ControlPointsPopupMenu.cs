@@ -16,10 +16,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// </details>
     public static class ControlPointsPopupMenu
     {
-        public static void Show(Vector2 position, SelectedControlPointsEditor controlPointsEditor, ControlPointsEditPositionPopup editPositionPopup, VisualElement target)
+        public static void Show(Vector2 position, SelectedControlPointsEditor controlPointsEditor, Action showEditPositionPopup, VisualElement target)
         {
             PopupMenuUtility.Show(
-                CreateMenuItemsDeleteEdit(controlPointsEditor, editPositionPopup, target)
+                CreateMenuItemsDeleteEdit(controlPointsEditor, showEditPositionPopup)
                     .Append(new MenuItemSeparator())
                     .Concat(CreateMenuItemsBothTangentMode(controlPointsEditor))
                     .Append(new MenuItemSeparator())
@@ -30,18 +30,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         }
 
         private static IEnumerable<IMenuItem> CreateMenuItemsDeleteEdit(
-            SelectedControlPointsEditor controlPointsEditor, 
-            ControlPointsEditPositionPopup editPositionPopup,
-            VisualElement target)
+            SelectedControlPointsEditor controlPointsEditor,
+            Action showEditPositionPopup
+        )
         {
             var isMultiSelection = controlPointsEditor.IsMultiSelection;
             yield return new MenuItem(isMultiSelection ? "Delete Keys" : "Delete Key", controlPointsEditor.RemoveAll);
-            yield return new MenuItem(isMultiSelection ? "Edit Keys..." : "Edit Key...", () =>
-            {
-                // editPositionPopupの位置を指定するのに呼び出し元のControlPointの位置を使いたい
-                // targetとして渡されるので流用している
-                editPositionPopup.Show(target.GetLocalPosition(), controlPointsEditor);
-            });
+            yield return new MenuItem(isMultiSelection ? "Edit Keys..." : "Edit Key...", showEditPositionPopup);
         }
 
         private static IEnumerable<IMenuItem> CreateMenuItemsBothTangentMode(SelectedControlPointsEditor controlPointsEditor)

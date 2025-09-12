@@ -118,7 +118,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 var controlPoint = new ControlPoint(
                     curveController,
                     _previewTransform,
-                    showPopupMenu: (position, cp) => ControlPointsPopupMenu.Show(position, _curveController.SelectedControlPointsEditor, _controlPointsEditPositionPopup, cp)
+                    showPopupMenu: (position, cp) => ControlPointsPopupMenu.Show(
+                        position, 
+                        _curveController.SelectedControlPointsEditor,
+                        () => ShowControlPointsEditPositionPopup(cp.LocalPosition), 
+                        cp)
                 );
                 controlPoint.AddManipulator(_controlPointsDragManipulatorSource.CreateManipulator());
                 return controlPoint;
@@ -245,8 +249,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     var pos = _selectedControlPointsRect.IsShown()
                         ? _selectedControlPointsRect.layout.center
                         : firstControlPoint.GetLocalPosition();
-                    
-                    _controlPointsEditPositionPopup.Show(pos, _curveController.SelectedControlPointsEditor);
+
+                    ShowControlPointsEditPositionPopup(pos);
                 }
             });
 
@@ -336,6 +340,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _curveController.UnselectAllControlPoints();
             _controlPointDisplayPositionPopup.Hide();
             _controlPointsEditPositionPopup.Hide();
+        }
+
+        private void ShowControlPointsEditPositionPopup(Vector2 localPosition)
+        {
+            _controlPointsEditPositionPopup.Show(localPosition, _curveController.SelectedControlPointsEditor, this);
         }
         
         #endregion

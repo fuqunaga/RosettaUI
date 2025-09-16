@@ -10,8 +10,8 @@ namespace RosettaUI.UIToolkit.NestedDropdownMenuSystem
     public static class VisualElementExtensions
     {
         private const int PseudoStatesHoverFlag = 2; // Corresponds to PseudoStates.Hover
-        private static Func<VisualElement, int>? GetPseudoStatesFunc;
-        private static Action<VisualElement, int>? SetPseudoStatesFunc;
+        private static Func<VisualElement, int>? _getPseudoStatesFunc;
+        private static Action<VisualElement, int>? _setPseudoStatesFunc;
         
         public static VisualElement GetFirstAncestorByClassName(this VisualElement element, string className)
         {
@@ -30,7 +30,7 @@ namespace RosettaUI.UIToolkit.NestedDropdownMenuSystem
         
         public static int GetPseudoStates(this VisualElement element)
         {
-            if (GetPseudoStatesFunc == null)
+            if (_getPseudoStatesFunc == null)
             {
                 var propertyInfo = typeof(VisualElement).GetProperty("pseudoStates", BindingFlags.Instance | BindingFlags.NonPublic);
                 if (propertyInfo == null)
@@ -42,15 +42,15 @@ namespace RosettaUI.UIToolkit.NestedDropdownMenuSystem
                 var propertyAccess = Expression.Property(elementParam, propertyInfo);
                 var convertToInt = Expression.Convert(propertyAccess, typeof(int));
                 var getLambda = Expression.Lambda<Func<VisualElement, int>>(convertToInt, elementParam);
-                GetPseudoStatesFunc = getLambda.Compile();
+                _getPseudoStatesFunc = getLambda.Compile();
             }
 
-            return GetPseudoStatesFunc(element);
+            return _getPseudoStatesFunc(element);
         }
         
         public static void SetPseudoStates(this VisualElement element, int pseudoStates)
         {
-            if (SetPseudoStatesFunc == null)
+            if (_setPseudoStatesFunc == null)
             {
                 var propertyInfo = typeof(VisualElement).GetProperty("pseudoStates", BindingFlags.Instance | BindingFlags.NonPublic);
                 if (propertyInfo == null)
@@ -64,10 +64,10 @@ namespace RosettaUI.UIToolkit.NestedDropdownMenuSystem
                 var propertyAccess = Expression.Property(elementParam, propertyInfo);
                 var assign = Expression.Assign(propertyAccess, valueConverted);
                 var setLambda = Expression.Lambda<Action<VisualElement, int>>(assign, elementParam, valueParam);
-                SetPseudoStatesFunc = setLambda.Compile();
+                _setPseudoStatesFunc = setLambda.Compile();
             }
 
-            SetPseudoStatesFunc(element, pseudoStates);
+            _setPseudoStatesFunc(element, pseudoStates);
         }
         
         public static void AddPseudoStatesHover(this VisualElement element)
@@ -75,20 +75,5 @@ namespace RosettaUI.UIToolkit.NestedDropdownMenuSystem
             var currentStates = element.GetPseudoStates();
             element.SetPseudoStates(currentStates | PseudoStatesHoverFlag);
         }
-
-#if !UNITY_6000_OR_NEWER
-        public static void RegisterCallbackOnce<TEventType>(
-            this VisualElement element,
-            EventCallback<TEventType> callback,
-            TrickleDown useTrickleDown = TrickleDown.NoTrickleDown)
-            where TEventType : EventBase<TEventType>, new()
-        {
-            element.RegisterCallback<TEventType>(evt =>
-            {
-                callback.Invoke(evt);
-                element.UnregisterCallback(callback, useTrickleDown);
-            }, useTrickleDown);
-        }
-#endif
     }
 }

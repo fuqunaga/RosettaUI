@@ -33,6 +33,7 @@
     --rosettaui-color-box-background: rgba(100,100,100,0.3);
     --rosettaui-color-list-background: var(--rosettaui-color-box-background);
     --rosettaui-color-tabs-title-inactive-background: rgba(0,0,0,0.4);
+    --rosettaui-color-animation-curve-background: #565656;
 
     --rosettaui-button-background-pressed: var(--rosettaui-highlight-dark-blue);
     
@@ -124,13 +125,9 @@
 }
 
 /********************************************************************************
-* Modal Window
+* Event Blocker
 ********************************************************************************/
-.rosettaui-modal-window {
-    padding-left: 4px;
-}
-
-.rosettaui-modal-window-event-blocker {
+.rosettaui-event-blocker {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -197,27 +194,30 @@
     min-width: var(--fixed-field-width-m);
 }
 
-
-
 /********************************************************************************
-* ColorField
+* PreviewBaseField
+* Color, Gradient, AnimationCurve Field のベースクラス
 ********************************************************************************/
-.rosettaui-color-field__input:hover {
+.rosettaui-preview-base-field__input:hover {
     border-color: var(--unity-colors-input_field-border-hover);
 }
 
-.rosettaui-color-field:focus > .rosettaui-color-field__input {
+.rosettaui-preview-base-field:focus > .rosettaui-preview-base-field__input {
     border-color: var(--unity-colors-input_field-border-focus);
 }
 
-.rosettaui-color-field__input,
-.rosettaui-color-field__input:disabled
+.rosettaui-preview-base-field__input,
+.rosettaui-preview-base-field__input:disabled
 {
     padding: 0;
     border-color: var(--unity-colors-input_field-border);
     width: 124px;
 }
 
+
+/********************************************************************************
+* ColorField
+********************************************************************************/
 .rosettaui-color-field__input-rgb {
     flex-grow: 1;
     width: 100%;
@@ -255,85 +255,12 @@
 
 
 /********************************************************************************
-* GradientField
-********************************************************************************/
-.rosettaui-gradient-field__input:hover {
-    border-color: var(--unity-colors-input_field-border-hover);
-}
-
-.rosettaui-gradient-field:focus > .rosettaui-gradient-field__input {
-    border-color: var(--unity-colors-input_field-border-focus);
-}
-
-.rosettaui-gradient-field__input,
-.rosettaui-gradient-field__input:disabled
-{
-    padding: 0;
-    border-color: var(--unity-colors-input_field-border);
-    width: 124px;
-}
-
-.rosettaui-gradient-field__input-rgb {
-    flex-grow: 1;
-    width: 100%;
-    background-color: black;
-}
-
-.rosettaui-gradient-field__input-alpha-container {
-    height: 20%;
-    width: 100%;
-    background-color: black;
-}
-
-.rosettaui-gradient-field__input-alpha {
-    flex-grow: 0;
-    flex-shrink: 0;
-    position: absolute;
-    width: 0;
-    height: 100%;
-    background-color: white;
-}
-
-
-/********************************************************************************
 * AnimationCurveField
 ********************************************************************************/
-.rosettaui-animation-curve-field__input:hover {
-    border-color: var(--unity-colors-input_field-border-hover);
+.rosettaui-animation-curve-field__input {
+    background-color: var(--rosettaui-color-animation-curve-background);
 }
 
-.rosettaui-animation-curve-field:focus > .rosettaui-animation-curve-field__input {
-    border-color: var(--unity-colors-input_field-border-focus);
-}
-
-.rosettaui-animation-curve-field__input,
-.rosettaui-animation-curve-field__input:disabled
-{
-    padding: 0;
-    border-color: var(--unity-colors-input_field-border);
-    width: 124px;
-}
-
-.rosettaui-animation-curve-field__input-rgb {
-    flex-grow: 1;
-    width: 100%;
-    background-color: black;
-}
-
-.rosettaui-animation-curve-field__input-alpha-container {
-    height: 20%;
-    width: 100%;
-    background-color: black;
-}
-
-.rosettaui-animation-curve-field__input-alpha {
-    flex-grow: 0;
-    flex-shrink: 0;
-    position: absolute;
-    width: 0;
-    height: 100%;
-    background-color: white;
-}
 
 /********************************************************************************
 * SliderInField
@@ -411,10 +338,9 @@
 ********************************************************************************/
 .rosettaui-morevert-menu-button
 {
-    min-width: 16px;
-    width: 16px;
-    height: 16px;
-    margin: 0 0 0 auto;
+    width: 20px;
+    height: 20px;
+    margin: 0 2px 0 auto; /* right aligned */
     padding: 2px;
     border-width: 0;
     border-radius: 1px;

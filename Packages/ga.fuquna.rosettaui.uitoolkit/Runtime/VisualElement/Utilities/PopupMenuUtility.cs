@@ -30,7 +30,7 @@ namespace RosettaUI.UIToolkit
 
     public static class PopupMenuUtility
     {
-        public static void Show(IEnumerable<IMenuItem> menuItems, Vector2 position, VisualElement targetElement)
+        public static void Show(IEnumerable<IMenuItem> menuItems, Vector2 position, VisualElement targetElement, Action onClosed = null)
         {
             var menu = new NestedDropdownMenu();
             
@@ -54,10 +54,12 @@ namespace RosettaUI.UIToolkit
             {
                 singleMenu.OuterContainer.AddBoxShadow();
             }
-
+            
             menu.DropDown(
                 new Rect() { position = position },
-                targetElement
+                targetElement,
+                anchored: false,
+                onClosed
             );
         }
     }

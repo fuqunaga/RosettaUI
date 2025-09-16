@@ -1,0 +1,52 @@
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine.Pool;
+
+namespace RosettaUI.Swatch
+{
+    /// <summary>
+    /// Swatchのセーブロード
+    /// </summary>
+    public class SwatchPersistentService<TValue>
+    {
+        public event Action onSaveSwatches;
+        
+        private readonly string _keyPrefix;
+        
+        
+        public bool HasSwatches => PersistentData.HasKey(KeySwatches);
+        
+        protected string KeySwatches => $"{_keyPrefix}-Swatches";
+        
+        public SwatchPersistentService(string keyPrefix) => _keyPrefix = keyPrefix;
+
+
+        public void SaveSwatches(IEnumerable<NameAndValue<TValue>> nameAndValueEnumerable)
+        {
+            using var _ = ListPool<NameAndValue<TValue>>.Get(out var nameAndValues);
+            nameAndValues.AddRange(nameAndValueEnumerable);
+            
+            PersistentData.Set(KeySwatches, nameAndValues);
+            
+            onSaveSwatches?.Invoke();
+        }
+        
+        public virtual IEnumerable<NameAndValue<TValue>> LoadSwatches()
+        {
+            return PersistentData.Get<List<NameAndValue<TValue>>>(KeySwatches);
+        }
+        
+        /// <summary>
+        /// 汎用サービス
+        /// </summary>
+        public T Get<T>(string key)
+        {
+            return PersistentData.Get<T>($"{_keyPrefix}-{key}");
+        }
+        
+        public void Set<T>(string key, T value)
+        {
+            PersistentData.Set($"{_keyPrefix}-{key}", value);
+        }
+    }
+}

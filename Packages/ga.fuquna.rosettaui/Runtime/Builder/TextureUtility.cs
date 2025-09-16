@@ -2,6 +2,7 @@
 using System.Buffers;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace RosettaUI.Builder
 {
@@ -40,7 +41,7 @@ namespace RosettaUI.Builder
             {
                 foreach (var texture in CheckerBoardTexture2X2S.Values)
                 {
-                    UnityEngine.Object.Destroy(texture);
+                    Object.Destroy(texture);
                 }
                 CheckerBoardTexture2X2S.Clear();
             });
@@ -92,6 +93,54 @@ namespace RosettaUI.Builder
             {
                 wrapMode = TextureWrapMode.Clamp
             };
+        }
+        
+        /// <summary>
+        /// Ensure that the RenderTexture has the specified width and height.
+        /// </summary>
+        /// <returns> Returns true if the texture was created or resized, false if it already has the correct size.</returns> 
+        public static bool EnsureTextureSize<TTexture>(ref TTexture texture, int width, int height)
+            where TTexture : Texture
+        {
+            if (texture != null && (texture.width != width || texture.height != height))
+            {
+                Release(texture);
+                Object.DestroyImmediate(texture);
+                texture = null;
+            }
+
+            if (texture != null)
+            {
+                return false;
+            }
+            
+            texture = Create(width, height);
+            
+            return true;
+            
+            
+            static void Release(TTexture texture)
+            {
+                if (texture is RenderTexture renderTexture)
+                {
+                    renderTexture.Release();
+                }
+            }
+            
+            static TTexture Create(int width, int height)
+            {
+                if (typeof(TTexture) == typeof(RenderTexture))
+                {
+                    return (TTexture)(object)new RenderTexture(width, height, 0);
+                }
+
+                if (typeof(TTexture) == typeof(Texture2D))
+                {
+                    return (TTexture)(object)new Texture2D(width, height);
+                }
+
+                throw new NotSupportedException($"Unsupported texture type: {typeof(TTexture)}");
+            }
         }
     }
 }

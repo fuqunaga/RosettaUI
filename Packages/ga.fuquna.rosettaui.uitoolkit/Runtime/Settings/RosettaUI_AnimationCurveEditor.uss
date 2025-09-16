@@ -1,68 +1,8 @@
 /********************************************************************************
 * Animation Curve Editor
 ********************************************************************************/
-.rosettaui-animation-curve-editor-fixed-size-area {
-    flex-shrink: 0;
-}
-
 .rosettaui-animation-curve-editor {
     flex-grow: 1;
-}
-
-.rosettaui-animation-curve-editor EnumField:disabled {
-    opacity: 0.5;
-}
-
-.rosettaui-animation-curve-editor .unity-base-field__label {
-    min-width: 100px;
-}
-
-.rosettaui-animation-curve-editor__curve-group {
-    flex-grow: 3;
-    flex-shrink: 1;
-    margin: 4px 8px;
-    padding: 0;
-    min-height: 200px;
-}
-
-.rosettaui-animation-curve-editor__preview-background {
-    flex-grow: 1;
-    height: 100%;
-    margin-top: -8px;
-}
-
-.rosettaui-animation-curve-editor__preview-front {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-.rosettaui-animation-curve-editor__horizontal-scroller-container {
-    flex-direction: row;
-}
-
-.rosettaui-animation-curve-editor__horizontal-scroller-container > Scroller {
-    flex-grow: 1;
-}
-
-.rosettaui-animation-curve-editor__horizontal-scroller-container > VisualElement {
-    width: 12px;
-}
-
-.rosettaui-animation-curve-editor__vertical-axis-label-container {
-    position: absolute;
-    width: 50px;
-    height: 100%;
-    top: 0;
-    left: 0;
-}
-
-.rosettaui-animation-curve-editor__horizontal-axis-label-container {
-    position: absolute;
-    width: 100%;
-    height: 20px;
-    bottom: 0;
-    left: 0;
 }
 
 .rosettaui-animation-curve-editor__vertical-axis-label-container > Label,
@@ -71,77 +11,84 @@
     color: gray;
 }
 
-.rosettaui-animation-curve-editor__control-buttons-container {
-    position: absolute;
-    height: 26px;
-    top: 0;
-    left: 0;
-    right: 0;
-    margin: 4px;
-    flex-direction: row-reverse;
-    opacity: 0.6;
-}
-
-.rosettaui-animation-curve-editor__control-buttons-container > * {
+.rosettaui-animation-curve-editor__control-button {
     width: 26px;
     height: 26px;
     margin: 0 0 0 4px;
+    opacity: 0.6;
 }
 
-.rosettaui-animation-curve-editor__fit-button {
-    background-image: resource("animation-curve_fit");
-}
-
-.rosettaui-animation-curve-editor__snap-x-button {
-    background-image: resource("animation-curve_snap-x");
-}
-
-.rosettaui-animation-curve-editor__snap-y-button {
-    background-image: resource("animation-curve_snap-y");
+.rosettaui-animation-curve-editor__control-point-display-position-popup {
+    position: absolute;
+    margin: 0;
+    padding: 0 2px;
+    background-color: black;
+    translate: 0 -100%;
+    min-height: auto;
 }
 
 .rosettaui-animation-curve-editor__property-group {
     margin: 8px 4px 8px 4px;
 }
 
-.rosettaui-animation-curve-editor__time-value-row
-{
-    height: 22px;
+/********************************************************************************
+* Selection Rect
+********************************************************************************/
+.rosettaui-animation-curve-editor__selection-rect {
+    position: absolute;
+    border-width: 1px;
+    border-color: rgba(65, 105, 225, 0.5); /* royalblue with transparency */
+    background-color: rgba(100, 149, 237, 0.3); /* cornflowerblue with transparency */
+    opacity: 0.6;
+}
+
+/********************************************************************************
+* Selected Control Points Rect
+********************************************************************************/
+.rosettaui-animation-curve-editor__selected-control-points-rect {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle {
+    position: absolute;
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--horizontal {
+    left: 10%;
+    right: 10%;
+    height: 10px;
+    justify-content: center;
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--vertical {
+    top: 10%;
+    bottom: 10%;
+    width: 10px;
     flex-direction: row;
-    flex-wrap: wrap;
+    justify-content: center;
 }
 
-.rosettaui-animation-curve-editor__time-value-row > FloatField
-{
-    flex-basis: 100px;
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--top {
+    top: -10px;
 }
 
-.rosettaui-animation-curve-editor__time-value-row .unity-base-field__label
-{
-    min-width: 50px;
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--bottom {
+    bottom: -10px;
 }
 
-.rosettaui-animation-curve-editor__time-value-row > EnumField
-{
-    min-width: 189.5px;
-    max-width: 100%;
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--left {
+    left: -10px;
 }
 
-.rosettaui-animation-curve-editor__field-row {
-    width: 100%;
-    height: 22px;
-    flex-direction: row;
-    flex-grow: 1;
-    padding: 0;
-    margin: 0 4px 0 0;
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--right {
+    right: -10px;
 }
 
-.rosettaui-animation-curve-editor__field-row > EnumField {
-    width: 120px;
-}
-
-.rosettaui-animation-curve-editor__field-row > ToggleButton {
-    margin-right: 4px;
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle__center-line {
+    background-color: #4368AD; /* capture from Unity Editor */
+    min-width: 0.7px;
+    min-height: 0.7px;
 }
 
 /********************************************************************************
@@ -150,21 +97,18 @@
 .rosettaui-animation-curve-editor__control-point-container {
     position: absolute;
     margin: 0;
-    width: 20px;
-    height: 20px;
-    translate: -10px -10px;
-}
-
-.rosettaui-animation-curve-editor__control-point-container > * {
-    translate: 5px 5px;
+    width: 10px;
+    height: 10px;
+    translate: -5px -5px;
+    justify-content: center;
+    align-items: center;
 }
 
 .rosettaui-animation-curve-editor__control-point {
-    position: absolute;
     margin: 0;
     padding: 0;
-    width: 10px;
-    height: 10px;
+    width: 6px;
+    height: 6px;
     background-color: #00ff00;
     rotate: 45deg;
     border-width: 1.5px;
@@ -178,33 +122,117 @@
 
 .rosettaui-animation-curve-editor__control-point-handle__line {
     position: absolute;
-    left: 5px;
-    top: 4px;
+    top: 3px;
     width: 50px;
-    height: 2px;
-    background-color: whitesmoke;
-    border-width: 0.5px;
-    border-color: gray;
-    transform-origin: 0 50%;
-    opacity: 0.5;
+    height: 1.5px;
+    background-color: rgba(245, 245, 245, 0.3); /* whitesmoke with transparency */
+    transform-origin: left center;
 }
 
 .rosettaui-animation-curve-editor__control-point-handle__handle-container {
     position: absolute;
-    top: -10px;
-    right: -10px;
+    top: -9.5px;
+    right: -9.5px;
     width: 20px;
     height: 20px;
+    justify-content: center;
+    align-items: center;
 }
 
 .rosettaui-animation-curve-editor__control-point-handle__handle {
-    position: absolute;
-    top: 7px;
-    right: 7px;
-    width: 6px;
-    height: 6px;
-    background-color: whitesmoke;
-    border-width: 0.5px;
+    width: 4px;
+    height: 4px;
+    background-color: #1d1d1d;
+    border-width: 1px;
     border-color: gray;
     rotate: 45deg;
+}
+
+.rosettaui-animation-curve-editor__control-point-handle__handle-container-weight > .rosettaui-animation-curve-editor__control-point-handle__handle {
+    width: 6px;
+    height: 6px;
+    rotate: 0;
+}
+
+/********************************************************************************
+* Wrap Mode Button
+********************************************************************************/
+.rosettaui-animation-curve-editor__wrap-mode-button {
+    position: absolute;
+    top: 10px;
+    width: 10px;
+    height: 10px;
+    background-image: url("../Images/MaterialSymbols/settings.png");
+    -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
+}
+
+.rosettaui-animation-curve-editor__wrap-mode-button--pre {
+    right: 17px;
+}
+
+.rosettaui-animation-curve-editor__wrap-mode-button--post {
+    left: 17px;
+}
+
+
+/********************************************************************************
+* Preset
+********************************************************************************/
+.rosettaui-animation-curve-editor-preset__tile {
+    width: 40px;
+    height: 25px;
+    margin: 1px 2px;
+    background-color: var(--rosettaui-color-animation-curve-background);
+}
+
+.rosettaui-animation-curve-editor-preset__tile-core
+{
+    width: 100%;
+    height: 100%;
+    /*border-width: 2px;*/
+    /*border-color: #404040;*/
+}
+
+.rosettaui-animation-curve-editor-preset__tile-curve
+{
+    width: 100%;
+    height: 100%;
+}
+
+/********************************************************************************
+* PresetPreview
+********************************************************************************/
+.rosettaui-animation-curve-editor__presets-container {
+    flex-direction: row;
+    flex-shrink: 0;
+    align-items: center;
+    margin: 6px 4px 0;
+}
+
+.rosettaui-animation-curve-editor__presets-popup-button {
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    background-image: url("../Images/MaterialSymbols/settings.png");
+    -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
+    margin: 4px;
+}
+
+.rosettaui-animation-curve-editor__presets-preview {
+    flex-direction: row;
+    flex-shrink: 0;
+}
+
+/********************************************************************************
+* Preset Popup
+********************************************************************************/
+.rosettaui-animation-curve-editor__presets-popup {
+    width: 265px;
+    height: 300px;
+    padding: 2px;
+    background-color: var(--rosettaui-color-window-background);
+}
+
+.rosettaui-animation-curve-editor__presets-popup .rosettaui-animation-curve-editor-preset__tile {
+    width: 120px;
 }

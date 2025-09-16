@@ -59,9 +59,14 @@ namespace RosettaUI.UIToolkit
             menu.AddSeparator(label);
         }
 
-        public void DropDown(Rect position, VisualElement? targetElement = null, bool anchored = false)
+        public void DropDown(Rect position, VisualElement? targetElement = null, bool anchored = false, Action? onClosed = null)
         {
             RootMenu.DropDown(position, targetElement, anchored);
+
+            if (onClosed != null)
+            {
+                RootMenu.OuterContainer.RegisterCallbackOnce<DetachFromPanelEvent>(_ => onClosed());
+            }
         }
 
         #endregion

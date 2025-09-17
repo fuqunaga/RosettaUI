@@ -72,8 +72,19 @@ namespace RosettaUI.UIToolkit
         {
             AddToClassList(UssClassName);
 
-            _minField = new();
-            _maxField = new();
+#if !UNITY_6000_0_OR_NEWER
+            // Unity6以前はdraggerと左右のminmaxDraggerThumbが重なっている
+            // draggerの角が見えてしまうのでthumb同様に丸める
+            var dragger = this.Q("unity-dragger");
+            var draggerStyle = dragger.style;
+            draggerStyle.borderTopRightRadius = 5f;
+            draggerStyle.borderTopLeftRadius = 5f;
+            draggerStyle.borderBottomRightRadius = 5f;
+            draggerStyle.borderBottomLeftRadius = 5f;
+#endif
+
+            _minField = new TField();
+            _maxField = new TField();
 
             Add(_minField);
             Add(_maxField);

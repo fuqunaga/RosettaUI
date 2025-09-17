@@ -351,7 +351,7 @@ Unity2022.2.0b6
     width: 10px;
     height: var(--rosettaui-slider-dragger-height);
     margin-top: -5px;
-    border-width: 0px;
+    border-width: 0;
     border-radius: var(--rosettaui-slider-dragger-border-radius);
     background-color: var(--unity-colors-slider_thumb-background);
 }

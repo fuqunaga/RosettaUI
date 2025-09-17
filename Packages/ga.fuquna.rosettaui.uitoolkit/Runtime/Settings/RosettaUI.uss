@@ -11,6 +11,7 @@
 
     --rosettaui-dark-gray: #101010;
     --rosettaui-highlight-gray: #606060;
+    --rosettaui-highlight-light-gray: #BBBBBB;
     --rosettaui-highlight-dark-gray: #303030;
     --rosettaui-highlight-blue: rgb(0, 150, 230);
     --rosettaui-highlight-dark-blue: var(--unity-colors-highlight-background);

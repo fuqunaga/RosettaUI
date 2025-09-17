@@ -1,15 +1,6 @@
 /********************************************************************************
 * min max slider
-*  unity-min-max-slider__dragger に9sliceの画像をセットしておいて
-*  c#側の unityengine.uielements.minmaxslider が
-*  min/max-thumbを自動的に求めるコードになっている
 ********************************************************************************/
-/*
-.unity-min-max-slider{
-    flex-grow: 1;
-}
-*/
-
 .unity-min-max-slider__input {
     border-width: 0;
     min-width: var(--slider-min-width);
@@ -24,40 +15,29 @@
 .unity-min-max-slider__dragger{
     margin-top: var(--rosettaui-slider-dragger-margin-top);
     height: var(--rosettaui-slider-dragger-height);
-    -unity-slice-left: 8;
-    -unity-slice-right: 8;
     border-width: 0;
-    -unity-background-image-tint-color:#A6A6A6;
-    background-image: resource("minmax slider thumb");
-}
-
-.unity-min-max-slider__dragger,
-.unity-min-max-slider__dragger:disabled
-{
-    background-color: transparent;
-}
-
-.unity-min-max-slider__dragger:hover:enabled,
-.unity-min-max-slider__input:focus:enabled > .unity-min-max-slider__dragger
-{
-    background-image: resource("minmax slider thumb"); /* cancel unity default */
-    -unity-background-image-tint-color: var(--unity-colors-slider_thumb-background-hover);
-}
-
-
-.rosettaui-min-max-slider > .unity-base-text-field
-{
-    flex-grow: 0;
-    width: var(--fixed-field-width-m);
+    background-color: var(--unity-colors-slider_thumb-background);
 }
 
 .unity-min-max-slider__min-thumb,
 .unity-min-max-slider__max-thumb {
     cursor: var(--cursor-resize-horizontal);
-    border-width: 0;
-
+    width: 10px;
+    height: var(--rosettaui-slider-dragger-height);
+    background-color: var(--unity-colors-slider_thumb-background);
+    
     margin-top: auto; /* cancel unity default */
     min-height: auto; /* cancel unity default */
+}
+
+.unity-min-max-slider__min-thumb {
+    border-radius: var(--rosettaui-slider-dragger-border-radius) 0 0 var(--rosettaui-slider-dragger-border-radius);
+
+}
+
+.unity-min-max-slider__max-thumb {
+    border-radius: 0 var(--rosettaui-slider-dragger-border-radius) var(--rosettaui-slider-dragger-border-radius) 0;
+    
 }
 
 .unity-min-max-slider__min-thumb:disabled,
@@ -66,10 +46,34 @@
 }
 
 .unity-min-max-slider__min-thumb,
-.unity-min-max-slider__max-thumb,
 .unity-min-max-slider__min-thumb:disabled,
-.unity-min-max-slider__max-thumb:disabled
+.unity-min-max-slider__min-thumb:enabled
 {
-    background-color: transparent;
-    color: transparent;
+    border-width: 0 1px 0 0; /* override unity default border*/  
+}
+
+.unity-min-max-slider__max-thumb,
+.unity-min-max-slider__max-thumb:disabled,
+.unity-min-max-slider__max-thumb:enabled
+{
+    border-width: 0 0 0 1px; /* override unity default border*/
+}
+
+.unity-min-max-slider__min-thumb:hover:enabled,
+.unity-min-max-slider__max-thumb:hover:enabled
+{
+    background-color: var(--rosettaui-highlight-light-gray);
+}
+
+.unity-min-max-slider--movable,
+.unity-min-max-slider--movable.unity-min-max-slider__max-thumb:hover:enabled,
+.unity-min-max-slider--movable.unity-min-max-slider__dragger:hover:enabled
+{
+    background-color: rgb(40, 120, 200);    
+}
+
+.rosettaui-min-max-slider > .unity-base-text-field
+{
+ flex-grow: 0;
+ width: var(--fixed-field-width-m);
 }

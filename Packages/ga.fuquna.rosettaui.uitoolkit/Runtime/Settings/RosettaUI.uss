@@ -5,6 +5,7 @@
     --slider-min-width: 180px;
     --input-border-width: 1px;
     --cursor-resize-horizontal: resource("cursor_ew") 24 9;
+    --cursor-resize-vertical: resource("cursor_ns") 9 22;
     --close-icon: resource("close");
     
     --rosettaui-gray-button-tint: #A0A0A0;

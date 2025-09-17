@@ -59,6 +59,7 @@
     right: 10%;
     height: 10px;
     justify-content: center;
+    cursor: var(--cursor-resize-vertical);
 }
 
 .rosettaui-animation-curve-editor__selected-control-points-rect__handle--vertical {
@@ -67,6 +68,7 @@
     width: 10px;
     flex-direction: row;
     justify-content: center;
+    cursor: var(--cursor-resize-horizontal);
 }
 
 .rosettaui-animation-curve-editor__selected-control-points-rect__handle--top {

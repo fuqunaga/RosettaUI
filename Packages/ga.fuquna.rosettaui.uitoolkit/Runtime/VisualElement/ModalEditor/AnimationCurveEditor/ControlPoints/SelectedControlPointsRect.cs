@@ -131,28 +131,28 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             AddToClassList(UssClassName);
             
-            _topHandle = CreateHandle(RectSide.Top, HandleTopClassName, HandleHorizontalClassName, CursorType.ResizeVertical);
+            _topHandle = CreateHandle(RectSide.Top, HandleTopClassName, HandleHorizontalClassName);
             Add(_topHandle);
             
-            _bottomHandle = CreateHandle(RectSide.Bottom, HandleBottomClassName, HandleHorizontalClassName, CursorType.ResizeVertical);
+            _bottomHandle = CreateHandle(RectSide.Bottom, HandleBottomClassName, HandleHorizontalClassName);
             Add(_bottomHandle);
             
-            _leftHandle = CreateHandle(RectSide.Left, HandleLeftClassName, HandleVerticalClassName, CursorType.ResizeHorizontal);
+            _leftHandle = CreateHandle(RectSide.Left, HandleLeftClassName, HandleVerticalClassName);
             Add(_leftHandle);
             
-            _rightHandle = CreateHandle(RectSide.Right, HandleRightClassName, HandleVerticalClassName, CursorType.ResizeHorizontal);
+            _rightHandle = CreateHandle(RectSide.Right, HandleRightClassName, HandleVerticalClassName);
             Add(_rightHandle);
             
             return;
             
             
-            VisualElement CreateHandle(RectSide side, string classNameDir, string classNameHv, CursorType cursorType)
+            VisualElement CreateHandle(RectSide side, string classNameDir, string classNameHv)
             {
                 var handle = new VisualElement();
                 handle.AddToClassList(HandleClassName);
                 handle.AddToClassList(classNameDir);
                 handle.AddToClassList(classNameHv);
-                handle.style.cursor = CursorHolder.Get(cursorType);
+                // handle.style.cursor = CursorHolder.Get(cursorType);
                 
                 var dragManipulator = new DragManipulator();
                 dragManipulator.onDragStarting += (_, evt) => OnDragStarting(evt, side);

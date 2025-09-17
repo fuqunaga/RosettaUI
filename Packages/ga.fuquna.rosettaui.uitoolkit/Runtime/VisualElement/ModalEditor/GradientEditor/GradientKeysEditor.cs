@@ -42,11 +42,8 @@ namespace RosettaUI.UIToolkit
             _onSwatchValueChanged = onSwatchValueChanged;
             _isAlpha = isAlpha;
             
-        
-            container.RegisterCallback<PointerDownEvent>(OnPointerDownOnContainer);
-            PointerDrag.RegisterCallback(container, OnPointerMoveOnContainer, OnPointerupOnContainer);
-            
             container.RegisterCallback<KeyDownEvent>(OnKeyDownOnContainer);
+            container.AddManipulator(new DragManipulator(OnDragStart, OnDrag, OnDragEnd));
         }
 
         public void Initialize(Gradient gradient, IEnumerable<GradientKeysSwatch> showedSwatches)
@@ -65,7 +62,7 @@ namespace RosettaUI.UIToolkit
         }
         
 
-        private void OnPointerDownOnContainer(PointerDownEvent evt)
+        private bool OnDragStart(PointerDownEvent evt)
         {
             var localPos = _container.WorldToLocal(evt.position);
             
@@ -93,9 +90,10 @@ namespace RosettaUI.UIToolkit
             }
 
             evt.StopPropagation();
+            return true;
         }
         
-        private void OnPointerMoveOnContainer(PointerMoveEvent evt)
+        private void OnDrag(PointerMoveEvent evt)
         {
             if (_selectedSwatch == null) return;
             
@@ -140,7 +138,7 @@ namespace RosettaUI.UIToolkit
             evt.StopPropagation();
         }
         
-        private void OnPointerupOnContainer(PointerUpEvent evt)
+        private void OnDragEnd(EventBase evt)
         {
             if (_selectedSwatch == null) return;
 

@@ -11,6 +11,27 @@ namespace RosettaUI.UIToolkit
         
         private int _activePointerId = -1;
         
+        
+        public DragManipulator(
+            Func<PointerDownEvent, bool> onDragStarting = null,
+            Action<PointerMoveEvent> onDrag = null,
+            Action<EventBase> onDragEnd = null)
+        {
+            if (onDrag != null) this.onDrag += (_, evt) => onDrag(evt);
+            if (onDragStarting != null) this.onDragStarting += (_, evt) => onDragStarting(evt);
+            if (onDragEnd != null) this.onDragEnd += (_, evt) => onDragEnd(evt);
+        }
+        
+        public DragManipulator(
+            Func<DragManipulator, PointerDownEvent, bool> onDragStarting ,
+            Action<DragManipulator, PointerMoveEvent> onDrag = null,
+            Action<DragManipulator, EventBase> onDragEnd = null)
+        {
+            this.onDragStarting += onDragStarting;
+            this.onDrag += onDrag;
+            this.onDragEnd += onDragEnd;
+        }
+        
         protected override void RegisterCallbacksOnTarget()
         {
             target.RegisterCallback<PointerDownEvent>(OnPointerDown);

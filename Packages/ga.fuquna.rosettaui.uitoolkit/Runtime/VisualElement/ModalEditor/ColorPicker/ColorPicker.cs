@@ -171,9 +171,8 @@ namespace RosettaUI.UIToolkit
             _svHandler = this.Q("handler-sv");
             _svCursor = _svHandler.Q("circle");
 
-            PointerDrag.RegisterCallback(_hueHandler, OnPointerMoveOnPanel_Hue, null, CheckPointIsValid_Hue, true);
-            PointerDrag.RegisterCallback(_svHandler, OnPointerMoveOnPanel_SV, null, CheckPointerIsValid_SV, true);
-
+            _hueHandler.AddManipulator(new DragManipulator(OnDragStartHue, OnDragHue));
+            _svHandler.AddManipulator(new DragManipulator(OnDragStartSV, OnDragSV));
             
             this.ScheduleToUseResolvedLayoutBeforeRendering(() =>
             {
@@ -221,7 +220,7 @@ namespace RosettaUI.UIToolkit
             UpdateHex();
         }
 
-        private bool CheckPointIsValid_Hue(PointerDownEvent evt)
+        private bool OnDragStartHue(PointerDownEvent evt)
         {
             var pos = evt.localPosition;
             
@@ -231,21 +230,32 @@ namespace RosettaUI.UIToolkit
             
             var distance = Vector2.Distance(pos, center);
             
-            return (maxRadius - _hueCircleThickness <= distance && distance <= maxRadius);
+            var startDrag = (maxRadius - _hueCircleThickness <= distance && distance <= maxRadius);
+            if (startDrag)
+            {
+                UpdateHueByPointerPosition(evt.position);
+                evt.StopPropagation();
+            }
+            
+            return startDrag;
         }
         
-        private void OnPointerMoveOnPanel_Hue(PointerMoveEvent evt)
+        private void OnDragHue(PointerMoveEvent evt)
         {
-            var localPos = _hueHandler.WorldToLocal(evt.position);
+            UpdateHueByPointerPosition(evt.position);
+            evt.StopPropagation();
+        }
+        
+        private void UpdateHueByPointerPosition(Vector2 pointerPosition)
+        {
+            var localPos = _hueHandler.WorldToLocal(pointerPosition);
 
             var hsv = Hsv;
             hsv.x = LocalPosToHue(localPos);
             Hsv = hsv;
-            
-            evt.StopPropagation();
         }
 
-        private bool CheckPointerIsValid_SV(PointerDownEvent evt)
+        private bool OnDragStartSV(PointerDownEvent evt)
         {
             var pos = evt.localPosition;
 
@@ -255,12 +265,25 @@ namespace RosettaUI.UIToolkit
             
             var distance = Vector2.Distance(pos, center);
 
-            return distance <= radius;
+            var startDrag = distance <= radius;
+            if (startDrag)
+            {
+                UpdateSvByPointerPosition(evt.position);
+                evt.StopPropagation();
+            }
+            
+            return startDrag;
         }
         
-        private void OnPointerMoveOnPanel_SV(PointerMoveEvent evt)
+        private void OnDragSV(PointerMoveEvent evt)
         {
-            var localPos = _svHandler.WorldToLocal(evt.position);
+            UpdateSvByPointerPosition(evt.position);
+            evt.StopPropagation();
+        }
+
+        private void UpdateSvByPointerPosition(Vector2 pointerPosition)
+        {
+            var localPos = _svHandler.WorldToLocal(pointerPosition);
             var radius = _svHandler.resolvedStyle.width * 0.5f;
             var posOnCircle = (localPos - Vector2.one * radius) / radius;
             if (posOnCircle.sqrMagnitude >= 1f)
@@ -275,9 +298,7 @@ namespace RosettaUI.UIToolkit
             var hsv = Hsv;
             hsv.y = Mathf.Clamp01(sv.x);
             hsv.z = Mathf.Clamp01(1f - sv.y);　// 数値表示が枠に収まるように端数を丸める
-            Hsv = hsv;
-
-            evt.StopPropagation();
+            Hsv = hsv; 
         }
 
         [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]

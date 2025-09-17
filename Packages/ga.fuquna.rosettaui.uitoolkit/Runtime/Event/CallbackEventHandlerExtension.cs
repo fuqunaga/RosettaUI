@@ -5,7 +5,7 @@ namespace RosettaUI.UIToolkit
 {
     public static class CallbackEventHandlerExtension
     {
-#if !UNITY_6000_OR_NEWER
+#if !UNITY_6000_0_OR_NEWER
         public static void RegisterCallbackOnce<TEventType>(this CallbackEventHandler handler,
             EventCallback<TEventType> callback,
             TrickleDown useTrickleDown = TrickleDown.NoTrickleDown)

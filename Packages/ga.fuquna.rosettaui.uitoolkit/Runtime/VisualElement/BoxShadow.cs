@@ -8,6 +8,7 @@ namespace RosettaUI.UIToolkit
 
         public BoxShadow()
         {
+            pickingMode = PickingMode.Ignore;
             AddToClassList(UssClassName);
         } 
     }

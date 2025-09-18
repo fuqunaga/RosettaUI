@@ -93,7 +93,7 @@ namespace RosettaUI
         protected abstract void BuildInternal(Element element);
 
 #if ENABLE_INPUT_SYSTEM
-        // https://forum.unity.com/threads/prevent-key-input -when-inputfield-has-focus.651055/#post-4384975
+        // https://discussions.unity.com/t/prevent-key-input-when-inputfield-has-focus/737128/3
         private void UpdateInputSystem()
         {
             if (!disableKeyboardInputWhileUITyping) return;

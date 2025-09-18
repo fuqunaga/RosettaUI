@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
@@ -57,6 +58,7 @@ namespace RosettaUI.UIToolkit
         private void OnPointerDown(PointerDownEvent e)
         {
             if (_activePointerId >= 0) return;
+            if (activators.Any() && !CanStartManipulation(e)) return;
 
             bool startDrag;
             if (onDragStarting != null)

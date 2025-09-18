@@ -57,9 +57,18 @@ namespace RosettaUI.UIToolkit
         private void OnPointerDown(PointerDownEvent e)
         {
             if (_activePointerId >= 0) return;
-            
 
-            var startDrag = onDragStarting?.Invoke(this, e) ?? true;
+            bool startDrag;
+            if (onDragStarting != null)
+            {
+                startDrag = onDragStarting(this, e);
+            }
+            else
+            {
+                startDrag = true;
+                e.StopPropagation();
+            }
+            
             if (startDrag)
             {
                 _activePointerId = e.pointerId;

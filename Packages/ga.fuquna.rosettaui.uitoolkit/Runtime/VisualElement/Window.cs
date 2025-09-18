@@ -53,7 +53,6 @@ namespace RosettaUI.UIToolkit
         private Button _closeButton;
         private DragMode _dragMode;
         private Vector2 _draggingLocalPosition;
-        private ResizeEdge _resizeEdge;
         private bool _focused;
         private bool _closable;
         private IVisualElementScheduledItem _focusTask;
@@ -174,6 +173,11 @@ namespace RosettaUI.UIToolkit
             TitleBarContainerLeft.AddToClassList(UssClassNameTitleBarContainerLeft);
             TitleBarContainerRight.AddToClassList(UssClassNameTitleBarContainerRight);
 
+            if (this.resizable)
+            {
+                InitResizeHandles();
+            }
+            
             _titleBarContainer.Add(TitleBarContainerLeft);
             _titleBarContainer.Add(TitleBarContainerRight);
             hierarchy.Add(_titleBarContainer);
@@ -182,19 +186,8 @@ namespace RosettaUI.UIToolkit
             hierarchy.Add(_contentContainer);
 
             Closable = closable;
-
-
+    
             this.AddBoxShadow();
-
-            // ResizeはWindowの少し外側から有効
-            // BoxShadowがWindow外のサイズをもつ子供のエレメントなので
-            // PointerMoveEventを拾うように有効化する
-            if (this.resizable)
-            {
-                var boxShadow = this.Q<BoxShadow>();
-                boxShadow.pickingMode = PickingMode.Position;
-                RegisterCallback<PointerMoveEvent>(OnPointerMove);
-            }
 
             RegisterCallback<PointerDownEvent>(OnPointerDownTrickleDown, TrickleDown.TrickleDown);
             RegisterCallback<PointerDownEvent>(OnPointerDown);
@@ -213,6 +206,71 @@ namespace RosettaUI.UIToolkit
             RegisterCallback<NavigationMoveEvent>(evt => evt.StopPropagationAndFocusControllerIgnoreEvent());
 
             ResetFixedSize();
+        }
+        
+            // 8方向にリサイズ用の透明なハンドルを追加する
+        private void InitResizeHandles()
+        {
+            Span<ResizeEdge> edges = stackalloc ResizeEdge[]
+            {
+                ResizeEdge.Top,
+                ResizeEdge.Bottom,
+                ResizeEdge.Left,
+                ResizeEdge.Right,
+                ResizeEdge.Top | ResizeEdge.Left,
+                ResizeEdge.Top | ResizeEdge.Right,
+                ResizeEdge.Bottom | ResizeEdge.Left,
+                ResizeEdge.Bottom | ResizeEdge.Right,
+            };
+            
+            var handleContainer = new VisualElement()
+            {
+                name = "resize-handle-container",
+                pickingMode = PickingMode.Ignore
+            };
+            handleContainer.AddToClassList("rosettaui-window__resize-handle-container");
+            
+            foreach (var edge in edges)
+            {
+                var handle = CreateHandle(edge);
+                handleContainer.Add(handle);
+            }
+            
+            hierarchy.Add(handleContainer);
+
+            return;
+
+            VisualElement CreateHandle(ResizeEdge edge)
+            {
+                var edgeName = edge.ToString().Replace(", ", "-").ToLower();
+                
+                // horizontal or vertical or corner
+                var edgeTypeName = edge switch
+                {
+                    ResizeEdge.Top or ResizeEdge.Bottom => "horizontal",
+                    ResizeEdge.Left or ResizeEdge.Right => "vertical",
+                    _ => "corner"
+                };
+                
+                var handle = new VisualElement
+                {
+                    name = $"resize-handle-{edgeName}",
+                    pickingMode = PickingMode.Position
+                };
+                handle.AddToClassList("rosettaui-window__resize-handle");
+                handle.AddToClassList($"rosettaui-window__resize-handle-{edgeTypeName}");
+                handle.AddToClassList($"rosettaui-window__resize-handle-{edgeName}");
+
+                var manipulator = new DragManipulator(
+                    null,
+                    (e) => OnHandleDrag(e, edge),
+                    OnHandleDragEnd
+                );
+                manipulator.activators.Add(new ManipulatorActivationFilter { button = MouseButton.LeftMouse });
+                handle.AddManipulator(manipulator);
+                
+                return handle;
+            }
         }
 
         // サイズ固定
@@ -266,24 +324,7 @@ namespace RosettaUI.UIToolkit
         protected virtual void OnPointerDown(PointerDownEvent evt)
         {
             if (evt.button != 0) return;
-
-            if (_resizeEdge != ResizeEdge.None)
-            {
-                StartDrag(DragMode.ResizeWindow);
-                evt.StopPropagation();
-            }
-            // BoxShadowがWindowの範囲より広いのでWindow外のポインタイベントも入ってくる
-            else if (layout.Contains(evt.position))
-            {
-                StartDragWindow(evt.localPosition);
-            }
-        }
-
-        protected virtual void OnPointerMove(PointerMoveEvent evt)
-        {
-            if (_dragMode != DragMode.None) return;
-
-            UpdateResizeEdgeAndCursor(evt.localPosition);
+            StartDragWindow(evt.localPosition);
         }
 
         protected virtual void OnNavigationCancel(NavigationCancelEvent evt)
@@ -390,7 +431,7 @@ namespace RosettaUI.UIToolkit
                         break;
 
                     case DragMode.ResizeWindow:
-                        UpdateResizeWindow(evt.position);
+                        // UpdateResizeWindow(evt.position);
                         break;
 
                     case DragMode.None:
@@ -463,28 +504,21 @@ namespace RosettaUI.UIToolkit
 
 
         #region Resize Window
-
-        private void UpdateResizeEdgeAndCursor(Vector2 localPosition)
+        
+        private void OnHandleDrag(PointerMoveEvent evt, ResizeEdge edge)
         {
-            var prevResizeEdge = _resizeEdge;
-            _resizeEdge = CalcEdge(localPosition);
-
-            // _resizeEdgeがNoneではないとき、カーソルを変更
-            // _resizeEdgeがNoneのとき、
-            //  別のエレメントでカーソルが変わっていた場合はSetResizeCursor()したくない
-            //  このWindowがカーソルを変えていた場合は戻したい
-            //  →とりあえずprevResizeEdgeがNoneじゃなければ元に戻す
-            if (_resizeEdge != ResizeEdge.None || prevResizeEdge != ResizeEdge.None)
-            {
-                SetResizeCursor();
-            }
+            UpdateResizeWindow(evt.position, edge);
+            evt.StopPropagation();
         }
         
-        private void UpdateResizeWindow(Vector2 position)
+        private void OnHandleDragEnd(EventBase _)
         {
-            SetResizeCursor();
-
-            if (_resizeEdge.HasFlag(ResizeEdge.Top))
+            FreezeFixedSize(fixHeight: true);
+        }
+        
+        private void UpdateResizeWindow(Vector2 position, ResizeEdge edge)
+        {
+            if (edge.HasFlag(ResizeEdge.Top))
             {
                 var diff = resolvedStyle.top - position.y;
 
@@ -492,13 +526,13 @@ namespace RosettaUI.UIToolkit
                 style.height =  Mathf.Max(diff + layout.height, minSize.y);
             }
 
-            if (_resizeEdge.HasFlag(ResizeEdge.Bottom))
+            if (edge.HasFlag(ResizeEdge.Bottom))
             {
                 var top = resolvedStyle.top;
                 style.height = Mathf.Max(position.y - top, minSize.y);
             }
 
-            if (_resizeEdge.HasFlag(ResizeEdge.Left))
+            if (edge.HasFlag(ResizeEdge.Left))
             {
                 var diff = resolvedStyle.left - position.x;
 
@@ -506,76 +540,11 @@ namespace RosettaUI.UIToolkit
                 style.width = Mathf.Max(diff + layout.width, minSize.x);
             }
 
-            if (_resizeEdge.HasFlag(ResizeEdge.Right))
+            if (edge.HasFlag(ResizeEdge.Right))
             {
                 var left = resolvedStyle.left;
                 style.width = Mathf.Max(position.x - left, minSize.x);
             }
-        }
-
-        private ResizeEdge CalcEdge(Vector2 localPosition)
-        {
-            const float edgeWidthOuter = 4f;
-            const float edgeWidthInner = 2f;
-
-            var rect = new Rect() { size = layout.size };
-            var outerRect = new Rect()
-            {
-                min = -Vector2.one * edgeWidthOuter,
-                max = rect.size + Vector2.one * edgeWidthOuter
-            };
-            var innerRect = new Rect()
-            {
-                min = Vector2.one * edgeWidthInner,
-                max = rect.size - Vector2.one * edgeWidthInner
-            };
-
-            if (!outerRect.Contains(localPosition)) return ResizeEdge.None;
-
-            var top = localPosition.y <= innerRect.yMin;
-            var bottom = localPosition.y >= innerRect.yMax;
-            var left = localPosition.x <= innerRect.xMin;
-            var right = localPosition.x >= innerRect.xMax;
-
-            var edge = ResizeEdge.None;
-            if (top) edge |= ResizeEdge.Top;
-            if (bottom) edge |= ResizeEdge.Bottom;
-            if (left) edge |= ResizeEdge.Left;
-            if (right) edge |= ResizeEdge.Right;
-            
-            return edge;
-        }
-
-        private static CursorType ToCursorType(ResizeEdge edge)
-        {
-            var type = CursorType.Default;
-
-            var top = edge.HasFlag(ResizeEdge.Top);
-            var bottom = edge.HasFlag(ResizeEdge.Bottom);
-            var left = edge.HasFlag(ResizeEdge.Left);
-            var right = edge.HasFlag(ResizeEdge.Right);
-
-            if (top)
-            {
-                type = left ? CursorType.ResizeUpLeft : (right ? CursorType.ResizeUpRight : CursorType.ResizeVertical);
-            }
-            else if (bottom)
-            {
-                type = left ? CursorType.ResizeUpRight : (right ? CursorType.ResizeUpLeft : CursorType.ResizeVertical);
-            }
-            else if (left || right)
-            {
-                type = CursorType.ResizeHorizontal;
-            }
-
-            return type;
-        }
-
-
-        private void SetResizeCursor()
-        {
-            var cursorType = ToCursorType(_resizeEdge);
-            CursorManager.SetCursor(cursorType);
         }
 
         #endregion

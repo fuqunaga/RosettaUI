@@ -6,6 +6,8 @@
     --input-border-width: 1px;
     --cursor-resize-horizontal: resource("cursor_ew") 24 9;
     --cursor-resize-vertical: resource("cursor_ns") 9 22;
+    --cursor-resize-up-left: resource("cursor_nwse") 16 16;
+    --cursor-resize-up-right: resource("cursor_nesw") 16 16;
     --close-icon: resource("close");
     
     --rosettaui-gray-button-tint: #A0A0A0;
@@ -62,68 +64,6 @@
 
 .rosettaui-window--focused > .rosettaui-box-shadow {
     -unity-background-image-tint-color: rgba(0,4,16,0.8);
-}
-
-
-
-/********************************************************************************
-* Window
-********************************************************************************/
-.rosettaui-window {
-    --rosettaui-window-border-width: 1px;
-    --rosettaui-window-border-color: rgba(5, 5, 5, 0.2);
-
-    background-color: var(--rosettaui-color-window-background);
-    position: absolute;
-    border-radius: 1px;
-    border-width: var(--rosettaui-window-border-width);
-    border-color: var(--rosettaui-window-border-color);
-    padding-bottom: 8px;
-}
-
-.rosettaui-window--focused {
-    background-color: var(--rosettaui-color-window-background-focused);
-}
-
-.rosettaui-window__titlebar-container {
-    /*margin: var(--window-border-width-inverse) var(--window-border-width-inverse) 0px var(--window-border-width-inverse);*/
-    margin: 2px;
-    flex-direction: row;
-    flex-shrink: 0;
-}
-
-.rosettaui-window__titlebar-container__right {
-    align-content: flex-end;
-    margin-left: auto;
-    margin-top: -2px;
-    margin-bottom: -2px;
-    margin-right: -2px;
-}
-
-.rosettaui-window-title-button {
-    padding: 1px 16px;
-    height: 100%;
-    min-height: 18px;
-    align-items: center;
-    flex-direction: row;
-}
-.rosettaui-window-title-button:hover {
-    background-color: #C42B1C;
-}
-.rosettaui-window-title-button:active {
-    background-color: #C53E2C;
-}
-
-.rosettaui-window-title-button__icon {
-    background-image: var(--close-icon);
-    width: 10px;
-    height: 10px;
-    -unity-background-image-tint-color: var(--gray-button-tint);
-}
-
-.rosettaui-window__content-container{
-    overflow: hidden;
-    flex-grow: 1;
 }
 
 /********************************************************************************

@@ -6,14 +6,10 @@ using Debug = UnityEngine.Debug;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.UI;
 #endif
 
 namespace RosettaUI
 {
-#if ENABLE_INPUT_SYSTEM && ! ENABLE_LEGACY_INPUT_MANAGER
-    [RequireComponent(typeof(InputSystemUIInputModule))]
-#endif
     public abstract class RosettaUIRoot : MonoBehaviour
     {
 #if ENABLE_INPUT_SYSTEM
@@ -89,15 +85,17 @@ namespace RosettaUI
         }
 
         public abstract bool WillUseKeyInput();
+        public abstract bool IsPointerOverUIInstance(Vector2 screenPosition);
 
         protected abstract void BuildInternal(Element element);
+
 
 #if ENABLE_INPUT_SYSTEM
         // https://discussions.unity.com/t/prevent-key-input-when-inputfield-has-focus/737128/3
         private void UpdateInputSystem()
         {
             if (!disableKeyboardInputWhileUITyping) return;
-            
+
             var keyboard = Keyboard.current;
             if (WillUseKeyInput() == keyboard.enabled)
             {
@@ -108,13 +106,14 @@ namespace RosettaUI
             }
         }
 #endif
-        
+
         #region Static
 
-        private static readonly HashSet<RosettaUIRoot> Roots = new();
+        private static readonly List<RosettaUIRoot> Roots = new();
 
         private static void Register(RosettaUIRoot root)
         {
+            if(Roots.Contains(root)) return;
             Roots.Add(root);
         }
 
@@ -125,7 +124,44 @@ namespace RosettaUI
 
         public static bool WillUseKeyInputAny()
         {
-            return Roots.Any(r => r.WillUseKeyInput());
+            // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
+            foreach (var root in Roots)
+            {
+                if (root.WillUseKeyInput())
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        public static bool IsPointerOverUI()
+        {
+            var screenPosition = Input.mousePosition;
+            
+#if ENABLE_INPUT_SYSTEM
+            if (Pointer.current != null)
+            {
+                screenPosition = Pointer.current.position.ReadValue();
+            }
+#endif
+
+            return IsPointerOverUI(screenPosition);
+        }
+
+        public static bool IsPointerOverUI(Vector2 screenPosition)
+        {
+            // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
+            foreach (var root in Roots)
+            {
+                if ( root.IsPointerOverUIInstance(screenPosition))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
         }
 
         public static void GlobalBuild(Element element, bool setEnableWhenRootEnabled = false)
@@ -136,7 +172,7 @@ namespace RosettaUI
                 Debug.LogWarning($"There is no active {nameof(RosettaUIRoot)}.");
                 return;
             }
-            
+
             root.Build(element, setEnableWhenRootEnabled);
         }
 

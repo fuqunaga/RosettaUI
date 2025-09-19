@@ -47,5 +47,17 @@ namespace RosettaUI.UIToolkit
         {
             return uiDocument != null && UIToolkitUtility.WillUseKeyInput(uiDocument.rootVisualElement?.panel);
         }
+
+        public override bool IsPointerOverUIInstance(Vector2 screenPosition)
+        {
+            var panel = uiDocument != null ? uiDocument.rootVisualElement?.panel : null;
+            if (panel == null) return false;
+            
+            screenPosition.y = Screen.height - screenPosition.y;
+            
+            var panelPosition = RuntimePanelUtils.ScreenToPanel(panel, screenPosition);
+            
+            return panel.Pick(panelPosition) != null;
+        }
     }
 }

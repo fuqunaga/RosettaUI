@@ -48,7 +48,7 @@ namespace RosettaUI.UIToolkit
             return uiDocument != null && UIToolkitUtility.WillUseKeyInput(uiDocument.rootVisualElement?.panel);
         }
 
-        public override bool IsPointerOverUIInstance(Vector2 screenPosition)
+        public override bool IsOverUIInstance(Vector2 screenPosition)
         {
             var panel = uiDocument != null ? uiDocument.rootVisualElement?.panel : null;
             if (panel == null) return false;

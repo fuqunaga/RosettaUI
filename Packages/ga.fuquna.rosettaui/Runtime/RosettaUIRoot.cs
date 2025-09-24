@@ -14,6 +14,7 @@ namespace RosettaUI
     {
 #if ENABLE_INPUT_SYSTEM
         public bool disableKeyboardInputWhileUITyping = true;
+        public bool disableMouseOrPointerInputOverUI = true;
 #endif
         
         public readonly ElementUpdater updater = new();
@@ -41,11 +42,16 @@ namespace RosettaUI
             {
                 element.Enable = true;
             }
+
         }
 
         protected virtual void OnDisable()
         {
             Unregister(this);
+            
+#if ENABLE_INPUT_SYSTEM
+            InputDeviceBlocker.shouldBlockInput -= IsMouseOrPointerOverUIInstance;
+#endif
         }
 
         protected virtual void Update()
@@ -84,8 +90,29 @@ namespace RosettaUI
             _createElementOnEnableQueue.Enqueue((createElement, setEnableWhenRootEnabled));
         }
 
+        public bool IsMouseOrPointerOverUIInstance()
+        {
+#if ENABLE_INPUT_SYSTEM
+            var mouse = Mouse.current;
+            if (mouse != null && IsOverUIInstance(mouse.position.ReadValue()))
+            {
+                return true;
+            }
+            
+            var pointer = Pointer.current;
+            if (pointer != null && IsOverUIInstance(pointer.position.ReadValue()))
+            {
+                return true;
+            }
+            
+            return false;
+#else
+            return IsOverUIInstance(Input.mousePosition);
+#endif
+        }
+
         public abstract bool WillUseKeyInput();
-        public abstract bool IsPointerOverUIInstance(Vector2 screenPosition);
+        public abstract bool IsOverUIInstance(Vector2 screenPosition);
 
         protected abstract void BuildInternal(Element element);
 
@@ -94,6 +121,20 @@ namespace RosettaUI
         // https://discussions.unity.com/t/prevent-key-input-when-inputfield-has-focus/737128/3
         private void UpdateInputSystem()
         {
+            if (disableMouseOrPointerInputOverUI != InputDeviceBlocker.Enabled)
+            {
+                if(disableMouseOrPointerInputOverUI)
+                {
+                    InputDeviceBlocker.SetEnable(true);
+                    InputDeviceBlocker.shouldBlockInput += IsMouseOrPointerOverUIInstance;
+                }
+                else
+                {
+                    InputDeviceBlocker.shouldBlockInput -= IsMouseOrPointerOverUIInstance;
+                }
+            }
+
+            
             if (!disableKeyboardInputWhileUITyping) return;
 
             var keyboard = Keyboard.current;
@@ -136,26 +177,33 @@ namespace RosettaUI
             return false;
         }
 
-        public static bool IsPointerOverUI()
+        public static bool IsMouseOrPointerOverUI()
         {
-            var screenPosition = Input.mousePosition;
-            
 #if ENABLE_INPUT_SYSTEM
-            if (Pointer.current != null)
+            var mouse = Mouse.current;
+            if (mouse != null && IsOverUI(mouse.position.ReadValue()))
             {
-                screenPosition = Pointer.current.position.ReadValue();
+                return true;
             }
+            
+            var pointer = Pointer.current;
+            if (pointer != null && IsOverUI(pointer.position.ReadValue()))
+            {
+                return true;
+            }
+            
+            return false;
+#else
+            return IsOverUI(Input.mousePosition);
 #endif
-
-            return IsPointerOverUI(screenPosition);
         }
 
-        public static bool IsPointerOverUI(Vector2 screenPosition)
+        public static bool IsOverUI(Vector2 screenPosition)
         {
             // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
             foreach (var root in Roots)
             {
-                if ( root.IsPointerOverUIInstance(screenPosition))
+                if ( root.IsOverUIInstance(screenPosition))
                 {
                     return true;
                 }

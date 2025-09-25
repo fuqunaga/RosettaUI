@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -45,14 +44,18 @@ namespace RosettaUI
                 element.Enable = true;
             }
 
+#if ENABLE_INPUT_SYSTEM
             RegisterForInputDeviceBlocker();
+#endif
         }
 
         protected virtual void OnDisable()
         {
             Unregister(this);
             
+#if ENABLE_INPUT_SYSTEM
             UnregisterForInputDeviceBlocker();
+#endif
         }
 
         protected virtual void Update()
@@ -97,21 +100,19 @@ namespace RosettaUI
         protected abstract void BuildInternal(Element element);
 
 
-        [Conditional("ENABLE_INPUT_SYSTEM")]
+#if ENABLE_INPUT_SYSTEM
         private void RegisterForInputDeviceBlocker()
         {
             InputDeviceBlocker.RegisterShouldBlockFuncIfNotYet(InputDeviceBlocker.Device.Pointer, ShouldBlockPointer);
             InputDeviceBlocker.RegisterShouldBlockFuncIfNotYet(InputDeviceBlocker.Device.Mouse, ShouldBlockMouse);
         }
         
-        [Conditional("ENABLE_INPUT_SYSTEM")]
         private void UnregisterForInputDeviceBlocker()
         {
             InputDeviceBlocker.UnregisterShouldBlockFunc(InputDeviceBlocker.Device.Pointer, ShouldBlockPointer);
             InputDeviceBlocker.UnregisterShouldBlockFunc(InputDeviceBlocker.Device.Mouse, ShouldBlockMouse);
         }
 
-#if ENABLE_INPUT_SYSTEM
         private bool ShouldBlockPointer()
         {
             if (!disablePointerInputOverUI) return false;

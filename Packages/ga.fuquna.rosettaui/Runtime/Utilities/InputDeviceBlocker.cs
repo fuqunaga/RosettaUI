@@ -71,8 +71,9 @@ namespace RosettaUI
         {
             if (Enabled == enable) return;
             
-            var enableDeviceTiming = typeof(PreUpdate.InputForUIUpdate);
-            var disableDeviceTiming = typeof(PreUpdate.InputForUIUpdate);
+            // PreUpdate.InputForUIUpdateの前後のほうがより厳密だがUnity2022にはないのでPreUpdate全体を指定
+            var enableDeviceTiming = typeof(PreUpdate);
+            var disableDeviceTiming = typeof(PreUpdate);
             
             PlayerLoopInjector.RemoveActionBefore(enableDeviceTiming, EnableDevice);
             PlayerLoopInjector.RemoveActionAfter(disableDeviceTiming, CheckAndDisableDevice);

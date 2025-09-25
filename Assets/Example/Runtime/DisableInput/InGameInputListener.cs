@@ -1,10 +1,13 @@
+using UnityEngine;
+
+#if ENABLE_INPUT_SYSTEM
+
 using System.Collections.Generic;
 using TMPro;
-using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
-namespace RosettaUI.Test
+namespace RosettaUI.Examples
 {
     public class InGameInputListener : MonoBehaviour
     {
@@ -126,3 +129,35 @@ namespace RosettaUI.Test
         }
     }
 }
+
+#else
+
+using System;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
+
+namespace RosettaUI.Test
+{
+    [InitializeOnLoad]
+    public class InGameInputListener : MonoBehaviour
+    {
+        static InGameInputListener()
+        {
+            EditorSceneManager.sceneOpened += OnSceneOpened;
+        }
+
+        private static void OnSceneOpened(Scene scene, OpenSceneMode mode)
+        {
+            if (scene.name != "ExampleDisableInput") return;
+
+            EditorUtility.DisplayDialog(
+                "Notice",
+                $"[{scene.name}] scene only works when the New Input System is enabled.",
+                "OK"
+            );
+        }
+    }
+}
+
+#endif

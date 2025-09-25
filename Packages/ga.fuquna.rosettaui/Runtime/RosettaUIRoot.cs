@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -14,7 +15,8 @@ namespace RosettaUI
     {
 #if ENABLE_INPUT_SYSTEM
         public bool disableKeyboardInputWhileUITyping = true;
-        public bool disableMouseOrPointerInputOverUI = true;
+        public bool disablePointerInputOverUI = true;
+        public bool disableMouseInputOverUI = true;
 #endif
         
         public readonly ElementUpdater updater = new();
@@ -43,15 +45,14 @@ namespace RosettaUI
                 element.Enable = true;
             }
 
+            RegisterForInputDeviceBlocker();
         }
 
         protected virtual void OnDisable()
         {
             Unregister(this);
             
-#if ENABLE_INPUT_SYSTEM
-            InputDeviceBlocker.shouldBlockInput -= IsMouseOrPointerOverUIInstance;
-#endif
+            UnregisterForInputDeviceBlocker();
         }
 
         protected virtual void Update()
@@ -90,51 +91,47 @@ namespace RosettaUI
             _createElementOnEnableQueue.Enqueue((createElement, setEnableWhenRootEnabled));
         }
 
-        public bool IsMouseOrPointerOverUIInstance()
-        {
-#if ENABLE_INPUT_SYSTEM
-            var mouse = Mouse.current;
-            if (mouse != null && IsOverUIInstance(mouse.position.ReadValue()))
-            {
-                return true;
-            }
-            
-            var pointer = Pointer.current;
-            if (pointer != null && IsOverUIInstance(pointer.position.ReadValue()))
-            {
-                return true;
-            }
-            
-            return false;
-#else
-            return IsOverUIInstance(Input.mousePosition);
-#endif
-        }
-
         public abstract bool WillUseKeyInput();
         public abstract bool IsOverUIInstance(Vector2 screenPosition);
 
         protected abstract void BuildInternal(Element element);
 
 
+        [Conditional("ENABLE_INPUT_SYSTEM")]
+        private void RegisterForInputDeviceBlocker()
+        {
+            InputDeviceBlocker.RegisterShouldBlockFuncIfNotYet(InputDeviceBlocker.Device.Pointer, ShouldBlockPointer);
+            InputDeviceBlocker.RegisterShouldBlockFuncIfNotYet(InputDeviceBlocker.Device.Mouse, ShouldBlockMouse);
+        }
+        
+        [Conditional("ENABLE_INPUT_SYSTEM")]
+        private void UnregisterForInputDeviceBlocker()
+        {
+            InputDeviceBlocker.UnregisterShouldBlockFunc(InputDeviceBlocker.Device.Pointer, ShouldBlockPointer);
+            InputDeviceBlocker.UnregisterShouldBlockFunc(InputDeviceBlocker.Device.Mouse, ShouldBlockMouse);
+        }
+
 #if ENABLE_INPUT_SYSTEM
+        private bool ShouldBlockPointer()
+        {
+            if (!disablePointerInputOverUI) return false;
+
+            var pointer = Pointer.current;
+            return pointer is { enabled: true } && IsOverUIInstance(pointer.position.ReadValue());
+        }
+        
+        private bool ShouldBlockMouse()
+        {
+            if (!disableMouseInputOverUI) return false;
+
+            var mouse = Mouse.current;
+            return mouse is { enabled: true } && IsOverUIInstance(mouse.position.ReadValue());
+        }
+        
+        
         // https://discussions.unity.com/t/prevent-key-input-when-inputfield-has-focus/737128/3
         private void UpdateInputSystem()
         {
-            if (disableMouseOrPointerInputOverUI != InputDeviceBlocker.Enabled)
-            {
-                if(disableMouseOrPointerInputOverUI)
-                {
-                    InputDeviceBlocker.SetEnable(true);
-                    InputDeviceBlocker.shouldBlockInput += IsMouseOrPointerOverUIInstance;
-                }
-                else
-                {
-                    InputDeviceBlocker.shouldBlockInput -= IsMouseOrPointerOverUIInstance;
-                }
-            }
-
-            
             if (!disableKeyboardInputWhileUITyping) return;
 
             var keyboard = Keyboard.current;
@@ -175,27 +172,6 @@ namespace RosettaUI
             }
             
             return false;
-        }
-
-        public static bool IsMouseOrPointerOverUI()
-        {
-#if ENABLE_INPUT_SYSTEM
-            var mouse = Mouse.current;
-            if (mouse != null && IsOverUI(mouse.position.ReadValue()))
-            {
-                return true;
-            }
-            
-            var pointer = Pointer.current;
-            if (pointer != null && IsOverUI(pointer.position.ReadValue()))
-            {
-                return true;
-            }
-            
-            return false;
-#else
-            return IsOverUI(Input.mousePosition);
-#endif
         }
 
         public static bool IsOverUI(Vector2 screenPosition)

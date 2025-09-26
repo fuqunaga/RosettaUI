@@ -96,14 +96,24 @@
     padding-left: 2px; /* unity6だと標準で設定されている。unity2022だと設定されていない */
 }
 
-/* 
-特定のTextField(Rowの子供、ラベルあり、multiline)
-align-self: flex-start
-だとなぜか横幅が伸びてしまう対策
-Unity2022.2.0b6
- */
 .unity-base-text-field__input--multiline {
+    /* 特定のTextField(Rowの子供、ラベルあり、multiline)
+    align-self: flex-start
+    だとなぜか横幅が伸びてしまう対策
+    Unity2022.2.0b6
+     */
     align-self: auto;
+    
+    /* Unity標準ではunity-text-alignが
+    - 通常のTextField: middle-left
+    - multiline: upper-left
+    となっており１行のとき上に寄っている見た目になる
+    これをmiddle-leftに変更すると複数行になったときに上に寄る挙動になる
+    複数行になっても１行目の表示は移動しないようにしたい
+    padding-topで調整するとうまくいった
+    Unity6000.0.55f1
+     */
+    padding-top: 1px;
 }
 
 /********************************************************************************

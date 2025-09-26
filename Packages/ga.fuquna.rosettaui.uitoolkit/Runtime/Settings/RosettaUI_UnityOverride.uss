@@ -456,7 +456,7 @@
 .unity-scroller .unity-scroller__slider .unity-base-slider__dragger
 {
     margin: 0;
-    background-image: resource("circle-fill");
+    background-image: url("../Images/circle-fill.png");
     background-color: initial;
     border-width: 0;
     border-radius: 0;

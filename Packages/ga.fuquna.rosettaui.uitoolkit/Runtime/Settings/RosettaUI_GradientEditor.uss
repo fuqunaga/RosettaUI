@@ -42,7 +42,7 @@
     height: 14px;
     margin: 0 0 0 -4px;
     border-width: 0;
-    background-image: resource("gradient_cursor");
+    background-image: url("../Images/gradient_cursor.png");
 }
 
 .rosettaui-gradient-editor__cursor-alpha 
@@ -59,7 +59,7 @@
 .rosettaui-gradient-editor__cursor_outline
 {
     flex-grow: 1;
-    background-image: resource("gradient_cursor_outline");
+    background-image: url("../Images/gradient_cursor_outline.png");
     -unity-background-image-tint-color: black;
 }
 

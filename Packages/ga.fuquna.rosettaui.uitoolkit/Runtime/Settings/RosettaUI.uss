@@ -8,7 +8,6 @@
     --cursor-resize-vertical: resource("cursor_ns") 9 22;
     --cursor-resize-up-left: resource("cursor_nwse") 16 16;
     --cursor-resize-up-right: resource("cursor_nesw") 16 16;
-    --close-icon: resource("close");
     
     --rosettaui-gray-button-tint: #A0A0A0;
 
@@ -51,7 +50,7 @@
 ********************************************************************************/
 .rosettaui-box-shadow {
     position: absolute;
-    background-image: resource("box-shadow");
+    background-image: url("../Images/box-shadow.png");
     -unity-background-image-tint-color: rgba(0,4,16,0.4);
 
     border-width: 22px 25px 24px 21px;

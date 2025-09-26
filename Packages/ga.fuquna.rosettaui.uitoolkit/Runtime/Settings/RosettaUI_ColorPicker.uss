@@ -42,7 +42,7 @@
 
 .rosettaui-colorpicker__handler-h__circle
 {
-    background-image: resource("circle_big");
+    background-image: url("../Images/circle_big.png");
 }
 
 
@@ -63,7 +63,7 @@
     height: 10px;
     margin: -5px 0 0 -5px;
     position: relative;
-    background-image: resource("circle");
+    background-image: url("../Images/circle.png");
 }
 
 .rosettaui-colorpicker-slider-type-button
@@ -138,5 +138,5 @@
 {
     width: 100%;
     height: 100%;
-    background-image: resource("half_triangle");
+    background-image: url("../Images/half_triangle.png");
 }

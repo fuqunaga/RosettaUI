@@ -47,7 +47,7 @@
 }
 
 .rosettaui-window-title-button__icon {
-    background-image: var(--close-icon);
+    background-image: url("../Images/close.png");
     width: 10px;
     height: 10px;
     -unity-background-image-tint-color: var(--gray-button-tint);

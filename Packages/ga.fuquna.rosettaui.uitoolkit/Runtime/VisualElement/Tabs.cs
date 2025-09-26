@@ -83,10 +83,7 @@ namespace RosettaUI.UIToolkit
         private void DoAddTab(VisualElement header, VisualElement content)
         {
             var index = _tabs.Count;
-            var titleVe = new Button(() => CurrentTabIndex = index)
-            {
-                tabIndex = -1
-            };
+            var titleVe = new Button(() => CurrentTabIndex = index);
             titleVe.ClearClassList();
             titleVe.AddToClassList(UssClassNameTitle);
             titleVe.Add(header);
@@ -103,26 +100,12 @@ namespace RosettaUI.UIToolkit
             {
                 var (title, content) = _tabs[i];
 
-                if (i == _currentTabIndex)
-                {
-                    title.RemoveFromClassList(UssClassNameTitleInactive);
-                    title.AddToClassList(UssClassNameTitleActive);
-
-                    if (content != null)
-                    {
-                        content.style.display = DisplayStyle.Flex;
-                    }
-                }
-                else
-                {
-                    title.RemoveFromClassList(UssClassNameTitleActive);
-                    title.AddToClassList(UssClassNameTitleInactive);
-
-                    if (content != null)
-                    {
-                        content.style.display = DisplayStyle.None;
-                    }
-                }
+                var isCurrent = i == _currentTabIndex;
+                title.EnableInClassList(UssClassNameTitleInactive, !isCurrent);
+                title.EnableInClassList(UssClassNameTitleActive, isCurrent);
+                title.focusable = !isCurrent;
+                
+                content?.SetShow(isCurrent);
             }
         }
 

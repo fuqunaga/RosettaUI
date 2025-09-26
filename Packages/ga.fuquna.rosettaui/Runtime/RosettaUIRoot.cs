@@ -6,18 +6,16 @@ using Debug = UnityEngine.Debug;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.UI;
 #endif
 
 namespace RosettaUI
 {
-#if ENABLE_INPUT_SYSTEM && ! ENABLE_LEGACY_INPUT_MANAGER
-    [RequireComponent(typeof(InputSystemUIInputModule))]
-#endif
     public abstract class RosettaUIRoot : MonoBehaviour
     {
 #if ENABLE_INPUT_SYSTEM
         public bool disableKeyboardInputWhileUITyping = true;
+        public bool disablePointerInputOverUI = true;
+        public bool disableMouseInputOverUI = true;
 #endif
         
         public readonly ElementUpdater updater = new();
@@ -45,11 +43,19 @@ namespace RosettaUI
             {
                 element.Enable = true;
             }
+
+#if ENABLE_INPUT_SYSTEM
+            RegisterForInputDeviceBlocker();
+#endif
         }
 
         protected virtual void OnDisable()
         {
             Unregister(this);
+            
+#if ENABLE_INPUT_SYSTEM
+            UnregisterForInputDeviceBlocker();
+#endif
         }
 
         protected virtual void Update()
@@ -89,15 +95,46 @@ namespace RosettaUI
         }
 
         public abstract bool WillUseKeyInput();
+        public abstract bool IsOverUIInstance(Vector2 screenPosition);
 
         protected abstract void BuildInternal(Element element);
 
+
 #if ENABLE_INPUT_SYSTEM
+        private void RegisterForInputDeviceBlocker()
+        {
+            InputDeviceBlocker.RegisterShouldBlockFuncIfNotYet(InputDeviceBlocker.Device.Pointer, ShouldBlockPointer);
+            InputDeviceBlocker.RegisterShouldBlockFuncIfNotYet(InputDeviceBlocker.Device.Mouse, ShouldBlockMouse);
+        }
+        
+        private void UnregisterForInputDeviceBlocker()
+        {
+            InputDeviceBlocker.UnregisterShouldBlockFunc(InputDeviceBlocker.Device.Pointer, ShouldBlockPointer);
+            InputDeviceBlocker.UnregisterShouldBlockFunc(InputDeviceBlocker.Device.Mouse, ShouldBlockMouse);
+        }
+
+        private bool ShouldBlockPointer()
+        {
+            if (!disablePointerInputOverUI) return false;
+
+            var pointer = Pointer.current;
+            return pointer is { enabled: true } && IsOverUIInstance(pointer.position.ReadValue());
+        }
+        
+        private bool ShouldBlockMouse()
+        {
+            if (!disableMouseInputOverUI) return false;
+
+            var mouse = Mouse.current;
+            return mouse is { enabled: true } && IsOverUIInstance(mouse.position.ReadValue());
+        }
+        
+        
         // https://discussions.unity.com/t/prevent-key-input-when-inputfield-has-focus/737128/3
         private void UpdateInputSystem()
         {
             if (!disableKeyboardInputWhileUITyping) return;
-            
+
             var keyboard = Keyboard.current;
             if (WillUseKeyInput() == keyboard.enabled)
             {
@@ -108,13 +145,14 @@ namespace RosettaUI
             }
         }
 #endif
-        
+
         #region Static
 
-        private static readonly HashSet<RosettaUIRoot> Roots = new();
+        private static readonly List<RosettaUIRoot> Roots = new();
 
         private static void Register(RosettaUIRoot root)
         {
+            if(Roots.Contains(root)) return;
             Roots.Add(root);
         }
 
@@ -125,7 +163,30 @@ namespace RosettaUI
 
         public static bool WillUseKeyInputAny()
         {
-            return Roots.Any(r => r.WillUseKeyInput());
+            // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
+            foreach (var root in Roots)
+            {
+                if (root.WillUseKeyInput())
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        public static bool IsOverUI(Vector2 screenPosition)
+        {
+            // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
+            foreach (var root in Roots)
+            {
+                if ( root.IsOverUIInstance(screenPosition))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
         }
 
         public static void GlobalBuild(Element element, bool setEnableWhenRootEnabled = false)
@@ -136,7 +197,7 @@ namespace RosettaUI
                 Debug.LogWarning($"There is no active {nameof(RosettaUIRoot)}.");
                 return;
             }
-            
+
             root.Build(element, setEnableWhenRootEnabled);
         }
 

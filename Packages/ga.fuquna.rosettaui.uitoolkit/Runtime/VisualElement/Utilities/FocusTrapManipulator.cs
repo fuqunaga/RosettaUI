@@ -1,59 +1,64 @@
-﻿using UnityEngine;
-using UnityEngine.Pool;
-using UnityEngine.UIElements;
+﻿using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit
 {
     /// <summary>
-    /// AddしたVisualElementの中にフォーカスを留めるマニュピレーター
+    /// AddしたVisualElementの中にフォーカスをループして留めるマニュピレーター
     /// </summary>
     public class FocusTrapManipulator : Manipulator
     {
+        private VisualElementFocusRing _focusRing;
+        
         protected override void RegisterCallbacksOnTarget()
         {
-            target.RegisterCallback<KeyDownEvent>(OnKeyDown, TrickleDown.TrickleDown);
-        }
-
-        protected override void UnregisterCallbacksFromTarget()
-        {
-            target.UnregisterCallback<KeyDownEvent>(OnKeyDown, TrickleDown.TrickleDown);
+            target.RegisterCallback<FocusOutEvent>(OnFocusOut);
         }
         
-        private void OnKeyDown(KeyDownEvent evt)
+        protected override void UnregisterCallbacksFromTarget()
         {
-            if (evt.keyCode != KeyCode.Tab) return;
-            
-            using var _ = ListPool<Focusable>.Get(out var focusableList);
-            focusableList.AddRange(
-                target.Query<VisualElement>()
-                    .Where(ve => ve.canGrabFocus && (ve.parent == null || !ve.parent.canGrabFocus))
-                    .Build()
-            );
-            
-            var count = focusableList.Count;
-            if (count == 0)
-            {
-                return;
-            }
-
-            var focused = target.panel.focusController.focusedElement;
-            
-            var currentIndex = focusableList.IndexOf(focused);
-            
-            // target外にフォーカスがある場合は無視
-            if (focused != null && currentIndex < 0)
-            {
-                return;
-            }
-            
-            var index = (focused == null)
-                ? (evt.shiftKey ? focusableList.Count - 1 : 0)
-                : (evt.shiftKey ? currentIndex - 1 : currentIndex + 1);
-
-            index  = (index + count) % count;
-            
-            focusableList[index].Focus();
-            evt.StopPropagation();
+            target.UnregisterCallback<FocusOutEvent>(OnFocusOut);
         }
-    }
+
+        private void OnFocusOut(FocusOutEvent evt)
+        {
+            var direction = evt.direction;
+
+            if (direction != VisualElementFocusChangeDirection.right &&
+                direction != VisualElementFocusChangeDirection.left)
+            {
+                return;
+            }
+            
+            // 自身の外へのフォーカスのみ対応
+            if (evt.relatedTarget is VisualElement nextFocusTarget && IsChild(nextFocusTarget))
+            {
+                return;
+            }
+                
+            _focusRing ??= new VisualElementFocusRing(target);
+
+            // GetNextFocusable()でcurrentFocusableをnullにすると、最初or最後の要素が返る実装を当て込んでいる
+            var focusTarget = _focusRing.GetNextFocusable(null, evt.direction);
+            if (focusTarget == null)
+            {
+                return;
+            }
+                
+            target.schedule.Execute(()=> focusTarget.Focus());
+            evt.StopPropagation();
+
+            return;
+
+            bool IsChild(VisualElement child)
+            {
+                while (child != null)
+                {
+                    if (child == target) return true;
+                    child = child.parent;
+                }
+
+                return false;
+            }
+        }
+   }
 }

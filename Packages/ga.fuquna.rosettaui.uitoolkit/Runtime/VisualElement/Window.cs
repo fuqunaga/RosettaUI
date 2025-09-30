@@ -199,6 +199,8 @@ namespace RosettaUI.UIToolkit
                 evt.StopPropagation();
             });
             
+            this.AddManipulator(new FocusTrapManipulator());
+            
             ResetFixedSize();
         }
         

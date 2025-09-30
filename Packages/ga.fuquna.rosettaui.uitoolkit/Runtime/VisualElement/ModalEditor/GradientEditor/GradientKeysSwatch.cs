@@ -82,6 +82,7 @@ namespace RosettaUI.UIToolkit
             var cursor = new VisualElement();
             cursor.AddToClassList(CursorUSSClassName);
             cursor.focusable = true;
+            cursor.tabIndex = -1;
 
             var outline = new VisualElement();
             outline.AddToClassList(CursorOutlineUSSClassName);

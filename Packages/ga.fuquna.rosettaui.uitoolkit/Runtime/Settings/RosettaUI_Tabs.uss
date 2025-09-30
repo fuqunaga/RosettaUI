@@ -36,5 +36,5 @@
 
 .rosettaui-tabs__title--inactive:focus
 {
-    border-color: var(--rosettaui-highlight-blue);
+    border-color: var(--unity-colors-input_field-border-focus);
 }

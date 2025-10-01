@@ -11,6 +11,7 @@ namespace RosettaUI.UIToolkit
     ///
     /// SliderにTextFieldを入れる作りにはしない？
     /// - this.value = newValue でクランプされてしまう
+    /// - Slider.clampedを（internalだけど無理やり）falseにするとSliderのUI上のつまみが範囲外に行ってしまう
     ///
     /// 親VisualElementを用意してSliderとTextFieldを並列に並べるのは？
     /// - ラベルのドラッグで値が変わって欲しい
@@ -27,6 +28,18 @@ namespace RosettaUI.UIToolkit
             Slider = new SliderInt();
             
             this.Initialize<ClampFreeSliderInteger, int>();
+            
+            // Slider上でNavigationMoveEventは無効化しデフォルトの挙動に任せる
+            // 
+            // IntegerField（の祖先のTextInputBaseField<TValueType>）はHandleEventBubbleUp()で
+            // NavigationMoveEventのときにevt.target != this.textInputBase.textElement だと
+            // this.textInputBase.textElementをcurrentFocusとしてSwitchFocusOnEvent()を呼んでしまう
+            // これはSliderにフォーカスがあるときにNavigationMoveEventが起こるとtextElementからのフォーカス移動扱いになり、
+            // Shift+Tab時は再度SliderにTab時はtextElementを飛ばして次のエレメントにフォーカスが移ってしまう
+            Slider.RegisterCallback<NavigationMoveEvent>(evt =>
+            {
+                evt.StopPropagation();
+            });
         }
 
         public override void SetValueWithoutNotify(int newValue)

@@ -13,7 +13,7 @@ namespace RosettaUI
     public abstract class RosettaUIRoot : MonoBehaviour
     {
 #if ENABLE_INPUT_SYSTEM
-        public bool disableKeyboardInputWhileUITyping = true;
+        public bool disableKeyboardInputWhileUIFocused = true;
         public bool disablePointerInputOverUI = true;
         public bool disableMouseInputOverUI = true;
 #endif
@@ -61,10 +61,6 @@ namespace RosettaUI
         protected virtual void Update()
         {
             updater.Update();
-            
-#if ENABLE_INPUT_SYSTEM
-            UpdateInputSystem();
-#endif
         }
 
         protected void OnDestroy()
@@ -94,6 +90,7 @@ namespace RosettaUI
             _createElementOnEnableQueue.Enqueue((createElement, setEnableWhenRootEnabled));
         }
 
+        public abstract bool IsFocusedInstance { get; }
         public abstract bool WillUseKeyInput();
         public abstract bool IsOverUIInstance(Vector2 screenPosition);
 
@@ -103,14 +100,21 @@ namespace RosettaUI
 #if ENABLE_INPUT_SYSTEM
         private void RegisterForInputDeviceBlocker()
         {
+            InputDeviceBlocker.RegisterShouldBlockFuncIfNotYet(InputDeviceBlocker.Device.Keyboard, ShouldBlockKeyboard);
             InputDeviceBlocker.RegisterShouldBlockFuncIfNotYet(InputDeviceBlocker.Device.Pointer, ShouldBlockPointer);
             InputDeviceBlocker.RegisterShouldBlockFuncIfNotYet(InputDeviceBlocker.Device.Mouse, ShouldBlockMouse);
         }
         
         private void UnregisterForInputDeviceBlocker()
         {
+            InputDeviceBlocker.RegisterShouldBlockFuncIfNotYet(InputDeviceBlocker.Device.Keyboard, ShouldBlockKeyboard);
             InputDeviceBlocker.UnregisterShouldBlockFunc(InputDeviceBlocker.Device.Pointer, ShouldBlockPointer);
             InputDeviceBlocker.UnregisterShouldBlockFunc(InputDeviceBlocker.Device.Mouse, ShouldBlockMouse);
+        }
+
+        private bool ShouldBlockKeyboard()
+        {
+            return disableKeyboardInputWhileUIFocused && IsFocusedInstance;
         }
 
         private bool ShouldBlockPointer()
@@ -128,27 +132,14 @@ namespace RosettaUI
             var mouse = Mouse.current;
             return mouse is { enabled: true } && IsOverUIInstance(mouse.position.ReadValue());
         }
-        
-        
-        // https://discussions.unity.com/t/prevent-key-input-when-inputfield-has-focus/737128/3
-        private void UpdateInputSystem()
-        {
-            if (!disableKeyboardInputWhileUITyping) return;
-
-            var keyboard = Keyboard.current;
-            if (WillUseKeyInput() == keyboard.enabled)
-            {
-                if (keyboard.enabled)
-                    InputSystem.DisableDevice(keyboard);
-                else
-                    InputSystem.EnableDevice(keyboard);
-            }
-        }
 #endif
 
         #region Static
 
         private static readonly List<RosettaUIRoot> Roots = new();
+        
+        
+        public static bool IsFocus => Roots.Any(root => root.IsFocusedInstance);
 
         private static void Register(RosettaUIRoot root)
         {
@@ -161,6 +152,7 @@ namespace RosettaUI
             Roots.Remove(root);
         }
 
+        [Obsolete("Use IsFocus instead")]
         public static bool WillUseKeyInputAny()
         {
             // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator

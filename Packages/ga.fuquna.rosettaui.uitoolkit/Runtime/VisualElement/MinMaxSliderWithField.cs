@@ -9,7 +9,7 @@ namespace RosettaUI.UIToolkit
     {
         private const string UssClassName = "rosettaui-min-max-slider";
 
-        #region ToTValue/TFloat
+        #region ToTValue/ToFloat
         
         public static readonly Func<float, TValue> ToTValue;
         public static readonly Func<TValue, float> ToFloat;
@@ -30,6 +30,8 @@ namespace RosettaUI.UIToolkit
                 ToFloat = (Func<TValue, float>)(object)(Func<int, float>)IntToFloat;
             }
 
+            return;
+
             static float FloatToFloat(float f) => f;
             static int FloatToInt(float f) => (int)f;
             static float IntToFloat(int i) => i;
@@ -39,11 +41,9 @@ namespace RosettaUI.UIToolkit
 
 
         private bool _showInputField = true;
-        private readonly TField _minField;
-        private readonly TField _maxField;
-        
-        public TField MinField => _minField;
-        public TField MaxField => _maxField;
+
+        public TField MinField { get; }
+        public TField MaxField { get; }
 
         public bool ShowInputField
         {
@@ -55,15 +55,15 @@ namespace RosettaUI.UIToolkit
                 _showInputField = value;
                 if (_showInputField)
                 {
-                    _minField.style.display = DisplayStyle.Flex;
-                    _maxField.style.display = DisplayStyle.Flex;
+                    MinField.style.display = DisplayStyle.Flex;
+                    MaxField.style.display = DisplayStyle.Flex;
                     
                     SetMinMaxToField(this.value);
                 }
                 else
                 {
-                    _minField.style.display = DisplayStyle.None;
-                    _maxField.style.display = DisplayStyle.None;
+                    MinField.style.display = DisplayStyle.None;
+                    MaxField.style.display = DisplayStyle.None;
                 }
             }
         }
@@ -83,14 +83,39 @@ namespace RosettaUI.UIToolkit
             draggerStyle.borderBottomLeftRadius = 5f;
 #endif
 
-            _minField = new TField();
-            _maxField = new TField();
+            MinField = new TField();
+            MaxField = new TField();
 
-            Add(_minField);
-            Add(_maxField);
+            Add(MinField);
+            Add(MaxField);
             
-            _minField.RegisterValueChangedCallback(evt => minValue = ToFloat(evt.newValue));
-            _maxField.RegisterValueChangedCallback(evt => maxValue = ToFloat(evt.newValue));
+            // MinMaxSliderのFocusInEventでスライダーがアクティブになってしまうのをFieldへのフォーカス時は防ぐ
+            MinField.RegisterCallback<FocusInEvent>(evt => evt.StopPropagation());
+            MaxField.RegisterCallback<FocusInEvent>(evt => evt.StopPropagation());
+            
+            // MinFieldからShift+Tabでスライダーへフォーカスする場合、
+            // MinMaxSliderのイベント
+            // - FocusInEventでスライダーがDragState.MinThumbになるが、そのあと
+            // - BlurEventでスライダーがDragState.NoThumbになってしまう
+            // 通常フォーカス時同様にDragState.MinThumbになってほしい
+            // ややこしいのがMinFieldのBlurEvent内でthis.Focus()しても、上記同様MinMaxSliderがBlurイベントを受け取ってしまいやはりうまくいかない
+            // 一度Blur()してからFocus()するようにしている
+            // ReflectionでMinMaxSlider.SetNavigationState()を呼び出した方が副作用の恐れが少なくていいかもしれない
+            var visualInput = this.Q(className: inputUssClassName);
+            MinField.RegisterCallback<BlurEvent>(evt =>
+            {
+                if (evt.relatedTarget == visualInput)
+                {
+                    schedule.Execute(() =>
+                    {
+                        Blur();
+                        Focus();
+                    });
+                }
+            });
+            
+            MinField.RegisterValueChangedCallback(evt => minValue = ToFloat(evt.newValue));
+            MaxField.RegisterValueChangedCallback(evt => maxValue = ToFloat(evt.newValue));
         }
 
         
@@ -106,8 +131,8 @@ namespace RosettaUI.UIToolkit
 
         private void SetMinMaxToField(Vector2 minMax)
         {
-            _minField?.SetValueWithoutNotifyIfNotEqual(ToTValue(minMax.x));
-            _maxField?.SetValueWithoutNotifyIfNotEqual(ToTValue(minMax.y));
+            MinField?.SetValueWithoutNotifyIfNotEqual(ToTValue(minMax.x));
+            MaxField?.SetValueWithoutNotifyIfNotEqual(ToTValue(minMax.y));
         }
     }
 }

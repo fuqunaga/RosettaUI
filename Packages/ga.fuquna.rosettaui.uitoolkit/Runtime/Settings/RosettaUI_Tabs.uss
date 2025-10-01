@@ -21,6 +21,7 @@
 {
     flex-shrink: 0;
     padding: 2px 4px;
+    border-bottom-width: 1px;
 }
 
 .rosettaui-tabs__title--inactive
@@ -31,4 +32,9 @@
 .rosettaui-tabs__title--inactive:hover
 {
     background-color: var(--rosettaui-highlight-dark-gray);
+}
+
+.rosettaui-tabs__title--inactive:focus
+{
+    border-color: var(--unity-colors-input_field-border-focus);
 }

@@ -17,14 +17,18 @@ namespace RosettaUI
     {
         public enum Device
         {
+            Keyboard,
             Pointer,
             Mouse,
         }
         
         private static readonly Dictionary<Device, List<Func<bool>>> DeviceShouldBlockFuncListTable = new();
         
+        private static Keyboard _dummyKeyboard;
         private static Mouse _dummyMouse;
         private static Pointer _dummyPointer;
+        
+        private static Keyboard _originalKeyboard;
         private static Mouse _originalMouse;
         private static Pointer _originalPointer;
 
@@ -93,6 +97,9 @@ namespace RosettaUI
 
         private static void EnableDevice()
         {
+            _originalKeyboard?.MakeCurrent();
+            _originalKeyboard = null;
+            
             _originalMouse?.MakeCurrent();
             _originalMouse = null;
             
@@ -109,6 +116,13 @@ namespace RosettaUI
                 
                 switch (device)
                 {
+                    case Device.Keyboard:
+                        _originalKeyboard = Keyboard.current;
+                        
+                        _dummyKeyboard ??= InputSystem.AddDevice<Keyboard>();
+                        _dummyKeyboard.MakeCurrent();
+                        break;
+                    
                     case Device.Pointer:
                         _originalPointer = Pointer.current;
 
@@ -122,7 +136,8 @@ namespace RosettaUI
                         _dummyMouse ??= InputSystem.AddDevice<Mouse>();
                         _dummyMouse.MakeCurrent();
                         break;
-                    
+
+
                     default:
                         throw new ArgumentOutOfRangeException();
                 }

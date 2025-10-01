@@ -223,24 +223,30 @@
 /********************************************************************************
 * Window Launcher
 ********************************************************************************/
-.rosettaui-window-launcher:hover
-{
+.rosettaui-window-launcher {
+    border-width: 1px;
+    border-color: transparent;
+}
+
+.rosettaui-window-launcher:hover {
     background-color: var(--rosettaui-highlight-dark-gray);
 }
 
-.rosettaui-window-launcher:checked
-{
+.rosettaui-window-launcher:checked {
     background-color: var(--rosettaui-highlight-dark-blue);
 }
 
-.rosettaui-window-launcher .unity-toggle__input
-{
+.rosettaui-window-launcher:focus {
+    color: var(--unity-colors-label-text-focus);
+}
+
+
+.rosettaui-window-launcher .unity-toggle__input {
     background-color: transparent;
     border-width: 0;
 }
 
-.rosettaui-window-launcher__checkmark
-{
+.rosettaui-window-launcher__checkmark {
     align-self: center;
     width: 16px;
     height: 16px;
@@ -249,6 +255,10 @@
     background-image: url("../Images/MaterialSymbols/open-in-new.png");
     background-color: transparent;
     border-color: transparent;
+}
+
+.rosettaui-window-launcher:focus .rosettaui-window-launcher__checkmark {
+    -unity-background-image-tint-color: var(--unity-colors-label-text-focus);
 }
 
 /********************************************************************************

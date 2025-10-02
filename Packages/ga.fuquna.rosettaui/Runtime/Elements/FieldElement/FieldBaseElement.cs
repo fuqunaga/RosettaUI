@@ -1,7 +1,7 @@
 ﻿namespace RosettaUI
 {
     /// <summary>
-    ///     値を持ち外部と同期するElement
+    /// 値を持ち外部と同期するElement
     /// </summary>
     public abstract class FieldBaseElement<T> : ReadOnlyFieldElement<T>
     {

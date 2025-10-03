@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -16,6 +17,9 @@ namespace RosettaUI
         public bool disableKeyboardInputWhileUIFocused = true;
         public bool disablePointerInputOverUI = true;
         public bool disableMouseInputOverUI = true;
+        
+        public InputAction undoAction;
+        public InputAction redoAction;
 #endif
         
         public readonly ElementUpdater updater = new();
@@ -46,6 +50,8 @@ namespace RosettaUI
 
 #if ENABLE_INPUT_SYSTEM
             RegisterForInputDeviceBlocker();
+            undoAction.Enable();
+            redoAction.Enable();
 #endif
         }
 
@@ -55,8 +61,26 @@ namespace RosettaUI
             
 #if ENABLE_INPUT_SYSTEM
             UnregisterForInputDeviceBlocker();
+            undoAction.Disable();
+            redoAction.Disable();
 #endif
         }
+
+        
+#if ENABLE_INPUT_SYSTEM
+        private void Start()
+        {
+            undoAction.performed += _ => DoUndo();
+            redoAction.performed += _ => DoRedo();
+        }
+        
+        
+        // Is there a smarter way to do this?
+        private void LateUpdate()
+        {
+            _undoRedoCalledThisFrame = false;
+        }
+#endif
 
         protected virtual void Update()
         {
@@ -177,7 +201,7 @@ namespace RosettaUI
                     return true;
                 }
             }
-            
+
             return false;
         }
 
@@ -192,6 +216,30 @@ namespace RosettaUI
 
             root.Build(element, setEnableWhenRootEnabled);
         }
+        
+        
+        // 救数インスタンスを想定しUndoRedoは１フレームに１回しか呼ばれないようにする
+        #region Undo/Redo
+        
+        private static bool _undoRedoCalledThisFrame;
+
+        private static void DoUndo()
+        {
+            if (_undoRedoCalledThisFrame) return;
+         
+            UndoHistory.Undo();
+            _undoRedoCalledThisFrame = true;
+        }
+
+        private static void DoRedo() 
+        {
+            if (_undoRedoCalledThisFrame) return;
+         
+            UndoHistory.Redo();
+            _undoRedoCalledThisFrame = true;
+        }
+        
+        #endregion
 
         #endregion
     }

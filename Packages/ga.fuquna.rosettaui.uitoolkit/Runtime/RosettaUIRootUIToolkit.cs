@@ -46,10 +46,16 @@ namespace RosettaUI.UIToolkit
             // RegisterCallbackが同じコールバックを複数回登録しても１つ分しか受け付けないのを当て込んでいる
             // 複数回BuildInternal()してもOnBlurは一回しか登録されない
             root.RegisterCallback<BlurEvent>(OnBlur, TrickleDown.TrickleDown);
+            root.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
 
             return;
 
             void OnBlur(BlurEvent e)
+            {
+                UndoHistory.FixLastUndoRecord();
+            }
+            
+            void OnPointerDown(PointerDownEvent e)
             {
                 UndoHistory.FixLastUndoRecord();
             }

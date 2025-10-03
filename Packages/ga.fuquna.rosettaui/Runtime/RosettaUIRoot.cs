@@ -163,7 +163,7 @@ namespace RosettaUI
         private static readonly List<RosettaUIRoot> Roots = new();
         
         
-        public static bool IsFocus => Roots.Any(root => root.IsFocusedInstance);
+        public static bool IsFocused => Roots.Any(root => root.IsFocusedInstance);
 
         private static void Register(RosettaUIRoot root)
         {
@@ -176,7 +176,7 @@ namespace RosettaUI
             Roots.Remove(root);
         }
 
-        [Obsolete("Use IsFocus instead")]
+        [Obsolete("Use IsFocused instead")]
         public static bool WillUseKeyInputAny()
         {
             // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator

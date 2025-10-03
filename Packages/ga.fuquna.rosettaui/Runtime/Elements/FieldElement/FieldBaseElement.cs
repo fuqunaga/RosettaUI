@@ -8,6 +8,11 @@ namespace RosettaUI
     public abstract class FieldBaseElement<T> : ReadOnlyFieldElement<T>
     {
         public FieldOption Option { get; }
+        
+        // ReSharper disable once MemberCanBeProtected.Global
+        public bool RecordUndo { get; set; } = true;
+        
+        
         private readonly IBinder<T> _binder;
         
         protected FieldBaseElement(LabelElement label, IBinder<T> binder, in FieldOption option = default) : base(label, binder)
@@ -26,17 +31,15 @@ namespace RosettaUI
             public FieldViewBridgeBase(FieldBaseElement<T> element) : base(element)
             {
             }
-
-            public void SetValueFromView(T t) => SetValueFromView(t, true);
             
-            public void SetValueFromView(T t, bool recordUndo)
+            public void SetValueFromView(T value)
             {
                 var before = Element._binder.Get();
-                Element._binder?.Set(t);
+                Element._binder?.Set(value);
 
-                if (recordUndo)
+                if (Element.RecordUndo)
                 {
-                    FieldBaseElementUndoRecord<T>.Register(Element, before, t);
+                    FieldBaseElementUndoRecord<T>.Register(Element, before, value);
                 }
 
                 Element.NotifyViewValueChanged();

@@ -7,6 +7,8 @@
         public WindowLauncherElement(LabelElement label, WindowElement window) :
             base(label, Binder.Create(() => window.IsOpen, v => window.IsOpen = v))
         {
+            RecordUndo = false;
+            
             this.window = window;
             this.window.IsOpen = false;
         }

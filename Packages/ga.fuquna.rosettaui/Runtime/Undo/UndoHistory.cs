@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace RosettaUI.UndoSystem
 {
@@ -8,6 +9,11 @@ namespace RosettaUI.UndoSystem
         private static readonly Stack<IUndoRecord> RedoStack = new();
 
         private static bool _isProcessing;
+        
+        public static event Action onRecordChanged; 
+        
+        public static IEnumerable<IUndoRecord> UndoRecords => UndoStack;
+        public static IEnumerable<IUndoRecord> RedoRecords => RedoStack;
         
         
         public static bool CanUndo => UndoStack.Count > 0;
@@ -31,40 +37,68 @@ namespace RosettaUI.UndoSystem
             }
 
             ClearStack(RedoStack);
+            
+            NotifyRecordChanged();
         }
 
         public static bool Undo()
         {
-            RemoveTopExpiredRecords(UndoStack);
-            if (!UndoStack.TryPop(out var record)) return false;
-            
-            _isProcessing = true;
-            record.Undo();
-            _isProcessing = false;
-            RedoStack.Push(record);
-            return true;
+            var changed = RemoveTopExpiredRecords(UndoStack);
+            var hasRecord = UndoStack.TryPop(out var record);
+            if (hasRecord)
+            {
+                _isProcessing = true;
+                record.Undo();
+                _isProcessing = false;
+                RedoStack.Push(record);
+                changed = true;
+            }
 
+            if (changed)
+            {
+                NotifyRecordChanged();
+            }
+
+            return hasRecord;
         }
         
         public static bool Redo()
         {
-            RemoveTopExpiredRecords(RedoStack);
-            if (!RedoStack.TryPop(out var record)) return false;
-            
-            _isProcessing = true;
-            record.Redo();
-            _isProcessing = false;
-            
-            UndoStack.Push(record);
-            return true;
+            var changed = RemoveTopExpiredRecords(RedoStack);
+            var hasRecord = RedoStack.TryPop(out var record);
+            if (hasRecord)
+            {
+                _isProcessing = true;
+                record.Redo();
+                _isProcessing = false;
+
+                UndoStack.Push(record);
+                changed = true;
+            }
+
+            if (changed)
+            {
+                NotifyRecordChanged();
+            }
+
+            return hasRecord;
         }
         
-        private static void RemoveTopExpiredRecords(Stack<IUndoRecord> stack)
+        private static void NotifyRecordChanged()
         {
+            onRecordChanged?.Invoke();
+        }
+        
+        private static bool RemoveTopExpiredRecords(Stack<IUndoRecord> stack)
+        {
+            var removed = false;
             while (stack.TryPeek(out var record) && record.IsExpired)
             {
                 stack.Pop().Dispose();
+                removed = true;
             }
+
+            return removed;
         }
 
         private static void ClearStack(Stack<IUndoRecord> stack)

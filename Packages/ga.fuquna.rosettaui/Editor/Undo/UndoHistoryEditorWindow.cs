@@ -17,12 +17,21 @@ namespace RosettaUI.Editor.UndoSystem
             window.Show();
         }
         
+        private MultiColumnListView _multiColumnListView;
+        
+        private void OnEnable()
+        {
+            EditorApplication.update += OnEditorUpdate;
+        }
+
+        private void OnDisable()
+        {
+            EditorApplication.update -= OnEditorUpdate;
+        }
         
         private void CreateGUI()
         {
-            var redoRecordCount = 0;
-            
-            var multiColumnListView  = new MultiColumnListView()
+            _multiColumnListView  = new MultiColumnListView()
             {
                 selectionType = SelectionType.None,
                 showAlternatingRowBackgrounds = AlternatingRowBackground.ContentOnly
@@ -50,33 +59,23 @@ namespace RosettaUI.Editor.UndoSystem
                 width = 100,
             };
             
-            multiColumnListView.columns.Add(nameColumn);
-            multiColumnListView.columns.Add(expiredColumn);
+            _multiColumnListView.columns.Add(nameColumn);
+            _multiColumnListView.columns.Add(expiredColumn);
           
-            rootVisualElement.Add(multiColumnListView );
-
-            UpdateItemSource();
-            UndoHistory.onRecordChanged += UpdateItemSource;
+            rootVisualElement.Add(_multiColumnListView );
 
             return;
-
-            void UpdateItemSource()
-            {
-                redoRecordCount = UndoHistory.RedoRecords.Count();
-                var list = UndoHistory.RedoRecords.Reverse().Concat(UndoHistory.UndoRecords).ToList();
-                multiColumnListView .itemsSource = list;
-            }
             
             void BindCellName(VisualElement element, int i)
             {
-                var list = (List<IUndoRecord>)multiColumnListView.itemsSource;
+                var list = (List<IUndoRecord>)_multiColumnListView.itemsSource;
                 ((Label)element).text = list[i].Name;
                 SetCellStyle(element, i);
             }
 
             void BindCellExpired(VisualElement element, int i)
             {
-                var list = (List<IUndoRecord>)multiColumnListView.itemsSource;
+                var list = (List<IUndoRecord>)_multiColumnListView.itemsSource;
                 var toggle = element.Q<Toggle>();
                 toggle.value = list[i].IsExpired;
                 toggle.style.justifyContent = Justify.Center;
@@ -85,10 +84,17 @@ namespace RosettaUI.Editor.UndoSystem
 
             void SetCellStyle(VisualElement element, int i)
             {
+                var redoRecordCount = UndoHistory.RedoRecords.Count();
                 // ReSharper disable once AccessToModifiedClosure
                 var opacity = i < redoRecordCount ? 0.5f : 1f;
                 element.style.opacity = opacity;
             }
+        }
+
+        private void OnEditorUpdate()
+        {
+            var list = UndoHistory.RedoRecords.Reverse().Concat(UndoHistory.UndoRecords).ToList();
+            _multiColumnListView.itemsSource = list;
         }
     }
 }

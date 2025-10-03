@@ -1,4 +1,6 @@
-﻿namespace RosettaUI
+﻿using RosettaUI.UndoSystem;
+
+namespace RosettaUI
 {
     /// <summary>
     /// 値を持ち外部と同期するElement
@@ -25,9 +27,18 @@
             {
             }
 
-            public void SetValueFromView(T t)
+            public void SetValueFromView(T t) => SetValueFromView(t, true);
+            
+            public void SetValueFromView(T t, bool recordUndo)
             {
+                var before = Element._binder.Get();
                 Element._binder?.Set(t);
+
+                if (recordUndo)
+                {
+                    FieldBaseElementUndoRecord<T>.Register(Element, before, t);
+                }
+
                 Element.NotifyViewValueChanged();
             }
         }

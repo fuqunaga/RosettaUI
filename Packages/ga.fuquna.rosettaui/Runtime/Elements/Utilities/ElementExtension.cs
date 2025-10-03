@@ -19,6 +19,8 @@ namespace RosettaUI
                 if (e is T t) yield return t;
             }
         }
+        
+        public static bool EnableInHierarchy(this Element element) => element.Parents().All(e => e.Enable);
 
         public static IEnumerable<Element> Parents(this Element element)
         {

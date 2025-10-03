@@ -1,4 +1,5 @@
 using RosettaUI.UIToolkit.Builder;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -41,6 +42,17 @@ namespace RosettaUI.UIToolkit
             var visualElement = UIToolkitBuilder.Build(element);
 
             root.Add(visualElement);
+            
+            // RegisterCallbackが同じコールバックを複数回登録しても１つ分しか受け付けないのを当て込んでいる
+            // 複数回BuildInternal()してもOnBlurは一回しか登録されない
+            root.RegisterCallback<BlurEvent>(OnBlur, TrickleDown.TrickleDown);
+
+            return;
+
+            void OnBlur(BlurEvent e)
+            {
+                UndoHistory.FixLastUndoRecord();
+            }
         }
 
         public override bool WillUseKeyInput()

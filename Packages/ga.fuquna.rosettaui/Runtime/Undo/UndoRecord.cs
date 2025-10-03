@@ -1,6 +1,6 @@
 ﻿using System;
+using UnityEngine.Assertions;
 using UnityEngine.Pool;
-using UnityEngine.UIElements;
 
 namespace RosettaUI.UndoSystem
 {
@@ -16,8 +16,9 @@ namespace RosettaUI.UndoSystem
         void Merge(IUndoRecord newer);
     }
 
-    public abstract class UndoRecord<TUndoRecord> 
-        where TUndoRecord : UndoRecord<TUndoRecord>, new()
+    
+    public abstract class UndoRecordWithPool<TUndoRecord> 
+        where TUndoRecord : UndoRecordWithPool<TUndoRecord>, new()
     {
         private static readonly ObjectPool<TUndoRecord> Pool = new(() => new TUndoRecord());
         
@@ -26,7 +27,8 @@ namespace RosettaUI.UndoSystem
         protected static void Release(TUndoRecord record) => Pool.Release(record);
     }
     
-    public abstract class ElementUndoRecord<TUndoRecord> : UndoRecord<TUndoRecord> , IUndoRecord
+    
+    public abstract class ElementUndoRecord<TUndoRecord> : UndoRecordWithPool<TUndoRecord> , IUndoRecord
         where TUndoRecord : ElementUndoRecord<TUndoRecord>, new()
     {
         protected Element element;
@@ -38,7 +40,7 @@ namespace RosettaUI.UndoSystem
         public abstract void Undo();
         public abstract void Redo();
 
-        public bool CanMerge(IUndoRecord newer) => (newer is TUndoRecord r) && r.element == element;
+        public virtual bool CanMerge(IUndoRecord newer) => (newer is TUndoRecord r) && r.element == element;
         
         public abstract void Merge(IUndoRecord newer);
         
@@ -68,6 +70,8 @@ namespace RosettaUI.UndoSystem
         
         public void Initialize(FieldBaseElement<TValue> field, TValue before, TValue after)
         {
+            Assert.IsTrue(typeof(TValue).IsValueType || typeof(TValue) == typeof(string));
+            
             base.Initialize(field);
             _before = before;
             _after = after;
@@ -86,6 +90,8 @@ namespace RosettaUI.UndoSystem
             Element.GetViewBridge().SetValueFromView(_after);
         }
 
+        public override bool CanMerge(IUndoRecord newer) => base.CanMerge(newer) && typeof(TValue) != typeof(bool);
+        
         public override void Merge(IUndoRecord newer)
         {
             if (newer is not FieldBaseElementUndoRecord<TValue> r)

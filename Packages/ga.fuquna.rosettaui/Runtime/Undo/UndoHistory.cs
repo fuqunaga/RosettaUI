@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace RosettaUI.UndoSystem
 {
@@ -9,12 +8,10 @@ namespace RosettaUI.UndoSystem
         private static readonly Stack<IUndoRecord> RedoStack = new();
 
         private static bool _isProcessing;
-        
-        public static event Action onRecordChanged; 
+        private static bool _canTryMargeNextRecord = true;
         
         public static IEnumerable<IUndoRecord> UndoRecords => UndoStack;
         public static IEnumerable<IUndoRecord> RedoRecords => RedoStack;
-        
         
         public static bool CanUndo => UndoStack.Count > 0;
         public static bool CanRedo => RedoStack.Count > 0;
@@ -24,9 +21,16 @@ namespace RosettaUI.UndoSystem
         {
             if (_isProcessing) return;
             if (record == null) return;
-            
+
             RemoveTopExpiredRecords(UndoStack);
-            if (UndoStack.TryPeek(out var previousRecord)
+            
+            // マージ可能条件
+            // - RedoStackが空
+            // - _canTryMargeNextRecord==true
+            //   - 同じElementでも一度フォーカスが外れたらマージしないようにしたいので外部から_canTryMargeNextRecordで制御できるようにする
+            if (RedoStack.Count <= 0
+                && _canTryMargeNextRecord
+                && UndoStack.TryPeek(out var previousRecord)
                 && previousRecord.CanMerge(record))
             {
                 previousRecord.Merge(record);
@@ -34,59 +38,49 @@ namespace RosettaUI.UndoSystem
             else
             {
                 UndoStack.Push(record);
+                _canTryMargeNextRecord = true;
             }
 
             ClearStack(RedoStack);
-            
-            NotifyRecordChanged();
+        }
+        
+        public static void Clear()
+        {
+            ClearStack(UndoStack);
+            ClearStack(RedoStack);
+        }
+        
+        public static void FixLastUndoRecord()
+        {
+            _canTryMargeNextRecord = false;
         }
 
         public static bool Undo()
         {
-            var changed = RemoveTopExpiredRecords(UndoStack);
-            var hasRecord = UndoStack.TryPop(out var record);
-            if (hasRecord)
-            {
-                _isProcessing = true;
-                record.Undo();
-                _isProcessing = false;
-                RedoStack.Push(record);
-                changed = true;
-            }
+            RemoveTopExpiredRecords(UndoStack);
+            if (!UndoStack.TryPop(out var record)) return false;
+            
+            _isProcessing = true;
+            record.Undo();
+            _isProcessing = false;
+            
+            RedoStack.Push(record);
 
-            if (changed)
-            {
-                NotifyRecordChanged();
-            }
-
-            return hasRecord;
+            return true;
         }
         
         public static bool Redo()
         {
-            var changed = RemoveTopExpiredRecords(RedoStack);
-            var hasRecord = RedoStack.TryPop(out var record);
-            if (hasRecord)
-            {
-                _isProcessing = true;
-                record.Redo();
-                _isProcessing = false;
+            RemoveTopExpiredRecords(RedoStack);
+            if (!RedoStack.TryPop(out var record)) return false;
+            
+            _isProcessing = true;
+            record.Redo();
+            _isProcessing = false;
 
-                UndoStack.Push(record);
-                changed = true;
-            }
+            UndoStack.Push(record);
 
-            if (changed)
-            {
-                NotifyRecordChanged();
-            }
-
-            return hasRecord;
-        }
-        
-        private static void NotifyRecordChanged()
-        {
-            onRecordChanged?.Invoke();
+            return true;
         }
         
         private static bool RemoveTopExpiredRecords(Stack<IUndoRecord> stack)

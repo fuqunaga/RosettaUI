@@ -144,9 +144,7 @@ namespace RosettaUI.UIToolkit.Builder
 
         protected override void OnElementEnableChanged(Element _, VisualElement ve, bool enable)
         {
-            var display = enable ? DisplayStyle.Flex : DisplayStyle.None;
-            ve.style.display = display;
-            
+            ve.SetShow(enable);
             RequestResizeWindowEvent.Send(ve);
         }
 

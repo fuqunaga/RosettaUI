@@ -1,5 +1,6 @@
 ﻿using System;
-using UnityEngine.Assertions;
+using RosettaUI.Builder;
+using UnityEngine;
 using UnityEngine.Pool;
 
 namespace RosettaUI.UndoSystem
@@ -61,33 +62,42 @@ namespace RosettaUI.UndoSystem
             UndoHistory.Add(record);
         }
         
+        // To prevent the value used for Undo from being modified externally, make a copy
+        // For reference types, such as ObjectField's Object, it's only relevant in the Editor, so it's ignored
+        private static TValue Clone(TValue value)
+        {
+            return value switch
+            {
+                Gradient g => (TValue)(object)GradientHelper.Clone(g),
+                AnimationCurve ac => (TValue)(object)AnimationCurveHelper.Clone(ac),
+                _ => value
+            };
+        }
+
         
         private TValue _before;
         private TValue _after;
         
         private FieldBaseElement<TValue> Element => (FieldBaseElement<TValue>)element;
-        
-        
-        public void Initialize(FieldBaseElement<TValue> field, TValue before, TValue after)
-        {
-            Assert.IsTrue(typeof(TValue).IsValueType || typeof(TValue) == typeof(string));
-            
-            base.Initialize(field);
-            _before = before;
-            _after = after;
-        }
 
+
+        private void Initialize(FieldBaseElement<TValue> field, TValue before, TValue after)
+        {
+            base.Initialize(field);
+            _before = Clone(before);
+            _after = Clone(after);
+        }
 
         public override string Name => Element.Label;
         
         public override void Undo()
         {
-            Element.GetViewBridge().SetValueFromView(_before);
+            Element.GetViewBridge().SetValueFromView(Clone(_before));
         }
 
         public override void Redo()
         {
-            Element.GetViewBridge().SetValueFromView(_after);
+            Element.GetViewBridge().SetValueFromView(Clone(_after));
         }
 
         public override bool CanMerge(IUndoRecord newer) => base.CanMerge(newer) && typeof(TValue) != typeof(bool);

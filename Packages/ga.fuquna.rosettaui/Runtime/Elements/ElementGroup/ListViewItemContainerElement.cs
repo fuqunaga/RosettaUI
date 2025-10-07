@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -320,7 +321,7 @@ namespace RosettaUI
             
             // 最後尾ではないけど１つだけなら消してずらす
             // 現状歯抜け選択には非対応
-            if (indexList.Count() == 1)
+            if (indexList.Count == 1)
             {
                 var i = indexList.First();
                 OnItemIndexShiftMinus(i);
@@ -364,7 +365,12 @@ namespace RosettaUI
             public void OnItemIndexChanged(int fromIndex, int toIndex) => Element.OnMoveItemIndex(fromIndex, toIndex);
 
             public void OnItemsAdded(IEnumerable<int> indices) => Element.OnItemsAdded(indices);
-            public void OnItemsRemoved(IEnumerable<int> indices) => Element.OnItemsRemoved(indices);
+
+            public void OnItemsRemoved(IEnumerable<int> indices)
+            {
+                UndoRecordListItemRemove.Register(Element, indices);
+                Element.OnItemsRemoved(indices);
+            }
 
             // UIでのリストの参照先の変更を通知
             // 値や要素数の変更は別途OnViewListValueChanged()が呼ばれるのでこちらではNotifyしない

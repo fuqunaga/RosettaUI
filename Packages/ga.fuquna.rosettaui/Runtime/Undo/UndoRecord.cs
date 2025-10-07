@@ -1,7 +1,5 @@
 ﻿using System;
-using RosettaUI.Builder;
-using UnityEngine;
-using UnityEngine.Pool;
+using RosettaUI.Utilities;
 
 namespace RosettaUI.UndoSystem
 {
@@ -16,26 +14,21 @@ namespace RosettaUI.UndoSystem
         bool CanMerge(IUndoRecord newer);
         void Merge(IUndoRecord newer);
     }
-
-    
-    public abstract class UndoRecordWithPool<TUndoRecord> 
-        where TUndoRecord : UndoRecordWithPool<TUndoRecord>, new()
-    {
-        private static readonly ObjectPool<TUndoRecord> Pool = new(() => new TUndoRecord());
-        
-        public static TUndoRecord GetPooled() => Pool.Get();
-
-        protected static void Release(TUndoRecord record) => Pool.Release(record);
-    }
     
     
-    public abstract class ElementUndoRecord<TUndoRecord> : UndoRecordWithPool<TUndoRecord> , IUndoRecord
+    public abstract class ElementUndoRecord<TUndoRecord> : ObjectPoolItem<TUndoRecord>, IUndoRecord
         where TUndoRecord : ElementUndoRecord<TUndoRecord>, new()
     {
         protected Element element;
         
         protected void Initialize(Element targetElement) => element = targetElement;
-
+        
+        public override void Dispose()
+        {
+            element = null;
+            base.Dispose();
+        }
+        
         public abstract string Name { get; }
         public bool IsExpired => !element.EnableInHierarchy();
         public abstract void Undo();
@@ -44,12 +37,6 @@ namespace RosettaUI.UndoSystem
         public virtual bool CanMerge(IUndoRecord newer) => (newer is TUndoRecord r) && r.element == element;
         
         public abstract void Merge(IUndoRecord newer);
-        
-        public virtual void Dispose()
-        {
-            element = null;
-            Release((TUndoRecord)this);
-        }
     }
 
     
@@ -61,18 +48,7 @@ namespace RosettaUI.UndoSystem
             record.Initialize(field, before, after);
             UndoHistory.Add(record);
         }
-        
-        // To prevent the value used for Undo from being modified externally, make a copy
-        // For reference types, such as ObjectField's Object, it's only relevant in the Editor, so it's ignored
-        private static TValue Clone(TValue value)
-        {
-            return value switch
-            {
-                Gradient g => (TValue)(object)GradientHelper.Clone(g),
-                AnimationCurve ac => (TValue)(object)AnimationCurveHelper.Clone(ac),
-                _ => value
-            };
-        }
+ 
 
         
         private TValue _before;
@@ -80,24 +56,31 @@ namespace RosettaUI.UndoSystem
         
         private FieldBaseElement<TValue> Element => (FieldBaseElement<TValue>)element;
 
+        public override string Name => Element.Label;
+        
 
         private void Initialize(FieldBaseElement<TValue> field, TValue before, TValue after)
         {
             base.Initialize(field);
-            _before = Clone(before);
-            _after = Clone(after);
+            _before = UndoHelper.Clone(before);
+            _after = UndoHelper.Clone(after);
         }
-
-        public override string Name => Element.Label;
+        
+        public override void Dispose()
+        {
+            _before = default;
+            _after = default;
+            base.Dispose();
+        }
         
         public override void Undo()
         {
-            Element.GetViewBridge().SetValueFromView(Clone(_before));
+            Element.GetViewBridge().SetValueFromView(UndoHelper.Clone(_before));
         }
 
         public override void Redo()
         {
-            Element.GetViewBridge().SetValueFromView(Clone(_after));
+            Element.GetViewBridge().SetValueFromView(UndoHelper.Clone(_after));
         }
 
         public override bool CanMerge(IUndoRecord newer) => base.CanMerge(newer) && typeof(TValue) != typeof(bool);
@@ -110,13 +93,6 @@ namespace RosettaUI.UndoSystem
             }
 
             _after = r._after;
-        }
-
-        public override void Dispose()
-        {
-            _before = default;
-            _after = default;
-            base.Dispose();
         }
     }
 }

@@ -151,7 +151,7 @@ namespace RosettaUI.UIToolkit.Builder
             }
 
             // OnItemsRemoved()がlistView.itemsSource変更前に呼ばれてしまうので、
-            // listView.itemsSource変更御のOnItemsSourceSizeChanged()で変更を通知する
+            // listView.itemsSource変更後のOnItemsSourceSizeChanged()で変更を通知する
             void OnItemsSourceSizeChanged()
             {
                 OnViewListValueChanged();

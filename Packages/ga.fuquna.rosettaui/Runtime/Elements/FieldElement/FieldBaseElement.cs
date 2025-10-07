@@ -10,7 +10,7 @@ namespace RosettaUI
         public FieldOption Option { get; }
         
         // ReSharper disable once MemberCanBeProtected.Global
-        public bool RecordUndo { get; set; } = true;
+        public bool ShouldRecordUndo { get; set; } = true;
         
         
         private readonly IBinder<T> _binder;
@@ -37,7 +37,7 @@ namespace RosettaUI
                 var before = Element._binder.Get();
                 Element._binder?.Set(value);
 
-                if (Element.RecordUndo)
+                if (Element.ShouldRecordUndo)
                 {
                     FieldBaseElementUndoRecord<T>.Register(Element, before, value);
                 }

@@ -17,8 +17,6 @@ namespace RosettaUI
 
         public static Type GetItemBinderType(Type type)
         {
-            static bool IsIList(Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IList<>);
-            
             var listType = IsIList(type)
                 ? type
                 : type.GetInterfaces().FirstOrDefault(IsIList);
@@ -26,6 +24,8 @@ namespace RosettaUI
             
             var itemType =  listType.GetGenericArguments()[0];
             return typeof(ListItemBinder<>).MakeGenericType(itemType);
+
+            static bool IsIList(Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IList<>);
         }
         
         public static IEnumerable<IListItemBinder> CreateItemBinders(IBinder listBinder)
@@ -89,6 +89,16 @@ namespace RosettaUI
             var itemType = ListUtility.GetItemType(binder.ValueType);
             
             list = ListUtility.AddItem(list, itemType, list[index], index + 1);
+            binder.SetObject(list);
+        }
+
+        public static void AddItem(IBinder binder, int index)
+        {
+            var list = GetIList(binder);
+            
+            var itemType = ListUtility.GetItemType(binder.ValueType);
+            
+            list = ListUtility.AddItem(list, itemType, null, index);
             binder.SetObject(list);
         }
 

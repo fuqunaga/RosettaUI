@@ -15,12 +15,22 @@ namespace RosettaUI.UndoSystem
         
         public static bool CanUndo => UndoStack.Count > 0;
         public static bool CanRedo => RedoStack.Count > 0;
+
+        // Undo/Redo処理中はAddできない
+        public static bool CanAdd => !_isProcessing;
         
-        
-        public static void Add(IUndoRecord record)
+        /// <summary>
+        /// UndoStackにrecordを追加する。
+        /// </summary>
+        public static bool Add(IUndoRecord record, bool disposeRecordIfNotStacked = true)
         {
-            if (_isProcessing) return;
-            if (record == null) return;
+            if (record == null) return false;
+            if (_isProcessing)
+            {
+                if (disposeRecordIfNotStacked) record.Dispose();
+                return false;
+            }
+            
 
             RemoveTopExpiredRecords(UndoStack);
             
@@ -34,6 +44,7 @@ namespace RosettaUI.UndoSystem
                 && previousRecord.CanMerge(record))
             {
                 previousRecord.Merge(record);
+                if (disposeRecordIfNotStacked) record.Dispose();
             }
             else
             {
@@ -42,6 +53,7 @@ namespace RosettaUI.UndoSystem
             }
 
             ClearStack(RedoStack);
+            return true;
         }
         
         public static void Clear()

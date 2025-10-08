@@ -92,7 +92,7 @@ namespace RosettaUI
             base.UpdateInternal();
         }
 
-        protected void NotifyListChangedToView()
+        private void NotifyListChangedToView()
         {
             _lastList = CurrentList;
             _lastListItemCount = ListItemCount;
@@ -140,28 +140,10 @@ namespace RosettaUI
                 element,
                 () => new[]
                 {
-                    new MenuItem("Add Element", DuplicateItem),
-                    new MenuItem("Remove Element", RemoveItem),
+                    new MenuItem("Add Element", () => GetListEditor().DuplicateItem(index)),
+                    new MenuItem("Remove Element", () => GetListEditor().RemoveItem(index))
                 }
             );
-
-            void DuplicateItem()
-            {
-                ListBinder.DuplicateItem(_binder, index);
-                OnItemIndexShiftPlus(index + 1);
-                
-                NotifyListChangedToView();
-                NotifyViewValueChanged();
-            }
-
-            void RemoveItem()
-            {
-                ListBinder.RemoveItem(_binder, index);
-                OnItemIndexShiftMinus(index);
-
-                NotifyListChangedToView();
-                NotifyViewValueChanged();
-            }
         }
         
         private void AddItemElement(Element element, int index, bool removeState = true)
@@ -274,8 +256,6 @@ namespace RosettaUI
 
         private void OnItemsAdded(IEnumerable<int> indices)
         {
-            _lastListItemCount = ListItemCount;
-
             using var pool = ListPool<int>.Get(out var indexList);
             indexList.AddRange(indices.Distinct());
 
@@ -300,37 +280,13 @@ namespace RosettaUI
             RemoveItemElementAll();
         }
         
-        private void OnItemsRemoved(IEnumerable<int> indices)
+        private void OnItemsRemoved(ReadOnlySpan<int> indicesOrderedDescending)
         {
-            _lastListItemCount = ListItemCount;
-            
-            using var pool = ListPool<int>.Get(out var indexList);
-            indexList.AddRange(indices.Distinct());
-
-            //　最後尾ならIndexの移動なし
-            var itemCount = ListItemCount;
-            if (indexList.All(i => i >= itemCount))
+            // 後ろのindexから消してずらす、を繰り返す
+            foreach(var i in indicesOrderedDescending)
             {
-                foreach (var i in indexList)
-                {
-                    RemoveItemElement(i);
-                }
-
-                return;
-            }
-            
-            // 最後尾ではないけど１つだけなら消してずらす
-            // 現状歯抜け選択には非対応
-            if (indexList.Count == 1)
-            {
-                var i = indexList.First();
                 OnItemIndexShiftMinus(i);
-                
-                return;
             }
-            
-            // 最後尾でないかつ複数ならリセット
-            RemoveItemElementAll();
         }
         
         // UI側でListの参照先、要素数、値が変わった(Arrayの要素数変更などすると参照先が変わる）ときの通知
@@ -348,49 +304,12 @@ namespace RosettaUI
         }
         
         protected override ElementViewBridge CreateViewBridge() => new ListViewItemContainerViewBridge(this);
-
-        public class ListViewItemContainerViewBridge : ElementViewBridge
-        {
-            private ListViewItemContainerElement Element => (ListViewItemContainerElement)element;
-            private IBinder Binder => Element._binder;
-            
-            public ListViewItemContainerViewBridge(ListViewItemContainerElement element) : base(element)
-            {
-            }
-            
-            public IList GetIList() => ListBinder.GetIList(Binder);
-            
-            public Element GetOrCreateItemElement(int index) => Element.GetOrCreateItemElement(index);
-
-            public void OnItemIndexChanged(int fromIndex, int toIndex) => Element.OnMoveItemIndex(fromIndex, toIndex);
-
-            public void OnItemsAdded(IEnumerable<int> indices) => Element.OnItemsAdded(indices);
-
-            public void OnItemsRemoved(IEnumerable<int> indices)
-            {
-                UndoRecordListItemRemove.Register(Element, indices);
-                Element.OnItemsRemoved(indices);
-            }
-
-            // UIでのリストの参照先の変更を通知
-            // 値や要素数の変更は別途OnViewListValueChanged()が呼ばれるのでこちらではNotifyしない
-            public void OnViewListChanged(IList list) => Element.SetViewListWithoutNotify(list);
-
-            // UIでのリストの変更を通知
-            // 要素数、値
-            public void OnViewListValueChanged(IList list) => Element.SetViewList(list);
-            
-            
-            // UIではない外部でのリストの変更を通知
-            // 参照or要素数
-            public void SubscribeListChanged(Action<IList> action)
-            {
-                Element.onListChanged += action;
-                onUnsubscribe += () => Element.onListChanged -= action;
-            }
-        }
-
-
+        
+        
+        // RosettaUI側でListを編集するためのインターフェースを取得
+        public ListEditor GetListEditor() => new(this);
+        
+        
         // 別のElementに引き継ぐElementの状態
         //　現状FoldのOpen/Close情報のみ
         private class ElementState
@@ -416,6 +335,123 @@ namespace RosettaUI
                 {
                     foldList[i].IsOpen = _openList[i];
                 }
+            }
+        }
+        
+        
+        public class ListViewItemContainerViewBridge : ElementViewBridge
+        {
+            private ListViewItemContainerElement Element => (ListViewItemContainerElement)element;
+            private IBinder Binder => Element._binder;
+            
+            public ListViewItemContainerViewBridge(ListViewItemContainerElement element) : base(element)
+            {
+            }
+
+            public Type GetListType() => Binder.ValueType;
+            
+            public IList GetIList() => ListBinder.GetIList(Binder);
+            
+            public Element GetOrCreateItemElement(int index) => Element.GetOrCreateItemElement(index);
+
+            public void OnItemIndexChanged(int fromIndex, int toIndex) => Element.OnMoveItemIndex(fromIndex, toIndex);
+
+            public void OnItemsAdded(IEnumerable<int> indices) => Element.OnItemsAdded(indices);
+
+            public void OnItemsRemoved(ReadOnlySpan<int> indicesOrderedDescending)
+            {
+                UndoRecordListItemRemove.Register(Element, indicesOrderedDescending);
+                Element.OnItemsRemoved(indicesOrderedDescending);
+            }
+
+            // UIでのリストの参照先の変更を通知
+            // 値や要素数の変更は別途OnViewListValueChanged()が呼ばれるのでこちらではNotifyしない
+            public void OnViewListChanged(IList list) => Element.SetViewListWithoutNotify(list);
+
+            // UIでのリストの変更を通知
+            // 要素数、値
+            public void OnViewListValueChanged(IList list) => Element.SetViewList(list);
+            
+            
+            // UIではない外部でのリストの変更を通知
+            // 参照or要素数
+            public void SubscribeListChanged(Action<IList> action)
+            {
+                Element.onListChanged += action;
+                onUnsubscribe += () => Element.onListChanged -= action;
+            }
+        }
+
+
+        /// <summary>
+        /// ライブラリ側でListViewのListを編集するためのインターフェースクラス
+        /// 
+        /// Listを編集する場所は通常アプリとUIの２つでBinder経由でやりとりするが、
+        /// Undoや別のUIからの操作はどちらでもなく、どちらに対しても通知する必要がある
+        /// - UIからの変更扱いにするとアプリは追従できるがUIが追従しない
+        /// - アプリからの変更扱いはそもそもどう変更されたか不明なためUIを作り直してしまう（Foldやスクロールの状態を引き継げない）
+        /// UIの状態を引き継ぎ、かつ、アプリもUIも追従させるための編集インターフェース
+        /// </summary>
+        public struct ListEditor
+        {
+            public ListViewItemContainerElement Element { get; private set; }
+            private IBinder Binder => Element._binder;
+            
+            public ListEditor(ListViewItemContainerElement element) => Element = element;
+
+            private void NotifyListChanged()
+            {
+                Element.NotifyListChangedToView();
+                Element.NotifyViewValueChanged();
+            }
+
+            public void DuplicateItem(int index)
+            {
+                // TODO: Record Undo
+                
+                ListBinder.DuplicateItem(Binder, index);
+                Element.OnItemIndexShiftPlus(index + 1);
+                
+                NotifyListChanged();
+            }
+            
+            public void RemoveItem(int index)
+            {
+                ReadOnlySpan<int> indices = stackalloc [] { index };
+                RemoveItems(indices);
+            }
+            
+            public void RemoveItems(ReadOnlySpan<int> indicesOrderedDescending)
+            {
+                UndoRecordListItemRemove.Register(Element, indicesOrderedDescending);
+                
+                foreach (var index in indicesOrderedDescending)
+                {
+                    ListBinder.RemoveItem(Binder, index);
+                    Element.OnItemIndexShiftMinus(index);
+                }
+                
+                NotifyListChanged();
+            }
+
+            public void ApplyRestoreRecords(IReadOnlyDictionary<int, ElementRestoreRecord> indexToRecord)
+            {
+                using var _ = ListPool<int>.Get(out var listOrderedAscending);
+                listOrderedAscending.AddRange(indexToRecord.Keys.OrderBy(i => i));
+                
+                foreach (var index in listOrderedAscending)
+                {
+                    ListBinder.AddItem(Binder, index);
+                    Element.OnItemIndexShiftPlus(index + 1);
+                }
+
+                foreach (var index in listOrderedAscending)
+                {
+                    var itemElement = Element.GetOrCreateItemElement(index);
+                    indexToRecord[index].Restore(itemElement);
+                }
+                
+                NotifyListChanged();
             }
         }
     }

@@ -1,25 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using NUnit.Framework;
 using RosettaUI.Utilities;
+using UnityEngine.Assertions;
 
 namespace RosettaUI.UndoSystem
 {
-    public interface IRestoreToElementRecord : IDisposable
-    {
-        bool TryRestore(Element element);
-    }
-
-
     /// <summary>
-    /// <see cref="FieldBaseElementValueRecord{TValue}"/> を生成するためのヘルパークラス
+    /// <see cref="FieldBaseElementRestoreRecord{TValue}"/> を生成するためのヘルパークラス
     /// </summary>    
-    public static class FieldBaseElementValueRecord
+    public static class FieldBaseElementRestoreRecord
     {
-        private static readonly Dictionary<Type, Func<Element, IRestoreToElementRecord>> CreateFuncTable = new();
+        private static readonly Dictionary<Type, Func<Element, IElementRestoreRecord>> CreateFuncTable = new();
         
-        public static bool TryCreate(Element element, out IRestoreToElementRecord record)
+        public static bool TryCreate(Element element, out IElementRestoreRecord record)
         {
             var elementType = element.GetType();
             if (!CreateFuncTable.TryGetValue(elementType, out var createFunc))
@@ -27,11 +21,11 @@ namespace RosettaUI.UndoSystem
                 var valueType = GetFieldBaseElementValueType(elementType);
                 if (valueType != null)
                 {
-                    var recordType = typeof(FieldBaseElementValueRecord<>).MakeGenericType(valueType);
-                    var methodInfo = recordType.GetMethod(nameof(FieldBaseElementValueRecord<int>.Create), BindingFlags.Public | BindingFlags.Static);
-                    Assert.IsNotNull(methodInfo, $"Method not found: {recordType.FullName}.{nameof(FieldBaseElementValueRecord<int>.Create)}");
+                    var recordType = typeof(FieldBaseElementRestoreRecord<>).MakeGenericType(valueType);
+                    var methodInfo = recordType.GetMethod(nameof(FieldBaseElementRestoreRecord<int>.Create), BindingFlags.Public | BindingFlags.Static);
+                    Assert.IsNotNull(methodInfo, $"Method not found: {recordType.FullName}.{nameof(FieldBaseElementRestoreRecord<int>.Create)}");
                     
-                    var func = (Func<Element, IRestoreToElementRecord>)methodInfo.CreateDelegate(typeof(Func<Element, IRestoreToElementRecord>));
+                    var func = (Func<Element, IElementRestoreRecord>)methodInfo.CreateDelegate(typeof(Func<Element, IElementRestoreRecord>));
                     createFunc = func;
                 }
 
@@ -72,9 +66,9 @@ namespace RosettaUI.UndoSystem
     /// FieldBaseElementのValueを記録し復元するUndo機能向けのレコード
     /// UndoRecordListItemRemoveで利用される
     /// </summary>
-    public class FieldBaseElementValueRecord<TValue> : ObjectPoolItem<FieldBaseElementValueRecord<TValue>>, IRestoreToElementRecord
+    public class FieldBaseElementRestoreRecord<TValue> : ObjectPoolItem<FieldBaseElementRestoreRecord<TValue>>, IElementRestoreRecord
     {
-        public static IRestoreToElementRecord Create(Element element)
+        public static IElementRestoreRecord Create(Element element)
         {
             if (element is not FieldBaseElement<TValue> fieldBaseElement)
             {

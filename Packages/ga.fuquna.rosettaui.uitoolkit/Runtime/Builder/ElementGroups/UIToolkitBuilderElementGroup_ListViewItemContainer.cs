@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -147,7 +146,7 @@ namespace RosettaUI.UIToolkit.Builder
             // 複数選択できないので１つか、最後の要素の複数削除しかこないはず
             void OnItemsRemoved(IEnumerable<int> idxes)
             {
-                viewBridge.OnItemsRemoved(idxes);
+                viewBridge.OnItemsRemoved(idxes.OrderByDescending(i => i).ToArray().AsSpan());
             }
 
             // OnItemsRemoved()がlistView.itemsSource変更前に呼ばれてしまうので、

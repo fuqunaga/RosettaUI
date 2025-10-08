@@ -84,8 +84,7 @@ namespace RosettaUI
         }
 
 
-
-        static object CreateNewItem(object baseItem, Type itemType)
+        private static object CreateNewItem(object baseItem, Type itemType)
         {
             object ret = null;
 
@@ -107,12 +106,9 @@ namespace RosettaUI
                 }
             }
 
-            if (ret == null)
-            {
-                ret = (itemType == typeof(string))
-                    ? ""
-                    : Activator.CreateInstance(itemType);
-            }
+            ret ??= (itemType == typeof(string))
+                ? ""
+                : Activator.CreateInstance(itemType);
 
             return ret;
         }

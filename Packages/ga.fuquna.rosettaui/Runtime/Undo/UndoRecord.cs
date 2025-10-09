@@ -34,9 +34,11 @@ namespace RosettaUI.UndoSystem
         public abstract void Undo();
         public abstract void Redo();
 
-        public virtual bool CanMerge(IUndoRecord newer) => (newer is TUndoRecord r) && r.element == element;
-        
-        public abstract void Merge(IUndoRecord newer);
+        public virtual bool CanMerge(IUndoRecord newer) => false;
+
+        public virtual void Merge(IUndoRecord newer)
+        {
+        }
     }
 
     
@@ -83,7 +85,12 @@ namespace RosettaUI.UndoSystem
             Element.GetViewBridge().SetValueFromView(UndoHelper.Clone(_after));
         }
 
-        public override bool CanMerge(IUndoRecord newer) => base.CanMerge(newer) && typeof(TValue) != typeof(bool);
+        public override bool CanMerge(IUndoRecord newer)
+        {
+            return (newer is FieldBaseElementUndoRecord<TValue> r)
+                   && element == r.element
+                   && typeof(TValue) != typeof(bool);
+        } 
         
         public override void Merge(IUndoRecord newer)
         {

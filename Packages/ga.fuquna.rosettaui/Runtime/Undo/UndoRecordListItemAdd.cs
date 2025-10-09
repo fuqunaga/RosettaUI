@@ -1,0 +1,60 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.Pool;
+
+namespace RosettaUI.UndoSystem
+{
+    /// <summary>
+    /// ListViewのアイテム追加を元に戻すためのUndoRecord
+    /// Redo時に削除されたアイテムを復元する必要があるためUndoRecordItemRemoveのように、Undo時削除するまえにの値を記録しておく必要がある
+    /// </summary>
+    public class UndoRecordListItemAdd : UndoRecordListItemBase<UndoRecordListItemAdd>
+    {
+        public static void Register(ListViewItemContainerElement listElement, int indix)
+        {
+            using var _ = ListPool<int>.Get(out var indices);
+            indices.Add(indix);
+            Register(listElement, indices);
+        }
+        
+        public static void Register(ListViewItemContainerElement listElement, IEnumerable<int> indices)
+        {
+            if (!UndoHistory.CanAdd) return;
+            
+            var record = GetPooled();
+            record.Initialize(listElement, indices);
+            UndoHistory.Add(record);
+        }
+        
+        
+        public override string Name => "List Item Add";
+        
+        private void Initialize(ListViewItemContainerElement listElement, IEnumerable<int> indices)
+        {
+            base.Initialize(listElement);
+
+            ClearRecords();
+            
+            // Undo時に必要なのはインデックスだけなのでインデックスのみにおRestoreRecordを保存
+            _records.AddRange(indices.Select(i => new ListViewItemContainerElement.RestoreRecord(i, false, null)));
+        }
+        
+        // 追加されたアイテムを削除する
+        // Redo時に復元するため、削除するまえの値を記録しておく
+        public override void Undo()
+        {
+            using var _ = ListPool<int>.Get(out var indices);
+            indices.AddRange(_records.Select(r => r.index));
+            
+            _records.Clear();
+            _records.AddRange(Element.CreateRestoreRecords(indices));
+
+            Element.GetListEditor().RemoveItems(indices);
+        }
+
+        public override void Redo()
+        {
+            Element.GetListEditor().ApplyRestoreRecords(_records);
+        }
+    }
+}

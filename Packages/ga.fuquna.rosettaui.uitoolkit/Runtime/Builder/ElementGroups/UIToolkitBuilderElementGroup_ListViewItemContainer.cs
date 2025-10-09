@@ -146,7 +146,7 @@ namespace RosettaUI.UIToolkit.Builder
             // 複数選択できないので１つか、最後の要素の複数削除しかこないはず
             void OnItemsRemoved(IEnumerable<int> idxes)
             {
-                viewBridge.OnItemsRemoved(idxes.OrderByDescending(i => i).ToArray().AsSpan());
+                viewBridge.OnItemsRemoved(idxes);
             }
 
             // OnItemsRemoved()がlistView.itemsSource変更前に呼ばれてしまうので、

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using RosettaUI.UndoSystem;
 using UnityEngine;
@@ -280,10 +281,10 @@ namespace RosettaUI
             RemoveItemElementAll();
         }
         
-        private void OnItemsRemoved(ReadOnlySpan<int> indicesOrderedDescending)
+        private void OnItemsRemoved(IEnumerable<int> indices)
         {
             // 後ろのindexから消してずらす、を繰り返す
-            foreach(var i in indicesOrderedDescending)
+            foreach(var i in indices.OrderBy(i => i))
             {
                 OnItemIndexShiftMinus(i);
             }
@@ -356,12 +357,18 @@ namespace RosettaUI
 
             public void OnItemIndexChanged(int fromIndex, int toIndex) => Element.OnMoveItemIndex(fromIndex, toIndex);
 
-            public void OnItemsAdded(IEnumerable<int> indices) => Element.OnItemsAdded(indices);
-
-            public void OnItemsRemoved(ReadOnlySpan<int> indicesOrderedDescending)
+            [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+            public void OnItemsAdded(IEnumerable<int> indices)
             {
-                UndoRecordListItemRemove.Register(Element, indicesOrderedDescending);
-                Element.OnItemsRemoved(indicesOrderedDescending);
+                UndoRecordListItemAdd.Register(Element, indices);
+                Element.OnItemsAdded(indices);
+            } 
+
+            [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+            public void OnItemsRemoved(IEnumerable<int> indices)
+            {
+                UndoRecordListItemRemove.Register(Element, indices);
+                Element.OnItemsRemoved(indices);
             }
 
             // UIでのリストの参照先の変更を通知
@@ -407,7 +414,7 @@ namespace RosettaUI
 
             public void DuplicateItem(int index)
             {
-                // TODO: Record Undo
+                UndoRecordListItemAdd.Register(Element, index);
                 
                 ListBinder.DuplicateItem(Binder, index);
                 Element.OnItemIndexShiftPlus(index + 1);
@@ -417,15 +424,17 @@ namespace RosettaUI
             
             public void RemoveItem(int index)
             {
-                ReadOnlySpan<int> indices = stackalloc [] { index };
+                using var _ = ListPool<int>.Get(out var indices);
+                indices.Add(index);
                 RemoveItems(indices);
             }
             
-            public void RemoveItems(ReadOnlySpan<int> indicesOrderedDescending)
+            [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+            public void RemoveItems(IEnumerable<int> indices)
             {
-                UndoRecordListItemRemove.Register(Element, indicesOrderedDescending);
+                UndoRecordListItemRemove.Register(Element, indices);
                 
-                foreach (var index in indicesOrderedDescending)
+                foreach (var index in indices.OrderByDescending(i => i))
                 {
                     ListBinder.RemoveItem(Binder, index);
                     Element.OnItemIndexShiftMinus(index);

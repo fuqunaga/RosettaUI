@@ -8,13 +8,6 @@ namespace RosettaUI
 {
     public static class ListBinder
     {
-        public static IEnumerable<BinderBase<T>> CreateItemBinders<T>(IList<T> list)
-        {
-            // var listBinder = 
-            // return Enumerable.Range(0, list.Count).Select(i => new ListItemBinder<T>(, i));
-            return null;
-        }
-
         public static Type GetItemBinderType(Type type)
         {
             var listType = IsIList(type)
@@ -26,16 +19,6 @@ namespace RosettaUI
             return typeof(ListItemBinder<>).MakeGenericType(itemType);
 
             static bool IsIList(Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IList<>);
-        }
-        
-        public static IEnumerable<IListItemBinder> CreateItemBinders(IBinder listBinder)
-        {
-            var itemBinderType = GetItemBinderType(listBinder.ValueType);
-            var itemCount = GetCount(listBinder);
-            
-            return Enumerable.Range(0, itemCount)
-                //.Select(i => Activator.CreateInstance(binderType, listBinder, i) as IBinder);
-                .Select(i => CreateItemBinderAt(listBinder, i, itemBinderType));
         }
 
         public static IListItemBinder CreateItemBinderAt(IBinder listBinder, int index)

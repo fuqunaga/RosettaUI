@@ -434,24 +434,52 @@ namespace RosettaUI
                 NotifyListChanged();
             }
 
-            public void ApplyRestoreRecords(IReadOnlyDictionary<int, ElementRestoreRecord> indexToRecord)
+            public void ApplyRestoreRecords(IEnumerable<RestoreRecord> records)
             {
-                using var _ = ListPool<int>.Get(out var listOrderedAscending);
-                listOrderedAscending.AddRange(indexToRecord.Keys.OrderBy(i => i));
-                
-                foreach (var index in listOrderedAscending)
+                foreach (var record in records.OrderBy(r => r.index))
                 {
-                    ListBinder.AddItem(Binder, index);
-                    Element.OnItemIndexShiftPlus(index + 1);
-                }
+                    var index = record.index;
+                    if (record.isNull)
+                    {
+                        ListBinder.AddNullItem(Binder, index);
+                    }
+                    else
+                    {
+                        ListBinder.AddItem(Binder, index);
+                    }
 
-                foreach (var index in listOrderedAscending)
-                {
-                    var itemElement = Element.GetOrCreateItemElement(index);
-                    indexToRecord[index].Restore(itemElement);
+                    Element.OnItemIndexShiftPlus(index + 1);
+                    
+                    var elementRecord = record.record;
+                    if (elementRecord != null)
+                    {
+                        var itemElement = Element.GetOrCreateItemElement(index);
+                        elementRecord.Restore(itemElement);
+                    }
                 }
                 
                 NotifyListChanged();
+            }
+        }
+
+        
+        // 削除されたアイテムをUndoで元に戻すためのRecord
+        public readonly struct RestoreRecord : IDisposable
+        {
+            public readonly int index;
+            public readonly bool isNull;
+            public readonly ElementRestoreRecord record;
+
+            public RestoreRecord(int index, bool isNull, ElementRestoreRecord record)
+            {
+                this.index = index;
+                this.isNull = isNull;
+                this.record = record;
+            }
+
+            public void Dispose()
+            {
+                record?.Dispose();
             }
         }
     }

@@ -47,20 +47,30 @@ namespace RosettaUI
 
         public static IList AddItem(IList list, Type elemType, object baseItem, int index)
         {
-            index = Mathf.Clamp(index, 0, list.Count);
             var newElem = CreateNewItem(baseItem, elemType);
+            return DoAddItem(list, elemType, newElem, index);
+        }
+        
+        public static IList AddNullItem(IList list, Type elemType, int index)
+        {
+            return DoAddItem(list, elemType, null, index);
+        }
+        
+        private static IList DoAddItem(IList list, Type elemType, object newItem, int index)
+        {
+            index = Mathf.Clamp(index, 0, list.Count);
 
             if (list is Array array)
             {
                 var newArray = Array.CreateInstance(elemType, array.Length + 1);
                 Array.Copy(array, newArray, index);
-                newArray.SetValue(newElem, index);
+                newArray.SetValue(newItem, index);
                 Array.Copy(array, index, newArray, index + 1, array.Length - index);
                 list = newArray;
             }
             else
             {
-                list.Insert(index, newElem);
+                list.Insert(index, newItem);
             }
 
             return list;

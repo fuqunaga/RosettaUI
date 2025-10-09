@@ -84,6 +84,16 @@ namespace RosettaUI
             list = ListUtility.AddItem(list, itemType, null, index);
             binder.SetObject(list);
         }
+        
+        public static void AddNullItem(IBinder binder, int index)
+        {
+            var list = GetIList(binder);
+            
+            var itemType = ListUtility.GetItemType(binder.ValueType);
+            
+            list = ListUtility.AddNullItem(list, itemType, index);
+            binder.SetObject(list);
+        }
 
         public static void RemoveItem(IBinder binder, int index)
         {

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using RosettaUI.Utilities;
-using UnityEngine.Pool;
 
 namespace RosettaUI.UndoSystem
 {
@@ -87,12 +86,12 @@ namespace RosettaUI.UndoSystem
         
         #endregion
 
-        
-        private List<IElementRestoreRecord> _records;
+
+        private readonly List<IElementRestoreRecord> _records = new();
         
         private bool Initialize(Element element)
         {
-            ListPool<IElementRestoreRecord>.Get(out _records);
+            _records.Clear();
             _records.AddRange(CreateRecords(element));
             return _records.Count > 0;
         }
@@ -103,8 +102,7 @@ namespace RosettaUI.UndoSystem
             {
                 record.Dispose();
             }
-            ListPool<IElementRestoreRecord>.Release(_records);
-            _records = null;
+            _records.Clear();
             
             base.Dispose();
         }

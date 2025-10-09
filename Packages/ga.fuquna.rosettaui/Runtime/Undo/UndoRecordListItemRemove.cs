@@ -21,8 +21,8 @@ namespace RosettaUI.UndoSystem
             record.Initialize(listElement, indicesOrderedDescending);
             UndoHistory.Add(record);
         }
-
-        private readonly Dictionary<int, ElementRestoreRecord> _indexToRecord = new();
+        
+        private readonly List<ListViewItemContainerElement.RestoreRecord> _records = new();
         
         
         private ListViewItemContainerElement Element => (ListViewItemContainerElement)element;
@@ -37,25 +37,31 @@ namespace RosettaUI.UndoSystem
             ClearRecords();
             
             var viewBridge = listElement.GetViewBridge();
+            var list = viewBridge.GetIList();
             
             using var _ = Getter.CacheScope();
             foreach(var index in indices)
             {
-                var itemElement = viewBridge.GetOrCreateItemElement(index);
-                if (ElementRestoreRecord.TryCreate(itemElement, out var record))
+                var isNull = list[index] == null;
+                
+                ElementRestoreRecord elementRecord = null;
+                if (!isNull)
                 {
-                    _indexToRecord[index] = record;    
+                    var itemElement = viewBridge.GetOrCreateItemElement(index);
+                    ElementRestoreRecord.TryCreate(itemElement, out elementRecord);
                 }
+                
+                _records.Add(new ListViewItemContainerElement.RestoreRecord(index, isNull, elementRecord));
             }
         }
         
         private void ClearRecords()
         {
-            foreach (var record in _indexToRecord.Values)
+            foreach (var record in _records)
             {
                 record.Dispose();
             }
-            _indexToRecord.Clear();
+            _records.Clear();
         }
         
         public override void Dispose()
@@ -68,20 +74,19 @@ namespace RosettaUI.UndoSystem
         // Undoで削除されたアイテムを元に戻し、値を復元する
         public override void Undo()
         {
-            Element.GetListEditor().ApplyRestoreRecords(_indexToRecord);
+            Element.GetListEditor().ApplyRestoreRecords(_records);
         }
 
         public override void Redo()
         {
-            var viewBridge = Element.GetViewBridge();
-            var list = viewBridge.GetIList();
-            var itemType = ListUtility.GetItemType(list.GetType());
-
-            using var _ = ListPool<int>.Get(out var indices);
-            indices.AddRange(_indexToRecord.Keys.OrderByDescending(i => i));
-
-            list = indices.Aggregate(list, (currentList, index) => ListUtility.RemoveItem(currentList, itemType, index));
-            viewBridge.OnViewListChanged(list);
+            Span<int> indices = stackalloc int[_records.Count];
+            var spanIndex = 0;
+            foreach (var index in _records.Select(r => r.index).OrderByDescending(i => i))
+            {
+                indices[spanIndex++] = index;
+            }
+            
+            Element.GetListEditor().RemoveItems(indices);
         }
 
         public override bool CanMerge(IUndoRecord _) => false;

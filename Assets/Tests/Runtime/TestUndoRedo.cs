@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using RosettaUI.Example;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace RosettaUI.Test
 {
@@ -11,12 +13,10 @@ namespace RosettaUI.Test
     {
         public RosettaUIRoot root;
 
-
         public float floatValue;
         public string stringValue = "Hello";
         public MyEnum enumValue;
         public Vector2 vector2Value;
-        
         
         private SimpleClass[] _classArray = {
             new() {stringValue = "Item 0", floatValue = 0f},
@@ -32,14 +32,25 @@ namespace RosettaUI.Test
         };
         
         
+        private WindowElement _window;
+        
+        
         private void Start()
         {
             root.Build(CreateElement());
         }
 
+        private void Update()
+        {
+            if (Keyboard.current[Key.U].wasPressedThisFrame)
+            {
+                _window.SetOpenFlag(!_window.IsOpen);
+            }
+        }
+
         private Element CreateElement()
         {
-            return UI.Window(nameof(TestUndoRedo),
+            return _window = UI.Window(nameof(TestUndoRedo),
                 UI.Page(
                     UI.HelpBox("Change values, then Undo/Redo with Ctrl+Z / Ctrl+Y."),
                     UI.Field(() => floatValue),

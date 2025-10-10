@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace RosettaUI.UndoSystem
 {
@@ -69,8 +70,7 @@ namespace RosettaUI.UndoSystem
 
         public static bool Undo()
         {
-            RemoveTopExpiredRecords(UndoStack);
-            if (!UndoStack.TryPop(out var record)) return false;
+            if (!TryPopAndRemoveExpiredRecords(UndoStack, out var record)) return false;
             
             _isProcessing = true;
             record.Undo();
@@ -83,8 +83,7 @@ namespace RosettaUI.UndoSystem
         
         public static bool Redo()
         {
-            RemoveTopExpiredRecords(RedoStack);
-            if (!RedoStack.TryPop(out var record)) return false;
+            if (!TryPopAndRemoveExpiredRecords(RedoStack, out var record)) return false;
             
             _isProcessing = true;
             record.Redo();
@@ -95,9 +94,31 @@ namespace RosettaUI.UndoSystem
             return true;
         }
         
+        private static bool TryPopAndRemoveExpiredRecords(Stack<IUndoRecord> stack, out IUndoRecord record)
+        {
+            record = stack.FirstOrDefault(r => !r.IsExpired);
+            
+            // すべて期限切れの場合は何もしない
+            if (record == null)
+            {
+                return false;
+            }
+            
+            // 期限切れでないレコードがある場合はそこまでものを削除してからPop
+            var currentRecord = stack.Pop();
+            while (record != currentRecord)
+            {
+                currentRecord.Dispose();
+                currentRecord = stack.Pop();
+            }
+
+            return true;
+        }
+        
         private static bool RemoveTopExpiredRecords(Stack<IUndoRecord> stack)
         {
             var removed = false;
+
             while (stack.TryPeek(out var record) && record.IsExpired)
             {
                 stack.Pop().Dispose();

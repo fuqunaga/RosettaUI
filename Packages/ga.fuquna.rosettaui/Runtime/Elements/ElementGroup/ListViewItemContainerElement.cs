@@ -457,7 +457,7 @@ namespace RosettaUI
                         ListBinder.AddItem(Binder, index);
                     }
 
-                    Element.OnItemIndexShiftPlus(index + 1);
+                    Element.OnItemIndexShiftPlus(index);
                     
                     var elementRecord = record.record;
                     if (elementRecord != null)

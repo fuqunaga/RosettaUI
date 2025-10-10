@@ -5,7 +5,7 @@ namespace RosettaUI
     /// <summary>
     /// 値を持ち外部と同期するElement
     /// </summary>
-    public abstract class FieldBaseElement<T> : ReadOnlyFieldElement<T>
+    public abstract class FieldBaseElement<T> : ReadOnlyFieldElement<T>, IUndoRestoreElement
     {
         public FieldOption Option { get; }
         
@@ -22,7 +22,17 @@ namespace RosettaUI
             Interactable = !binder.IsReadOnly;
         }
         
+        
+        #region IUndoRestoreElement
+        
+        public IElementRestoreRecord CreateRestoreRecord() => FieldBaseElementRestoreRecord<T>.Create(this);
+        public bool TryRestore(IElementRestoreRecord record) => record.TryRestore(this);
+        
+        #endregion
+
+        
         protected override ElementViewBridge CreateViewBridge() => new FieldViewBridgeBase(this);
+        
         
         public class FieldViewBridgeBase : ReadOnlyValueViewBridgeBase
         {
@@ -34,14 +44,13 @@ namespace RosettaUI
             
             public void SetValueFromView(T value)
             {
-                var before = Element._binder.Get();
-                Element._binder?.Set(value);
-
                 if (Element.ShouldRecordUndo)
                 {
+                    var before = Element.Value;
                     FieldBaseElementUndoRecord<T>.Register(Element, before, value);
                 }
-
+                
+                Element._binder?.Set(value);
                 Element.NotifyViewValueChanged();
             }
         }

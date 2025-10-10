@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using RosettaUI.Utilities;
+using UnityEngine.UIElements;
 
 namespace RosettaUI.UndoSystem
 {
@@ -27,7 +29,7 @@ namespace RosettaUI.UndoSystem
 
         // targetElement以下のElementを再帰的にフラットに列挙する
         // Recordを作成・復元する際に同じ構成なら同じ順番で列挙されることを期待している
-        private static IEnumerable<Element> FlattenElements(Element targetElement)
+        private static IEnumerable<IUndoRestoreElement> FlattenUndoRestoreElements(Element targetElement)
         {
             if (targetElement is ListViewItemContainerElement listElementContainer)
             {
@@ -39,28 +41,21 @@ namespace RosettaUI.UndoSystem
             {
                 foreach (var child in group.Contents)
                 {
-                    foreach (var e in FlattenElements(child))
+                    foreach (var e in FlattenUndoRestoreElements(child))
                     {
                         yield return e;
                     }
                 }
             }
-            else
+            else if(targetElement is IUndoRestoreElement undoRestoreElement)
             {
-                yield return targetElement;
+                yield return undoRestoreElement;
             }
         }
         
         public static IEnumerable<IElementRestoreRecord> CreateRecords(Element targetElement)
         {
-            foreach (var e in FlattenElements(targetElement))
-            {
-                if (FieldBaseElementRestoreRecord.TryCreate(e, out var record))
-                {
-                    yield return record;
-                }
-            }
-        
+            return FlattenUndoRestoreElements(targetElement).Select(e => e.CreateRestoreRecord());
         }
         
         // CreateElementRecordsで作成したレコードを元にElementの状態を復元する
@@ -70,14 +65,14 @@ namespace RosettaUI.UndoSystem
             using var recordsEnumerator = records.GetEnumerator();
             recordsEnumerator.MoveNext();
             
-            foreach (var e in FlattenElements(targetElement))
+            foreach (var e in FlattenUndoRestoreElements(targetElement))
             {
                 if (recordsEnumerator.Current == null)
                 {
                     break;
                 }
                 
-                if ( recordsEnumerator.Current.TryRestore(e) )
+                if ( e.TryRestore(recordsEnumerator.Current) )
                 {
                     recordsEnumerator.MoveNext();
                 }

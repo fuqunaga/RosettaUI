@@ -367,7 +367,7 @@ namespace RosettaUI
             [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
             public void OnItemsRemoved(IEnumerable<int> indices)
             {
-                UndoRecordListItemRemove.Register(Element, indices);
+                UndoRecordListItemRemove.Record(Element, indices);
                 Element.OnItemsRemoved(indices);
             }
 
@@ -432,7 +432,7 @@ namespace RosettaUI
             [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
             public void RemoveItems(IEnumerable<int> indices)
             {
-                UndoRecordListItemRemove.Register(Element, indices);
+                UndoRecordListItemRemove.Record(Element, indices);
                 
                 foreach (var index in indices.OrderByDescending(i => i))
                 {

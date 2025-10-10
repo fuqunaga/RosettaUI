@@ -47,7 +47,7 @@ namespace RosettaUI
                 if (Element.ShouldRecordUndo)
                 {
                     var before = Element.Value;
-                    FieldBaseElementUndoRecord<T>.Register(Element, before, value);
+                    UndoRecordFieldBaseElement<T>.Record(Element, before, value);
                 }
                 
                 Element._binder?.Set(value);

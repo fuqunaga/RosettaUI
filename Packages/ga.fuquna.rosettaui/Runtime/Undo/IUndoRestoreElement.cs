@@ -7,6 +7,5 @@
     public interface IUndoRestoreElement
     {
         IElementRestoreRecord CreateRestoreRecord();
-        bool TryRestore(IElementRestoreRecord record);
     }
 }

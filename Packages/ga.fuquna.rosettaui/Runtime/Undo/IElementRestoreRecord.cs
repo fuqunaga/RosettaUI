@@ -4,6 +4,6 @@ namespace RosettaUI.UndoSystem
 {
     public interface IElementRestoreRecord : IDisposable
     {
-        bool TryRestore(Element element);
+        bool TryRestore(IUndoRestoreElement element);
     }
 }

@@ -11,7 +11,7 @@ namespace RosettaUI.UndoSystem
     /// </summary>
     public class UndoRecordListItemRemove : UndoRecordListItemBase<UndoRecordListItemRemove>
     {
-        public static void Register(ListViewItemContainerElement listElement, IEnumerable<int> indices)
+        public static void Record(ListViewItemContainerElement listElement, IEnumerable<int> indices)
         {
             if (!UndoHistory.CanAdd) return;
             

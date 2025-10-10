@@ -9,7 +9,7 @@ namespace RosettaUI.UndoSystem
     /// Elementの状態を保存、復元する
     /// 内部的にElementの特定の型ごとのIElementRestoreRecordを複数持つ
     /// </summary>
-    public class ElementRestoreRecord : ObjectPoolItem<ElementRestoreRecord>, IElementRestoreRecord
+    public class ElementRestoreRecord : ObjectPoolItem<ElementRestoreRecord>
     {
         #region Static
         
@@ -72,7 +72,7 @@ namespace RosettaUI.UndoSystem
                     break;
                 }
                 
-                if ( e.TryRestore(recordsEnumerator.Current) )
+                if ( recordsEnumerator.Current.TryRestore(e) )
                 {
                     recordsEnumerator.MoveNext();
                 }
@@ -100,12 +100,6 @@ namespace RosettaUI.UndoSystem
             _records.Clear();
             
             base.Dispose();
-        }
-
-        public bool TryRestore(Element element)
-        {
-            Restore(element);
-            return true;
         }
 
         public void Restore(Element element)

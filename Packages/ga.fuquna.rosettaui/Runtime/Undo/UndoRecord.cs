@@ -42,16 +42,15 @@ namespace RosettaUI.UndoSystem
     }
 
     
-    public class FieldBaseElementUndoRecord<TValue> : ElementUndoRecord<FieldBaseElementUndoRecord<TValue>>
+    public class UndoRecordFieldBaseElement<TValue> : ElementUndoRecord<UndoRecordFieldBaseElement<TValue>>
     {
-        public static void Register(FieldBaseElement<TValue> field, TValue before, TValue after)
+        public static void Record(FieldBaseElement<TValue> field, TValue before, TValue after)
         {
             var record = GetPooled();
             record.Initialize(field, before, after);
             UndoHistory.Add(record);
         }
- 
-
+        
         
         private TValue _before;
         private TValue _after;
@@ -87,14 +86,14 @@ namespace RosettaUI.UndoSystem
 
         public override bool CanMerge(IUndoRecord newer)
         {
-            return (newer is FieldBaseElementUndoRecord<TValue> r)
+            return (newer is UndoRecordFieldBaseElement<TValue> r)
                    && element == r.element
                    && typeof(TValue) != typeof(bool);
         } 
         
         public override void Merge(IUndoRecord newer)
         {
-            if (newer is not FieldBaseElementUndoRecord<TValue> r)
+            if (newer is not UndoRecordFieldBaseElement<TValue> r)
             {
                 throw new InvalidOperationException($"Cannot merge {GetType()} with {newer.GetType()}");
             }

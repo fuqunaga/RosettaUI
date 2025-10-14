@@ -175,6 +175,11 @@ namespace RosettaUI
         {
             Roots.Remove(root);
         }
+        
+        public static bool IsRootElement(Element element)
+        {
+            return Roots.Any(root => root.Elements.Contains(element));
+        }
 
         [Obsolete("Use IsFocused instead")]
         public static bool WillUseKeyInputAny()
@@ -218,7 +223,7 @@ namespace RosettaUI
         }
         
         
-        // 救数インスタンスを想定しUndoRedoは１フレームに１回しか呼ばれないようにする
+        // 複数インスタンスを想定しUndoRedoは１フレームに１回しか呼ばれないようにする
         #region Undo/Redo
         
         private static bool _undoRedoCalledThisFrame;

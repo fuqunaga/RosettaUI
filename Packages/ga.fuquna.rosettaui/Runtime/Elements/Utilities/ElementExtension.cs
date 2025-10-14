@@ -20,7 +20,17 @@ namespace RosettaUI
             }
         }
         
-        public static bool EnableInHierarchy(this Element element) => element.Parents().All(e => e.Enable);
+        // 自分と親がすべてEnableかつ最後の親がRootに登録されていたらtrue
+        public static bool EnableInHierarchy(this Element element)
+        {
+            var e = element;
+            while (true)
+            {
+                if (e is not {Enable: true}) return false;
+                if (e.Parent == null) return RosettaUIRoot.IsRootElement(e);
+                e = e.Parent;
+            }
+        }
 
         public static IEnumerable<Element> Parents(this Element element)
         {

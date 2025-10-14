@@ -27,7 +27,7 @@ namespace RosettaUI.UndoSystem
         }
         
         
-        public override string Name => "List Item Add";
+        public override string Name => $"List Item Add index:({string.Join(", ", records.Select(r => r.index))})";
         
         private void Initialize(ListViewItemContainerElement listElement, IEnumerable<int> indices)
         {

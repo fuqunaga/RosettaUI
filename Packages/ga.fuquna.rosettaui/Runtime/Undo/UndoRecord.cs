@@ -19,23 +19,20 @@ namespace RosettaUI.UndoSystem
     public abstract class ElementUndoRecord<TUndoRecord> : ObjectPoolItem<TUndoRecord>, IUndoRecord
         where TUndoRecord : ElementUndoRecord<TUndoRecord>, new()
     {
-        protected Element element;
+        protected readonly ElementHierarchyPath hierarchyPath = new();
         
-        protected void Initialize(Element targetElement) => element = targetElement;
+        protected Element Element => hierarchyPath.TargetElement;
         
-        public override void Dispose()
-        {
-            element = null;
-            base.Dispose();
-        }
+        protected void Initialize(Element targetElement) => hierarchyPath.Initialize(targetElement);
+        
         
         public abstract string Name { get; }
-        public bool IsExpired => !element.EnableInHierarchy();
+        public bool IsExpired => !hierarchyPath.TryGetElement(out _);
+        
         public abstract void Undo();
         public abstract void Redo();
 
         public virtual bool CanMerge(IUndoRecord newer) => false;
-
         public virtual void Merge(IUndoRecord newer)
         {
         }
@@ -55,9 +52,9 @@ namespace RosettaUI.UndoSystem
         private TValue _before;
         private TValue _after;
         
-        private FieldBaseElement<TValue> Element => (FieldBaseElement<TValue>)element;
+        private FieldBaseElement<TValue> FieldElement => (FieldBaseElement<TValue>)Element;
 
-        public override string Name => Element.Label;
+        public override string Name => $"{(string)FieldElement.Label} ({typeof(TValue).Name}: [{_before}] -> [{_after}])";
         
 
         private void Initialize(FieldBaseElement<TValue> field, TValue before, TValue after)
@@ -76,18 +73,24 @@ namespace RosettaUI.UndoSystem
         
         public override void Undo()
         {
-            Element.GetViewBridge().SetValueFromView(UndoHelper.Clone(_before));
+            if (hierarchyPath.TryGetElement(out var element) && element is FieldBaseElement<TValue> fieldElement)
+            {
+                fieldElement.GetViewBridge().SetValueFromView(UndoHelper.Clone(_before));
+            }
         }
 
         public override void Redo()
         {
-            Element.GetViewBridge().SetValueFromView(UndoHelper.Clone(_after));
+            if (hierarchyPath.TryGetElement(out var element) && element is FieldBaseElement<TValue> fieldElement)
+            {
+                fieldElement.GetViewBridge().SetValueFromView(UndoHelper.Clone(_after));
+            }
         }
 
         public override bool CanMerge(IUndoRecord newer)
         {
             return (newer is UndoRecordFieldBaseElement<TValue> r)
-                   && element == r.element
+                   && Element == r.Element
                    && typeof(TValue) != typeof(bool);
         } 
         

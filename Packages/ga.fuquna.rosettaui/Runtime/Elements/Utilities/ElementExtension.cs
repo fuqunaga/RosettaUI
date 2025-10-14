@@ -32,6 +32,8 @@ namespace RosettaUI
             }
         }
 
+        public static IEnumerable<Element> SelfAndParents(this Element element) => element.Parents().Prepend(element);
+        
         public static IEnumerable<Element> Parents(this Element element)
         {
             for (var parent = element.Parent; parent != null; parent = parent.Parent)
@@ -39,6 +41,15 @@ namespace RosettaUI
                 yield return parent;
             }
         }
+
+        public static bool TryGetRootElement(this Element element, out Element rootElement)
+        {
+            var last = element.SelfAndParents().LastOrDefault();
+            var isRoot = RosettaUIRoot.IsRootElement(last);
+            rootElement = isRoot ? last : null;
+            return isRoot;
+        }
+        
 
         public static LabelElement FirstLabel(this Element element) => element.Query<LabelElement>().FirstOrDefault();
         

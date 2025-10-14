@@ -11,18 +11,18 @@ namespace RosettaUI.UndoSystem
     public abstract class UndoRecordListItemBase<TRecord> : ElementUndoRecord<TRecord>
         where TRecord : UndoRecordListItemBase<TRecord>, new()
     {
-        protected readonly List<ListViewItemContainerElement.RestoreRecord> _records = new();
+        protected readonly List<ListViewItemContainerElement.RestoreRecord> records = new();
         
-        protected ListViewItemContainerElement Element => (ListViewItemContainerElement)element;
+        protected ListViewItemContainerElement ListElement => (ListViewItemContainerElement)Element;
         
         
         protected void ClearRecords()
         {
-            foreach (var record in _records)
+            foreach (var record in records)
             {
                 record.Dispose();
             }
-            _records.Clear();
+            records.Clear();
         }
         
         public override void Dispose()

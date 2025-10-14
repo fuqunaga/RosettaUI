@@ -28,18 +28,18 @@ namespace RosettaUI.UndoSystem
             base.Initialize(listElement);
 
             ClearRecords();
-            _records.AddRange(listElement.CreateRestoreRecords(indices));
+            records.AddRange(listElement.CreateRestoreRecords(indices));
         }
         
         // Undoで削除されたアイテムを元に戻し、値を復元する
         public override void Undo()
         {
-            Element.GetListEditor().ApplyRestoreRecords(_records);
+            ListElement.GetListEditor().ApplyRestoreRecords(records);
         }
 
         public override void Redo()
         {
-            Element.GetListEditor().RemoveItems(_records.Select(r => r.index));
+            ListElement.GetListEditor().RemoveItems(records.Select(r => r.index));
         }
     }
 }

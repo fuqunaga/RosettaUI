@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using RosettaUI.UndoSystem;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -28,7 +26,7 @@ namespace RosettaUI
     /// ElementとBinderを新たなIndexのものとして扱うことでUIの状態を引き継げるようにしている
     /// 移動した要素の移動前移動後のIndexだけでなくその間の要素のIndexもすべてずれるのでそれらすべでで上述のIndex替え操作を行う
     /// </summary>
-    public class ListViewItemContainerElement : ElementGroup
+    public partial class ListViewItemContainerElement : ElementGroup
     {
         private readonly IBinder _binder;
         public readonly ListViewOption option;
@@ -336,159 +334,6 @@ namespace RosettaUI
                 {
                     foldList[i].IsOpen = _openList[i];
                 }
-            }
-        }
-        
-        
-        public class ListViewItemContainerViewBridge : ElementViewBridge
-        {
-            private ListViewItemContainerElement Element => (ListViewItemContainerElement)element;
-            private IBinder Binder => Element._binder;
-            
-            public ListViewItemContainerViewBridge(ListViewItemContainerElement element) : base(element)
-            {
-            }
-
-            public Type GetListType() => Binder.ValueType;
-            
-            public IList GetIList() => ListBinder.GetIList(Binder);
-            
-            public Element GetOrCreateItemElement(int index) => Element.GetOrCreateItemElement(index);
-
-            public void OnItemIndexChanged(int fromIndex, int toIndex) => Element.OnMoveItemIndex(fromIndex, toIndex);
-
-            [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-            public void OnItemsAdded(IEnumerable<int> indices)
-            {
-                UndoRecordListItemAdd.Register(Element, indices);
-                Element.OnItemsAdded(indices);
-            } 
-
-            [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-            public void OnItemsRemoved(IEnumerable<int> indices)
-            {
-                UndoRecordListItemRemove.Record(Element, indices);
-                Element.OnItemsRemoved(indices);
-            }
-
-            // UIでのリストの参照先の変更を通知
-            // 値や要素数の変更は別途OnViewListValueChanged()が呼ばれるのでこちらではNotifyしない
-            public void OnViewListChanged(IList list) => Element.SetViewListWithoutNotify(list);
-
-            // UIでのリストの変更を通知
-            // 要素数、値
-            public void OnViewListValueChanged(IList list) => Element.SetViewList(list);
-            
-            
-            // UIではない外部でのリストの変更を通知
-            // 参照or要素数
-            public void SubscribeListChanged(Action<IList> action)
-            {
-                Element.onListChanged += action;
-                onUnsubscribe += () => Element.onListChanged -= action;
-            }
-        }
-
-
-        /// <summary>
-        /// ライブラリ側でListViewのListを編集するためのインターフェースクラス
-        /// 
-        /// Listを編集する場所は通常アプリとUIの２つでBinder経由でやりとりするが、
-        /// Undoや別のUIからの操作はどちらでもなく、どちらに対しても通知する必要がある
-        /// - UIからの変更扱いにするとアプリは追従できるがUIが追従しない
-        /// - アプリからの変更扱いはそもそもどう変更されたか不明なためUIを作り直してしまう（Foldやスクロールの状態を引き継げない）
-        /// UIの状態を引き継ぎ、かつ、アプリもUIも追従させるための編集インターフェース
-        /// </summary>
-        public struct ListEditor
-        {
-            public ListViewItemContainerElement Element { get; private set; }
-            private IBinder Binder => Element._binder;
-            
-            public ListEditor(ListViewItemContainerElement element) => Element = element;
-
-            private void NotifyListChanged()
-            {
-                Element.NotifyListChangedToView();
-                Element.NotifyViewValueChanged();
-            }
-
-            public void DuplicateItem(int index)
-            {
-                UndoRecordListItemAdd.Register(Element, index);
-                
-                ListBinder.DuplicateItem(Binder, index);
-                Element.OnItemIndexShiftPlus(index + 1);
-                
-                NotifyListChanged();
-            }
-            
-            public void RemoveItem(int index)
-            {
-                using var _ = ListPool<int>.Get(out var indices);
-                indices.Add(index);
-                RemoveItems(indices);
-            }
-            
-            [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-            public void RemoveItems(IEnumerable<int> indices)
-            {
-                UndoRecordListItemRemove.Record(Element, indices);
-                
-                foreach (var index in indices.OrderByDescending(i => i))
-                {
-                    ListBinder.RemoveItem(Binder, index);
-                    Element.OnItemIndexShiftMinus(index);
-                }
-                
-                NotifyListChanged();
-            }
-
-            public void ApplyRestoreRecords(IEnumerable<RestoreRecord> records)
-            {
-                foreach (var record in records.OrderBy(r => r.index))
-                {
-                    var index = record.index;
-                    if (record.isNull)
-                    {
-                        ListBinder.AddNullItem(Binder, index);
-                    }
-                    else
-                    {
-                        ListBinder.AddItem(Binder, index);
-                    }
-
-                    Element.OnItemIndexShiftPlus(index);
-                    
-                    var elementRecord = record.record;
-                    if (elementRecord != null)
-                    {
-                        var itemElement = Element.GetOrCreateItemElement(index);
-                        elementRecord.Restore(itemElement);
-                    }
-                }
-                
-                NotifyListChanged();
-            }
-        }
-
-        
-        // 削除されたアイテムをUndoで元に戻すためのRecord
-        public readonly struct RestoreRecord : IDisposable
-        {
-            public readonly int index;
-            public readonly bool isNull;
-            public readonly ElementRestoreRecord record;
-
-            public RestoreRecord(int index, bool isNull, ElementRestoreRecord record)
-            {
-                this.index = index;
-                this.isNull = isNull;
-                this.record = record;
-            }
-
-            public void Dispose()
-            {
-                record?.Dispose();
             }
         }
     }

@@ -28,7 +28,7 @@ namespace RosettaUI.UndoSystem
             base.Initialize(listElement);
 
             ClearRecords();
-            records.AddRange(listElement.CreateRestoreRecords(indices));
+            records.AddRange(listElement.GetListEditor().CreateRestoreRecords(indices));
         }
         
         // Undoで削除されたアイテムを元に戻し、値を復元する

@@ -27,7 +27,7 @@ namespace RosettaUI.UndoSystem
         
         
         public abstract string Name { get; }
-        public bool IsExpired => !hierarchyPath.TryGetElement(out _);
+        public bool IsExpired => !hierarchyPath.TryGetExistingElement(out _);
         
         public abstract void Undo();
         public abstract void Redo();
@@ -73,7 +73,7 @@ namespace RosettaUI.UndoSystem
         
         public override void Undo()
         {
-            if (hierarchyPath.TryGetElement(out var element) && element is FieldBaseElement<TValue> fieldElement)
+            if (hierarchyPath.TryGetExistingElement(out var element) && element is FieldBaseElement<TValue> fieldElement)
             {
                 fieldElement.GetViewBridge().SetValueFromView(UndoHelper.Clone(_before));
             }
@@ -81,7 +81,7 @@ namespace RosettaUI.UndoSystem
 
         public override void Redo()
         {
-            if (hierarchyPath.TryGetElement(out var element) && element is FieldBaseElement<TValue> fieldElement)
+            if (hierarchyPath.TryGetExistingElement(out var element) && element is FieldBaseElement<TValue> fieldElement)
             {
                 fieldElement.GetViewBridge().SetValueFromView(UndoHelper.Clone(_after));
             }

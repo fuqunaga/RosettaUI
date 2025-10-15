@@ -70,7 +70,11 @@ namespace RosettaUI.UndoSystem
             _elementAndIndices.Reverse();
         }
         
-        public bool TryGetElement(out Element targetElement)
+        /// <summary>
+        /// 記録した位置に現在存在するElementを取得する
+        /// 存在しない、または型が異なる場合はfalseを返す
+        /// </summary>
+        public bool TryGetExistingElement(out Element targetElement)
         {
             targetElement = null;
             if (_elementAndIndices.Count == 0) return false;

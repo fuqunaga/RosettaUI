@@ -77,17 +77,26 @@ namespace RosettaUI
         }
 
         public static IList RemoveItem(IList list, Type itemType, int index)
+            => RemoveItems(list, itemType, index..(index + 1));
+
+        public static IList RemoveItems(IList list, Type itemType, Range range)
         {
+            var (offset, length) = range.GetOffsetAndLength(list.Count);
+            if (length <= 0) return list;
+
             if (list is Array array)
             {
-                var newArray = Array.CreateInstance(itemType, array.Length - 1);
-                Array.Copy(array, newArray, index);
-                Array.Copy(array, index + 1, newArray, index, array.Length - 1 - index);
+                var newArray = Array.CreateInstance(itemType, array.Length - length);
+                Array.Copy(array, newArray, offset);
+                Array.Copy(array, offset + length, newArray, offset, array.Length - (offset + length));
                 list = newArray;
             }
             else
             {
-                list.RemoveAt(index);
+                for (var i = 0; i < length; i++)
+                {
+                    list.RemoveAt(offset);
+                }
             }
 
             return list;

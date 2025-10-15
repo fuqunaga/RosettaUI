@@ -96,12 +96,15 @@ namespace RosettaUI
         }
 
         public static void RemoveItem(IBinder binder, int index)
+            => RemoveItems(binder, index..(index + 1));
+        
+        public static void RemoveItems(IBinder binder, Range range)
         {
             var list = GetIList(binder);
             
             var itemType = ListUtility.GetItemType(binder.ValueType);
             
-            list = ListUtility.RemoveItem(list, itemType, index);
+            list = ListUtility.RemoveItems(list, itemType, range);
             binder.SetObject(list);
         }
 

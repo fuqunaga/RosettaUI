@@ -10,6 +10,11 @@ namespace RosettaUI
     public partial class ListViewItemContainerElement
     {
         /// <summary>
+        /// RosettaUI側でListを編集するためのインターフェースを取得 
+        /// </summary>
+        public ListEditor GetListEditor() => new(this);
+        
+        /// <summary>
         /// ライブラリ側でListViewのListを編集するためのインターフェースクラス
         /// 
         /// Elementの値の編集は通常、アプリ側とUI側の２箇所でBinder経由でやりとりするが、
@@ -124,8 +129,9 @@ namespace RosettaUI
             }
         }
         
-        
-        // 削除されたアイテムをUndoで元に戻すためのRecord
+        /// <summary>
+        /// 削除されたアイテムをUndoで元に戻すためのRecord 
+        /// </summary>
         public readonly struct RestoreRecord : IDisposable
         {
             public readonly int index;
@@ -147,5 +153,7 @@ namespace RosettaUI
                 state?.Dispose();
             }
         }
+        
+        
     }
 }

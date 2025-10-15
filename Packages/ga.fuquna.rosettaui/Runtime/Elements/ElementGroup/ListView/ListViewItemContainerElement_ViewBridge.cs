@@ -8,6 +8,9 @@ namespace RosettaUI
 {
     public partial class ListViewItemContainerElement
     {
+        protected override ElementViewBridge CreateViewBridge() => new ListViewItemContainerViewBridge(this);
+
+        
         public class ListViewItemContainerViewBridge : ElementViewBridge
         {
             private ListViewItemContainerElement Element => (ListViewItemContainerElement)element;
@@ -54,6 +57,11 @@ namespace RosettaUI
                 onUnsubscribe += () => Element.onListChanged -= action;
             }
         }
-
+    }
+    
+    
+    public static partial class ElementViewBridgeExtensions
+    {
+        public static ListViewItemContainerElement.ListViewItemContainerViewBridge GetViewBridge(this ListViewItemContainerElement element) => (ListViewItemContainerElement.ListViewItemContainerViewBridge)element.ViewBridge;
     }
 }

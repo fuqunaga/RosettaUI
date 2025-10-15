@@ -26,7 +26,6 @@ namespace RosettaUI
         #region IUndoRestoreElement
         
         public IElementRestoreRecord CreateRestoreRecord() => FieldBaseElementRestoreRecord<T>.Create(this);
-        public bool TryRestore(IElementRestoreRecord record) => record.TryRestore(this);
         
         #endregion
 

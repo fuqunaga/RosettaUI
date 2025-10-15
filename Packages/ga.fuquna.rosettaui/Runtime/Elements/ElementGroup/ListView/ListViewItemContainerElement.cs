@@ -316,15 +316,5 @@ namespace RosettaUI
             SetViewListWithoutNotify(list);
             NotifyViewValueChanged();
         }
-        
-        protected override ElementViewBridge CreateViewBridge() => new ListViewItemContainerViewBridge(this);
-        
-        // RosettaUI側でListを編集するためのインターフェースを取得
-        public ListEditor GetListEditor() => new(this);
-    }
-
-    public static partial class ElementViewBridgeExtensions
-    {
-        public static ListViewItemContainerElement.ListViewItemContainerViewBridge GetViewBridge(this ListViewItemContainerElement element) => (ListViewItemContainerElement.ListViewItemContainerViewBridge)element.ViewBridge;
     }
 }

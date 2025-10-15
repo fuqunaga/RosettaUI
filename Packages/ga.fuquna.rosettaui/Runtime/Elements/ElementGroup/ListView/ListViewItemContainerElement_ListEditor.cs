@@ -48,12 +48,12 @@ namespace RosettaUI
 
             public void DuplicateItem(int index)
             {
-                UndoRecordListItemAdd.Register(Element, index);
-                
                 ListBinder.DuplicateItem(Binder, index);
                 Element.OnItemIndexShiftPlus(index + 1);
                 
                 NotifyListChanged();
+                
+                UndoRecordListItemAdd.Register(Element, index + 1);
             }
             
             public void RemoveItem(int index)

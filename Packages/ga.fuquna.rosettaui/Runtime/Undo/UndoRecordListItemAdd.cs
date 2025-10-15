@@ -36,7 +36,7 @@ namespace RosettaUI.UndoSystem
             ClearRecords();
             
             // Undo時に必要なのはインデックスだけなのでインデックスのみのRestoreRecordを保存
-            records.AddRange(indices.Select(i => new ListViewItemContainerElement.RestoreRecord(i, false, null)));
+            records.AddRange(indices.Select(i => new ListViewItemContainerElement.RestoreRecord(i, false, null, null)));
         }
         
         // 追加されたアイテムを削除する
@@ -46,7 +46,7 @@ namespace RosettaUI.UndoSystem
             using var _ = ListPool<int>.Get(out var indices);
             indices.AddRange(records.Select(r => r.index));
             
-            records.Clear();
+            ClearRecords();
             records.AddRange(ListElement.GetListEditor().CreateRestoreRecords(indices));
 
             ListElement.GetListEditor().RemoveItems(indices);

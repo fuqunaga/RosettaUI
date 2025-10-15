@@ -18,9 +18,9 @@ namespace RosettaUI
         /// - アプリからの変更扱いはそもそもどう変更されたか不明なためUIを作り直してしまう（Foldやスクロールの状態を引き継げない）
         /// UIの状態を引き継ぎ、かつ、アプリもUIも追従させるための編集インターフェース
         /// </summary>
-        public struct ListEditor
+        public readonly struct ListEditor
         {
-            public ListViewItemContainerElement Element { get; private set; }
+            private ListViewItemContainerElement Element { get; }
             private IBinder Binder => Element._binder;
             
             public ListEditor(ListViewItemContainerElement element) => Element = element;
@@ -84,6 +84,13 @@ namespace RosettaUI
                         var itemElement = Element.GetOrCreateItemElement(index);
                         elementRecord.Restore(itemElement);
                     }
+                    
+                    var state = record.state;
+                    if (state != null)
+                    {
+                        var itemElement = Element.GetOrCreateItemElement(index);
+                        state.Apply(itemElement);
+                    }
                 }
                 
                 NotifyListChanged();
@@ -104,13 +111,15 @@ namespace RosettaUI
                     var isNull = list[index] == null;
                 
                     ElementRestoreRecord elementRecord = null;
+                    ElementState elementState = null;
                     if (!isNull)
                     {
                         var itemElement = Element.GetOrCreateItemElement(index);
                         ElementRestoreRecord.TryCreate(itemElement, out elementRecord);
+                        elementState = ElementState.Create(itemElement);
                     }
                 
-                    yield return new RestoreRecord(index, isNull, elementRecord);
+                    yield return new RestoreRecord(index, isNull, elementRecord, elementState);
                 }
             }
         }
@@ -122,17 +131,20 @@ namespace RosettaUI
             public readonly int index;
             public readonly bool isNull;
             public readonly ElementRestoreRecord record;
+            public readonly ElementState state;
 
-            public RestoreRecord(int index, bool isNull, ElementRestoreRecord record)
+            public RestoreRecord(int index, bool isNull, ElementRestoreRecord record, ElementState state)
             {
                 this.index = index;
                 this.isNull = isNull;
                 this.record = record;
+                this.state = state;
             }
 
             public void Dispose()
             {
                 record?.Dispose();
+                state?.Dispose();
             }
         }
     }

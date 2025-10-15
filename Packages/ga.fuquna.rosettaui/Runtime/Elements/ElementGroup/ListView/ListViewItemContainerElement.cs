@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.Pool;
 
 namespace RosettaUI
@@ -154,7 +153,14 @@ namespace RosettaUI
 
         private void RemoveItemElement(int index, bool removeState = true)
         {
-            if ( removeState) _itemIndexToElementState.Remove(index);
+            if (removeState)
+            {
+                if (_itemIndexToElementState.Remove(index, out var state))
+                {
+                    state.Dispose();
+                }
+            }
+
             if (!_itemIndexToElement.Remove(index, out var element)) return;
 
             RemoveChild(element, false);
@@ -212,34 +218,43 @@ namespace RosettaUI
 
         private void MoveElementState(int fromIndex, int toIndex)
         {
-            if (!_itemIndexToElementState.Remove(fromIndex, out var state))
-            {
-                state = CreateElementState(fromIndex);
-            }
-
-            if (state != null)
-            {
-                _itemIndexToElementState[toIndex] = state;
-            }
+            var state = PopOrCreateElementState(fromIndex);
+            SetElementState(toIndex, state);
         }
 
         private void OnMoveItemIndex(int fromIndex, int toIndex)
         {
-            if (!_itemIndexToElementState.Remove(fromIndex, out var state))
-            {
-                state = CreateElementState(fromIndex);
-            }
+            var state = PopOrCreateElementState(fromIndex);
             
             if ( toIndex < fromIndex )
                 OnItemIndexShiftPlus(toIndex, fromIndex);
             else
                 OnItemIndexShiftMinus(fromIndex, toIndex);
-
-
-            if (state != null)
+            
+            SetElementState(toIndex, state);
+        }
+        
+        
+        /// <summary>
+        /// 指定したIndexのElementStateを取り出し、なければ新規作成して返す
+        /// 取り出したElementStateは辞書から削除される
+        /// </summary>
+        private ElementState PopOrCreateElementState(int index)
+        {
+            return _itemIndexToElementState.Remove(index, out var state) 
+                ? state 
+                : CreateElementState(index);
+        }
+        
+        private void SetElementState(int index, ElementState state)
+        {
+            if (_itemIndexToElementState.Remove(index, out var oldState))
             {
-                _itemIndexToElementState[toIndex] = state;
+                oldState.Dispose();
             }
+
+            if (state == null) return;
+            _itemIndexToElementState[index] = state;
         }
 
         private ElementState CreateElementState(int index)
@@ -304,38 +319,8 @@ namespace RosettaUI
         
         protected override ElementViewBridge CreateViewBridge() => new ListViewItemContainerViewBridge(this);
         
-        
         // RosettaUI側でListを編集するためのインターフェースを取得
         public ListEditor GetListEditor() => new(this);
-        
-        
-        // 別のElementに引き継ぐElementの状態
-        //　現状FoldのOpen/Close情報のみ
-        private class ElementState
-        {
-            private List<bool> _openList;
-            
-            public static ElementState Create(Element element)
-            {
-                return new ElementState()
-                {
-                    _openList = element.Query<FoldElement>().Select(fold => fold.IsOpen).ToList()
-                };
-            }
-
-            public void Apply(Element element)
-            {
-                using var pool = ListPool<FoldElement>.Get(out var foldList);
-                foldList.AddRange(element.Query<FoldElement>());
-                
-                // 数が合わなくてもできるだけ引き継ぐ
-                var count = Mathf.Min(foldList.Count, _openList.Count);
-                for (var i = 0; i < count; ++i)
-                {
-                    foldList[i].IsOpen = _openList[i];
-                }
-            }
-        }
     }
 
     public static partial class ElementViewBridgeExtensions

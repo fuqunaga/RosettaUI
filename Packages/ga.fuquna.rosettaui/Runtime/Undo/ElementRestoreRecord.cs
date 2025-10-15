@@ -34,7 +34,7 @@ namespace RosettaUI.UndoSystem
             if (targetElement is ListViewItemContainerElement listElementContainer)
             {
                 // todo
-                yield break;
+                // yield break;
             }
                 
             if (targetElement is ElementGroup group)

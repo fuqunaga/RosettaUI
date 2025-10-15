@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Utilities;
-using UnityEngine.UIElements;
 
 namespace RosettaUI.UndoSystem
 {
@@ -31,25 +30,23 @@ namespace RosettaUI.UndoSystem
         // Recordを作成・復元する際に同じ構成なら同じ順番で列挙されることを期待している
         private static IEnumerable<IUndoRestoreElement> FlattenUndoRestoreElements(Element targetElement)
         {
-            if (targetElement is ListViewItemContainerElement listElementContainer)
+            switch (targetElement)
             {
-                // todo
-                // yield break;
-            }
+                case IUndoRestoreElement undoRestoreElement:
+                    yield return undoRestoreElement;
+                    break;
                 
-            if (targetElement is ElementGroup group)
-            {
-                foreach (var child in group.Contents)
+                case ElementGroup group:
                 {
-                    foreach (var e in FlattenUndoRestoreElements(child))
+                    foreach (var child in group.Contents)
                     {
-                        yield return e;
+                        foreach (var e in FlattenUndoRestoreElements(child))
+                        {
+                            yield return e;
+                        }
                     }
+                    break;
                 }
-            }
-            else if(targetElement is IUndoRestoreElement undoRestoreElement)
-            {
-                yield return undoRestoreElement;
             }
         }
         

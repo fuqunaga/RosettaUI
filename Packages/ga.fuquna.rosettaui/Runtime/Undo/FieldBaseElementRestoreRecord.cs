@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
 using RosettaUI.Utilities;
-using UnityEngine.Assertions;
 
 namespace RosettaUI.UndoSystem
 {
@@ -34,15 +31,13 @@ namespace RosettaUI.UndoSystem
 
         public bool TryRestore(IUndoRestoreElement element)
         {
-            if (element is not FieldBaseElement<TValue> fieldBaseElement) return false;
+            if (element is not FieldBaseElement<TValue> fieldBaseElement)
+            {
+                return false;
+            }
             
-            Restore(fieldBaseElement);
-            return true;
-        }
-
-        private void Restore(FieldBaseElement<TValue> fieldBaseElement)
-        {
             fieldBaseElement.GetViewBridge().SetValueFromView(UndoHelper.Clone(_value));
+            return true;
         }
     }
 }

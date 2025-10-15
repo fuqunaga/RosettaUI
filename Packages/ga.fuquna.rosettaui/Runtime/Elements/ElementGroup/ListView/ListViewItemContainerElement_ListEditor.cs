@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -7,8 +8,15 @@ using UnityEngine.Pool;
 
 namespace RosettaUI
 {
-    public partial class ListViewItemContainerElement
+    public partial class ListViewItemContainerElement : IUndoRestoreElement
     {
+        #region IUndoRedoElement
+
+        public IElementRestoreRecord CreateRestoreRecord() => ListViewItemContainerElementRestoreRecord.Create(this);
+
+        #endregion
+        
+        
         /// <summary>
         /// RosettaUI側でListを編集するためのインターフェースを取得 
         /// </summary>
@@ -27,6 +35,8 @@ namespace RosettaUI
         {
             private ListViewItemContainerElement Element { get; }
             private IBinder Binder => Element._binder;
+            
+            public IList CurrentList => ListBinder.GetIList(Binder);
             
             public ListEditor(ListViewItemContainerElement element) => Element = element;
 
@@ -66,6 +76,53 @@ namespace RosettaUI
                 
                 NotifyListChanged();
             }
+            
+            public IEnumerable<RestoreRecord> CreateRestoreRecordsForAllItems() => CreateRestoreRecords(Enumerable.Range(0, CurrentList?.Count ?? 0));
+
+            public void ApplyRestoreRecordsForAllItems(IEnumerable<RestoreRecord> records)
+            {
+                var list = CurrentList;
+                
+                // いったん全削除
+                var count = list?.Count ?? 0;
+                if (count > 0)
+                {
+                    ListBinder.RemoveItems(Binder, ..count);
+                }
+                
+                ApplyRestoreRecords(records);
+            }
+            
+            public IEnumerable<RestoreRecord> CreateRestoreRecords(IEnumerable<int> indices)
+            {
+                var list = CurrentList;
+                if (list == null)
+                {
+                    yield break;
+                }
+            
+                using var _ = Getter.CacheScope();
+                foreach(var index in indices)
+                {
+                    if (index < 0 || index >= list.Count)
+                    {
+                        continue;
+                    }
+                
+                    var isNull = list[index] == null;
+                
+                    ElementRestoreRecord elementRecord = null;
+                    ElementState elementState = null;
+                    if (!isNull)
+                    {
+                        var itemElement = Element.GetOrCreateItemElement(index);
+                        ElementRestoreRecord.TryCreate(itemElement, out elementRecord);
+                        elementState = ElementState.Create(itemElement);
+                    }
+                
+                    yield return new RestoreRecord(index, isNull, elementRecord, elementState);
+                }
+            }
 
             public void ApplyRestoreRecords(IEnumerable<RestoreRecord> records)
             {
@@ -100,33 +157,6 @@ namespace RosettaUI
                 
                 NotifyListChanged();
             }
-            
-            public IEnumerable<RestoreRecord> CreateRestoreRecords(IEnumerable<int> indices)
-            {
-                var list = ListBinder.GetIList(Binder);
-            
-                using var _ = Getter.CacheScope();
-                foreach(var index in indices)
-                {
-                    if (index < 0 || index >= list.Count)
-                    {
-                        continue;
-                    }
-                
-                    var isNull = list[index] == null;
-                
-                    ElementRestoreRecord elementRecord = null;
-                    ElementState elementState = null;
-                    if (!isNull)
-                    {
-                        var itemElement = Element.GetOrCreateItemElement(index);
-                        ElementRestoreRecord.TryCreate(itemElement, out elementRecord);
-                        elementState = ElementState.Create(itemElement);
-                    }
-                
-                    yield return new RestoreRecord(index, isNull, elementRecord, elementState);
-                }
-            }
         }
         
         /// <summary>
@@ -153,7 +183,5 @@ namespace RosettaUI
                 state?.Dispose();
             }
         }
-        
-        
     }
 }

@@ -405,7 +405,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8a64a64e5fde714e90ce9ec52340ba6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _root: {fileID: 1900745268}
+  root: {fileID: 1900745268}
+  floatValue: 0
+  stringValue: Hello
+  enumValue: 0
+  vector2Value: {x: 0, y: 0}
 --- !u!4 &1932631889
 Transform:
   m_ObjectHideFlags: 0

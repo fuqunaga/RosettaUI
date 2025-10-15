@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using RosettaUI.Utilities;
 
 namespace RosettaUI.UndoSystem
 {
-    /*
     /// <summary>
-    /// ListViewItemContainer にバインドされているリストと状態を記録し復元するUndo機能向けのレコード
-    /// UndoRecordListItemRemoveで利用される
+    /// Listの要素がListを含む入れ子の構造になっている場合の要素内のListをUndo時に復元するためのレコード
     /// </summary>
-    public class ListViewItemContainerElementRestoreRecord<TValue> : ObjectPoolItem<FieldBaseElementRestoreRecord<TValue>>, IElementRestoreRecord
+    public class ListViewItemContainerElementRestoreRecord : ObjectPoolItem<ListViewItemContainerElementRestoreRecord>, IElementRestoreRecord
     {
         public static IElementRestoreRecord Create(Element element)
         {
@@ -22,29 +22,35 @@ namespace RosettaUI.UndoSystem
             return record;
         }
 
+        private readonly List<ListViewItemContainerElement.RestoreRecord> _restoreRecords = new();
 
-        private Type _listType;
-        private int? _itemCount;
-    
-        private void Initialize(ListViewItemContainerElement  listViewItemContainerElement)
+        private void Initialize(ListViewItemContainerElement listViewItemContainerElement)
         {
-            var viewBridge = listViewItemContainerElement.GetViewBridge();
-            _listType = viewBridge.GetListType();
-            _itemCount = viewBridge.GetIList()?.Count;
+            Clear();
+
+            var listEditor = listViewItemContainerElement.GetListEditor();
+            _restoreRecords.AddRange(listEditor.CreateRestoreRecordsForAllItems());
         }
-    
-        public bool TryRestore(Element element)
+
+        private void Clear()
+        {
+            _restoreRecords.Clear();
+        }
+
+        public bool TryRestore(IUndoRestoreElement element)
         {
             if (element is not ListViewItemContainerElement listViewItemContainerElement) return false;
             
-            Restore(listViewItemContainerElement);
+            var listEditor = listViewItemContainerElement.GetListEditor();
+            listEditor.ApplyRestoreRecordsForAllItems(_restoreRecords);
+            
             return true;
         }
-    
-        private void Restore(ListViewItemContainerElement listViewItemContainerElement)
+        
+        public override void Dispose()
         {
-            
+            Clear();
+            base.Dispose();
         }
     }
-    */
 }

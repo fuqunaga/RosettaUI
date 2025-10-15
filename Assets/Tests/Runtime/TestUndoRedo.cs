@@ -11,6 +11,12 @@ namespace RosettaUI.Test
     [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
     public class TestUndoRedo : MonoBehaviour
     {
+        public class ListIncludeClass
+        {
+            public string stringValue = nameof(ListIncludeClass);
+            public List<SimpleClass> classList = Enumerable.Range(0, 3).Select(i => new SimpleClass {stringValue = $"Item{i}"}).ToList();
+        }
+        
         public RosettaUIRoot root;
 
         public float floatValue;
@@ -30,9 +36,23 @@ namespace RosettaUI.Test
             null,
             new SimpleClass {stringValue = "Item 2", floatValue = 2f},
         };
+
+
+        private ListIncludeClass[] _arrayIncludeClassArray =
+        {
+            new() { stringValue = "Item 0" },
+            null,
+            new() { stringValue = "Item 2" },
+        };
         
+        private List<ListIncludeClass> _arrayIncludeClassList = new()
+        {
+            new() { stringValue = "Item 0" },
+            null,
+            new() { stringValue = "Item 2" },
+        };
         
-        private List<int> _intList = new() {1};
+         
         
         private WindowElement _window;
         
@@ -95,6 +115,13 @@ namespace RosettaUI.Test
                     UI.Button("Add null element", () => _classArray = _classArray.Append(null).ToArray()),
                     UI.Field(() => _classList),
                     UI.Button("Add null element", () => _classList.Add(null)),
+                    UI.Field(() => _arrayIncludeClassArray),
+                    UI.Button("Add null element", () => _arrayIncludeClassArray = _arrayIncludeClassArray.Append(null).ToArray()),
+                    UI.Field(() => _arrayIncludeClassList),
+                    UI.Button("Add null element", () => _arrayIncludeClassList.Add(null)),
+                    
+                    
+                    Space(),
                     UI.Slider(() => floatValue),
                     UI.Slider(() => vector2Value),
                     Space(),

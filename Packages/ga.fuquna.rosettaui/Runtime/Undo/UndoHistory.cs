@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace RosettaUI.UndoSystem
+namespace RosettaUI.Undo
 {
     public static class UndoHistory
     {

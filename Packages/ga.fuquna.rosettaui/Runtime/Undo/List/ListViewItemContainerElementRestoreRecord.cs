@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Utilities;
 
-namespace RosettaUI.UndoSystem
+namespace RosettaUI.Undo
 {
     /// <summary>
     /// Listの要素がListを含む入れ子の構造になっている場合の要素内のListをUndo時に復元するためのレコード

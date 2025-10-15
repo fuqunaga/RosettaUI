@@ -1,45 +1,8 @@
 ﻿using System;
-using RosettaUI.Utilities;
 
-namespace RosettaUI.UndoSystem
+namespace RosettaUI.Undo
 {
-    public interface IUndoRecord : IDisposable
-    {
-        string Name { get; }
-        bool IsExpired { get; }
-        
-        void Undo();
-        void Redo();
-        
-        bool CanMerge(IUndoRecord newer);
-        void Merge(IUndoRecord newer);
-    }
-    
-    
-    public abstract class ElementUndoRecord<TUndoRecord> : ObjectPoolItem<TUndoRecord>, IUndoRecord
-        where TUndoRecord : ElementUndoRecord<TUndoRecord>, new()
-    {
-        protected readonly ElementHierarchyPath hierarchyPath = new();
-        
-        protected Element Element => hierarchyPath.TargetElement;
-        
-        protected void Initialize(Element targetElement) => hierarchyPath.Initialize(targetElement);
-        
-        
-        public abstract string Name { get; }
-        public bool IsExpired => !hierarchyPath.TryGetExistingElement(out _);
-        
-        public abstract void Undo();
-        public abstract void Redo();
-
-        public virtual bool CanMerge(IUndoRecord newer) => false;
-        public virtual void Merge(IUndoRecord newer)
-        {
-        }
-    }
-
-    
-    public class UndoRecordFieldBaseElement<TValue> : ElementUndoRecord<UndoRecordFieldBaseElement<TValue>>
+   public class UndoRecordFieldBaseElement<TValue> : UndoRecordElementBase<UndoRecordFieldBaseElement<TValue>, FieldBaseElement<TValue>>
     {
         public static void Record(FieldBaseElement<TValue> field, TValue before, TValue after)
         {
@@ -52,9 +15,8 @@ namespace RosettaUI.UndoSystem
         private TValue _before;
         private TValue _after;
         
-        private FieldBaseElement<TValue> FieldElement => (FieldBaseElement<TValue>)Element;
-
-        public override string Name => $"{(string)FieldElement.Label} ({typeof(TValue).Name}: [{_before}] -> [{_after}])";
+        
+        public override string Name => $"{(string)Element.Label} ({typeof(TValue).Name}: [{_before}] -> [{_after}])";
         
 
         private void Initialize(FieldBaseElement<TValue> field, TValue before, TValue after)

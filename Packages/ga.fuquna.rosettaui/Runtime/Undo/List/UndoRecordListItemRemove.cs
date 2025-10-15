@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace RosettaUI.UndoSystem
+namespace RosettaUI.Undo
 {
     /// <summary>
     /// ListViewのアイテム削除を元に戻すためのUndoRecord
@@ -9,7 +9,7 @@ namespace RosettaUI.UndoSystem
     /// - Undoでアイテムを元に戻し、記録した値を復元する
     ///  - 復元時はElementの構造が変わっていない想定。DynamicElementなどで構造が変わっていると正しく復元できない可能性がある
     /// </summary>
-    public class UndoRecordListItemRemove : UndoRecordListItemBase<UndoRecordListItemRemove>
+    public class UndoRecordListItemRemove : UndoRecordListItemRestoreBase<UndoRecordListItemRemove>
     {
         public static void Record(ListViewItemContainerElement listElement, IEnumerable<int> indices)
         {
@@ -34,12 +34,12 @@ namespace RosettaUI.UndoSystem
         // Undoで削除されたアイテムを元に戻し、値を復元する
         public override void Undo()
         {
-            ListElement.GetListEditor().ApplyRestoreRecords(records);
+            Element.GetListEditor().ApplyRestoreRecords(records);
         }
 
         public override void Redo()
         {
-            ListElement.GetListEditor().RemoveItems(records.Select(r => r.index));
+            Element.GetListEditor().RemoveItems(records.Select(r => r.index));
         }
     }
 }

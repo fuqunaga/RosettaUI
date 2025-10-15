@@ -2,18 +2,18 @@
 using System.Linq;
 using UnityEngine.Pool;
 
-namespace RosettaUI.UndoSystem
+namespace RosettaUI.Undo
 {
     /// <summary>
     /// ListViewのアイテム追加を元に戻すためのUndoRecord
     /// Redo時に削除されたアイテムを復元する必要があるためUndoRecordItemRemoveのように、Undo時削除するまえにの値を記録しておく必要がある
     /// </summary>
-    public class UndoRecordListItemAdd : UndoRecordListItemBase<UndoRecordListItemAdd>
+    public class UndoRecordListItemAdd : UndoRecordListItemRestoreBase<UndoRecordListItemAdd>
     {
-        public static void Register(ListViewItemContainerElement listElement, int indix)
+        public static void Register(ListViewItemContainerElement listElement, int index)
         {
             using var _ = ListPool<int>.Get(out var indices);
-            indices.Add(indix);
+            indices.Add(index);
             Register(listElement, indices);
         }
         
@@ -47,14 +47,14 @@ namespace RosettaUI.UndoSystem
             indices.AddRange(records.Select(r => r.index));
             
             ClearRecords();
-            records.AddRange(ListElement.GetListEditor().CreateRestoreRecords(indices));
+            records.AddRange(Element.GetListEditor().CreateRestoreRecords(indices));
 
-            ListElement.GetListEditor().RemoveItems(indices);
+            Element.GetListEditor().RemoveItems(indices);
         }
 
         public override void Redo()
         {
-            ListElement.GetListEditor().ApplyRestoreRecords(records);
+            Element.GetListEditor().ApplyRestoreRecords(records);
         }
     }
 }

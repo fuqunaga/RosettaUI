@@ -178,7 +178,8 @@ namespace RosettaUI
         
         public static bool IsRootElement(Element element)
         {
-            return Roots.Any(root => root.Elements.Contains(element));
+            // WindowLauncherElement内のWindowはroot.Elementsに含まれないけどupdater.Elementsには含まれる
+            return Roots.Any(root => root.Elements.Contains(element) || root.updater.Elements.Contains(element));
         }
 
         [Obsolete("Use IsFocused instead")]

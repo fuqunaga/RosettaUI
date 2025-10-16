@@ -24,12 +24,16 @@ namespace RosettaUI
             
             public Element GetOrCreateItemElement(int index) => Element.GetOrCreateItemElement(index);
 
-            public void OnItemIndexChanged(int fromIndex, int toIndex) => Element.OnMoveItemIndex(fromIndex, toIndex);
+            public void OnItemIndexChanged(int fromIndex, int toIndex)
+            {
+                UndoRecordListItemMove.Record(Element, fromIndex, toIndex);
+                Element.OnMoveItemIndex(fromIndex, toIndex);
+            }
 
             [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
             public void OnItemsAdded(IEnumerable<int> indices)
             {
-                UndoRecordListItemAdd.Register(Element, indices);
+                UndoRecordListItemAdd.Record(Element, indices);
                 Element.OnItemsAdded(indices);
             } 
 

@@ -51,9 +51,9 @@ namespace RosettaUI
                 ListBinder.DuplicateItem(Binder, index);
                 Element.OnItemIndexShiftPlus(index + 1);
                 
-                NotifyListChanged();
+                UndoRecordListItemAdd.Record(Element, index + 1);
                 
-                UndoRecordListItemAdd.Register(Element, index + 1);
+                NotifyListChanged();
             }
             
             public void RemoveItem(int index)
@@ -76,6 +76,19 @@ namespace RosettaUI
                 
                 NotifyListChanged();
             }
+            
+            public void MoveItem(int fromIndex, int toIndex)
+            {
+                if (fromIndex == toIndex) return;
+                
+                ListBinder.MoveItem(Binder, fromIndex, toIndex);
+                Element.OnMoveItemIndex(fromIndex, toIndex);
+                
+                UndoRecordListItemMove.Record(Element, fromIndex, toIndex);
+                
+                NotifyListChanged();
+            }
+            
             
             public IEnumerable<RestoreRecord> CreateRestoreRecordsForAllItems() => CreateRestoreRecords(Enumerable.Range(0, CurrentList?.Count ?? 0));
 

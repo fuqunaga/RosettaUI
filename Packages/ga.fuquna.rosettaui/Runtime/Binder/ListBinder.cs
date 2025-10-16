@@ -107,6 +107,13 @@ namespace RosettaUI
             list = ListUtility.RemoveItems(list, itemType, range);
             binder.SetObject(list);
         }
+        
+        public static void MoveItem(IBinder binder, int fromIndex, int toIndex)
+        {
+            var list = GetIList(binder);
+            ListUtility.MoveItem(list, fromIndex, toIndex);
+            binder.SetObject(list);
+        }
 
         public static void AddItemAtLast(IBinder binder)
         {

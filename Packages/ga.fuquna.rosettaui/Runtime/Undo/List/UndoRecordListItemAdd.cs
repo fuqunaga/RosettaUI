@@ -10,14 +10,14 @@ namespace RosettaUI.Undo
     /// </summary>
     public class UndoRecordListItemAdd : UndoRecordListItemRestoreBase<UndoRecordListItemAdd>
     {
-        public static void Register(ListViewItemContainerElement listElement, int index)
+        public static void Record(ListViewItemContainerElement listElement, int index)
         {
             using var _ = ListPool<int>.Get(out var indices);
             indices.Add(index);
-            Register(listElement, indices);
+            Record(listElement, indices);
         }
         
-        public static void Register(ListViewItemContainerElement listElement, IEnumerable<int> indices)
+        public static void Record(ListViewItemContainerElement listElement, IEnumerable<int> indices)
         {
             if (!UndoHistory.CanAdd) return;
             

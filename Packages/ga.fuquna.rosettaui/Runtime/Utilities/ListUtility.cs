@@ -101,6 +101,44 @@ namespace RosettaUI
 
             return list;
         }
+        
+        public static void MoveItem(IList list, int fromIndex, int toIndex)
+        {
+            if (fromIndex == toIndex) return;
+            
+            var item = list[fromIndex];
+            if (fromIndex < toIndex)
+            {
+                if (list is Array array)
+                {
+                    Array.Copy(array, fromIndex + 1, array, fromIndex, toIndex - fromIndex);
+                }
+                else
+                {
+                    for (var i = fromIndex; i < toIndex; i++)
+                    {
+                        list[i] = list[i + 1];
+                    }
+                }
+            }
+            // toIndex < fromIndex 
+            else
+            {
+                if (list is Array array)
+                {
+                    Array.Copy(array, toIndex, array, toIndex + 1, fromIndex - toIndex);
+                }
+                else
+                {
+                    for (var i = fromIndex; i > toIndex; i--)
+                    {
+                        list[i] = list[i - 1];
+                    }
+                }
+            }
+            
+            list[toIndex] = item;
+        }
 
 
         private static object CreateNewItem(object baseItem, Type itemType)

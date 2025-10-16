@@ -23,5 +23,11 @@ namespace RosettaUI.Undo
         public virtual void Merge(IUndoRecord newer)
         {
         }
+        
+        public override void Dispose()
+        {
+            hierarchyPath.Clear();
+            base.Dispose();
+        }
     }
 }

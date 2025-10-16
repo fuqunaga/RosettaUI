@@ -48,7 +48,7 @@ namespace RosettaUI.Undo
 
         public Element TargetElement => _elementAndIndices.Last().element;
         
-        private void Clear()
+        public void Clear()
         {
             _elementAndIndices.Clear();
         }

@@ -14,7 +14,7 @@ namespace RosettaUI.Undo
         
         
         public abstract string Name { get; }
-        public bool IsExpired => !hierarchyPath.TryGetExistingElement(out _);
+        public bool IsAvailable => hierarchyPath.TryGetExistingElement(out _);
         
         public abstract void Undo();
         public abstract void Redo();

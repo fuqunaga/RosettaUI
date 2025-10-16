@@ -11,7 +11,7 @@ namespace RosettaUI.Undo
     public interface IUndoRecord : IDisposable
     {
         string Name { get; }
-        bool IsExpired { get; }
+        bool IsAvailable { get; }
         
         void Undo();
         void Redo();

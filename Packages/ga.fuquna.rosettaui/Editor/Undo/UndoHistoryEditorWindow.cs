@@ -45,22 +45,22 @@ namespace RosettaUI.Editor.UndoSystem
                 width = 200,
             };
             
-            var expiredColumn = new Column()
+            var availableColumn = new Column()
             {
-                name = nameof(IUndoRecord.IsExpired),
-                title = nameof(IUndoRecord.IsExpired),
+                name = nameof(IUndoRecord.IsAvailable),
+                title = nameof(IUndoRecord.IsAvailable),
                 makeCell = () =>
                 {
                     var container = new VisualElement(){ style = { justifyContent = Justify.Center } };
                     container.Add(new Toggle());
                     return container;
                 },
-                bindCell = BindCellExpired,
+                bindCell = BindCellIsAvailable,
                 width = 100,
             };
             
             _multiColumnListView.columns.Add(nameColumn);
-            _multiColumnListView.columns.Add(expiredColumn);
+            _multiColumnListView.columns.Add(availableColumn);
           
             rootVisualElement.Add(_multiColumnListView );
 
@@ -73,11 +73,11 @@ namespace RosettaUI.Editor.UndoSystem
                 SetCellStyle(element, i);
             }
 
-            void BindCellExpired(VisualElement element, int i)
+            void BindCellIsAvailable(VisualElement element, int i)
             {
                 var list = (List<IUndoRecord>)_multiColumnListView.itemsSource;
                 var toggle = element.Q<Toggle>();
-                toggle.value = list[i].IsExpired;
+                toggle.value = list[i].IsAvailable;
                 toggle.style.justifyContent = Justify.Center;
                 SetCellStyle(toggle, i);
             }

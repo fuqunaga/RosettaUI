@@ -96,7 +96,7 @@ namespace RosettaUI.Undo
         
         private static bool TryPopAndRemoveExpiredRecords(Stack<IUndoRecord> stack, out IUndoRecord record)
         {
-            record = stack.FirstOrDefault(r => !r.IsExpired);
+            record = stack.FirstOrDefault(r => r.IsAvailable);
             
             // すべて期限切れの場合は何もしない
             if (record == null)
@@ -119,7 +119,7 @@ namespace RosettaUI.Undo
         {
             var removed = false;
 
-            while (stack.TryPeek(out var record) && record.IsExpired)
+            while (stack.TryPeek(out var record) && !record.IsAvailable)
             {
                 stack.Pop().Dispose();
                 removed = true;

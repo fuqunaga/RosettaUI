@@ -8,7 +8,7 @@ namespace RosettaUI.Undo
     /// - Dispose可能（UndoHistoryから削除されたときにDisposeされる）
     /// - マージ可能（UndoHistory上最新のIUndoRecordとCanMargeなら一つにまとめる。同じElementへの連続した変更など）
     /// </summary>
-    public interface IUndoRecord : IDisposable
+    public interface IUndoRecord
     {
         string Name { get; }
         bool IsAvailable { get; }
@@ -18,5 +18,16 @@ namespace RosettaUI.Undo
         
         bool CanMerge(IUndoRecord newer);
         void Merge(IUndoRecord newer);
+    }
+    
+    public static class UndoRecordExtensions
+    {
+        public static void Dispose(this IUndoRecord record)
+        {
+            if (record is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+        }
     }
 }

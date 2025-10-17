@@ -8,9 +8,8 @@ namespace RosettaUI
     public abstract class FieldBaseElement<T> : ReadOnlyFieldElement<T>, IUndoRestoreElement
     {
         public FieldOption Option { get; }
-        
-        // ReSharper disable once MemberCanBeProtected.Global
-        public bool ShouldRecordUndo { get; set; } = true;
+
+        protected virtual bool ShouldRecordUndo => true;
         
         
         private readonly IBinder<T> _binder;

@@ -1,9 +1,6 @@
-﻿using RosettaUI.Utilities;
-
-namespace RosettaUI.Undo
+﻿namespace RosettaUI.Undo
 {
-    public abstract class UndoRecordElementBase<TUndoRecord, TElement> : ObjectPoolItem<TUndoRecord>, IUndoRecord
-        where TUndoRecord : UndoRecordElementBase<TUndoRecord, TElement>, new()
+    public abstract class UndoRecordElementBase<TElement> : IUndoRecord
         where TElement : Element
     {
         protected readonly ElementHierarchyPath hierarchyPath = new();
@@ -24,10 +21,9 @@ namespace RosettaUI.Undo
         {
         }
         
-        public override void Dispose()
+        public virtual void Dispose()
         {
             hierarchyPath.Clear();
-            base.Dispose();
         }
     }
 }

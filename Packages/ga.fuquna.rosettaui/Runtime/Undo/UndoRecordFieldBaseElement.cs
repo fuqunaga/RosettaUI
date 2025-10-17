@@ -2,13 +2,14 @@
 
 namespace RosettaUI.Undo
 {
-   public class UndoRecordFieldBaseElement<TValue> : UndoRecordElementBase<UndoRecordFieldBaseElement<TValue>, FieldBaseElement<TValue>>
+   public class UndoRecordFieldBaseElement<TValue> : UndoRecordElementBase<FieldBaseElement<TValue>>
     {
         public static void Record(FieldBaseElement<TValue> field, TValue before, TValue after)
         {
-            var record = GetPooled();
-            record.Initialize(field, before, after);
-            UndoHistory.Add(record);
+            using (UndoRecorder<UndoRecordFieldBaseElement<TValue>>.Get(out var record))
+            {
+                record.Initialize(field, before, after);
+            }
         }
         
         
@@ -19,7 +20,7 @@ namespace RosettaUI.Undo
         public override string Name => $"{(string)Element.Label} ({typeof(TValue).Name}: [{_before}] -> [{_after}])";
         
 
-        private void Initialize(FieldBaseElement<TValue> field, TValue before, TValue after)
+        public void Initialize(FieldBaseElement<TValue> field, TValue before, TValue after)
         {
             base.Initialize(field);
             _before = UndoHelper.Clone(before);

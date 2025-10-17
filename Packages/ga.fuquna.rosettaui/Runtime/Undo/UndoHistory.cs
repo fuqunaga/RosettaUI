@@ -1,18 +1,40 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace RosettaUI.Undo
 {
     public static class UndoHistory
     {
-        private static readonly Stack<IUndoRecord> UndoStack = new();
-        private static readonly Stack<IUndoRecord> RedoStack = new();
+        private readonly struct RecordHolder
+        {
+            public IUndoRecord Record { get; }
+            private readonly Action<IUndoRecord> _onDispose;
+
+            public bool IsValid => Record != null;
+
+            public RecordHolder(IUndoRecord record, Action<IUndoRecord> onDispose)
+            {
+                Record = record;
+                _onDispose = onDispose;
+            }
+
+            public void Dispose()
+            {
+                Record.Dispose();
+                _onDispose?.Invoke(Record);
+            }
+        }
+            
+        
+        private static readonly Stack<RecordHolder> UndoStack = new();
+        private static readonly Stack<RecordHolder> RedoStack = new();
 
         private static bool _isProcessing;
         private static bool _canTryMargeNextRecord = true;
         
-        public static IEnumerable<IUndoRecord> UndoRecords => UndoStack;
-        public static IEnumerable<IUndoRecord> RedoRecords => RedoStack;
+        public static IEnumerable<IUndoRecord> UndoRecords => UndoStack.Select(holder => holder.Record);
+        public static IEnumerable<IUndoRecord> RedoRecords => RedoStack.Select(holder => holder.Record);
         
         public static bool CanUndo => UndoStack.Count > 0;
         public static bool CanRedo => RedoStack.Count > 0;
@@ -23,13 +45,15 @@ namespace RosettaUI.Undo
         /// <summary>
         /// UndoStackにrecordを追加する。
         /// </summary>
-        public static bool Add(IUndoRecord record, bool disposeRecordIfNotStacked = true)
+        public static void Add(IUndoRecord record, Action<IUndoRecord> onDispose = null, bool disposeRecordIfNotStacked = true)
         {
-            if (record == null) return false;
+            if (record == null) return;
+            
+            var holder = new RecordHolder(record, onDispose);
             if (_isProcessing)
             {
-                if (disposeRecordIfNotStacked) record.Dispose();
-                return false;
+                if (disposeRecordIfNotStacked) holder.Dispose();
+                return;
             }
             
 
@@ -41,20 +65,19 @@ namespace RosettaUI.Undo
             //   - 同じElementでも一度フォーカスが外れたらマージしないようにしたいので外部から_canTryMargeNextRecordで制御できるようにする
             if (RedoStack.Count <= 0
                 && _canTryMargeNextRecord
-                && UndoStack.TryPeek(out var previousRecord)
-                && previousRecord.CanMerge(record))
+                && UndoStack.TryPeek(out var previous)
+                && previous.Record.CanMerge(record))
             {
-                previousRecord.Merge(record);
+                previous.Record.Merge(record);
                 if (disposeRecordIfNotStacked) record.Dispose();
             }
             else
             {
-                UndoStack.Push(record);
+                UndoStack.Push(holder);
                 _canTryMargeNextRecord = true;
             }
 
             ClearStack(RedoStack);
-            return true;
         }
         
         public static void Clear()
@@ -70,56 +93,48 @@ namespace RosettaUI.Undo
 
         public static bool Undo()
         {
-            if (!TryPopAndRemoveExpiredRecords(UndoStack, out var record)) return false;
+            if (!TryPopAndRemoveUnavailableRecords(UndoStack, out var holder)) return false;
             
             _isProcessing = true;
-            record.Undo();
+            holder.Record.Undo();
             _isProcessing = false;
             
-            RedoStack.Push(record);
+            RedoStack.Push(holder);
 
             return true;
         }
         
         public static bool Redo()
         {
-            if (!TryPopAndRemoveExpiredRecords(RedoStack, out var record)) return false;
+            if (!TryPopAndRemoveUnavailableRecords(RedoStack, out var holder)) return false;
             
             _isProcessing = true;
-            record.Redo();
+            holder.Record.Redo();
             _isProcessing = false;
 
-            UndoStack.Push(record);
+            UndoStack.Push(holder);
 
             return true;
         }
         
-        private static bool TryPopAndRemoveExpiredRecords(Stack<IUndoRecord> stack, out IUndoRecord record)
+        private static bool TryPopAndRemoveUnavailableRecords(Stack<RecordHolder> stack, out RecordHolder holder)
         {
-            record = stack.FirstOrDefault(r => r.IsAvailable);
-            
-            // すべて期限切れの場合は何もしない
-            if (record == null)
+            RemoveTopUnavailableRecords(stack);
+
+            if (stack.TryPop(out holder))
             {
-                return false;
-            }
-            
-            // 期限切れでないレコードがある場合はそこまでものを削除してからPop
-            var currentRecord = stack.Pop();
-            while (record != currentRecord)
-            {
-                currentRecord.Dispose();
-                currentRecord = stack.Pop();
+                return true;
             }
 
-            return true;
+            holder = default;
+            return false;
         }
         
-        private static bool RemoveTopUnavailableRecords(Stack<IUndoRecord> stack)
+        private static bool RemoveTopUnavailableRecords(Stack<RecordHolder> stack)
         {
             var removed = false;
 
-            while (stack.TryPeek(out var record) && !record.IsAvailable)
+            while (stack.TryPeek(out var holder) && !holder.Record.IsAvailable)
             {
                 stack.Pop().Dispose();
                 removed = true;
@@ -128,7 +143,7 @@ namespace RosettaUI.Undo
             return removed;
         }
 
-        private static void ClearStack(Stack<IUndoRecord> stack)
+        private static void ClearStack(Stack<RecordHolder> stack)
         {
             while (stack.TryPop(out var record))
             {

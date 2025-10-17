@@ -1,14 +1,15 @@
 ﻿namespace RosettaUI.Undo
 {
-    public class UndoRecordListItemMove : UndoRecordElementBase<UndoRecordListItemMove, ListViewItemContainerElement>
+    public class UndoRecordListItemMove : UndoRecordElementBase<ListViewItemContainerElement>
     {
         public static void Record(ListViewItemContainerElement listElement, int fromIndex, int toIndex)
         {
             if (!UndoHistory.CanAdd) return;
             
-            var record = GetPooled();
-            record.Initialize(listElement, fromIndex, toIndex);
-            UndoHistory.Add(record);
+            using (UndoRecorder<UndoRecordListItemMove>.Get(out var record))
+            {
+                record.Initialize(listElement, fromIndex, toIndex);
+            }
         }
         
         

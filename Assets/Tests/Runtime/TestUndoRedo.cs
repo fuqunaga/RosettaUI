@@ -22,6 +22,9 @@ namespace RosettaUI.Test
         public string stringValue = "Hello";
         public MyEnum enumValue;
         public Vector2 vector2Value;
+        public Color colorValue = Color.white;
+        public Gradient gradientValue = new();
+        public AnimationCurve animationCurveValue = new();
         
         private SimpleClass[] _classArray = {
             new() {stringValue = "Item 0", floatValue = 0f},
@@ -80,6 +83,11 @@ namespace RosettaUI.Test
             
             return _window = UI.Window(nameof(TestUndoRedo),
                 UI.Page(
+                    UI.Fold("Modal Editors.",
+                        UI.Field(() => colorValue),
+                        UI.Field(() => gradientValue),
+                        UI.Field(() => animationCurveValue)
+                    ).Open(),
                     UI.Fold("Change values, then Undo/Redo with Ctrl+Z / Ctrl+Y.",
                         UI.Field(() => floatValue),
                         UI.Field(() => stringValue),

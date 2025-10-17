@@ -34,8 +34,7 @@ namespace RosettaUI.UIToolkit
             inputField.SetColor(color);
         }
 
-
-        // ReSharper disable once MemberCanBeProtected.Global
+        
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         public class ColorInput : VisualElement

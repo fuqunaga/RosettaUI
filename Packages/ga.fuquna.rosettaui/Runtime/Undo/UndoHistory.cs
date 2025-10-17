@@ -33,7 +33,7 @@ namespace RosettaUI.Undo
             }
             
 
-            RemoveTopExpiredRecords(UndoStack);
+            RemoveTopUnavailableRecords(UndoStack);
             
             // マージ可能条件
             // - RedoStackが空
@@ -115,7 +115,7 @@ namespace RosettaUI.Undo
             return true;
         }
         
-        private static bool RemoveTopExpiredRecords(Stack<IUndoRecord> stack)
+        private static bool RemoveTopUnavailableRecords(Stack<IUndoRecord> stack)
         {
             var removed = false;
 

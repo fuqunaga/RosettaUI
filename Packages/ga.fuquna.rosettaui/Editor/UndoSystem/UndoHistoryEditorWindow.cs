@@ -9,6 +9,8 @@ namespace RosettaUI.Editor.UndoSystem
 {
     public class UndoHistoryEditorWindow : EditorWindow
     {
+        private const string TitlePrefix = "Undo History";
+        
         [UnityEditor.MenuItem("Window/RosettaUI/Undo History")]
         public static void Open()
         {
@@ -93,6 +95,7 @@ namespace RosettaUI.Editor.UndoSystem
 
         private void OnEditorUpdate()
         {
+            titleContent.text = $"{TitlePrefix}: {UndoHistory.HistoryStackNames.FirstOrDefault()}";
             var list = UndoHistory.RedoRecords.Reverse().Concat(UndoHistory.UndoRecords).ToList();
             _multiColumnListView.itemsSource = list;
         }

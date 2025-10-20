@@ -1,4 +1,5 @@
 ﻿using System;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UIElements;
@@ -52,11 +53,13 @@ namespace RosettaUI.UIToolkit
         protected void Show(Vector2 position, VisualElement target, Action<TValue> onValueChanged, Action<bool> onHide = null)
         {
             onEditorValueChanged += onValueChanged;
-            window.onHide += onHide;
+            
+            UndoHistory.PushHistoryStack(nameof(ModalEditor<TValue>));
+            window.onHide += OnHide;
             
             window.RegisterCallbackOnce<DetachFromPanelEvent>(_ =>
             {
-                window.onHide -= onHide;
+                window.onHide -= OnHide;
                 onEditorValueChanged -= onValueChanged;
                 target?.Focus();
             });
@@ -68,6 +71,15 @@ namespace RosettaUI.UIToolkit
             {
                 VisualElementExtensions.ClampPositionToScreen(position, window);
             });
+
+            return;
+            
+            void OnHide(bool isCancelled)
+            {
+                // onHideでModalEditorの結果をUndoに残すケースを考慮してonHideの前にPopする
+                UndoHistory.PopHistoryStack();
+                onHide?.Invoke(isCancelled);
+            }
         }
 
         protected virtual void NotifyEditorValueChanged()

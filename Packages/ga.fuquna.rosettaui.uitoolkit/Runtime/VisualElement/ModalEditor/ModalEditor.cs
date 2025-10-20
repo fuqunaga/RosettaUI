@@ -27,7 +27,7 @@ namespace RosettaUI.UIToolkit
             }
             
             window.SetSize(size);
-            window.onHide += () => PersistentData.Set(persistentSizeKey, window.GetSize());
+            window.onHide += (_) => PersistentData.Set(persistentSizeKey, window.GetSize());
         }
         
         protected ModalEditor(string visualTreeAssetPath = "", bool resizable = false)
@@ -46,18 +46,17 @@ namespace RosettaUI.UIToolkit
             }
 
             window = new ModalWindow(resizable);
+            window.Add(this);
         }
 
-        protected void Show(Vector2 position, VisualElement target, Action<TValue> onValueChanged, Action onCancel = null)
+        protected void Show(Vector2 position, VisualElement target, Action<TValue> onValueChanged, Action<bool> onHide = null)
         {
             onEditorValueChanged += onValueChanged;
+            window.onHide += onHide;
             
-            window.Add(this);
-
-            window.onCancel += onCancel;
             window.RegisterCallbackOnce<DetachFromPanelEvent>(_ =>
             {
-                window.onCancel -= onCancel;
+                window.onHide -= onHide;
                 onEditorValueChanged -= onValueChanged;
                 target?.Focus();
             });

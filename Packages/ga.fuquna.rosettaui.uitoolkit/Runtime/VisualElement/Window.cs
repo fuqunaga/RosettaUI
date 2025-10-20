@@ -42,8 +42,12 @@ namespace RosettaUI.UIToolkit
         public readonly bool resizable;
 
         public event Action onShow;
-        public event Action onHide;
-        public event Action onCancel;
+        
+        /// <summary>
+        /// Called when the window is hidden (for example, by pressing the close button or the Escape key).
+        /// The argument is true if the window was cancelled by the Escape key, or false if it was closed by the close button.
+        /// </summary>
+        public event Action<bool> onHide;
 
         protected VisualElement dragRoot;
 
@@ -325,8 +329,7 @@ namespace RosettaUI.UIToolkit
 
         protected virtual void OnNavigationCancel(NavigationCancelEvent evt)
         {
-            onCancel?.Invoke();
-            Hide();
+            Hide(isCancelled: true);
         }
 
         // Focusは短時間で複数回変わるケースがあるので様子を見る
@@ -553,11 +556,13 @@ namespace RosettaUI.UIToolkit
             onShow?.Invoke();
         }
 
-        public virtual void Hide()
+        public virtual void Hide() => Hide(false);
+        
+        public virtual void Hide(bool isCancelled)
         {
             style.display = DisplayStyle.None;
             FinishDrag();
-            onHide?.Invoke();
+            onHide?.Invoke(isCancelled);
         }
 
         public virtual void Show(VisualElement target)

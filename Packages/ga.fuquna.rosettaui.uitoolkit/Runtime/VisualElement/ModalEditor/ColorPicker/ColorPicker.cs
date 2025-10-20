@@ -27,14 +27,14 @@ namespace RosettaUI.UIToolkit
         }
         
         public static void Show(Vector2 position, VisualElement target, Color initialColor,
-            Action<Color> onColorChanged, bool enableAlpha = true)
+            Action<Color> onColorChanged, Action<bool> onHide, bool enableAlpha = true)
         {
             _instance ??= new ColorPicker();
   
             _instance.CopiedValue = initialColor;
             _instance.EnableAlpha = enableAlpha;
 
-            _instance.Show(position, target, onColorChanged, () => onColorChanged?.Invoke(initialColor));
+            _instance.Show(position, target, onColorChanged, onHide);
         }
         
         #endregion

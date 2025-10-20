@@ -25,7 +25,22 @@ namespace RosettaUI.UIToolkit
 
         protected override void ShowEditor(Vector3 position)
         {
-            ColorPicker.Show(position, this, value, color => value = color, EnableAlpha);
+            var initialValue = value;
+            ColorPicker.Show(position, this, initialValue,
+                onColorChanged: color => value = color,
+                onHide: OnHide,
+                enableAlpha: EnableAlpha
+            );
+
+            return;
+
+            void OnHide(bool isCancelled)
+            {
+                if (isCancelled)
+                {
+                    value = initialValue;
+                }
+            }
         }
 
         public override void SetValueWithoutNotify(Color color)

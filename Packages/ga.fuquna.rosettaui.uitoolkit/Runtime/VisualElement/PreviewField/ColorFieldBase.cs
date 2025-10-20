@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using RosettaUI.UIToolkit.UndoSystem;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -27,6 +28,7 @@ namespace RosettaUI.UIToolkit
         protected override void ShowEditor(Vector3 position)
         {
             var initialValue = value;
+            
             ColorPicker.Show(position, this, initialValue,
                 onColorChanged: color => value = color,
                 onHide: OnHide,

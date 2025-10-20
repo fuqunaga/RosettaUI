@@ -66,12 +66,15 @@ namespace RosettaUI.UndoSystem
         public static void PushHistoryStack(string name)
         {
             Assert.IsFalse(_isProcessing, "Cannot push history stack during undo/redo processing");
+            FixLastUndoRecord();
+            
             HistoryStacks.Push((name, new Stack<RecordHolder>(), new Stack<RecordHolder>()));
         }
         
         public static void PopHistoryStack()
         {
             Assert.IsFalse(_isProcessing, "Cannot pop history stack during undo/redo processing");
+            FixLastUndoRecord();
             
             if (HistoryStacks.Count <= 1)
             {

@@ -98,17 +98,16 @@ namespace RosettaUI.UIToolkit
             }
             private set
             {
-                if (Color != value)
-                {
-                    Color.RGBToHSV(value, out var h, out var s, out var v);
-                    var oldHsv = Hsv;
-                    _hsv = new Vector3(h, s, v);
-                    _alpha = value.a;
+                if (Color == value) return;
+                
+                Color.RGBToHSV(value, out var h, out var s, out var v);
+                var oldHsv = Hsv;
+                _hsv = new Vector3(h, s, v);
+                _alpha = value.a;
 
-                    OnHsvChanged(_hsv, oldHsv);
-                    OnAlphaChanged();
-                    OnColorChanged();
-                }
+                OnHsvChanged(_hsv, oldHsv);
+                OnAlphaChanged();
+                OnColorChanged();
             }
         }
 
@@ -150,7 +149,7 @@ namespace RosettaUI.UIToolkit
             _sliderSet = new SliderSet(this);
             InitHex();
 
-            _swatchSet= new ColorPickerSwatchSet(color => Color = color);
+            _swatchSet= new ColorPickerSwatchSet(SetColorUndoable);
             Add(_swatchSet);
         }
 
@@ -162,7 +161,7 @@ namespace RosettaUI.UIToolkit
 
            
             Checkerboard.SetupAsCheckerboard(checkerboard, CheckerboardTheme.Light);
-            _previewPrev.RegisterCallback<PointerDownEvent>((_) => Color = PrevColor);
+            _previewPrev.RegisterCallback<PointerDownEvent>((_) => SetColorUndoable(PrevColor));
         }
 
         private void InitHsvHandlers()
@@ -212,7 +211,7 @@ namespace RosettaUI.UIToolkit
                 {
                     Color col = col32;
                     col.a = Alpha;
-                    Color = col;
+                    SetColorUndoable(col);
                 }
             });
 
@@ -253,7 +252,7 @@ namespace RosettaUI.UIToolkit
 
             var hsv = Hsv;
             hsv.x = LocalPosToHue(localPos);
-            Hsv = hsv;
+            SetHsvUndoable(hsv);
         }
 
         private bool OnDragStartSV(PointerDownEvent evt)
@@ -299,7 +298,8 @@ namespace RosettaUI.UIToolkit
             var hsv = Hsv;
             hsv.y = Mathf.Clamp01(sv.x);
             hsv.z = Mathf.Clamp01(1f - sv.y);　// 数値表示が枠に収まるように端数を丸める
-            Hsv = hsv; 
+            
+            SetHsvUndoable(hsv);
         }
 
         [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
@@ -322,8 +322,6 @@ namespace RosettaUI.UIToolkit
             }
             
             _sliderSet.OnHsvChanged(hChanged, sChanged, vChanged);
-
-            Undo.RecordValueChange("ColorPicker HSV", oldValue, newValue, hsv => Hsv = hsv);
         }
 
         private void OnAlphaChanged()
@@ -403,6 +401,30 @@ namespace RosettaUI.UIToolkit
         private void UpdateHex()
         {
             _hex.SetValueWithoutNotify(ColorPickerHelper.ColorToHex(Color));
+        }
+
+
+        private void SetColorUndoable(Color newValue)
+        {
+            var oldValue = Color;
+            Color = newValue;
+            Undo.RecordValueChange("ColorPicker Color", oldValue, newValue, color => Color = color);
+        }
+
+        private void SetHsvUndoable(Vector3 newValue)
+        {
+            var oldValue = Hsv;
+            Hsv = newValue;
+            
+            Undo.RecordValueChange("ColorPicker HSV", oldValue, newValue, hsv => Hsv = hsv);
+        }
+        
+        private void SetAlphaUndoable(float newValue)
+        {
+            var oldValue = Alpha;
+            Alpha = newValue;
+            
+            Undo.RecordValueChange("ColorPicker Alpha", oldValue, newValue, alpha => Alpha = alpha);
         }
     }
 }

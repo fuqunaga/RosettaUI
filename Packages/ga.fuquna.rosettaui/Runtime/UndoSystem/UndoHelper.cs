@@ -1,7 +1,7 @@
 ﻿using RosettaUI.Builder;
 using UnityEngine;
 
-namespace RosettaUI.Undo
+namespace RosettaUI.UndoSystem
 {
     public static class UndoHelper
     {

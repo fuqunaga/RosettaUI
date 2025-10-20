@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RosettaUI.Undo
+namespace RosettaUI.UndoSystem
 {
     /// <summary>
     /// UndoHistoryで管理されるUndoの記録

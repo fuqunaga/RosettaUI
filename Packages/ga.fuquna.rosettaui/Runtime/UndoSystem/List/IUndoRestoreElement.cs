@@ -1,4 +1,4 @@
-﻿namespace RosettaUI.Undo
+﻿namespace RosettaUI.UndoSystem
 {
     /// <summary>
     /// 削除されたあとUndoで復元可能なElementに実装するインターフェース

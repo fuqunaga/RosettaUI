@@ -1,4 +1,4 @@
-﻿using RosettaUI.Undo;
+﻿using RosettaUI.UndoSystem;
 
 namespace RosettaUI
 {
@@ -45,7 +45,7 @@ namespace RosettaUI
                 if (Element.ShouldRecordUndo)
                 {
                     var before = Element.Value;
-                    UndoRecordFieldBaseElement<T>.Record(Element, before, value);
+                    Undo.RecordFieldBaseElement(Element, before, value);
                 }
                 
                 Element._binder?.Set(value);

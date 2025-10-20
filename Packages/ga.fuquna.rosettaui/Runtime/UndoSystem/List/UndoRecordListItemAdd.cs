@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine.Pool;
 
-namespace RosettaUI.Undo
+namespace RosettaUI.UndoSystem
 {
     /// <summary>
     /// ListViewのアイテム追加を元に戻すためのUndoRecord
@@ -10,27 +10,9 @@ namespace RosettaUI.Undo
     /// </summary>
     public class UndoRecordListItemAdd : UndoRecordListItemRestoreBase<UndoRecordListItemAdd>
     {
-        public static void Record(ListViewItemContainerElement listElement, int index)
-        {
-            using var _ = ListPool<int>.Get(out var indices);
-            indices.Add(index);
-            Record(listElement, indices);
-        }
-        
-        public static void Record(ListViewItemContainerElement listElement, IEnumerable<int> indices)
-        {
-            if (!UndoHistory.CanAdd) return;
-    
-            using (UndoRecorder<UndoRecordListItemAdd>.Get(out var record))
-            {
-                record.Initialize(listElement, indices);
-            }
-        }
-        
-        
         public override string Name => $"List Item Add index:({string.Join(", ", records.Select(r => r.index))})";
         
-        private void Initialize(ListViewItemContainerElement listElement, IEnumerable<int> indices)
+        public void Initialize(ListViewItemContainerElement listElement, IEnumerable<int> indices)
         {
             base.Initialize(listElement);
 
@@ -56,6 +38,27 @@ namespace RosettaUI.Undo
         public override void Redo()
         {
             Element.GetListEditor().ApplyRestoreRecords(records);
+        }
+    }
+    
+    
+    public static partial class Undo
+    {
+        public static void RecordListItemAdd(ListViewItemContainerElement listElement, int index)
+        {
+            using var _ = ListPool<int>.Get(out var indices);
+            indices.Add(index);
+            RecordListItemAdd(listElement, indices);
+        }
+        
+        public static void RecordListItemAdd(ListViewItemContainerElement listElement, IEnumerable<int> indices)
+        {
+            if (!UndoHistory.CanAdd) return;
+    
+            using (UndoRecorder<UndoRecordListItemAdd>.Get(out var record))
+            {
+                record.Initialize(listElement, indices);
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using RosettaUI.Builder;
-using RosettaUI.Undo;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -322,11 +322,8 @@ namespace RosettaUI.UIToolkit
             }
             
             _sliderSet.OnHsvChanged(hChanged, sChanged, vChanged);
-            
-            using(UndoRecorder<UndoRecordValueChange<Vector3>>.Get(out var record))
-            {
-                record.Initialize("ColorPicker HSV", oldValue, newValue, hsv => Hsv = hsv);
-            }
+
+            Undo.RecordValueChange("ColorPicker HSV", oldValue, newValue, hsv => Hsv = hsv);
         }
 
         private void OnAlphaChanged()

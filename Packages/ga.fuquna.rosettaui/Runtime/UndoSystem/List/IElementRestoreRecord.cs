@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RosettaUI.Undo
+namespace RosettaUI.UndoSystem
 {
     public interface IElementRestoreRecord : IDisposable
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace RosettaUI.Undo
+namespace RosettaUI.UndoSystem
 {
     /// <summary>
     /// ListViewのアイテム削除を元に戻すためのUndoRecord

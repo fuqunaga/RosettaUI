@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RosettaUI.Undo
+namespace RosettaUI.UndoSystem
 {
     /// <summary>
     /// 汎用的な値の変更を記録するUndoRecord
@@ -66,6 +66,18 @@ namespace RosettaUI.Undo
             IsAvailableFunc = null;
             CanMargeFunc = null;
             MergeAction = null;
+        }
+    }
+    
+    
+    public static partial class Undo
+    {
+        public static void RecordValueChange<TValue>(string label, TValue before, TValue after, Action<TValue> applyValue)
+        {
+            using (UndoRecorder<UndoRecordValueChange<TValue>>.Get(out var record))
+            {
+                record.Initialize(label, before, after, applyValue);
+            }
         }
     }
 }

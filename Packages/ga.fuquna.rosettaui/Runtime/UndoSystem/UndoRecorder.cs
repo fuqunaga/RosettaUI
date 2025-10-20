@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine.Pool;
 
-namespace RosettaUI.Undo
+namespace RosettaUI.UndoSystem
 {
     /// <summary>
     /// UndoRecordをプーリングして管理するための構造体

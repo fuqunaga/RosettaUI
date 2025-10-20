@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using RosettaUI.UIToolkit.UndoSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -39,6 +40,10 @@ namespace RosettaUI.UIToolkit
                 if (isCancelled)
                 {
                     value = initialValue;
+                }
+                else if (initialValue != value)
+                {
+                    UndoUIToolkit.RecordBaseField(this, initialValue, value);
                 }
             }
         }

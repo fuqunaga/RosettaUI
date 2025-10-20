@@ -1,4 +1,4 @@
-﻿namespace RosettaUI.Undo
+﻿namespace RosettaUI.UndoSystem
 {
     /// <summary>
     /// 値の変更を記録するUndoRecord向けのユーティリティクラス

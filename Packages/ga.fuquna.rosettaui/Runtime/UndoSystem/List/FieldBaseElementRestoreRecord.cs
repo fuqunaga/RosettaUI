@@ -1,7 +1,7 @@
 ﻿using System;
 using RosettaUI.Utilities;
 
-namespace RosettaUI.Undo
+namespace RosettaUI.UndoSystem
 {
     /// <summary>
     /// FieldBaseElementのValueを記録し復元するUndo機能向けのレコード

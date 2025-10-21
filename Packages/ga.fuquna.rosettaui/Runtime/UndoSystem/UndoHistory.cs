@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Assertions;
 
-namespace RosettaUI.Undo
+namespace RosettaUI.UndoSystem
 {
     public static class UndoHistory
     {
+        /// <summary>
+        /// IUndoRecordを保持し、Dispose時に指定のActionを呼び出す
+        /// IUndoRecordにObjectPoolの仕組みは入れたくないが実質ObjectPoolを利用したい
+        /// UndoRecorderと連携してObjectPool管理するためのもの
+        /// </summary>
         private readonly struct RecordHolder
         {
             public IUndoRecord Record { get; }
@@ -25,14 +31,18 @@ namespace RosettaUI.Undo
                 _onDispose?.Invoke(Record);
             }
         }
-            
-        
-        private static readonly Stack<RecordHolder> UndoStack = new();
-        private static readonly Stack<RecordHolder> RedoStack = new();
 
+        /// <summary>
+        /// Undo/Redo用のスタック自体をスタックする
+        /// 主にModalEditorで一時的にUndo/Redo履歴過去と切り離して管理する場合に利用する 
+        /// </summary>
+        private static readonly Stack<(string name, Stack<RecordHolder> undoStack, Stack<RecordHolder> redoStack)> HistoryStacks = new();
+        
         private static bool _isProcessing;
         private static bool _canTryMargeNextRecord = true;
-        
+
+
+        public static IEnumerable<string> HistoryStackNames => HistoryStacks.Select(stack => stack.name);
         public static IEnumerable<IUndoRecord> UndoRecords => UndoStack.Select(holder => holder.Record);
         public static IEnumerable<IUndoRecord> RedoRecords => RedoStack.Select(holder => holder.Record);
         
@@ -41,6 +51,41 @@ namespace RosettaUI.Undo
 
         // Undo/Redo処理中はAddできない
         public static bool CanAdd => !_isProcessing;
+
+        
+        private static Stack<RecordHolder> UndoStack => HistoryStacks.Peek().undoStack;
+        private static Stack<RecordHolder> RedoStack => HistoryStacks.Peek().redoStack;
+
+        
+        static UndoHistory()
+        {
+            // 最初の履歴スタックを作成
+            PushHistoryStack("Default");
+        }
+        
+        public static void PushHistoryStack(string name)
+        {
+            Assert.IsFalse(_isProcessing, "Cannot push history stack during undo/redo processing");
+            FixLastUndoRecord();
+            
+            HistoryStacks.Push((name, new Stack<RecordHolder>(), new Stack<RecordHolder>()));
+        }
+        
+        public static void PopHistoryStack()
+        {
+            Assert.IsFalse(_isProcessing, "Cannot pop history stack during undo/redo processing");
+            FixLastUndoRecord();
+            
+            if (HistoryStacks.Count <= 1)
+            {
+                return;
+            }
+            
+            var (_, undoStack, redoStack) = HistoryStacks.Pop();
+            ClearStack(undoStack);
+            ClearStack(redoStack);
+        }
+        
         
         /// <summary>
         /// UndoStackにrecordを追加する。

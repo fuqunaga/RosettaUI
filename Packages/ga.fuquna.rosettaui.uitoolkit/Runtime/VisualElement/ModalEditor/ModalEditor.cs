@@ -1,4 +1,5 @@
 ﻿using System;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UIElements;
@@ -27,7 +28,7 @@ namespace RosettaUI.UIToolkit
             }
             
             window.SetSize(size);
-            window.onHide += () => PersistentData.Set(persistentSizeKey, window.GetSize());
+            window.onHide += (_) => PersistentData.Set(persistentSizeKey, window.GetSize());
         }
         
         protected ModalEditor(string visualTreeAssetPath = "", bool resizable = false)
@@ -46,18 +47,19 @@ namespace RosettaUI.UIToolkit
             }
 
             window = new ModalWindow(resizable);
+            window.Add(this);
         }
 
-        protected void Show(Vector2 position, VisualElement target, Action<TValue> onValueChanged, Action onCancel = null)
+        protected void Show(Vector2 position, VisualElement target, Action<TValue> onValueChanged, Action<bool> onHide = null)
         {
             onEditorValueChanged += onValueChanged;
             
-            window.Add(this);
-
-            window.onCancel += onCancel;
+            UndoHistory.PushHistoryStack(nameof(ModalEditor<TValue>));
+            window.onHide += OnHide;
+            
             window.RegisterCallbackOnce<DetachFromPanelEvent>(_ =>
             {
-                window.onCancel -= onCancel;
+                window.onHide -= OnHide;
                 onEditorValueChanged -= onValueChanged;
                 target?.Focus();
             });
@@ -69,6 +71,15 @@ namespace RosettaUI.UIToolkit
             {
                 VisualElementExtensions.ClampPositionToScreen(position, window);
             });
+
+            return;
+            
+            void OnHide(bool isCancelled)
+            {
+                // onHideでModalEditorの結果をUndoに残すケースを考慮してonHideの前にPopする
+                UndoHistory.PopHistoryStack();
+                onHide?.Invoke(isCancelled);
+            }
         }
 
         protected virtual void NotifyEditorValueChanged()

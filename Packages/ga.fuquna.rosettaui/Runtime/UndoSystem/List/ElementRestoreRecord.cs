@@ -2,7 +2,7 @@
 using System.Linq;
 using RosettaUI.Utilities;
 
-namespace RosettaUI.Undo
+namespace RosettaUI.UndoSystem
 {
     /// <summary>
     /// Elementの状態を保存、復元する

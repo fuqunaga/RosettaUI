@@ -1,4 +1,4 @@
-﻿using RosettaUI.Undo;
+﻿using RosettaUI.UndoSystem;
 
 namespace RosettaUI
 {
@@ -8,9 +8,8 @@ namespace RosettaUI
     public abstract class FieldBaseElement<T> : ReadOnlyFieldElement<T>, IUndoRestoreElement
     {
         public FieldOption Option { get; }
-        
-        // ReSharper disable once MemberCanBeProtected.Global
-        public bool ShouldRecordUndo { get; set; } = true;
+
+        protected virtual bool ShouldRecordUndo => true;
         
         
         private readonly IBinder<T> _binder;
@@ -46,7 +45,7 @@ namespace RosettaUI
                 if (Element.ShouldRecordUndo)
                 {
                     var before = Element.Value;
-                    UndoRecordFieldBaseElement<T>.Record(Element, before, value);
+                    Undo.RecordFieldBaseElement(Element, before, value);
                 }
                 
                 Element._binder?.Set(value);

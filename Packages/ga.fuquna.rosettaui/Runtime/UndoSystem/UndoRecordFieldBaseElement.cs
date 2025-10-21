@@ -1,36 +1,23 @@
 ﻿using System;
 
-namespace RosettaUI.Undo
+namespace RosettaUI.UndoSystem
 {
    public class UndoRecordFieldBaseElement<TValue> : UndoRecordElementBase<FieldBaseElement<TValue>>
     {
-        public static void Record(FieldBaseElement<TValue> field, TValue before, TValue after)
-        {
-            using (UndoRecorder<UndoRecordFieldBaseElement<TValue>>.Get(out var record))
-            {
-                record.Initialize(field, before, after);
-            }
-        }
+        private readonly ValueChangeRecord<TValue> _valueChangeRecord = new();
         
-        
-        private TValue _before;
-        private TValue _after;
-        
-        
-        public override string Name => $"{(string)Element.Label} ({typeof(TValue).Name}: [{_before}] -> [{_after}])";
+        public override string Name => $"{(string)Element.Label} ({typeof(TValue).Name}: {_valueChangeRecord})";
         
 
         public void Initialize(FieldBaseElement<TValue> field, TValue before, TValue after)
         {
             base.Initialize(field);
-            _before = UndoHelper.Clone(before);
-            _after = UndoHelper.Clone(after);
+            _valueChangeRecord.Initialize(before, after);
         }
         
         public override void Dispose()
         {
-            _before = default;
-            _after = default;
+            _valueChangeRecord.Clear();
             base.Dispose();
         }
         
@@ -38,7 +25,7 @@ namespace RosettaUI.Undo
         {
             if (hierarchyPath.TryGetExistingElement(out var element) && element is FieldBaseElement<TValue> fieldElement)
             {
-                fieldElement.GetViewBridge().SetValueFromView(UndoHelper.Clone(_before));
+                fieldElement.GetViewBridge().SetValueFromView(_valueChangeRecord.Before);
             }
         }
 
@@ -46,7 +33,7 @@ namespace RosettaUI.Undo
         {
             if (hierarchyPath.TryGetExistingElement(out var element) && element is FieldBaseElement<TValue> fieldElement)
             {
-                fieldElement.GetViewBridge().SetValueFromView(UndoHelper.Clone(_after));
+                fieldElement.GetViewBridge().SetValueFromView(_valueChangeRecord.After);
             }
         }
 
@@ -64,7 +51,19 @@ namespace RosettaUI.Undo
                 throw new InvalidOperationException($"Cannot merge {GetType()} with {newer.GetType()}");
             }
 
-            _after = r._after;
+            _valueChangeRecord.AfterRaw = r._valueChangeRecord.AfterRaw;
+        }
+    }
+   
+   
+    public static partial class Undo
+    {
+        public static void RecordFieldBaseElement<TValue>(FieldBaseElement<TValue> field, TValue before, TValue after)
+        {
+            using (UndoRecorder<UndoRecordFieldBaseElement<TValue>>.Get(out var record))
+            {
+                record.Initialize(field, before, after);
+            }
         }
     }
 }

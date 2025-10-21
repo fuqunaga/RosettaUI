@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Swatch;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -143,7 +144,15 @@ namespace RosettaUI.UIToolkit
             
             if (IsSwatchDisplayLabel)
             {
-                newSwatch.StartRename(SaveSwatches);
+                newSwatch.StartRename(() =>
+                {
+                    SaveSwatches();
+                    RecordUndoAdd(newSwatch);
+                });
+            }
+            else
+            {
+                RecordUndoAdd(newSwatch);
             }
 
             evt.StopPropagation();
@@ -173,15 +182,23 @@ namespace RosettaUI.UIToolkit
 
             IEnumerable<IMenuItem> CreateMenuItems()
             {
-                yield return new MenuItem("Replace", () => ReplaceSwatchValueToCurrent(swatch));
-                yield return new MenuItem("Delete", () => DeleteSwatch(swatch));
+                yield return new MenuItem("Replace", () => ReplaceSwatchValueToCurrentUndoable(swatch));
+                yield return new MenuItem("Delete", () => DeleteSwatchUndoable(swatch));
                 if (Layout == TileLayout.List)
                 {
-                    yield return new MenuItem("Rename", () => swatch.StartRename(SaveSwatches));
+                    yield return new MenuItem("Rename", () =>
+                    {
+                        var oldName = swatch.Label;
+                        swatch.StartRename(() =>
+                        {
+                            SaveSwatches();
+                            RecordUndoNameChange(swatch, oldName);
+                        });
+                    });
                 }
                 
                 // "Move To First"が途中までしか表示されないのでスペースとダミー文字で文字数を増やす @Unity6000.0.2f1
-                yield return new MenuItem("Move To First", () => MoveToFirstSwatch(swatch));
+                yield return new MenuItem("Move To First", () => MoveToFirstSwatchUndoable(swatch));
             }
         }
         
@@ -199,6 +216,12 @@ namespace RosettaUI.UIToolkit
 
         private TSwatch AddSwatch(TValue swatchValue, string swatchName = null)
         {
+            var index = Mathf.Max(0, _tileScrollView.childCount - 1);
+            return InsertSwatch(index, swatchValue, swatchName);
+        }
+        
+        private TSwatch InsertSwatch(int index, TValue swatchValue, string swatchName = null)
+        {
             var swatch = new TSwatch()
             {
                 Label = swatchName,
@@ -208,9 +231,7 @@ namespace RosettaUI.UIToolkit
             swatch.RegisterCallback<PointerDownEvent>(OnSwatchPointerDown);
             swatch.EnableText = IsSwatchDisplayLabel;
             
-            // 最後はCurrentSwatchなので、その一つ前に追加
-            var prevLastIndex = Mathf.Max(0, _tileScrollView.childCount - 1);
-            _tileScrollView.Insert(prevLastIndex, swatch);
+            _tileScrollView.Insert(index, swatch);
 
             return swatch;
         }
@@ -221,18 +242,39 @@ namespace RosettaUI.UIToolkit
             SaveSwatches();
         }
 
-        private void ReplaceSwatchValueToCurrent(TSwatch swatch)
+        private void DeleteSwatchUndoable(TSwatch swatch)
         {
+            RecordUndoDelete(swatch);
+            DeleteSwatch(swatch);
+        }
+        
+
+        private void ReplaceSwatchValueToCurrentUndoable(TSwatch swatch)
+        {
+            var oldValue = swatch.Value;
             swatch.Value = _currentSwatch.Value;
             SaveSwatches();
+
+            RecordUndoValueChange(swatch, oldValue);
         }
 
-        private void MoveToFirstSwatch(TSwatch swatch)
+        private void MoveToFirstSwatchUndoable(TSwatch swatch)
         {
+            var oldIndex = _tileScrollView.IndexOf(swatch);
+            MoveSwatch(oldIndex, 0);
+            
+            RecordUndoMoveToFirst(oldIndex);
+        }
+        
+        private void MoveSwatch(int oldIndex, int newIndex)
+        {
+            var swatch = _tileScrollView.ElementAt(oldIndex);
             _tileScrollView.Remove(swatch);
-            _tileScrollView.Insert(0, swatch);
+            _tileScrollView.Insert(newIndex, swatch);
             SaveSwatches();
         }
+        
+        
         
         private void SaveSwatches()
         {
@@ -261,5 +303,82 @@ namespace RosettaUI.UIToolkit
                 AddSwatch(nameAndValue.value, nameAndValue.name);
             }
         }
+        
+        
+        #region Undo
+
+        private void RecordUndoValueChange(TSwatch swatch, TValue before)
+        {
+            var index = _tileScrollView.IndexOf(swatch);
+            var after = swatch.Value;
+            
+            Undo.RecordValueChange("Swatch Value Change", before, after, v =>
+            {
+                if (_tileScrollView.ElementAt(index) is not TSwatch s) return;
+                s.Value = v;
+                SaveSwatches();
+            });
+        }
+        
+        private void RecordUndoNameChange(TSwatch swatch, string before)
+        {
+            var index = _tileScrollView.IndexOf(swatch);
+            var after = swatch.Label;
+            
+            Undo.RecordValueChange("Swatch Name Change", before, after, v =>
+            {
+                if (_tileScrollView.ElementAt(index) is not TSwatch s) return;
+                s.Label = v;
+                SaveSwatches();
+            });
+        }
+        
+        private void RecordUndoAdd(TSwatch swatch)
+        {
+            Undo.RecordCommon("Swatch Add", (UndoHelper.Clone(swatch.Value), swatch.Label), 
+                undoAction: _ => DeleteSwatch(GetTargetSwatch()),
+                redoAction: data => 
+                {
+                    var (value, name) = data;
+                    AddSwatch(UndoHelper.Clone(value), name);
+                }
+            );
+            return;
+
+            TSwatch GetTargetSwatch()
+            {
+                // 最後はCurrentSwatchなので、追加されたものは一つ前のはず
+                var prevLastIndex = Mathf.Max(0, _tileScrollView.childCount - 2);
+                return _tileScrollView.ElementAt(prevLastIndex) as TSwatch;
+            }
+        }
+        
+        private void RecordUndoDelete(TSwatch swatch)
+        {
+            var index = _tileScrollView.IndexOf(swatch);
+            
+            Undo.RecordCommon("Swatch Delete", (index, UndoHelper.Clone(swatch.Value), swatch.Label), 
+                undoAction: data => 
+                {
+                    var (i, value, name) = data;
+                    InsertSwatch(i, UndoHelper.Clone(value), name);
+                },
+                redoAction: data =>
+                {
+                    var (i, _, _) = data;
+                    var s = _tileScrollView.ElementAt(i) as TSwatch;
+                    DeleteSwatch(s);
+                });
+        }
+        
+        private void RecordUndoMoveToFirst(int oldIndex)
+        {
+            Undo.RecordCommon("Swatch Move To First", oldIndex,
+                undoAction: i => MoveSwatch(0, i),
+                redoAction: i => MoveSwatch(i, 0)
+            );
+        }
+        
+        #endregion
     }
 }

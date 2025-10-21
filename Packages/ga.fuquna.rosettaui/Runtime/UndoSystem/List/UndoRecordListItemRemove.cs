@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace RosettaUI.Undo
+namespace RosettaUI.UndoSystem
 {
     /// <summary>
     /// ListViewのアイテム削除を元に戻すためのUndoRecord
@@ -11,20 +11,9 @@ namespace RosettaUI.Undo
     /// </summary>
     public class UndoRecordListItemRemove : UndoRecordListItemRestoreBase<UndoRecordListItemRemove>
     {
-        public static void Record(ListViewItemContainerElement listElement, IEnumerable<int> indices)
-        {
-            if (!UndoHistory.CanAdd) return;
-
-            using (UndoRecorder<UndoRecordListItemRemove>.Get(out var record))
-            {
-                record.Initialize(listElement, indices);
-            }
-        }
-        
-        
         public override string Name => $"List Item Remove index:({string.Join(", ", records.Select(r => r.index))})";
         
-        private void Initialize(ListViewItemContainerElement listElement, IEnumerable<int> indices)
+        public void Initialize(ListViewItemContainerElement listElement, IEnumerable<int> indices)
         {
             base.Initialize(listElement);
 
@@ -41,6 +30,20 @@ namespace RosettaUI.Undo
         public override void Redo()
         {
             Element.GetListEditor().RemoveItems(records.Select(r => r.index));
+        }
+    }
+    
+    
+    public static partial class Undo
+    {
+        public static void RecordListItemRemove(ListViewItemContainerElement listElement, IEnumerable<int> indices)
+        {
+            if (!UndoHistory.CanAdd) return;
+
+            using (UndoRecorder<UndoRecordListItemRemove>.Get(out var record))
+            {
+                record.Initialize(listElement, indices);
+            }
         }
     }
 }

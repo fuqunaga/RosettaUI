@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using RosettaUI.Undo;
+using RosettaUI.UndoSystem;
 using UnityEngine.Pool;
 
 namespace RosettaUI
@@ -51,7 +51,7 @@ namespace RosettaUI
                 ListBinder.DuplicateItem(Binder, index);
                 Element.OnItemIndexShiftPlus(index + 1);
                 
-                UndoRecordListItemAdd.Record(Element, index + 1);
+                Undo.RecordListItemAdd(Element, index + 1);
                 
                 NotifyListChanged();
             }
@@ -66,7 +66,7 @@ namespace RosettaUI
             [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
             public void RemoveItems(IEnumerable<int> indices)
             {
-                UndoRecordListItemRemove.Record(Element, indices);
+                Undo.RecordListItemRemove(Element, indices);
                 
                 foreach (var index in indices.OrderByDescending(i => i))
                 {
@@ -84,7 +84,7 @@ namespace RosettaUI
                 ListBinder.MoveItem(Binder, fromIndex, toIndex);
                 Element.OnMoveItemIndex(fromIndex, toIndex);
                 
-                UndoRecordListItemMove.Record(Element, fromIndex, toIndex);
+                Undo.RecordListItemMove(Element, fromIndex, toIndex);
                 
                 NotifyListChanged();
             }

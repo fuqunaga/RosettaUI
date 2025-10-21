@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using RosettaUI.Undo;
+using RosettaUI.UndoSystem;
 
 namespace RosettaUI
 {
@@ -26,21 +26,21 @@ namespace RosettaUI
 
             public void OnItemIndexChanged(int fromIndex, int toIndex)
             {
-                UndoRecordListItemMove.Record(Element, fromIndex, toIndex);
+                Undo.RecordListItemMove(Element, fromIndex, toIndex);
                 Element.OnMoveItemIndex(fromIndex, toIndex);
             }
 
             [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
             public void OnItemsAdded(IEnumerable<int> indices)
             {
-                UndoRecordListItemAdd.Record(Element, indices);
+                Undo.RecordListItemAdd(Element, indices);
                 Element.OnItemsAdded(indices);
             } 
 
             [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
             public void OnItemsRemoved(IEnumerable<int> indices)
             {
-                UndoRecordListItemRemove.Record(Element, indices);
+                Undo.RecordListItemRemove(Element, indices);
                 Element.OnItemsRemoved(indices);
             }
 

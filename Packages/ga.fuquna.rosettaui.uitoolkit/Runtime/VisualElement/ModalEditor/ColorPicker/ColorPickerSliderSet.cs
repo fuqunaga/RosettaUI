@@ -59,19 +59,19 @@ namespace RosettaUI.UIToolkit
             private Color Color
             {
                 get => _colorPicker.Color;
-                set => _colorPicker.Color = value;
+                set => _colorPicker.SetColorUndoable(value);
             }
 
             private float Alpha
             {
                 get => _colorPicker.Alpha;
-                set => _colorPicker.Alpha = value;
+                set => _colorPicker.SetAlphaUndoable(value);
             }
 
             private Vector3 Hsv
             {
                 get => _colorPicker.Hsv;
-                set => _colorPicker.Hsv = value;
+                set => _colorPicker.SetHsvUndoable(value);
             }
 
             public bool DisplayAlpha

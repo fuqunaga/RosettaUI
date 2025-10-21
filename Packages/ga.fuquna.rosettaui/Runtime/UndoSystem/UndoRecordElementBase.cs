@@ -1,4 +1,4 @@
-﻿namespace RosettaUI.Undo
+﻿namespace RosettaUI.UndoSystem
 {
     public abstract class UndoRecordElementBase<TElement> : IUndoRecord
         where TElement : Element

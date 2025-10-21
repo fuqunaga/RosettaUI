@@ -21,10 +21,10 @@ namespace RosettaUI.UIToolkit
         }
 
         public static void Show(Vector2 position, VisualElement target, Gradient initialGradient,
-            Action<Gradient> onGradientChanged)
+            Action<Gradient> onGradientChanged, Action<bool> onHide)
         {
             _instance ??= new GradientEditor();
-            _instance.Show(position, target, onGradientChanged);
+            _instance.Show(position, target, onGradientChanged, onHide);
             
             
             _instance.CopiedValue = initialGradient;

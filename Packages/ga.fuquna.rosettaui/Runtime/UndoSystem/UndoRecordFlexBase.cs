@@ -7,6 +7,9 @@ namespace RosettaUI.UndoSystem
     /// </summary>
     public abstract class UndoRecordFlexBase : IDisposable
     {
+        public event Action onDispose;
+        
+        
         public virtual bool IsAvailable => IsAvailableFunc?.Invoke() ?? true;
 
         public Func<bool> IsAvailableFunc { get; set; }
@@ -39,6 +42,8 @@ namespace RosettaUI.UndoSystem
 
         public virtual void Dispose()
         {
+            onDispose?.Invoke();
+            onDispose = null;
             IsAvailableFunc = null;
             CanMargeFunc = null;
             MergeAction = null;

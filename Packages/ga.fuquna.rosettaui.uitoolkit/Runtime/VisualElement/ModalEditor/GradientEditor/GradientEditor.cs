@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 using RosettaUI.Builder;
+using RosettaUI.UIToolkit.UndoSystem;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -21,10 +23,10 @@ namespace RosettaUI.UIToolkit
         }
 
         public static void Show(Vector2 position, VisualElement target, Gradient initialGradient,
-            Action<Gradient> onGradientChanged)
+            Action<Gradient> onGradientChanged, Action<bool> onHide)
         {
             _instance ??= new GradientEditor();
-            _instance.Show(position, target, onGradientChanged);
+            _instance.Show(position, target, onGradientChanged, onHide);
             
             
             _instance.CopiedValue = initialGradient;
@@ -57,6 +59,7 @@ namespace RosettaUI.UIToolkit
         private Button _pasteButton;
         private Label _infoLabel;
         
+        
         #region ModalEditor
 
         protected override Gradient CopiedValue
@@ -67,6 +70,7 @@ namespace RosettaUI.UIToolkit
 
         #endregion
 
+        
         // ReSharper disable once MemberCanBePrivate.Global
         public GradientEditor() : base(VisualTreeAssetName)
         {
@@ -75,6 +79,10 @@ namespace RosettaUI.UIToolkit
             InitUI();
         }
 
+        public Color Evaluate(float time)
+        {
+            return _gradient.Evaluate(time);
+        }
         
         private void InitUI()
         {
@@ -104,37 +112,41 @@ namespace RosettaUI.UIToolkit
             _alphaSlider = this.Q("alpha-slider") as Slider;
             _locationSlider = this.Q("location-slider") as Slider;
 
-            _modeEnum.RegisterValueChangedCallback(_ => UpdateGradient());
+            _modeEnum.RegisterValueChangedCallback(evt =>
+            {
+                UpdateGradient();
+                RecordUndoChangeEvent(_modeEnum, evt);
+            });
             
             _colorField.RegisterValueChangedCallback(evt =>
             {
                 if (_selectedSwatch == null) return;
-                
                 _selectedSwatch.Color = evt.newValue;
                 UpdateGradient();
+                
+                // Undoの登録はColorField内で行われるためここでは行わない
             });
             
             _alphaSlider.RegisterValueChangedCallback(evt =>
             {
                 if (_selectedSwatch == null) return;
-                
                 _selectedSwatch.Alpha = evt.newValue;
                 UpdateGradient();
+
+                RecordUndoChangeEvent(_alphaSlider, evt);
             });
 
-            _locationSlider.RegisterValueChangedCallback(_ =>
+            _locationSlider.RegisterValueChangedCallback(evt =>
             {
                 if (_selectedSwatch == null) return;
-
-                _selectedSwatch.TimePercent = _locationSlider.value;
+                _selectedSwatch.TimePercent = evt.newValue;
                 UpdateGradient();
+                
+                RecordUndoChangeEvent(_locationSlider, evt);
             });
 
-            _presetSet = new GradientEditorPresetSet(gradient =>
-            {
-                CopiedValue = gradient;
-                NotifyEditorValueChanged();
-            });
+            _presetSet = new GradientEditorPresetSet(ApplyPreset);
+            
             Add(_presetSet);
         }
 
@@ -155,14 +167,7 @@ namespace RosettaUI.UIToolkit
 
         private void UpdateAlphaKeysEditor()
         {
-            _alphaKeysEditor ??= new GradientKeysEditor(
-                _alphaCursorContainer,
-                OnAddSwatch,
-                OnRemoveSwatch,
-                OnSelectedSwatchChanged,
-                OnSwatchValueChanged,
-                isAlpha: true
-            );
+            _alphaKeysEditor ??= new GradientKeysEditor(this, _alphaCursorContainer, isAlpha: true);
 
             var swatches = _gradient.alphaKeys.Select(ak => new GradientKeysSwatch()
             {
@@ -170,19 +175,12 @@ namespace RosettaUI.UIToolkit
                 Alpha = ak.alpha
             });
 
-            _alphaKeysEditor.Initialize(_gradient, swatches);
+            _alphaKeysEditor.Initialize(swatches);
         }
 
         private void UpdateColorKeysEditor()
         {
-            _colorKeysEditor ??= new GradientKeysEditor(
-                _colorCursorContainer,
-                OnAddSwatch,
-                OnRemoveSwatch,
-                OnSelectedSwatchChanged,
-                OnSwatchValueChanged,
-                isAlpha: false
-            );
+            _colorKeysEditor ??= new GradientKeysEditor(this, _colorCursorContainer, isAlpha: false);
 
             var swatches = _gradient.colorKeys.Select(ak => new GradientKeysSwatch()
             {
@@ -190,7 +188,17 @@ namespace RosettaUI.UIToolkit
                 Color = ak.color
             });
 
-            _colorKeysEditor.Initialize(_gradient, swatches);
+            _colorKeysEditor.Initialize(swatches);
+        }
+        
+        private void ApplyPreset(Gradient gradient)
+        {
+            var before = RentAllKeysSnapshot();
+            
+            CopiedValue = gradient;
+            NotifyEditorValueChanged();
+
+            RecordUndoAllKeysSnapshot(before);
         }
 
         // GradientEditorのUIから値が変更されたとき
@@ -199,6 +207,18 @@ namespace RosettaUI.UIToolkit
             UpdateGradientPreview();
             _presetSet.SetValue(_gradient);
             NotifyEditorValueChanged();
+        }
+
+        public void OnGradientKeysChanged()
+        { ;
+            if (_selectedSwatch != null)
+            {
+                var keysEditor = _selectedSwatch.IsAlpha ? _alphaKeysEditor : _colorKeysEditor;
+                var isSelectedSwatchExist = keysEditor.ShowedSwatches.Any(s => s.UniqueId == _selectedSwatch.UniqueId);
+                UpdateSelectedSwatchField(isSelectedSwatchExist ? _selectedSwatch : null);
+            }
+
+            UpdateGradient();
         }
         
         private void UpdateGradient()
@@ -220,44 +240,29 @@ namespace RosettaUI.UIToolkit
             GradientVisualElementHelper.UpdatePreviewToBackgroundImage(_gradient, _gradientPreview);
         }
 
-        
-        private void OnAddSwatch(GradientKeysSwatch swatch)
-        {
-            UpdateGradient();
-        }
-        
-        private void OnRemoveSwatch(GradientKeysSwatch swatch)
-        {
-            UpdateGradient();
-        }
-        
-        private void OnSelectedSwatchChanged(GradientKeysSwatch selectedSwatch)
-        {
-            UpdateSelectedSwatchField(selectedSwatch);
-        }
-        private void OnSwatchValueChanged(GradientKeysSwatch selectedSwatch)
-        {
-            UpdateSelectedSwatchField(selectedSwatch);
-            UpdateGradient();
-        }
-
-        
-        private void UpdateSelectedSwatchField(GradientKeysSwatch swatch)
+        public void UpdateSelectedSwatchField(GradientKeysSwatch swatch)
         {
             if (swatch == null)
             {
                 _propertyGroup.visible = false;
                 _locationSlider.visible = false;
+                _selectedSwatch = null;
                 return;
             }
             
             _propertyGroup.visible = true;
-            
-            _selectedSwatch = swatch;
+
+            if (_selectedSwatch != swatch)
+            {
+                _selectedSwatch?.Blur();
+                _selectedSwatch = swatch;
+                _selectedSwatch.Focus();
+            }
+
             var isAlpha = swatch.IsAlpha;
             
-            SetDisplay(_alphaSlider, isAlpha);
-            SetDisplay(_colorField, !isAlpha);
+            _alphaSlider.SetShow(isAlpha);
+            _colorField.SetShow(!isAlpha);
             
             if (isAlpha)
             {
@@ -270,13 +275,76 @@ namespace RosettaUI.UIToolkit
 
             _locationSlider.visible = true;
             _locationSlider.SetValueWithoutNotify(swatch.TimePercent);
-
-            return;
-            
-            void SetDisplay(VisualElement element, bool display)
-            {
-                element.style.display = display ? DisplayStyle.Flex : DisplayStyle.None;
-            }
         }
+        
+        
+        #region Undo
+        
+        public int GetSelectedSwatchId()
+        {
+            return _selectedSwatch?.UniqueId ?? -1;
+        }
+        
+        public void SelectSwatchById(int swatchId)
+        {
+            var swatch = (_colorKeysEditor.ShowedSwatches
+                          .Concat(_alphaKeysEditor.ShowedSwatches))
+                         .FirstOrDefault(s => s.UniqueId == swatchId);
+            
+            UpdateSelectedSwatchField(swatch);
+        }
+        
+        private void RecordUndoChangeEvent<TValue>(BaseField<TValue> baseField, ChangeEvent<TValue> evt)
+        {
+            var selectedSwatchId = _selectedSwatch?.UniqueId ?? -1;
+            
+            Undo.RecordValueChange(nameof(GradientEditor), evt.previousValue, evt.newValue, value =>
+            {
+                var swatch = (_colorKeysEditor.ShowedSwatches
+                              .Concat(_alphaKeysEditor.ShowedSwatches))
+                             .FirstOrDefault(s => s.UniqueId == selectedSwatchId);
+                
+                if (swatch != null)
+                {
+                    UpdateSelectedSwatchField(swatch);
+                    baseField.value = value;
+                }
+            });
+        }
+        
+        private (GradientKeysEditor.Snapshot color, GradientKeysEditor.Snapshot alpha) RentAllKeysSnapshot()
+        {
+            var colorSnapshot = GradientKeysEditor.Snapshot.GetPooled();
+            var alphaSnapshot = GradientKeysEditor.Snapshot.GetPooled();
+            _colorKeysEditor.TakeSnapshot(colorSnapshot);
+            _alphaKeysEditor.TakeSnapshot(alphaSnapshot);
+            return (colorSnapshot, alphaSnapshot);
+        }
+        
+        
+        /// <summary>
+        /// ColorKeysとAlphaKeysの両方のUndoを記録する
+        /// </summary>
+        private void RecordUndoAllKeysSnapshot((GradientKeysEditor.Snapshot color, GradientKeysEditor.Snapshot alpha) before)
+        {
+            var after = RentAllKeysSnapshot();
+            
+            var record = Undo.RecordValueChange($"{nameof(GradientEditor)} Apply Preset", before, after, value =>
+            {
+                _colorKeysEditor.RestoreSnapshotWithoutNotify(value.color);
+                _alphaKeysEditor.RestoreSnapshotWithoutNotify(value.alpha);
+                OnGradientKeysChanged();
+            });
+            
+            record.onDispose += () =>
+            {
+                before.color.Dispose();
+                before.alpha.Dispose();
+                after.color.Dispose();
+                after.alpha.Dispose();
+            };
+        }
+        
+        #endregion
     }
 }

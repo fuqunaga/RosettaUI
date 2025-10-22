@@ -52,12 +52,12 @@ namespace RosettaUI.UndoSystem
     
     public static partial class Undo
     {
-        public static void RecordValueChange<TValue>(string label, TValue before, TValue after, Action<TValue> applyValue)
+        public static UndoRecordValueChange<TValue> RecordValueChange<TValue>(string label, TValue before, TValue after, Action<TValue> applyValue)
         {
-            using (UndoRecorder<UndoRecordValueChange<TValue>>.Get(out var record))
-            {
-                record.Initialize(label, before, after, applyValue);
-            }
+            using var _ = UndoRecorder<UndoRecordValueChange<TValue>>.Get(out var record);
+
+            record.Initialize(label, before, after, applyValue);
+            return record;
         }
     }
 }

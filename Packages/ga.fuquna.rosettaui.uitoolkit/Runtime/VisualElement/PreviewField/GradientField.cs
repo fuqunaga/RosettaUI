@@ -27,7 +27,7 @@ namespace RosettaUI.UIToolkit
                 {
                     if (!GradientHelper.EqualsWithoutAlloc(initialValue, rawValue))
                     {
-                        UndoUIToolkit.RecordBaseField(this, initialValue, rawValue);
+                        UndoUIToolkit.RecordBaseField(nameof(GradientField), this, initialValue, rawValue);
                     }
                 }
             );

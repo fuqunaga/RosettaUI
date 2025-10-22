@@ -10,16 +10,18 @@ namespace RosettaUI.UIToolkit.UndoSystem
     /// </summary>
     public static class UndoUIToolkit
     {
-        public static void RecordBaseField<TValue>(BaseField<TValue> field, TValue oldValue, TValue newValue)
+        public static void RecordBaseField<TValue>(string label, BaseField<TValue> field, TValue oldValue, TValue newValue)
         {
+            // 対応するFieldBaseElementがあればそちらでUndoを記録する
             var element = UIToolkitBuilder.Instance.GetElement(field);
-            if (element is not FieldBaseElement<TValue> fieldElement)
+            if (element is FieldBaseElement<TValue> fieldElement)
             {
-                Debug.LogWarning($"UndoBaseField.Record: element is not FieldBaseElement<{typeof(TValue)}>.");
+                Undo.RecordFieldBaseElement(fieldElement, oldValue, newValue);
                 return;
             }
 
-            Undo.RecordFieldBaseElement(fieldElement, oldValue, newValue);
+            // 無い場合は独自でUndoを記録する
+            Undo.RecordValueChange(label, oldValue, newValue, value => field.value = value);
         }
     }
 }

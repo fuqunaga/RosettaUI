@@ -45,7 +45,7 @@ namespace RosettaUI.UIToolkit
                 }
                 else if (initialValue != value)
                 {
-                    UndoUIToolkit.RecordBaseField(this, initialValue, value);
+                    UndoUIToolkit.RecordBaseField(nameof(ColorFieldBase), this, initialValue, value);
                 }
             }
         }

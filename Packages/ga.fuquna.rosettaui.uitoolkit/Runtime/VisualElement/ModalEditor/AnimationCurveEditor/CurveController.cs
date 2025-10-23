@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Builder;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UIElements;
@@ -13,7 +14,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// </summary>
     public class CurveController
     {
-        public event Action onCurveChanged;
+        public event Action<AnimationCurve> onCurveChanged;
         
         // Invoked when control point selection or addition/removal happens
         public event Action onControlPointSelectionChanged;
@@ -76,6 +77,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             var key = new Keyframe(keyFramePosition.x, keyFramePosition.y);
             
+            var beforeCurve = AnimationCurveHelper.Clone(Curve);
+            
             var index = Curve.AddKey(key);
             if (index < 0) return index;
             
@@ -94,7 +97,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 controlPoint.OutTangentMode = outTangentMode;
             }
             
-            OnCurveChanged();
+            OnCurveChanged(beforeCurve);
             
             return index;
         }
@@ -112,12 +115,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             using var _ = ListPool<ControlPoint>.Get(out var list);
             list.AddRange(ControlPoints.Where(cp => cp.IsActive));
             
+            var beforeCurve = AnimationCurveHelper.Clone(Curve);
+            
             foreach (var cp in list)
             {
                 DoRemoveControlPoint(cp);
             }
             
-            OnCurveChanged();
+            OnCurveChanged(beforeCurve);
         }
         
         private void DoRemoveControlPoint(ControlPoint controlPoint)
@@ -235,15 +240,19 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public void SetPreWrapMode(WrapMode mode)
         {
             if (Curve == null) return;
+            
+            var before = UndoHelper.Clone(Curve);
             Curve.preWrapMode = mode;
-            onCurveChanged?.Invoke();
+            onCurveChanged?.Invoke(before);
         }
         
         public void SetPostWrapMode(WrapMode mode)
         {
             if (Curve == null) return;
+            
+            var before = UndoHelper.Clone(Curve);
             Curve.postWrapMode = mode;
-            onCurveChanged?.Invoke();
+            onCurveChanged?.Invoke(before);
         }
         
         /// <summary>
@@ -256,6 +265,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             {
                 return;
             }
+            
+            var beforeCurve = AnimationCurveHelper.Clone(Curve);
             
             using var _ = ListPool<(ControlPoint controlPoint, Keyframe keyframe)>.Get(out var list);
             list.AddRange(controlPointAndNewKeyframes);
@@ -292,16 +303,16 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 }
             }
 
-            {
-                OnCurveChanged();
-                onControlPointSelectionChanged?.Invoke();
-            }
+            OnCurveChanged(beforeCurve);
+            onControlPointSelectionChanged?.Invoke();
         }
   
-        public void OnCurveChanged()
+        public void OnCurveChanged(AnimationCurve before = null)
         {
+            before ??= AnimationCurveHelper.Clone(Curve);
+            
             ApplyTangentModeAndKeyBrokenToKeyframes();
-            onCurveChanged?.Invoke();
+            onCurveChanged?.Invoke(before);
         }
 
         

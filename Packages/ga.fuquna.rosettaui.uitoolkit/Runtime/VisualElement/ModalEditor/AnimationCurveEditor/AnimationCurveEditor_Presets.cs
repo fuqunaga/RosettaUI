@@ -20,7 +20,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void InitPresetsUI()
         {
-            _presetsPopup = new PresetsPopup(SetCurveFromPreset);
+            _presetsPopup = new PresetsPopup(SetCurveFromUI);
             _presetsPopup.RegisterCallback<AttachToPanelEvent>(_ => _presetsPopup.Hide());
             Add(_presetsPopup);
             
@@ -36,7 +36,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             container.Add(popupButton);
             
 
-            _presetsPreview = new PresetsPreview(_presetsPopup.PersistentService, SetCurveFromPreset);
+            _presetsPreview = new PresetsPreview(_presetsPopup.PersistentService, SetCurveFromUI);
             container.Add(_presetsPreview);
             
             return;
@@ -50,20 +50,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 _presetsPopup.Show(popupLeftBottom, _curveController.Curve);
                 
                 evt.StopPropagation();
-            }
-            
-            
-            void SetCurveFromPreset(AnimationCurve curve)
-            {
-                if (curve.Equals(_curveController.Curve))
-                {
-                    return;
-                }
-                
-                _curveController.SetCurve(curve);
-                UnselectAllControlPoint();
-                UpdateView();
-                NotifyEditorValueChanged();
             }
         }
     }

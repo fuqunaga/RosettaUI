@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using RosettaUI.Builder;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -73,12 +74,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private Vector2 _zoomStartPosition;
         private float _lastPointerDownTime;
         
+        
         #region ModalEditor
 
         protected override AnimationCurve CopiedValue
         {
             get => AnimationCurveHelper.Clone(_curveController.Curve);
-            set => SetCurve(AnimationCurveHelper.Clone(value));
+            set => InitializeCurve(AnimationCurveHelper.Clone(value));
         }
 
         #endregion
@@ -91,11 +93,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var controlPointContainer = this.Q("control-point-container");
             
             _curveController = new CurveController(controlPointContainer, CreateControlPoint);
-            _curveController.onCurveChanged += () =>
+            _curveController.onCurveChanged += (before) =>
             {
                 UpdateView();
                 NotifyEditorValueChanged();
+                
+                var after = _curveController.Curve;
+                Undo.RecordValueChange(nameof(AnimationCurveEditor), before, after, SetCurveFromUI);
             };
+            
             _curveController.onControlPointSelectionChanged += () => _selectedControlPointsRect.UpdateView();
             
             InitUI();
@@ -132,12 +138,26 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         /// <summary>
         /// Set the curve to be edited.
         /// </summary>
-        private void SetCurve(AnimationCurve curve)
+        private void InitializeCurve(AnimationCurve curve)
         {
             _curveController.SetCurve(curve);
             UnselectAllControlPoint();
             FitViewToCurve();
         }
+
+        private void SetCurveFromUI(AnimationCurve curve)
+        {   
+            if (curve.Equals(_curveController.Curve))
+            {
+                return;
+            }
+                
+            _curveController.SetCurve(curve);
+            UnselectAllControlPoint();
+            UpdateView();
+            NotifyEditorValueChanged();
+        }
+        
         
         #region Initialization
         

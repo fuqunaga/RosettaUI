@@ -250,7 +250,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         /// ControlPointのKeyframeの時間が変更されたらAnimationCurve上のIndexが変わる可能性がある
         /// Indexが変わるなら追随する
         /// </summary>
-        public void UpdateKeyframes(IEnumerable<(ControlPoint, Keyframe)> controlPointAndNewKeyframes, bool notifyOnChanged = true)
+        public void UpdateKeyframes(IEnumerable<(ControlPoint, Keyframe)> controlPointAndNewKeyframes)
         {
             if (controlPointAndNewKeyframes == null || Curve == null || ControlPoints.Count == 0)
             {
@@ -292,7 +292,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 }
             }
 
-            if (notifyOnChanged)
             {
                 OnCurveChanged();
                 onControlPointSelectionChanged?.Invoke();

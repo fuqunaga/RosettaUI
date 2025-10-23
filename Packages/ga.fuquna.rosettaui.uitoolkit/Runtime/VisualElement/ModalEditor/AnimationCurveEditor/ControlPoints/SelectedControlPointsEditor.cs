@@ -64,7 +64,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public void SetKeyBroken(bool isBroken, bool notifyOnChanged = true)
             => EditControlPoints(cp => cp.IsKeyBroken = isBroken, notifyOnChanged);
 
-        public void SetWeightedMode(WeightedMode weightedMode, bool weighted, bool notifyOnChanged = true)
+        public void SetWeightedMode(WeightedMode weightedMode, bool weighted)
         {
             // weightedになったらTangentMode.Freeにする
             // https://github.com/Unity-Technologies/UnityCsReference/blob/4b463aa72c78ec7490b7f03176bd012399881768/Editor/Mono/Animation/AnimationWindow/CurveMenuManager.cs#L188-L202
@@ -96,32 +96,27 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             {
                 keyframe.SetWeightedFrag(weightedMode, weighted);
                 return keyframe;
-            }, notifyOnChanged);
+            });
         }
-        
-        public void UpdateKeyframePosition(float? xOrNull, float? yOrNull, bool notifyOnChanged = true){
+
+        public void UpdateKeyframePosition(float? xOrNull, float? yOrNull)
+        {
             UpdateKeyframes(keyframe =>
             {
                 if (xOrNull is { } x) keyframe.time = x;
                 if (yOrNull is { } y) keyframe.value = y;
                 return keyframe;
-            }, notifyOnChanged);
+            });
         }
         
-        public void UpdateKeyframes(Func<Keyframe, Keyframe> editKeyframeFunc, bool notifyOnChanged = true)
+        public void UpdateKeyframes(Func<Keyframe, Keyframe> editKeyframeFunc)
         {
-            UpdateControlPointKeyframes(
-                cp => editKeyframeFunc(cp.Keyframe),
-                notifyOnChanged
-            );
+            UpdateControlPointKeyframes(cp => editKeyframeFunc(cp.Keyframe));
         } 
         
-        public void UpdateControlPointKeyframes(Func<ControlPoint, Keyframe> controlPointToNewKeyframeFunc, bool notifyOnChanged = true)
+        public void UpdateControlPointKeyframes(Func<ControlPoint, Keyframe> controlPointToNewKeyframeFunc)
         {
-            _curveController.UpdateKeyframes(
-                ControlPoints.Select(cp => (cp, controlPointToNewKeyframeFunc(cp))),
-                notifyOnChanged
-            );
+            _curveController.UpdateKeyframes(ControlPoints.Select(cp => (cp, controlPointToNewKeyframeFunc(cp))));
         } 
         
         public void EditControlPoints(Action<ControlPoint> editAction, bool notifyOnChanged = true)

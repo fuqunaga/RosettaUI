@@ -93,16 +93,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var controlPointContainer = this.Q("control-point-container");
             
             _curveController = new CurveController(controlPointContainer, CreateControlPoint);
-            _curveController.onCurveChanged += (before) =>
+            _curveController.onCurveChanged += () =>
             {
                 UpdateView();
                 NotifyEditorValueChanged();
-                
-                var after = _curveController.Curve;
-                Undo.RecordValueChange(nameof(AnimationCurveEditor), before, after, SetCurveFromUI);
             };
-            
             _curveController.onControlPointSelectionChanged += () => _selectedControlPointsRect.UpdateView();
+            _curveController.onApplySnapshot += OnResetCurve;
             
             InitUI();
             InitPresetsUI();
@@ -144,15 +141,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             UnselectAllControlPoint();
             FitViewToCurve();
         }
-
-        private void SetCurveFromUI(AnimationCurve curve)
-        {   
-            if (curve.Equals(_curveController.Curve))
-            {
-                return;
-            }
-                
-            _curveController.SetCurve(curve);
+        
+        private void OnResetCurve()
+        {
             UnselectAllControlPoint();
             UpdateView();
             NotifyEditorValueChanged();

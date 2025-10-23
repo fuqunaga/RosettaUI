@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using RosettaUI.Builder;
 using RosettaUI.Swatch;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -20,7 +21,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         private void InitPresetsUI()
         {
-            _presetsPopup = new PresetsPopup(SetCurveFromUI);
+            _presetsPopup = new PresetsPopup(SetCurveFromPreset);
             _presetsPopup.RegisterCallback<AttachToPanelEvent>(_ => _presetsPopup.Hide());
             Add(_presetsPopup);
             
@@ -36,7 +37,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             container.Add(popupButton);
             
 
-            _presetsPreview = new PresetsPreview(_presetsPopup.PersistentService, SetCurveFromUI);
+            _presetsPreview = new PresetsPreview(_presetsPopup.PersistentService, SetCurveFromPreset);
             container.Add(_presetsPreview);
             
             return;
@@ -50,6 +51,27 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 _presetsPopup.Show(popupLeftBottom, _curveController.Curve);
                 
                 evt.StopPropagation();
+            }
+            
+                    
+            void SetCurveFromPreset(AnimationCurve curve)
+            {   
+                if (curve.Equals(_curveController.Curve))
+                {
+                    return;
+                }
+
+                var before = _curveController.RentSnapshot();
+                
+                _curveController.SetCurve(curve);
+                OnResetCurve();
+                
+                var after = _curveController.RentSnapshot();
+                Undo.RecordValueChange(
+                    $"{nameof(AnimationCurveEditor)} Preset Change",
+                    before,
+                    after,
+                    _curveController.ApplySnapshot);
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using RosettaUI.Builder;
 using UnityEngine;
 
@@ -13,6 +14,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     {
         private readonly CurveController _curveController;
         
+        private bool _isInUndoScope = false;
+
+
         public bool IsEmpty => !_curveController.SelectedControlPoints.Any();
 
         public bool IsMultiSelection => _curveController.SelectedControlPoints.Skip(1).Any();
@@ -29,7 +33,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void RemoveAll() => _curveController.RemoveAllSelectedControlPoints();
 
-        public void SetTangentMode(InOrOut inOrOut, TangentMode tangentMode, bool notifyOnChanged = true)
+        public void SetTangentMode(InOrOut inOrOut, TangentMode tangentMode)
         {
             Action<ControlPoint> setFunc = inOrOut switch
             {
@@ -38,7 +42,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 _ => throw new ArgumentOutOfRangeException(nameof(inOrOut), inOrOut, null)
             };
             
-            EditControlPoints(setFunc, notifyOnChanged);
+            EditControlPoints(setFunc);
             return;
 
             void SetIn(ControlPoint cp)
@@ -52,17 +56,16 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
         
-        public void SetBothTangentMode(TangentMode tangentMode, bool notifyOnChanged = true)
+        public void SetBothTangentMode(TangentMode tangentMode)
         {
             EditControlPoints(cp =>
             {
                 cp.InTangentMode = tangentMode;
                 cp.OutTangentMode = tangentMode;
-            }, notifyOnChanged);
+            });
         }
 
-        public void SetKeyBroken(bool isBroken, bool notifyOnChanged = true)
-            => EditControlPoints(cp => cp.IsKeyBroken = isBroken, notifyOnChanged);
+        public void SetKeyBroken(bool isBroken) => EditControlPoints(cp => cp.IsKeyBroken = isBroken);
 
         public void SetWeightedMode(WeightedMode weightedMode, bool weighted)
         {
@@ -89,7 +92,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     {
                         cp.OutTangentMode = TangentMode.Free;
                     }
-                }, false);
+                });
             }
             
             UpdateKeyframes(keyframe =>
@@ -114,22 +117,55 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             UpdateControlPointKeyframes(cp => editKeyframeFunc(cp.Keyframe));
         } 
         
+        // これだけRecordUndoScopeの対象外
+        // UpdateKeyframesが内部的にUndoと通知を行っている
+        // ControlPointsPopupMenuのFlatでSetBothTangentModeと一緒に呼ばれるため、
+        // UpdateKeyframesとRecordUndoScopeと二重に通知とUndo記録が行われる
+        // Undoはマージされるので一旦気にしない
         public void UpdateControlPointKeyframes(Func<ControlPoint, Keyframe> controlPointToNewKeyframeFunc)
         {
             _curveController.UpdateKeyframes(ControlPoints.Select(cp => (cp, controlPointToNewKeyframeFunc(cp))));
-        } 
-        
-        public void EditControlPoints(Action<ControlPoint> editAction, bool notifyOnChanged = true)
+        }
+
+        private void EditControlPoints(Action<ControlPoint> editAction)
         {
+            Assert.IsTrue(_isInUndoScope, "EditControlPoints must be called inside RecordUndoScope.");
+            
             foreach (var cp in ControlPoints)
             {
                 editAction(cp);
             }
+        }
+        
+        
+        #region Undo
+        
+        public RecordUndoScope RecordUndo() => new RecordUndoScope(this);
+        
+        public readonly struct RecordUndoScope : IDisposable
+        {
+            private readonly SelectedControlPointsEditor _editor;
+            private readonly AnimationCurveUndoSnapshot _beforeSnapshot;
 
-            if (notifyOnChanged)
+            public RecordUndoScope(SelectedControlPointsEditor editor)
             {
-                _curveController.OnCurveChanged();
+                editor._isInUndoScope = true;
+                
+                _editor = editor;
+                var curveController = _editor._curveController;
+                _beforeSnapshot = curveController.RentSnapshot();
+                _beforeSnapshot.Initialize(curveController.Curve, curveController.ControlPoints);
+            }
+            
+            public void Dispose()
+            {
+                var curveController = _editor._curveController;
+                curveController.OnCurveChangedWithUndo(_beforeSnapshot);
+                
+                _editor._isInUndoScope = false;
             }
         }
+        
+        #endregion
     }
 }

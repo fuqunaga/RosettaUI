@@ -62,21 +62,33 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             yield return Create("Free Smooth", allFreeSmooth, () =>
             {
-                controlPointsEditor.SetBothTangentMode(TangentMode.Free);
-                controlPointsEditor.SetKeyBroken(false);
+                using (controlPointsEditor.RecordUndo())
+                {
+                    controlPointsEditor.SetBothTangentMode(TangentMode.Free);
+                    controlPointsEditor.SetKeyBroken(false);
+                }
             });
             yield return Create("Flat", allFlat, () =>
             {
-                controlPointsEditor.SetBothTangentMode(TangentMode.Free, false);
-                controlPointsEditor.SetKeyBroken(false, false);
-                controlPointsEditor.UpdateKeyframes(keyframe =>
+                using (controlPointsEditor.RecordUndo())
                 {
-                    keyframe.inTangent = 0;
-                    keyframe.outTangent = 0;
-                    return keyframe;
-                });
+                    controlPointsEditor.SetBothTangentMode(TangentMode.Free);
+                    controlPointsEditor.SetKeyBroken(false);
+                    controlPointsEditor.UpdateKeyframes(keyframe =>
+                    {
+                        keyframe.inTangent = 0;
+                        keyframe.outTangent = 0;
+                        return keyframe;
+                    });
+                }
             });
-            yield return Create("Broken", allBroken, () => controlPointsEditor.SetKeyBroken(true));
+            yield return Create("Broken", allBroken, () =>
+            {
+                using (controlPointsEditor.RecordUndo())
+                {
+                    controlPointsEditor.SetKeyBroken(true);
+                }
+            });
             
             yield break;
 
@@ -124,13 +136,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var leftItems = CreateMenuItemsTangent("Left Tangent",
                 allLeftFree, allLeftLinear, allLeftConstant, allLeftWeighted,
                 mode => SetTangentMode((true, false), mode),
-                weighted => controlPointsEditor.SetWeightedMode(WeightedMode.In, weighted)
+                weighted => SetWeightedMode(WeightedMode.In, weighted)
             );
             
             var rightItems = CreateMenuItemsTangent("Right Tangent",
                 allRightFree, allRightLinear, allRightConstant, allRightWeighted,
                 mode => SetTangentMode((false, true), mode),
-                weighted => controlPointsEditor.SetWeightedMode(WeightedMode.Out, weighted)
+                weighted => SetWeightedMode(WeightedMode.Out, weighted)
             );
             
             var bothItems = CreateMenuItemsTangent("Both Tangents",
@@ -139,25 +151,37 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 allLeftConstant && allRightConstant,
                 allLeftWeighted && allRightWeighted,
                 mode => SetTangentMode((true, true), mode),
-                weighted => controlPointsEditor.SetWeightedMode(WeightedMode.Both, weighted)
+                weighted => SetWeightedMode(WeightedMode.Both, weighted)
             );
             
             return leftItems.Concat(rightItems).Concat(bothItems);
 
+            
             void SetTangentMode((bool inEnable, bool outEnable) enable, TangentMode mode)
             {
-                if (enable.inEnable)
+                using (controlPointsEditor.RecordUndo())
                 {
-                    controlPointsEditor.SetTangentMode(InOrOut.In, mode);
-                }
+                    if (enable.inEnable)
+                    {
+                        controlPointsEditor.SetTangentMode(InOrOut.In, mode);
+                    }
 
-                if (enable.outEnable)
-                {
-                    controlPointsEditor.SetTangentMode(InOrOut.Out, mode);
+                    if (enable.outEnable)
+                    {
+                        controlPointsEditor.SetTangentMode(InOrOut.Out, mode);
+                    }
+
+                    controlPointsEditor.SetKeyBroken(true);
                 }
-                
-                controlPointsEditor.SetKeyBroken(true);
             }
+            
+            void SetWeightedMode(WeightedMode mode, bool weightedFlag)
+            {
+                using (controlPointsEditor.RecordUndo())
+                {
+                    controlPointsEditor.SetWeightedMode(mode, weightedFlag);
+                }
+            };
         }
         
         private static IEnumerable<IMenuItem> CreateMenuItemsTangent(string menuPath,

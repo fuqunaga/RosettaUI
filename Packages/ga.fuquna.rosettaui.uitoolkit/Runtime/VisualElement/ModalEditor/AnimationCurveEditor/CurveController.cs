@@ -14,10 +14,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// </summary>
     public class CurveController
     {
-        public event Action<AnimationCurve> onCurveChanged;
+        public event Action onCurveChanged;
         
         // Invoked when control point selection or addition/removal happens
         public event Action onControlPointSelectionChanged;
+        public event Action onApplySnapshot;
         
         private readonly VisualElement _parent;
         private readonly Func<CurveController, ControlPoint> _getNewControlPoint;
@@ -43,6 +44,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             Curve = curve;
             ResetControlPoints();
+        }
+
+        public void ApplySnapshot(AnimationCurveUndoSnapshot snapshot)
+        {
+            Curve = snapshot.curve;
+            ResetControlPoints(snapshot.extraDataList);
+            onApplySnapshot?.Invoke();
         }
         
         public Keyframe GetKeyframe(ControlPoint controlPoint)
@@ -76,8 +84,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public int AddKey(Vector2 keyFramePosition)
         {
             var key = new Keyframe(keyFramePosition.x, keyFramePosition.y);
-            
-            var beforeCurve = AnimationCurveHelper.Clone(Curve);
+
+            var beforeSnapshot = RentSnapshot();
             
             var index = Curve.AddKey(key);
             if (index < 0) return index;
@@ -97,7 +105,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 controlPoint.OutTangentMode = outTangentMode;
             }
             
-            OnCurveChanged(beforeCurve);
+            OnCurveChangedWithUndo(beforeSnapshot);
             
             return index;
         }
@@ -114,15 +122,15 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             using var _ = ListPool<ControlPoint>.Get(out var list);
             list.AddRange(ControlPoints.Where(cp => cp.IsActive));
-            
-            var beforeCurve = AnimationCurveHelper.Clone(Curve);
+
+            var beforeSnapshot = RentSnapshot();
             
             foreach (var cp in list)
             {
                 DoRemoveControlPoint(cp);
             }
             
-            OnCurveChanged(beforeCurve);
+            OnCurveChangedWithUndo(beforeSnapshot);
         }
         
         private void DoRemoveControlPoint(ControlPoint controlPoint)
@@ -207,7 +215,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             return ControlPoints[index];
         }
         
-        private void ResetControlPoints()
+        private void ResetControlPoints(IReadOnlyCollection<AnimationCurveUndoSnapshot.ExtraData> snapshotExtraDataList = null)
         {
             if (Curve == null) return;
             
@@ -223,12 +231,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
         
-        private ControlPoint CreateAndInsertControlPoint(int index)
+        private ControlPoint CreateAndInsertControlPoint(int index, AnimationCurveUndoSnapshot.ExtraData? extraData = null)
         {
             var controlPoint = _getNewControlPoint(this);
-            controlPoint.IsKeyBroken = Curve.GetKeyBroken(index);
-            controlPoint.InTangentMode = Curve.GetInTangentMode(index);
-            controlPoint.OutTangentMode = Curve.GetOutTangentMode(index);
+            controlPoint.IsKeyBroken = extraData?.isBroken ?? Curve.GetKeyBroken(index);
+            controlPoint.InTangentMode = extraData?.inTangentMode ?? Curve.GetInTangentMode(index);
+            controlPoint.OutTangentMode = extraData?.outTangentMode ?? Curve.GetOutTangentMode(index);
             
             _parent.Add(controlPoint);
             
@@ -240,19 +248,25 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public void SetPreWrapMode(WrapMode mode)
         {
             if (Curve == null) return;
+            var before = Curve.preWrapMode;
+            if (before == mode) return;
             
-            var before = UndoHelper.Clone(Curve);
             Curve.preWrapMode = mode;
-            onCurveChanged?.Invoke(before);
+            onCurveChanged?.Invoke();
+            
+            Undo.RecordValueChange($"{nameof(CurveController)} SetPreWrapMode", before, mode, m => Curve.preWrapMode = m);
         }
         
         public void SetPostWrapMode(WrapMode mode)
         {
             if (Curve == null) return;
+            var before = Curve.postWrapMode;
+            if (before == mode) return;
             
-            var before = UndoHelper.Clone(Curve);
             Curve.postWrapMode = mode;
-            onCurveChanged?.Invoke(before);
+            onCurveChanged?.Invoke();
+            
+            Undo.RecordValueChange($"{nameof(CurveController)} SetPostWrapMode", before, mode, m => Curve.postWrapMode = m);
         }
         
         /// <summary>
@@ -265,8 +279,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             {
                 return;
             }
-            
-            var beforeCurve = AnimationCurveHelper.Clone(Curve);
+
+            var beforeSnapshot = RentSnapshot();
             
             using var _ = ListPool<(ControlPoint controlPoint, Keyframe keyframe)>.Get(out var list);
             list.AddRange(controlPointAndNewKeyframes);
@@ -303,16 +317,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 }
             }
 
-            OnCurveChanged(beforeCurve);
+            OnCurveChangedWithUndo(beforeSnapshot);
             onControlPointSelectionChanged?.Invoke();
         }
   
-        public void OnCurveChanged(AnimationCurve before = null)
+        public void OnCurveChangedWithUndo(AnimationCurveUndoSnapshot before)
         {
-            before ??= AnimationCurveHelper.Clone(Curve);
-            
             ApplyTangentModeAndKeyBrokenToKeyframes();
-            onCurveChanged?.Invoke(before);
+            onCurveChanged?.Invoke();
+            
+            var after = RentSnapshot();
+            Undo.RecordValueChange($"{nameof(CurveController)} Curve Changed", before, after, ApplySnapshot);
         }
 
         
@@ -363,5 +378,18 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 #endif
             }
         }
+        
+        
+        #region Undo
+        
+        
+        public AnimationCurveUndoSnapshot RentSnapshot()
+        {
+            var snapshot = AnimationCurveUndoSnapshot.GetPooled();
+            snapshot.Initialize(Curve, ControlPoints);
+            return snapshot;
+        }
+        
+        #endregion
     }
 }

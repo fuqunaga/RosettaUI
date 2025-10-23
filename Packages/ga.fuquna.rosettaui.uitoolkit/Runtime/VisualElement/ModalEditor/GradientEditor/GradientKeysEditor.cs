@@ -334,18 +334,12 @@ namespace RosettaUI.UIToolkit
             _dragStartSnapshot.CopyTo(before);
             TakeSnapshot(after);
 
-            var record = Undo.RecordValueChange(
+            Undo.RecordValueChange(
                 $"{nameof(GradientKeysEditor)} {(_isAlpha ? "Alpha" : "Color")} Keys Change",
                 before,
                 after,
                 RestoreSnapshot
             );
-
-            record.onDispose += () =>
-            {
-                before.Dispose();
-                after.Dispose();
-            };
         }
         
         #endregion

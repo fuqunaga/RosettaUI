@@ -23,11 +23,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             });
         }
 
-        public static void Show(Vector2 position, VisualElement target, AnimationCurve initialCurve, Action<AnimationCurve> onCurveChanged)
+        public static void Show(Vector2 position, VisualElement target, AnimationCurve initialCurve, Action<AnimationCurve> onCurveChanged, Action<bool> onHide)
         {
             _instance ??= new AnimationCurveEditor();;
             
-            _instance.Show(position, target, onCurveChanged);
+            _instance.Show(position, target, onCurveChanged, onHide);
             
             _instance.CopiedValue = initialCurve;
             

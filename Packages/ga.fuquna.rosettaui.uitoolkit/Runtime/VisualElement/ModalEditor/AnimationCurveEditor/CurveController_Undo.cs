@@ -203,7 +203,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         }
 
 
-        private readonly struct RecordUndoSnapshotScope : IDisposable
+        public readonly struct RecordUndoSnapshotScope : IDisposable
         {
             private readonly string _commandName;
             private readonly CurveController _curveController;
@@ -239,7 +239,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public UndoableCommand Command => new(this);
         public UndoableCommandForSelection CommandForSelection => new(this);
         
-        private RecordUndoSnapshotScope RecordUndoSnapshot([CallerMemberName]string callerMethodName = "") => new(callerMethodName, this);
+        public RecordUndoSnapshotScope RecordUndoSnapshot([CallerMemberName]string callerMethodName = "") => new(callerMethodName, this);
         
         
         public AnimationCurveUndoSnapshot RentSnapshot()
@@ -252,7 +252,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         public void ApplySnapshot(AnimationCurveUndoSnapshot snapshot)
         {
-            Curve = snapshot.curve;
+            Curve = snapshot.Curve;
             ResetControlPoints(snapshot.extraDataList);
             onApplySnapshot?.Invoke();
         }

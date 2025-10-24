@@ -28,6 +28,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private Manipulator _currentManipulator;
         private Vector2 _pointerPositionOnDragStart;
         private MoveAxis _moveAxis = MoveAxis.Both;
+        private CurveController.RecordUndoSnapshotScope _undoScopeOnDragStart;
 
         private IEnumerable<ControlPoint> SelectedControlPoints => _curveController.SelectedControlPoints;
         
@@ -57,6 +58,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             if (evt.button != 0) return false; // left button only
             if(_currentManipulator != null) return false; // すでにドラッグ中
             _currentManipulator = manipulator;
+            
+            _undoScopeOnDragStart = _curveController.RecordUndoSnapshot();
             
             // start drag
             _pointerPositionOnDragStart = _previewTransform.GetCurvePosFromUIWorldPos(evt.position);
@@ -133,6 +136,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private void OnDragEnd(DragManipulator _, EventBase evt)
         {
+            _undoScopeOnDragStart.Dispose();
+            _undoScopeOnDragStart = default;
+            
             _currentManipulator = null;
             _positionPopup.Hide();
         }

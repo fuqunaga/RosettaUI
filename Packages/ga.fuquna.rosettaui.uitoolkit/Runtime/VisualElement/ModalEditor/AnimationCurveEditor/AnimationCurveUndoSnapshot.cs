@@ -35,12 +35,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
 
-        public readonly AnimationCurve curve = new();
+        private readonly AnimationCurve _curve = new();
         public readonly List<ExtraData> extraDataList = new();
+        
+        public AnimationCurve Curve => AnimationCurveHelper.Clone(_curve);
         
         public void Initialize(AnimationCurve currentCurve, IEnumerable<ControlPoint> controlPoints)
         {
-            AnimationCurveHelper.Copy(currentCurve, curve);
+            AnimationCurveHelper.Copy(currentCurve, _curve);
             
             extraDataList.Clear();
             extraDataList.AddRange(controlPoints.Select(cp => new ExtraData()
@@ -54,7 +56,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         public bool Equals(AnimationCurveUndoSnapshot other)
         {
             if (other == null) return false;
-            if (!curve.Equals(other.curve)) return false;
+            if (!_curve.Equals(other._curve)) return false;
             
             return extraDataList.SequenceEqual(other.extraDataList);
         }

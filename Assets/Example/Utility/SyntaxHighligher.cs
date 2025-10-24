@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 
 namespace RosettaUI.Example
@@ -38,7 +39,8 @@ namespace RosettaUI.Example
                 nameof(ListViewOption),
                 nameof(IElementCreator),
                 nameof(Element),
-                nameof(LabelElement)
+                nameof(LabelElement),
+                nameof(Undo)
             },
             ["method"] = new()
             {
@@ -79,7 +81,8 @@ namespace RosettaUI.Example
                 nameof(ElementExtensionsMethodChain.Close),
                 nameof(ElementExtensionsMethodChain.RegisterUpdateCallback),
                 nameof(ElementExtensionsMethodChain.RegisterValueChangeCallback),
-                nameof(IElementCreator.CreateElement)
+                nameof(IElementCreator.CreateElement),
+                nameof(Undo.RecordValueChange)
             },
             ["keyword"] = new()
             {

@@ -94,6 +94,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly VisualElement _bottomHandle;
         private readonly VisualElement _leftHandle;
         private readonly VisualElement _rightHandle;
+
+        private CurveController.RecordUndoSnapshotScope _undoScopeOnHandleDragStarting;
         
         private Rect ControlPointsRect
         {
@@ -151,10 +153,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 handle.AddToClassList(classNameDir);
                 handle.AddToClassList(classNameHv);
                 // handle.style.cursor = CursorHolder.Get(cursorType);
-                
-                var dragManipulator = new DragManipulator();
-                dragManipulator.onDragStarting += (_, evt) => OnDragStarting(evt, side);
-                dragManipulator.onDrag += (_, evt) => OnDrag(evt);
+
+                var dragManipulator = new DragManipulator(
+                    onDragStarting: evt => OnHandleDragStarting(evt, side),
+                    onDrag: OnHandleDrag,
+                    onDragEnd: OnHandleDragEnd
+                );
                 handle.AddManipulator(dragManipulator);
                 
                 var line = new VisualElement
@@ -203,9 +207,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         
         #region Drag callbacks
         
-        private bool OnDragStarting(PointerDownEvent evt, RectSide side)
+        private bool OnHandleDragStarting(PointerDownEvent evt, RectSide side)
         {
             if (evt.button != 0) return false;
+            
+            _undoScopeOnHandleDragStarting = _curveController.RecordUndoSnapshot();
+            
             
             var rectOnParent = ControlPointsRect;
             var rectOnCurve = new Rect()
@@ -228,7 +235,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             // さらにドラッグしてtimeがずれたら復活したい
             _curveSnapshot.TakeSnapshot();
             
-            
             evt.StopPropagation();
             return true;
         }
@@ -236,7 +242,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         // 表示されるRectとは別に論理的にControlPointsのBoundingRectを計算する
         // 表示されるRectは厚みがThicknessMin以下にならないように制限しているが、論理Rectは制限なし
         // ドラッグ中にZoomされてもいいように論理RectはCurve座標系
-        private void OnDrag(PointerMoveEvent evt)
+        private void OnHandleDrag(PointerMoveEvent evt)
         {
             // 未選択Keyframeの追加を試みる
             // ドラッグ中に選択中のKeyframeが同一timeに来ると上書きされて消えるがさらにドラッグしてtimeがずれたら復活させる
@@ -265,6 +271,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             });
 
             evt.StopPropagation();
+        }
+        
+        private void OnHandleDragEnd(EventBase obj)
+        {
+            _undoScopeOnHandleDragStarting.Dispose();
+            _undoScopeOnHandleDragStarting = default;
         }
         
         #endregion

@@ -99,7 +99,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 NotifyEditorValueChanged();
             };
             _curveController.onControlPointSelectionChanged += () => _selectedControlPointsRect.UpdateView();
-            _curveController.onApplySnapshot += OnResetCurve;
+            _curveController.onApplySnapshot += () =>
+            {
+                HidePopups();
+                UpdateView();
+                NotifyEditorValueChanged();
+            };
             
             InitUI();
             InitPresetsUI();
@@ -141,14 +146,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             UnselectAllControlPoint();
             FitViewToCurve();
         }
-        
-        private void OnResetCurve()
-        {
-            UnselectAllControlPoint();
-            UpdateView();
-            NotifyEditorValueChanged();
-        }
-        
         
         #region Initialization
         
@@ -349,6 +346,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void UnselectAllControlPoint()
         {
             _curveController.UnselectAllControlPoints();
+            HidePopups();
+        }
+        
+        private void HidePopups()
+        {
             _controlPointDisplayPositionPopup.Hide();
             _controlPointsEditPositionPopup.Hide();
         }

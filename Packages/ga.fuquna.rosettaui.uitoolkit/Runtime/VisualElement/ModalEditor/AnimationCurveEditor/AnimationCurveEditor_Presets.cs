@@ -62,7 +62,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 }
 
                 _curveController.Command.SetCurve(curve);
-                OnResetCurve();
+                
+                UpdateView();
+                NotifyEditorValueChanged();
             }
         }
     }

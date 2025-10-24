@@ -209,6 +209,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             controlPoint.IsKeyBroken = extraData?.isBroken ?? Curve.GetKeyBroken(index);
             controlPoint.InTangentMode = extraData?.inTangentMode ?? Curve.GetInTangentMode(index);
             controlPoint.OutTangentMode = extraData?.outTangentMode ?? Curve.GetOutTangentMode(index);
+            controlPoint.IsActive = extraData?.isActive ?? false;
             
             _parent.Add(controlPoint);
             

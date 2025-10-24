@@ -18,10 +18,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             public bool isBroken;
             public TangentMode inTangentMode;
             public TangentMode outTangentMode;
+            public bool isActive;
 
             public bool Equals(ExtraData other)
             {
-                return isBroken == other.isBroken && inTangentMode == other.inTangentMode && outTangentMode == other.outTangentMode;
+                return isBroken == other.isBroken 
+                       && inTangentMode == other.inTangentMode
+                       && outTangentMode == other.outTangentMode
+                       && isActive == other.isActive;
             }
 
             public override bool Equals(object obj)
@@ -49,7 +53,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             {
                 isBroken = cp.IsKeyBroken,
                 inTangentMode = cp.InTangentMode,
-                outTangentMode = cp.OutTangentMode
+                outTangentMode = cp.OutTangentMode,
+                isActive = cp.IsActive,
             }));
         }
 

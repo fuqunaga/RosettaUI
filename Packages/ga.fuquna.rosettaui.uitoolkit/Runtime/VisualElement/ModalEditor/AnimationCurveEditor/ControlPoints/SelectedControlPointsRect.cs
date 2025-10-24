@@ -95,14 +95,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private readonly VisualElement _leftHandle;
         private readonly VisualElement _rightHandle;
         
-        private SelectedControlPointsEditor SelectedControlPointsEditor => _curveController.SelectedControlPointsEditor;
-        
         private Rect ControlPointsRect
         {
             get
             {
                 using var _ = ListPool<ControlPoint>.Get(out var list);
-                list.AddRange(SelectedControlPointsEditor.ControlPoints);
+                list.AddRange(_curveController.SelectedControlPoints);
                 
                 if (list.Count == 0)
                 {
@@ -219,7 +217,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _edgeMovableRect.Setup(side, rectOnCurve);
             
             _normalizedPositionsOnDragStart.Clear();
-            foreach (var cp in SelectedControlPointsEditor.ControlPoints)
+            foreach (var cp in _curveController.SelectedControlPoints)
             {
                 var normalized = Rect.PointToNormalized(rectOnCurve, cp.KeyframePosition);
                 _normalizedPositionsOnDragStart[cp] = normalized;
@@ -250,7 +248,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             var rect = _edgeMovableRect.MoveEdge(deltaValue);
             
-            SelectedControlPointsEditor.UpdateControlPointKeyframes(cp =>
+            _curveController.UpdateSelectedControlPointKeyframes(cp =>
             {
                 if (!_normalizedPositionsOnDragStart.TryGetValue(cp, out var normalized))
                 {

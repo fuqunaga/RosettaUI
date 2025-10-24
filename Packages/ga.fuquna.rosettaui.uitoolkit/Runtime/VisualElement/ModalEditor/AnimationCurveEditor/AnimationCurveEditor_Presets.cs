@@ -61,17 +61,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     return;
                 }
 
-                var before = _curveController.RentSnapshot();
-                
-                _curveController.SetCurve(curve);
+                _curveController.Command.SetCurve(curve);
                 OnResetCurve();
-                
-                var after = _curveController.RentSnapshot();
-                Undo.RecordValueChange(
-                    $"{nameof(AnimationCurveEditor)} Preset Change",
-                    before,
-                    after,
-                    _curveController.ApplySnapshot);
             }
         }
     }

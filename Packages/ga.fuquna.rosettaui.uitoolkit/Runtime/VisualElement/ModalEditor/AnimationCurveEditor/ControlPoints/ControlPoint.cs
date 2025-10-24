@@ -152,11 +152,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 switch (_wrapModeButton.CurrentPreOrPost)
                 {
                     case WrapModeButton.PreOrPost.Pre:
-                        setWrapMode = _curveController.SetPreWrapMode;
+                        setWrapMode = _curveController.Command.SetPreWrapMode;
                         currentMode = _curveController.Curve.preWrapMode;
                         break;
                     case WrapModeButton.PreOrPost.Post:
-                        setWrapMode = _curveController.SetPostWrapMode;
+                        setWrapMode = _curveController.Command.SetPostWrapMode;
                         currentMode = _curveController.Curve.postWrapMode;
                         break;
 

@@ -60,6 +60,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 using var _ = _curveController.RecordUndoSnapshot();
                 _curveController.SetCurve(newCurve);
             }
+
+            public void SetControlPointKeyframe(ControlPoint controlPoint, Keyframe keyframe)
+            {
+                using var _ = _curveController.RecordUndoSnapshot();
+                _curveController.UpdateKeyframes(new[]{(controlPoint, keyframe)});
+            }
         }
 
         

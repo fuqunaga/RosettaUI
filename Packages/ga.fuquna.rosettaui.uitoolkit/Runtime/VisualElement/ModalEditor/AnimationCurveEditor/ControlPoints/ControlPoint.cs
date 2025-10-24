@@ -57,11 +57,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
 
-        public Keyframe Keyframe
-        {
-            get => _curveController.GetKeyframe(this);
-            private set => _curveController.UpdateKeyframes(new[] { (this, value) });
-        }
+        public Keyframe Keyframe => _curveController.GetKeyframe(this);
 
         public Vector2 KeyframePosition => Keyframe.GetPosition();
 
@@ -140,8 +136,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
                 keyframe.SetWeight(inOrOut, keyframe.IsWeighted(inOrOut) ? weight : WeightDefaultValue);
 
-
-                Keyframe = keyframe;
+                
+                _curveController.Command.SetControlPointKeyframe(this, keyframe);
             }
 
             void OnWrapModeButtonClicked()

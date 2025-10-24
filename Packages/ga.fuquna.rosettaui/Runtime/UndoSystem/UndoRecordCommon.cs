@@ -3,6 +3,35 @@
 namespace RosettaUI.UndoSystem
 {
     /// <summary>
+    /// Undo/Redoを行う汎用的なUndoRecord
+    /// </summary>
+    public class UndoRecordCommon: UndoRecordFlexBase, IUndoRecord
+    {
+        private Action _undoAction;
+        private Action _redoAction;
+        
+        public string Name { get; private set; }
+        
+        public void Initialize(string name, Action undoAction, Action redoAction)
+        {
+            Name = name;
+            _undoAction = undoAction;
+            _redoAction = redoAction;
+        }
+        
+        public void Undo() => _undoAction?.Invoke();
+
+        public void Redo() => _redoAction?.Invoke();
+        
+        public override void Dispose()
+        {
+            base.Dispose();
+            _undoAction = null;
+            _redoAction = null;
+        }
+    }
+    
+    /// <summary>
     /// データを保存してUndo/Redoを行う汎用的なUndoRecord
     /// </summary>
     public class UndoRecordCommon<TData> : UndoRecordFlexBase, IUndoRecord
@@ -40,12 +69,18 @@ namespace RosettaUI.UndoSystem
     
     public static partial class Undo
     {
-        public static void RecordCommon<TData>(string label, TData data, Action<TData> undoAction, Action<TData> redoAction)
+        public static UndoRecordCommon RecordCommon(string label, Action undoAction, Action redoAction)
         {
-            using (UndoRecorder<UndoRecordCommon<TData>>.Get(out var record))
-            {
-                record.Initialize(label, data, undoAction, redoAction);
-            }
+            using var _ = UndoRecorder<UndoRecordCommon>.Get(out var record);
+            record.Initialize(label, undoAction, redoAction);
+            return record;
+        }
+        
+        public static UndoRecordCommon<TData> RecordCommon<TData>(string label, TData data, Action<TData> undoAction, Action<TData> redoAction)
+        {
+            using var _ = UndoRecorder<UndoRecordCommon<TData>>.Get(out var record);
+            record.Initialize(label, data, undoAction, redoAction);
+            return record;
         }
     }
 }

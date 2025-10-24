@@ -1,4 +1,6 @@
-﻿namespace RosettaUI.UndoSystem
+﻿using System;
+
+namespace RosettaUI.UndoSystem
 {
     /// <summary>
     /// 値の変更を記録するUndoRecord向けのユーティリティクラス
@@ -19,6 +21,9 @@
 
         public void Clear()
         {
+            if (BeforeRaw is IDisposable d0) d0.Dispose();
+            if (AfterRaw is IDisposable d1) d1.Dispose();
+            
             BeforeRaw = default;
             AfterRaw = default;
         }

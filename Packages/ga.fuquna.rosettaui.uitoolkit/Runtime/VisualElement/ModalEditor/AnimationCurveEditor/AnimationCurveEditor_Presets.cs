@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using RosettaUI.Builder;
 using RosettaUI.Swatch;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -52,16 +53,16 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 evt.StopPropagation();
             }
             
-            
+                    
             void SetCurveFromPreset(AnimationCurve curve)
-            {
+            {   
                 if (curve.Equals(_curveController.Curve))
                 {
                     return;
                 }
+
+                _curveController.Command.SetCurve(curve);
                 
-                _curveController.SetCurve(curve);
-                UnselectAllControlPoint();
                 UpdateView();
                 NotifyEditorValueChanged();
             }

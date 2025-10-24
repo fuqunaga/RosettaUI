@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using RosettaUI.Builder;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -23,11 +24,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             });
         }
 
-        public static void Show(Vector2 position, VisualElement target, AnimationCurve initialCurve, Action<AnimationCurve> onCurveChanged)
+        public static void Show(Vector2 position, VisualElement target, AnimationCurve initialCurve, Action<AnimationCurve> onCurveChanged, Action<bool> onHide)
         {
             _instance ??= new AnimationCurveEditor();;
             
-            _instance.Show(position, target, onCurveChanged);
+            _instance.Show(position, target, onCurveChanged, onHide);
             
             _instance.CopiedValue = initialCurve;
             
@@ -73,12 +74,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private Vector2 _zoomStartPosition;
         private float _lastPointerDownTime;
         
+        
         #region ModalEditor
 
         protected override AnimationCurve CopiedValue
         {
             get => AnimationCurveHelper.Clone(_curveController.Curve);
-            set => SetCurve(AnimationCurveHelper.Clone(value));
+            set => InitializeCurve(AnimationCurveHelper.Clone(value));
         }
 
         #endregion
@@ -97,6 +99,12 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 NotifyEditorValueChanged();
             };
             _curveController.onControlPointSelectionChanged += () => _selectedControlPointsRect.UpdateView();
+            _curveController.onApplySnapshot += () =>
+            {
+                HidePopups();
+                UpdateView();
+                NotifyEditorValueChanged();
+            };
             
             InitUI();
             InitPresetsUI();
@@ -120,7 +128,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     _previewTransform,
                     showPopupMenu: (position, cp) => ControlPointsPopupMenu.Show(
                         position, 
-                        _curveController.SelectedControlPointsEditor,
+                        _curveController,
                         () => ShowControlPointsEditPositionPopup(cp.LocalPosition), 
                         cp)
                 );
@@ -132,7 +140,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         /// <summary>
         /// Set the curve to be edited.
         /// </summary>
-        private void SetCurve(AnimationCurve curve)
+        private void InitializeCurve(AnimationCurve curve)
         {
             _curveController.SetCurve(curve);
             UnselectAllControlPoint();
@@ -234,7 +242,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             _keyEventHelper.RegisterKeyAction(KeyCode.Delete, evt =>
             {
                 if (evt != KeyEventType.KeyDown) return;
-                _curveController.SelectedControlPointsEditor.RemoveAll();
+                _curveController.CommandForSelection.RemoveAllControlPoints();
             });
 
             _keyEventHelper.RegisterKeyAction(KeyCode.Return, evt =>
@@ -332,19 +340,24 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private void AddControlPoint(Vector2 keyFramePosition)
         {
             UnselectAllControlPoint();
-            _curveController.AddKey(keyFramePosition);
+            _curveController.Command.AddKey(keyFramePosition);
         }
         
         private void UnselectAllControlPoint()
         {
             _curveController.UnselectAllControlPoints();
+            HidePopups();
+        }
+        
+        private void HidePopups()
+        {
             _controlPointDisplayPositionPopup.Hide();
             _controlPointsEditPositionPopup.Hide();
         }
 
         private void ShowControlPointsEditPositionPopup(Vector2 localPosition)
         {
-            _controlPointsEditPositionPopup.Show(localPosition, _curveController.SelectedControlPointsEditor, this);
+            _controlPointsEditPositionPopup.Show(localPosition, _curveController, this);
         }
         
         #endregion

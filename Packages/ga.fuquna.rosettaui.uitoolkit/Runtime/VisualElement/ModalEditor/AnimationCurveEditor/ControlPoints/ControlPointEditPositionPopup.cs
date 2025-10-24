@@ -16,7 +16,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private FloatField _timeField;
         private FloatField _valueField;
 
-        private SelectedControlPointsEditor _controlPointsEditor;
+        private CurveController _curveController;
         private VisualElement _focusBackElement;
         
         public ControlPointsEditPositionPopup()
@@ -55,7 +55,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                         break;
                     
                     case KeyCode.Return or KeyCode.KeypadEnter:
-                        _controlPointsEditor?.UpdateKeyframePosition(
+                        _curveController?.CommandForSelection.SetKeyframePosition(
                             _timeField.showMixedValue ? null : _timeField.value,
                             _valueField.showMixedValue ? null : _valueField.value
                         );
@@ -75,21 +75,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
         
-        public void Show(Vector2 localPosition, SelectedControlPointsEditor selectedControlPointsEditor, VisualElement focusBackElement)
+        public void Show(Vector2 localPosition, CurveController curveController, VisualElement focusBackElement)
         {
-            if (selectedControlPointsEditor.IsEmpty)
+            if (!curveController.SelectedControlPoints.Any())
             {
                 return;
             }
             
             InitializeIfNeeded();
             
-            _controlPointsEditor = selectedControlPointsEditor;
+            _curveController = curveController;
             _focusBackElement = focusBackElement;
 
             using var _ = ListPool<Vector2>.Get(out var keyframePositions);
             keyframePositions.AddRange(
-                _controlPointsEditor.ControlPoints.Select(cp => cp.KeyframePosition)
+                _curveController.SelectedControlPoints.Select(cp => cp.KeyframePosition)
             );
             
             var hasMultipleValueX = keyframePositions.Select(p => p.x).Distinct().Skip(1).Any();
@@ -127,7 +127,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             _focusBackElement?.Focus();
             
-            _controlPointsEditor = null;
+            _curveController = null;
             _focusBackElement = null;
             style.display = DisplayStyle.None;
         }

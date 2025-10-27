@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using RosettaUI.UndoSystem;
 using UnityEngine;
 
@@ -72,14 +74,15 @@ namespace RosettaUI.Example
             return (
                 ExampleTemplate.TabTitle(nameof(Custom)),
                 UI.Column(
-                    UI.HelpBox("The application can register its own Undo actions.\n" +
-                               "RosettaUI can only Undo changes to UI library values,\n" +
-                               "but by adding Undo actions from the application, more natural behavior can be achieved.",
+                    ExampleTemplate.BlankLine(),
+                    UI.HelpBox("You can register custom Undo actions in your application.\n" +
+                               "RosettaUI only undoes changes to UI library values,\n" +
+                               "but adding your own Undo actions enables more natural behavior.",
                         HelpBoxType.Info),
                     ExampleTemplate.BlankLine(),
                     UI.Tabs(
                         UndoRecordValueChangeTab(),
-                        UndoRecordCommonTab()
+                        UndoRecordActionTab()
                     )
                 )
             );
@@ -88,6 +91,7 @@ namespace RosettaUI.Example
         private static (string, Element) UndoRecordValueChangeTab()
         {
             var intValue = 0;
+            SyntaxHighlighter.AddPattern("method", nameof(AddIntValue));
 
             return ExampleTemplate.CodeElementSetsTab(
                 ExampleTemplate.FunctionStr(nameof(Undo), nameof(Undo.RecordValueChange)),
@@ -132,11 +136,86 @@ void AddIntValue(int delta)
                 );
             }
         }
-        
-        
-        private (string label, Element element) UndoRecordCommonTab()
+
+
+        private static (string label, Element element) UndoRecordActionTab()
         {
-            throw new System.NotImplementedException();
+            var objectName = "MyGameObject";
+            var primitiveType = PrimitiveType.Cube;
+            List<GameObject> createdObjects = new();
+
+            return ExampleTemplate.CodeElementSetsTab(
+                ExampleTemplate.FunctionStr(nameof(Undo), nameof(Undo.RecordAction)),
+                (@"UI.Column(
+    UI.Field(() => objectName),
+    UI.Field(() => primitiveType),
+    UI.Button(""Create GameObject"", () =>
+        {
+            var position = Vector3.right * createdObjects.Count * 2f;
+            var createData = (objectName, primitiveType, position);
+            var go = Create(createData);
+            
+            Undo.RecordCommon(
+                ""Create GameObject"",
+                undoAction: () => Remove(go),
+                redoAction: () => Create(createData)
+            );
+        }
+    )
+)
+
+GameObject Create((string, PrimitiveType, Vector3) createData)
+{
+    var (goName, type, position) = createData;
+    var go = GameObject.CreatePrimitive(type);
+    go.name = goName;
+    go.transform.position = position;
+    
+    createdObjects.Add(go);
+    return go;
+}
+
+void Remove(GameObject go)
+{
+    createdObjects.Remove(go);
+    Destroy(go);
+}",
+                    UI.Column(
+                        UI.Field(() => objectName),
+                        UI.Field(() => primitiveType),
+                        UI.Button("Create GameObject", () =>
+                            {
+                                var position = Vector3.right * createdObjects.Count * 2f;
+                                var createData = (objectName, primitiveType, position);
+                                var go = Create(createData);
+                                
+                                Undo.RecordAction(
+                                    "Create GameObject",
+                                    undoAction: () => Remove(go),
+                                    redoAction: () => Create(createData)
+                                );
+                            }
+                        )
+                    )
+                )
+            );
+
+            GameObject Create((string, PrimitiveType, Vector3) createData)
+            {
+                var (goName, type, position) = createData;
+                var go = GameObject.CreatePrimitive(type);
+                go.name = goName;
+                go.transform.position = position;
+                
+                createdObjects.Add(go);
+                return go;
+            }
+
+            void Remove(GameObject go)
+            {
+                createdObjects.Remove(go);
+                Destroy(go);
+            }
         }
     }
 }

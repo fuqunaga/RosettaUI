@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using RosettaUI.UndoSystem;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace RosettaUI.Example
 {
@@ -26,9 +27,12 @@ namespace RosettaUI.Example
                 "NonSerialized",
                 "HideInInspector",
                 nameof(Vector2),
+                nameof(Vector3),
                 nameof(Color),
                 nameof(Screen),
                 nameof(Debug),
+                nameof(GameObject),
+                nameof(PrimitiveType),
                 
                 nameof(UI),
                 nameof(UICustom),
@@ -49,7 +53,10 @@ namespace RosettaUI.Example
                 nameof(string.ToLower),
                 nameof(Enumerable.Range),
                 nameof(Enumerable.Select),
+                nameof(List<int>.Add),
+                nameof(List<int>.Remove),
                 nameof(Debug.Log),
+                nameof(Object.Destroy),
                 nameof(UI.Field),
                 nameof(UI.FieldReadOnly),
                 nameof(UI.Slider),

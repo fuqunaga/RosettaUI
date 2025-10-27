@@ -335,7 +335,7 @@ namespace RosettaUI.UIToolkit
         
         private void RecordUndoAdd(TSwatch swatch)
         {
-            Undo.RecordCommon("Swatch Add", (UndoHelper.Clone(swatch.Value), swatch.Label), 
+            Undo.RecordAction("Swatch Add", (UndoHelper.Clone(swatch.Value), swatch.Label), 
                 undoAction: _ => DeleteSwatch(GetTargetSwatch()),
                 redoAction: data => 
                 {
@@ -357,7 +357,7 @@ namespace RosettaUI.UIToolkit
         {
             var index = _tileScrollView.IndexOf(swatch);
             
-            Undo.RecordCommon("Swatch Delete", (index, UndoHelper.Clone(swatch.Value), swatch.Label), 
+            Undo.RecordAction("Swatch Delete", (index, UndoHelper.Clone(swatch.Value), swatch.Label), 
                 undoAction: data => 
                 {
                     var (i, value, name) = data;
@@ -373,7 +373,7 @@ namespace RosettaUI.UIToolkit
         
         private void RecordUndoMoveToFirst(int oldIndex)
         {
-            Undo.RecordCommon("Swatch Move To First", oldIndex,
+            Undo.RecordAction("Swatch Move To First", oldIndex,
                 undoAction: i => MoveSwatch(0, i),
                 redoAction: i => MoveSwatch(i, 0)
             );

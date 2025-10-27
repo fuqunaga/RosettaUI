@@ -244,6 +244,7 @@ namespace RosettaUI
                         ((fi.IsPublic && fi.GetCustomAttribute<NonSerializedAttribute>() == null)
                         || fi.GetCustomAttribute<SerializeField>() != null)
                         && fi.GetCustomAttribute<HideInInspector>() == null
+                        && (fi.FieldType != typeof(Delegate) && !fi.FieldType.IsSubclassOf(typeof(Delegate)))
                     )
                     .ToDictionary(fi => fi.Name, fi => fi.FieldType);
             }

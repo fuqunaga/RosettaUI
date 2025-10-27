@@ -15,6 +15,8 @@ namespace RosettaUI
         {
             private ListViewItemContainerElement Element => (ListViewItemContainerElement)element;
             private IBinder Binder => Element._binder;
+
+            public Func<IList, Type, int, object> CreateItemFunc => Element.option.createItemInstanceFunc;
             
             public ListViewItemContainerViewBridge(ListViewItemContainerElement element) : base(element)
             {

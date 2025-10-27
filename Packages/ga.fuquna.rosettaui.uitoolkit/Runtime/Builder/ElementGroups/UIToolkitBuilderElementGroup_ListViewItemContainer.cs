@@ -17,7 +17,7 @@ namespace RosettaUI.UIToolkit.Builder
             var viewBridge = itemContainerElement.GetViewBridge();
             var itemsSource = viewBridge.GetIList();
 
-            var listViewController = new ListViewControllerCustom();
+            var listViewController = new ListViewControllerCustom(viewBridge.CreateItemFunc);
             listView.SetViewController(listViewController);
             listView.virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight; //　これだけ定数
             listView.reorderable = option.reorderable;

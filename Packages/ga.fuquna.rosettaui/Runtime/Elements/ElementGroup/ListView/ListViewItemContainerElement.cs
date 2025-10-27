@@ -30,7 +30,6 @@ namespace RosettaUI
         private readonly IBinder _binder;
         public readonly ListViewOption option;
         
-        private readonly Func<IBinder, int, Element> _createItemElement;
         private readonly BinderHistory.Snapshot _binderTypeHistorySnapshot;
         private readonly Dictionary<int, IBinder> _itemIndexToBinder = new();
         private readonly Dictionary<int, Element> _itemIndexToElement = new();
@@ -64,10 +63,16 @@ namespace RosettaUI
             }
         }
 
-        public ListViewItemContainerElement(IBinder listBinder, Func<IBinder, int, Element> createItemElement, in ListViewOption option) : base(null)
+        [Obsolete("Use ListViewOption.createItemElementFunc instead")]
+        public ListViewItemContainerElement(IBinder listBinder,
+            Func<IBinder, int, Element> createItemElement,
+            in ListViewOption option) : this(listBinder, new ListViewOption(option){ createItemElementFunc = createItemElement })
+        {
+        }
+
+        public ListViewItemContainerElement(IBinder listBinder, in ListViewOption option) : base(null)
         {
             _binder = listBinder;
-            _createItemElement = createItemElement;
             this.option = option;
 
             Interactable = !ListBinder.IsReadOnly(listBinder);
@@ -116,7 +121,7 @@ namespace RosettaUI
                 _itemIndexToBinder[index] = itemBinder = ListBinder.CreateItemBinderAt(_binder, index);
             }
 
-            element = _createItemElement(itemBinder, index);
+            element = option.createItemElementFunc(itemBinder, index);
             if (!isReadOnly && !option.fixedSize)
             {
                 element = AddPopupMenu(element, index);

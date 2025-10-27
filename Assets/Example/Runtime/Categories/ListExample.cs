@@ -10,7 +10,7 @@ namespace RosettaUI.Example
         {
             public int intValue;
         }
-        
+
         public class CloneableClass : ICloneable
         {
             public int intValue;
@@ -21,55 +21,63 @@ namespace RosettaUI.Example
         {
             public int intValue;
 
-            public CopyConstructorClass() { }
-            
+            public CopyConstructorClass()
+            {
+            }
+
             public CopyConstructorClass(CopyConstructorClass other)
             {
                 intValue = other.intValue;
             }
         }
         
+        public interface IListItem : IElementCreator
+        {
+        }
+
+        public class IntItem : IListItem
+        {
+            public int intValue;
+            
+            public Element CreateElement(LabelElement label)
+            {
+                return UI.Field(label, () => intValue);
+            }
+        }
         
-        public int[] intArray = {1, 2, 3};
-        public List<int> intList = new() {1, 2, 3};
-        
+        public class FloatItem : IListItem
+        {
+            public float floatValue;
+            
+            public Element CreateElement(LabelElement label)
+            {
+                return UI.Slider(label, () => floatValue);
+            }
+        }
+       
+
+
+        public int[] intArray = { 1, 2, 3 };
+        public List<int> intList = new() { 1, 2, 3 };
+
         public SimpleClass[] classArray =
         {
-            new() {stringValue = "1"}, 
-            new() {stringValue = "2"}, 
-            new() {stringValue = "3"}
+            new() { stringValue = "1" },
+            new() { stringValue = "2" },
+            new() { stringValue = "3" }
         };
-        
+
         public List<SimpleClass> classList = new()
         {
-            new SimpleClass {stringValue = "1"}, 
-            new SimpleClass {stringValue = "2"}, 
-            new SimpleClass {stringValue = "3"}
+            new SimpleClass { stringValue = "1" },
+            new SimpleClass { stringValue = "2" },
+            new SimpleClass { stringValue = "3" }
         };
 
-        [NonReorderable]
-        public int[] nonReorderableArray = {1,2,3};
-        
+        [NonReorderable] public int[] nonReorderableArray = { 1, 2, 3 };
+
         public Element CreateElement(LabelElement _)
         {
-            var listViewOption = ListViewOption.Default;
-
-            List<NoCopyClass> noCopyClassList = new()
-            {
-                new NoCopyClass { intValue = 1 },
-            };
-
-            List<CloneableClass> cloneableClassList = new()
-            {
-                new CloneableClass { intValue = 1 },
-            };
-
-            List<CopyConstructorClass> copyConstructorClassList = new()
-            {
-                new CopyConstructorClass { intValue = 1 },
-            };
-            
-            
             return UI.Tabs(
                 ExampleTemplate.UIFunctionTab(nameof(UI.List),
                     UI.List(() => intArray),
@@ -84,25 +92,45 @@ namespace RosettaUI.Example
                     UI.ListReadOnly(() => classArray),
                     UI.ListReadOnly(() => classList)
                 ),
-                ExampleTemplate.Tab("Codes0",
-                    ExampleTemplate.CodeElementSets("CustomItemElement",
-                        (@"UI.List(() => intArray,
-    createItemElement: (itemBinder, idx) => UI.Row(
-        UI.Field($""Item {idx}"", itemBinder),
-        UI.Button(""+"", () => intArray[idx]++),
-        UI.Button(""-"", () => intArray[idx]--)
+                Code0(),
+                Code1(),
+                CustomInstance()
+            );
+        }
+
+
+        private (string, Element) Code0()
+        {
+            var listViewOption = ListViewOption.Default;
+
+            return ExampleTemplate.Tab(nameof(Code0),
+                ExampleTemplate.CodeElementSets("CustomItemElement",
+                    (@"UI.List(
+    () => intArray,
+    new ListViewOption
+    {
+        createItemElementFunc = (itemBinder, idx) => UI.Row(
+            UI.Field($""Item {idx}"", itemBinder),
+            UI.Button(""+"", () => intArray[idx]++),
+            UI.Button(""-"", () => intArray[idx]--)
+        )
+    }
 );",
-                            UI.List(() => intArray,
-                               createItemElement: (itemBinder, idx) => UI.Row(
+                        UI.List(
+                            () => intArray,
+                            new ListViewOption
+                            {
+                                createItemElementFunc = (itemBinder, idx) => UI.Row(
                                     UI.Field($"Item {idx}", itemBinder),
                                     UI.Button("+", () => intArray[idx]++),
                                     UI.Button("-", () => intArray[idx]--)
                                 )
-                            )
+                            }
                         )
-                    ),
-                    ExampleTemplate.CodeElementSets("Options",
-                        (@"var listViewOption = ListViewOption.Default;
+                    )
+                ),
+                ExampleTemplate.CodeElementSets("Options",
+                    (@"var listViewOption = ListViewOption.Default;
 
 UI.Field(() => listViewOption).Open(),
 
@@ -110,20 +138,39 @@ UI.DynamicElementOnStatusChanged(
     () => listViewOption,
     _ => UI.List(() => intArray, listViewOption)
 )",
-                            UI.Column(
-                                UI.Field(() => listViewOption).Open(),
-                                UI.DynamicElementOnStatusChanged(
-                                    () => listViewOption,
-                                    _ => UI.List(() => intArray, listViewOption)
-                                )
+                        UI.Column(
+                            UI.Field(() => listViewOption).Open(),
+                            UI.DynamicElementOnStatusChanged(
+                                () => listViewOption,
+                                _ => UI.List(() => intArray, listViewOption)
                             )
                         )
                     )
-                ),
-                ExampleTemplate.Tab("Codes1",
-                    ExampleTemplate.CodeElementSets("<b>Duplicate previous item</b>",
-                        "If the item implements ICloneable or has a copy constructor, it will copy its previous item when added.",
-                        (@"public class NoCopyClass
+                )
+            );
+        }
+
+        private (string, Element) Code1()
+        {
+            List<NoCopyClass> noCopyClassList = new()
+            {
+                new NoCopyClass { intValue = 1 },
+            };
+
+            List<CloneableClass> cloneableClassList = new()
+            {
+                new CloneableClass { intValue = 1 },
+            };
+
+            List<CopyConstructorClass> copyConstructorClassList = new()
+            {
+                new CopyConstructorClass { intValue = 1 },
+            };
+
+            return ExampleTemplate.Tab(nameof(Code1),
+                ExampleTemplate.CodeElementSets("<b>Duplicate previous item</b>",
+                    "If the item implements ICloneable or has a copy constructor, it will copy its previous item when added.",
+                    (@"public class NoCopyClass
 {
     public int intValue;
 }
@@ -150,20 +197,39 @@ UI.List(() => noCopyClassList);
 UI.List(() => cloneableClassList);
 UI.List(() => copyConstructorClassList);
 ",
-                            UI.Column(
-                                UI.List(() => noCopyClassList),
-                                UI.List(() => cloneableClassList),
-                                UI.List(() => copyConstructorClassList)
-                            )
+                        UI.Column(
+                            UI.List(() => noCopyClassList),
+                            UI.List(() => cloneableClassList),
+                            UI.List(() => copyConstructorClassList)
                         )
-                    ),
-                    ExampleTemplate.CodeElementSets("<b>Attribute</b>",
-                        (@"[NonReorderable]
+                    )
+                ),
+                ExampleTemplate.CodeElementSets("<b>Attribute</b>",
+                    (@"[NonReorderable]
 public int[] nonReorderableArray;
 
 UI.List(() => nonReorderableArray);
 ",
-                            UI.List(() => nonReorderableArray)))
+                        UI.List(() => nonReorderableArray)))
+            );
+        }
+        
+        
+        private (string label, Element element) CustomInstance()
+        {
+            var list = new List<IListItem>
+            {
+                new IntItem { intValue = 1 },
+                new FloatItem() { floatValue = 2f },
+                new IntItem { intValue = 3 },
+            };
+
+            return ExampleTemplate.Tab("CustomInstance",
+                ExampleTemplate.CodeElementSets("Custom instance with interface",
+                    (@"public interface IListItem
+",
+                        UI.Field(() => list)
+                    )
                 )
             );
         }

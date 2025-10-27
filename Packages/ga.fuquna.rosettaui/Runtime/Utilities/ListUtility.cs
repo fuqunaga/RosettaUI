@@ -37,7 +37,12 @@ namespace RosettaUI
 
             var baseItem = list.Count > 0 ? list[^1] : null;
 
-            return AddItem(list, itemType, baseItem, list.Count);
+            return DuplicateItem(list, itemType, baseItem, list.Count);
+        }
+        
+        public static IList AddItemAtLast(IList list, Type itemType, object newItem)
+        {
+            return AddItem(list, itemType, newItem, list.Count);
         }
 
         public static IList RemoveItemAtLast(IList target, Type itemType)
@@ -45,18 +50,18 @@ namespace RosettaUI
             return RemoveItem(target, itemType, target.Count - 1);
         }
 
-        public static IList AddItem(IList list, Type elemType, object baseItem, int index)
+        public static IList DuplicateItem(IList list, Type elemType, object baseItem, int index)
         {
             var newElem = CreateNewItem(baseItem, elemType);
-            return DoAddItem(list, elemType, newElem, index);
+            return AddItem(list, elemType, newElem, index);
         }
         
         public static IList AddNullItem(IList list, Type elemType, int index)
         {
-            return DoAddItem(list, elemType, null, index);
+            return AddItem(list, elemType, null, index);
         }
         
-        private static IList DoAddItem(IList list, Type elemType, object newItem, int index)
+        public static IList AddItem(IList list, Type elemType, object newItem, int index)
         {
             index = Mathf.Clamp(index, 0, list.Count);
 

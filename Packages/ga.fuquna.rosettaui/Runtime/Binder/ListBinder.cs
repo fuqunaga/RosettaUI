@@ -71,7 +71,7 @@ namespace RosettaUI
             
             var itemType = ListUtility.GetItemType(binder.ValueType);
             
-            list = ListUtility.AddItem(list, itemType, list[index], index + 1);
+            list = ListUtility.DuplicateItem(list, itemType, list[index], index + 1);
             binder.SetObject(list);
         }
 
@@ -81,7 +81,7 @@ namespace RosettaUI
             
             var itemType = ListUtility.GetItemType(binder.ValueType);
             
-            list = ListUtility.AddItem(list, itemType, null, index);
+            list = ListUtility.DuplicateItem(list, itemType, null, index);
             binder.SetObject(list);
         }
         

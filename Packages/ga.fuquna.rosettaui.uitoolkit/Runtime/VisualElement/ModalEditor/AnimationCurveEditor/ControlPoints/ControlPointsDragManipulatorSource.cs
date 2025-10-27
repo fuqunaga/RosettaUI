@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using RosettaUI.Builder;
 using UnityEngine;
-using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
 namespace RosettaUI.UIToolkit.AnimationCurveEditor
@@ -29,9 +28,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         private Manipulator _currentManipulator;
         private Vector2 _pointerPositionOnDragStart;
         private MoveAxis _moveAxis = MoveAxis.Both;
+        private CurveController.RecordUndoSnapshotScope _undoScopeOnDragStart;
 
-        private SelectedControlPointsEditor SelectedControlPointsEditor => _curveController.SelectedControlPointsEditor;
-
+        private IEnumerable<ControlPoint> SelectedControlPoints => _curveController.SelectedControlPoints;
+        
         public ControlPointsDragManipulatorSource(
             CurveController curveController,
             PreviewTransform previewTransform,
@@ -59,11 +59,13 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             if(_currentManipulator != null) return false; // すでにドラッグ中
             _currentManipulator = manipulator;
             
+            _undoScopeOnDragStart = _curveController.RecordUndoSnapshot();
+            
             // start drag
             _pointerPositionOnDragStart = _previewTransform.GetCurvePosFromUIWorldPos(evt.position);
             
             _pointerToKeyframePositionOffsetsOnDragStart.Clear();
-            foreach (var cp in SelectedControlPointsEditor.ControlPoints)
+            foreach (var cp in SelectedControlPoints)
             {
                 _pointerToKeyframePositionOffsetsOnDragStart[cp] = cp.KeyframePosition - _pointerPositionOnDragStart;
             }
@@ -97,10 +99,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
             
             var pointerPositionOnCurve = _previewTransform.GetCurvePosFromUIWorldPos(evt.position);
-            
-            SelectedControlPointsEditor.UpdateControlPointKeyframes(cp =>
+
+            _curveController.UpdateSelectedControlPointKeyframes(cp =>
             {
-                if (!_pointerToKeyframePositionOffsetsOnDragStart.TryGetValue(cp, out var pointerToKeyframeOffsetOnDragStart))
+                if (!_pointerToKeyframePositionOffsetsOnDragStart.TryGetValue(cp,
+                        out var pointerToKeyframeOffsetOnDragStart))
                 {
                     return cp.Keyframe;
                 }
@@ -118,11 +121,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-                
+
                 var keyframePosition = pointerToKeyframeOffsetOnDragStart + pointerPositionOnCurve;
-                
+
                 keyframePosition = _previewTransform.SnapCurvePositionIfEnabled(keyframePosition);
-                
+
                 var keyframe = cp.Keyframe;
                 keyframe.SetPosition(keyframePosition);
                 return keyframe;
@@ -133,6 +136,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
         private void OnDragEnd(DragManipulator _, EventBase evt)
         {
+            _undoScopeOnDragStart.Dispose();
+            _undoScopeOnDragStart = default;
+            
             _currentManipulator = null;
             _positionPopup.Hide();
         }
@@ -143,7 +149,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             Vector2 elementPosition;
             Vector2 keyframePosition;
             
-            var isMultiSelection = SelectedControlPointsEditor.IsMultiSelection;
+            var isMultiSelection = _curveController.IsMultiSelection;
             if (isMultiSelection)
             {
                 elementPosition = _previewTransform.GetScreenPosFromUIWorldPos(pointerPosition);
@@ -151,7 +157,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
             else
             {
-                var cp = SelectedControlPointsEditor.ControlPoints.FirstOrDefault();
+                var cp = SelectedControlPoints.FirstOrDefault();
                 if (cp == null)
                 {
                     return;

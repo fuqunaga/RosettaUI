@@ -1,4 +1,6 @@
 using RosettaUI.Builder;
+using RosettaUI.UIToolkit.UndoSystem;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -18,7 +20,17 @@ namespace RosettaUI.UIToolkit
 
         protected override void ShowEditor(Vector3 position)
         {
-            GradientEditor.Show(position, this, rawValue, gradient => value = gradient);
+            var initialValue = UndoHelper.Clone(rawValue);
+            GradientEditor.Show(position, this, rawValue,
+                onGradientChanged: gradient => value = gradient,
+                onHide: _ =>
+                {
+                    if (!GradientHelper.EqualsWithoutAlloc(initialValue, rawValue))
+                    {
+                        UndoUIToolkit.RecordBaseField(nameof(GradientField), this, initialValue, rawValue);
+                    }
+                }
+            );
         }
 
 

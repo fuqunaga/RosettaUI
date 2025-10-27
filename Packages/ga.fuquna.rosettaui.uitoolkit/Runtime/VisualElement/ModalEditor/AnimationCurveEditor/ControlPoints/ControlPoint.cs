@@ -57,11 +57,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
 
-        public Keyframe Keyframe
-        {
-            get => _curveController.GetKeyframe(this);
-            private set => _curveController.UpdateKeyframes(new[] { (this, value) });
-        }
+        public Keyframe Keyframe => _curveController.GetKeyframe(this);
 
         public Vector2 KeyframePosition => Keyframe.GetPosition();
 
@@ -140,8 +136,8 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
 
                 keyframe.SetWeight(inOrOut, keyframe.IsWeighted(inOrOut) ? weight : WeightDefaultValue);
 
-
-                Keyframe = keyframe;
+                
+                _curveController.Command.SetControlPointKeyframe(this, keyframe);
             }
 
             void OnWrapModeButtonClicked()
@@ -152,11 +148,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 switch (_wrapModeButton.CurrentPreOrPost)
                 {
                     case WrapModeButton.PreOrPost.Pre:
-                        setWrapMode = _curveController.SetPreWrapMode;
+                        setWrapMode = _curveController.Command.SetPreWrapMode;
                         currentMode = _curveController.Curve.preWrapMode;
                         break;
                     case WrapModeButton.PreOrPost.Post:
-                        setWrapMode = _curveController.SetPostWrapMode;
+                        setWrapMode = _curveController.Command.SetPostWrapMode;
                         currentMode = _curveController.Curve.postWrapMode;
                         break;
 

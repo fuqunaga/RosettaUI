@@ -8,17 +8,8 @@ namespace RosettaUI
 {
     public static class ListBinder
     {
-        public static IEnumerable<BinderBase<T>> CreateItemBinders<T>(IList<T> list)
-        {
-            // var listBinder = 
-            // return Enumerable.Range(0, list.Count).Select(i => new ListItemBinder<T>(, i));
-            return null;
-        }
-
         public static Type GetItemBinderType(Type type)
         {
-            static bool IsIList(Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IList<>);
-            
             var listType = IsIList(type)
                 ? type
                 : type.GetInterfaces().FirstOrDefault(IsIList);
@@ -26,16 +17,8 @@ namespace RosettaUI
             
             var itemType =  listType.GetGenericArguments()[0];
             return typeof(ListItemBinder<>).MakeGenericType(itemType);
-        }
-        
-        public static IEnumerable<IListItemBinder> CreateItemBinders(IBinder listBinder)
-        {
-            var itemBinderType = GetItemBinderType(listBinder.ValueType);
-            var itemCount = GetCount(listBinder);
-            
-            return Enumerable.Range(0, itemCount)
-                //.Select(i => Activator.CreateInstance(binderType, listBinder, i) as IBinder);
-                .Select(i => CreateItemBinderAt(listBinder, i, itemBinderType));
+
+            static bool IsIList(Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IList<>);
         }
 
         public static IListItemBinder CreateItemBinderAt(IBinder listBinder, int index)
@@ -92,13 +75,43 @@ namespace RosettaUI
             binder.SetObject(list);
         }
 
-        public static void RemoveItem(IBinder binder, int index)
+        public static void AddItem(IBinder binder, int index)
         {
             var list = GetIList(binder);
             
             var itemType = ListUtility.GetItemType(binder.ValueType);
             
-            list = ListUtility.RemoveItem(list, itemType, index);
+            list = ListUtility.AddItem(list, itemType, null, index);
+            binder.SetObject(list);
+        }
+        
+        public static void AddNullItem(IBinder binder, int index)
+        {
+            var list = GetIList(binder);
+            
+            var itemType = ListUtility.GetItemType(binder.ValueType);
+            
+            list = ListUtility.AddNullItem(list, itemType, index);
+            binder.SetObject(list);
+        }
+
+        public static void RemoveItem(IBinder binder, int index)
+            => RemoveItems(binder, index..(index + 1));
+        
+        public static void RemoveItems(IBinder binder, Range range)
+        {
+            var list = GetIList(binder);
+            
+            var itemType = ListUtility.GetItemType(binder.ValueType);
+            
+            list = ListUtility.RemoveItems(list, itemType, range);
+            binder.SetObject(list);
+        }
+        
+        public static void MoveItem(IBinder binder, int fromIndex, int toIndex)
+        {
+            var list = GetIList(binder);
+            ListUtility.MoveItem(list, fromIndex, toIndex);
             binder.SetObject(list);
         }
 

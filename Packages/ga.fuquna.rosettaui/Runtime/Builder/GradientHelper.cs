@@ -37,7 +37,7 @@ namespace RosettaUI.Builder
         
         /// <summary>
         /// Unity6以降ではアロケーション無しで値での比較
-        /// ＊たまにInternal_Equals 無いでアロケーションするっぽい
+        /// ＊たまにInternal_Equals 内でアロケーションするっぽい
         /// 以下の操作はアロケーションが発生するので、Gradient内部の比較メソッドを利用する
         /// - Gradient.colorKeys
         /// - Gradient.Equals() : boxingが発生するため

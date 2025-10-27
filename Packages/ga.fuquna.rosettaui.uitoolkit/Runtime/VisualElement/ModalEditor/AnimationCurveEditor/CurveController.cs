@@ -11,21 +11,21 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// <summary>
     /// Manage AnimationCurve and ControlPoints
     /// </summary>
-    public class CurveController
+    public partial class CurveController
     {
         public event Action onCurveChanged;
         
         // Invoked when control point selection or addition/removal happens
         public event Action onControlPointSelectionChanged;
+        public event Action onApplySnapshot;
         
         private readonly VisualElement _parent;
         private readonly Func<CurveController, ControlPoint> _getNewControlPoint;
 
         public AnimationCurve Curve { get; private set; } = new();
         
-        public SelectedControlPointsEditor SelectedControlPointsEditor { get; }
-        
         public IEnumerable<ControlPoint> SelectedControlPoints => ControlPoints.Where(t => t.IsActive);
+        public bool IsMultiSelection => SelectedControlPoints.Skip(1).Any();
 
 
         public List<ControlPoint> ControlPoints { get; } = new();
@@ -34,8 +34,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
         {
             _parent = parent;
             _getNewControlPoint = getNewControlPoint;
-            
-            SelectedControlPointsEditor = new SelectedControlPointsEditor(this);
         }
         
         public void SetCurve(AnimationCurve curve)
@@ -43,7 +41,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             Curve = curve;
             ResetControlPoints();
         }
-        
+
         public Keyframe GetKeyframe(ControlPoint controlPoint)
         {
             var index = ControlPoints.IndexOf(controlPoint);
@@ -72,10 +70,10 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 : GetControlPoint(index + 1);
         }
 
-        public int AddKey(Vector2 keyFramePosition)
+        private int AddKey(Vector2 keyFramePosition)
         {
             var key = new Keyframe(keyFramePosition.x, keyFramePosition.y);
-            
+
             var index = Curve.AddKey(key);
             if (index < 0) return index;
             
@@ -105,19 +103,6 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             return index < 0 
                 ? null
                 : CreateAndInsertControlPoint(index);
-        }
-        
-        public void RemoveAllSelectedControlPoints()
-        {
-            using var _ = ListPool<ControlPoint>.Get(out var list);
-            list.AddRange(ControlPoints.Where(cp => cp.IsActive));
-            
-            foreach (var cp in list)
-            {
-                DoRemoveControlPoint(cp);
-            }
-            
-            OnCurveChanged();
         }
         
         private void DoRemoveControlPoint(ControlPoint controlPoint)
@@ -202,7 +187,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             return ControlPoints[index];
         }
         
-        private void ResetControlPoints()
+        private void ResetControlPoints(IReadOnlyCollection<AnimationCurveUndoSnapshot.ExtraData> snapshotExtraDataList = null)
         {
             if (Curve == null) return;
             
@@ -214,16 +199,17 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             for (var i = 0; i < Curve.length; i++)
             {
-                CreateAndInsertControlPoint(i);
+                CreateAndInsertControlPoint(i, snapshotExtraDataList?.ElementAt(i));
             }
         }
         
-        private ControlPoint CreateAndInsertControlPoint(int index)
+        private ControlPoint CreateAndInsertControlPoint(int index, AnimationCurveUndoSnapshot.ExtraData? extraData = null)
         {
             var controlPoint = _getNewControlPoint(this);
-            controlPoint.IsKeyBroken = Curve.GetKeyBroken(index);
-            controlPoint.InTangentMode = Curve.GetInTangentMode(index);
-            controlPoint.OutTangentMode = Curve.GetOutTangentMode(index);
+            controlPoint.IsKeyBroken = extraData?.isBroken ?? Curve.GetKeyBroken(index);
+            controlPoint.InTangentMode = extraData?.inTangentMode ?? Curve.GetInTangentMode(index);
+            controlPoint.OutTangentMode = extraData?.outTangentMode ?? Curve.GetOutTangentMode(index);
+            controlPoint.IsActive = extraData?.isActive ?? false;
             
             _parent.Add(controlPoint);
             
@@ -232,31 +218,39 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             return controlPoint;
         }
 
-        public void SetPreWrapMode(WrapMode mode)
+        private void SetPreWrapMode(WrapMode mode)
         {
             if (Curve == null) return;
+            
             Curve.preWrapMode = mode;
             onCurveChanged?.Invoke();
         }
         
-        public void SetPostWrapMode(WrapMode mode)
+        private void SetPostWrapMode(WrapMode mode)
         {
             if (Curve == null) return;
+            
             Curve.postWrapMode = mode;
             onCurveChanged?.Invoke();
+        }
+
+
+        public void UpdateSelectedControlPointKeyframes(Func<ControlPoint, Keyframe> controlPointToNewKeyframeFunc)
+        {
+            UpdateKeyframes(SelectedControlPoints.Select(cp => (cp, controlPointToNewKeyframeFunc(cp))));
         }
         
         /// <summary>
         /// ControlPointのKeyframeの時間が変更されたらAnimationCurve上のIndexが変わる可能性がある
         /// Indexが変わるなら追随する
         /// </summary>
-        public void UpdateKeyframes(IEnumerable<(ControlPoint, Keyframe)> controlPointAndNewKeyframes, bool notifyOnChanged = true)
+        public void UpdateKeyframes(IEnumerable<(ControlPoint, Keyframe)> controlPointAndNewKeyframes)
         {
             if (controlPointAndNewKeyframes == null || Curve == null || ControlPoints.Count == 0)
             {
                 return;
             }
-            
+
             using var _ = ListPool<(ControlPoint controlPoint, Keyframe keyframe)>.Get(out var list);
             list.AddRange(controlPointAndNewKeyframes);
             
@@ -292,14 +286,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 }
             }
 
-            if (notifyOnChanged)
-            {
-                OnCurveChanged();
-                onControlPointSelectionChanged?.Invoke();
-            }
+            OnCurveChanged();
+            onControlPointSelectionChanged?.Invoke();
         }
-  
-        public void OnCurveChanged()
+
+        private void OnCurveChanged()
         {
             ApplyTangentModeAndKeyBrokenToKeyframes();
             onCurveChanged?.Invoke();

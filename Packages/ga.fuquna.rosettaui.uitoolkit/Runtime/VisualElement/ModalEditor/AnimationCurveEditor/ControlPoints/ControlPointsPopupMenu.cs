@@ -16,37 +16,37 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
     /// </details>
     public static class ControlPointsPopupMenu
     {
-        public static void Show(Vector2 position, SelectedControlPointsEditor controlPointsEditor, Action showEditPositionPopup, VisualElement target)
+        public static void Show(Vector2 position, CurveController curveController, Action showEditPositionPopup, VisualElement target)
         {
             PopupMenuUtility.Show(
-                CreateMenuItemsDeleteEdit(controlPointsEditor, showEditPositionPopup)
+                CreateMenuItemsDeleteEdit(curveController, showEditPositionPopup)
                     .Append(new MenuItemSeparator())
-                    .Concat(CreateMenuItemsBothTangentMode(controlPointsEditor))
+                    .Concat(CreateMenuItemsBothTangentMode(curveController))
                     .Append(new MenuItemSeparator())
-                    .Concat(CreateMenuItemsTangent(controlPointsEditor)),
+                    .Concat(CreateMenuItemsTangent(curveController)),
                 position,
                 target
             );
         }
 
         private static IEnumerable<IMenuItem> CreateMenuItemsDeleteEdit(
-            SelectedControlPointsEditor controlPointsEditor,
+            CurveController curveController,
             Action showEditPositionPopup
         )
         {
-            var isMultiSelection = controlPointsEditor.IsMultiSelection;
-            yield return new MenuItem(isMultiSelection ? "Delete Keys" : "Delete Key", controlPointsEditor.RemoveAll);
+            var isMultiSelection = curveController.IsMultiSelection;
+            yield return new MenuItem(isMultiSelection ? "Delete Keys" : "Delete Key", curveController.CommandForSelection.RemoveAllControlPoints);
             yield return new MenuItem(isMultiSelection ? "Edit Keys..." : "Edit Key...", showEditPositionPopup);
         }
 
-        private static IEnumerable<IMenuItem> CreateMenuItemsBothTangentMode(SelectedControlPointsEditor controlPointsEditor)
+        private static IEnumerable<IMenuItem> CreateMenuItemsBothTangentMode(CurveController curveController)
         {
-            var anyKeys = !controlPointsEditor.IsEmpty;
+            var anyKeys = curveController.SelectedControlPoints.Any();
             var allFreeSmooth = anyKeys;
             var allFlat = anyKeys;
             var allBroken = anyKeys;
             
-            var controlPoints = controlPointsEditor.ControlPoints;
+            var controlPoints = curveController.SelectedControlPoints;
             foreach (var controlPoint in controlPoints)
             {
                 var key = controlPoint.Keyframe;
@@ -58,25 +58,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 if (broken || leftMode != TangentMode.Free || key.inTangent != 0 || rightMode != TangentMode.Free || key.outTangent != 0) allFlat = false;
                 if (!broken) allBroken = false;
             }
-            
-            
-            yield return Create("Free Smooth", allFreeSmooth, () =>
-            {
-                controlPointsEditor.SetBothTangentMode(TangentMode.Free);
-                controlPointsEditor.SetKeyBroken(false);
-            });
-            yield return Create("Flat", allFlat, () =>
-            {
-                controlPointsEditor.SetBothTangentMode(TangentMode.Free, false);
-                controlPointsEditor.SetKeyBroken(false, false);
-                controlPointsEditor.UpdateKeyframes(keyframe =>
-                {
-                    keyframe.inTangent = 0;
-                    keyframe.outTangent = 0;
-                    return keyframe;
-                });
-            });
-            yield return Create("Broken", allBroken, () => controlPointsEditor.SetKeyBroken(true));
+
+
+            yield return Create("Free Smooth", allFreeSmooth, curveController.CommandForSelection.SetFreeSmooth);
+            yield return Create("Flat", allFlat, curveController.CommandForSelection.SetFlat);
+            yield return Create("Broken", allBroken, () => curveController.CommandForSelection.SetKeyBroken(true));
             
             yield break;
 
@@ -89,9 +75,9 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             }
         }
         
-        private static IEnumerable<IMenuItem> CreateMenuItemsTangent(SelectedControlPointsEditor controlPointsEditor)
+        private static IEnumerable<IMenuItem> CreateMenuItemsTangent(CurveController curveController)
         {
-            var anyKeys = !controlPointsEditor.IsEmpty;
+            var anyKeys = curveController.SelectedControlPoints.Any();
             var allLeftWeighted = anyKeys;
             var allLeftFree = anyKeys;
             var allLeftLinear = anyKeys;
@@ -101,7 +87,7 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             var allRightLinear = anyKeys;
             var allRightConstant = anyKeys;
             
-            var controlPoints = controlPointsEditor.ControlPoints;
+            var controlPoints = curveController.SelectedControlPoints;
             foreach (var controlPoint in controlPoints)
             {
                 var key = controlPoint.Keyframe;
@@ -123,14 +109,14 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
             
             var leftItems = CreateMenuItemsTangent("Left Tangent",
                 allLeftFree, allLeftLinear, allLeftConstant, allLeftWeighted,
-                mode => SetTangentMode((true, false), mode),
-                weighted => controlPointsEditor.SetWeightedMode(WeightedMode.In, weighted)
+                mode =>  curveController.CommandForSelection.SetTangentMode(true, false, mode),
+                weighted => curveController.CommandForSelection.SetWeightedMode(WeightedMode.In, weighted)
             );
             
             var rightItems = CreateMenuItemsTangent("Right Tangent",
                 allRightFree, allRightLinear, allRightConstant, allRightWeighted,
-                mode => SetTangentMode((false, true), mode),
-                weighted => controlPointsEditor.SetWeightedMode(WeightedMode.Out, weighted)
+                mode => curveController.CommandForSelection.SetTangentMode(false, true, mode),
+                weighted => curveController.CommandForSelection.SetWeightedMode(WeightedMode.Out, weighted)
             );
             
             var bothItems = CreateMenuItemsTangent("Both Tangents",
@@ -138,26 +124,11 @@ namespace RosettaUI.UIToolkit.AnimationCurveEditor
                 allLeftLinear && allRightLinear,
                 allLeftConstant && allRightConstant,
                 allLeftWeighted && allRightWeighted,
-                mode => SetTangentMode((true, true), mode),
-                weighted => controlPointsEditor.SetWeightedMode(WeightedMode.Both, weighted)
+                mode => curveController.CommandForSelection.SetTangentMode(true, true, mode),
+                weighted => curveController.CommandForSelection.SetWeightedMode(WeightedMode.Both, weighted)
             );
             
             return leftItems.Concat(rightItems).Concat(bothItems);
-
-            void SetTangentMode((bool inEnable, bool outEnable) enable, TangentMode mode)
-            {
-                if (enable.inEnable)
-                {
-                    controlPointsEditor.SetTangentMode(InOrOut.In, mode);
-                }
-
-                if (enable.outEnable)
-                {
-                    controlPointsEditor.SetTangentMode(InOrOut.Out, mode);
-                }
-                
-                controlPointsEditor.SetKeyBroken(true);
-            }
         }
         
         private static IEnumerable<IMenuItem> CreateMenuItemsTangent(string menuPath,

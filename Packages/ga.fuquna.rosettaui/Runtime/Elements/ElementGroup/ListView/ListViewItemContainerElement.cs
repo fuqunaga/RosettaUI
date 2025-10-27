@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.Pool;
 
 namespace RosettaUI
@@ -26,7 +25,7 @@ namespace RosettaUI
     /// ElementとBinderを新たなIndexのものとして扱うことでUIの状態を引き継げるようにしている
     /// 移動した要素の移動前移動後のIndexだけでなくその間の要素のIndexもすべてずれるのでそれらすべでで上述のIndex替え操作を行う
     /// </summary>
-    public class ListViewItemContainerElement : ElementGroup
+    public partial class ListViewItemContainerElement : ElementGroup
     {
         private readonly IBinder _binder;
         public readonly ListViewOption option;
@@ -91,7 +90,7 @@ namespace RosettaUI
             base.UpdateInternal();
         }
 
-        protected void NotifyListChangedToView()
+        private void NotifyListChangedToView()
         {
             _lastList = CurrentList;
             _lastListItemCount = ListItemCount;
@@ -139,28 +138,10 @@ namespace RosettaUI
                 element,
                 () => new[]
                 {
-                    new MenuItem("Add Element", DuplicateItem),
-                    new MenuItem("Remove Element", RemoveItem),
+                    new MenuItem("Add Element", () => GetListEditor().DuplicateItem(index)),
+                    new MenuItem("Remove Element", () => GetListEditor().RemoveItem(index))
                 }
             );
-
-            void DuplicateItem()
-            {
-                ListBinder.DuplicateItem(_binder, index);
-                OnItemIndexShiftPlus(index + 1);
-                
-                NotifyListChangedToView();
-                NotifyViewValueChanged();
-            }
-
-            void RemoveItem()
-            {
-                ListBinder.RemoveItem(_binder, index);
-                OnItemIndexShiftMinus(index);
-
-                NotifyListChangedToView();
-                NotifyViewValueChanged();
-            }
         }
         
         private void AddItemElement(Element element, int index, bool removeState = true)
@@ -172,7 +153,14 @@ namespace RosettaUI
 
         private void RemoveItemElement(int index, bool removeState = true)
         {
-            if ( removeState) _itemIndexToElementState.Remove(index);
+            if (removeState)
+            {
+                if (_itemIndexToElementState.Remove(index, out var state))
+                {
+                    state.Dispose();
+                }
+            }
+
             if (!_itemIndexToElement.Remove(index, out var element)) return;
 
             RemoveChild(element, false);
@@ -230,34 +218,43 @@ namespace RosettaUI
 
         private void MoveElementState(int fromIndex, int toIndex)
         {
-            if (!_itemIndexToElementState.Remove(fromIndex, out var state))
-            {
-                state = CreateElementState(fromIndex);
-            }
-
-            if (state != null)
-            {
-                _itemIndexToElementState[toIndex] = state;
-            }
+            var state = PopOrCreateElementState(fromIndex);
+            SetElementState(toIndex, state);
         }
 
         private void OnMoveItemIndex(int fromIndex, int toIndex)
         {
-            if (!_itemIndexToElementState.Remove(fromIndex, out var state))
-            {
-                state = CreateElementState(fromIndex);
-            }
+            var state = PopOrCreateElementState(fromIndex);
             
             if ( toIndex < fromIndex )
                 OnItemIndexShiftPlus(toIndex, fromIndex);
             else
                 OnItemIndexShiftMinus(fromIndex, toIndex);
-
-
-            if (state != null)
+            
+            SetElementState(toIndex, state);
+        }
+        
+        
+        /// <summary>
+        /// 指定したIndexのElementStateを取り出し、なければ新規作成して返す
+        /// 取り出したElementStateは辞書から削除される
+        /// </summary>
+        private ElementState PopOrCreateElementState(int index)
+        {
+            return _itemIndexToElementState.Remove(index, out var state) 
+                ? state 
+                : CreateElementState(index);
+        }
+        
+        private void SetElementState(int index, ElementState state)
+        {
+            if (_itemIndexToElementState.Remove(index, out var oldState))
             {
-                _itemIndexToElementState[toIndex] = state;
+                oldState.Dispose();
             }
+
+            if (state == null) return;
+            _itemIndexToElementState[index] = state;
         }
 
         private ElementState CreateElementState(int index)
@@ -273,8 +270,6 @@ namespace RosettaUI
 
         private void OnItemsAdded(IEnumerable<int> indices)
         {
-            _lastListItemCount = ListItemCount;
-
             using var pool = ListPool<int>.Get(out var indexList);
             indexList.AddRange(indices.Distinct());
 
@@ -301,35 +296,11 @@ namespace RosettaUI
         
         private void OnItemsRemoved(IEnumerable<int> indices)
         {
-            _lastListItemCount = ListItemCount;
-            
-            using var pool = ListPool<int>.Get(out var indexList);
-            indexList.AddRange(indices.Distinct());
-
-            //　最後尾ならIndexの移動なし
-            var itemCount = ListItemCount;
-            if (indexList.All(i => i >= itemCount))
+            // 後ろのindexから消してずらす、を繰り返す
+            foreach(var i in indices.OrderBy(i => i))
             {
-                foreach (var i in indexList)
-                {
-                    RemoveItemElement(i);
-                }
-
-                return;
-            }
-            
-            // 最後尾ではないけど１つだけなら消してずらす
-            // 現状歯抜け選択には非対応
-            if (indexList.Count() == 1)
-            {
-                var i = indexList.First();
                 OnItemIndexShiftMinus(i);
-                
-                return;
             }
-            
-            // 最後尾でないかつ複数ならリセット
-            RemoveItemElementAll();
         }
         
         // UI側でListの参照先、要素数、値が変わった(Arrayの要素数変更などすると参照先が変わる）ときの通知
@@ -345,77 +316,5 @@ namespace RosettaUI
             SetViewListWithoutNotify(list);
             NotifyViewValueChanged();
         }
-        
-        protected override ElementViewBridge CreateViewBridge() => new ListViewItemContainerViewBridge(this);
-
-        public class ListViewItemContainerViewBridge : ElementViewBridge
-        {
-            private ListViewItemContainerElement Element => (ListViewItemContainerElement)element;
-            private IBinder Binder => Element._binder;
-            
-            public ListViewItemContainerViewBridge(ListViewItemContainerElement element) : base(element)
-            {
-            }
-            
-            public IList GetIList() => ListBinder.GetIList(Binder);
-            
-            public Element GetOrCreateItemElement(int index) => Element.GetOrCreateItemElement(index);
-
-            public void OnItemIndexChanged(int fromIndex, int toIndex) => Element.OnMoveItemIndex(fromIndex, toIndex);
-
-            public void OnItemsAdded(IEnumerable<int> indices) => Element.OnItemsAdded(indices);
-            public void OnItemsRemoved(IEnumerable<int> indices) => Element.OnItemsRemoved(indices);
-
-            // UIでのリストの参照先の変更を通知
-            // 値や要素数の変更は別途OnViewListValueChanged()が呼ばれるのでこちらではNotifyしない
-            public void OnViewListChanged(IList list) => Element.SetViewListWithoutNotify(list);
-
-            // UIでのリストの変更を通知
-            // 要素数、値
-            public void OnViewListValueChanged(IList list) => Element.SetViewList(list);
-            
-            
-            // UIではない外部でのリストの変更を通知
-            // 参照or要素数
-            public void SubscribeListChanged(Action<IList> action)
-            {
-                Element.onListChanged += action;
-                onUnsubscribe += () => Element.onListChanged -= action;
-            }
-        }
-
-
-        // 別のElementに引き継ぐElementの状態
-        //　現状FoldのOpen/Close情報のみ
-        private class ElementState
-        {
-            private List<bool> _openList;
-            
-            public static ElementState Create(Element element)
-            {
-                return new ElementState()
-                {
-                    _openList = element.Query<FoldElement>().Select(fold => fold.IsOpen).ToList()
-                };
-            }
-
-            public void Apply(Element element)
-            {
-                using var pool = ListPool<FoldElement>.Get(out var foldList);
-                foldList.AddRange(element.Query<FoldElement>());
-                
-                // 数が合わなくてもできるだけ引き継ぐ
-                var count = Mathf.Min(foldList.Count, _openList.Count);
-                for (var i = 0; i < count; ++i)
-                {
-                    foldList[i].IsOpen = _openList[i];
-                }
-            }
-        }
-    }
-
-    public static partial class ElementViewBridgeExtensions
-    {
-        public static ListViewItemContainerElement.ListViewItemContainerViewBridge GetViewBridge(this ListViewItemContainerElement element) => (ListViewItemContainerElement.ListViewItemContainerViewBridge)element.ViewBridge;
     }
 }

@@ -1,4 +1,6 @@
 using RosettaUI.Builder;
+using RosettaUI.UIToolkit.UndoSystem;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -32,7 +34,17 @@ namespace RosettaUI.UIToolkit
 
         protected override void ShowEditor(Vector3 position)
         {
-            AnimationCurveEditor.AnimationCurveEditor.Show(position, this, value, curve => value = curve);
+            var initialValue = UndoHelper.Clone(value);
+            AnimationCurveEditor.AnimationCurveEditor.Show(position, this, value,
+                onCurveChanged: curve => value = curve,
+                onHide: _ =>
+                {
+                    if (!initialValue.Equals(value))
+                    {
+                        UndoUIToolkit.RecordBaseField(nameof(AnimationCurveField), this, initialValue, value);
+                    }
+                }
+            );
         }
         
         protected override void Copy(AnimationCurve source, AnimationCurve destination)

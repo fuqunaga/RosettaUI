@@ -56,14 +56,12 @@ namespace RosettaUI
         {
             ProcessQueue();
 
-            Getter.EnableCache();
+            using var _ = Getter.CacheScope();
 
             foreach (var e in _elements)
             {
                 e.Update();
             }
-            
-            Getter.DisableCache();
         }
 
         /// <summary>

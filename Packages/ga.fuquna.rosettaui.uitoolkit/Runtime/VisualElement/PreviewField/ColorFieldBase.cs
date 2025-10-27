@@ -1,4 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
+using RosettaUI.UIToolkit.UndoSystem;
+using RosettaUI.UndoSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -25,7 +27,27 @@ namespace RosettaUI.UIToolkit
 
         protected override void ShowEditor(Vector3 position)
         {
-            ColorPicker.Show(position, this, value, color => value = color, EnableAlpha);
+            var initialValue = value;
+            
+            ColorPicker.Show(position, this, initialValue,
+                onColorChanged: color => value = color,
+                onHide: OnHide,
+                enableAlpha: EnableAlpha
+            );
+
+            return;
+
+            void OnHide(bool isCancelled)
+            {
+                if (isCancelled)
+                {
+                    value = initialValue;
+                }
+                else if (initialValue != value)
+                {
+                    UndoUIToolkit.RecordBaseField(nameof(ColorFieldBase), this, initialValue, value);
+                }
+            }
         }
 
         public override void SetValueWithoutNotify(Color color)
@@ -34,8 +56,7 @@ namespace RosettaUI.UIToolkit
             inputField.SetColor(color);
         }
 
-
-        // ReSharper disable once MemberCanBeProtected.Global
+        
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         public class ColorInput : VisualElement

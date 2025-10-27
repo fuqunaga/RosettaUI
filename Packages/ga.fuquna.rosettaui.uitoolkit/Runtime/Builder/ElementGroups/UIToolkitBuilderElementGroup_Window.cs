@@ -57,7 +57,7 @@ namespace RosettaUI.UIToolkit.Builder
 
 
             void OnShow() => windowElement.Enable = true;
-            void OnHide() => windowElement.Enable = false;
+            void OnHide(bool _) => windowElement.Enable = false;
         }
     }
 }

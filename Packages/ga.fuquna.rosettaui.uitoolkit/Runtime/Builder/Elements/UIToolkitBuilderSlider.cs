@@ -13,7 +13,7 @@ namespace RosettaUI.UIToolkit.Builder
         {
             if (element is not SliderElement<TValue> sliderElement || visualElement is not TSlider sliderInField) return false;
 
-            sliderInField.SetShowInputField(sliderElement.showInputField);
+            sliderInField.InputField.SetShow(sliderElement.showInputField);
 
             BindRangeFieldElement(sliderElement,
                 (min) => sliderInField.Slider.lowValue = min,

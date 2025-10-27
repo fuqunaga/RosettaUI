@@ -28,20 +28,20 @@ namespace RosettaUI.Example
 
         public static (string, Element) Tab(string title, params Element[] elements) =>
             (TabTitle(title), UI.Page(elements));
-        
+
         public static Element FunctionColumn(string className, string functionName, params Element[] elements) =>
             TitleIndent(FunctionStr(className, functionName), elements);
-        
+
         public static Element UIFunctionColumn(string functionName, params Element[] elements) =>
             TitleIndent(UIFunctionStr(functionName), elements);
-        
+
         public static Element UIFunctionPage(string functionName, params Element[] elements) =>
             TitlePage(UIFunctionStr(functionName), elements);
 
         public static Element UIFunctionRow(string functionName, params Element[] elements) =>
             UI.Column(
                 UI.Row(
-                    new Element[]{UI.Label(UIFunctionStr(functionName), LabelType.Prefix)}.Concat(elements)
+                    new Element[] { UI.Label(UIFunctionStr(functionName), LabelType.Prefix) }.Concat(elements)
                 ),
                 BlankLine()
             );
@@ -60,17 +60,17 @@ namespace RosettaUI.Example
                 UI.Label(highlightedCode)
             ).SetBackgroundColor(new Color(0f, 0f, 0f, 0.7f));
         }
-        
+
         public static Element CodeElementSets(string title, params (string, Element)[] pairs)
             => CodeElementSets(title, null, pairs);
-        
+
         public static Element CodeElementSets(string title, string description, params (string, Element)[] pairs)
         {
             var texts = pairs.Select(pair => pair.Item1);
             var elements = pairs.Select(pair => pair.Item2);
 
             var code = string.Join("\n", texts);
-            
+
             return TitleIndent(Bold(title),
                 string.IsNullOrEmpty(description) ? null : UI.Label(description),
                 UI.Column(
@@ -85,16 +85,33 @@ namespace RosettaUI.Example
             );
         }
 
-        public static (string, Element) CodeElementSetsTab(string title, params (string, Element)[] pairs) => 
+        public static (string, Element) CodeElementSetsTab(string title, params (string, Element)[] pairs) =>
             CodeElementSetsTab(title, title, pairs);
 
-        public static (string, Element) CodeElementSetsWithDescriptionTab(string title, string description, params (string, Element)[] pairs) => 
+        public static (string, Element) CodeElementSetsWithDescriptionTab(string title, string description,
+            params (string, Element)[] pairs) =>
             CodeElementSetsTab(title, title, description, pairs);
-        
-        public static (string, Element) CodeElementSetsTab(string tabTitle, string codeTitle, params (string, Element)[] pairs) => 
+
+        public static (string, Element) CodeElementSetsTab(string tabTitle, string codeTitle,
+            params (string, Element)[] pairs) =>
             CodeElementSetsTab(tabTitle, codeTitle, null, pairs);
 
-        public static (string, Element) CodeElementSetsTab(string tabTitle, string codeTitle, string description, params (string, Element)[] pairs) => 
+        public static (string, Element) CodeElementSetsTab(string tabTitle, string codeTitle, string description,
+            params (string, Element)[] pairs) =>
             (TabTitle(tabTitle), UI.Page(CodeElementSets(codeTitle, description, pairs)));
+
+
+        public static Element TitleDescriptionElement(string title, string description, params Element[] elements)
+        {
+            return TitleIndent(Bold(title),
+                UI.Label(description),
+                BlankLine(),
+                UI.Box(
+                    UI.Page(
+                        elements
+                    )
+                )
+            );
+        }
     }
 }

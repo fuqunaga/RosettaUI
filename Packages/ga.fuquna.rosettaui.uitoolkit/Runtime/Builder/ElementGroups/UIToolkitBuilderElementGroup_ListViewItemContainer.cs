@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -49,8 +48,8 @@ namespace RosettaUI.UIToolkit.Builder
             listView.Rebuild();
             
             return true;
-            
-            
+
+
             #region Local functions
 
             void SetCallbacks()
@@ -60,10 +59,24 @@ namespace RosettaUI.UIToolkit.Builder
                 {
                     listView.itemsSource = list;
                     listView.Rebuild();
-                    
+
+                    // リストの一番下までスクロールした状態で外部から要素を追加すると
+                    // 追加された要素が表示されない
+                    // CollectionVirtualizationMethod.DynamicHeight 限定
+                    // 再度Rebuild()を呼ぶと表示されるので暫定対処
+                    // - 発生確認
+                    //  - 6000.0.58f2
+                    //  - 6000.0.59f2
+                    // - 未発生確認
+                    //  - 2022.3.62f1
+                    //  - 6000.2.6f2
+#if UNITY_6000_0_OR_NEWER && !UNITY_6000_2_OR_NEWER
+                    listView.Rebuild();
+#endif
+
                     RequestResizeWindowEvent.Send(listView);
                 });
-                
+
                 //　itemsRemoved は要素が削除される前に呼ばれるので注意@Unity6
                 // 要素変化後の itemSource を参照するために itemsSourceSizeChanged を登録する
                 // listView.itemsSourceSizeChangedはinternalなのでListViewControllerCustomに登録ｓ
@@ -151,7 +164,7 @@ namespace RosettaUI.UIToolkit.Builder
             }
 
             // OnItemsRemoved()がlistView.itemsSource変更前に呼ばれてしまうので、
-            // listView.itemsSource変更御のOnItemsSourceSizeChanged()で変更を通知する
+            // listView.itemsSource変更後のOnItemsSourceSizeChanged()で変更を通知する
             void OnItemsSourceSizeChanged()
             {
                 OnViewListValueChanged();

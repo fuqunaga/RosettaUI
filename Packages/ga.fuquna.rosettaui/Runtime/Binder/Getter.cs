@@ -19,7 +19,19 @@ namespace RosettaUI
         {
             CacheEnable = false;
         }
+        
+        public static GetterCacheScope CacheScope()
+        {
+            EnableCache();
+            return new GetterCacheScope();
+        }
+        
+        public readonly struct GetterCacheScope : IDisposable
+        {
+            public void Dispose() => DisableCache();
+        }
     }
+
 
     public class Getter<T> : GetterBase<T>
     {

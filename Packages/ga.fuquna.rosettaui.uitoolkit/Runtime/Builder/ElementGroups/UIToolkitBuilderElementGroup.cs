@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using RosettaUI.Builder;
 using UnityEngine.Assertions;
 using UnityEngine.Pool;
@@ -26,24 +25,6 @@ namespace RosettaUI.UIToolkit.Builder
                 ve.style.marginLeft = LayoutSettings.IndentSize * indentLevel;
         }
 
-        private VisualElement Build_ElementGroupContents(VisualElement container, Element element,
-            Action<VisualElement, int> setupContentsVe = null)
-        {
-            var group = (ElementGroup) element;
-
-            container.name = group.DisplayName;
-
-            var i = 0;
-            foreach (var ve in Build_ElementGroupContents(group))
-            {
-                setupContentsVe?.Invoke(ve, i);
-                container.Add(ve);
-                i++;
-            }
-
-            return container;
-        }
-        
         // ElementGroupのBind
         // 型チェックあり
         private bool Bind_ElementGroup<TElementGroup, TVisualElement>(Element element, VisualElement visualElement)
@@ -56,8 +37,7 @@ namespace RosettaUI.UIToolkit.Builder
 
         // ElementGroupのBind
         // visualElementの子供にBindできない場合はBuildで生成する
-        private bool Bind_ElementGroupContents(ElementGroup elementGroup, VisualElement visualElement,
-            Action<Element, VisualElement, int> bindChild = null)
+        private bool Bind_ElementGroupContents(ElementGroup elementGroup, VisualElement visualElement)
         {
             visualElement.name = elementGroup.DisplayName;
             

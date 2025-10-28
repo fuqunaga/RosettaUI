@@ -39,11 +39,13 @@ namespace RosettaUI
         
         private event Action<IList> onListChanged;
 
+        
+        private ListBinder ListBinder => new(_binder, option.createItemInstanceFunc);
         private IList CurrentList => ListBinder.GetIList(_binder);
         
         public int ListItemCount
         {
-            get => ListBinder.GetCount(_binder);
+            get => ListBinder.GetCount();
             set
             {
                 var prevCount = ListItemCount;
@@ -58,7 +60,7 @@ namespace RosettaUI
                     }
                 }
 
-                ListBinder.SetCount(_binder, value);
+                ListBinder.SetCount(value);
                 NotifyListChangedToView();
             }
         }

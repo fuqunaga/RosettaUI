@@ -75,17 +75,13 @@ namespace RosettaUI
             return UI.NullGuard(label, binder, () =>
                 UI.DynamicElementOnTrigger
                 (
-                    rebuildIf: _ =>
-                    {
-                        var current = binder.GetObject();
-                        var refChanged = !ReferenceEquals(lastObject, binder.GetObject());
-                        lastObject = current;
-                        return refChanged;
-                    },
+                    rebuildIf: _ =>!ReferenceEquals(lastObject, binder.GetObject()),
                     () =>
                     {
-                        if (lastObject is IElementCreator elementCreator)
+                        var current = binder.GetObject();
+                        if (current is IElementCreator elementCreator)
                         {
+                            lastObject = current;
                             label?.DetachView();
                             var element = elementCreator.CreateElement(label);
                             SetCallBinderSetterWhenValueChanged(element);

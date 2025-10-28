@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace RosettaUI.Example
 {
@@ -215,7 +216,7 @@ UI.List(() => nonReorderableArray);
         }
         
         
-        private (string label, Element element) CustomInstance()
+        private static (string label, Element element) CustomInstance()
         {
             var list = new List<IListItem>
             {
@@ -223,15 +224,35 @@ UI.List(() => nonReorderableArray);
                 new FloatItem() { floatValue = 2f },
                 new IntItem { intValue = 3 },
             };
-
+            
             return ExampleTemplate.Tab("CustomInstance",
                 ExampleTemplate.CodeElementSets("Custom instance with interface",
-                    (@"public interface IListItem
+                    (@"UI.List(
+    () => list,
+    ListViewOption.OfType(list).SetCreateItemInstanceFunc(CreateNewItem)
+)
+
+IListItem CreateNewItem(List<IListItem> _, int index)
+{
+    return index % 2 == 0 
+        ? new IntItem() 
+        : new FloatItem();
+}
 ",
-                        UI.Field(() => list)
+                        UI.List(
+                            () => list,
+                            ListViewOption.OfType(list).SetCreateItemInstanceFunc(CreateNewItem)
+                        )
                     )
                 )
             );
+
+            IListItem CreateNewItem(List<IListItem> _, int index)
+            {
+                return index % 2 == 0 
+                    ? new IntItem() 
+                    : new FloatItem();
+            }
         }
     }
 }

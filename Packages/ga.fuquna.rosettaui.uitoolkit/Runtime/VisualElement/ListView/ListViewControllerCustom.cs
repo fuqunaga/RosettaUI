@@ -24,18 +24,18 @@ namespace RosettaUI.UIToolkit
 
             var previousCount = GetItemsCount();
             
-            var type = itemsSource.GetType();
-            var itemType = ListUtility.GetItemType(type);
+            var listType = itemsSource.GetType();
+            var itemType = ListUtility.GetItemType(listType);
             for (var i = 0; i < itemCount; ++i)
             {
                 if (_createItemFunc != null)
                 {
                     var newItem = _createItemFunc(itemsSource, itemType, previousCount + i);
-                    itemsSource = ListUtility.AddItemAtLast(itemsSource, itemType, newItem);
+                    itemsSource = ListUtility.AddItemAtLast(itemsSource,listType, itemType, newItem);
                 }
                 else
                 {
-                    itemsSource = ListUtility.AddItemAtLast(itemsSource, type, itemType);
+                    itemsSource = ListUtility.AddItemAtLast(itemsSource, listType, itemType);
                 }
             }
 

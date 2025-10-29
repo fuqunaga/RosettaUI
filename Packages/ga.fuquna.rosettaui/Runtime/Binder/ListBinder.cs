@@ -19,7 +19,16 @@ namespace RosettaUI
             Assert.IsTrue(IsListBinder(binder));
 
             _binder = binder;
-            _createItemInstanceFunc = createItemInstanceFunc;
+            _createItemInstanceFunc = createItemInstanceFunc ?? DuplicateItemInstance;
+
+            return;
+
+            
+            static object DuplicateItemInstance(IList list, Type itemType, int index)
+            {
+                var baseItem = list[index];
+                return ListUtility.CreateNewItem(baseItem, itemType);
+            }
         }
 
         public IListItemBinder CreateItemBinderAt(int index) => CreateItemBinderAt(_binder, index);
@@ -44,8 +53,16 @@ namespace RosettaUI
 
         public bool IsReadOnly() => IsReadOnly(_binder);
 
-        public void DuplicateItem(int index) => DuplicateItem(_binder, index);
-        public void AddItem(int index) => AddItem(_binder, index);
+        public void AddItem(int index)
+        {
+            var list = GetIList();
+            
+            var newItem = CreateNewItem(index);
+            list = ListUtility.AddItem(list, ItemType, newItem, index);
+            
+            _binder.SetObject(list);
+        }
+            
         public void AddNullItem(int index) => AddNullItem(_binder, index);
         public void RemoveItem(int index) => RemoveItem(_binder, index);
         public void RemoveItems(Range range) => RemoveItems(_binder, range);
@@ -56,26 +73,16 @@ namespace RosettaUI
             var list = GetIList() ?? (IList) Activator.CreateInstance(ListType);
             
             var index = list?.Count ?? 0;
-            var newItem = CreateNewItem(list, index);
-
-            list = ListUtility.AddItem(list, ItemType, newItem, index);
-            
-            _binder.SetObject(list);
+            AddItem(index);
         }
         
         public void RemoveItemAtLast() => RemoveItemAtLast(_binder);
         
         
-        private object CreateNewItem(IList list, int index)
+        private object CreateNewItem(int index)
         {
-            if (_createItemInstanceFunc != null)
-            {
-                return _createItemInstanceFunc(list, ItemType, index);
-            }
-            
-            var baseIndex = Math.Max(0, list.Count - 1);
-            var baseItem = list.Count > 0 ? list[baseIndex] : null;
-            return ListUtility.CreateNewItem(baseItem, ItemType);
+            var list = GetIList();
+            return _createItemInstanceFunc?.Invoke(list, ItemType, index);
         }
     }
 }

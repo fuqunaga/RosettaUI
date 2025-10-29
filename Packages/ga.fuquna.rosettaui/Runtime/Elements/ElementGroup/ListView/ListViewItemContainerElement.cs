@@ -41,7 +41,7 @@ namespace RosettaUI
 
         
         private ListBinder ListBinder => new(_binder, option.createItemInstanceFunc);
-        private IList CurrentList => ListBinder.GetIList(_binder);
+        private IList CurrentList => ListBinder.GetIList();
         
         public int ListItemCount
         {
@@ -66,18 +66,18 @@ namespace RosettaUI
         }
 
         [Obsolete("Use ListViewOption.createItemElementFunc instead")]
-        public ListViewItemContainerElement(IBinder listBinder,
+        public ListViewItemContainerElement(IBinder binder,
             Func<IBinder, int, Element> createItemElement,
-            in ListViewOption option) : this(listBinder, new ListViewOption(option){ createItemElementFunc = createItemElement })
+            in ListViewOption option) : this(binder, new ListViewOption(option){ createItemElementFunc = createItemElement })
         {
         }
 
-        public ListViewItemContainerElement(IBinder listBinder, in ListViewOption option) : base(null)
+        public ListViewItemContainerElement(IBinder binder, in ListViewOption option) : base(null)
         {
-            _binder = listBinder;
+            _binder = binder;
             this.option = option;
 
-            Interactable = !ListBinder.IsReadOnly(listBinder);
+            Interactable = !ListBinder.IsReadOnly();
             
             _binderTypeHistorySnapshot = BinderHistory.Snapshot.Create();
 
@@ -116,11 +116,11 @@ namespace RosettaUI
             if (element != null) return element;
             
             using var applyScope = _binderTypeHistorySnapshot.GetApplyScope();
-            var isReadOnly = ListBinder.IsReadOnly(_binder);
+            var isReadOnly = ListBinder.IsReadOnly();
 
             if (!_itemIndexToBinder.TryGetValue(index, out var itemBinder))
             {
-                _itemIndexToBinder[index] = itemBinder = ListBinder.CreateItemBinderAt(_binder, index);
+                _itemIndexToBinder[index] = itemBinder = ListBinder.CreateItemBinderAt(index);
             }
 
             element = option.createItemElementFunc(itemBinder, index);
@@ -145,7 +145,7 @@ namespace RosettaUI
                 element,
                 () => new[]
                 {
-                    new MenuItem("Add Element", () => GetListEditor().DuplicateItem(index)),
+                    new MenuItem("Add Element", () => GetListEditor().AddItem(index + 1)),
                     new MenuItem("Remove Element", () => GetListEditor().RemoveItem(index))
                 }
             );

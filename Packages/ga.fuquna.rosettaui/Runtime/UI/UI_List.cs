@@ -218,12 +218,13 @@ namespace RosettaUI
             return ret;
         }
 
-        public static Element ListCounterField(IBinder listBinder,　Element itemContainerElement, in ListViewOption option)
+        public static Element ListCounterField(IBinder binder,　Element itemContainerElement, in ListViewOption option)
         {
-            var interactable = !ListBinder.IsReadOnly(listBinder) && !option.fixedSize;
+            var listBinder = new ListBinder(binder, option.createItemInstanceFunc);
+            var interactable = !listBinder.IsReadOnly() && !option.fixedSize;
 
             return Field(null,
-                () => ListBinder.GetCount(listBinder),
+                () => listBinder.GetCount(),
                 count =>
                 {
                     // ListViewItemContainerElementが存在していたら新しいcountを通知
@@ -235,7 +236,7 @@ namespace RosettaUI
                     }
                     else
                     {
-                        ListBinder.SetCount(listBinder, count);
+                        listBinder.SetCount(count);
                     }
                 },
                 new FieldOption { delayInput = true }
@@ -283,8 +284,8 @@ namespace RosettaUI
 
                 return Field(Label(() =>
                 {
-                    object obj = binder.GetObject();
-                    string label = obj == null ? string.Empty : getter(obj);
+                    var obj = binder.GetObject();
+                    var label = obj == null ? string.Empty : getter(obj);
                     return string.IsNullOrEmpty(label) ? $"Item {index}" : label;
                 }), binder);
             }

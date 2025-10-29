@@ -34,21 +34,22 @@ namespace RosettaUI
         public readonly struct ListEditor
         {
             private ListViewItemContainerElement Element { get; }
-            private IBinder Binder => Element._binder;
+            private ListBinder ListBinder => Element.ListBinder;
+            public IList CurrentList => ListBinder.GetIList();
             
-            public IList CurrentList => ListBinder.GetIList(Binder);
             
             public ListEditor(ListViewItemContainerElement element) => Element = element;
 
+            
             private void NotifyListChanged()
             {
                 Element.NotifyListChangedToView();
                 Element.NotifyViewValueChanged();
             }
 
-            public void DuplicateItem(int index)
+            public void AddItem(int index)
             {
-                ListBinder.DuplicateItem(Binder, index);
+                ListBinder.AddItem(index);
                 Element.OnItemIndexShiftPlus(index + 1);
                 
                 Undo.RecordListItemAdd(Element, index + 1);
@@ -70,7 +71,7 @@ namespace RosettaUI
                 
                 foreach (var index in indices.OrderByDescending(i => i))
                 {
-                    ListBinder.RemoveItem(Binder, index);
+                    ListBinder.RemoveItem(index);
                     Element.OnItemIndexShiftMinus(index);
                 }
                 
@@ -81,7 +82,7 @@ namespace RosettaUI
             {
                 if (fromIndex == toIndex) return;
                 
-                ListBinder.MoveItem(Binder, fromIndex, toIndex);
+                ListBinder.MoveItem(fromIndex, toIndex);
                 Element.OnMoveItemIndex(fromIndex, toIndex);
                 
                 Undo.RecordListItemMove(Element, fromIndex, toIndex);
@@ -100,7 +101,7 @@ namespace RosettaUI
                 var count = list?.Count ?? 0;
                 if (count > 0)
                 {
-                    ListBinder.RemoveItems(Binder, ..count);
+                    ListBinder.RemoveItems(..count);
                 }
                 
                 ApplyRestoreRecords(records);
@@ -144,11 +145,11 @@ namespace RosettaUI
                     var index = record.index;
                     if (record.isNull)
                     {
-                        ListBinder.AddNullItem(Binder, index);
+                        ListBinder.AddNullItem(index);
                     }
                     else
                     {
-                        ListBinder.AddItem(Binder, index);
+                        ListBinder.AddItem(index);
                     }
 
                     Element.OnItemIndexShiftPlus(index);

@@ -34,11 +34,18 @@ namespace RosettaUI.Example
         
         public interface IListItem : IElementCreator
         {
+            float Value { get; set; }
         }
 
         public class IntItem : IListItem
         {
             public int intValue;
+
+            public float Value
+            {
+                get => intValue; 
+                set => intValue = (int)value;
+            }
             
             public Element CreateElement(LabelElement label)
             {
@@ -48,11 +55,11 @@ namespace RosettaUI.Example
         
         public class FloatItem : IListItem
         {
-            public float floatValue;
+            public float Value { get; set; }
             
             public Element CreateElement(LabelElement label)
             {
-                return UI.Slider(label, () => floatValue);
+                return UI.Slider(label, () => Value);
             }
         }
        
@@ -220,9 +227,9 @@ UI.List(() => nonReorderableArray);
         {
             var list = new List<IListItem>
             {
-                new IntItem { intValue = 1 },
-                new FloatItem() { floatValue = 2f },
-                new IntItem { intValue = 3 },
+                new IntItem { Value = 1 },
+                new FloatItem() { Value = 2f },
+                new IntItem { Value = 3 },
             };
             
             return ExampleTemplate.Tab("CustomInstance",
@@ -234,9 +241,13 @@ UI.List(() => nonReorderableArray);
 
 IListItem CreateNewItem(List<IListItem> _, int index)
 {
-    return index % 2 == 0 
-        ? new IntItem() 
-        : new FloatItem();
+    var previousValue = index > 0 
+        ? list[index - 1].Value
+        : 0f;
+
+    return index % 2 == 0
+        ? new IntItem() { Value = previousValue }
+        : new FloatItem() { Value = previousValue };
 }
 ",
                         UI.List(
@@ -249,9 +260,13 @@ IListItem CreateNewItem(List<IListItem> _, int index)
 
             IListItem CreateNewItem(List<IListItem> _, int index)
             {
-                return index % 2 == 0 
-                    ? new IntItem() 
-                    : new FloatItem();
+                var previousValue = index > 0 
+                    ? list[index - 1].Value
+                    : 0f;
+
+                return index % 2 == 0
+                    ? new IntItem() { Value = previousValue }
+                    : new FloatItem() { Value = previousValue };
             }
         }
     }

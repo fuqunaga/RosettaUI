@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using UnityEngine.Assertions;
+using RosettaUI.UndoSystem;
 
 namespace RosettaUI
 {
@@ -11,15 +12,15 @@ namespace RosettaUI
         public static ListViewOption Default =>  new (true);
         
         
-        public static ListViewOptionOfType<TList> OfType<TList>(TList _)
-            where TList : IList
+        public static ListViewOptionOfType<TItem> OfType<TItem>(IList<TItem> _)
         {
-            return new ListViewOptionOfType<TList>(Default);
+            return new ListViewOptionOfType<TItem>(Default);
         }
         
         
         public Func<IBinder, int, Element> createItemElementFunc;
         public Func<IList, Type, int, object> createItemInstanceFunc;
+        public Func<object, IObjectRestoreRecord> createItemRestoreRecordFunc;
         
         public bool reorderable;
         public bool fixedSize;
@@ -30,6 +31,7 @@ namespace RosettaUI
         {
             createItemElementFunc = null;
             createItemInstanceFunc = null;
+            createItemRestoreRecordFunc = null;
             
             this.reorderable = reorderable;
             this.fixedSize = fixedSize;
@@ -41,6 +43,7 @@ namespace RosettaUI
         {
             createItemElementFunc = other.createItemElementFunc;
             createItemInstanceFunc = other.createItemInstanceFunc;
+            createItemRestoreRecordFunc = other.createItemRestoreRecordFunc;
             
             reorderable = other.reorderable;
             fixedSize = other.fixedSize;
@@ -49,26 +52,27 @@ namespace RosettaUI
         }
     }
     
+    
     public static class ListViewOptionExtensions
     {
-        public static ListViewOptionOfType<TList> OfType<TList>(this ListViewOption option, TList _)
-            where TList : IList
+        public static ListViewOptionOfType<TItem> OfType<TItem>(this ListViewOption option, IList<TItem> _)
         {
-            return new ListViewOptionOfType<TList>(option);
+            return new ListViewOptionOfType<TItem>(option);
         }
     }
-
+    
+    
     /// <summary>
-    /// ListViewOption specialized for List types.
-    /// Acts as a wrapper to enable type inference and omit type arguments when using SetCreateItemInstanceFunc().
+    /// Wrapper class for ListViewOption specifying the item type of the list
+    /// ListViewOption is type-independent, so use it to guarantee type safety
     /// </summary>
-    public struct ListViewOptionOfType<TList>
-        where TList : IList
+    public struct ListViewOptionOfType<TItem>
     {
-        public static implicit operator ListViewOption (ListViewOptionOfType<TList> optionOfType)
+        public static implicit operator ListViewOption (ListViewOptionOfType<TItem> optionOfType)
         {
             return optionOfType._option;
         }
+        
         
         private ListViewOption _option;
 
@@ -77,14 +81,27 @@ namespace RosettaUI
             _option = option;
         }
         
-        public ListViewOption SetCreateItemInstanceFunc<TItem>(Func<TList, int, TItem> func)
+        public ListViewOptionOfType<TItem> SetCreateItemInstanceFunc(Func<IReadOnlyList<TItem>, int, TItem> func)
         {
-            Assert.IsTrue(ListUtility.GetItemType(typeof(TList)).IsAssignableFrom(typeof(TItem)),
-                $"TItem ({typeof(TItem)}) must be assignable to the item type of TList ({ListUtility.GetItemType(typeof(TList))})"
-            );
+            _option.createItemInstanceFunc = func == null 
+                ? null 
+                :  (list, _, index) => func((IReadOnlyList<TItem>)list, index);
             
-            _option.createItemInstanceFunc = (list, _, index) => func((TList)list, index);
-            return _option;
+            return this;
+        }
+        
+        public ListViewOptionOfType<TItem> SetCreateItemRestoreRecordFunc(Func<TItem, IObjectRestoreRecord<TItem>> func)
+        {
+            _option.createItemRestoreRecordFunc = func == null
+                ? null
+                : obj => func((TItem)obj);
+            
+            return this;
+        }
+
+        public ListViewOptionOfType<TItem> SetItemRestoreFunc(Func<TItem, Func<TItem>> func)
+        {
+            return SetCreateItemRestoreRecordFunc(item => new ObjectRestoreRecord<TItem>(func(item)));
         }
     }
 }

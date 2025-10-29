@@ -123,18 +123,21 @@ namespace RosettaUI
                         continue;
                     }
                 
-                    var isNull = list[index] == null;
+                    var item = list[index];
+                    var isNull = item == null;
                 
                     ElementRestoreRecord elementRecord = null;
                     ElementState elementState = null;
+                    IObjectRestoreRecord objectRestoreRecord = null;
                     if (!isNull)
                     {
                         var itemElement = Element.GetOrCreateItemElement(index);
                         ElementRestoreRecord.TryCreate(itemElement, out elementRecord);
                         elementState = ElementState.Create(itemElement);
+                        objectRestoreRecord = Element.option.createItemRestoreRecordFunc?.Invoke(item);
                     }
                 
-                    yield return new RestoreRecord(index, isNull, elementRecord, elementState);
+                    yield return new RestoreRecord(index, isNull, elementRecord, elementState, objectRestoreRecord);
                 }
             }
 
@@ -149,7 +152,15 @@ namespace RosettaUI
                     }
                     else
                     {
-                        ListBinder.AddItem(index);
+                        if (record.objectRestoreRecord != null)
+                        {
+                            var restoredObject = record.objectRestoreRecord.RestoreObject();
+                            ListBinder.AddItem(restoredObject, index);
+                        }
+                        else
+                        {
+                            ListBinder.AddItem(index);
+                        }
                     }
 
                     Element.OnItemIndexShiftPlus(index);
@@ -182,19 +193,27 @@ namespace RosettaUI
             public readonly bool isNull;
             public readonly ElementRestoreRecord record;
             public readonly ElementState state;
+            public readonly IObjectRestoreRecord objectRestoreRecord;
 
-            public RestoreRecord(int index, bool isNull, ElementRestoreRecord record, ElementState state)
+            public RestoreRecord(int index, bool isNull, ElementRestoreRecord record, ElementState state, IObjectRestoreRecord objectRestoreRecord)
             {
                 this.index = index;
                 this.isNull = isNull;
                 this.record = record;
                 this.state = state;
+                this.objectRestoreRecord = objectRestoreRecord;
             }
 
             public void Dispose()
             {
                 record?.Dispose();
                 state?.Dispose();
+                
+                // ReSharper disable once SuspiciousTypeConversion.Global
+                if (objectRestoreRecord is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
             }
         }
     }

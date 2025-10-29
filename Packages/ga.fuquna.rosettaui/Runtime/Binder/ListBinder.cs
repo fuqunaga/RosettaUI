@@ -26,7 +26,11 @@ namespace RosettaUI
             
             static object DuplicateItemInstance(IList list, Type itemType, int index)
             {
-                var baseItem = list[index];
+                var previousIndex = index - 1;
+                var baseItem = (previousIndex < 0 || previousIndex >= list.Count)
+                    ? null
+                    : list[previousIndex];
+                
                 return ListUtility.CreateNewItem(baseItem, itemType);
             }
         }
@@ -55,14 +59,17 @@ namespace RosettaUI
 
         public void AddItem(int index)
         {
-            var list = GetIList();
-            
             var newItem = CreateNewItem(index);
+            AddItem(newItem, index);
+        }
+        
+        public void AddItem(object newItem, int index)
+        {
+            var list = GetIList();
             list = ListUtility.AddItem(list, ItemType, newItem, index);
-            
             _binder.SetObject(list);
         }
-            
+
         public void AddNullItem(int index) => AddNullItem(_binder, index);
         public void RemoveItem(int index) => RemoveItem(_binder, index);
         public void RemoveItems(Range range) => RemoveItems(_binder, range);

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using RosettaUI.UndoSystem;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace RosettaUI.Example
 {
@@ -62,6 +62,27 @@ namespace RosettaUI.Example
                 return UI.Slider(label, () => Value);
             }
         }
+
+        public class StringOrSliderItem : IElementCreator
+        {
+            public string stringValue;
+            public float floatValue;
+            public bool useSlider;
+            
+            public Element CreateElement(LabelElement label)
+            {
+                return UI.Row(
+                    UI.DynamicElementOnStatusChanged(
+                        () => useSlider,
+                        _ => useSlider
+                            ? UI.Slider(() => floatValue)
+                            : UI.Field(() => stringValue)
+                    ),
+                    UI.Button("Change Field",
+                        () => useSlider = !useSlider)
+                );
+            }
+        }
        
 
 
@@ -102,7 +123,8 @@ namespace RosettaUI.Example
                 ),
                 Code0(),
                 Code1(),
-                CustomInstance()
+                CustomInstance(),
+                CustomUndo()
             );
         }
 
@@ -225,21 +247,23 @@ UI.List(() => nonReorderableArray);
         
         private static (string label, Element element) CustomInstance()
         {
-            var list = new List<IListItem>
+            var list = new IListItem[]
             {
                 new IntItem { Value = 1 },
-                new FloatItem() { Value = 2f },
+                new FloatItem { Value = 2f },
                 new IntItem { Value = 3 },
             };
-            
-            return ExampleTemplate.Tab("CustomInstance",
-                ExampleTemplate.CodeElementSets("Custom instance with interface",
+
+            ListViewOption.OfType(list);
+
+            return ExampleTemplate.Tab(nameof(CustomInstance),
+                ExampleTemplate.CodeElementSets("Custom instance",
                     (@"UI.List(
     () => list,
     ListViewOption.OfType(list).SetCreateItemInstanceFunc(CreateNewItem)
 )
 
-IListItem CreateNewItem(List<IListItem> _, int index)
+IListItem CreateNewItem(IReadOnlyList<IListItem> _, int index)
 {
     var previousValue = index > 0 
         ? list[index - 1].Value
@@ -258,7 +282,7 @@ IListItem CreateNewItem(List<IListItem> _, int index)
                 )
             );
 
-            IListItem CreateNewItem(List<IListItem> _, int index)
+            IListItem CreateNewItem(IReadOnlyList<IListItem> _, int index)
             {
                 var previousValue = index > 0 
                     ? list[index - 1].Value
@@ -267,6 +291,68 @@ IListItem CreateNewItem(List<IListItem> _, int index)
                 return index % 2 == 0
                     ? new IntItem() { Value = previousValue }
                     : new FloatItem() { Value = previousValue };
+            }
+        }
+
+        private static (string label, Element element) CustomUndo()
+        {
+            var list0 = CreateList();
+            var list1 = CreateList();
+            
+            return ExampleTemplate.Tab(nameof(CustomUndo),
+                ExampleTemplate.CodeElementSets("Custom Undo",
+                    "When restoring a list item with Undo/Redo, only the value of the existing element is recreated; other parameters are not restored.\n" +
+                    "With the Restore function, even if you edit floatValue using the \"Change Field\" button and then delete the item, it will be restored with Undo.",
+                    (@"UI.List(""Without Restore function"",
+    () => list0
+),
+UI.List(""With Restore function"",
+    () => list1,
+    ListViewOption.OfType(list1).SetItemRestoreFunc(CreateRestoreFunc)
+)
+
+            
+Func<StringOrSliderItem> CreateRestoreFunc(StringOrSliderItem itemBeforeRemoval)
+{
+    return () => new StringOrSliderItem
+    {
+        stringValue = itemBeforeRemoval.stringValue,
+        floatValue = itemBeforeRemoval.floatValue,
+        useSlider = itemBeforeRemoval.useSlider
+    };
+}
+",
+                        UI.Column(
+                            UI.List("Without Restore function",
+                                () => list0
+                            ),
+                            UI.List("With Restore function",
+                                () => list1,
+                                ListViewOption.OfType(list1).SetItemRestoreFunc(CreateRestoreFunc)
+                            )
+                        )
+                    )
+                )
+            );
+            
+            Func<StringOrSliderItem> CreateRestoreFunc(StringOrSliderItem itemBeforeRemoval)
+            {
+                return () => new StringOrSliderItem
+                {
+                    stringValue = itemBeforeRemoval.stringValue,
+                    floatValue = itemBeforeRemoval.floatValue,
+                    useSlider = itemBeforeRemoval.useSlider
+                };
+            }
+
+            static List<StringOrSliderItem> CreateList()
+            {
+                return new List<StringOrSliderItem>
+                {
+                    new() { stringValue = "1st", floatValue = 0.1f },
+                    new() { stringValue = "2nd", floatValue = 0.2f },
+                    new() { stringValue = "3rd", floatValue = 0.3f },
+                };
             }
         }
     }

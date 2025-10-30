@@ -110,7 +110,8 @@ namespace RosettaUI.Example
                     UI.List(() => intList),
                     UI.List(() => classArray),
                     UI.List(() => classList),
-                    UI.HelpBox("Right-click on an item to open the menu", HelpBoxType.Info)
+                    UI.HelpBox("Right-click on an item to open the menu", HelpBoxType.Info),
+                    ExampleTemplate.BlankLine()
                 ),
                 ExampleTemplate.UIFunctionTab(nameof(UI.ListReadOnly),
                     UI.ListReadOnly(() => intArray),
@@ -119,8 +120,8 @@ namespace RosettaUI.Example
                     UI.ListReadOnly(() => classList)
                 ),
                 OptionsAttributes(),
-                DuplicatePreviusItem(),
-                CustomItemElement(),
+                DuplicatePreviousItem(),
+                CustomElement(),
                 CustomInstance(),
                 CustomUndo()
             );
@@ -161,7 +162,7 @@ UI.List(() => nonReorderableArray);
             );
         }
 
-        private (string, Element) DuplicatePreviusItem()
+        private (string, Element) DuplicatePreviousItem()
         {
             List<NoCopyClass> noCopyClassList = new()
             {
@@ -178,7 +179,7 @@ UI.List(() => nonReorderableArray);
                 new CopyConstructorClass { intValue = 1 },
             };
 
-            return ExampleTemplate.Tab(nameof(DuplicatePreviusItem),
+            return ExampleTemplate.Tab(nameof(DuplicatePreviousItem),
                 ExampleTemplate.CodeElementSets("<b>Duplicate previous item</b>",
                     "If the item implements ICloneable or has a copy constructor, it will copy its previous item when added.",
                     (@"public class NoCopyClass
@@ -218,10 +219,10 @@ UI.List(() => copyConstructorClassList);
             );
         }
 
-        private (string label, Element element) CustomItemElement()
+        private (string label, Element element) CustomElement()
         {
-            return ExampleTemplate.Tab(nameof(CustomItemElement),
-                ExampleTemplate.CodeElementSets(nameof(CustomItemElement),
+            return ExampleTemplate.Tab(nameof(CustomElement),
+                ExampleTemplate.CodeElementSets(nameof(CustomElement),
                     (@"UI.List(
     () => intArray,
     new ListViewOption
@@ -252,17 +253,16 @@ UI.List(() => copyConstructorClassList);
         
         private static (string label, Element element) CustomInstance()
         {
-            var list = new IListItem[]
+            var list = new List<IListItem>
             {
                 new IntItem { Value = 1 },
                 new FloatItem { Value = 2f },
                 new IntItem { Value = 3 },
             };
 
-            ListViewOption.OfType(list);
-
             return ExampleTemplate.Tab(nameof(CustomInstance),
                 ExampleTemplate.CodeElementSets("Custom instance",
+                    "You can register a function that generates an instance of an item to be added.",
                     (@"UI.List(
     () => list,
     ListViewOption.OfType(list).SetCreateItemInstanceFunc(CreateNewItem)
@@ -356,7 +356,9 @@ Func<StringOrSliderItem> CreateRestoreFunc(StringOrSliderItem itemBeforeRemoval)
                             )
                         )
                     )
-                )
+                ),
+                UI.HelpBox("RosettaUI's Undo is supported only during runtime. It does not work in EditorWindow or similar contexts.", HelpBoxType.Warning),
+                ExampleTemplate.BlankLine()
             );
             
             Func<StringOrSliderItem> CreateRestoreFunc(StringOrSliderItem itemBeforeRemoval)

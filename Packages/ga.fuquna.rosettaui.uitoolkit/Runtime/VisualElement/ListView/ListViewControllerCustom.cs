@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Linq;
 using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
@@ -9,28 +11,37 @@ namespace RosettaUI.UIToolkit
     /// </summary>
     public class ListViewControllerCustom : ListViewController
     {
+        private readonly Func<IList, Type, int, object> _createItemFunc;
+        
+        public ListViewControllerCustom(Func<IList, Type, int, object> createItemFunc = null)
+        {
+            _createItemFunc = createItemFunc;
+        }
+        
         public override void AddItems(int itemCount)
         {
             if (itemCount <= 0) return;
 
             var previousCount = GetItemsCount();
-            var intList = ListPool<int>.Get();
-            try
+            
+            var listType = itemsSource.GetType();
+            var itemType = ListUtility.GetItemType(listType);
+            for (var i = 0; i < itemCount; ++i)
             {
-                var type = itemsSource.GetType();
-                var itemType = ListUtility.GetItemType(type);
-                for (var i = 0; i < itemCount; ++i)
+                if (_createItemFunc != null)
                 {
-                    itemsSource = ListUtility.AddItemAtLast(itemsSource, type, itemType);
-                    intList.Add(previousCount + i);
+                    var newItem = _createItemFunc(itemsSource, itemType, previousCount + i);
+                    itemsSource = ListUtility.AddItemAtLast(itemsSource,listType, itemType, newItem);
                 }
-                
-                RaiseItemsAdded(intList);
+                else
+                {
+                    itemsSource = ListUtility.AddItemAtLast(itemsSource, listType, itemType);
+                }
             }
-            finally
-            {
-                CollectionPool<List<int>, int>.Release(intList);
-            }
+
+            using var _ = ListPool<int>.Get(out var intList);
+            intList.AddRange(Enumerable.Range(previousCount, itemCount));
+            RaiseItemsAdded(intList);
             
             RaiseOnSizeChanged();
         }

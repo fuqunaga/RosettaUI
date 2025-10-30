@@ -14,13 +14,15 @@ namespace RosettaUI
         public class ListViewItemContainerViewBridge : ElementViewBridge
         {
             private ListViewItemContainerElement Element => (ListViewItemContainerElement)element;
-            private IBinder Binder => Element._binder;
+            private ListBinder ListBinder => Element.ListBinder;
+
+            public Func<IList, Type, int, object> CreateItemFunc => Element.option.createItemInstanceFunc;
             
             public ListViewItemContainerViewBridge(ListViewItemContainerElement element) : base(element)
             {
             }
 
-            public IList GetIList() => ListBinder.GetIList(Binder);
+            public IList GetIList() => ListBinder.GetIList();
             
             public Element GetOrCreateItemElement(int index) => Element.GetOrCreateItemElement(index);
 

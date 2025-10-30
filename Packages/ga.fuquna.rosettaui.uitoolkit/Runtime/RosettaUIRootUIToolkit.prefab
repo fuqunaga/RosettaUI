@@ -99,6 +99,30 @@ MonoBehaviour:
       m_Groups: 
       m_Action: Undo
       m_Flags: 8
+    - m_Name: Command+Z
+      m_Id: b1bfa6d5-c558-4a49-9b20-fd113ef23103
+      m_Path: OneModifier
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Undo
+      m_Flags: 4
+    - m_Name: modifier
+      m_Id: 853e146d-9e29-49de-837a-3d1aa46b06fc
+      m_Path: <Keyboard>/Command
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Undo
+      m_Flags: 8
+    - m_Name: binding
+      m_Id: 7d09d09e-7612-4515-b832-a44ae0f5e74b
+      m_Path: <Keyboard>/z
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Undo
+      m_Flags: 8
     m_Flags: 0
   redoAction:
     m_Name: Redo
@@ -127,6 +151,38 @@ MonoBehaviour:
     - m_Name: binding
       m_Id: d4b2005b-5512-4e81-bb53-b260b15c3841
       m_Path: <Keyboard>/y
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Redo
+      m_Flags: 8
+    - m_Name: Shift+Command+Z
+      m_Id: 21be991c-d982-4daa-8010-e4026dbefcda
+      m_Path: TwoModifiers
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Redo
+      m_Flags: 4
+    - m_Name: modifier1
+      m_Id: c211b959-06f6-4595-972e-53aff9533117
+      m_Path: <Keyboard>/shift
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Redo
+      m_Flags: 8
+    - m_Name: modifier2
+      m_Id: fb3da12c-b37d-4bee-91ea-7db0ae87cc14
+      m_Path: <Keyboard>/Command
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Redo
+      m_Flags: 8
+    - m_Name: binding
+      m_Id: 1603f7bc-217d-48f5-8908-cc08865aaeaf
+      m_Path: <Keyboard>/z
       m_Interactions: 
       m_Processors: 
       m_Groups: 

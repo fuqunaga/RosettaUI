@@ -14,31 +14,27 @@ namespace RosettaUI
 
         public static Element List<TList> (
             Expression<Func<TList>> targetExpression,
-            in ListViewOption option
-        )
-            where TList : IList
-            => List(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, null, option);
-
-        public static Element List<TList>(
-            Expression<Func<TList>> targetExpression,
-            Func<IBinder, int, Element> createItemElement = null,
             in ListViewOption? option = null
         )
             where TList : IList
-            => List(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, createItemElement, option);
+        {
+            return List(ExpressionUtility.CreateLabelString(targetExpression), targetExpression, option);
+        }
 
+        [Obsolete("Use ListViewOption to set createItemElementFunc")]
         public static Element List<TList>(
-            LabelElement label,
             Expression<Func<TList>> targetExpression,
-            in ListViewOption option
+            Func<IBinder, int, Element> createItemElement,
+            in ListViewOption? option = null
         )
             where TList : IList
-            => List(label, targetExpression, null, option);
+        {
+            return List(targetExpression, MergeOptionWithCreateElementFunc(option, createItemElement));
+        }
 
         public static Element List<TList>(
             LabelElement label,
             Expression<Func<TList>> targetExpression,
-            Func<IBinder, int, Element> createItemElement = null,
             in ListViewOption? option = null
         )
             where TList : IList
@@ -46,8 +42,23 @@ namespace RosettaUI
             return List(
                 label,
                 ExpressionUtility.CreateBinder(targetExpression),
-                createItemElement,
                 option ?? CalcDefaultOptionOf(targetExpression)
+            );
+        }
+
+        [Obsolete("Use ListViewOption to set createItemElementFunc")]
+        public static Element List<TList>(
+            LabelElement label,
+            Expression<Func<TList>> targetExpression,
+            Func<IBinder, int, Element> createItemElement,
+            in ListViewOption? option = null
+        )
+            where TList : IList
+        {
+            return List(
+                label,
+                targetExpression,
+                MergeOptionWithCreateElementFunc(option, createItemElement)
             );
         }
 
@@ -59,24 +70,6 @@ namespace RosettaUI
         public static Element List<TList>(
             Expression<Func<TList>> targetExpression,
             Action<TList> writeValue,
-            in ListViewOption option
-        )
-            where TList : IList
-            => List(targetExpression, writeValue, null, option);
-        
-        public static Element List<TList>(
-            LabelElement label,
-            Func<TList> readValue,
-            Action<TList> writeValue,
-            in ListViewOption option
-        )
-            where TList : IList
-            => List(label, readValue, writeValue, null, option);
-
-        public static Element List<TList>(
-            Expression<Func<TList>> targetExpression,
-            Action<TList> writeValue,
-            Func<IBinder, int, Element> createItemElement = null,
             in ListViewOption? option = null
         )
             where TList : IList
@@ -85,35 +78,57 @@ namespace RosettaUI
                 ExpressionUtility.CreateLabelString(targetExpression),
                 targetExpression.Compile(), 
                 writeValue,
-                createItemElement, 
                 option ?? CalcDefaultOptionOf(targetExpression));
+        }
+
+        [Obsolete("Use ListViewOption to set createItemElementFunc")]
+        public static Element List<TList>(
+            Expression<Func<TList>> targetExpression,
+            Action<TList> writeValue,
+            Func<IBinder, int, Element> createItemElement,
+            in ListViewOption? option = null
+        )
+            where TList : IList
+        {
+            return List(
+                targetExpression,
+                writeValue,
+                MergeOptionWithCreateElementFunc(option, createItemElement)
+            );
         }
 
         public static Element List<TList>(
             LabelElement label,
             Func<TList> readValue,
             Action<TList> writeValue,
-            Func<IBinder, int, Element> createItemElement = null,
             in ListViewOption? option = null
         )
             where TList : IList
-            => List(label, Binder.Create(readValue, writeValue), createItemElement, option);
+        {
+            return List(label, Binder.Create(readValue, writeValue), option);
+        }
 
+        [Obsolete("Use ListViewOption to set createItemElementFunc")]
+        public static Element List<TList>(
+            LabelElement label,
+            Func<TList> readValue,
+            Action<TList> writeValue,
+            Func<IBinder, int, Element> createItemElement,
+            in ListViewOption? option = null
+        )
+            where TList : IList
+        {
+            return List(label, readValue, writeValue, MergeOptionWithCreateElementFunc(option, createItemElement));
+        }
+
+        
         #endregion
 
 
         #region ReadOnly
-        
-        public static Element ListReadOnly<TList>(
-            Expression<Func<TList>> targetExpression,
-            in ListViewOption option
-        )
-            where TList : IList
-            => ListReadOnly(targetExpression, null, option);
 
         public static Element ListReadOnly<TList>(
             Expression<Func<TList>> targetExpression,
-            Func<IBinder, int, Element> createItemElement = null,
             in ListViewOption? option = null
         )
             where TList : IList
@@ -121,29 +136,46 @@ namespace RosettaUI
             return List(
                 ExpressionUtility.CreateLabelString(targetExpression),
                 UIInternalUtility.CreateReadOnlyBinder(targetExpression),
-                createItemElement, 
                 option ?? CalcDefaultOptionOf(targetExpression));
         }
-
+        
+        [Obsolete("Use ListViewOption to set createItemElementFunc")]
+        public static Element ListReadOnly<TList>(
+            Expression<Func<TList>> targetExpression,
+            Func<IBinder, int, Element> createItemElement,
+            in ListViewOption? option = null
+        )
+            where TList : IList
+        {
+            return ListReadOnly(
+                targetExpression,
+                MergeOptionWithCreateElementFunc(option ?? CalcDefaultOptionOf(targetExpression), createItemElement)
+            );
+        }
+        
         public static Element ListReadOnly<TList>(
             LabelElement label,
             Func<TList> readValue,
-            in ListViewOption option
-        )
-            where TList : IList
-            => ListReadOnly(label, readValue, null, option);
-        
-        public static Element ListReadOnly<TList>(
-            LabelElement label, 
-            Func<TList> readValue, 
-            Func<IBinder, int, Element> createItemElement = null,
             in ListViewOption? option = null
         )
             where TList : IList
         {
             var binder = Binder.Create(readValue, null);
-            return List(label, binder, createItemElement, option);
+            return List(label, binder, option);
         }
+        
+        [Obsolete("Use ListViewOption to set createItemElementFunc")]
+        public static Element ListReadOnly<TList>(
+            LabelElement label, 
+            Func<TList> readValue, 
+            Func<IBinder, int, Element> createItemElement,
+            in ListViewOption? option = null
+        )
+            where TList : IList
+        {
+            return ListReadOnly(label, readValue, MergeOptionWithCreateElementFunc(option, createItemElement));
+        }
+
         
         #endregion
 
@@ -155,8 +187,17 @@ namespace RosettaUI
         public static Element List(LabelElement label, IBinder listBinder, Func<IBinder, int, Element> createItemElement = null, in ListViewOption? optionNullable = null)
         {
             var option = optionNullable ?? ListViewOption.Default;
+            option.createItemElementFunc = createItemElement;
 
-            var listItemContainer = ListItemContainer(listBinder, createItemElement, option);
+            return List(label, listBinder, option);
+        }
+        
+        public static Element List(LabelElement label, IBinder listBinder, in ListViewOption? optionNullable = null)
+        {
+            var option = optionNullable ?? ListViewOption.Default;
+            option.createItemElementFunc ??= ListItemDefault;
+            
+            var listItemContainer = ListItemContainer(listBinder, option);
             var ret = listItemContainer;
             
             if (option.header)
@@ -177,12 +218,13 @@ namespace RosettaUI
             return ret;
         }
 
-        public static Element ListCounterField(IBinder listBinder,　Element itemContainerElement, in ListViewOption option)
+        public static Element ListCounterField(IBinder binder,　Element itemContainerElement, in ListViewOption option)
         {
-            var interactable = !ListBinder.IsReadOnly(listBinder) && !option.fixedSize;
+            var listBinder = new ListBinder(binder, option.createItemInstanceFunc);
+            var interactable = !listBinder.IsReadOnly() && !option.fixedSize;
 
             return Field(null,
-                () => ListBinder.GetCount(listBinder),
+                () => listBinder.GetCount(),
                 count =>
                 {
                     // ListViewItemContainerElementが存在していたら新しいcountを通知
@@ -194,21 +236,20 @@ namespace RosettaUI
                     }
                     else
                     {
-                        ListBinder.SetCount(listBinder, count);
+                        listBinder.SetCount(count);
                     }
                 },
                 new FieldOption { delayInput = true }
             ).SetMinWidth(32f).SetInteractable(interactable);
         }
         
-        private static Element ListItemContainer(IBinder listBinder, Func<IBinder, int, Element> createItemElement, in ListViewOption option)
+        private static Element ListItemContainer(IBinder listBinder, in ListViewOption option)
         {
             var optionCaptured = option;
+            optionCaptured.createItemElementFunc ??= ListItemDefault;
+            
             return NullGuard(null, listBinder,
-                () => new ListViewItemContainerElement(
-                    listBinder,
-                    createItemElement ?? ListItemDefault,
-                    optionCaptured)
+                () => new ListViewItemContainerElement(listBinder, optionCaptured)
             ).SetFlexShrink(1f);
         }
 
@@ -243,8 +284,8 @@ namespace RosettaUI
 
                 return Field(Label(() =>
                 {
-                    object obj = binder.GetObject();
-                    string label = obj == null ? string.Empty : getter(obj);
+                    var obj = binder.GetObject();
+                    var label = obj == null ? string.Empty : getter(obj);
                     return string.IsNullOrEmpty(label) ? $"Item {index}" : label;
                 }), binder);
             }
@@ -257,6 +298,13 @@ namespace RosettaUI
                     ? new ListViewOption(reorderable: false)
                     : null;
 
+        
+        private static ListViewOption MergeOptionWithCreateElementFunc(in ListViewOption? optionNullable, Func<IBinder, int, Element> createItemElement)
+        {
+            var newOption = optionNullable ?? ListViewOption.Default;
+            newOption.createItemElementFunc = createItemElement;
+            return newOption;
+        }
 
         #endregion
     }

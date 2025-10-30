@@ -30,7 +30,6 @@ namespace RosettaUI
         private readonly IBinder _binder;
         public readonly ListViewOption option;
         
-        private readonly Func<IBinder, int, Element> _createItemElement;
         private readonly BinderHistory.Snapshot _binderTypeHistorySnapshot;
         private readonly Dictionary<int, IBinder> _itemIndexToBinder = new();
         private readonly Dictionary<int, Element> _itemIndexToElement = new();
@@ -40,11 +39,13 @@ namespace RosettaUI
         
         private event Action<IList> onListChanged;
 
-        private IList CurrentList => ListBinder.GetIList(_binder);
+        
+        private ListBinder ListBinder => new(_binder, option.createItemInstanceFunc);
+        private IList CurrentList => ListBinder.GetIList();
         
         public int ListItemCount
         {
-            get => ListBinder.GetCount(_binder);
+            get => ListBinder.GetCount();
             set
             {
                 var prevCount = ListItemCount;
@@ -59,18 +60,24 @@ namespace RosettaUI
                     }
                 }
 
-                ListBinder.SetCount(_binder, value);
+                ListBinder.SetCount(value);
                 NotifyListChangedToView();
             }
         }
 
-        public ListViewItemContainerElement(IBinder listBinder, Func<IBinder, int, Element> createItemElement, in ListViewOption option) : base(null)
+        [Obsolete("Use ListViewOption.createItemElementFunc instead")]
+        public ListViewItemContainerElement(IBinder binder,
+            Func<IBinder, int, Element> createItemElement,
+            in ListViewOption option) : this(binder, new ListViewOption(option){ createItemElementFunc = createItemElement })
         {
-            _binder = listBinder;
-            _createItemElement = createItemElement;
+        }
+
+        public ListViewItemContainerElement(IBinder binder, in ListViewOption option) : base(null)
+        {
+            _binder = binder;
             this.option = option;
 
-            Interactable = !ListBinder.IsReadOnly(listBinder);
+            Interactable = !ListBinder.IsReadOnly();
             
             _binderTypeHistorySnapshot = BinderHistory.Snapshot.Create();
 
@@ -109,14 +116,14 @@ namespace RosettaUI
             if (element != null) return element;
             
             using var applyScope = _binderTypeHistorySnapshot.GetApplyScope();
-            var isReadOnly = ListBinder.IsReadOnly(_binder);
+            var isReadOnly = ListBinder.IsReadOnly();
 
             if (!_itemIndexToBinder.TryGetValue(index, out var itemBinder))
             {
-                _itemIndexToBinder[index] = itemBinder = ListBinder.CreateItemBinderAt(_binder, index);
+                _itemIndexToBinder[index] = itemBinder = ListBinder.CreateItemBinderAt(index);
             }
 
-            element = _createItemElement(itemBinder, index);
+            element = option.createItemElementFunc(itemBinder, index);
             if (!isReadOnly && !option.fixedSize)
             {
                 element = AddPopupMenu(element, index);
@@ -138,7 +145,7 @@ namespace RosettaUI
                 element,
                 () => new[]
                 {
-                    new MenuItem("Add Element", () => GetListEditor().DuplicateItem(index)),
+                    new MenuItem("Add Element", () => GetListEditor().AddItem(index + 1)),
                     new MenuItem("Remove Element", () => GetListEditor().RemoveItem(index))
                 }
             );

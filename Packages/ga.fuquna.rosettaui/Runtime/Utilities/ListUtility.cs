@@ -31,38 +31,38 @@ namespace RosettaUI
             return itemType;
         } 
         
-        public static IList AddItemAtLast(IList list, Type type, Type itemType)
+        public static IList AddItemAtLast(IList list, Type listType, Type itemType)
         {
-            list ??= (IList) Activator.CreateInstance(type);
+            list ??= (IList) Activator.CreateInstance(listType);
 
             var baseItem = list.Count > 0 ? list[^1] : null;
-
-            return AddItem(list, itemType, baseItem, list.Count);
+            var newItem = CreateNewItem(baseItem, itemType);
+            return AddItem(list, itemType, newItem, list.Count);
+        }
+        
+        public static IList AddItemAtLast(IList list, Type listType, Type itemType, object newItem)
+        {
+            list ??= (IList) Activator.CreateInstance(listType);
+            return AddItem(list, itemType, newItem, list.Count);
         }
 
         public static IList RemoveItemAtLast(IList target, Type itemType)
         {
             return RemoveItem(target, itemType, target.Count - 1);
         }
-
-        public static IList AddItem(IList list, Type elemType, object baseItem, int index)
+        
+        public static IList AddNullItem(IList list, Type itemType, int index)
         {
-            var newElem = CreateNewItem(baseItem, elemType);
-            return DoAddItem(list, elemType, newElem, index);
+            return AddItem(list, itemType, null, index);
         }
         
-        public static IList AddNullItem(IList list, Type elemType, int index)
-        {
-            return DoAddItem(list, elemType, null, index);
-        }
-        
-        private static IList DoAddItem(IList list, Type elemType, object newItem, int index)
+        public static IList AddItem(IList list, Type itemType, object newItem, int index)
         {
             index = Mathf.Clamp(index, 0, list.Count);
 
             if (list is Array array)
             {
-                var newArray = Array.CreateInstance(elemType, array.Length + 1);
+                var newArray = Array.CreateInstance(itemType, array.Length + 1);
                 Array.Copy(array, newArray, index);
                 newArray.SetValue(newItem, index);
                 Array.Copy(array, index, newArray, index + 1, array.Length - index);
@@ -141,7 +141,7 @@ namespace RosettaUI
         }
 
 
-        private static object CreateNewItem(object baseItem, Type itemType)
+        public static object CreateNewItem(object baseItem, Type itemType)
         {
             object ret = null;
 

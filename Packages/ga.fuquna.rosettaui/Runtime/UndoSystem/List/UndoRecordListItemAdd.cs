@@ -19,7 +19,7 @@ namespace RosettaUI.UndoSystem
             ClearRecords();
             
             // Undo時に必要なのはインデックスだけなのでインデックスのみのRestoreRecordを保存
-            records.AddRange(indices.Select(i => new ListViewItemContainerElement.RestoreRecord(i, false, null, null)));
+            records.AddRange(indices.Select(i => new ListViewItemContainerElement.RestoreRecord(i, false, null, null, null)));
         }
         
         // 追加されたアイテムを削除する

@@ -7,7 +7,7 @@ namespace RosettaUI.UIToolkit.Editor
     public abstract class RosettaUIEditorWindowUIToolkit : EditorWindow
     {
         private static StyleSheet _styleSheet;
-        private static readonly string StyleSheetPath = "Packages/ga.fuquna.rosettaui.uitoolkit/Runtime/Settings/RosettaUI_DefaultRuntimeTheme.tss";
+        private static readonly string StyleSheetPath = "Packages/ga.fuquna.rosettaui/UIToolkit/Runtime/Settings/RosettaUI_DefaultRuntimeTheme.tss";
 
         public static StyleSheet StyleSheet
         {

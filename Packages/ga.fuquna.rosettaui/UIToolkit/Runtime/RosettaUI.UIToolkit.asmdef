@@ -2,8 +2,7 @@
     "name": "RosettaUI.UIToolkit",
     "rootNamespace": "",
     "references": [
-        "GUID:2b1b0416520827b409049c7e4d90bcc1",
-        "GUID:10043d6ab0c030d489fbc2555e20e9b5"
+        "GUID:2b1b0416520827b409049c7e4d90bcc1"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

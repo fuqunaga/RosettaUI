@@ -65,14 +65,6 @@
       "source": "embedded",
       "dependencies": {}
     },
-    "ga.fuquna.rosettaui.uitoolkit": {
-      "version": "file:ga.fuquna.rosettaui.uitoolkit",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {
-        "ga.fuquna.rosettaui": "1.11.0"
-      }
-    },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
       "depth": 0,

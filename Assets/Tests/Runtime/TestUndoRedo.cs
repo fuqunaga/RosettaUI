@@ -3,7 +3,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using RosettaUI.Example;
 using UnityEngine;
+
+#if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
+#endif
 
 namespace RosettaUI.Test
 {
@@ -66,7 +69,11 @@ namespace RosettaUI.Test
 
         private void Update()
         {
+#if ENABLE_INPUT_SYSTEM
             if (Keyboard.current[Key.U].wasPressedThisFrame)
+#else
+            if (Input.GetKey(KeyCode.U))
+#endif
             {
                 _window.SetOpenFlag(!_window.IsOpen);
             }

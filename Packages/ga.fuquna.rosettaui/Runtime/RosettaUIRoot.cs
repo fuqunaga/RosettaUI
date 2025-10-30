@@ -20,6 +20,43 @@ namespace RosettaUI
         
         public InputAction undoAction;
         public InputAction redoAction;
+#else
+        [Serializable]
+        public class KeyCombination
+        {
+            [Header("Main Key")]
+            public KeyCode key;
+
+            [Header("Modifiers")]
+            public bool control;
+            public bool command;
+            public bool shift;
+            public bool alt;
+            
+            public bool IsPressed()
+            {
+                if (!Input.GetKeyDown(key)) return false;
+                
+                if (control != (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))) return false;
+                if (command != (Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand))) return false;
+                if (shift != (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))) return false;
+                if (alt != (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt))) return false;
+                
+                return true;
+            }
+        }
+        
+        public List<KeyCombination> undoKeys = new()
+        {
+            new KeyCombination {key = KeyCode.Z, control = true},
+            new KeyCombination {key = KeyCode.Z, command = true}
+        };
+        
+        public List<KeyCombination> redoKey = new()
+        {
+            new KeyCombination {key = KeyCode.Y, control = true},
+            new KeyCombination {key = KeyCode.Z, command = true, shift = true},
+        };
 #endif
         
         public readonly ElementUpdater updater = new();
@@ -73,20 +110,34 @@ namespace RosettaUI
             undoAction.performed += _ => DoUndo();
             redoAction.performed += _ => DoRedo();
         }
-        
+
+#endif
+
+        protected virtual void Update()
+        {
+#if !ENABLE_INPUT_SYSTEM
+            if (IsFocused)
+            {
+                if (undoKeys.Any(k => k.IsPressed()))
+                {
+                    DoUndo();
+                }
+                else if (redoKey.Any(k => k.IsPressed()))
+                {
+                    DoRedo();
+                }
+            }
+#endif
+            
+            updater.Update();
+        }
         
         // Is there a smarter way to do this?
         private void LateUpdate()
         {
             _undoRedoCalledThisFrame = false;
         }
-#endif
-
-        protected virtual void Update()
-        {
-            updater.Update();
-        }
-
+        
         protected void OnDestroy()
         {
             foreach (var e in _elements) e.DetachView();

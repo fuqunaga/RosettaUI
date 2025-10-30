@@ -90,17 +90,17 @@ namespace RosettaUI.Test
             
             return _window = UI.Window(nameof(TestUndoRedo),
                 UI.Page(
-                    UI.Fold("Modal Editors.",
-                        UI.Field(() => colorValue),
-                        UI.Field(() => gradientValue),
-                        UI.Field(() => animationCurveValue)
-                    ).Open(),
                     UI.Fold("Change values, then Undo/Redo with Ctrl+Z / Ctrl+Y.",
                         UI.Field(() => floatValue),
                         UI.Field(() => stringValue),
                         UI.Field(() => enumValue),
                         UI.Field(() => vector2Value)
                     ),
+                    UI.Fold("Modal Editors.",
+                        UI.Field(() => colorValue),
+                        UI.Field(() => gradientValue),
+                        UI.Field(() => animationCurveValue)
+                    ).Open(),
                     UI.Fold("Removed Element Undo test",
                         UI.HelpBox("Expired if the Element to be Undo is deleted."),
                         UI.Field(() => simpleClass),
@@ -132,17 +132,7 @@ namespace RosettaUI.Test
                     UI.Field(() => _arrayIncludeClassArray),
                     UI.Button("Add null element", () => _arrayIncludeClassArray = _arrayIncludeClassArray.Append(null).ToArray()),
                     UI.Field(() => _arrayIncludeClassList),
-                    UI.Button("Add null element", () => _arrayIncludeClassList.Add(null)),
-                    
-                    
-                    Space(),
-                    UI.Slider(() => floatValue),
-                    UI.Slider(() => vector2Value),
-                    Space(),
-                    UI.MinMaxSlider(() => vector2Value),
-                    Space(),
-                    UI.HelpBox("リストの要素Elementは動的に子供のIndexが変わるためElementHierarchyPathで特殊処理が必要"),
-                    UI.Field(() => intArray).SetHeight(500f)
+                    UI.Button("Add null element", () => _arrayIncludeClassList.Add(null))
                 )
             );
 

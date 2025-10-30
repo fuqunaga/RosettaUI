@@ -5,6 +5,8 @@ namespace RosettaUI.Example
 {
     public static class ExampleTemplate
     {
+        public static float codeBoxMaxHeight = 250f;
+        
         public static SpaceElement BlankLine() => UI.Space().SetHeight(10f);
 
         public static string Bold(string str) => $"<b>{str}</b>";
@@ -53,12 +55,17 @@ namespace RosettaUI.Example
             Tab(UIFunctionStr(functionName), elements);
 
 
-        public static Element CodeBox(string code)
+        public static Element CodeBox(string code, float? maxHeight = null)
         {
             var highlightedCode = SyntaxHighlighter.Highlight(code);
-            return UI.Box(
-                UI.Label(highlightedCode)
-            ).SetBackgroundColor(new Color(0f, 0f, 0f, 0.7f));
+            Element innerElement = maxHeight.HasValue
+                ? UI.ScrollViewVertical(
+                    maxHeight.Value,
+                    UI.Label(highlightedCode)
+                )
+                : UI.Label(highlightedCode);
+            
+            return UI.Box(innerElement).SetBackgroundColor(new Color(0f, 0f, 0f, 0.7f));
         }
 
         public static Element CodeElementSets(string title, params (string, Element)[] pairs)
@@ -74,7 +81,7 @@ namespace RosettaUI.Example
             return TitleIndent(Bold(title),
                 string.IsNullOrEmpty(description) ? null : UI.Label(description),
                 UI.Column(
-                    CodeBox(code),
+                    CodeBox(code, codeBoxMaxHeight),
                     UI.Space().SetWidth(30f),
                     UI.Box(
                         UI.Page(

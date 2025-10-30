@@ -74,12 +74,9 @@ namespace RosettaUI.Example
                 return UI.Row(
                     UI.DynamicElementOnStatusChanged(
                         () => useSlider,
-                        _ => useSlider
-                            ? UI.Slider(() => floatValue)
-                            : UI.Field(() => stringValue)
+                        _ => useSlider ? UI.Slider(() => floatValue) : UI.Field(() => stringValue)
                     ),
-                    UI.Button("Change Field",
-                        () => useSlider = !useSlider)
+                    UI.Button("Change Field", () => useSlider = !useSlider)
                 );
             }
         }
@@ -121,44 +118,20 @@ namespace RosettaUI.Example
                     UI.ListReadOnly(() => classArray),
                     UI.ListReadOnly(() => classList)
                 ),
-                Code0(),
-                Code1(),
+                OptionsAttributes(),
+                DuplicatePreviusItem(),
+                CustomItemElement(),
                 CustomInstance(),
                 CustomUndo()
             );
         }
 
 
-        private (string, Element) Code0()
+        private (string, Element) OptionsAttributes()
         {
             var listViewOption = ListViewOption.Default;
 
-            return ExampleTemplate.Tab(nameof(Code0),
-                ExampleTemplate.CodeElementSets("CustomItemElement",
-                    (@"UI.List(
-    () => intArray,
-    new ListViewOption
-    {
-        createItemElementFunc = (itemBinder, idx) => UI.Row(
-            UI.Field($""Item {idx}"", itemBinder),
-            UI.Button(""+"", () => intArray[idx]++),
-            UI.Button(""-"", () => intArray[idx]--)
-        )
-    }
-);",
-                        UI.List(
-                            () => intArray,
-                            new ListViewOption
-                            {
-                                createItemElementFunc = (itemBinder, idx) => UI.Row(
-                                    UI.Field($"Item {idx}", itemBinder),
-                                    UI.Button("+", () => intArray[idx]++),
-                                    UI.Button("-", () => intArray[idx]--)
-                                )
-                            }
-                        )
-                    )
-                ),
+            return ExampleTemplate.Tab("Options/Attributes",
                 ExampleTemplate.CodeElementSets("Options",
                     (@"var listViewOption = ListViewOption.Default;
 
@@ -176,11 +149,19 @@ UI.DynamicElementOnStatusChanged(
                             )
                         )
                     )
-                )
+                ),
+                ExampleTemplate.CodeElementSets("<b>Attribute</b>",
+                    (@"[NonReorderable]
+public int[] nonReorderableArray;
+
+UI.List(() => nonReorderableArray);
+",
+                        UI.List(() => nonReorderableArray))
+                    )
             );
         }
 
-        private (string, Element) Code1()
+        private (string, Element) DuplicatePreviusItem()
         {
             List<NoCopyClass> noCopyClassList = new()
             {
@@ -197,7 +178,7 @@ UI.DynamicElementOnStatusChanged(
                 new CopyConstructorClass { intValue = 1 },
             };
 
-            return ExampleTemplate.Tab(nameof(Code1),
+            return ExampleTemplate.Tab(nameof(DuplicatePreviusItem),
                 ExampleTemplate.CodeElementSets("<b>Duplicate previous item</b>",
                     "If the item implements ICloneable or has a copy constructor, it will copy its previous item when added.",
                     (@"public class NoCopyClass
@@ -233,14 +214,38 @@ UI.List(() => copyConstructorClassList);
                             UI.List(() => copyConstructorClassList)
                         )
                     )
-                ),
-                ExampleTemplate.CodeElementSets("<b>Attribute</b>",
-                    (@"[NonReorderable]
-public int[] nonReorderableArray;
+                )
+            );
+        }
 
-UI.List(() => nonReorderableArray);
-",
-                        UI.List(() => nonReorderableArray)))
+        private (string label, Element element) CustomItemElement()
+        {
+            return ExampleTemplate.Tab(nameof(CustomItemElement),
+                ExampleTemplate.CodeElementSets(nameof(CustomItemElement),
+                    (@"UI.List(
+    () => intArray,
+    new ListViewOption
+    {
+        createItemElementFunc = (itemBinder, idx) => UI.Row(
+            UI.Field($""Item {idx}"", itemBinder),
+            UI.Button(""+"", () => intArray[idx]++),
+            UI.Button(""-"", () => intArray[idx]--)
+        )
+    }
+);",
+                        UI.List(
+                            () => intArray,
+                            new ListViewOption
+                            {
+                                createItemElementFunc = (itemBinder, idx) => UI.Row(
+                                    UI.Field($"Item {idx}", itemBinder),
+                                    UI.Button("+", () => intArray[idx]++),
+                                    UI.Button("-", () => intArray[idx]--)
+                                )
+                            }
+                        )
+                    )
+                )
             );
         }
         
@@ -296,19 +301,38 @@ IListItem CreateNewItem(IReadOnlyList<IListItem> _, int index)
 
         private static (string label, Element element) CustomUndo()
         {
-            var list0 = CreateList();
-            var list1 = CreateList();
+            var stringOrSliderItemList0 = CreateList();
+            var stringOrSliderItemList1 = CreateList();
             
             return ExampleTemplate.Tab(nameof(CustomUndo),
                 ExampleTemplate.CodeElementSets("Custom Undo",
                     "When restoring a list item with Undo/Redo, only the value of the existing element is recreated; other parameters are not restored.\n" +
                     "With the Restore function, even if you edit floatValue using the \"Change Field\" button and then delete the item, it will be restored with Undo.",
-                    (@"UI.List(""Without Restore function"",
-    () => list0
+                    (@"public class StringOrSliderItem : IElementCreator
+{
+    public string stringValue;
+    public float floatValue;
+    public bool useSlider;
+    
+    public Element CreateElement(LabelElement label)
+    {
+        return UI.Row(
+            UI.DynamicElementOnStatusChanged(
+                () => useSlider,
+                _ => useSlider ? UI.Slider(() => floatValue) : UI.Field(() => stringValue)
+            ),
+            UI.Button(""Change Field"", () => useSlider = !useSlider)
+        );
+    }
+}
+
+
+UI.List(""Without Restore function"",
+    () => stringOrSliderItemList0
 ),
 UI.List(""With Restore function"",
-    () => list1,
-    ListViewOption.OfType(list1).SetItemRestoreFunc(CreateRestoreFunc)
+    () => stringOrSliderItemList1,
+    ListViewOption.OfType(stringOrSliderItemList1).SetItemRestoreFunc(CreateRestoreFunc)
 )
 
             
@@ -324,11 +348,11 @@ Func<StringOrSliderItem> CreateRestoreFunc(StringOrSliderItem itemBeforeRemoval)
 ",
                         UI.Column(
                             UI.List("Without Restore function",
-                                () => list0
+                                () => stringOrSliderItemList0
                             ),
                             UI.List("With Restore function",
-                                () => list1,
-                                ListViewOption.OfType(list1).SetItemRestoreFunc(CreateRestoreFunc)
+                                () => stringOrSliderItemList1,
+                                ListViewOption.OfType(stringOrSliderItemList1).SetItemRestoreFunc(CreateRestoreFunc)
                             )
                         )
                     )

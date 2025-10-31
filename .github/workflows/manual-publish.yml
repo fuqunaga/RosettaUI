@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Dry-run mode (true for test, false for actual publish)'
+        description: 'Dry-run mode
         required: true
-        default: 'false'
+        default: true
         type: boolean
       package_folder:
         description: 'Package folder path'
@@ -38,7 +38,7 @@ jobs:
         env: 
           dryrun: ${{ github.event.inputs.dry_run }}
         run: |
-          if ${{ env.dry_run }} then
+          if ${{ env.dryrun }} then
             npm publish --dry-run
           else
             npm publish

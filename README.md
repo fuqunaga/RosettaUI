@@ -58,7 +58,7 @@ public class ExampleSimple : MonoBehaviour
 
 <br>
 
-### ✨Specific Features
+### ✨ Features
 
 - Undo/Redo surpport (runtime only)
 - Inspector-like visual editor for Gradient and AnimationCurve at runtime
@@ -74,17 +74,21 @@ public class ExampleSimple : MonoBehaviour
     </tr>
 </table>
 
+- Inspector-compatible Copy and Paste
+
+  ![copyandpaste](https://github.com/user-attachments/assets/2a2010c6-a5ce-4403-b7d0-81a974260cc9)
+
 
 <br>
 
-# 🔄Ver1 → Ver2 Migration
+# 🔄 Ver1 → Ver2 Migration
 
 Please remove the `RosettaUI.UIToolkit` package from the Package Manager.  
 In Ver2, the `RosettaUI.UIToolkit` package is now included in the `RosettaUI` package.
 
 <br>
 
-# ⬇️Installation
+# ⬇️ Installation
 
 This package uses the [scoped registry] feature to resolve package
 dependencies. 
@@ -137,7 +141,7 @@ We recommend downloading and checking it out.
 
 <br>
 
-# 💻Environment
+# 💻 Environment
 
 | Platform | Support            |
 | -------- |--------------------|
@@ -148,7 +152,7 @@ We recommend downloading and checking it out.
 
 <br>
 
-# 💡️Tips
+# 💡️ Tips
 
 ## Disable input when UI focused
 
@@ -172,6 +176,6 @@ if ( !RosettaUIRoot.IsFocused() && Input.GetKeyDown(KeyCode.A) )
 
 <br>
 
-# 🔎Related Libraries
+# 🔎 Related Libraries
 
 [PrefsGUI](https://github.com/fuqunaga/PrefsGUI) - Accessors and GUIs for persistent preference values using a JSON file

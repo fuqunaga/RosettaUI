@@ -46,7 +46,7 @@ public class ExampleSimple : MonoBehaviour
 }
 ```
 </td>
-<td width=50%>
+<td width="50%">
     
 <img src="https://github.com/user-attachments/assets/16f31cf9-5608-4acc-8629-6c22bc8ef261" />
 
@@ -55,6 +55,19 @@ public class ExampleSimple : MonoBehaviour
 
 </table>
 
+### ✨Specific Features
+
+- Undo/Redo
+- Inspector-like runtime visual editor for Gradient and AnimationCurve
+
+<br>
+
+# 🔄Ver1 → Ver2 Migration
+
+Please remove the `RosettaUI.UIToolkit` package from the Package Manager.  
+In Ver2, the `RosettaUI.UIToolkit` package is now included in the `RosettaUI` package.
+
+<br>
 
 # ⬇️Installation
 
@@ -84,7 +97,7 @@ Select `MyRegistries`> `fuqunaga` > `RosettaUI` and click the Install button
 
 <br>
 
-### Input System(optional)
+### Input System (optional)
 
 RosettaUI recommends using Input System.  
 See [Tips](#disable-keyboard-input-when-typing-in-ui).
@@ -97,26 +110,26 @@ https://docs.unity3d.com/Packages/com.unity.inputsystem@1.5/manual/Installation.
 
 # 🚀How to use
 
-1. Put `Packages/RosettaUI/UIToolkit/Runtime/RosettaUIRootUIToolkit.prefab` in the Hierarchy.
-1. Write code to generate `Element` instance.
-1. Call `RosettaUIRoot.Build(Element)` to generate the actual UI ([ExampleSimple]).
+1. Add `Packages/RosettaUI/UIToolkit/Runtime/RosettaUIRootUIToolkit.prefab` to the Hierarchy.
+1. Write code to generate an `Element` instance.
+1. Call `RosettaUIRoot.Build(Element)` to generate the actual UI (see [ExampleSimple]).
 
 
 [ExampleSimple]: Assets/Example/ExampleSimple.cs
 
 👉 <b>[Examples](Assets/Scenes) are available in this repository.</b>  
-It is recommend downloading and checking it out!
+We recommend downloading and checking it out.
 
 <br>
 
-# 💻Enviroment
+# 💻Environment
 
-| Platform | Support           |
-| -------- | ----------------- |
-| Windows  | ✔                 |
-| Mac      | Maybe(not tested) |
-| Linux    | Maybe(not tested) |
-| IL2CPP   | Suspended         |
+| Platform | Support            |
+| -------- |--------------------|
+| Windows  | ✔                  |
+| Mac      | Maybe (not tested) |
+| Linux    | Maybe (not tested) |
+| IL2CPP   | Not supported      |
 
 <br>
 
@@ -144,6 +157,6 @@ if ( !RosettaUIRoot.IsFocused() && Input.GetKeyDown(KeyCode.A) )
 
 <br>
 
-# See also
+# 🔎Related Libraries
 
 [PrefsGUI](https://github.com/fuqunaga/PrefsGUI) - Accessors and GUIs for persistent preference values using a JSON file

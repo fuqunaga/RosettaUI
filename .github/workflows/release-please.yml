@@ -2,6 +2,19 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry-run mode'
+        required: true
+        default: true
+        type: boolean
+      package_folder:
+        description: 'Package folder path'
+        required: true
+        default: './Packages/ga.fuquna.rosettaui'
+        type: string
+
 
 permissions:
   id-token: write  # Required for OIDC
@@ -13,6 +26,7 @@ name: release-please
 
 jobs:
   release-please:
+    if: ${{ github.event_name != 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     outputs:
       # releases_created と paths_released を後続のジョブから参照できるようにする
@@ -41,8 +55,6 @@ jobs:
 
       # `release-please`の出力からリリースされたパッケージを特定し、npm publishを実行
       - name: Publish to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
         run: |
           # paths_released をパースして、リリースされたパッケージをループ処理
           PACKAGES_TO_PUBLISH=$(echo '${{ needs.release-please.outputs.paths_released }}' | jq -r '.[]')
@@ -60,3 +72,31 @@ jobs:
             npm publish
             cd - # 元のディレクトリに戻る
           done
+
+  manual-publish:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # npm publishに必要なOIDC認証のため（推奨）
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Publish to NPM
+        working-directory: ${{ github.event.inputs.package_folder }}
+        env: 
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            npm publish --dry-run
+          else
+            npm publish
+          fi

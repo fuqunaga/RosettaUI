@@ -32,7 +32,8 @@ namespace RosettaUI
                 {
                     binder.Set(value);
                     element.NotifyViewValueChanged();
-                })
+                },
+                element)
             );
         }
     }

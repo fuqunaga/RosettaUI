@@ -4,6 +4,11 @@ namespace RosettaUI
 {
     public static class Clipboard
     {
+        public static string GetRawString()
+        {
+            return GUIUtility.systemCopyBuffer;
+        }
+        
         public static bool TryGet<T>(out T value)
         {
             var text = GUIUtility.systemCopyBuffer;

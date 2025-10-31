@@ -57,8 +57,8 @@ public class ExampleSimple : MonoBehaviour
 
 ### ✨Specific Features
 
-- Undo/Redo
-- Inspector-like runtime visual editor for Gradient and AnimationCurve
+- Undo/Redo surpport (runtime only)
+- Inspector-like visual editor for Gradient and AnimationCurve at runtime
 
 <br>
 

@@ -7,7 +7,8 @@ Code-based UI library for development menu for Unity
 
 <img src="https://github.com/user-attachments/assets/4313a51f-e319-457b-a227-a0caf4d0f908" />
 
-
+<br>
+<br>
 
 <table>
 <tr>
@@ -55,10 +56,24 @@ public class ExampleSimple : MonoBehaviour
 
 </table>
 
+<br>
+
 ### ✨Specific Features
 
 - Undo/Redo surpport (runtime only)
 - Inspector-like visual editor for Gradient and AnimationCurve at runtime
+
+<table>
+    <tr>
+        <td width="45%">
+        <img src="https://github.com/user-attachments/assets/66e4ccff-5800-4ef1-a026-370370d36bcb" />
+        </td>
+        <td>
+        <img src="https://github.com/user-attachments/assets/6f58a454-47e3-402f-8f99-1774ad8f0825" />
+        </td>
+    </tr>
+</table>
+
 
 <br>
 
@@ -115,7 +130,7 @@ https://docs.unity3d.com/Packages/com.unity.inputsystem@1.5/manual/Installation.
 1. Call `RosettaUIRoot.Build(Element)` to generate the actual UI (see [ExampleSimple]).
 
 
-[ExampleSimple]: Assets/Example/ExampleSimple.cs
+[ExampleSimple]: Assets/Example/Runtime/ExampleSimple.cs
 
 👉 <b>[Examples](Assets/Scenes) are available in this repository.</b>  
 We recommend downloading and checking it out.

@@ -1,0 +1,157 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+namespace RosettaUI.Builder
+{
+    public static class AnimationCurveHelper 
+    {
+        private static List<AnimationCurve> _factoryPresets;
+
+        public static IReadOnlyList<AnimationCurve> FactoryPresets
+        {
+            get
+            {
+                return _factoryPresets ??= new List<AnimationCurve>
+                {
+                    AnimationCurve.Constant(0f, 1f, 1f),
+                    AnimationCurve.Linear(0f, 0f, 1f, 1f),
+                    new(new Keyframe(0f, 0f, 0f, 0f), new Keyframe(1f, 1f, 2f, 0f)),
+                    new(new Keyframe(0f, 0f, 0f, 2f), new Keyframe(1f, 1f, 0f, 0f)),
+                    AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
+                };
+            }
+        }
+
+
+        // AnimationCurve.CopyFrom()だと次のエラーになる場合があるので自前コピー
+        // @Unity6000.0.55f1
+        // > vector: assign data may not be data from the vector itself.
+        // > UnityEngine.AnimationCurve:CopyFrom (UnityEngine.AnimationCurve)
+        public static AnimationCurve Clone(AnimationCurve src)
+        {
+            var dst = new AnimationCurve();
+            Copy(src, dst);
+            return dst;
+        }
+        
+        public static void Copy(AnimationCurve src, AnimationCurve dst)
+        {
+            dst.keys = src.keys;
+            dst.postWrapMode = src.postWrapMode;
+            dst.preWrapMode = src.preWrapMode;
+        }
+
+        
+        public static Rect GetCurveRect(this AnimationCurve curve) => GetCurveRect(curve, ..);
+        public static Rect GetCurveRect(this AnimationCurve curve, Range range)
+        {
+            if (curve == null)
+            {
+                return Rect01();
+            }
+
+            var allKeys = curve.keys.AsSpan();
+            if (allKeys.Length <= 0)
+            {
+                return Rect01();
+            }
+            
+            var keys = allKeys[range];
+  
+            
+            var firstKeyPosition = keys[0].GetPosition();
+            var xMin = firstKeyPosition.x;
+            var xMax = keys[^1].time;
+
+            var yMin = float.MaxValue;
+            var yMax = float.MinValue;
+            
+            // 高さの幅は一部のrangeしか指定していなくてもカーブ全体のものを適用
+            // UnityのCurveEditorで選択範囲にFキーでフィットさせたときの挙動準拠
+            foreach (var t in allKeys)
+            {
+                var v = t.value;
+                yMin = Mathf.Min(yMin, v);
+                yMax = Mathf.Max(yMax, v);
+            }
+
+            for (var i = 0; i < keys.Length - 1; i++)
+            {
+                var (min, max) = CubicBezier.Create(keys[i], keys[i + 1]).CalcMinMaxY();
+                yMin = Mathf.Min(yMin, min);
+                yMax = Mathf.Max(yMax, max);
+            }
+            
+            var rect = Rect.MinMaxRect(xMin, yMin, xMax, yMax);
+
+            
+            if (Mathf.Approximately(rect.width, 0f))
+            {
+                rect.width = 1f;
+                rect.x -= 0.5f;
+            }
+            
+            if (Mathf.Approximately(rect.height, 0f))
+            {
+                rect.height = 1f;
+                rect.y -= 0.5f;
+            }
+
+            return rect;
+            
+            static Rect Rect01()
+            {
+                return new Rect(0f, 0f, 1f, 1f);
+            }
+        }
+        
+        /// <summary>
+        /// インスペクターやUIToolkit標準のCurveFieldのようにカーブを表示する矩形の高さを再計算する
+        /// 1.0未満で徐々にカーブの上下に余白を非線形に追加していく
+        /// 正確な模倣ではない
+        /// </summary>
+        public static Rect AdjustCurveRectHeightLikeInspector(in Rect rect)
+        {
+            var height = rect.height;
+            if (Mathf.Abs(height) >= 1f)
+            {
+                return rect;
+            }
+            
+            const float powFactor = 10f;
+            var padding = (Mathf.Pow(1f - height, powFactor)) * 0.5f;
+
+            var ret = rect;
+            ret.yMin -= padding;
+            ret.yMax += padding;
+            return ret;
+        }
+        
+        /// <summary>
+        /// カーブのプレビュー用のテクスチャを生成または更新する
+        /// </summary>
+        /// <returns>生成された場合はtrue、更新された場合はfalse</returns>
+        public static bool GenerateOrUpdatePreviewTexture(
+            AnimationCurve curve, 
+            ref RenderTexture texture,
+            int width, int height, 
+            in AnimationCurvePreviewRenderer.CurvePreviewViewInfo viewInfo)
+        {
+            var textureGenerated = TextureUtility.EnsureTextureSize(ref texture, width, height);
+            if (textureGenerated)
+            {
+                texture.name = "AnimationCurvePreview";
+                texture.wrapMode = TextureWrapMode.Clamp;
+                texture.filterMode = FilterMode.Bilinear;
+            }
+            
+            AnimationCurvePreviewRenderer.Render(curve, texture, viewInfo);
+
+            return textureGenerated;
+        }
+
+
+    }
+}

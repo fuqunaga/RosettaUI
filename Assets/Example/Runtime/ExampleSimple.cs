@@ -10,14 +10,14 @@ namespace RosettaUI.Example
         public int intValue;
         public Color colorValue;
 
-        
-        void Start()
+
+        private void Start()
         {
             var root = GetComponent<RosettaUIRoot>();
             root.Build(CreateElement());
         }
 
-        Element CreateElement()
+        private Element CreateElement()
         {
             return UI.Window(nameof(ExampleSimple),
                 UI.Page(

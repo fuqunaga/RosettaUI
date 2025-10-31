@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RosettaUI.Example
@@ -47,13 +48,7 @@ namespace RosettaUI.Example
                     UI.Button(nameof(UI.Button), () => print("On button clicked"))
                 ),
                 ExampleTemplate.UIFunctionRow(nameof(UI.PopupMenuButton),
-                    UI.PopupMenuButton(nameof(UI.PopupMenuButton), () => new[]
-                        {
-                            new MenuItem("Menu0", () => Debug.Log("Menu0")),
-                            new MenuItem("Menu1", () => Debug.Log("Menu1")),
-                            new MenuItem("Menu2", () => Debug.Log("Menu2"))
-                        }
-                    )
+                    UI.PopupMenuButton(nameof(UI.PopupMenuButton), CreateMenuItems)
                 ),
                 ExampleTemplate.UIFunctionRow(nameof(UI.HelpBox),
                     UI.Column(
@@ -70,12 +65,7 @@ namespace RosettaUI.Example
                 ExampleTemplate.UIFunctionRow(nameof(UI.Popup),
                     UI.Popup(
                         UI.Box(UI.Label($"{nameof(UI.Popup)}(Right click)")),
-                        () => new[]
-                        {
-                            new MenuItem("Menu0", () => Debug.Log("Menu0")),
-                            new MenuItem("Menu1", () => Debug.Log("Menu1")),
-                            new MenuItem("Menu2", () => Debug.Log("Menu2"))
-                        }
+                        CreateMenuItems
                     )
                 ),
                 ExampleTemplate.UIFunctionRow(nameof(UI.Clickable),
@@ -85,6 +75,24 @@ namespace RosettaUI.Example
                     )
                 )
             );
+
+            static IEnumerable<IMenuItem> CreateMenuItems()
+            {
+                return new IMenuItem[]
+                {
+                    new MenuItem("Item0", () => Debug.Log("Item0")),
+                    new MenuItem("Item1(Checked)", () => Debug.Log("Item1(Checked)")) { isChecked = true },
+                    new MenuItem("Item2(Disabled)"),
+                    new MenuItemSeparator(""),
+                    new MenuItem("Sub0/Item0", () => Debug.Log("Sub0/Item0")),
+                    new MenuItem("Sub0/Item1(Checked)", () => Debug.Log("Sub0/Item1(Checked)")) { isChecked = true },
+                    new MenuItem("Sub0/Item2(Disabled)"),
+                    new MenuItemSeparator("Sub0/"),
+                    new MenuItem("Sub0/Sub1/Item0", () => Debug.Log("Sub0/Sub1/Item0")),
+                    new MenuItem("Sub0/Sub1/Item1(Checked)", () => Debug.Log("Sub0/Sub1/Item1(Checked)")) { isChecked = true },
+                    new MenuItem("Sub0/Sub1/Item2(Disabled)")
+                };
+            }
         }
     }
 }

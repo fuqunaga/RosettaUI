@@ -35,7 +35,7 @@ namespace RosettaUI.Test
         public RectInt rectIntValue;
         public BoundsInt boundsIntValue;
         // public Hash128 hash128Value;
-#if UNITY_6000_OR_NEWER
+#if UNITY_6000_0_OR_NEWER
         public RenderingLayerMask renderingLayerMask;
 #endif
 

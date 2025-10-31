@@ -1,6 +1,5 @@
 {
   "packages": {
-    "Packages/ga.fuquna.rosettaui": {},
-    "Packages/ga.fuquna.rosettaui.uitoolkit": {}
+    "Packages/ga.fuquna.rosettaui": {}
   }
 }

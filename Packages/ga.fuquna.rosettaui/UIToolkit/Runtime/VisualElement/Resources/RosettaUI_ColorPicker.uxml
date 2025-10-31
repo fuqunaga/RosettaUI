@@ -1,0 +1,24 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement name="preview" class="rosettaui-colorpicker__preview">
+        <engine:VisualElement name="preview-checkerboard" class="rosettaui-checkerboard rosettaui-colorpicker__preview-checkerboard" style="flex-grow: 1;">
+            <engine:VisualElement name="preview-prev" class="rosettaui-colorpicker__preview-prev" />
+            <engine:VisualElement name="preview-curr" class="rosettaui-colorpicker__preview-curr" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+    <engine:VisualElement name="handler" class="rosettaui-colorpicker__handler">
+        <engine:VisualElement name="handler-h" class="rosettaui-colorpicker__handler-h">
+            <engine:VisualElement name="circle" class="rosettaui-colorpicker__handler-h__circle" />
+            <engine:VisualElement name="handler-sv" class="rosettaui-colorpicker__handler-sv">
+                <engine:VisualElement name="circle" class="rosettaui-colorpicker-circle" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+    </engine:VisualElement>
+    <engine:Button name="slider-type-button" class="rosettaui-colorpicker-slider-type-button" />
+    <engine:VisualElement name="slider-container" class="rosettaui-colorpicker-slider-container" style="-unity-text-align: middle-left;">
+        <engine:Slider name="slider0" show-input-field="true" />
+        <engine:Slider name="slider1" show-input-field="true" />
+        <engine:Slider name="slider2" show-input-field="true" />
+        <engine:Slider name="slider3" show-input-field="true" />
+    </engine:VisualElement>
+    <engine:TextField name="hex" label="Hexadecimal" class="rosettaui-colorpicker__hex" style="-unity-text-align: middle-left;" />
+</engine:UXML>

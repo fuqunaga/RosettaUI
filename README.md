@@ -5,11 +5,15 @@
 
 Code-based UI library for development menu for Unity
 
-![](Documentation~/2023-01-25-15-48-22.png)
+<img src="https://github.com/user-attachments/assets/4313a51f-e319-457b-a227-a0caf4d0f908" />
 
+<br>
+<br>
 
-
-
+<table>
+<tr>
+<td>
+    
 ```csharp
 public class ExampleSimple : MonoBehaviour
 {
@@ -42,15 +46,57 @@ public class ExampleSimple : MonoBehaviour
     }
 }
 ```
-<img src=Documentation~/simple.gif width=500px />
+</td>
+<td width="50%">
+    
+<img src="https://github.com/user-attachments/assets/16f31cf9-5608-4acc-8629-6c22bc8ef261" />
 
-# Installation
+</td>
+</tr>
+
+</table>
+
+<br>
+
+### ✨ Features
+
+- Undo/Redo surpport (runtime only)
+- Inspector-like visual editor for Gradient and AnimationCurve at runtime
+
+<table>
+    <tr>
+        <td width="45%">
+        <img src="https://github.com/user-attachments/assets/66e4ccff-5800-4ef1-a026-370370d36bcb" />
+        </td>
+        <td>
+        <img src="https://github.com/user-attachments/assets/6f58a454-47e3-402f-8f99-1774ad8f0825" />
+        </td>
+    </tr>
+</table>
+
+- Inspector-compatible Copy and Paste
+
+  ![copyandpaste](https://github.com/user-attachments/assets/2a2010c6-a5ce-4403-b7d0-81a974260cc9)
+
+
+<br>
+
+# 🔄 Ver1 → Ver2 Migration
+
+Please remove the `RosettaUI.UIToolkit` package from the Package Manager.  
+In Ver2, the `RosettaUI.UIToolkit` package is now included in the `RosettaUI` package.
+
+<br>
+
+# ⬇️ Installation
 
 This package uses the [scoped registry] feature to resolve package
 dependencies. 
 
 [scoped registry]: https://docs.unity3d.com/Manual/upm-scoped.html
 
+
+<br>
 
 **Edit > ProjectSettings... > Package Manager > Scoped Registries**
 
@@ -61,20 +107,16 @@ Enter the following and click the Save button.
 "url": "https://registry.npmjs.com",
 "scopes": [ "ga.fuquna" ]
 ```
-![](Documentation~/2022-04-12-17-29-38.png)
 
+<br>
 
 **Window > Package Manager**
 
-Select `MyRegistries` in `Packages:`
+Select `MyRegistries`> `fuqunaga` > `RosettaUI` and click the Install button
 
-<img src="Documentation~/2022-04-12-17-40-26.png" width=35%>
+<br>
 
-Select `RosettaUI - UI ToolKit` and click the Install button
-![](Documentation~/2022-04-12-18-04-29.png)
-
-
-### Input System(optional)
+### Input System (optional)
 
 RosettaUI recommends using Input System.  
 See [Tips](#disable-keyboard-input-when-typing-in-ui).
@@ -82,91 +124,58 @@ See [Tips](#disable-keyboard-input-when-typing-in-ui).
 Install according to the official documentation.  
 https://docs.unity3d.com/Packages/com.unity.inputsystem@1.5/manual/Installation.html
 
-# How to use
 
-1. Put `Packages/RosettaUI - UIToolkit/RosettaUIRootUIToolkit.prefab` in the Hierarchy
-1. Write code to generate `Element` instance
-1. Call `RosettaUIRoot.Build(Element)` to generate the actual UI ( [Example] )
+<br>
 
-[Example]: Assets/Example/ExampleSimple.cs
+# 🚀How to use
 
-Examples are available in this repository.
-I recommend downloading and checking it out.
+1. Add `Packages/RosettaUI/UIToolkit/Runtime/RosettaUIRootUIToolkit.prefab` to the Hierarchy.
+1. Write code to generate an `Element` instance.
+1. Call `RosettaUIRoot.Build(Element)` to generate the actual UI (see [ExampleSimple]).
 
 
-# Functions
+[ExampleSimple]: Assets/Example/Runtime/ExampleSimple.cs
 
-## UI.Field()
+👉 <b>[Examples](Assets/Scenes) are available in this repository.</b>  
+We recommend downloading and checking it out.
 
-![](Documentation~/field.gif)
-![](Documentation~/2023-01-25-16-36-00.png)
+<br>
 
+# 💻 Environment
 
+| Platform | Support            |
+| -------- |--------------------|
+| Windows  | ✔                  |
+| Mac      | Maybe (not tested) |
+| Linux    | Maybe (not tested) |
+| IL2CPP   | Not supported      |
 
-## UI.Slider()
+<br>
 
-![](Documentation~/2023-01-25-16-41-59.png)
-![](Documentation~/2023-01-25-16-56-56.png)
+# 💡️ Tips
 
+## Disable input when UI focused
 
-## UI.MinMaxSlider()
+During UI operations, input to the application is suppressed by replacing the keyboard, pointer, and mouse devices with dummies.
 
-![](Documentation~/2023-01-25-17-05-28.png)
-![](Documentation~/2023-01-25-17-07-45.png)
-
-## UI.List()
-
-![](Documentation~/2023-01-25-17-11-06.png)
-![](Documentation~/2023-01-25-17-25-46.png)
-
-## Layout elements
-
-
-![](Documentation~/2023-01-25-17-26-32.png)
-![](Documentation~/2023-01-25-17-27-30.png)
-
-
-## And more!
-Please check the [Examples](Assets/Scenes)
-
-# Enviroment
-
-| Platform | Support           |
-| -------- | ----------------- |
-| Windows  | ✔                 |
-| Mac      | Maybe(not tested) |
-| Linux    | Maybe(not tested) |
-| IL2CPP   | Suspended         |
-
-| UI Library | Support      |
-| ---------- | ----------- |
-| UI Toolkit | ✔           |
-| UGUI       | Suspended   |
-| IMGUI      | Not planned |
-
-
-# Tips
-
-## Disable keyboard input when typing in UI
-
-When using InputSystem, set `RosettaUIRoot.disableKeyboardInputWhileUITyping=true (default)` to disable keyboard input while typing in UI.
 ```csharp
-// false while typing in UI
+// false while RosettaUI focused
 if ( Keyboard.current[Key.A].wasPressedThisFrame )
 {
     // do something
 }
 ```
 
-For LegacyInputSystem, refer to `RosettaUIRoot.WillUseKeyInputAny()`.
+For LegacyInputSystem, refer to `RosettaUIRoot.IsFocused()`.
 ```csharp
-if ( !RosettaUIRoot.WillUseKeyInputAny() && Input.GetKeyDown(KeyCode.A) )
+if ( !RosettaUIRoot.IsFocused() && Input.GetKeyDown(KeyCode.A) )
 {
     // do something
 }
 ```
 
+<br>
 
-# See also
+# 🔎 Related Libraries
 
 [PrefsGUI](https://github.com/fuqunaga/PrefsGUI) - Accessors and GUIs for persistent preference values using a JSON file

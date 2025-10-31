@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="EditKeyPopupRoot" style="flex-grow: 1; position: absolute; width: 150px; translate: -50px 0;">
+        <ui:VisualElement name="TimeRow" style="flex-grow: 1; flex-direction: row;">
+            <ui:Label text="time" name="time" style="width: 50px; -unity-text-align: middle-right;" />
+            <ui:FloatField value="42.2" name="TimeField" style="flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="ValueRow" style="flex-grow: 1; flex-direction: row;">
+            <ui:Label text="value" name="value" style="width: 50px; -unity-text-align: middle-right;" />
+            <ui:FloatField value="42.2" name="ValueField" style="flex-grow: 1;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

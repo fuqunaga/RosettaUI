@@ -1,0 +1,33 @@
+﻿using System;
+
+namespace RosettaUI.UndoSystem
+{
+    /// <summary>
+    /// UndoHistoryで管理されるUndoの記録
+    /// - Undo/Redoの処理を持つ
+    /// - Dispose可能（UndoHistoryから削除されたときにDisposeされる）
+    /// - マージ可能（UndoHistory上最新のIUndoRecordとCanMargeなら一つにまとめる。同じElementへの連続した変更など）
+    /// </summary>
+    public interface IUndoRecord
+    {
+        string Name { get; }
+        bool IsAvailable { get; }
+        
+        void Undo();
+        void Redo();
+        
+        bool CanMerge(IUndoRecord newer);
+        void Merge(IUndoRecord newer);
+    }
+    
+    public static class UndoRecordExtensions
+    {
+        public static void Dispose(this IUndoRecord record)
+        {
+            if (record is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+        }
+    }
+}

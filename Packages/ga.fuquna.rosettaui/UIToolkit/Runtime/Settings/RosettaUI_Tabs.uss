@@ -1,0 +1,40 @@
+/********************************************************************************
+* Tabs
+********************************************************************************/
+.rosettaui-tabs__title-container
+{
+    flex-direction: row;
+    flex-shrink: 0;
+    border-top-width: 4px;
+    border-color: var(--rosettaui-color-tabs-title-inactive-background);
+}
+
+.rosettaui-tabs__title-spacer
+{
+    flex-grow: 1;
+    flex-shrink: 0;
+    height: 100%;
+    background-color: var(--rosettaui-color-tabs-title-inactive-background);
+}
+
+.rosettaui-tabs__title
+{
+    flex-shrink: 0;
+    padding: 2px 4px;
+    border-bottom-width: 1px;
+}
+
+.rosettaui-tabs__title--inactive
+{
+    background-color: var(--rosettaui-color-tabs-title-inactive-background);
+}
+
+.rosettaui-tabs__title--inactive:hover
+{
+    background-color: var(--rosettaui-highlight-dark-gray);
+}
+
+.rosettaui-tabs__title--inactive:focus
+{
+    border-color: var(--unity-colors-input_field-border-focus);
+}

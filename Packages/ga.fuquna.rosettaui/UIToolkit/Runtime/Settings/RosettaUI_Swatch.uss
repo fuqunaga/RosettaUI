@@ -1,0 +1,93 @@
+/********************************************************************************
+* SwatchSet
+********************************************************************************/
+.rosettaui-swatchset
+{
+    margin-top: 12px;
+}
+
+.rosettaui-swatchset__menu
+{
+    margin: 0 0 0 auto;
+}
+
+.rosettaui-swatchset__tile-container--grid
+{
+    flex-wrap: wrap;
+}
+
+.rosettaui-swatchset__tile-container--list
+{
+    flex-wrap: nowrap;
+}
+
+/********************************************************************************
+* Swatch
+********************************************************************************/
+.rosettaui-swatch
+{
+    flex-direction: row;
+}
+
+.rosettaui-swatch--enable-text >.rosettaui-swatch__tile
+{
+    margin: 2px;
+}
+
+.rosettaui-swatch--current > .rosettaui-swatch__tile
+{
+    padding: 1px;
+    border-width: 1px;
+    border-radius: 3px;
+    border-color: var(--rosettaui-dark-gray);
+    background-color: var(--unity-colors-button-background);
+}
+
+.rosettaui-swatch--current > .rosettaui-swatch__tile:hover{
+    background-color: var(--unity-colors-button-background-hover);
+}
+
+.rosettaui-swatch__tile__overlap-text {
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0; /* ignore parent padding */
+    left: 0; /* ignore parent padding */
+    font-size: 20px;
+    -unity-font-style: bold;
+    -unity-text-outline: black 1px;
+    -unity-text-align: middle-center;
+}
+
+.rosettaui-swatch__tile__overlap-text:hover {
+    color: white;
+}
+
+.rosettaui-swatch--current .rosettaui-swatch__tile__overlap-text {
+    display: flex;
+}
+
+.rosettaui-swatch__text-container
+{
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: center;
+}
+
+.rosettaui-swatch > .rosettaui-swatch__text-container
+{
+    display: none;
+}
+
+.rosettaui-swatch--enable-text > .rosettaui-swatch__text-container
+{
+    display: flex;
+}
+
+.rosettaui-swatch__text-container *
+{
+    margin-top: 0;
+    margin-bottom: 0;
+    flex-grow: 1;
+}

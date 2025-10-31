@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using RosettaUI;
@@ -6,12 +5,36 @@ using RosettaUI.Editor;
 using RosettaUI.Example;
 using RosettaUI.UIToolkit.Editor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class RosettaUIEditorWindowExample : RosettaUIEditorWindowUIToolkit
 {
+    private const string TargetSceneName = "Example";
+    private const string TargetScenePath = "Assets/Scenes/" + TargetSceneName + ".unity";
+    
     [UnityEditor.MenuItem("RosettaUI/RosettaUIEditorWindowExample")]
     public static void ShowExample()
     {
+        // ExampleUIToolkit.sceneがロードされてるか確認して、ロードされてなければロードする
+        var targetSceneName = System.IO.Path.GetFileNameWithoutExtension(TargetScenePath);
+        if (SceneManager.GetActiveScene().name != targetSceneName)
+        {
+            if (UnityEditor.EditorUtility.DisplayDialog(
+                    "Scene not loaded",
+                    $"Please load '{TargetSceneName}' scene to use RosettaUIEditorWindowExample.\n" +
+                    "Do you want to load it now? (Unsaved changes will be lost)",
+                    "Load Scene",
+                    "Cancel"))
+            {
+                UnityEditor.SceneManagement.EditorSceneManager.OpenScene(TargetScenePath);
+            }
+            else
+            {
+                return;
+            }
+        }
+        
+        
         var wnd = GetWindow<RosettaUIEditorWindowExample>();
         wnd.titleContent = new GUIContent(nameof(RosettaUIEditorWindowExample));
     }

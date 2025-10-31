@@ -1,0 +1,240 @@
+/********************************************************************************
+* Animation Curve Editor
+********************************************************************************/
+.rosettaui-animation-curve-editor {
+    flex-grow: 1;
+}
+
+.rosettaui-animation-curve-editor__vertical-axis-label-container > Label,
+.rosettaui-animation-curve-editor__horizontal-axis-label-container > Label {
+    position: absolute;
+    color: gray;
+}
+
+.rosettaui-animation-curve-editor__control-button {
+    width: 26px;
+    height: 26px;
+    margin: 0 0 0 4px;
+    opacity: 0.6;
+}
+
+.rosettaui-animation-curve-editor__control-point-display-position-popup {
+    position: absolute;
+    margin: 0;
+    padding: 0 2px;
+    background-color: black;
+    translate: 0 -100%;
+    min-height: auto;
+}
+
+.rosettaui-animation-curve-editor__property-group {
+    margin: 8px 4px 8px 4px;
+}
+
+/********************************************************************************
+* Selection Rect
+********************************************************************************/
+.rosettaui-animation-curve-editor__selection-rect {
+    position: absolute;
+    border-width: 1px;
+    border-color: rgba(65, 105, 225, 0.5); /* royalblue with transparency */
+    background-color: rgba(100, 149, 237, 0.3); /* cornflowerblue with transparency */
+    opacity: 0.6;
+}
+
+/********************************************************************************
+* Selected Control Points Rect
+********************************************************************************/
+.rosettaui-animation-curve-editor__selected-control-points-rect {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle {
+    position: absolute;
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--horizontal {
+    left: 10%;
+    right: 10%;
+    height: 10px;
+    justify-content: center;
+    cursor: var(--cursor-resize-vertical);
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--vertical {
+    top: 10%;
+    bottom: 10%;
+    width: 10px;
+    flex-direction: row;
+    justify-content: center;
+    cursor: var(--cursor-resize-horizontal);
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--top {
+    top: -10px;
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--bottom {
+    bottom: -10px;
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--left {
+    left: -10px;
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle--right {
+    right: -10px;
+}
+
+.rosettaui-animation-curve-editor__selected-control-points-rect__handle__center-line {
+    background-color: #4368AD; /* capture from Unity Editor */
+    min-width: 0.7px;
+    min-height: 0.7px;
+}
+
+/********************************************************************************
+* Control Point
+********************************************************************************/
+.rosettaui-animation-curve-editor__control-point-container {
+    position: absolute;
+    margin: 0;
+    width: 10px;
+    height: 10px;
+    translate: -5px -5px;
+    justify-content: center;
+    align-items: center;
+}
+
+.rosettaui-animation-curve-editor__control-point {
+    margin: 0;
+    padding: 0;
+    width: 6px;
+    height: 6px;
+    background-color: #00ff00;
+    rotate: 45deg;
+    border-width: 1.5px;
+    border-color: black;
+}
+
+.rosettaui-animation-curve-editor__control-point--active {
+    border-color: whitesmoke;
+    border-width: 2px;
+}
+
+.rosettaui-animation-curve-editor__control-point-handle__line {
+    position: absolute;
+    top: 3px;
+    width: 50px;
+    height: 1.5px;
+    background-color: rgba(245, 245, 245, 0.3); /* whitesmoke with transparency */
+    transform-origin: left center;
+}
+
+.rosettaui-animation-curve-editor__control-point-handle__handle-container {
+    position: absolute;
+    top: -9.5px;
+    right: -9.5px;
+    width: 20px;
+    height: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+.rosettaui-animation-curve-editor__control-point-handle__handle {
+    width: 4px;
+    height: 4px;
+    background-color: #1d1d1d;
+    border-width: 1px;
+    border-color: gray;
+    rotate: 45deg;
+}
+
+.rosettaui-animation-curve-editor__control-point-handle__handle-container-weight > .rosettaui-animation-curve-editor__control-point-handle__handle {
+    width: 6px;
+    height: 6px;
+    rotate: 0;
+}
+
+/********************************************************************************
+* Wrap Mode Button
+********************************************************************************/
+.rosettaui-animation-curve-editor__wrap-mode-button {
+    position: absolute;
+    top: 10px;
+    width: 10px;
+    height: 10px;
+    background-image: url("../Images/MaterialSymbols/settings.png");
+    -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
+}
+
+.rosettaui-animation-curve-editor__wrap-mode-button--pre {
+    right: 17px;
+}
+
+.rosettaui-animation-curve-editor__wrap-mode-button--post {
+    left: 17px;
+}
+
+
+/********************************************************************************
+* Preset
+********************************************************************************/
+.rosettaui-animation-curve-editor-preset__tile {
+    width: 40px;
+    height: 25px;
+    margin: 1px 2px;
+    background-color: var(--rosettaui-color-animation-curve-background);
+}
+
+.rosettaui-animation-curve-editor-preset__tile-core
+{
+    width: 100%;
+    height: 100%;
+    /*border-width: 2px;*/
+    /*border-color: #404040;*/
+}
+
+.rosettaui-animation-curve-editor-preset__tile-curve
+{
+    width: 100%;
+    height: 100%;
+}
+
+/********************************************************************************
+* PresetPreview
+********************************************************************************/
+.rosettaui-animation-curve-editor__presets-container {
+    flex-direction: row;
+    flex-shrink: 0;
+    align-items: center;
+    margin: 6px 4px 0;
+}
+
+.rosettaui-animation-curve-editor__presets-popup-button {
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    background-image: url("../Images/MaterialSymbols/settings.png");
+    -unity-background-image-tint-color: var(--rosettaui-gray-button-tint);
+    margin: 4px;
+}
+
+.rosettaui-animation-curve-editor__presets-preview {
+    flex-direction: row;
+    flex-shrink: 0;
+}
+
+/********************************************************************************
+* Preset Popup
+********************************************************************************/
+.rosettaui-animation-curve-editor__presets-popup {
+    width: 265px;
+    height: 300px;
+    padding: 2px;
+    background-color: var(--rosettaui-color-window-background);
+}
+
+.rosettaui-animation-curve-editor__presets-popup .rosettaui-animation-curve-editor-preset__tile {
+    width: 120px;
+}

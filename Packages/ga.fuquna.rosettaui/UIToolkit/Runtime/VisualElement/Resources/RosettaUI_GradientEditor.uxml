@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="fixed-size-area" class="rosettaui-gradient-editor-fixed-size-area">
+        <ui:EnumField label="Mode" type="UnityEngine.GradientMode, UnityEngine.CoreModule" name="mode-enum" style="margin-right: 8px; margin-left: 8px;" />
+        <ui:GroupBox name="gradient-group" style="flex-grow: 3; margin-left: 8px; margin-right: 8px; margin-top: 4px; margin-bottom: 4px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-shrink: 1;">
+            <ui:VisualElement name="alpha-cursor-container" class="rosettaui-gradient-editor__alpha-cursor-container" style="flex-basis: auto; flex-grow: 0; flex-shrink: 0;" />
+            <ui:VisualElement name="preview-background" class="rosettaui-gradient-editor__preview-background">
+                <ui:VisualElement name="preview-front" class="rosettaui-gradient-editor__preview-front" />
+            </ui:VisualElement>
+            <ui:VisualElement name="color-cursor-container" class="rosettaui-gradient-editor__color-cursor-container" style="flex-basis: auto; flex-grow: 0; flex-shrink: 0; margin-top: -8px;" />
+        </ui:GroupBox>
+        <ui:VisualElement name="property-group" style="background-color: rgba(0, 0, 0, 0); margin-top: 8px; margin-right: 4px; margin-bottom: 8px; margin-left: 4px; visibility: hidden;">
+            <ui:VisualElement name="value-field-container" style="flex-grow: 1; height: 25px;">
+                <ui:Slider picking-mode="Ignore" label="Alpha" name="alpha-slider" high-value="1" show-input-field="true">
+                    <ui:Label display-tooltip-when-elided="true" name="alpha-per-label" text="%" style="align-items: stretch; visibility: hidden;" />
+                </ui:Slider>
+            </ui:VisualElement>
+            <ui:Slider picking-mode="Ignore" label="Location" value="0" high-value="100" name="location-slider" show-input-field="true">
+                <ui:Label text="%" display-tooltip-when-elided="true" name="location-per-label" style="align-items: stretch; -unity-text-align: middle-left;" />
+            </ui:Slider>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

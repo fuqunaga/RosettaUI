@@ -1,0 +1,43 @@
+name: Manual NPM Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry-run mode (true for test, false for actual publish)'
+        required: true
+        default: 'false'
+        type: boolean
+      package_folder:
+        description: 'Package folder path'
+        required: true
+        default: './Packages/ga.fuquna.rosettaui'
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # npm publishに必要なOIDC認証のため（推奨）
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'  # 必要に応じてバージョンを変更
+          cache: 'npm'
+
+      - name: Publish to NPM
+        working-directory: ${{ github.event.inputs.package_folder }}
+        env: 
+          dryrun: ${{ github.event.inputs.dry_run }}
+        run: |
+          if ${{ env.dry_run }} then
+            npm publish --dry-run
+          else
+            npm publish
+          fi

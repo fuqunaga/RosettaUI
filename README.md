@@ -5,11 +5,14 @@
 
 Code-based UI library for development menu for Unity
 
-![](Documentation~/2023-01-25-15-48-22.png)
+<img src="https://github.com/user-attachments/assets/4313a51f-e319-457b-a227-a0caf4d0f908" />
 
 
 
-
+<table>
+<tr>
+<td>
+    
 ```csharp
 public class ExampleSimple : MonoBehaviour
 {
@@ -42,7 +45,15 @@ public class ExampleSimple : MonoBehaviour
     }
 }
 ```
-<img src=Documentation~/simple.gif width=500px />
+</td>
+<td>
+    
+![simple](https://github.com/user-attachments/assets/16f31cf9-5608-4acc-8629-6c22bc8ef261)
+
+</td>
+</tr>
+
+</table>
 
 # Installation
 

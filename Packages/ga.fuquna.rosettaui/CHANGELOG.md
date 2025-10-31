@@ -2,29 +2,17 @@
 
 ## [2.0.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.11.0...ga.fuquna.rosettaui-v2.0.0) (2025-10-31)
 
+### BREAKING CHANGES
+* Integrated the `RosttaUI.UIToolkit` package into the main `RosttaUI` package. 
+  > **Note:** Users upgrading from v1.x must remove the old `RosttaUI.UIToolkit` package to avoid conflicts.
 
 ### Features
+* Undo/Redo.
+* Nested dropdown menu.
 
-* change disableKeyboardInputWhiltUITyping to disableKeyboardInputWhiltUITyping ([3bf744f](https://github.com/fuqunaga/RosettaUI/commit/3bf744f66c6bab5ad4ad37e48ebd777884918ae8))
+### Changed
+* Updated the `AnimationCurveEditor` with an Inspector-like user interface.
 
-
-### Bug Fixes
-
-* bug CubicBezier.CalcMinMaxY() ([cc07cd0](https://github.com/fuqunaga/RosettaUI/commit/cc07cd0bbe88f45d6ddaf211fc5490f4f2f7e07d))
-* Sometimes AnimationCurve does not display. ([f28262e](https://github.com/fuqunaga/RosettaUI/commit/f28262e23aefffe8d4ed5153107715dc47889354))
-* Undo in Window opened by WindowLauncher was always IsAvailable==false ([638cf2d](https://github.com/fuqunaga/RosettaUI/commit/638cf2d3bfd3c621a94a08b17f312b4e0377050c))
-* When right-clicking to add an element to the list, the previous element is deleted when Undo is performed. ([9549374](https://github.com/fuqunaga/RosettaUI/commit/95493744ef287bee3ef341993ac30bc9c34616e1))
-
-
-### Performance Improvements
-
-* remove UI.DynamicElementIfObjectFound() every frame allocation ([880573f](https://github.com/fuqunaga/RosettaUI/commit/880573f2c0039825f3a7b4d613b66390b06df6d2))
-* remove UI.WindowLauncher() every frame allocation ([e827271](https://github.com/fuqunaga/RosettaUI/commit/e827271e982fffc024d55bdc5ae0ee03ec579d3d))
-
-
-### Miscellaneous Chores
-
-* release 2.0.0 ([ffb3837](https://github.com/fuqunaga/RosettaUI/commit/ffb3837b7e89f04ab524909b76434b9911387f90))
 
 ## [ga.fuquna.rosettaui-v1.11.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.10.0...ga.fuquna.rosettaui-v1.11.0) (2025-04-16)
 

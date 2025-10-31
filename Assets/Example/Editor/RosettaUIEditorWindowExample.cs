@@ -9,7 +9,8 @@ using UnityEngine.SceneManagement;
 
 public class RosettaUIEditorWindowExample : RosettaUIEditorWindowUIToolkit
 {
-    private const string TargetScenePath = "Assets/Scenes/ExampleUIToolkit.unity";
+    private const string TargetSceneName = "Example";
+    private const string TargetScenePath = "Assets/Scenes/" + TargetSceneName + ".unity";
     
     [UnityEditor.MenuItem("RosettaUI/RosettaUIEditorWindowExample")]
     public static void ShowExample()
@@ -20,7 +21,7 @@ public class RosettaUIEditorWindowExample : RosettaUIEditorWindowUIToolkit
         {
             if (UnityEditor.EditorUtility.DisplayDialog(
                     "Scene not loaded",
-                    "Please load 'ExampleUIToolkit' scene to use RosettaUIEditorWindowExample.\n" +
+                    $"Please load '{TargetSceneName}' scene to use RosettaUIEditorWindowExample.\n" +
                     "Do you want to load it now? (Unsaved changes will be lost)",
                     "Load Scene",
                     "Cancel"))

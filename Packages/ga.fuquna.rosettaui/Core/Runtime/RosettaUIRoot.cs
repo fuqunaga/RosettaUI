@@ -46,17 +46,8 @@ namespace RosettaUI
             }
         }
         
-        public List<KeyCombination> undoKeys = new()
-        {
-            new KeyCombination {key = KeyCode.Z, control = true},
-            new KeyCombination {key = KeyCode.Z, command = true}
-        };
-        
-        public List<KeyCombination> redoKey = new()
-        {
-            new KeyCombination {key = KeyCode.Y, control = true},
-            new KeyCombination {key = KeyCode.Z, command = true, shift = true},
-        };
+        public KeyCombination undoKey = new() {key = KeyCode.Z, control = true};
+        public KeyCombination redoKey = new() {key = KeyCode.Y, control = true};
 #endif
         
         public readonly ElementUpdater updater = new();
@@ -118,11 +109,11 @@ namespace RosettaUI
 #if !ENABLE_INPUT_SYSTEM
             if (IsFocused)
             {
-                if (undoKeys.Any(k => k.IsPressed()))
+                if (undoKey.IsPressed())
                 {
                     DoUndo();
                 }
-                else if (redoKey.Any(k => k.IsPressed()))
+                else if (redoKey.IsPressed())
                 {
                     DoRedo();
                 }

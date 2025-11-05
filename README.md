@@ -119,7 +119,7 @@ Select `MyRegistries`> `fuqunaga` > `RosettaUI` and click the Install button
 ### Input System (optional)
 
 RosettaUI recommends using Input System.  
-See [Tips](#disable-keyboard-input-when-typing-in-ui).
+See [Tips](#disable-input-when-ui-focused).
 
 Install according to the official documentation.  
 https://docs.unity3d.com/Packages/com.unity.inputsystem@1.5/manual/Installation.html

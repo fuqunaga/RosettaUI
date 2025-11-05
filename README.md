@@ -86,6 +86,11 @@ public class ExampleSimple : MonoBehaviour
 Please remove the `RosettaUI.UIToolkit` package from the Package Manager.  
 In Ver2, the `RosettaUI.UIToolkit` package is now included in the `RosettaUI` package.
 
+### `Keyboard.current.onTextInput`
+
+If you are using `Keyboard.current.onTextInput`, be aware that [it now also fires during UI operations.](#disable-input-when-ui-focused).  
+Consider using `KeyControl` (e.g., `Keyboard.current[Key.A].wasPressedThisFrame`) as an alternative.
+
 <br>
 
 # ⬇️ Installation
@@ -156,7 +161,7 @@ We recommend downloading and checking it out.
 
 ## Disable input when UI focused
 
-During UI operations, input to the application is suppressed by replacing the keyboard, pointer, and mouse devices with dummies.
+During UI operations, input to the application is suppressed by replacing the **keyboard**, **pointer**, and **mouse** devices with dummies.
 
 ```csharp
 // false while RosettaUI focused
@@ -165,6 +170,10 @@ if ( Keyboard.current[Key.A].wasPressedThisFrame )
     // do something
 }
 ```
+
+> [!WARNING]
+> the `Keyboard.current.onTextInput` event will still be called.
+
 
 For LegacyInputSystem, refer to `RosettaUIRoot.IsFocused()`.
 ```csharp

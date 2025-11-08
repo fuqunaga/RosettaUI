@@ -185,6 +185,14 @@ if ( !RosettaUIRoot.IsFocused() && Input.GetKeyDown(KeyCode.A) )
 
 <br>
 
+## Custom Undo/Redo
+
+Users can register custom Undo/Redo actions.  
+For details, try running [ExampleUndo](Assets/Scenes/ExampleUndo.unity).
+
+<br>
+
+
 # 🔎 Related Libraries
 
 [PrefsGUI](https://github.com/fuqunaga/PrefsGUI) - Accessors and GUIs for persistent preference values using a JSON file

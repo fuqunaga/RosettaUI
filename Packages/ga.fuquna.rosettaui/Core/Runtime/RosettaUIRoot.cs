@@ -14,7 +14,8 @@ namespace RosettaUI
     public abstract class RosettaUIRoot : MonoBehaviour
     {
 #if ENABLE_INPUT_SYSTEM
-        public bool disableKeyboardInputWhileUIFocused = true;
+        public bool disableKeyboardInputWhileUITyping = true;
+        public bool disableKeyboardInputWhileUIFocused = false;
         public bool disablePointerInputOverUI = true;
         public bool disableMouseInputOverUI = true;
         
@@ -180,7 +181,8 @@ namespace RosettaUI
 
         private bool ShouldBlockKeyboard()
         {
-            return disableKeyboardInputWhileUIFocused && IsFocusedInstance;
+            return (disableKeyboardInputWhileUIFocused && IsFocusedInstance)
+                   || (disableKeyboardInputWhileUITyping && WillUseKeyInput());
         }
 
         private bool ShouldBlockPointer()
@@ -225,8 +227,7 @@ namespace RosettaUI
                 .Where(root => root != null && root.isActiveAndEnabled)
                 .Any(root => root.Elements.Contains(element) || root.updater.Elements.Contains(element));
         }
-
-        [Obsolete("Use IsFocused instead")]
+        
         public static bool WillUseKeyInputAny()
         {
             // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator

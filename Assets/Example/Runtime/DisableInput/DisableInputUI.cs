@@ -24,6 +24,7 @@ namespace RosettaUI.Examples
 #if ENABLE_INPUT_SYSTEM
                     UI.HelpBox("Disables in-game input while operating the UI.", HelpBoxType.Info),
                     UI.Box(
+                        UI.Toggle(() => rosettaUIRoot.disableKeyboardInputWhileUITyping),
                         UI.Toggle(() => rosettaUIRoot.disableKeyboardInputWhileUIFocused),
                         UI.Toggle(() => rosettaUIRoot.disablePointerInputOverUI),
                         UI.Toggle(() => rosettaUIRoot.disableMouseInputOverUI)

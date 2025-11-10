@@ -785,10 +785,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5340823435572635049, guid: 4ed1865184a851c448a44589b9f302b9, type: 3}
-      propertyPath: disableKeyboardInputWhileUITyping
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

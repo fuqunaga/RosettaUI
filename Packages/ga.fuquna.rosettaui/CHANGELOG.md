@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v2.0.0...ga.fuquna.rosettaui-v2.0.1) (2026-05-07)
+
+
+### Bug Fixes
+
+* add conditional dropdown handling for Unity 6000.3 and newer ([9196293](https://github.com/fuqunaga/RosettaUI/commit/9196293684191c864036f648f2c8e7d40d629c79))
+
 ## [2.0.0](https://github.com/fuqunaga/RosettaUI/compare/ga.fuquna.rosettaui-v1.11.0...ga.fuquna.rosettaui-v2.0.0) (2025-10-31)
 
 ### BREAKING CHANGES

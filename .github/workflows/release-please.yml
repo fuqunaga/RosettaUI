@@ -95,5 +95,5 @@ jobs:
           if [ "$DRY_RUN" = "true" ]; then
             npm publish --dry-run
           else
-            npm publish
+            npm publish --provenance --access public
           fi

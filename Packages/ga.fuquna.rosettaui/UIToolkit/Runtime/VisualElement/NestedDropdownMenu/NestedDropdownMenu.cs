@@ -58,7 +58,25 @@ namespace RosettaUI.UIToolkit
             var (menu, label) = GetMenuAndLabel(path);
             menu.AddSeparator(label);
         }
+        
+#if UNITY_6000_3_OR_NEWER
+        
+        public void DropDown(Rect position, VisualElement? targetElement = null, bool anchored = false, Action? onClosed = null)
+        {
+            DropDown(position, targetElement, anchored ? DropdownMenuSizeMode.Fixed : DropdownMenuSizeMode.Content, onClosed);
+        }
+        
+        public void DropDown(Rect position, VisualElement? targetElement = null, DropdownMenuSizeMode dropdownMenuSizeMode = DropdownMenuSizeMode.Auto, Action? onClosed = null)
+        {
+            RootMenu.DropDown(position, targetElement, dropdownMenuSizeMode);
 
+            if (onClosed != null)
+            {
+                RootMenu.OuterContainer.RegisterCallbackOnce<DetachFromPanelEvent>(_ => onClosed());
+            }
+        }
+
+#else
         public void DropDown(Rect position, VisualElement? targetElement = null, bool anchored = false, Action? onClosed = null)
         {
             RootMenu.DropDown(position, targetElement, anchored);
@@ -68,6 +86,8 @@ namespace RosettaUI.UIToolkit
                 RootMenu.OuterContainer.RegisterCallbackOnce<DetachFromPanelEvent>(_ => onClosed());
             }
         }
+
+#endif
 
         #endregion
 

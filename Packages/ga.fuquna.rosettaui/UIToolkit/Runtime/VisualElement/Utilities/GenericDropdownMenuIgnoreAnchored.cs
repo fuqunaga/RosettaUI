@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !UNITY_6000_3_OR_NEWER
+using System;
 using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
@@ -64,3 +65,4 @@ namespace RosettaUI.UIToolkit
         }
     }
 }
+#endif

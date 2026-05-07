@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.UIElements;
-#if !UNITY_2022_1_OR_NEWER
-using RosettaUI.UIToolkit.UnityInternalAccess;
-#endif
 
 namespace RosettaUI.UIToolkit
 {
@@ -18,8 +17,8 @@ namespace RosettaUI.UIToolkit
     /// styleでminWidthを指定する
     ///
     /// 2. ドロップダウンメニューをanchoredをfalse（指定矩形の幅を使用しない）で呼ぶ
-    /// BasePopupFieldが行っているanchored==trueで呼ぶとvisualInputの幅でメニューが表示されるが、
-    /// これが十分な幅ではないためメニューないにスクロールバーが出てしまう
+    /// BasePopupFieldが行っているanchored==true(Unity6.3以降はDropdownMenuSizeMode.Fixed)で)呼ぶとvisualInputの幅でメニューが表示されるが、
+    /// これが十分な幅ではないためメニュー内にスクロールバーが出てしまう
     /// 外側Windowが小さいサイズにされた場合はさらにvisualInputが小さくなってしまう
     /// </summary>
     public class PopupFieldCustom<T> : PopupField<T>
@@ -72,7 +71,9 @@ namespace RosettaUI.UIToolkit
         private string GetValueToDisplay(T str)
         {
             return formatListItemCallback?.Invoke(str) ??
-                   (choices.Contains(str) ? str.ToString() : string.Empty);
+                   (choices.Contains(str) 
+                       ? (str?.ToString() ?? string.Empty) 
+                       : string.Empty);
         }
         
         #endregion
@@ -82,9 +83,54 @@ namespace RosettaUI.UIToolkit
 
         private static readonly FieldInfo CreateMenuCallbackFieldInfo = typeof(BasePopupField<T, T>).GetField("createMenuCallback", BindingFlags.NonPublic | BindingFlags.Instance);
         
+        
         public PopupFieldCustom()
         {
-            CreateMenuCallbackFieldInfo.SetValue(this, (Func<GenericDropdownMenu>)GenericDropdownMenuIgnoreAnchoredBuilder.CreateGenericDropdownMenuIgnoreAnchored);
+            CreateMenuCallbackFieldInfo.SetValue(this, (Func<GenericDropdownMenu>)CreateCustomGenericDropdownMenu);
+        }
+
+        
+#if UNITY_6000_3_OR_NEWER
+        
+        /// Dropdown()の第3引数を無視するGenericDropdownMenu
+        private　class GenericDropdownMenuIgnoreSizeMode : GenericDropdownMenu
+        {
+            public override void DropDown(Rect position, VisualElement element, DropdownMenuSizeMode _  = DropdownMenuSizeMode.Auto)
+            {
+                base.DropDown(position, element, DropdownMenuSizeMode.Content);
+            }
+        }
+
+        private static GenericDropdownMenu CreateCustomGenericDropdownMenu()
+        {
+            return new GenericDropdownMenuIgnoreSizeMode();
+        }
+
+#else
+
+        private static GenericDropdownMenu CreateCustomGenericDropdownMenu()
+        {
+            return GenericDropdownMenuIgnoreAnchoredBuilder.CreateGenericDropdownMenuIgnoreAnchored();
+        }
+        
+#endif
+        
+        #endregion
+        
+        
+        #region choisesにIEnumerable<T>を渡せるようにする
+        
+        public bool SetChoices(IEnumerable<T> newChoices)
+        {
+            if (ReferenceEquals(choices, newChoices)) return false;
+            
+            using var _ = ListPool<T>.Get(out var newChoicesList);
+            newChoicesList.AddRange(newChoices ?? Array.Empty<T>());
+            
+            if (choices?.SequenceEqual(newChoicesList) ?? false) return false;
+            
+            choices = new List<T>(newChoicesList);
+            return true;
         }
         
         #endregion
